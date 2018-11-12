@@ -25,15 +25,16 @@ class JobStatusService {
      */
     def updateStatus(jobName, status, viewerURL = null, altViewerURL = null, results = null) {
         def retValue = false   // true if the job was cancelled
-        def jobNameArray = jobName.split("-")
+        def jobNameArray = jobName.split('-')
         def jobID = jobNameArray[2]
 
-        //logger.debug("Checking to see if the user cancelled the job")
-        if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            logger.warn("${jobName} has been cancelled")
+        //logger.debug('Checking to see if the user cancelled the job')
+        if (jobResultsService[jobName]['Status'] == 'Cancelled') {
+            logger.warn('' + jobName + ' has been cancelled')
             retValue = true
-        } else {
-            jobResultsService[jobName]["Status"] = status
+        }
+        else {
+            jobResultsService[jobName]['Status'] = status
         }
 
         //If the job isn't already cancelled, update the job info.
@@ -41,7 +42,7 @@ class JobStatusService {
             def asyncJob = AsyncJob.get(jobID)
 
             TimeDuration td = TimeCategory.minus(new Date(), asyncJob.lastRunOn)
-            //logger.debug("Job has been running for ${td}}")
+            //logger.debug('Job has been running for ' + td + '}')
             asyncJob.runTime = td
             asyncJob.jobStatus = status
             if (viewerURL && viewerURL != '') asyncJob.viewerURL = viewerURL

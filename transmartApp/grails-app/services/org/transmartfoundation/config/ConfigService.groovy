@@ -617,636 +617,636 @@ class ConfigService {
         properties.each { k,v ->
 
             // admin
-            if(k == "com.recomdata.admin.paginate.max"){addConfig(adminParams,k,v,'')}
-            else if(k == "org.transmart.config.showUsernames"){addConfig(adminParams,k,v,'')}
-            else if(k == "org.transmart.config.showPasswords"){addConfig(adminParams,k,v,'')}
-            else if(k == "com.recomdata.plugin.pluginScriptDirectory"){addConfig(adminParams,k,v,'')}
-            else if(k == "org.transmart.originalConfigBinding"){addConfig(adminParams,k,v,'Saved original configuration')}
+            if(k == 'com.recomdata.admin.paginate.max'){addConfig(adminParams,k,v,'')}
+            else if(k == 'org.transmart.config.showUsernames'){addConfig(adminParams,k,v,'')}
+            else if(k == 'org.transmart.config.showPasswords'){addConfig(adminParams,k,v,'')}
+            else if(k == 'com.recomdata.plugin.pluginScriptDirectory'){addConfig(adminParams,k,v,'')}
+            else if(k == 'org.transmart.originalConfigBinding'){addConfig(adminParams,k,v,'Saved original configuration')}
 
             // analysis
-            else if(k == "com.recomdata.datasetExplorer.genePatternEnabled"){addConfig(analysisParams,k,v,'')}
-            else if(k == "com.recomdata.datasetExplorer.genePatternURL"){addConfig(analysisParams,k,v,'')}
-            else if(k == "com.recomdata.datasetExplorer.genePatternRealURLBehindProxy"){addConfig(analysisParams,k,v,'')}
-            else if(k == "com.recomdata.datasetExplorer.genePatternUser"){addConfig(analysisParams,k,encodeConfigUsername(v),'')}
+            else if(k == 'com.recomdata.datasetExplorer.genePatternEnabled'){addConfig(analysisParams,k,v,'')}
+            else if(k == 'com.recomdata.datasetExplorer.genePatternURL'){addConfig(analysisParams,k,v,'')}
+            else if(k == 'com.recomdata.datasetExplorer.genePatternRealURLBehindProxy'){addConfig(analysisParams,k,v,'')}
+            else if(k == 'com.recomdata.datasetExplorer.genePatternUser'){addConfig(analysisParams,k,encodeConfigUsername(v),'')}
 
-            else if(k == "com.recomdata.analysis.data.file.dir"){addConfig(analysisParams,k,v,'')}
-            else if(k == "com.recomdata.analysis.genepattern.file.dir"){addConfig(analysisParams,k,v,'')}
-            else if(k == "com.recomdata.analysis.survival.censorFlagList"){addConfig(analysisParams,k,v,'')}
-            else if(k == "com.recomdata.analysis.survival.survivalDataList"){addConfig(analysisParams,k,v,'')}
-            else if(k == "com.recomdata.datasetExplorer.plinkExcutable"){addConfig(analysisParams,k,v,'')}
+            else if(k == 'com.recomdata.analysis.data.file.dir'){addConfig(analysisParams,k,v,'')}
+            else if(k == 'com.recomdata.analysis.genepattern.file.dir'){addConfig(analysisParams,k,v,'')}
+            else if(k == 'com.recomdata.analysis.survival.censorFlagList'){addConfig(analysisParams,k,v,'')}
+            else if(k == 'com.recomdata.analysis.survival.survivalDataList'){addConfig(analysisParams,k,v,'')}
+            else if(k == 'com.recomdata.datasetExplorer.plinkExcutable'){addConfig(analysisParams,k,v,'')}
 
             // analyze tab
-            else if(k == "com.recomdata.datasetExplorer.gridShortLabels"){addConfig(analyzeParams,k,v,'Grid view short labels for standard terms')}
-            else if(k == "com.recomdata.datasetExplorer.hideAcrossTrialsPanel"){addConfig(analyzeParams,k,v,'Hide across trial panel')}
-            else if(k == "com.recomdata.datasetExplorer.imageTempDir"){addConfig(analyzeParams,k,v,'')}
-            else if(k == "com.recomdata.datasetExplorer.inforsense"){addConfig(analyzeParams,k,v,'Deprecated - leave it as false')}
-            else if(k == "com.recomdata.datasetExplorer.pmServiceURL"){addConfig(analyzeParams,k,v,'I2b2 project management cell url')}
-            else if(k == "com.recomdata.datasetExplorer.pmServiceProxy"){addConfig(analyzeParams,k,v,'Turn proxy on if the project management cell is deployed on a different server or not through the apache proxy')}
-            else if(k == "com.recomdata.plugins.tempFolderDirectory"){addConfig(analyzeParams,k,v,'')}
+            else if(k == 'com.recomdata.datasetExplorer.gridShortLabels'){addConfig(analyzeParams,k,v,'Grid view short labels for standard terms')}
+            else if(k == 'com.recomdata.datasetExplorer.hideAcrossTrialsPanel'){addConfig(analyzeParams,k,v,'Hide across trial panel')}
+            else if(k == 'com.recomdata.datasetExplorer.imageTempDir'){addConfig(analyzeParams,k,v,'')}
+            else if(k == 'com.recomdata.datasetExplorer.inforsense'){addConfig(analyzeParams,k,v,'Deprecated - leave it as false')}
+            else if(k == 'com.recomdata.datasetExplorer.pmServiceURL'){addConfig(analyzeParams,k,v,'I2b2 project management cell url')}
+            else if(k == 'com.recomdata.datasetExplorer.pmServiceProxy'){addConfig(analyzeParams,k,v,'Turn proxy on if the project management cell is deployed on a different server or not through the apache proxy')}
+            else if(k == 'com.recomdata.plugins.tempFolderDirectory'){addConfig(analyzeParams,k,v,'')}
 
             // auth
-            else if(k == "grails.plugin.springsecurity.providerNames"){addConfigLink(authParams,k,linkAuthProviders(grailsApplication.config.grails.plugin.springsecurity.providerNames),'Click link to see full list')}
-            else if(k == "com.recomdata.guestAutoLogin"){addConfig(authParams,k,v,'')}
-            else if(k == "com.recomdata.guestUserName"){addConfig(authParams,k,v,'')}
-            else if(k == "com.recomdata.passwordstrength.pattern"){addConfig(authParams,k,v,'')}
-            else if(k == "com.recomdata.passwordstrength.description"){addConfig(authParams,k,v,'')}
-            else if(k == "transmartproject.authUser.create.passwordRequired"){addConfig(authParams,k,v,'')}
-            else if(k == "org.transmart.security.sniValidation"){addConfig(authParams,k,v,'')}
-            else if(k == "org.transmart.security.spnegoEnabled"){addConfig(authParams,k,v,'')}
-            else if(k == "org.transmart.security.sslValidation"){addConfig(authParams,k,v,'')}
-            else if(k == "user.password.strength.regex"){addConfig(authParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.providerNames'){addConfigLink(authParams,k,linkAuthProviders(grailsApplication.config.grails.plugin.springsecurity.providerNames),'Click link to see full list')}
+            else if(k == 'com.recomdata.guestAutoLogin'){addConfig(authParams,k,v,'')}
+            else if(k == 'com.recomdata.guestUserName'){addConfig(authParams,k,v,'')}
+            else if(k == 'com.recomdata.passwordstrength.pattern'){addConfig(authParams,k,v,'')}
+            else if(k == 'com.recomdata.passwordstrength.description'){addConfig(authParams,k,v,'')}
+            else if(k == 'transmartproject.authUser.create.passwordRequired'){addConfig(authParams,k,v,'')}
+            else if(k == 'org.transmart.security.sniValidation'){addConfig(authParams,k,v,'')}
+            else if(k == 'org.transmart.security.spnegoEnabled'){addConfig(authParams,k,v,'')}
+            else if(k == 'org.transmart.security.sslValidation'){addConfig(authParams,k,v,'')}
+            else if(k == 'user.password.strength.regex'){addConfig(authParams,k,v,'')}
 
             // browse
-            else if(k == "com.recomdata.FmFolderJob.cronExpression"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.recomdata.FmFolderJob.startDelayMs"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.recomdata.FmFolderService.filestoreDirectory"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.recomdata.FmFolderService.importDirectory"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.recomdata.FmFolderService.fileTypes"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.recomdata.solr.baseURL"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.rwg.solr.scheme"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.rwg.solr.host"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.rwg.solr.path"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.rwg.solr.browse.path"){addConfig(browseParams,k,v,'')}
-            else if(k == "com.rwg.solr.update.path"){addConfig(browseParams,k,v,'')}
-            else if(k == "transmartproject.mongoFiles.enableMongo"){addConfig(browseParams,k,v,'')}
-            else if(k == "transmartproject.mongoFiles.useDriver"){addConfig(browseParams,k,v,'')}
-            else if(k == "transmartproject.mongoFiles.dbServer"){addConfig(browseParams,k,v,'')}
-            else if(k == "transmartproject.mongoFiles.dbPort"){addConfig(browseParams,k,v,'')}
-            else if(k == "transmartproject.mongoFiles.dbName"){addConfig(browseParams,k,v,'')}
-            else if(k == "transmartproject.mongoFiles.apiURL"){addConfig(browseParams,k,v,'')}
-            else if(k == "transmartproject.mongoFiles.apiKey"){addConfig(browseParams,k,encodeConfigUsername(v),'')}
-            else if(k == "ui.browse.delete.allowprogram"){addConfig(browseParams,k,v,'')}
-            else if(k == "ui.browse.delete.allowstudy"){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.recomdata.FmFolderJob.cronExpression'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.recomdata.FmFolderJob.startDelayMs'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.recomdata.FmFolderService.filestoreDirectory'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.recomdata.FmFolderService.importDirectory'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.recomdata.FmFolderService.fileTypes'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.recomdata.solr.baseURL'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.rwg.solr.scheme'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.rwg.solr.host'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.rwg.solr.path'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.rwg.solr.browse.path'){addConfig(browseParams,k,v,'')}
+            else if(k == 'com.rwg.solr.update.path'){addConfig(browseParams,k,v,'')}
+            else if(k == 'transmartproject.mongoFiles.enableMongo'){addConfig(browseParams,k,v,'')}
+            else if(k == 'transmartproject.mongoFiles.useDriver'){addConfig(browseParams,k,v,'')}
+            else if(k == 'transmartproject.mongoFiles.dbServer'){addConfig(browseParams,k,v,'')}
+            else if(k == 'transmartproject.mongoFiles.dbPort'){addConfig(browseParams,k,v,'')}
+            else if(k == 'transmartproject.mongoFiles.dbName'){addConfig(browseParams,k,v,'')}
+            else if(k == 'transmartproject.mongoFiles.apiURL'){addConfig(browseParams,k,v,'')}
+            else if(k == 'transmartproject.mongoFiles.apiKey'){addConfig(browseParams,k,encodeConfigUsername(v),'')}
+            else if(k == 'ui.browse.delete.allowprogram'){addConfig(browseParams,k,v,'')}
+            else if(k == 'ui.browse.delete.allowstudy'){addConfig(browseParams,k,v,'')}
 
             // buildInfo
-            else if(k == "buildInfo.properties.include"){addConfig(buildInfoParams,k,v,'')}
-            else if(k == "buildInfo.properties.exclude"){addConfig(buildInfoParams,k,v,'')}
+            else if(k == 'buildInfo.properties.include'){addConfig(buildInfoParams,k,v,'')}
+            else if(k == 'buildInfo.properties.exclude'){addConfig(buildInfoParams,k,v,'')}
 
             // contact
-            else if(k == "com.recomdata.adminEmail"){addConfig(contactParams,k,v,'')}
-            else if(k == "com.recomdata.administrator"){addConfig(contactParams,k,v,'Obsolete administrator email address, use com.recomdata.adminEmail')}
-            else if(k == "com.recomdata.contactUs"){addConfig(contactParams,k,v,'')}
-            else if(k == "com.recomdata.searchtool.contactUs"){addConfig(contactParams,k,v,'Obsolete search panel contact email, use com.recomdata.contactUs')}
+            else if(k == 'com.recomdata.adminEmail'){addConfig(contactParams,k,v,'')}
+            else if(k == 'com.recomdata.administrator'){addConfig(contactParams,k,v,'Obsolete administrator email address, use com.recomdata.adminEmail')}
+            else if(k == 'com.recomdata.contactUs'){addConfig(contactParams,k,v,'')}
+            else if(k == 'com.recomdata.searchtool.contactUs'){addConfig(contactParams,k,v,'Obsolete search panel contact email, use com.recomdata.contactUs')}
 
             // datasource
-            else if(k == "dataSource.dialect"){addConfig(dataSourceParams,k,v,'')}
-            else if(k == "dataSource.driverClassName"){addConfig(dataSourceParams,k,v,'')}
-            else if(k == "dataSource.dbCreate"){addConfig(dataSourceParams,k,v,'')}
-            else if(k == "dataSource.url"){addConfig(dataSourceParams,k,v,'')}
-            else if(k == "dataSource.username"){addConfig(dataSourceParams,k,encodeConfigUsername(v),'')}
-            else if(k == "dataSource.formatSql"){addConfig(dataSourceParams,k,v,'')}
-            else if(k == "dataSource.logSql"){addConfig(dataSourceParams,k,v,'')}
-            else if(k == "dataSource.password"){addConfig(dataSourceParams,k,encodeConfigPassword(v),'')}
-            else if(k == "dataSource.properties.initialSize"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.minIdle"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.maxIdle"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.maxActive"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.maxWait"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.numTestsPerEvictionRun"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.minEvictableIdleTimeMillis"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.timeBetweenEvictionRunsMillis"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.validationQuery"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.testOnBorrow"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.testWhileIdle"){addConfig(dataSourceParams,k,v,'')}
-	    else if(k == "dataSource.properties.testOnReturn"){addConfig(dataSourceParams,k,v,'')}
+            else if(k == 'dataSource.dialect'){addConfig(dataSourceParams,k,v,'')}
+            else if(k == 'dataSource.driverClassName'){addConfig(dataSourceParams,k,v,'')}
+            else if(k == 'dataSource.dbCreate'){addConfig(dataSourceParams,k,v,'')}
+            else if(k == 'dataSource.url'){addConfig(dataSourceParams,k,v,'')}
+            else if(k == 'dataSource.username'){addConfig(dataSourceParams,k,encodeConfigUsername(v),'')}
+            else if(k == 'dataSource.formatSql'){addConfig(dataSourceParams,k,v,'')}
+            else if(k == 'dataSource.logSql'){addConfig(dataSourceParams,k,v,'')}
+            else if(k == 'dataSource.password'){addConfig(dataSourceParams,k,encodeConfigPassword(v),'')}
+            else if(k == 'dataSource.properties.initialSize'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.minIdle'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.maxIdle'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.maxActive'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.maxWait'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.numTestsPerEvictionRun'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.minEvictableIdleTimeMillis'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.timeBetweenEvictionRunsMillis'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.validationQuery'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.testOnBorrow'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.testWhileIdle'){addConfig(dataSourceParams,k,v,'')}
+	    else if(k == 'dataSource.properties.testOnReturn'){addConfig(dataSourceParams,k,v,'')}
 
             // export
-            else if(k == "com.recomdata.export.jobs.sweep.startDelay"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.export.jobs.sweep.repeatInterval"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.export.jobs.sweep.fileAge"){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.export.jobs.sweep.startDelay'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.export.jobs.sweep.repeatInterval'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.export.jobs.sweep.fileAge'){addConfig(exportParams,k,v,'')}
 
-            else if(k.startsWith("com.recomdata.transmart.data.export.dataTypesMap.")){
-                def kk = k - "com.recomdata.transmart.data.export.dataTypesMap."
-                addConfig(exportParams,k,v,"Export datatypes map for ${kk}")
+            else if(k.startsWith('com.recomdata.transmart.data.export.dataTypesMap.')){
+                def kk = k - 'com.recomdata.transmart.data.export.dataTypesMap.'
+                addConfig(exportParams,k,v,'Export datatypes map for ' + kk)
             }
 
-            else if(k == "com.recomdata.transmart.data.export.ftp.password"){addConfig(exportParams,k,encodeConfigPassword(v),'')}
-            else if(k == "com.recomdata.transmart.data.export.ftp.remote.path"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.transmart.data.export.ftp.server"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.transmart.data.export.ftp.serverport"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.transmart.data.export.ftp.username"){addConfig(exportParams,k,encodeConfigUsername(v),'')}
-            else if(k == "com.recomdata.transmart.data.export.max.export.jobs.loaded"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.transmart.data.export.jobTmpDirectory"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.transmart.data.export.rScriptDirectory"){addConfig(exportParams,k,v,'')}
-            else if(k == "dataExport.bed.acgh.rgbColorScheme"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.search.gene.max"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.search.genepathway"){addConfig(exportParams,k,v,'')}
-            else if(k == "com.recomdata.plugins.resultSize"){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.transmart.data.export.ftp.password'){addConfig(exportParams,k,encodeConfigPassword(v),'')}
+            else if(k == 'com.recomdata.transmart.data.export.ftp.remote.path'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.transmart.data.export.ftp.server'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.transmart.data.export.ftp.serverport'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.transmart.data.export.ftp.username'){addConfig(exportParams,k,encodeConfigUsername(v),'')}
+            else if(k == 'com.recomdata.transmart.data.export.max.export.jobs.loaded'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.transmart.data.export.jobTmpDirectory'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.transmart.data.export.rScriptDirectory'){addConfig(exportParams,k,v,'')}
+            else if(k == 'dataExport.bed.acgh.rgbColorScheme'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.search.gene.max'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.search.genepathway'){addConfig(exportParams,k,v,'')}
+            else if(k == 'com.recomdata.plugins.resultSize'){addConfig(exportParams,k,v,'')}
 
             // galaxy
-            else if(k == "com.galaxy.export.galaxyEnabled"){addConfig(galaxyParams,k,v,'')}
-            else if(k == "com.galaxy.export.galaxyURL"){addConfig(galaxyParams,k,v,'')}
+            else if(k == 'com.galaxy.export.galaxyEnabled'){addConfig(galaxyParams,k,v,'')}
+            else if(k == 'com.galaxy.export.galaxyURL'){addConfig(galaxyParams,k,v,'')}
 
             // general
-            else if(k == "com.recomdata.appTitle"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.largeLogo"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.smallLogo"){addConfig(generalParams,k,v,'')} 
-            else if(k == "com.recomdata.projectName"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.projectLogo"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.projectURL"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.providerName"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.providerLogo"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.providerURL"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.skipdisclaimer"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.disclaimer"){addConfig(generalParams,k,v,'')}
-            else if(k == "com.recomdata.view.studyview"){addConfig(generalParams,k,v,'')}
-            else if(k == "org.transmart.configFine"){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.appTitle'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.largeLogo'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.smallLogo'){addConfig(generalParams,k,v,'')} 
+            else if(k == 'com.recomdata.projectName'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.projectLogo'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.projectURL'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.providerName'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.providerLogo'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.providerURL'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.skipdisclaimer'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.disclaimer'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.view.studyview'){addConfig(generalParams,k,v,'')}
+            else if(k == 'org.transmart.configFine'){addConfig(generalParams,k,v,'')}
 
-            else if(k == "grails.cache.ehcache.ehcacheXmlLocation"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.cache.ehcache.reloadable"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.cache.enabled"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.config.locations"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.converters.default.pretty.print"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.converters.encoding"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.databinding.convertEmptyStringsToNull"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.databinding.trimStrings"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.enable.native2ascii"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.exceptionresolver.params.exclude"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.mime.disable.accept.header.userAgents"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.mime.file.extensions"){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.cache.ehcache.ehcacheXmlLocation'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.cache.ehcache.reloadable'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.cache.enabled'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.config.locations'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.converters.default.pretty.print'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.converters.encoding'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.databinding.convertEmptyStringsToNull'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.databinding.trimStrings'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.enable.native2ascii'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.exceptionresolver.params.exclude'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.mime.disable.accept.header.userAgents'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.mime.file.extensions'){addConfig(generalParams,k,v,'')}
 
-            else if(k.startsWith("grails.mime.types.")){
-                def kk = k - "grails.mime.types."
-                addConfig(generalParams,k,v,"Mime type ${kk}")
+            else if(k.startsWith('grails.mime.types.')){
+                def kk = k - 'grails.mime.types.'
+                addConfig(generalParams,k,v,'Mime type ' + kk)
             }
 
-            else if(k == "grails.plugins.sendfile.tomcat"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.resources.adhoc.excludes"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.spring.bean.packages"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.views.default.codec"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.views.gsp.encoding"){addConfig(generalParams,k,v,'')}
-            else if(k == "grails.views.javascript.library"){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.plugins.sendfile.tomcat'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.resources.adhoc.excludes'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.spring.bean.packages'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.views.default.codec'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.views.gsp.encoding'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.views.javascript.library'){addConfig(generalParams,k,v,'')}
 
-            else if(k == "hibernate.cache.region.factory_class"){addConfig(generalParams,k,v,'')}
-            else if(k == "hibernate.cache.use_query_cache"){addConfig(generalParams,k,v,'')}
-            else if(k == "hibernate.cache.use_second_level_cache"){addConfig(generalParams,k,v,'')}
+            else if(k == 'hibernate.cache.region.factory_class'){addConfig(generalParams,k,v,'')}
+            else if(k == 'hibernate.cache.use_query_cache'){addConfig(generalParams,k,v,'')}
+            else if(k == 'hibernate.cache.use_second_level_cache'){addConfig(generalParams,k,v,'')}
 
             // gwas
-            else if(k == "com.recomdata.rwg.manhattanplots.cacheImages"){addConfig(gwasParams,k,v,'')}
-            else if(k == "com.recomdata.rwg.qqplots.cacheImages"){addConfig(gwasParams,k,v,'')}
-            else if(k == "com.recomdata.rwg.qqplots.temporaryImageFolder"){addConfig(gwasParams,k,v,'')}
-            else if(k == "com.recomdata.rwg.qqplots.temporaryImageFolderFullPath"){addConfig(gwasParams,k,v,'')}
-            else if(k == "com.recomdata.gwas.usehg19table"){addConfig(gwasParams,k,v,'')}
-            else if(k == "grails.plugin.transmartGwasPlink.plinkPath"){addConfig(gwasParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.manhattanplots.cacheImages'){addConfig(gwasParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.qqplots.cacheImages'){addConfig(gwasParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.qqplots.temporaryImageFolder'){addConfig(gwasParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.qqplots.temporaryImageFolderFullPath'){addConfig(gwasParams,k,v,'')}
+            else if(k == 'com.recomdata.gwas.usehg19table'){addConfig(gwasParams,k,v,'')}
+            else if(k == 'grails.plugin.transmartGwasPlink.plinkPath'){addConfig(gwasParams,k,v,'')}
 
             // gwava
-            else if(k == "com.recomdata.rwg.webstart.codebase"){addConfig(gwavaParams,k,v,'')}
-            else if(k == "com.recomdata.rwg.webstart.gwavaInstance"){addConfig(gwavaParams,k,v,'')}
-            else if(k == "com.recomdata.rwg.webstart.href"){addConfig(gwasParams,k,v,'')}
-            else if(k == "com.recomdata.rwg.webstart.jar"){addConfig(gwasParams,k,v,'')}
-            else if(k == "com.recomdata.rwg.webstart.mainClass"){addConfig(gwasParams,k,v,'')}
-            else if(k == "com.recomdata.rwg.webstart.transmart.url"){addConfig(gwavaParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.webstart.codebase'){addConfig(gwavaParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.webstart.gwavaInstance'){addConfig(gwavaParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.webstart.href'){addConfig(gwasParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.webstart.jar'){addConfig(gwasParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.webstart.mainClass'){addConfig(gwasParams,k,v,'')}
+            else if(k == 'com.recomdata.rwg.webstart.transmart.url'){addConfig(gwavaParams,k,v,'')}
 
             // help
-            else if(k == "com.recomdata.adminHelpURL"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.hiDomePopUp"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.summaryStatistics"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.geneSignatureList"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.rsIdSignatureList"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.boxPlot"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.correlationAnalysis"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.heatMap"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.heatMapMaxRows"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.hierarchicalClustering"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.hierarchicalClusteringMaxRows"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.kMeansClustering"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.kMeansClusteringMaxRows"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.lineGraph"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.logisticRegression"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.markerSelection"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.pca"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.scatterPlot"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.search"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.survivalAnalysis"){addConfig(helpParams,k,v,'')}
-            else if(k == "org.transmartproject.helpUrls.tableWithFisher"){addConfig(helpParams,k,v,'')}
+            else if(k == 'com.recomdata.adminHelpURL'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.hiDomePopUp'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.summaryStatistics'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.geneSignatureList'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.rsIdSignatureList'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.boxPlot'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.correlationAnalysis'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.heatMap'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.heatMapMaxRows'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.hierarchicalClustering'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.hierarchicalClusteringMaxRows'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.kMeansClustering'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.kMeansClusteringMaxRows'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.lineGraph'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.logisticRegression'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.markerSelection'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.pca'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.scatterPlot'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.search'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.survivalAnalysis'){addConfig(helpParams,k,v,'')}
+            else if(k == 'org.transmartproject.helpUrls.tableWithFisher'){addConfig(helpParams,k,v,'')}
 
             // i2b2
-            else if(k == "com.recomdata.i2b2.subject.domain"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "com.recomdata.i2b2.subject.projectid"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "com.recomdata.i2b2.subject.username"){addConfig(i2b2Params,k,encodeConfigUsername(v),'')}
-            else if(k == "com.recomdata.i2b2.subject.password"){addConfig(i2b2Params,k,encodeConfigPassword(v),'')}
-            else if(k == "org.transmartproject.i2b2.instance"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "org.transmartproject.i2b2.instance.port"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "org.transmartproject.i2b2.user_id"){addConfig(i2b2Params,k,encodeConfigUsername(v),'')}
-            else if(k == "org.transmartproject.i2b2.group_id"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "org.transmartproject.i2b2.pool"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "org.transmartproject.i2b2.waitTimeMilliseconds"){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'com.recomdata.i2b2.subject.domain'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'com.recomdata.i2b2.subject.projectid'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'com.recomdata.i2b2.subject.username'){addConfig(i2b2Params,k,encodeConfigUsername(v),'')}
+            else if(k == 'com.recomdata.i2b2.subject.password'){addConfig(i2b2Params,k,encodeConfigPassword(v),'')}
+            else if(k == 'org.transmartproject.i2b2.instance'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'org.transmartproject.i2b2.instance.port'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'org.transmartproject.i2b2.user_id'){addConfig(i2b2Params,k,encodeConfigUsername(v),'')}
+            else if(k == 'org.transmartproject.i2b2.group_id'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'org.transmartproject.i2b2.pool'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'org.transmartproject.i2b2.waitTimeMilliseconds'){addConfig(i2b2Params,k,v,'')}
 
-            else if(k == "com.recomdata.i2b2.sample.domain"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "com.recomdata.i2b2.sample.projectid"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "com.recomdata.i2b2.sample.username"){addConfig(i2b2Params,k,encodeConfigUsername(v),'')}
-            else if(k == "com.recomdata.i2b2.sample.password"){addConfig(i2b2Params,k,encodeConfigPassword(v),'')}
+            else if(k == 'com.recomdata.i2b2.sample.domain'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'com.recomdata.i2b2.sample.projectid'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'com.recomdata.i2b2.sample.username'){addConfig(i2b2Params,k,encodeConfigUsername(v),'')}
+            else if(k == 'com.recomdata.i2b2.sample.password'){addConfig(i2b2Params,k,encodeConfigPassword(v),'')}
 
-            else if(k == "com.recomdata.i2b2helper.i2b2demodata"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "com.recomdata.i2b2helper.i2b2hive"){addConfig(i2b2Params,k,v,'')}
-            else if(k == "com.recomdata.i2b2helper.i2b2metadata"){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'com.recomdata.i2b2helper.i2b2demodata'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'com.recomdata.i2b2helper.i2b2hive'){addConfig(i2b2Params,k,v,'')}
+            else if(k == 'com.recomdata.i2b2helper.i2b2metadata'){addConfig(i2b2Params,k,v,'')}
 
             // kerberos
-            else if(k == "grails.plugin.springsecurity.kerberos.active"){addConfig(kerberosParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.kerberos.debug"){addConfig(kerberosParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.kerberos.client.debug"){addConfig(kerberosParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.kerberos.ticketValidator.debug"){addConfig(kerberosParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.kerberos.skipIfAlreadyAuthenticated"){addConfig(kerberosParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.kerberos.successHandler.headerName"){addConfig(kerberosParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.kerberos.successHandler.headerPrefix"){addConfig(kerberosParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.kerberos.ticketValidator.holdOnToGSSContext"){addConfig(kerberosParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.kerberos.active'){addConfig(kerberosParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.kerberos.debug'){addConfig(kerberosParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.kerberos.client.debug'){addConfig(kerberosParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.kerberos.ticketValidator.debug'){addConfig(kerberosParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.kerberos.skipIfAlreadyAuthenticated'){addConfig(kerberosParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.kerberos.successHandler.headerName'){addConfig(kerberosParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.kerberos.successHandler.headerPrefix'){addConfig(kerberosParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.kerberos.ticketValidator.holdOnToGSSContext'){addConfig(kerberosParams,k,v,'')}
 
             // ldap
-            else if(k == "grails.plugin.springsecurity.ldap.active"){addConfig(ldapParams,k,v,'')}
-            else if(k == "org.transmart.security.ldap.newUsernamePattern"){addConfig(ldapParams,k,v,'')}
-            else if(k == "org.transmart.security.ldap.defaultAuthorities"){addConfig(ldapParams,k,v,'')}
-            else if(k == "org.transmart.security.ldap.inheritPassword"){addConfig(ldapParams,k,v,'')}
-            else if(k == "org.transmart.security.ldap.mappedUsernameProperty"){addConfig(ldapParams,k,v,'')}
-            else if(k == "org.transmart.security.ldap.ad.domain"){addConfig(ldapParams,k,v,'')}
-            else if(k == "org.transmart.security.ldap.context.server"){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.active'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'org.transmart.security.ldap.newUsernamePattern'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'org.transmart.security.ldap.defaultAuthorities'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'org.transmart.security.ldap.inheritPassword'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'org.transmart.security.ldap.mappedUsernameProperty'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'org.transmart.security.ldap.ad.domain'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'org.transmart.security.ldap.context.server'){addConfig(ldapParams,k,v,'')}
 
-            else if(k == "grails.plugin.springsecurity.ldap.auth.hideUserNotFoundExceptions"){addConfig(ldapParams,k,v,'If true, throw BadCredentialsExceptionelse throw explicit UsernameNotFoundException')}
-            else if(k == "grails.plugin.springsecurity.ldap.auth.useAuthPassword"){addConfig(ldapParams,k,v,'If true, use supplied password, else try to obtain password from Userdetails object')}
-            else if(k == "grails.plugin.springsecurity.ldap.authenticator.attributesToReturn"){addConfig(ldapParams,k,v,'Names of attribute ids to return; use null to return all and an empty list to return none')}
-            else if(k == "grails.plugin.springsecurity.ldap.authenticator.passwordAttributeName"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.authenticator.useBind"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.clean.dashes"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.clean.uppercase"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.groupRoleAttribute"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.groupSearchBase"){addConfig(ldapParams,k,v,'The base DN from which the search for group membership should be performed')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.groupSearchFilter"){addConfig(ldapParams,k,v,'The pattern to be used for the user search. {0} is the user DN')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.ignorePartialResultException"){addConfig(ldapParams,k,v,'Whether PartialResultExceptions should be ignored in searches, typically used with Active Directory since AD servers often have a problem with referrals')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.prefix"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.retrieveDatabaseRoles"){addConfig(ldapParams,k,v,'Whether to retrieve additional roles from the database using the User/Role many-to-many')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.retrieveGroupRoles"){addConfig(ldapParams,k,v,'Whether to infer roles based on group membership')}
-            else if(k == "grails.plugin.springsecurity.ldap.authorities.searchSubtree"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.context.anonymousReadOnly"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.context.cacheEnvironmentProperties"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.context.contextFactoryClassName"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.context.dirObjectFactoryClassName"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.context.managerDn"){addConfig(ldapParams,k,v,'LDAP DN to authenticate with')}
-            else if(k == "grails.plugin.springsecurity.ldap.context.managerPassword"){addConfig(ldapParams,k,encodeConfigPassword(v),'LDAP manager password for authentication (plain text)')}
-            else if(k == "grails.plugin.springsecurity.ldap.context.server"){addConfig(ldapParams,k,v,'Address of the LDAP server (see org.transmart.security.ldap.context.server)')}
-            else if(k == "grails.plugin.springsecurity.ldap.mapper.convertToUpperCase"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.mapper.passwordAttributeName"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.rememberMe.detailsManager.groupMemberAttributeName"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.rememberMe.detailsManager.groupRoleAttributeName"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.rememberMe.detailsManager.groupSearchBase"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.rememberMe.detailsManager.passwordAttributeName"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.search.base"){addConfig(ldapParams,k,v,'Context name to search in, relative to the base of the configured ContextSource')}
-            else if(k == "grails.plugin.springsecurity.ldap.search.derefLink"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.search.filter"){addConfig(ldapParams,k,v,'The filter expression used in the user search')}
-            else if(k == "grails.plugin.springsecurity.ldap.search.searchSubtree"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.search.timeLimit"){addConfig(ldapParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ldap.useRememberMe"){addConfig(ldapParams,k,v,'')}
-            else if(k == "org.transmart.security.ldap.inheritPassword"){addConfig(ldapParams,k,v,'')}
-            else if(k == "org.transmart.security.ldap.mappedUsernameProperty"){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.auth.hideUserNotFoundExceptions'){addConfig(ldapParams,k,v,'If true, throw BadCredentialsExceptionelse throw explicit UsernameNotFoundException')}
+            else if(k == 'grails.plugin.springsecurity.ldap.auth.useAuthPassword'){addConfig(ldapParams,k,v,'If true, use supplied password, else try to obtain password from Userdetails object')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authenticator.attributesToReturn'){addConfig(ldapParams,k,v,'Names of attribute ids to return; use null to return all and an empty list to return none')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authenticator.passwordAttributeName'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authenticator.useBind'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.clean.dashes'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.clean.uppercase'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.groupRoleAttribute'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.groupSearchBase'){addConfig(ldapParams,k,v,'The base DN from which the search for group membership should be performed')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.groupSearchFilter'){addConfig(ldapParams,k,v,'The pattern to be used for the user search. {0} is the user DN')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.ignorePartialResultException'){addConfig(ldapParams,k,v,'Whether PartialResultExceptions should be ignored in searches, typically used with Active Directory since AD servers often have a problem with referrals')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.prefix'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.retrieveDatabaseRoles'){addConfig(ldapParams,k,v,'Whether to retrieve additional roles from the database using the User/Role many-to-many')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.retrieveGroupRoles'){addConfig(ldapParams,k,v,'Whether to infer roles based on group membership')}
+            else if(k == 'grails.plugin.springsecurity.ldap.authorities.searchSubtree'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.context.anonymousReadOnly'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.context.cacheEnvironmentProperties'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.context.contextFactoryClassName'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.context.dirObjectFactoryClassName'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.context.managerDn'){addConfig(ldapParams,k,v,'LDAP DN to authenticate with')}
+            else if(k == 'grails.plugin.springsecurity.ldap.context.managerPassword'){addConfig(ldapParams,k,encodeConfigPassword(v),'LDAP manager password for authentication (plain text)')}
+            else if(k == 'grails.plugin.springsecurity.ldap.context.server'){addConfig(ldapParams,k,v,'Address of the LDAP server (see org.transmart.security.ldap.context.server)')}
+            else if(k == 'grails.plugin.springsecurity.ldap.mapper.convertToUpperCase'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.mapper.passwordAttributeName'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.rememberMe.detailsManager.groupMemberAttributeName'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.rememberMe.detailsManager.groupRoleAttributeName'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.rememberMe.detailsManager.groupSearchBase'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.rememberMe.detailsManager.passwordAttributeName'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.search.base'){addConfig(ldapParams,k,v,'Context name to search in, relative to the base of the configured ContextSource')}
+            else if(k == 'grails.plugin.springsecurity.ldap.search.derefLink'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.search.filter'){addConfig(ldapParams,k,v,'The filter expression used in the user search')}
+            else if(k == 'grails.plugin.springsecurity.ldap.search.searchSubtree'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.search.timeLimit'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ldap.useRememberMe'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'org.transmart.security.ldap.inheritPassword'){addConfig(ldapParams,k,v,'')}
+            else if(k == 'org.transmart.security.ldap.mappedUsernameProperty'){addConfig(ldapParams,k,v,'')}
 
             // log
-	    else if(k == "log4j"){addConfig(logParams,k,v,'')}
+	    else if(k == 'log4j'){addConfig(logParams,k,v,'')}
 
             // login
-            else if(k == "bruteForceLoginLock.allowedNumberOfAttempts"){addConfig(loginParams,k,v,'')}
-            else if(k == "bruteForceLoginLock.lockTimeInMinutes"){addConfig(loginParams,k,v,'')}
-            else if(k == "org.transmartproject.maxConcurrentUserSessions"){addConfig(loginParams,k,v,'')}
-            else if(k == "ui.loginScreen.disclaimer"){addConfig(loginParams,k,v,'')}
+            else if(k == 'bruteForceLoginLock.allowedNumberOfAttempts'){addConfig(loginParams,k,v,'')}
+            else if(k == 'bruteForceLoginLock.lockTimeInMinutes'){addConfig(loginParams,k,v,'')}
+            else if(k == 'org.transmartproject.maxConcurrentUserSessions'){addConfig(loginParams,k,v,'')}
+            else if(k == 'ui.loginScreen.disclaimer'){addConfig(loginParams,k,v,'')}
 
             // metacore
-            else if(k == "com.thomsonreuters.transmart.metacoreAnalyticsEnable"){addConfig(metacoreParams,k,v,'')}
-            else if(k == "com.thomsonreuters.transmart.metacoreSettingsMode"){addConfig(metacoreParams,k,v,'')}
-            else if(k == "com.thomsonreuters.transmart.demoEnrichmentURL"){addConfig(metacoreParams,k,v,'')}
-            else if(k == "com.thomsonreuters.transmart.demoMapBaseURL"){addConfig(metacoreParams,k,v,'')}
-            else if(k == "com.thomsonreuters.transmart.metacoreDefaultLogin"){addConfig(metacoreParams,k,encodeConfigUsername(v),'')}
-            else if(k == "com.thomsonreuters.transmart.metacoreDefaultPassword"){addConfig(metacoreParams,k,encodeConfigPassword(v),'')}
-            else if(k == "com.thomsonreuters.transmart.metacoreURL"){addConfig(metacoreParams,k,v,'')}
-            else if(k == "com.thomsonreuters.transmart.metacoreLogin"){addConfig(metacoreParams,k,encodeConfigUsername(v),'')}
-            else if(k == "com.thomsonreuters.transmart.metacorePassword"){addConfig(metacoreParams,k,encodeConfigPassword(v),'')}
+            else if(k == 'com.thomsonreuters.transmart.metacoreAnalyticsEnable'){addConfig(metacoreParams,k,v,'')}
+            else if(k == 'com.thomsonreuters.transmart.metacoreSettingsMode'){addConfig(metacoreParams,k,v,'')}
+            else if(k == 'com.thomsonreuters.transmart.demoEnrichmentURL'){addConfig(metacoreParams,k,v,'')}
+            else if(k == 'com.thomsonreuters.transmart.demoMapBaseURL'){addConfig(metacoreParams,k,v,'')}
+            else if(k == 'com.thomsonreuters.transmart.metacoreDefaultLogin'){addConfig(metacoreParams,k,encodeConfigUsername(v),'')}
+            else if(k == 'com.thomsonreuters.transmart.metacoreDefaultPassword'){addConfig(metacoreParams,k,encodeConfigPassword(v),'')}
+            else if(k == 'com.thomsonreuters.transmart.metacoreURL'){addConfig(metacoreParams,k,v,'')}
+            else if(k == 'com.thomsonreuters.transmart.metacoreLogin'){addConfig(metacoreParams,k,encodeConfigUsername(v),'')}
+            else if(k == 'com.thomsonreuters.transmart.metacorePassword'){addConfig(metacoreParams,k,encodeConfigPassword(v),'')}
 
             // oauth
-            else if(k == "dataSource_oauth2.dbCreate"){addConfig(oauthParams,k,v,'')}
-            else if(k == "dataSource_oauth2.driverClassName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "dataSource_oauth2.formatSql"){addConfig(oauthParams,k,v,'')}
-            else if(k == "dataSource_oauth2.logSql"){addConfig(oauthParams,k,v,'')}
-            else if(k == "dataSource_oauth2.password"){addConfig(oauthParams,k,encodeConfigPassword(v),'')}
-            else if(k == "dataSource_oauth2.url"){addConfig(oauthParams,k,v,'')}
-            else if(k == "dataSource_oauth2.username"){addConfig(oauthParams,k,encodeConfigUsername(v),'')}
+            else if(k == 'dataSource_oauth2.dbCreate'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'dataSource_oauth2.driverClassName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'dataSource_oauth2.formatSql'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'dataSource_oauth2.logSql'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'dataSource_oauth2.password'){addConfig(oauthParams,k,encodeConfigPassword(v),'')}
+            else if(k == 'dataSource_oauth2.url'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'dataSource_oauth2.username'){addConfig(oauthParams,k,encodeConfigUsername(v),'')}
 
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.additionalInformationPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.authenticationKeyPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.authenticationPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.clientIdPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.expirationPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.refreshTokenPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.scopePropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.tokenTypePropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.usernamePropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.accessTokenLookup.valuePropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.active"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approval.approvalValiditySeconds"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approval.auto"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approval.handleRevocationAsExpiry"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approval.scopePrefix"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approvalLookup.approvedPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approvalLookup.clientIdPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approvalLookup.expirationPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approvalLookup.lastModifiedPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approvalLookup.scopePropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.approvalLookup.usernamePropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.authorization.requireRegisteredRedirectUri"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.authorization.requireScope"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.authenticationPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.className"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.codePropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.authorizationEndpointUrl"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.basicAuthenticationFilterStartPosition"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientFilterStartPosition"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.accessTokenValiditySecondsPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.additionalInformationPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.authoritiesPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.authorizedGrantTypesPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.autoApproveScopesPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.className"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.clientIdPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.clientSecretPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.redirectUrisPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.refreshTokenValiditySecondsPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.resourceIdsPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clientLookup.scopesPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.clients"){addConfigLink(oauthParams,k,linkOauthClients(grailsApplication.config.grails.plugin.springsecurity.oauthProvider.clients),'Click link to see full list')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.additionalInformationPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.authenticationKeyPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.authenticationPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.className'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.clientIdPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.expirationPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.refreshTokenPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.scopePropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.tokenTypePropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.usernamePropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.accessTokenLookup.valuePropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.active'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approval.approvalValiditySeconds'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approval.auto'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approval.handleRevocationAsExpiry'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approval.scopePrefix'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approvalLookup.approvedPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approvalLookup.clientIdPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approvalLookup.expirationPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approvalLookup.lastModifiedPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approvalLookup.scopePropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.approvalLookup.usernamePropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.authorization.requireRegisteredRedirectUri'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.authorization.requireScope'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.authenticationPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.className'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.authorizationCodeLookup.codePropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.authorizationEndpointUrl'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.basicAuthenticationFilterStartPosition'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientFilterStartPosition'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.accessTokenValiditySecondsPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.additionalInformationPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.authoritiesPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.authorizedGrantTypesPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.autoApproveScopesPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.className'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.clientIdPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.clientSecretPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.redirectUrisPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.refreshTokenValiditySecondsPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.resourceIdsPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clientLookup.scopesPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.clients'){addConfigLink(oauthParams,k,linkOauthClients(grailsApplication.config.grails.plugin.springsecurity.oauthProvider.clients),'Click link to see full list')}
 
-            else if(k == "grails.plugin.springsecurity.oauthProvider.credentialsCharset"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.defaultClientConfig.authorities"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.defaultClientConfig.authorizedGrantTypes"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.defaultClientConfig.autoApproveScopes"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.defaultClientConfig.resourceIds"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.defaultClientConfig.scope"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.exceptionTranslationFilterStartPosition"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.filterStartPosition"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.grantTypes.authorizationCode"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.grantTypes.clientCredentials"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.grantTypes.implicit"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.grantTypes.password"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.grantTypes.refreshToken"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.authenticationPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.expirationPropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.valuePropertyName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.registerBasicAuthenticationFilter"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.errorEndpointUrl"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.realmName"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.registerExceptionTranslationFilter"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.registerStatelessFilter"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.statelessFilterStartPosition"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.tokenEndpointUrl"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.tokenServices.accessTokenValiditySeconds"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.tokenServices.refreshTokenValiditySeconds"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.tokenServices.registerTokenEnhancers"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.tokenServices.reuseRefreshToken"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.tokenServices.supportRefreshToken"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.userApprovalEndpointUrl"){addConfig(oauthParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.oauthProvider.userApprovalParameter"){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.credentialsCharset'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.defaultClientConfig.authorities'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.defaultClientConfig.authorizedGrantTypes'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.defaultClientConfig.autoApproveScopes'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.defaultClientConfig.resourceIds'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.defaultClientConfig.scope'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.exceptionTranslationFilterStartPosition'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.filterStartPosition'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.grantTypes.authorizationCode'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.grantTypes.clientCredentials'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.grantTypes.implicit'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.grantTypes.password'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.grantTypes.refreshToken'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.authenticationPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.className'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.expirationPropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.refreshTokenLookup.valuePropertyName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.registerBasicAuthenticationFilter'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.errorEndpointUrl'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.realmName'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.registerExceptionTranslationFilter'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.registerStatelessFilter'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.statelessFilterStartPosition'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.tokenEndpointUrl'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.tokenServices.accessTokenValiditySeconds'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.tokenServices.refreshTokenValiditySeconds'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.tokenServices.registerTokenEnhancers'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.tokenServices.reuseRefreshToken'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.tokenServices.supportRefreshToken'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.userApprovalEndpointUrl'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.oauthProvider.userApprovalParameter'){addConfig(oauthParams,k,v,'')}
 
             // rmodules
-            else if(k == "RModules.host"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "RModules.port"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "RModules.pluginScriptDirectory"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "RModules.tempFolderDirectory"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "RModules.imageURL"){addConfig(rmodulesParams,k,v,'(Obsolete) URL path for images from analysis jobs - now fixed as /analysisfiles/')}
-            else if(k == "ui.tabs.datasetExplorer.analysisJobs.show"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "quartz._properties.org.quartz.scheduler.skipUpdateCheck"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "quartz.autoStartup"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "quartz.exposeSchedulerInRepository"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "quartz.jdbcStore"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "quartz.props.scheduler.skipUpdateCheck"){addConfig(rmodulesParams,k,v,'')}
-            else if(k == "quartz.waitForJobsToCompleteOnShutdown"){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'RModules.host'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'RModules.port'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'RModules.pluginScriptDirectory'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'RModules.tempFolderDirectory'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'RModules.imageURL'){addConfig(rmodulesParams,k,v,'(Obsolete) URL path for images from analysis jobs - now fixed as /analysisfiles/')}
+            else if(k == 'ui.tabs.datasetExplorer.analysisJobs.show'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'quartz._properties.org.quartz.scheduler.skipUpdateCheck'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'quartz.autoStartup'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'quartz.exposeSchedulerInRepository'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'quartz.jdbcStore'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'quartz.props.scheduler.skipUpdateCheck'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'quartz.waitForJobsToCompleteOnShutdown'){addConfig(rmodulesParams,k,v,'')}
 
             // saml
-            else if(k == "org.transmart.security.samlEnabled"){addConfig(samlParams,k,v,'')}
-            else if(k == "org.transmart.security.lb.scheme"){addConfig(samlParams,k,v,'')}
-            else if(k == "org.transmart.security.lb.serverName"){addConfig(samlParams,k,v,'')}
-            else if(k == "org.transmart.security.lb.serverPort"){addConfig(samlParams,k,v,'')}
-            else if(k == "org.transmart.security.lb.includeServerPortInRequestURL"){addConfig(samlParams,k,v,'')}
-            else if(k == "org.transmart.security.lb.contextPath"){addConfig(samlParams,k,v,'')}
-            else if(k == "org.transmart.security.lb.createInexistentUsers"){addConfig(samlParams,k,v,'')}
+            else if(k == 'org.transmart.security.samlEnabled'){addConfig(samlParams,k,v,'')}
+            else if(k == 'org.transmart.security.lb.scheme'){addConfig(samlParams,k,v,'')}
+            else if(k == 'org.transmart.security.lb.serverName'){addConfig(samlParams,k,v,'')}
+            else if(k == 'org.transmart.security.lb.serverPort'){addConfig(samlParams,k,v,'')}
+            else if(k == 'org.transmart.security.lb.includeServerPortInRequestURL'){addConfig(samlParams,k,v,'')}
+            else if(k == 'org.transmart.security.lb.contextPath'){addConfig(samlParams,k,v,'')}
+            else if(k == 'org.transmart.security.lb.createInexistentUsers'){addConfig(samlParams,k,v,'')}
 
 
             // sampleExplorer
-            else if(k == "sampleExplorer.idfield"){addConfig(sampleParams,k,v,'')}
-            else if(k == "edu.harvard.transmart.sampleBreakdownMap.aliquot_id"){addConfig(sampleParams,k,v,'')}
-            else if(k == "sampleExplorer.resultsGridHeight"){addConfig(sampleParams,k,v,'')}
-            else if(k == "sampleExplorer.resultsGridWidth"){addConfig(sampleParams,k,v,'')}
-            else if(k == "com.recomdata.solr.maxNewsStories"){addConfig(sampleParams,k,v,'')}
-            else if(k == "com.recomdata.solr.maxRows"){addConfig(sampleParams,k,v,'')}
+            else if(k == 'sampleExplorer.idfield'){addConfig(sampleParams,k,v,'')}
+            else if(k == 'edu.harvard.transmart.sampleBreakdownMap.aliquot_id'){addConfig(sampleParams,k,v,'')}
+            else if(k == 'sampleExplorer.resultsGridHeight'){addConfig(sampleParams,k,v,'')}
+            else if(k == 'sampleExplorer.resultsGridWidth'){addConfig(sampleParams,k,v,'')}
+            else if(k == 'com.recomdata.solr.maxNewsStories'){addConfig(sampleParams,k,v,'')}
+            else if(k == 'com.recomdata.solr.maxRows'){addConfig(sampleParams,k,v,'')}
 
-            else if(k == "sampleExplorer.fieldMapping.clone"){addConfig(sampleParams,k,v,'')}
-            else if(k == "sampleExplorer.fieldMapping.columns"){addConfigLink(sampleParams,k,linkSampleMapping(grailsApplication.config.sampleExplorer.fieldMapping.columns),'Click link to see full list')}
+            else if(k == 'sampleExplorer.fieldMapping.clone'){addConfig(sampleParams,k,v,'')}
+            else if(k == 'sampleExplorer.fieldMapping.columns'){addConfigLink(sampleParams,k,linkSampleMapping(grailsApplication.config.sampleExplorer.fieldMapping.columns),'Click link to see full list')}
 
             // search
-            else if(k == "com.recomdata.searchengine.index"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.search.paginate.max"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.search.paginate.maxsteps"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.solr.solrFieldList"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.solr.fieldExclusionList"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.solr.resultFields"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.solr.maxLinksDisplayed"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.solr.numberOfSuggestions"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.search.gene.max"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.search.autocomplete.max"){addConfig(searchParams,k,v,'')}
-            else if(k == "com.recomdata.searchtool.appTitle"){addConfig(searchParams,k,v,'application "About" text from Utilities tab (obsolete)')}
-            else if(k == "com.recomdata.searchtool.datasetExplorerURL"){addConfig(searchParams,k,v,'Relative context path from Search to Analyze tab')}
-            else if(k == "com.recomdata.searchtool.hideInternalTabs"){addConfig(searchParams,k,v,'Hide internal tabs including doc and jubilant tabs')}
-            else if(k == "com.recomdata.searchtool.genegoURL"){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.searchengine.index'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.search.paginate.max'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.search.paginate.maxsteps'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.solr.solrFieldList'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.solr.fieldExclusionList'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.solr.resultFields'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.solr.maxLinksDisplayed'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.solr.numberOfSuggestions'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.search.gene.max'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.search.autocomplete.max'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.searchtool.appTitle'){addConfig(searchParams,k,v,'application "About" text from Utilities tab (obsolete)')}
+            else if(k == 'com.recomdata.searchtool.datasetExplorerURL'){addConfig(searchParams,k,v,'Relative context path from Search to Analyze tab')}
+            else if(k == 'com.recomdata.searchtool.hideInternalTabs'){addConfig(searchParams,k,v,'Hide internal tabs including doc and jubilant tabs')}
+            else if(k == 'com.recomdata.searchtool.genegoURL'){addConfig(searchParams,k,v,'')}
 
             // smartr
-            else if(k == "smartR.baseDir"){addConfig(smartrParams,k,v,'')}
-            else if(k == "smartR.remoteScriptDirectory"){addConfig(smartrParams,k,v,'')}
-            else if(k == "grails.plugin.transmartGwasPlink.enabled"){addConfig(smartrParams,k,v,'')}
+            else if(k == 'smartR.baseDir'){addConfig(smartrParams,k,v,'')}
+            else if(k == 'smartR.remoteScriptDirectory'){addConfig(smartrParams,k,v,'')}
+            else if(k == 'grails.plugin.transmartGwasPlink.enabled'){addConfig(smartrParams,k,v,'')}
 
             // solr
 
             // spring
-            else if(k == "grails.plugin.springsecurity.active"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.adh.ajaxErrorPage"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.adh.errorPage"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.adh.useForward"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.afterInvocationManagerProviderNames"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.ajaxHeader"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.anon.key"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.apf.allowSessionCreation"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.apf.continueChainBeforeSuccessfulAuthentication"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.apf.filterProcessesUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.apf.passwordParameter"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.apf.postOnly"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.apf.storeLastUsername"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.apf.usernameParameter"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.atr.anonymousClass"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.atr.rememberMeClass"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.auth.ajaxLoginFormUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.auth.forceHttps"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.auth.loginFormUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.auth.useForward"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.authority.className"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.authority.nameField"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.active'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.adh.ajaxErrorPage'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.adh.errorPage'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.adh.useForward'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.afterInvocationManagerProviderNames'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.ajaxHeader'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.anon.key'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.apf.allowSessionCreation'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.apf.continueChainBeforeSuccessfulAuthentication'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.apf.filterProcessesUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.apf.passwordParameter'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.apf.postOnly'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.apf.storeLastUsername'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.apf.usernameParameter'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.atr.anonymousClass'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.atr.rememberMeClass'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.auth.ajaxLoginFormUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.auth.forceHttps'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.auth.loginFormUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.auth.useForward'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.authority.className'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.authority.nameField'){addConfig(springParams,k,v,'')}
             
-            else if(k == "grails.plugin.springsecurity.basic.credentialsCharset"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.basic.realmName"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.basic.credentialsCharset'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.basic.realmName'){addConfig(springParams,k,v,'')}
 
-            else if(k == "grails.plugin.springsecurity.cacheUsers"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.cacheUsers'){addConfig(springParams,k,v,'')}
 
-            else if(k == "grails.plugin.springsecurity.dao.hideUserNotFoundExceptions"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.debug.useFilter"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.digest.createAuthenticatedToken"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.digest.key"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.digest.nonceValiditySeconds"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.digest.passwordAlreadyEncoded"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.digest.realmName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.digest.useCleartextPasswords"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.dao.hideUserNotFoundExceptions'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.debug.useFilter'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.digest.createAuthenticatedToken'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.digest.key'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.digest.nonceValiditySeconds'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.digest.passwordAlreadyEncoded'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.digest.realmName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.digest.useCleartextPasswords'){addConfig(springParams,k,v,'')}
             
-            else if(k == "grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.failureHandler.allowSessionCreation"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.failureHandler.defaultFailureUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.failureHandler.useForward"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.fii.alwaysReauthenticate"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.fii.observeOncePerRequest"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.fii.publishAuthorizationSuccess"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.fii.rejectPublicInvocations"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.fii.validateConfigAttributes"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.failureHandler.allowSessionCreation'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.failureHandler.defaultFailureUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.failureHandler.useForward'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.fii.alwaysReauthenticate'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.fii.observeOncePerRequest'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.fii.publishAuthorizationSuccess'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.fii.rejectPublicInvocations'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.fii.validateConfigAttributes'){addConfig(springParams,k,v,'')}
 
-            else if(k.startsWith("grails.plugin.springsecurity.filterChain.chainMap.")){
-                def kk = k - "grails.plugin.springsecurity.filterChain.chainMap."
-                addConfig(springParams,k,v,"Filter chainMap for ${kk}")
+            else if(k.startsWith('grails.plugin.springsecurity.filterChain.chainMap.')){
+                def kk = k - 'grails.plugin.springsecurity.filterChain.chainMap.'
+                addConfig(springParams,k,v,'Filter chainMap for ' + kk)
             }
 
-            else if(k.startsWith("grails.plugin.springsecurity.interceptUrlMap.")){
-                def kk = k - "grails.plugin.springsecurity.interceptUrlMap."
-                addConfig(springParams,k,v,"Intercept UrlMap for ${kk}")
+            else if(k.startsWith('grails.plugin.springsecurity.interceptUrlMap.')){
+                def kk = k - 'grails.plugin.springsecurity.interceptUrlMap.'
+                addConfig(springParams,k,v,'Intercept UrlMap for ' + kk)
             }
             
-            else if(k == "grails.plugin.springsecurity.logout.clearAuthentication"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.logout.afterLogoutUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.logout.alwaysUseDefaultTargetUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.logout.filterProcessesUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.logout.handlerNames"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.logout.invalidateHttpSession"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.logout.postOnly"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.logout.redirectToReferer"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.logout.clearAuthentication'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.logout.afterLogoutUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.logout.alwaysUseDefaultTargetUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.logout.filterProcessesUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.logout.handlerNames'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.logout.invalidateHttpSession'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.logout.postOnly'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.logout.redirectToReferer'){addConfig(springParams,k,v,'')}
 
-            else if(k == "grails.plugin.springsecurity.password.algorithm"){addConfig(springParams,k,v,'Password encryption algorithm')}
-            else if(k == "grails.plugin.springsecurity.password.bcrypt.logrounds"){addConfig(springParams,k,v,'Password bcrypt number of rounds')}
-            else if(k == "grails.plugin.springsecurity.password.encodeHashAsBase64"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.password.hash.iterations"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.portMapper.httpPort"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.portMapper.httpsPort"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.printStatusMessages"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.providerManager.eraseCredentialsAfterAuthentication"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.password.algorithm'){addConfig(springParams,k,v,'Password encryption algorithm')}
+            else if(k == 'grails.plugin.springsecurity.password.bcrypt.logrounds'){addConfig(springParams,k,v,'Password bcrypt number of rounds')}
+            else if(k == 'grails.plugin.springsecurity.password.encodeHashAsBase64'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.password.hash.iterations'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.portMapper.httpPort'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.portMapper.httpsPort'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.printStatusMessages'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.providerManager.eraseCredentialsAfterAuthentication'){addConfig(springParams,k,v,'')}
 
-            else if(k == "grails.plugin.springsecurity.redirectStrategy.contextRelative"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.registerLoggerListener"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.rejectIfNoRule"){addConfig(springParams,k,v,'If true, reject URLs with no intercept URL map')}
-            else if(k == "grails.plugin.springsecurity.rememberMe.alwaysRemember"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.rememberMe.cookieName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.rememberMe.createSessionOnSuccess"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.rememberMe.key"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.rememberMe.parameter"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.rememberMe.persistent"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.rememberMe.persistentToken.seriesLength"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.rememberMe.persistentToken.tokenLength"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.rememberMe.tokenValiditySeconds"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.requestCache.createSession"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.requestMap.className"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.requestMap.configAttributeField"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.requestMap.httpMethodField"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.requestMap.urlField"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.roleHierarchy"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.redirectStrategy.contextRelative'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.registerLoggerListener'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.rejectIfNoRule'){addConfig(springParams,k,v,'If true, reject URLs with no intercept URL map')}
+            else if(k == 'grails.plugin.springsecurity.rememberMe.alwaysRemember'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.rememberMe.cookieName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.rememberMe.createSessionOnSuccess'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.rememberMe.key'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.rememberMe.parameter'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.rememberMe.persistent'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.rememberMe.persistentToken.seriesLength'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.rememberMe.persistentToken.tokenLength'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.rememberMe.tokenValiditySeconds'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.requestCache.createSession'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.requestMap.className'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.requestMap.configAttributeField'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.requestMap.httpMethodField'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.requestMap.urlField'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.roleHierarchy'){addConfig(springParams,k,v,'')}
 
-            else if(k == "grails.plugin.springsecurity.sch.strategyName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.scpf.forceEagerSessionCreation"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.scr.allowSessionCreation"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.scr.disableUrlRewriting"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.scr.springSecurityContextKey"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.secureChannel.insecureHeaderName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.secureChannel.insecureHeaderValue"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.secureChannel.secureHeaderName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.secureChannel.secureHeaderValue"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.secureChannel.useHeaderCheckChannelSecurity"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.securityConfigType"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.sessionFixationPrevention.alwaysCreateSession"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.sessionFixationPrevention.migrate"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.successHandler.ajaxSuccessUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.successHandler.alwaysUseDefault"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.successHandler.defaultTargetUrl"){addConfig(springParams,k,v,'URL to redirect after logging in, default config uses value of org.transmart.defaultLoginredirect')}
-            else if(k == "grails.plugin.springsecurity.successHandler.targetUrlParameter"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.successHandler.useReferer"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.switchUser.exitUserUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.switchUser.switchUserUrl"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.switchUser.usernameParameter"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.sch.strategyName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.scpf.forceEagerSessionCreation'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.scr.allowSessionCreation'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.scr.disableUrlRewriting'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.scr.springSecurityContextKey'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.secureChannel.insecureHeaderName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.secureChannel.insecureHeaderValue'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.secureChannel.secureHeaderName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.secureChannel.secureHeaderValue'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.secureChannel.useHeaderCheckChannelSecurity'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.securityConfigType'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.sessionFixationPrevention.alwaysCreateSession'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.sessionFixationPrevention.migrate'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.successHandler.ajaxSuccessUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.successHandler.alwaysUseDefault'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.successHandler.defaultTargetUrl'){addConfig(springParams,k,v,'URL to redirect after logging in, default config uses value of org.transmart.defaultLoginredirect')}
+            else if(k == 'grails.plugin.springsecurity.successHandler.targetUrlParameter'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.successHandler.useReferer'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.switchUser.exitUserUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.switchUser.switchUserUrl'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.switchUser.usernameParameter'){addConfig(springParams,k,v,'')}
 
-            else if(k == "grails.plugin.springsecurity.useBasicAuth"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.useDigestAuth"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.useExternalClasses"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.useHttpSessionEventPublisher"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.userLookup.accountExpiredPropertyName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.userLookup.accountLockedPropertyName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.userLookup.authoritiesPropertyName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.userLookup.enabledPropertyName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.userLookup.passwordExpiredPropertyName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.userLookup.userDomainClassName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.userLookup.authorityJoinClassName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.userLookup.passwordPropertyName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.userLookup.usernamePropertyName"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.useRoleGroups"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.useSecurityEventListener"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.useSessionFixationPrevention"){addConfig(springParams,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.useSwitchUserFilter"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.useBasicAuth'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.useDigestAuth'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.useExternalClasses'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.useHttpSessionEventPublisher'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.userLookup.accountExpiredPropertyName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.userLookup.accountLockedPropertyName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.userLookup.authoritiesPropertyName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.userLookup.enabledPropertyName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.userLookup.passwordExpiredPropertyName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.userLookup.userDomainClassName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.userLookup.authorityJoinClassName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.userLookup.passwordPropertyName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.userLookup.usernamePropertyName'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.useRoleGroups'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.useSecurityEventListener'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.useSessionFixationPrevention'){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.useSwitchUserFilter'){addConfig(springParams,k,v,'')}
 
-            else if(k == "grails.plugin.springsecurity.voterNames"){addConfig(springParams,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.voterNames'){addConfig(springParams,k,v,'')}
 
             // ui
-            else if(k == "com.recomdata.hideSampleExplorer"){addConfig(uiParams,k,v,'Disable sample explorer (obsolete?)')}
-            else if(k == "com.recomdata.sessionTimeout"){addConfig(uiParams,k,v,'')}
-            else if(k == "com.recomdata.debug.jsCallbacks"){addConfig(uiParams,k,v,'')}
-            else if(k == "com.recomdata.plugins.resultSize"){addConfig(uiParams,k,v,'')}
-            else if(k == "com.recomdata.heartbeatLaps"){addConfig(uiParams,k,v,'')}
-            else if(k == "org.transmart.xnatViewerEnable"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.jirareport.hide"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.browse.hide"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.datasetExplorer.dataExport.hide"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.datasetExplorer.dataExportJobs.hide"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.datasetExplorer.gridView.hide"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.datasetExplorer.workspace.hide"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.geneSignature.hide"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.gwas.hide"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.sampleExplorer.hide"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.search.show"){addConfig(uiParams,k,v,'')}
-            else if(k == "ui.tabs.uploadData.hide"){addConfig(uiParams,k,v,'')}
+            else if(k == 'com.recomdata.hideSampleExplorer'){addConfig(uiParams,k,v,'Disable sample explorer (obsolete?)')}
+            else if(k == 'com.recomdata.sessionTimeout'){addConfig(uiParams,k,v,'')}
+            else if(k == 'com.recomdata.debug.jsCallbacks'){addConfig(uiParams,k,v,'')}
+            else if(k == 'com.recomdata.plugins.resultSize'){addConfig(uiParams,k,v,'')}
+            else if(k == 'com.recomdata.heartbeatLaps'){addConfig(uiParams,k,v,'')}
+            else if(k == 'org.transmart.xnatViewerEnable'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.jirareport.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.browse.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.datasetExplorer.dataExport.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.datasetExplorer.dataExportJobs.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.datasetExplorer.gridView.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.datasetExplorer.workspace.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.geneSignature.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.gwas.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.sampleExplorer.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.search.show'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.uploadData.hide'){addConfig(uiParams,k,v,'')}
 
             // upload
-            else if(k == "com.recomdata.dataUpload.appTitle"){addConfig(uploadParams,k,v,'')}
-            else if(k == "com.recomdata.dataUpload.etl.dir"){addConfig(uploadParams,k,v,'')}
-            else if(k == "com.recomdata.dataUpload.adminEmail"){addConfig(contactParams,k,v,'')}
-            else if(k == "com.recomdata.dataUpload.stageScript"){addConfig(uploadParams,k,v,'')}
-            else if(k == "com.recomdata.dataUpload.templates.dir"){addConfig(uploadParams,k,v,'')}
-            else if(k == "com.recomdata.dataUpload.uploads.dir"){addConfig(uploadParams,k,v,'')}
+            else if(k == 'com.recomdata.dataUpload.appTitle'){addConfig(uploadParams,k,v,'')}
+            else if(k == 'com.recomdata.dataUpload.etl.dir'){addConfig(uploadParams,k,v,'')}
+            else if(k == 'com.recomdata.dataUpload.adminEmail'){addConfig(contactParams,k,v,'')}
+            else if(k == 'com.recomdata.dataUpload.stageScript'){addConfig(uploadParams,k,v,'')}
+            else if(k == 'com.recomdata.dataUpload.templates.dir'){addConfig(uploadParams,k,v,'')}
+            else if(k == 'com.recomdata.dataUpload.uploads.dir'){addConfig(uploadParams,k,v,'')}
 
             // x509
-            else if(k == "grails.plugin.springsecurity.useX509"){addConfig(x509Params,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.x509.checkForPrincipalChanges"){addConfig(x509Params,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.x509.continueFilterChainOnUnsuccessfulAuthentication"){addConfig(x509Params,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.x509.invalidateSessionOnPrincipalChange"){addConfig(x509Params,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.x509.subjectDnRegex"){addConfig(x509Params,k,v,'')}
-            else if(k == "grails.plugin.springsecurity.x509.throwExceptionWhenTokenRejected"){addConfig(x509Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.useX509'){addConfig(x509Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.x509.checkForPrincipalChanges'){addConfig(x509Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.x509.continueFilterChainOnUnsuccessfulAuthentication'){addConfig(x509Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.x509.invalidateSessionOnPrincipalChange'){addConfig(x509Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.x509.subjectDnRegex'){addConfig(x509Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.x509.throwExceptionWhenTokenRejected'){addConfig(x509Params,k,v,'')}
 
             // xnatImport
-            else if(k == "org.transmart.data.location"){addConfig(xnatImportParams,k,v,'')}
-            else if(k == "org.transmart.xnatImporterEnable"){addConfig(xnatImportParams,k,v,'')}
+            else if(k == 'org.transmart.data.location'){addConfig(xnatImportParams,k,v,'')}
+            else if(k == 'org.transmart.xnatImporterEnable'){addConfig(xnatImportParams,k,v,'')}
 
             // xnatView
-            else if(k == "org.xnat.domain"){addConfig(xnatViewParams,k,v,'')}
-            else if(k == "org.xnat.password"){addConfig(xnatViewParams,k,encodeConfigPassword(v),'')}
-            else if(k == "org.xnat.projectName"){addConfig(xnatViewParams,k,v,'')}
-            else if(k == "org.xnat.username"){addConfig(xnatViewParams,k,encodeConfigUsername(v),'')}
+            else if(k == 'org.xnat.domain'){addConfig(xnatViewParams,k,v,'')}
+            else if(k == 'org.xnat.password'){addConfig(xnatViewParams,k,encodeConfigPassword(v),'')}
+            else if(k == 'org.xnat.projectName'){addConfig(xnatViewParams,k,v,'')}
+            else if(k == 'org.xnat.username'){addConfig(xnatViewParams,k,encodeConfigUsername(v),'')}
 
 
 
             // all remaining params not known go here
 
-            else {addConfig(Params,k,v,"Unknown")}
+            else {addConfig(Params,k,v,'Unknown')}
 
          }
 
@@ -1314,11 +1314,13 @@ class ConfigService {
         def result = []
 
         grailsApplication.config.grails.plugin.springsecurity.oauthProvider.clients.each{ it ->
-            if(it.clientId == "api-client") {
-                it.desc = "REST API client"
-            } else if (it.clientId == "glowingbear-js") {
-                it.desc = "Glowing Bear UI"
-            } else {
+            if(it.clientId == 'api-client') {
+                it.desc = 'REST API client'
+            }
+            else if (it.clientId == 'glowingbear-js') {
+                it.desc = 'Glowing Bear UI'
+            }
+            else {
                 it.desc = "Unknown client '${it.client_id}'"
             }
             result.add(it)
@@ -1331,51 +1333,73 @@ class ConfigService {
         def result = []
 
         grailsApplication.config.sampleExplorer.fieldMapping.columns.each{ it ->
-            if(it.header == "ID") {
-                it.desc = "Identifier"
-            } else if (it.header == "trial name") {
-                it.desc = "Trial name"
-            } else if (it.header == "barcode") {
-                it.desc = "Bar code"
-            } else if (it.header == "plate id") {
-                it.desc = "Plate ID"
-            } else if (it.header == "patient id") {
-                it.desc = "Patient ID"
-            } else if (it.header == "external id") {
-                it.desc = "External ID"
-            } else if (it.header == "aliquot id") {
-                it.desc = "Aliquot ID"
-            } else if (it.header == "visit") {
-                it.desc = "Visit"
-            } else if (it.header == "sample type") {
-                it.desc = "Sample type"
-            } else if (it.header == "description") {
-                it.desc = "Description"
-            } else if (it.header == "comment") {
-                it.desc = "Comment"
-            } else if (it.header == "location") {
-                it.desc = "Location"
-            } else if (it.header == "tissue type") {
-                it.desc = "Tissue type"
-            } else if (it.header == "data types") {
-                it.desc = "Data types"
-            } else if (it.header == "disease") {
-                it.desc = "Disease"
-            } else if (it.header == "tissue state") {
-                it.desc = "Tissue state"
-            } else if (it.header == "biobank") {
-                it.desc = "Biobank"
-            } else if (it.header == "organism") {
-                it.desc = "Organism"
-            } else if (it.header == "treatment") {
-                it.desc = "Treatment"
-            } else if (it.header == "sample treatment") {
-                it.desc = "Sample treatment"
-            } else if (it.header == "subject treatment") {
-                it.desc = "Subject treatment"
-            } else if (it.header == "timepoint") {
-                it.desc = "Time point"
-            } else {
+            if(it.header == 'ID') {
+                it.desc = 'Identifier'
+            }
+            else if (it.header == 'trial name') {
+                it.desc = 'Trial name'
+            }
+            else if (it.header == 'barcode') {
+                it.desc = 'Bar code'
+            }
+            else if (it.header == 'plate id') {
+                it.desc = 'Plate ID'
+            }
+            else if (it.header == 'patient id') {
+                it.desc = 'Patient ID'
+            }
+            else if (it.header == 'external id') {
+                it.desc = 'External ID'
+            }
+            else if (it.header == 'aliquot id') {
+                it.desc = 'Aliquot ID'
+            }
+            else if (it.header == 'visit') {
+                it.desc = 'Visit'
+            }
+            else if (it.header == 'sample type') {
+                it.desc = 'Sample type'
+            }
+            else if (it.header == 'description') {
+                it.desc = 'Description'
+            }
+            else if (it.header == 'comment') {
+                it.desc = 'Comment'
+            }
+            else if (it.header == 'location') {
+                it.desc = 'Location'
+            }
+            else if (it.header == 'tissue type') {
+                it.desc = 'Tissue type'
+            }
+            else if (it.header == 'data types') {
+                it.desc = 'Data types'
+            }
+            else if (it.header == 'disease') {
+                it.desc = 'Disease'
+            }
+            else if (it.header == 'tissue state') {
+                it.desc = 'Tissue state'
+            }
+            else if (it.header == 'biobank') {
+                it.desc = 'Biobank'
+            }
+            else if (it.header == 'organism') {
+                it.desc = 'Organism'
+            }
+            else if (it.header == 'treatment') {
+                it.desc = 'Treatment'
+            }
+            else if (it.header == 'sample treatment') {
+                it.desc = 'Sample treatment'
+            }
+            else if (it.header == 'subject treatment') {
+                it.desc = 'Subject treatment'
+            }
+            else if (it.header == 'timepoint') {
+                it.desc = 'Time point'
+            }
+            else {
                 it.desc = "Unknown column '${it.header}'"
             }
             result.add(it)
@@ -1387,14 +1411,16 @@ class ConfigService {
     def private addConfig(Map paramData, String paramName, String paramValue, String paramDescription) {
         if(paramData.containsKey(paramName)){
             paramData[(paramName)].put('value',paramValue.encodeAsHTML())
-            if(paramDescription != "") {
-                if(paramData[(paramName)].desc == "") {
+            if(paramDescription != '') {
+                if(paramData[(paramName)].desc == '') {
                     paramData[(paramName)].desc = paramDescription
-                } else {
+                }
+                else {
                     paramData[(paramName)].desc = paramData[(paramName)].desc + '<br>' + paramDescription
                 }
-            } else {
-                if(paramData[(paramName)].desc == "") {
+            }
+            else {
+                if(paramData[(paramName)].desc == '') {
                     paramData[(paramName)].desc = '(Defined but undocumented)'
                 }
             }
@@ -1407,14 +1433,16 @@ class ConfigService {
     def private addConfigLink(Map paramData, String paramName, String paramValue, String paramDescription) {
         if(paramData.containsKey(paramName)){
             paramData[(paramName)].put('value',paramValue)
-            if(paramDescription != "") {
-                if(paramData[(paramName)].desc == "") {
+            if(paramDescription != '') {
+                if(paramData[(paramName)].desc == '') {
                     paramData[(paramName)].desc = paramDescription
-                } else {
+                }
+                else {
                     paramData[(paramName)].desc = paramData[(paramName)].desc + '<br>' + paramDescription
                 }
-            } else {
-                if(paramData[(paramName)].desc == "") {
+            }
+            else {
+                if(paramData[(paramName)].desc == '') {
                     paramData[(paramName)].desc = '(Defined but undocumented)'
                 }
             }
@@ -1427,7 +1455,8 @@ class ConfigService {
     def private encodeConfigPassword(String password) {
         if(!grailsApplication.config.org.transmart.config.showPasswords) {
             '(hidden)'
-        } else {
+        }
+        else {
             password
         }
     }
@@ -1435,21 +1464,22 @@ class ConfigService {
     def private encodeConfigUsername(String username) {
         if(!grailsApplication.config.org.transmart.config.showUsernames) {
             '(hidden)'
-        } else {
+        }
+        else {
             username
         }
     }
     
     def private linkAuthProviders(List providers) {
-       "Defined<a href=\"authProviders\">${providers.size()} providers</a>"
+       'Defined<a href=\'authProviders\'>' + providers.size() + ' providers</a>'
     }
     
     def private linkOauthClients(List clients) {
-       "Defined<a href=\"oauthClients\">${clients.size()} clients</a>"
+       'Defined<a href=\'oauthClients\'>' + clients.size() + ' clients</a>'
     }
     
     def private linkSampleMapping(List mappings) {
-       "Defined<a href=\"sampleMapping\">${mappings.size()} mappings</a>"
+       'Defined<a href=\'sampleMapping\'>' + mappings.size() + ' mappings</a>'
     }
     
 }

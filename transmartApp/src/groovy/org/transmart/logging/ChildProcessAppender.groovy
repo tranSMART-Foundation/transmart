@@ -83,12 +83,12 @@ class ChildProcessAppender extends AppenderSkeleton {
     ] as ThreadLocal<int[]>
 
     void setRestartLimit(int l) {
-        if (l < 0) throw new IllegalArgumentException("restartLimit cannot be negative (use 0 to disable the limit)")
+        if (l < 0) throw new IllegalArgumentException('restartLimit cannot be negative (use 0 to disable the limit)')
         this.restartLimit = l
     }
 
     void setRestartWindow(int w) {
-        if (w <= 0) throw new IllegalArgumentException("restartWindow must be larger than 0")
+        if (w <= 0) throw new IllegalArgumentException('restartWindow must be larger than 0')
         this.restartWindow = w
     }
 
@@ -101,7 +101,7 @@ class ChildProcessAppender extends AppenderSkeleton {
     /* We cannot call into the normal logging system while we have this appender locked (that risks deadlock), so use
      * the backup logging system.*/
     private void debug(String msg) {
-        LogLog.debug("${this.class.name}(name: $name): $msg")
+        LogLog.debug('' + this.class.name + '(name: ' + name + '): ' + msg)
     }
 
     private synchronized startProcess() {
@@ -119,7 +119,8 @@ class ChildProcessAppender extends AppenderSkeleton {
         try {
             process.exitValue()
             return false
-        } catch (IllegalThreadStateException _) {
+        }
+        catch (IllegalThreadStateException _) {
             return true
         }
     }
@@ -132,15 +133,15 @@ class ChildProcessAppender extends AppenderSkeleton {
         if (restartLimit != 0 && inWindow && failcount > restartLimit) {
             broken = true
             // Don't log from here while we are synchronized, that would cause a deadlock condition
-            return "Failed to restart external log handling process \"${command.join(' ')}\", failed $failcount times" +
-                    " in less than $restartWindow seconds"
+            return 'Failed to restart external log handling process \'' + command.join(' ') + '\', failed $failcount times' +
+                    ' in less than ' + restartWindow + ' seconds'
         }
         input.close()
         if (!inWindow) {
             starttime = now
             failcount = 0
         }
-        debug("Restarting external logging process ${command.join(' ')}")
+        debug('Restarting external logging process ' + command.join(' '))
         startProcess()
         return null
     }
@@ -154,10 +155,11 @@ class ChildProcessAppender extends AppenderSkeleton {
             if (rc[0] > 1) return
 
             if (broken) {
-                String msg = "Attempting to write to broken external log handling process"
+                String msg = 'Attempting to write to broken external log handling process'
                 if (throwOnFailure) {
                     throw new ChildFailedException(msg)
-                } else {
+                }
+                else {
                     logger.warn(msg)
                     return
                 }
@@ -175,8 +177,9 @@ class ChildProcessAppender extends AppenderSkeleton {
                         input.write(str)
                         input.flush()
                         return
-                    } catch (IOException e) {
-                        debug("Caught IOException while writing to child process: $e")
+                    }
+                    catch (IOException e) {
+                        debug('Caught IOException while writing to child process: ' + e)
                         errmsg = restartChild()
                     }
                 }
@@ -188,7 +191,8 @@ class ChildProcessAppender extends AppenderSkeleton {
             if (throwOnFailure) {
                 throw new ChildFailedException(errmsg)
             }
-        } finally {
+        }
+        finally {
             rc[0] = oldrc
         }
     }
@@ -196,7 +200,7 @@ class ChildProcessAppender extends AppenderSkeleton {
     @Override
     void append(LoggingEvent event) {
         // Check for recursive invocation
-        if (recursionCount.get()[0] > 0) return;
+        if (recursionCount.get()[0] > 0) return
 
         write(layout.format(event))
     }

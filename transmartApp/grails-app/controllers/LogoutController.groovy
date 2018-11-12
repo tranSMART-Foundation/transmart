@@ -17,7 +17,7 @@ class LogoutController {
      * Index action. Redirects to the Spring security logout uri.
      */
     def index = {
-        new AccessLog(username: springSecurityService.getPrincipal().username, event: "Logout", accesstime: new Date()).save()
+        new AccessLog(username: springSecurityService.getPrincipal().username, event: 'Logout', accesstime: new Date()).save()
         redirect uri: SpringSecurityUtils.securityConfig.logout.filterProcessesUrl
     }
 }

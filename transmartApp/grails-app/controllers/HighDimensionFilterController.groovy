@@ -13,36 +13,36 @@ class HighDimensionFilterController {
     /**
      * Render the filter dialog.
      * @param gpl_id The GPL ID of the platform for this high dimensional dataset
-     * @param filter Should be "true" for filter dialog (cohort selection), "false" for selection dialog (when dropping
+     * @param filter Should be 'true' for filter dialog (cohort selection), 'false' for selection dialog (when dropping
      *        into summary statistics or grid view)
      * @param concept_key The concept key of the high dimensional concept
      */
     def filterDialog = {
-        def template = "highDimensionFilterDialog"
+        def template = 'highDimensionFilterDialog'
         def gpl_id = params.gpl_id ?: null
         def filter = params.filter ?: true
         def concept_key = params.concept_key ?: null
         if (gpl_id == null) {
-            render template: template, model: [error: "No GPL ID provided."]
+            render template: template, model: [error: 'No GPL ID provided.']
             return
         }
 
         if (concept_key == null) {
-            render template: template, model: [error: "No concept key provided"]
+            render template: template, model: [error: 'No concept key provided']
             return
         }
 
         def platform = DeGplInfo.findById gpl_id ?: null
 
         if (platform == null) {
-            render template: template, model: [error: "Unknown GPL ID provided."]
+            render template: template, model: [error: 'Unknown GPL ID provided.']
             return
         }
 
         def resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept_key)
 
         if (resource.dataTypeName == 'vcf') {
-            render "Small Variant data is not supperted yet, stay tuned!"
+            render 'Small Variant data is not supperted yet, stay tuned!'
         }
         else {
             def model = [gpl_id               : platform.id,
@@ -62,18 +62,18 @@ class HighDimensionFilterController {
 
     /**
      * Get general information on the high dimensional filter.
-     * @param filter Should be "true" for filter dialog (cohort selection), "false" for selection dialog (when dropping
+     * @param filter Should be 'true' for filter dialog (cohort selection), 'false' for selection dialog (when dropping
      *        into summary statistics or grid view)
      * @param concept_key The concept key of the high dimensional concept
      * @return JSON object with following properties: platform, auto_complete_source, filter_type,
      *         filter, concept_key, concept_code
      */
     def filterInfo = {
-        def template = "highDimensionFilterDialog"
+        def template = 'highDimensionFilterDialog'
         def concept_key = params.concept_key ?: null
         def filter = params.filter ?: true
         if (concept_key == null) {
-            render template: template, model: [error: "No concept key provided."]
+            render template: template, model: [error: 'No concept key provided.']
             return
         }
         def concept_code = i2b2HelperService.getConceptCodeFromKey(concept_key)
@@ -82,18 +82,18 @@ class HighDimensionFilterController {
         def resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept_key)
 
         def result = [platform: platform,
-                      auto_complete_source: "/transmart/highDimensionFilter/searchAutoComplete", //?concept_key=" + URLEncoder.encode(concept_key, "UTF-8"),
+                      auto_complete_source: '/transmart/highDimensionFilter/searchAutoComplete, //?concept_key=' + URLEncoder.encode(concept_key, 'UTF-8'),
                       filter_type: resource.getHighDimensionFilterType(),
                       filter: filter,
                       concept_key: concept_key,
                       concept_code: concept_code]
 
-        if (result.filter_type == "") result['error'] = "Unrecognized marker type " + platform.markerType
+        if (result.filter_type == '') result['error'] = 'Unrecognized marker type ' + platform.markerType
         render result as JSON
     }
 
     def searchAutoComplete = {
-        if (params.concept_key == "" || params.term == "" || params.search_property == "") {
+        if (params.concept_key == '' || params.term == '' || params.search_property == '') {
             return [] as JSON
         }
         //def result = omicsQueryService.getSearchResults(params.term, params.concept_key, params.search_property)

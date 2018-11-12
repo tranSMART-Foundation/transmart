@@ -20,13 +20,14 @@ public class AssayStatsExpMarkerQuery extends AssayAnalysisDataQuery {
         def biomarkerFilters = gfilter.getBioMarkerFilters()
 
         if (!biomarkerFilters.isEmpty()) {
-            def markerAlias = mainTableAlias + ".marker"
+            def markerAlias = mainTableAlias + '.marker'
             if (expandBioMarkers) {
-                addCondition(createExpandBioMarkerCondition(markerAlias, gfilter));
-                //	addCondition(markerAlias+".id IN ("+createExpandBioMarkerSubQuery(biomarkerFilters.getKeywordDataIdString())+") ")
+                addCondition(createExpandBioMarkerCondition(markerAlias, gfilter))
+                //	addCondition(markerAlias+'.id IN ('+createExpandBioMarkerSubQuery(biomarkerFilters.getKeywordDataIdString())+') ')
 
-            } else {
-                addCondition(markerAlias + ".id IN (" + biomarkerFilters.getKeywordDataIdString() + ") ")
+            }
+            else {
+                addCondition(markerAlias + '.id IN (' + biomarkerFilters.getKeywordDataIdString() + ') ')
             }
         }
     }

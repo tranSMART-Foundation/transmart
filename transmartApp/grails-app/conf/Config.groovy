@@ -6,7 +6,7 @@ if (!Environment.isWarDeployed() && Environment.isWithinShell()) {
 	console = GrailsConsole.instance
 }
 else {
-	console = [info: { println "[INFO] $it" }, warn: { println "[WARN] $it" }]
+	console = [info: { println '[INFO] ' + it }, warn: { println '[WARN] ' + it }]
 }
 
 /**
@@ -29,9 +29,9 @@ grails.config.locations = []
 List<String> defaultConfigFiles
 if (Environment.current != Environment.TEST) {
 	defaultConfigFiles = [
-			"$userHome/.grails/${appName}Config/Config.groovy",
-			"$userHome/.grails/${appName}Config/RModulesConfig.groovy",
-			"$userHome/.grails/${appName}Config/DataSource.groovy"
+			'' + userHome + '/.grails/' + appName + 'Config/Config.groovy',
+			'' + userHome + '/.grails/' + appName + 'Config/RModulesConfig.groovy',
+			'' + userHome + '/.grails/' + appName + 'Config/DataSource.groovy'
 	]
 }
 else {
@@ -49,21 +49,21 @@ for (String filePath in defaultConfigFiles) {
 		grails.config.locations << 'file:' + filePath
 	}
 	else if (f.name != 'RModulesConfig.groovy') {
-		console.info "Configuration file $filePath does not exist."
+		console.info 'Configuration file ' + filePath + ' does not exist.'
 	}
 }
 String bashSafeEnvAppName = appName.toString().toUpperCase(Locale.ENGLISH).replaceAll(/-/, '_')
 
-String externalConfig = System.getenv("${bashSafeEnvAppName}_CONFIG_LOCATION")
+String externalConfig = System.getenv('' + bashSafeEnvAppName + '_CONFIG_LOCATION')
 if (externalConfig) {
 	grails.config.locations << 'file:' + externalConfig
 }
-String externalDataSource = System.getenv("${bashSafeEnvAppName}_DATASOURCE_LOCATION")
+String externalDataSource = System.getenv('' + bashSafeEnvAppName + '_DATASOURCE_LOCATION')
 if (externalDataSource) {
 	grails.config.locations << 'file:' + externalDataSource
 }
 for (location in grails.config.locations) {
-	console.info "Including configuration file [$location] in configuration building."
+	console.info 'Including configuration file [' + location + '] in configuration building.'
 }
 
 grails {
@@ -251,14 +251,14 @@ log4j.main = {
 	appenders {
 		// default log directory is either the tomcat root directory or the current working directory.
 		String catalinaBase = System.getProperty('catalina.base') ?: '.'
-		String logDirectory = "$catalinaBase/logs"
+		String logDirectory = '' + catalinaBase + '/logs'
 
 		// Use layout: JsonLayout(conversionPattern: '%m%n', singleLine: true) to get each message as a single line
 		// json the same way as ChildProcessAppender sends it.
 		appender new DailyRollingFileAppender(
 			name: 'fileAuditLogger',
 			datePattern: "'.'yyyy-MM-dd",
-			fileName: "$logDirectory/audit.log",
+			fileName: '' + logDirectory + '/audit.log',
 			layout: JsonLayout(conversionPattern:'%d %m%n')
 		)
 		// the default layout is a JsonLayout(conversionPattern: '%m%n, singleLine: true)

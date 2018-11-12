@@ -42,7 +42,7 @@ class BruteForceLoginLockService {
      */
     def failLogin(String login) {
         def numberOfAttempts = failedAttempts.get(login)
-        logger.debug "fail login ${login} previous number for failedAttempts $numberOfAttempts"
+        logger.debug 'fail login ' + login + ' previous number for failedAttempts ' + numberOfAttempts
         failedAttempts.put(login, numberOfAttempts + 1)
     }
 
@@ -52,7 +52,7 @@ class BruteForceLoginLockService {
      */
     def loginSuccess(String login) {
         if (!isLocked(login)) {
-            logger.debug "successful login for ${login}"
+            logger.debug 'successful login for ' + login
             failedAttempts.invalidate(login)
         }
     }

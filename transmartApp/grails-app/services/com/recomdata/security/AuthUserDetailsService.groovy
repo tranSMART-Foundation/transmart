@@ -47,7 +47,8 @@ class AuthUserDetailsService implements GrailsUserDetailsService {
                     username,
                     loadRoles,
                     true /* ignore case */)
-        } catch (UsernameNotFoundException unfe) {
+        }
+        catch (UsernameNotFoundException unfe) {
             def splitUsername = username.split('@') as List
             if (splitUsername.size() != 2) {
                 throw unfe
@@ -66,7 +67,7 @@ class AuthUserDetailsService implements GrailsUserDetailsService {
                                    boolean ignoreCase = false)
             throws UsernameNotFoundException {
 
-        logger.info "Attempting to find user for $property = $value"
+        logger.info 'Attempting to find user for ' + property + ' = ' + value
 
         Class<?> userClass = grailsApplication.getDomainClass(
                 conf.userLookup.userDomainClassName).clazz
@@ -81,9 +82,9 @@ class AuthUserDetailsService implements GrailsUserDetailsService {
         def authorities = []
 
         if (!user) {
-            logger.warn "User not found with $property = $value"
-            throw new UsernameNotFoundException("User not found",
-                    "$property = $value")
+            logger.warn 'User not found with ' + property + ' = ' + value
+            throw new UsernameNotFoundException('User not found',
+                    '' + property + ' = ' + value)
         }
 
         if (loadRoles) {
@@ -93,7 +94,7 @@ class AuthUserDetailsService implements GrailsUserDetailsService {
         }
 
         if (loadRoles && logger.isDebugEnabled()) {
-            logger.debug("Roles for user ${user.username} are: " +
+            logger.debug('Roles for user ' + user.username + ' are: ' +
                     authorities.join(', ') ?: '(none)')
         }
 

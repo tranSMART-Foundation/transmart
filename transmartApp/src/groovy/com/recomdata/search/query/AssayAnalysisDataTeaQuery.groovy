@@ -15,17 +15,17 @@ public class AssayAnalysisDataTeaQuery extends Query {
      * create biomarker table alias
      */
     def String getBioMarkerTable() {
-        return mainTableAlias + ".featureGroup.markers ";
+        return mainTableAlias + '.featureGroup.markers '
     }
     /**
      *  criteria builder for disease,override default
      */
     def buildGlobalFilterDiseaseCriteria(GlobalFilter gfilter) {
         if (!gfilter.getDiseaseFilters().isEmpty()) {
-            def dAlias = mainTableAlias + "_dis"
-            def dtable = mainTableAlias + ".experiment.diseases " + dAlias;
-            addTable("JOIN " + dtable)
-            addCondition(dAlias + ".id IN (" + gfilter.getDiseaseFilters().getKeywordDataIdString() + ") ")
+            def dAlias = mainTableAlias + '_dis'
+            def dtable = mainTableAlias + '.experiment.diseases ' + dAlias
+            addTable('JOIN ' + dtable)
+            addCondition(dAlias + '.id IN (' + gfilter.getDiseaseFilters().getKeywordDataIdString() + ') ')
         }
 
     }
@@ -36,10 +36,10 @@ public class AssayAnalysisDataTeaQuery extends Query {
 
     def buildGlobalFilterCompoundCriteria(GlobalFilter gfilter) {
         if (!gfilter.getCompoundFilters().isEmpty()) {
-            def dAlias = mainTableAlias + "_cpd"
-            def dtable = mainTableAlias + ".experiment.compounds " + dAlias;
-            addTable("JOIN " + dtable)
-            addCondition(dAlias + ".id IN (" + gfilter.getCompoundFilters().getKeywordDataIdString() + ") ")
+            def dAlias = mainTableAlias + '_cpd'
+            def dtable = mainTableAlias + '.experiment.compounds ' + dAlias
+            addTable('JOIN ' + dtable)
+            addCondition(dAlias + '.id IN (' + gfilter.getCompoundFilters().getKeywordDataIdString() + ') ')
         }
 
     }
@@ -50,10 +50,10 @@ public class AssayAnalysisDataTeaQuery extends Query {
 
     def buildGlobalFilterExperimentCriteria(GlobalFilter gfilter) {
         if (!gfilter.getTrialFilters().isEmpty()) {
-            addCondition(mainTableAlias + ".experiment.id IN (" + gfilter.getTrialFilters().getKeywordDataIdString() + ")")
+            addCondition(mainTableAlias + '.experiment.id IN (' + gfilter.getTrialFilters().getKeywordDataIdString() + ')')
         }
         if (!gfilter.getStudyFilters().isEmpty()) {
-            addCondition(mainTableAlias + ".experiment.id IN (" + gfilter.getStudyFilters().getKeywordDataIdString() + ")")
+            addCondition(mainTableAlias + '.experiment.id IN (' + gfilter.getStudyFilters().getKeywordDataIdString() + ')')
         }
     }
 

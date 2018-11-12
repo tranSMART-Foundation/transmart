@@ -46,7 +46,7 @@ class ProteomicsBedExporterTests {
     }
 
     @Test
-    void "test whether Proteomics data is exported properly"() {
+    void 'test whether Proteomics data is exported properly'() {
 
         tabularResult = createMockProteomicsTabularResult()
 
@@ -60,8 +60,8 @@ class ProteomicsBedExporterTests {
 
             assertThat outputStreams, hasSize(2)
 
-            String assay1Output = outputStreams[0].toString("UTF-8")
-            String assay2Output = outputStreams[1].toString("UTF-8")
+            String assay1Output = outputStreams[0].toString('UTF-8')
+            String assay2Output = outputStreams[1].toString('UTF-8')
 
             List assay1Lines = assay1Output.readLines()
             //NOTE: bioMarker is used as label if it's present
@@ -86,29 +86,29 @@ class ProteomicsBedExporterTests {
         // Setup tabularResult and projection to test with
         List<AssayColumn> sampleAssays = createSampleAssays(2)
         Map<String, List<Object>> dataRows = [
-                "row1": [
+                'row1': [
                         [intensity: 110, zscore: lowZscoreValue],
                         [intensity: 220, zscore: highZscoreValue]
                 ],
-                "row2": [
+                'row2': [
                         [intensity: 330, zscore: 0],
                         [intensity: 440, zscore: highZscoreValue]
                 ],
-                "row3": [
+                'row3': [
                         [intensity: 550, zscore: lowZscoreValue],
                         [intensity: 660, zscore: 0]
                 ],
         ]
 
         Map<String, Map> proteomicsRowProperties = [
-                "row1": [
+                'row1': [
                         chromosome: 'chrX',
                         start     : 1234,
                         end       : 1300,
                         name      : 'test-region1',
                         platform  : [genomeReleaseId: 'hg19']
                 ],
-                "row2": [
+                'row2': [
                         chromosome: 'CHRY',
                         start     : 1301,
                         end       : 1400,
@@ -116,7 +116,7 @@ class ProteomicsBedExporterTests {
                         bioMarker : 'test-bio-marker',
                         platform  : [genomeReleaseId: 'hg19']
                 ],
-                "row3": [
+                'row3': [
                         chromosome: '9',
                         start     : 1000,
                         end       : 2000,

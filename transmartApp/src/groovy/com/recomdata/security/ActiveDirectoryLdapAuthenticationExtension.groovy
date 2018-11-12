@@ -20,7 +20,7 @@ class ActiveDirectoryLdapAuthenticationExtension {
     boolean onlyDomainNames = false
     String domain
 
-    private final Log logger = LogFactory.getLog(ActiveDirectoryLdapAuthenticationExtension.class);
+    private final Log logger = LogFactory.getLog(ActiveDirectoryLdapAuthenticationExtension.class)
 
     @PostConstruct
     def configure() {
@@ -31,13 +31,13 @@ class ActiveDirectoryLdapAuthenticationExtension {
         if (ldapConf.ad.onlyDomainNames) {
             onlyDomainNames = ldapConf.ad.onlyDomainNames
         }
-        logger.info("domain ${ldapConf.ad.domain} lowerCaseName ${lowerCaseName} onlyDomainNames ${onlyDomainNames}");
+        logger.info('domain ' + ldapConf.ad.domain + ' lowerCaseName ' + lowerCaseName + ' onlyDomainNames ' + onlyDomainNames)
         domain = ldapConf.ad.domain
     }
 
     protected static Authentication toLowerCaseAuthentication(Authentication auth) {
         if (auth.name == auth.name.toLowerCase()) {
-            return auth;
+            return auth
         }
         Authentication res = new UsernamePasswordAuthenticationToken(auth.name.toLowerCase(),
                 auth.credentials, auth.authorities)
@@ -45,16 +45,16 @@ class ActiveDirectoryLdapAuthenticationExtension {
         return res
     }
 
-    @Around("execution(* org.springframework.security.ldap.authentication.AbstractLdapAuthenticationProvider+.authenticate(..))")
+    @Around('execution(* org.springframework.security.ldap.authentication.AbstractLdapAuthenticationProvider+.authenticate(..))')
     def authenticate(ProceedingJoinPoint point) {
-        logger.info("authenticate start");
+        logger.info('authenticate start')
         Authentication auth = point.args[0]
         if (point.target instanceof ActiveDirectoryLdapAuthenticationProvider) {
             if (lowerCaseName) {
                 auth = toLowerCaseAuthentication(auth)
             }
-            if (onlyDomainNames && !auth.name.endsWith("@$domain")) {
-                return null;
+            if (onlyDomainNames && !auth.name.endsWith('@' + domain)) {
+                return null
             }
         }
         return point.proceed(auth)

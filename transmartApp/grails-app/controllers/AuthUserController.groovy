@@ -164,7 +164,7 @@ class AuthUserController {
         else {
             msg = '' + person.username + ' has been updated. Changed fields include: '
             msg += person.dirtyPropertyNames.collect { field ->
-                def newValue = person."$field"
+                def newValue = person[field]
                 def oldValue = person.getPersistentValue(field)
                 if (newValue != oldValue) {
                     '' + field + ' (' + oldValue + ' -> ' + newValue + ')'

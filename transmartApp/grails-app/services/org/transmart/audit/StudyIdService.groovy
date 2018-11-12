@@ -57,21 +57,22 @@ class StudyIdService {
         }
         concept_key = concept_key.trim()
         if (concept_key.empty) {
-            return ""
+            return ''
         }
-        String studyId = ""
+        String studyId = ''
         try {
-            logger.debug "Query study id for concept key: ${concept_key}"
+            logger.debug 'Query study id for concept key: ' + concept_key
             OntologyTerm term = conceptsResourceService.getByKey(concept_key)
             Study study = term?.study
             studyId = study?.id
             if (options?.studyConceptOnly && study?.ontologyTerm != term) {
                 studyId = null
             }
-            logger.debug "Study id for concept key ${concept_key} is: ${studyId}"
-        } catch(NoSuchResourceException e) {
-            logger.warn "Resource not found: " +
-                    "ConceptResource.getByKey(${concept_key})"
+            logger.debug 'Study id for concept key ' + concept_key + ' is: ' + studyId
+        }
+        catch(NoSuchResourceException e) {
+            logger.warn 'Resource not found: ' +
+                    'ConceptResource.getByKey(' + concept_key + ')'
         }
         studyId
     }
@@ -80,12 +81,13 @@ class StudyIdService {
     Set<String> getStudyIdsForQueryId(Long queryId) {
         Set<String> result = []
         try {
-            logger.debug "Query trials for query id: ${queryId}"
+            logger.debug 'Query trials for query id: ' + queryId
             QueryResult queryResult = queriesResourceService.getQueryResultFromId(queryId)
             result = queryResult.patients*.trial as Set
-        } catch (NoSuchResourceException e) {
-            logger.warn "Resource not found: " +
-                    "QueriesResource.getQueryResultFromId(${queryId})"
+        }
+        catch (NoSuchResourceException e) {
+            logger.warn 'Resource not found: ' +
+                    'QueriesResource.getQueryResultFromId(' + queryId + ')'
         }
         result
     }
@@ -103,12 +105,13 @@ class StudyIdService {
     public String getStudyIdsForQueries(List<String> queryIds) {
         Set<String> studyIds = []
         for (String queryId: queryIds) {
-            if (queryId != null && queryId != "null") {
+            if (queryId != null && queryId != 'null') {
                 queryId = queryId.trim()
                 if (!queryId.empty) {
                     if (!queryId.isLong()) {
-                        logger.warn "Query id is not an integer: ${queryId}"
-                    } else {
+                        logger.warn 'Query id is not an integer: ' + queryId
+                    }
+                    else {
                         Long qId = queryId.toLong()
                         studyIds += getStudyIdsForQueryId(qId)
                     }

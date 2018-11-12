@@ -16,13 +16,13 @@ public class LiteratureDataQuery extends Query {
 
     def buildGlobalFilterExperimentCriteria(GlobalFilter gfilter) {
         if (!gfilter.getTrialFilters().isEmpty()) {
-            addCondition("1 = 0")
+            addCondition('1 = 0')
         }
     }
 
     def buildGlobalFilterStudyCriteria(GlobalFilter gfilter) {
         if (!gfilter.getStudyFilters().isEmpty()) {
-            addCondition("1 = 0")
+            addCondition('1 = 0')
         }
     }
 

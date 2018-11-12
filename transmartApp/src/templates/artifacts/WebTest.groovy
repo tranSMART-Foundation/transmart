@@ -46,9 +46,9 @@ class @webtest.name.caps @Test extends grails.util.WebTest {
     String ROW_COUNT_XPATH = "count(//td[@class='actionButtons']/..)"
 
     def verifyListPage(int count) {
-        ant.group(description: "verify @webtest.name.caps@ list view with $count row(s)") {
+        ant.group(description: 'verify @webtest.name.caps@ list view with ' + count + ' row(s)') {
             verifyText(text: '@webtest.name.caps@ List')
-            verifyXPath(xpath: ROW_COUNT_XPATH, text: count, description: "$count row(s) of data expected")
+            verifyXPath(xpath: ROW_COUNT_XPATH, text: count, description: '' + count + ' row(s) of data expected')
         }
     }
 }

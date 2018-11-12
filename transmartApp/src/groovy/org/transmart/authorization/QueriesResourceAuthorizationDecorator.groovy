@@ -31,8 +31,8 @@ class QueriesResourceAuthorizationDecorator
     @Override
     QueryResult runQuery(QueryDefinition definition) throws InvalidRequestException {
         if (!user.canPerform(BUILD_COHORT, definition)) {
-            throw new AccessDeniedException("Denied ${user.username} access " +
-                    "for building cohort based on $definition")
+            throw new AccessDeniedException('Denied ' + user.username + ' access ' +
+                    'for building cohort based on ' + definition)
         }
 
         delegate.runQuery definition
@@ -41,12 +41,12 @@ class QueriesResourceAuthorizationDecorator
     @Override
     QueryResult runQuery(QueryDefinition definition, String username) throws InvalidRequestException {
         if (!user.canPerform(BUILD_COHORT, definition)) {
-            throw new AccessDeniedException("Denied ${user.username} access " +
-                    "for building cohort based on $definition")
+            throw new AccessDeniedException('Denied ' + user.username + ' access ' +
+                    'for building cohort based on ' + definition)
         }
         if (username != user.username) {
-            throw new AccessDeniedException("Denied ${user.username} access " +
-                    "to building a cohort in name of ${username}")
+            throw new AccessDeniedException('Denied ' + user.username + ' access ' +
+                    'to building a cohort in name of ' + username)
         }
 
         delegate.runQuery definition, username
@@ -57,8 +57,8 @@ class QueriesResourceAuthorizationDecorator
         def res = delegate.getQueryResultFromId id
 
         if (!user.canPerform(READ, res)) {
-            throw new AccessDeniedException("Denied ${user.username} access " +
-                    "to query result with id $id")
+            throw new AccessDeniedException('Denied ' + user.username + ' access ' +
+                    'to query result with id ' + id)
         }
 
         res
@@ -104,14 +104,14 @@ class QueriesResourceAuthorizationDecorator
 
         ids.each { long it ->
             if (cache && cache.resultInstanceIdsAllowed.contains(it)) {
-                logger.debug("Request cache for legacy access to result " +
-                        "instance ids includes entry for rid $it")
+                logger.debug('Request cache for legacy access to result ' +
+                        'instance ids includes entry for rid ' + it)
                 return
             }
 
             thiz.getQueryResultFromId it //may throw
-            logger.debug("Request access to rid $it from legacy " +
-                    "checkQueryResultAccess")
+            logger.debug('Request access to rid ' + it + ' from legacy ' +
+                    'checkQueryResultAccess')
 
             if (cache) {
                 cache.resultInstanceIdsAllowed << it

@@ -35,17 +35,19 @@ class PluginModuleTests extends GrailsUnitTestCase {
         try {
             pluginModule.name = 'Test Plugin Module updated'
             pluginModule.save()
-        } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            println "Plugin Module could not be updated"
+        }
+        catch (org.springframework.dao.DataIntegrityViolationException e) {
+            println 'Plugin Module could not be updated'
         }
 
         println 'Finished Updating Plugin Module'
 
         try {
             pluginModule.delete()
-            println "Plugin Module deleted"
-        } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            println "Plugin Module could not be deleted"
+            println 'Plugin Module deleted'
+        }
+        catch (org.springframework.dao.DataIntegrityViolationException e) {
+            println 'Plugin Module could not be deleted'
         }
 
         println 'Finished Deleting Plugin Module'

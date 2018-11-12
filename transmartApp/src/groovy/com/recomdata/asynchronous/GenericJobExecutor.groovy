@@ -52,23 +52,23 @@ class GenericJobExecutor implements Job {
     // TODO -- NEED TO BE REVIEWED (f.guitton@imperial.ac.uk)
     private void init() {
         //Put an entry in our logger.
-        logger.info("${jobName} has been triggered to run ")
+        logger.info('' + jobName + ' has been triggered to run ')
 
         //Get the data map which shows the attributes for our job.
 
         //Write our attributes to a log file.
         if (logger.isDebugEnabled()) {
             jobDataMap.getKeys().each { _key ->
-                logger.debug("\t${_key} -> ${jobDataMap[_key]}")
+                logger.debug('\t' + _key + ' -> ' + jobDataMap[_key])
             }
         }
 
-        logger.info("Data Export Service: " + dataExportService)
+        logger.info('Data Export Service: ' + dataExportService)
 
-//		grailsApplication = jobDataMap.get("SGA")
-//		jobResultsService = jobDataMap.get("SJRS")
-//		asyncJobService = jobDataMap.get("SAJS")
-//		dataExportService = jobDataMap.get("SDES")
+//		grailsApplication = jobDataMap.get('SGA')
+//		jobResultsService = jobDataMap.get('SJRS')
+//		asyncJobService = jobDataMap.get('SAJS')
+//		dataExportService = jobDataMap.get('SDES')
 
     }
     // --
@@ -85,7 +85,8 @@ class GenericJobExecutor implements Job {
             interceptor = Holders.applicationContext.persistenceInterceptor
             interceptor.init()
             doExecute(jobExecutionContext.jobDetail)
-        } finally {
+        }
+        finally {
             // Thread will be reused, need to clear user in context
             quartzSpringScope.clear()
             interceptor.flush()
@@ -99,89 +100,94 @@ class GenericJobExecutor implements Job {
         jobDataMap = jobDetail.getJobDataMap()
 
         //Initialize
-        init();
+        init()
 
         //Initialize the jobTmpDirectory which will be used during bundling in ZipUtil
-        jobTmpDirectory = tempFolderDirectory + File.separator + "${jobName}" + File.separator
-        jobTmpDirectory = jobTmpDirectory.replace("\\", "\\\\")
+        jobTmpDirectory = tempFolderDirectory + File.separator + jobName + File.separator
+        jobTmpDirectory = jobTmpDirectory.replace('\\', '\\\\')
         if (new File(jobTmpDirectory).exists()) {
             logger.warn("The job folder ${jobTmpDirectory} already exists. It's going to be overwritten.")
             FileUtils.deleteDirectory(new File(jobTmpDirectory))
         }
-        jobTmpWorkingDirectory = jobTmpDirectory + "workingDirectory"
+        jobTmpWorkingDirectory = jobTmpDirectory + 'workingDirectory'
 
         //Try to make the working directory.
         File jtd = new File(jobTmpWorkingDirectory)
-        jtd.mkdirs();
+        jtd.mkdirs()
 
         //Create a file that will have all the job parameters for debugging purposes.
         jobInfoFile = new File(jobTmpWorkingDirectory + File.separator + 'jobInfo.txt')
 
         //Write our parameters to the file.
-        jobInfoFile.write("Parameters" + System.getProperty("line.separator"))
+        jobInfoFile.write('Parameters' + System.getProperty('line.separator'))
         jobDataMap.getKeys().each { _key ->
-            jobInfoFile.append("\t${_key} -> ${jobDataMap[_key]}" + System.getProperty("line.separator"))
+            jobInfoFile.append('\t' + _key + ' -> ' + jobDataMap[_key] + System.getProperty('line.separator'))
         }
 
         //JobResult[] jresult
         String sResult
         try {
             //TODO: Possibly abstract this our so the Quartz job doesn't have all this nonsense.
-            updateStatus(jobName, "Gathering Data")
+            updateStatus(jobName, 'Gathering Data')
             if (isJobCancelled(jobName)) return
             getData()
 
-            updateStatus(jobName, "Running Conversions")
+            updateStatus(jobName, 'Running Conversions')
             if (isJobCancelled(jobName)) return
             runConversions()
 
-            updateStatus(jobName, "Running Analysis")
+            updateStatus(jobName, 'Running Analysis')
             if (isJobCancelled(jobName)) return
             runAnalysis()
 
-            updateStatus(jobName, "Rendering Output")
+            updateStatus(jobName, 'Rendering Output')
             if (isJobCancelled(jobName)) return
             renderOutput(jobDetail)
 
-        } catch (DataNotFoundException dnfe) {
-            logger.error("DAO exception thrown executing job: " + dnfe.getMessage(), dnfe)
-            jobResultsService[jobName]["Exception"] = dnfe.getMessage()
+        }
+        catch (DataNotFoundException dnfe) {
+            logger.error('DAO exception thrown executing job: ' + dnfe.getMessage(), dnfe)
+            jobResultsService[jobName]['Exception'] = dnfe.getMessage()
             return
             /*}catch(WebServiceException wse)	{
-                logger.error("WebServiceException thrown executing job: " + wse.getMessage(), wse)
-                jobResultsService[jobName]["Exception"] = "There was an error running your job. Please contact an administrator."
+                logger.error('WebServiceException thrown executing job: ' + wse.getMessage(), wse)
+                jobResultsService[jobName]['Exception'] = 'There was an error running your job. Please contact an administrator.'
                 return*/
-        } catch (RserveException rse) {
-            logger.error("RserveException thrown executing job: " + rse.getMessage(), rse)
-            jobResultsService[jobName]["Exception"] = "There was an error running the R script for your job. Please contact an administrator."
+        }
+        catch (RserveException rse) {
+            logger.error('RserveException thrown executing job: ' + rse.getMessage(), rse)
+            jobResultsService[jobName]['Exception'] = 'There was an error running the R script for your job. Please contact an administrator.'
             return
-        } catch (Exception e) {
-            logger.error("Exception thrown executing job: " + e.getMessage(), e)
+        }
+        catch (Exception e) {
+            logger.error('Exception thrown executing job: ' + e.getMessage(), e)
             def errorMsg = null
             if (e instanceof UndeclaredThrowableException) {
                 errorMsg = ((UndeclaredThrowableException) e)?.getUndeclaredThrowable().message
-            } else {
+            }
+            else {
                 errorMsg = e?.message
             }
             if (!errorMsg?.trim()) {
                 errorMsg = "There was an error running your job \'${jobName}\'. Please contact an administrator."
             }
-            jobResultsService[jobName]["Exception"] = errorMsg
+            jobResultsService[jobName]['Exception'] = errorMsg
             return
-        } finally {
-            if (jobResultsService[jobName]["Exception"] != null) {
-                asyncJobService.updateStatus(jobName, "Error", null, null, jobResultsService[jobName]["Exception"])
+        }
+        finally {
+            if (jobResultsService[jobName]['Exception'] != null) {
+                asyncJobService.updateStatus(jobName, 'Error', null, null, jobResultsService[jobName]['Exception'])
             }
         }
 
         //Marking the status as complete makes the
-        updateStatus(jobName, "Completed")
+        updateStatus(jobName, 'Completed')
     }
 
     private boolean isStudySelected(int studyCnt, List checkboxList) {
         boolean studySelected = false
         for (checkbox in checkboxList) {
-            if (StringUtils.contains(checkbox, "subset" + studyCnt)) {
+            if (StringUtils.contains(checkbox, 'subset' + studyCnt)) {
                 studySelected = true
                 break
             }
@@ -198,17 +204,16 @@ class GenericJobExecutor implements Job {
 
     private void runConversions() {
         //Get the data based on the job configuration.
-        def conversionSteps = jobDataMap.get("conversionSteps")
+        def conversionSteps = jobDataMap.get('conversionSteps')
 
-        conversionSteps.each
-                {
+        conversionSteps.each {
                     currentStep ->
 
                         switch (currentStep.key) {
-                            case "R":
+                            case 'R':
 
                                 //Call a function to process our R commands.
-                                runRCommandList(currentStep.value);
+                                runRCommandList(currentStep.value)
                         }
 
                 }
@@ -216,30 +221,29 @@ class GenericJobExecutor implements Job {
 
     private void runAnalysis() {
         //Get the data based on the job configuration.
-        def analysisSteps = jobDataMap.get("analysisSteps")
+        def analysisSteps = jobDataMap.get('analysisSteps')
 
-        analysisSteps.each
-                {
+        analysisSteps.each {
                     currentStep ->
 
                         switch (currentStep.key) {
-                            case "bundle":
+                            case 'bundle':
                                 /** Access the ZipUtil in a static way */
-                                String zipFileLoc = (new File(jobTmpDirectory))?.getParent() + File.separator;
-                                finalOutputFile = ZipUtil.zipFolder(jobTmpDirectory, zipFileLoc + jobDataMap.get("jobName") + ".zip")
+                                String zipFileLoc = (new File(jobTmpDirectory))?.getParent() + File.separator
+                                finalOutputFile = ZipUtil.zipFolder(jobTmpDirectory, zipFileLoc + jobDataMap.get('jobName') + '.zip')
                                 try {
-                                    File outputFile = new File(zipFileLoc + finalOutputFile);
+                                    File outputFile = new File(zipFileLoc + finalOutputFile)
                                     if (outputFile.isFile()) {
-                                        String remoteFilePath = FTPUtil.uploadFile(true, outputFile);
+                                        String remoteFilePath = FTPUtil.uploadFile(true, outputFile)
                                         if (StringUtils.isNotEmpty(remoteFilePath)) {
                                             //Since File has been uploaded to the FTP server, we can delete the
                                             //ZIP file and the folder which has been zipped
 
                                             //Delete the output Folder
-                                            String outputFolder = null;
-                                            int index = outputFile.name.lastIndexOf('.');
+                                            String outputFolder = null
+                                            int index = outputFile.name.lastIndexOf('.')
                                             if (index > 0 && index <= outputFile.name.length() - 2) {
-                                                outputFolder = outputFile.name.substring(0, index);
+                                                outputFolder = outputFile.name.substring(0, index)
                                             }
                                             File outputDir = new File(zipFileLoc + outputFolder)
                                             if (outputDir.isDirectory()) {
@@ -247,18 +251,19 @@ class GenericJobExecutor implements Job {
                                             }
 
                                             //Delete the ZIP file
-                                            outputFile.delete();
+                                            outputFile.delete()
                                         }
                                     }
-                                } catch (Exception e) {
-                                    logger.error("Failed to FTP PUT the ZIP file: " + e.getMessage);
+                                }
+                                catch (Exception e) {
+                                    logger.error('Failed to FTP PUT the ZIP file: ' + e.getMessage)
                                 }
 
                                 break
-                            case "R":
+                            case 'R':
 
                                 //Call a function to process our R commands.
-                                runRCommandList(currentStep.value);
+                                runRCommandList(currentStep.value)
                                 break
                         }
 
@@ -267,30 +272,29 @@ class GenericJobExecutor implements Job {
 
     private void renderOutput(jobDetail) {
         //Get the data based on the job configuration.
-        def renderSteps = jobDataMap.get("renderSteps")
+        def renderSteps = jobDataMap.get('renderSteps')
 
-        renderSteps.each
-                {
+        renderSteps.each {
                     currentStep ->
 
                         switch (currentStep.key) {
-                            case "FILELINK":
+                            case 'FILELINK':
 
                                 //Gather the jobs name.
                                 def jobName = jobDetail.getName()
 
                                 //Add the result file link to the job.
                                 jobResultsService[jobName]['resultType'] = "DataExport"
-                                jobResultsService[jobName]["ViewerURL"] = finalOutputFile
-                                asyncJobService.updateStatus(jobName, "Rendering Output", finalOutputFile, null, null)
-                                break;
-                            case "GSP":
+                                jobResultsService[jobName]['ViewerURL'] = finalOutputFile
+                                asyncJobService.updateStatus(jobName, 'Rendering Output', finalOutputFile, null, null)
+                                break
+                            case 'GSP':
                                 //Gather the jobs name.
                                 def jobName = jobDetail.getName()
 
                                 //Add the link to the output URL to the jobs object. We get the base URL from the job parameters.
-                                jobResultsService[jobName]["ViewerURL"] = currentStep.value + "?jobName=" + jobName
-                                break;
+                                jobResultsService[jobName]['ViewerURL'] = currentStep.value + '?jobName=' + jobName
+                                break
                         }
                 }
 
@@ -299,7 +303,7 @@ class GenericJobExecutor implements Job {
     private void runRCommandList(stepList) {
 
         //We need to get the study ID for this study so we can know the path to the clinical output file.
-        def studies = jobDataMap.get("studyAccessions")
+        def studies = jobDataMap.get('studyAccessions')
 
         //String representing rOutput Directory.
         String rOutputDirectory = jobTmpWorkingDirectory
@@ -308,49 +312,50 @@ class GenericJobExecutor implements Job {
         new File(rOutputDirectory).mkdir()
 
         //Establish a connection to R Server.
-        RConnection c = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port);
+        RConnection c = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port)
 
-        logger.debug("Attempting following R Command : " + "setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
+        logger.debug("Attempting following R Command : ' + 'setwd('${rOutputDirectory}')".replace("\\", "\\\\"))
 
         //Set the working directory to be our temporary location.
         String workingDirectoryCommand = "setwd('${rOutputDirectory}')".replace("\\", "\\\\")
 
         //Run the R command to set the working directory to our temp directory.
-        REXP x = c.eval(workingDirectoryCommand);
+        REXP x = c.eval(workingDirectoryCommand)
 
         //For each R step there is a list of commands.
         stepList.each { currentCommand ->
 
             //Need to escape backslashes for R commands.
-            String reformattedCommand = currentCommand.replace("\\", "\\\\")
+            String reformattedCommand = currentCommand.replace('\\', '\\\\')
 
             //Replace the working directory flag if it exists in the string.
-            reformattedCommand = reformattedCommand.replace("||TEMPFOLDERDIRECTORY||", jobTmpDirectory + "subset1_" + studies[0] + File.separator.replace("\\", "\\\\"))
+            reformattedCommand = reformattedCommand.replace('||TEMPFOLDERDIRECTORY||', jobTmpDirectory + 'subset1_' + studies[0] + File.separator.replace('\\', '\\\\'))
 
             //We need to loop through the variable map and do string replacements on the R command.
-            jobDataMap.get("variableMap").each { variableItem ->
+            jobDataMap.get('variableMap').each { variableItem ->
 
                 //Try and grab the variable from the Job Data Map. These were fed in from the HTML form.
                 def valueFromForm = jobDataMap.get(variableItem.value)
 
                 //Clean up the variable if it was found in the form.
                 if (valueFromForm) {
-                    valueFromForm = valueFromForm.replace("\\", "\\\\").trim()
-                } else {
-                    valueFromForm = ""
+                    valueFromForm = valueFromForm.replace('\\', '\\\\').trim()
+                }
+                else {
+                    valueFromForm = ''
                 }
 
                 reformattedCommand = reformattedCommand.replace(variableItem.key, valueFromForm)
             }
 
-            logger.debug("Attempting following R Command : " + reformattedCommand)
+            logger.debug('Attempting following R Command : ' + reformattedCommand)
 
             //Run the R command against our server.
-            //x = c.eval(reformattedCommand);
+            //x = c.eval(reformattedCommand)
 
-            REXP r = c.parseAndEval("try(" + reformattedCommand + ",silent=TRUE)");
+            REXP r = c.parseAndEval('try(' + reformattedCommand + ',silent=TRUE)')
 
-            if (r.inherits("try-error")) {
+            if (r.inherits('try-error')) {
                 //Grab the error R gave us.
                 String rError = r.asString()
 
@@ -359,22 +364,23 @@ class GenericJobExecutor implements Job {
 
                 //If it is a friendly error, use that, otherwise throw the default message.
                 if (rError ==~ /.*\|\|FRIENDLY\|\|.*/) {
-                    rError = rError.replaceFirst(/.*\|\|FRIENDLY\|\|/, "")
-                    newError = new RserveException(c, rError);
-                } else {
-                    logger.error("RserveException thrown executing job: " + rError)
-                    newError = new RserveException(c, "There was an error running the R script for your job. Please contact an administrator.");
+                    rError = rError.replaceFirst(/.*\|\|FRIENDLY\|\|/, '')
+                    newError = new RserveException(c, rError)
+                }
+                else {
+                    logger.error('RserveException thrown executing job: ' + rError)
+                    newError = new RserveException(c, 'There was an error running the R script for your job. Please contact an administrator.')
                 }
 
-                c.close();
+                c.close()
 
-                throw newError;
+                throw newError
 
             }
 
         }
 
-        c.close();
+        c.close()
     }
 
     /**
@@ -385,7 +391,7 @@ class GenericJobExecutor implements Job {
      * @return
      */
     def updateStatus(jobName, status) {
-        jobResultsService[jobName]["Status"] = status
+        jobResultsService[jobName]['Status'] = status
         logger.debug(status)
         asyncJobService.updateStatus(jobName, status)
     }
@@ -396,9 +402,9 @@ class GenericJobExecutor implements Job {
         //if no job has been submitted, it cannot be cancelled
         if (! jobName) return false
 
-        //logger.debug("Checking to see if the user cancelled the job")
-        if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            logger.warn("${jobName} has been cancelled")
+        //logger.debug('Checking to see if the user cancelled the job')
+        if (jobResultsService[jobName]['Status'] == 'Cancelled') {
+            logger.warn('' + jobName + ' has been cancelled')
             jobCancelled = true
         }
         return jobCancelled

@@ -8,7 +8,7 @@ class LogTagLib {
      *
      * <g:logMsg>Any message with ${variables}</g:logMsg>
      *
-     * also <g:logMsg level="debug"> (default here is info) etc.
+     * also <g:logMsg level='debug'> (default here is info) etc.
      *
      */
     def logMsg = { attrs, body ->

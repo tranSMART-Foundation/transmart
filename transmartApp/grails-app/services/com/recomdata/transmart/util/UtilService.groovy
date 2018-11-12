@@ -10,10 +10,11 @@ class UtilService {
             if (obj && (obj?.toString())?.trim() != '') {
                 if (obj instanceof String) {
                     objToString.append("'").append(obj.toString()).append("'")
-                } else {
+                }
+                else {
                     objToString.append(obj.toString())
                 }
-                objToString.append(",")
+                objToString.append(',')
             }
         }
 

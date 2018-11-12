@@ -46,17 +46,17 @@ class VCFExporter implements HighDimExporter {
 
     @Override
     public boolean isDataTypeSupported(String dataType) {
-        return dataType == "vcf"
+        return dataType == 'vcf'
     }
 
     @Override
     public String getFormat() {
-        return "VCF"
+        return 'VCF'
     }
 
     @Override
     public String getDescription() {
-        return "VCF formatted variants"
+        return 'VCF formatted variants'
     }
 
     @Override
@@ -69,22 +69,22 @@ class VCFExporter implements HighDimExporter {
     public void export(TabularResult tabularResult, Projection projection,
                        Closure<OutputStream> newOutputStream, Closure<Boolean> isCancelled) {
 
-        logger.info("started exporting to $format ")
+        logger.info('started exporting to ' + format + ' ')
         def startTime = System.currentTimeMillis()
 
         if (isCancelled()) {
             return
         }
 
-        newOutputStream("data", format).withWriter("UTF-8") { writer ->
+        newOutputStream('data', format).withWriter('UTF-8') { writer ->
 
             // Write the headers
             headers.each {
-                writer << "##" << it << "\n"
+                writer << '##' << it << '\n'
             }
 
             // Write the header row for the data
-            writer << "#" << getDataColumns(tabularResult).join("\t") << "\n"
+            writer << '#' << getDataColumns(tabularResult).join('\t') << '\n'
 
             // Determine the order of the assays
             List<AssayColumn> assayList = tabularResult.indicesList
@@ -96,11 +96,11 @@ class VCFExporter implements HighDimExporter {
                     return
                 }
 
-                writer << getDataForPosition(datarow, assayList).join("\t") << "\n"
+                writer << getDataForPosition(datarow, assayList).join('\t') << '\n'
             }
         }
 
-        logger.info("Exporting data took ${System.currentTimeMillis() - startTime} ms")
+        logger.info('Exporting data took ' + System.currentTimeMillis() - startTime + ' ms')
     }
 
     /**
@@ -109,9 +109,9 @@ class VCFExporter implements HighDimExporter {
      */
     protected List<String> getHeaders() {
         [
-                "fileformat=VCFv4.2",
-                "fileDate=" + new Date().format('yyyyMMdd'),
-                "source=transmart v" + Metadata.current["app.version"]
+                'fileformat=VCFv4.2',
+                'fileDate=' + new Date().format('yyyyMMdd'),
+                'source=transmart v' + Metadata.current['app.version']
         ]
     }
 
@@ -121,7 +121,7 @@ class VCFExporter implements HighDimExporter {
      * @return
      */
     protected List<String> getDataColumns(TabularResult tabularResult) {
-        ["CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"] + tabularResult.indicesList*.label
+        ['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT'] + tabularResult.indicesList*.label
     }
 
     protected List<String> getDataForPosition(DataRow datarow, List<AssayColumn> assayList) {
@@ -141,7 +141,7 @@ class VCFExporter implements HighDimExporter {
         // TODO: Determine which info fields can be exported (if any)
         data << getInfoFields(datarow).collect {
             it.key + (it.value != true ? '=' + it.value : '')
-        }.join(";")
+        }.join(';')
         data << datarow.format
 
         // Determine a list of original variants and new variants, to do translation
@@ -150,15 +150,15 @@ class VCFExporter implements HighDimExporter {
 
         // Every line must always have a GT field in the format column
         // to follow the specification.
-        List<String> formats = datarow.format.tokenize(":")
-        int genotypeIndex = formats.indexOf("GT")
+        List<String> formats = datarow.format.tokenize(':')
+        int genotypeIndex = formats.indexOf('GT')
 
         if (genotypeIndex == -1)
-            throw new Exception("No GT field found for position ${datarow.chromosome}:${datarow.position}")
+            throw new Exception('No GT field found for position ' + datarow.chromosome + ':' + datarow.position)
 
         // Now add the data for each assay
         for (AssayColumn assay : assayList) {
-            data << getSubjectData(datarow, assay, originalVariants, newVariants, formats, genotypeIndex).join(":")
+            data << getSubjectData(datarow, assay, originalVariants, newVariants, formats, genotypeIndex).join(':')
         }
 
         data
@@ -185,19 +185,19 @@ class VCFExporter implements HighDimExporter {
         // 'AC' : allele count in genotypes, for each ALT allele, in the 
         //        same order as listed
         if (datarow.cohortInfo.alternativeAlleles.size() > 0)
-            infoFields["AC"] = datarow.cohortInfo.alleleCount.tail().join(",")
+            infoFields['AC'] = datarow.cohortInfo.alleleCount.tail().join(',')
 
         // 'AF' : allele frequency for each ALT allele in the same order 
         //        as listed: use this when estimated from primary data, 
         //        not called genotypes
         if (datarow.cohortInfo.alternativeAlleles.size() > 0)
-            infoFields["AF"] = datarow.cohortInfo.alleleFrequency.tail().join(",")
+            infoFields['AF'] = datarow.cohortInfo.alleleFrequency.tail().join(',')
 
         // 'AN' : total number of alleles in called genotypes
-        infoFields["AN"] = datarow.cohortInfo.totalAlleleCount
+        infoFields['AN'] = datarow.cohortInfo.totalAlleleCount
 
         // 'NS' : Number of samples with data
-        infoFields["NS"] = datarow.cohortInfo.numberOfSamplesWithData
+        infoFields['NS'] = datarow.cohortInfo.numberOfSamplesWithData
 
         infoFields
     }
@@ -229,7 +229,7 @@ class VCFExporter implements HighDimExporter {
         // Convert the old indices (e.g. 1 and 0) to the
         // new indices that were computed
         def convertedIndices = []
-        ["allele1", "allele2"].each {
+        ['allele1', 'allele2'].each {
             if (assayData.containsKey(it)) {
                 def oldIndex = assayData[it]
 
@@ -238,7 +238,8 @@ class VCFExporter implements HighDimExporter {
                     int newIndex = newVariants.indexOf(variant)
 
                     convertedIndices << newIndex
-                } else {
+                }
+                else {
                     convertedIndices << EMPTY_VALUE
                 }
             }
@@ -249,22 +250,23 @@ class VCFExporter implements HighDimExporter {
         def newData
 
         if (originalData) {
-            newData = originalData.tokenize(":")
-        } else {
+            newData = originalData.tokenize(':')
+        }
+        else {
             // Generate data to state that we don't know
             newData = (1..formats.size()).collect { EMPTY_VALUE }
         }
 
         // Put the computed genotype into the originaldata
         // TODO: Take phase of the original read into account (unphased or phased, / or |)
-        newData[genotypeIndex] = convertedIndices.join("/")
+        newData[genotypeIndex] = convertedIndices.join('/')
 
         newData
     }
 
     @Override
     public String getProjection() {
-        "cohort"
+        'cohort'
     }
 
 }

@@ -31,12 +31,12 @@ import static org.hamcrest.Matchers.*
 class JsonLayoutTests {
 
     static LoggingEvent makeEvent(msg) {
-        new LoggingEvent("", new Category('debug'), Level.DEBUG, msg, null)
+        new LoggingEvent('', new Category('debug'), Level.DEBUG, msg, null)
     }
 
     @Test
     void testSingleLine() {
-        def j = new JsonLayout(singleLine: true, conversionPattern: "%m%n")
+        def j = new JsonLayout(singleLine: true, conversionPattern: '%m%n')
         assertThat j.format(makeEvent([1,2,3])), is(String.format('[1,2,3]%n'))
         assertThat j.format(makeEvent([foo: 'bar', baz: 42, qux: null])), is (String.format('{"foo":"bar","baz":42,"qux":null}%n'))
     }
@@ -57,9 +57,10 @@ class JsonLayoutTests {
         TimeZone defaultzone = TimeZone.default
 
         try {
-            TimeZone.setDefault(TimeZone.getTimeZone("GMT+1"))
+            TimeZone.setDefault(TimeZone.getTimeZone('GMT+1'))
             assertThat j.format(makeEvent(d)), is('"2016-02-02 12:27:42.729+01"')
-        } finally {
+        }
+        finally {
             TimeZone.setDefault(defaultzone)
         }
     }

@@ -14,7 +14,7 @@ public class TrialAnalysisResult extends TEABaseResult {
     def getProtocol() {
         def file = null
         for (cr in trial.files) {
-            if (cr.type == "Protocol") {
+            if (cr.type == 'Protocol') {
                 file = cr
             }
         }
@@ -24,7 +24,7 @@ public class TrialAnalysisResult extends TEABaseResult {
     def getFiles() {
         def files = []
         for (cr in trial.files) {
-            if (cr.type != "Protocol") {
+            if (cr.type != 'Protocol') {
                 files.add(cr)
             }
         }
@@ -32,7 +32,7 @@ public class TrialAnalysisResult extends TEABaseResult {
     }
 
     def hasResult() {
-        return analysisCount > 0;
+        return analysisCount > 0
     }
 
 }

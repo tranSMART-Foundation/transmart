@@ -25,7 +25,7 @@ class OAuth2SyncService {
 
         clients.each { Map m ->
             if (!m['clientId']) {
-                logger.error("Client data without clientId: $m")
+                logger.error('Client data without clientId: ' + m)
                 return
             }
 
@@ -36,14 +36,15 @@ class OAuth2SyncService {
             def dirty = false
             m.each { String prop, def value ->
                 if (Client.hasProperty(prop)) {
-                    logger.error("Invalid property $prop in client definition $m")
+                    logger.error('Invalid property ' + prop + ' in client definition ' + m)
                     return
                 }
 
                 // Convert GStrings to Strings, Lists to Sets
                 if (!(value instanceof List)) {
                     value = value.toString()
-                } else {
+                }
+                else {
                     value = value*.toString() as Set
                 }
 
@@ -51,7 +52,8 @@ class OAuth2SyncService {
                     if (springSecurityService.passwordEncoder.isPasswordValid(client."$prop", value, null)) {
                         return
                     }
-                } else if (client."$prop" == value) {
+                }
+                else if (client."$prop" == value) {
                     return
                 }
 
@@ -78,7 +80,7 @@ class OAuth2SyncService {
         }.deleteAll()
 
         if (n != 0) {
-            logger.warn("Deleted $n OAuth2 clients")
+            logger.warn('Deleted ' + n + ' OAuth2 clients')
         }
     }
 }

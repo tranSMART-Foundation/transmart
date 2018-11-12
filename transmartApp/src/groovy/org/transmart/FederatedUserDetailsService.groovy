@@ -41,7 +41,8 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
         try {
             logger.debug("Searching for user with federated id '$federatedId'")
             return userDetailsService.loadUserByProperty('federatedId', federatedId, true)
-        } catch (UsernameNotFoundException nf) {
+        }
+        catch (UsernameNotFoundException nf) {
             logger.info("No user found with federated id '$federatedId")
             tryCreateUser(credential, federatedId, nf)
             logger.info("Trying to load user with federated id '$federatedId' again")
@@ -53,7 +54,8 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
     String fetchFederatedId(SAMLCredential credential) {
         if (attributeConfig.federatedId) {
             getAttr(credential, attributeConfig.federatedId)
-        } else {
+        }
+        else {
             credential.nameID.value //better be persistent
         }
     }
@@ -61,22 +63,24 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
     static String getAttr(SAMLCredential credential, String it) {
         def values = credential.getAttribute(it)?.attributeValues
         if (!values) {
-            throw new UnexpectedResultException("Could not find values " +
-                    "for attribute $it in SAML credential")
+            throw new UnexpectedResultException('Could not find values ' +
+                    'for attribute ' + it + ' in SAML credential')
         }
         if (values.size() > 1) {
-            throw new UnexpectedResultException("Found more than one " +
-                    "value for attribute $it: $values")
+            throw new UnexpectedResultException('Found more than one ' +
+                    'value for attribute ' + it + ': ' + values)
         }
 
         XMLObject attrValue = values.getAt(0)
         if (attrValue.hasProperty('value')) {
             attrValue.value
-        } else if (values.hasProperty('textContent')) {
+        }
+        else if (values.hasProperty('textContent')) {
             attrValue.textContent
-        } else {
-            throw new UnexpectedResultException("Unexpected value for " +
-                    "attribute $it: $attrValue")
+        }
+        else {
+            throw new UnexpectedResultException('Unexpected value for ' +
+                    'attribute ' + it + ': ' + attrValue)
         }
     }
 
@@ -90,7 +94,7 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
 
     private void tryCreateUser(SAMLCredential credential, federatedId, nf) {
         if (grailsApplication.config.org.transmart.security.saml.createInexistentUsers != 'true') {
-            logger.warn("Will not try to create user with federated id " +
+            logger.warn('Will not try to create user with federated id ' +
                     "'$federatedId', such option is deactivated")
             throw nf
         }
@@ -117,7 +121,7 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
             }
 
             AuthUser newUser = AuthUser.createFederatedUser(federatedId,
-                    username, realName, email, sessionFactory.currentSession);
+                    username, realName, email, sessionFactory.currentSession)
 
             if (samlConfig.defaultRoles) {
                 // if new user authorities specified then replace default authorities
@@ -127,12 +131,13 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
 
             def outcome = newUser.save(flush: true)
             if (outcome) {
-                logger.info("Created new user. {federatedId=$federatedId, " +
-                        "username=$username, realName=$realName, email=" +
-                        "$email}")
-            } else {
-                logger.error("Failed creating new user with federatedId " +
-                        "$federatedId, errors: " + newUser.errors)
+                logger.info('Created new user. {federatedId=' + federatedId + ', ' +
+                        'username=' + username + ', realName=' + realName + ', email=' +
+                        '' + email + '}')
+            }
+            else {
+                logger.error('Failed creating new user with federatedId ' +
+                        '' + federatedId + ', errors: ' + newUser.errors)
                 throw nf
             }
         }

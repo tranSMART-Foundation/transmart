@@ -41,7 +41,7 @@ class TwoRegionExporterTests {
     }
 
     @Test
-    void "test whether two region data is exported properly"() {
+    void 'test whether two region data is exported properly'() {
 
         tabularResult = createMockTwoRegionTabularResult()
         List<ByteArrayOutputStream> outputStreams = []
@@ -55,8 +55,8 @@ class TwoRegionExporterTests {
             //3 assays, have both events and junction files=6 files in total
             assertThat outputStreams, hasSize(6)
 
-            String junctionOutput = outputStreams[0].toString("UTF-8")
-            String eventOutput = outputStreams[1].toString("UTF-8")
+            String junctionOutput = outputStreams[0].toString('UTF-8')
+            String eventOutput = outputStreams[1].toString('UTF-8')
 
             List junctions = junctionOutput.readLines()
             assertThat junctions, contains(
@@ -71,8 +71,8 @@ class TwoRegionExporterTests {
                     'null\tnull\t10\tnull\tnull\tnull\tnull\t1\tdeletion\tnull\tnull\tnull',
                     'null\tnull\t10\tnull\tnull\tnull\tnull\t2\tdeletion\tnull\tnull\tnull')
 
-            junctionOutput = outputStreams[2].toString("UTF-8")
-            eventOutput = outputStreams[3].toString("UTF-8")
+            junctionOutput = outputStreams[2].toString('UTF-8')
+            eventOutput = outputStreams[3].toString('UTF-8')
 
             junctions = junctionOutput.readLines()
             assertThat junctions, contains(
@@ -100,16 +100,16 @@ class TwoRegionExporterTests {
         //2nd event: deletion assay1, chrX 2-10 - chr3 12-18
         //junction without event assay1, chrY 2-10 - chr3 12-18
         def event = new DeTwoRegionEvent()
-        event.cgaType = "deletion"
+        event.cgaType = 'deletion'
         def junction = new DeTwoRegionJunction(
-                downChromosome: "1",
+                downChromosome: '1',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "3",
+                downStrand: '+',
+                upChromosome: '3',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[0]
         )
@@ -123,14 +123,14 @@ class TwoRegionExporterTests {
         junction.junctionEvents = [junctionEvent]
 
         junction = new DeTwoRegionJunction(
-                downChromosome: "10",
+                downChromosome: '10',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "13",
+                downStrand: '+',
+                upChromosome: '13',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[0]
         )
@@ -146,24 +146,24 @@ class TwoRegionExporterTests {
 
         def gene = new DeTwoRegionEventGene(
                 geneId: 'TP53',
-                effect: "fusion"
+                effect: 'fusion'
         )
 
         event = new DeTwoRegionEvent(
-                soapClass: "translocation",
+                soapClass: 'translocation',
                 eventGenes: [gene]
         )
         gene.event = event
 
         def junction2 = new DeTwoRegionJunction(
-                downChromosome: "X",
+                downChromosome: 'X',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "3",
+                downStrand: '+',
+                upChromosome: '3',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[1]
         )
@@ -182,14 +182,14 @@ class TwoRegionExporterTests {
         )
 
         junction = new DeTwoRegionJunction(
-                downChromosome: "Y",
+                downChromosome: 'Y',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "3",
+                downStrand: '+',
+                upChromosome: '3',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[1]
         )
@@ -197,14 +197,14 @@ class TwoRegionExporterTests {
         junctions.add(junction)
 
         junction = new DeTwoRegionJunction(
-                downChromosome: "Y",
+                downChromosome: 'Y',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "3",
+                downStrand: '+',
+                upChromosome: '3',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[2]
         )

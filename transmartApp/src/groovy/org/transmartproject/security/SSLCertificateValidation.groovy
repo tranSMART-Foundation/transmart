@@ -6,19 +6,20 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSession
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.cert.CertificateException
+import java.security.cert.X509Certificate
 
 public class SSLCertificateValidation {
 
     public static void disable() {
         try {
-            SSLContext sslContext = SSLContext.getInstance("TLS")
+            SSLContext sslContext = SSLContext.getInstance('TLS')
             TrustManager[] trustManagerArray = [ new NullX509TrustManager() ]
             sslContext.init(null, trustManagerArray, null)
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory())
             HttpsURLConnection.setDefaultHostnameVerifier(new NullHostnameVerifier())
-        } catch(Exception e) {
+        }
+        catch(Exception e) {
             e.printStackTrace()
         }
     }

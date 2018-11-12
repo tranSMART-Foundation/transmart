@@ -357,7 +357,7 @@ class RecomTagLib {
         def field = attrs['field']
         def format = attrs['format']
 
-        def date = bean."${field}"
+        def date = bean[field]
         if (date) {
             out << (new SimpleDateFormat(format).format(date))
         }
@@ -369,7 +369,7 @@ class RecomTagLib {
     def fieldBytes = { attrs, body ->
         def bean = attrs['bean']
         def field = attrs['field']
-        def bytes = bean."${field}"
+        def bytes = bean[field]
 
         if (bytes < 1024) {
             out << bytes + ' B' //Don't format a decimal on!

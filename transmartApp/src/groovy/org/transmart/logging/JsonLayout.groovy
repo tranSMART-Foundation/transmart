@@ -30,7 +30,7 @@ import org.apache.log4j.spi.LoggingEvent
 class JsonLayout extends EnhancedPatternLayout {
 
     boolean singleLine = false
-    String dateFormat = "yyyy-MM-dd HH:mm:ss.SSSX"
+    String dateFormat = 'yyyy-MM-dd HH:mm:ss.SSSX'
     boolean printNulls = true
 
     @Lazy volatile Gson gson = {
@@ -59,7 +59,8 @@ class JsonLayout extends EnhancedPatternLayout {
         try {
             event.@message = gson.toJson(originalMessage)
             return super.format(event)
-        } finally {
+        }
+        finally {
             event.@message = originalMessage
             event.@renderedMessage = origRenderedMessage
         }

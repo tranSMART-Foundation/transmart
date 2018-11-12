@@ -18,7 +18,7 @@ class EntrezSummary {
     def getOMIMID() {
         def retValue = null
         if (Mim != null) {
-            retValue = Mim.split(":")
+            retValue = Mim.split(':')
         }
         if (retValue != null && retValue.length > 1) {
             retValue = retValue[1]
@@ -29,7 +29,7 @@ class EntrezSummary {
     def getAliases() {
         def retValue = null
         if (OtherAliases != null) {
-            retValue = OtherAliases.split(",")
+            retValue = OtherAliases.split(',')
         }
         return retValue
     }

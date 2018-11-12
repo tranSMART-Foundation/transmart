@@ -28,7 +28,7 @@ public class KeywordSet extends LinkedHashSet {
 
         for (keyword in this) {
             if (s.length() > 0) {
-                s.append(", ")
+                s.append(', ')
             }
             s.append(keyword.bioDataId)
         }

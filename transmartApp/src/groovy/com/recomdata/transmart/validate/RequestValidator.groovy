@@ -19,9 +19,9 @@ abstract class RequestValidator {
      * @return null or the input argument if it is not null (or empty or undefined)
      */
     public static String nullCheck(inputArg) {
-        logger.debug("Input argument to nullCheck: ${inputArg}")
-        if (inputArg == "undefined" || inputArg == "null" || inputArg == "") {
-            logger.debug("Returning null in nullCheck")
+        logger.debug('Input argument to nullCheck: ' + inputArg)
+        if (inputArg == 'undefined' || inputArg == 'null' || inputArg == '') {
+            logger.debug('Returning null in nullCheck')
             return null
         }
         return inputArg

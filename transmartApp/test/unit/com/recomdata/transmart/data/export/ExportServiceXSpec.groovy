@@ -24,13 +24,13 @@ class ExportServiceXSpec extends Specification {
         defineBeans {
             // the dependency only has to be satisfied; it's not used in the
             // tested method here
-            "${CurrentUserBeanProxyFactory.BEAN_BAME}"(Object)
+            '' + CurrentUserBeanProxyFactory.BEAN_BAME(Object)
         }
         service = testFor(ExportService)
     }
 
-    void "test getHighDimDataTypesAndFormats basic functionality"() {
-        given: "a set of selected checkboxes"
+    void 'test getHighDimDataTypesAndFormats basic functionality'() {
+        given: 'a set of selected checkboxes'
         def selectedCheckBoxList = [
                 [
                         subset    : 'subset1',
@@ -59,33 +59,33 @@ class ExportServiceXSpec extends Specification {
                 ],
         ].collect { (it as JSON).toString() }
 
-        when: "the strings are parsed"
+        when: 'the strings are parsed'
         def formats = service.getHighDimDataTypesAndFormats(selectedCheckBoxList)
 
-        then: "the output is a properly formatted map"
+        then: 'the output is a properly formatted map'
         // Expected
         //      subset1={mrna={TXT=[GPL570, GPL571], XLS=[GPL570]}, mirna={TXT=[GPL570]}}
         //      subset2={mrna={TXT=[GPL570]}}
         formats.keySet().size() == 2
-        formats.containsKey("subset1")
-        formats.containsKey("subset2")
+        formats.containsKey('subset1')
+        formats.containsKey('subset2')
 
         formats.subset1.keySet().size() == 2
-        formats.subset1.containsKey("mrna")
-        formats.subset1.containsKey("mirna")
+        formats.subset1.containsKey('mrna')
+        formats.subset1.containsKey('mirna')
 
         formats.subset1.mrna.keySet().size() == 2
-        formats.subset1.mrna.containsKey("TXT")
-        formats.subset1.mrna.containsKey("XLS")
+        formats.subset1.mrna.containsKey('TXT')
+        formats.subset1.mrna.containsKey('XLS')
 
         formats.subset1.mirna.keySet().size() == 1
-        formats.subset1.mirna.containsKey("TXT")
+        formats.subset1.mirna.containsKey('TXT')
 
         formats.subset2.keySet().size() == 1
-        formats.subset2.containsKey("mrna")
+        formats.subset2.containsKey('mrna')
 
         formats.subset2.mrna.keySet().size() == 1
-        formats.subset2.mrna.containsKey("TXT")
+        formats.subset2.mrna.containsKey('TXT')
 
     }
 }

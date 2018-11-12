@@ -7,7 +7,7 @@ import org.transmart.searchapp.AuthUser
 class ChangeMyPasswordController {
 
     static Map allowedMethods = [save: 'POST']
-    static defaultAction = "show"
+    static defaultAction = 'show'
 
     def messageSource
     def springSecurityService
@@ -17,7 +17,8 @@ class ChangeMyPasswordController {
     def save(ChangePasswordCommand command) {
         if (command.hasErrors()) {
             render(view: 'show', model: [command: command])
-        } else {
+        }
+        else {
             AuthUser currentUser = springSecurityService.currentUser
             currentUser.passwd = springSecurityService.encodePassword(command.newPassword)
             currentUser.changePassword = false
@@ -26,7 +27,8 @@ class ChangeMyPasswordController {
             if (currentUser.hasErrors()) {
                 command.errors.reject('ChangePassword.couldNotSave')
                 render(view: 'show', model: [command: command])
-            } else {
+            }
+            else {
                 flash.message = messageSource.getMessage('ChangePassword.savedSuccessfully',
                         new Objects[0], RequestContextUtils.getLocale(request))
                 redirect(action: 'show')

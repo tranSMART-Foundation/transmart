@@ -1,6 +1,6 @@
 package com.recomdata.search.query
 
-import org.transmart.GlobalFilter;
+import org.transmart.GlobalFilter
 
 /**
  * $Id: Query.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
@@ -99,15 +99,16 @@ public class Query {
         def biomarkerFilters = gfilter.getBioMarkerFilters()
 
         if (!biomarkerFilters.isEmpty()) {
-            def markerAlias = mainTableAlias + "_bm"
-            def markerTable = getBioMarkerTable() + markerAlias;
-            addTable("JOIN " + markerTable)
+            def markerAlias = mainTableAlias + '_bm'
+            def markerTable = getBioMarkerTable() + markerAlias
+            addTable('JOIN ' + markerTable)
             if (expandBioMarkers) {
-                addCondition(createExpandBioMarkerCondition(markerAlias, gfilter));
-                //	addCondition(markerAlias+".id IN ("+createExpandBioMarkerSubQuery(biomarkerFilters.getKeywordDataIdString())+") ")
+                addCondition(createExpandBioMarkerCondition(markerAlias, gfilter))
+                //	addCondition(markerAlias+'.id IN ('+createExpandBioMarkerSubQuery(biomarkerFilters.getKeywordDataIdString())+') ')
 
-            } else {
-                addCondition(markerAlias + ".id IN (" + biomarkerFilters.getKeywordDataIdString() + ") ")
+            }
+            else {
+                addCondition(markerAlias + '.id IN (' + biomarkerFilters.getKeywordDataIdString() + ') ')
             }
         }
     }
@@ -118,7 +119,7 @@ public class Query {
         def biomarkerFilters = gfilter.getBioMarkerFilters()
 
         if (!biomarkerFilters.isEmpty()) {
-            addCondition(createExpandBioMarkerConditionMV(mainTableAlias, gfilter));
+            addCondition(createExpandBioMarkerConditionMV(mainTableAlias, gfilter))
         }
     }
 
@@ -126,23 +127,23 @@ public class Query {
      * create biomarker table alias
      */
     def String getBioMarkerTable() {
-        return mainTableAlias + ".markers ";
+        return mainTableAlias + '.markers '
     }
     /**
      * default criteria builder for disease
      */
     def buildGlobalFilterDiseaseCriteria(GlobalFilter gfilter) {
         if (!gfilter.getDiseaseFilters().isEmpty()) {
-            def dAlias = mainTableAlias + "_dis"
-            def dtable = mainTableAlias + ".diseases " + dAlias;
-            addTable("JOIN " + dtable)
-            addCondition(dAlias + ".id IN (" + gfilter.getDiseaseFilters().getKeywordDataIdString() + ") ")
+            def dAlias = mainTableAlias + '_dis'
+            def dtable = mainTableAlias + '.diseases ' + dAlias
+            addTable('JOIN ' + dtable)
+            addCondition(dAlias + '.id IN (' + gfilter.getDiseaseFilters().getKeywordDataIdString() + ') ')
         }
     }
 
     def buildGlobalFilterFreeTextCriteria(GlobalFilter gfilter) {
         if (gfilter.isTextOnly()) {
-            addCondition(" 1 = 0")
+            addCondition(' 1 = 0')
         }
     }
 
@@ -152,10 +153,10 @@ public class Query {
 
     def buildGlobalFilterCompoundCriteria(GlobalFilter gfilter) {
         if (!gfilter.getCompoundFilters().isEmpty()) {
-            def dAlias = mainTableAlias + "_cpd"
-            def dtable = mainTableAlias + ".compounds " + dAlias;
-            addTable("JOIN " + dtable)
-            addCondition(dAlias + ".id IN (" + gfilter.getCompoundFilters().getKeywordDataIdString() + ") ")
+            def dAlias = mainTableAlias + '_cpd'
+            def dtable = mainTableAlias + '.compounds ' + dAlias
+            addTable('JOIN ' + dtable)
+            addCondition(dAlias + '.id IN (' + gfilter.getCompoundFilters().getKeywordDataIdString() + ') ')
         }
     }
 
@@ -175,25 +176,25 @@ public class Query {
      * generate a Hibernate Query from this query object
      */
     def generateSQL() {
-        StringBuilder s = new StringBuilder("SELECT ")
+        StringBuilder s = new StringBuilder('SELECT ')
         if (setDistinct) {
-            s.append(" DISTINCT ")
+            s.append(' DISTINCT ')
         }
-        s.append(createClause(selectClause, ", ", null))
-        s.append(" FROM ")
+        s.append(createClause(selectClause, ', ', null))
+        s.append(' FROM ')
         // create from clause but don't put a separator if JOIN presents
-        s.append(createClause(fromClause, ", ", "JOIN"))
+        s.append(createClause(fromClause, ', ', 'JOIN'))
         if (!whereClause.isEmpty()) {
-            s.append(" WHERE ")
-            s.append(createClause(whereClause, " AND ", null))
+            s.append(' WHERE ')
+            s.append(createClause(whereClause, ' AND ', null))
         }
         if (!groupbyClause.isEmpty()) {
-            s.append(" GROUP BY ")
-            s.append(createClause(groupbyClause, ", ", null))
+            s.append(' GROUP BY ')
+            s.append(createClause(groupbyClause, ', ', null))
         }
         if (!orderbyClause.isEmpty()) {
-            s.append(" ORDER BY ")
-            s.append(createClause(orderbyClause, ", ", null))
+            s.append(' ORDER BY ')
+            s.append(createClause(orderbyClause, ', ', null))
         }
         return s.toString()
     }
@@ -212,7 +213,7 @@ public class Query {
                     }
                 }
 
-                s.append(" ").append(sc);
+                s.append(' ').append(sc)
             }
         }
         return s.toString()
@@ -220,12 +221,12 @@ public class Query {
 
     def createExpandBioMarkerSubQuery(ids) {
 
-        StringBuilder s = new StringBuilder();
-        s.append("SELECT DISTINCT bdc.associatedBioDataId FROM org.transmart.biomart.BioDataCorrelation bdc ");
-        s.append(" WHERE bdc.bioDataId in (").append(ids).append(")");
-        // s.append("SELECT DISTINCT marker.id FROM org.transmart.biomart.BioMarker marker ")
-        // s.append(" LEFT JOIN marker.associatedCorrels marker_cor")
-        // s.append(" WHERE marker_cor.bioDataId IN (").append(ids).append(")")
+        StringBuilder s = new StringBuilder()
+        s.append('SELECT DISTINCT bdc.associatedBioDataId FROM org.transmart.biomart.BioDataCorrelation bdc ')
+        s.append(' WHERE bdc.bioDataId in (').append(ids).append(')')
+        // s.append('SELECT DISTINCT marker.id FROM org.transmart.biomart.BioMarker marker ')
+        // s.append(' LEFT JOIN marker.associatedCorrels marker_cor')
+        // s.append(' WHERE marker_cor.bioDataId IN (').append(ids).append(')')
         //s.append (" AND marker_cor.correlationDescr.correlation='PATHWAY GENE'")
         return s.toString()
     }
@@ -237,28 +238,28 @@ public class Query {
 
         /*
          // query to use if only using 1 MV from searchapp
-         s.append(markerAlias).append(".id IN (")
-         s.append("SELECT DISTINCT sbmcmv.assocBioMarkerId FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv ");
-         s.append(" WHERE sbmcmv.domainObjectId in (").append(ids).append(")");
+         s.append(markerAlias).append('.id IN (')
+         s.append('SELECT DISTINCT sbmcmv.assocBioMarkerId FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv ')
+         s.append(' WHERE sbmcmv.domainObjectId in (').append(ids).append(')')
          */
 
         // aggregate ids from both static and refresh MVs
-        StringBuilder s = new StringBuilder();
-        s.append("(");
+        StringBuilder s = new StringBuilder()
+        s.append('(')
         if (!gfilter.getGeneSigListFilters().isEmpty()) {
-            s.append(markerAlias).append(".id IN (")
-            s.append("SELECT DISTINCT sbmcmv.assocBioMarkerId FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv ");
-            s.append(" WHERE sbmcmv.domainObjectId in (").append(gfilter.getGeneSigListFilters().getKeywordDataIdString()).append("))");
+            s.append(markerAlias).append('.id IN (')
+            s.append('SELECT DISTINCT sbmcmv.assocBioMarkerId FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv ')
+            s.append(' WHERE sbmcmv.domainObjectId in (').append(gfilter.getGeneSigListFilters().getKeywordDataIdString()).append('))')
         }
         if (!gfilter.getGenePathwayFilters().isEmpty()) {
             if (s.length() > 1) {
-                s.append(" OR ");
+                s.append(' OR ')
             }
-            s.append(markerAlias).append(".id IN (")
-            s.append("SELECT DISTINCT bmcmv.assoBioMarkerId FROM org.transmart.biomart.BioMarkerCorrelationMV bmcmv ");
-            s.append(" WHERE bmcmv.bioMarkerId in (").append(gfilter.getGenePathwayFilters().getKeywordDataIdString()).append(")) ");
+            s.append(markerAlias).append('.id IN (')
+            s.append('SELECT DISTINCT bmcmv.assoBioMarkerId FROM org.transmart.biomart.BioMarkerCorrelationMV bmcmv ')
+            s.append(' WHERE bmcmv.bioMarkerId in (').append(gfilter.getGenePathwayFilters().getKeywordDataIdString()).append(')) ')
         }
-        s.append(")");
+        s.append(')')
         return s.toString()
     }
 
@@ -266,27 +267,27 @@ public class Query {
     def createExpandBioMarkerConditionMV(String markerAlias, GlobalFilter gfilter) {
 
         // aggregate ids from both static and refresh MVs
-        StringBuilder s = new StringBuilder();
-        s.append("(");
+        StringBuilder s = new StringBuilder()
+        s.append('(')
         if (!gfilter.getGeneSigListFilters().isEmpty()) {
-            s.append(markerAlias).append(".id IN (")
-            s.append("SELECT DISTINCT sbmcmv.assocBioMarkerId FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv ");
-            s.append(" WHERE sbmcmv.domainObjectId in (").append(gfilter.getGeneSigListFilters().getKeywordDataIdString()).append("))");
+            s.append(markerAlias).append('.id IN (')
+            s.append('SELECT DISTINCT sbmcmv.assocBioMarkerId FROM org.transmart.searchapp.SearchBioMarkerCorrelFastMV sbmcmv ')
+            s.append(' WHERE sbmcmv.domainObjectId in (').append(gfilter.getGeneSigListFilters().getKeywordDataIdString()).append('))')
         }
         if (!gfilter.getGenePathwayFilters().isEmpty()) {
             if (s.length() > 1) {
-                s.append(" OR ");
+                s.append(' OR ')
             }
-            s.append(markerAlias).append(".id IN (")
-            s.append("SELECT DISTINCT bmcmv.assoBioMarkerId FROM org.transmart.biomart.BioMarkerCorrelationMV bmcmv ");
-            s.append(" WHERE bmcmv.bioMarkerId in (").append(gfilter.getGenePathwayFilters().getKeywordDataIdString()).append(")) ");
+            s.append(markerAlias).append('.id IN (')
+            s.append('SELECT DISTINCT bmcmv.assoBioMarkerId FROM org.transmart.biomart.BioMarkerCorrelationMV bmcmv ')
+            s.append(' WHERE bmcmv.bioMarkerId in (').append(gfilter.getGenePathwayFilters().getKeywordDataIdString()).append(')) ')
         }
-        s.append(")");
+        s.append(')')
         return s.toString()
     }
 
 
     String toString() {
-        return generateSQL();
+        return generateSQL()
     }
 }

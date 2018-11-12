@@ -11,42 +11,43 @@ import org.transmart.searchapp.SearchKeyword
  */
 public class GlobalFilter {
 
-    def CATEGORY_GENE = "GENE"
-    def CATEGORY_PATHWAY = "PATHWAY"
-    def CATEGORY_COMPOUND = "COMPOUND"
-    def CATEGORY_DISEASE = "DISEASE"
-    def CATEGORY_TRIAL = "TRIAL"
-    def CATEGORY_TEXT = "TEXT"
-    def CATEGORY_STUDY = "STUDY"
-    def CATEGORY_GENE_SIG = "GENESIG"
-    def CATEGORY_GENE_LIST = "GENELIST"
+    def CATEGORY_GENE = 'GENE'
+    def CATEGORY_PATHWAY = 'PATHWAY'
+    def CATEGORY_COMPOUND = 'COMPOUND'
+    def CATEGORY_DISEASE = 'DISEASE'
+    def CATEGORY_TRIAL = 'TRIAL'
+    def CATEGORY_TEXT = 'TEXT'
+    def CATEGORY_STUDY = 'STUDY'
+    def CATEGORY_GENE_SIG = 'GENESIG'
+    def CATEGORY_GENE_LIST = 'GENELIST'
 
 
     def categoryFilterMap = new LinkedHashMap()
     def selectedpathlist = []
-    def processed = false;
+    def processed = false
 
     def isEmpty() {
         for (value in categoryFilterMap.values()) {
             if (!value.isEmpty()) {
-                return false;
+                return false
             }
         }
-        return true;
+        return true
     }
 
     def isTextOnly() {
-        def hasText = false;
+        def hasText = false
         for (key in categoryFilterMap.keySet()) {
             if (!categoryFilterMap.get(key).isEmpty()) {
                 if (key.equals(CATEGORY_TEXT)) {
-                    hasText = true;
-                } else {
-                    return false;
+                    hasText = true
+                }
+                else {
+                    return false
                 }
             }
         }
-        return hasText;
+        return hasText
     }
 
     def containsFilter(filter) {
@@ -56,34 +57,34 @@ public class GlobalFilter {
 
     def getBioMarkerFilters() {
         def all = new KeywordSet()
-        all.addAll(getGeneFilters());
-        all.addAll(getPathwayFilters());
-        all.addAll(getGeneSignatureFilters());
-        all.addAll(getGeneListFilters());
-        return all;
+        all.addAll(getGeneFilters())
+        all.addAll(getPathwayFilters())
+        all.addAll(getGeneSignatureFilters())
+        all.addAll(getGeneListFilters())
+        return all
     }
 
     def hasAnyListFilters() {
         return !getPathwayFilters().isEmpty() ||
                 !getGeneSignatureFilters().isEmpty() ||
-                !getGeneListFilters().isEmpty();
+                !getGeneListFilters().isEmpty()
 
     }
 
     def getGenePathwayFilters() {
         def all = new KeywordSet()
-        all.addAll(getGeneFilters());
-        all.addAll(getPathwayFilters());
-        return all;
+        all.addAll(getGeneFilters())
+        all.addAll(getPathwayFilters())
+        return all
     }
 
     def getAllListFilters() {
         def all = new KeywordSet()
-        //all.addAll(getGeneFilters());
-        all.addAll(getPathwayFilters());
-        all.addAll(getGeneSignatureFilters());
-        all.addAll(getGeneListFilters());
-        return all;
+        //all.addAll(getGeneFilters())
+        all.addAll(getPathwayFilters())
+        all.addAll(getGeneSignatureFilters())
+        all.addAll(getGeneListFilters())
+        return all
     }
 
     def getGeneFilters() {
@@ -100,9 +101,9 @@ public class GlobalFilter {
 
     def getGeneSigListFilters() {
         def all = new KeywordSet()
-        all.addAll(getGeneSignatureFilters());
-        all.addAll(getGeneListFilters());
-        return all;
+        all.addAll(getGeneSignatureFilters())
+        all.addAll(getGeneListFilters())
+        return all
     }
 
     def getPathwayFilters() {
@@ -146,19 +147,19 @@ public class GlobalFilter {
      * returns a list of keywords for given category or an empty list if not present
      */
     def findFiltersByCategory(String category) {
-        def filters = categoryFilterMap.get(category);
+        def filters = categoryFilterMap.get(category)
         if (filters == null) {
-            filters = new KeywordSet();
+            filters = new KeywordSet()
             categoryFilterMap.put(category, filters)
         }
-        return filters.clone();
+        return filters.clone()
     }
 
-    // Returns list of keywords for keywordset. Useful for building "in" clauses or search terms.
+    // Returns list of keywords for keywordset. Useful for building 'in' clauses or search terms.
     def formatKeywordList(KeywordSet set, String separator, String textQualifier, int maxLength) {
-        String list = ""
+        String list = ''
         for (filter in set) {
-            String s = ""
+            String s = ''
             if (list.length() > 0 && separator != null && separator.length() > 0) {
                 s = separator
             }
@@ -177,7 +178,7 @@ public class GlobalFilter {
         return list.toString()
     }
 
-    // Returns list of bioDataIds for specified category. Useful for building "in" clauses.
+    // Returns list of bioDataIds for specified category. Useful for building 'in' clauses.
     def formatIdList(KeywordSet set, String separator) {
         def list = new StringBuilder()
         for (filter in set) {
@@ -210,10 +211,10 @@ public class GlobalFilter {
 
     def dumpFilters() {
         for (category in categoryFilterMap.keySet()) {
-            print(category + ": ")
+            print(category + ': ')
             def keywordset = categoryFilterMap.get(category)
             for (keyword in keywordset) {
-                print(keyword.uniqueId + " ")
+                print(keyword.uniqueId + ' ')
             }
             println()
         }
@@ -223,7 +224,7 @@ public class GlobalFilter {
      * indicates if filter contains a pathway
      */
     def hasPathway() {
-        return getPathwayFilters().size() > 0;
+        return getPathwayFilters().size() > 0
     }
 
 }

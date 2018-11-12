@@ -19,7 +19,7 @@ class SpringSecurityProxyMetaClassInterceptor implements PropertyAccessIntercept
             return beforeGet(object, 'principal')
         }
         throw new UnsupportedOperationException(
-                "Unexpected method call: $methodName($arguments)")
+                'Unexpected method call: ' + methodName + '(' + arguments + ')')
     }
 
     boolean doInvoke() {
@@ -31,12 +31,12 @@ class SpringSecurityProxyMetaClassInterceptor implements PropertyAccessIntercept
             return [username: username]
         }
         throw new UnsupportedOperationException(
-                "Unexpected property requested: $property")
+                'Unexpected property requested: ' + property)
     }
 
     void beforeSet(Object object, String property, Object newValue) {
         throw new UnsupportedOperationException(
-                "Unexpected property setting requested: $property, " +
-                        "value $newValue")
+                'Unexpected property setting requested: ' + property + ', ' +
+                        'value ' + newValue)
     }
 }

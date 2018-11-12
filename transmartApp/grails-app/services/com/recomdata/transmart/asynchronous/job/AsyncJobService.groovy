@@ -32,38 +32,39 @@ class AsyncJobService {
         def c = AsyncJob.createCriteria()
         if (StringUtils.isNotEmpty(jobType)) {
             jobResults = c {
-                like("jobName", "${userName}%")
-                eq("jobType", "${jobType}")
-                ge("lastRunOn", new Date() - 7)
-                order("id", "desc")
+                like('jobName', '' + userName + '%')
+                eq('jobType', '' + jobType)
+                ge('lastRunOn', new Date() - 7)
+                order('id', 'desc')
             }
-        } else {
+        }
+        else {
             jobResults = c {
-                like("jobName", "${userName}%")
+                like('jobName', '' + userName + '%')
                 or {
-                    ne("jobType", "DataExport")
-                    isNull("jobType")
+                    ne('jobType', 'DataExport')
+                    isNull('jobType')
                 }
-                ge("lastRunOn", new Date() - 7)
-                order("id", "desc")
+                ge('lastRunOn', new Date() - 7)
+                order('id', 'desc')
             }
         }
         def m = [:]
         for (jobResult in jobResults) {
             m = [:]
-            m["name"] = jobResult.jobName
-            m["type"] = jobResult.jobType
-            m["status"] = jobResult.jobStatus
-            m["runTime"] = jobResult.jobStatusTime
-            m["startDate"] = jobResult.lastRunOn
-            m["viewerURL"] = jobResult.viewerURL
-            m["altViewerURL"] = jobResult.altViewerURL
+            m['name'] = jobResult.jobName
+            m['type'] = jobResult.jobType
+            m['status'] = jobResult.jobStatus
+            m['runTime'] = jobResult.jobStatusTime
+            m['startDate'] = jobResult.lastRunOn
+            m['viewerURL'] = jobResult.viewerURL
+            m['altViewerURL'] = jobResult.altViewerURL
             rows.put(m)
         }
 
-        result.put("success", true)
-        result.put("totalCount", jobResults.size())
-        result.put("jobs", rows)
+        result.put('success', true)
+        result.put('totalCount', jobResults.size())
+        result.put('jobs', rows)
 
         return result
     }
@@ -83,26 +84,26 @@ class AsyncJobService {
 
         if (StringUtils.isNotEmpty(jobName)) {
             jobResults = c {
-                like("jobName", "%${jobName}%")
+                like('jobName', '%' + jobName + '%')
             }
         }
 
         def m = [:]
         for (jobResult in jobResults) {
             m = [:]
-            m["name"] = jobResult.jobName
-            m["status"] = jobResult.jobStatus
-            m["runTime"] = jobResult.runTime
-            m["startDate"] = jobResult.lastRunOn
-            m["viewerURL"] = jobResult.viewerURL
-            m["altViewerURL"] = jobResult.altViewerURL
-            m["jobInputsJson"] = new JSONObject(jobResult.jobInputsJson ?: "{}")
+            m['name'] = jobResult.jobName
+            m['status'] = jobResult.jobStatus
+            m['runTime'] = jobResult.runTime
+            m['startDate'] = jobResult.lastRunOn
+            m['viewerURL'] = jobResult.viewerURL
+            m['altViewerURL'] = jobResult.altViewerURL
+            m['jobInputsJson'] = new JSONObject(jobResult.jobInputsJson ?: '{}')
             rows.put(m)
         }
 
-        result.put("success", true)
-        result.put("totalCount", jobResults.size())
-        result.put("jobs", rows)
+        result.put('success', true)
+        result.put('totalCount', jobResults.size())
+        result.put('jobs', rows)
 
         return result
 
@@ -114,7 +115,7 @@ class AsyncJobService {
     def getjobresults(jobName) {
         JSONObject result = new JSONObject()
         def jobResults = AsyncJob.findByJobName(jobName).results
-        result.put("jobResults", jobResults)
+        result.put('jobResults', jobResults)
         return result
     }
 
@@ -124,7 +125,7 @@ class AsyncJobService {
      */
     def createnewjob(params) {
         def userName = springSecurityService.getPrincipal().username
-        def jobStatus = "Started"
+        def jobStatus = 'Started'
 
         def newJob = new AsyncJob(lastRunOn: new Date())
         newJob.save()
@@ -146,12 +147,12 @@ class AsyncJobService {
         jobResultsService[jobName] = [:]
         updateStatus(jobName, jobStatus)
 
-        logger.debug("Sending ${jobName} back to the client")
+        logger.debug('Sending ' + jobName + ' back to the client')
         JSONObject result = new JSONObject()
-        result.put("jobName", jobName)
-        result.put("jobStatus", jobStatus)
+        result.put('jobName', jobName)
+        result.put('jobStatus', jobStatus)
 
-        return result;
+        return result
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -160,7 +161,7 @@ class AsyncJobService {
         assert params
 
         def job = AsyncJob.findByJobName(jobName)
-        assert "${jobName} job is not found.", job
+        assert '' + jobName + ' job is not found.', job
 
         job.jobInputsJson = new JSONObject(params).toString()
         job.save(flush: true)
@@ -170,16 +171,16 @@ class AsyncJobService {
      * Method called that will cancel a running job
      */
     def canceljob(jobName, group = null) {
-        def jobStatus = "Cancelled"
+        def jobStatus = 'Cancelled'
         def result = null
-        logger.debug("Attempting to delete ${jobName} from the Quartz scheduler")
+        logger.debug('Attempting to delete ' + jobName + ' from the Quartz scheduler')
         result = quartzScheduler.deleteJob(jobName, group)
-        logger.debug("Deletion attempt successful? ${result}")
+        logger.debug('Deletion attempt successful? ' + result)
 
         updateStatus(jobName, jobStatus)
 
         JSONObject jsonResult = new JSONObject()
-        jsonResult.put("jobName", jobName)
+        jsonResult.put('jobName', jobName)
         return jsonResult
     }
 
@@ -189,53 +190,56 @@ class AsyncJobService {
     def checkJobStatus(jobName, jobType = null) {
         JSONObject result = new JSONObject()
         if (StringUtils.isEmpty(jobType)) {
-            def jobNameArray = jobName.split("-")
+            def jobNameArray = jobName.split('-')
             jobType = jobNameArray[1]
         }
-        def jobStatus = jobResultsService[jobName]["Status"]
+        def jobStatus = jobResultsService[jobName]['Status']
         def statusIndex = null
-        if (jobResultsService[jobName]["StatusList"] != null) {
-            statusIndex = jobResultsService[jobName]["StatusList"].indexOf(jobStatus)
+        if (jobResultsService[jobName]['StatusList'] != null) {
+            statusIndex = jobResultsService[jobName]['StatusList'].indexOf(jobStatus)
         }
-        def jobException = jobResultsService[jobName]["Exception"]
-        def viewerURL = jobResultsService[jobName]["ViewerURL"]
-        def altViewerURL = jobResultsService[jobName]["AltViewerURL"]
-        def jobResults = jobResultsService[jobName]["Results"]
-        def errorType = ""
+        def jobException = jobResultsService[jobName]['Exception']
+        def viewerURL = jobResultsService[jobName]['ViewerURL']
+        def altViewerURL = jobResultsService[jobName]['AltViewerURL']
+        def jobResults = jobResultsService[jobName]['Results']
+        def errorType = ''
         if (viewerURL != null) {
-            def jobResultType = jobResultsService[jobName]["resultType"]
-            if (jobResultType != null) result.put("resultType", jobResultType)
-            logger.debug("${viewerURL} is being sent to the client")
-            result.put("jobViewerURL", viewerURL)
+            def jobResultType = jobResultsService[jobName]['resultType']
+            if (jobResultType != null) result.put('resultType', jobResultType)
+            logger.debug('' + viewerURL + ' is being sent to the client')
+            result.put('jobViewerURL', viewerURL)
             if (altViewerURL != null) {
-                logger.debug("${altViewerURL} for Comparative Marker Selection")
-                result.put("jobAltViewerURL", altViewerURL)
+                logger.debug('' + altViewerURL + ' for Comparative Marker Selection')
+                result.put('jobAltViewerURL', altViewerURL)
             }
-            jobStatus = "Completed"
-        } else if (jobResults != null) {
-            result.put("jobResults", jobResults)
-            result.put("resultType", jobType)
-            jobStatus = "Completed"
-        } else if (jobException != null) {
-            logger.warn("An exception was thrown, passing this back to the user")
+            jobStatus = 'Completed'
+        }
+        else if (jobResults != null) {
+            result.put('jobResults', jobResults)
+            result.put('resultType', jobType)
+            jobStatus = 'Completed'
+        }
+        else if (jobException != null) {
+            logger.warn('An exception was thrown, passing this back to the user')
             logger.warn(jobException)
-            result.put("jobException", jobException)
-            jobStatus = "Error"
-            errorType = "data"
+            result.put('jobException', jobException)
+            jobStatus = 'Error'
+            errorType = 'data'
         }
         if (statusIndex != null) {
             result.put('statusIndexExists', true)
-            result.put("statusIndex", statusIndex)
-        } else {
+            result.put('statusIndex', statusIndex)
+        }
+        else {
             result.put('statusIndexExists', false)
         }
 
         updateStatus(jobName, jobStatus, viewerURL, altViewerURL, jobResults)
 
-        //logger.debug("Returning status: ${jobStatus} for ${jobName}")
-        result.put("jobStatus", jobStatus)
-        result.put("errorType", errorType)
-        result.put("jobName", jobName)
+        //logger.debug('Returning status: ' + jobStatus + ' for ' + jobName)
+        result.put('jobStatus', jobStatus)
+        result.put('errorType', errorType)
+        result.put('jobName', jobName)
 
         return result
     }
@@ -253,28 +257,29 @@ class AsyncJobService {
      */
     def updateStatus(jobName, status, viewerURL = null, altViewerURL = null, results = null) {
         def retValue = false   // true if the job was cancelled
-        def jobNameArray = jobName.split("-")
+        def jobNameArray = jobName.split('-')
         def jobID = jobNameArray[-1]
 
-        //logger.debug("Checking to see if the user cancelled the job")
-        if (jobResultsService[jobName]["Status"] == "Cancelled") {
-            logger.warn("${jobName} has been cancelled")
+        //logger.debug('Checking to see if the user cancelled the job')
+        if (jobResultsService[jobName]['Status'] == 'Cancelled') {
+            logger.warn('' + jobName + ' has been cancelled')
             retValue = true
-        } else {
-            jobResultsService[jobName]["Status"] = status
+        }
+        else {
+            jobResultsService[jobName]['Status'] = status
         }
         //If the job isn't already cancelled, update the job info.
         if (!retValue) {
             def asyncJob = AsyncJob.get(Long.parseLong(jobID))
 
             // TimeDuration td = TimeCategory.minus(new Date(), asyncJob.lastRunOn)
-            //logger.debug("Job has been running for ${td}}")
+            //logger.debug('Job has been running for ' + td + '}')
             //asyncJob.runTime = td
             asyncJob.jobStatus = status
             if (viewerURL && viewerURL != '') asyncJob.viewerURL = viewerURL
             if (altViewerURL && altViewerURL != '' && asyncJob.altViewerURL != null) asyncJob.altViewerURL = altViewerURL
             if (results && results != '') asyncJob.results = results
-            jobResultsService[jobName]["ViewerURL"] = viewerURL
+            jobResultsService[jobName]['ViewerURL'] = viewerURL
             //We need to flush so that the value doesn't overwrite cancelled when the controller finishes.
             asyncJob.save(flush: true)
         }
@@ -287,7 +292,7 @@ class AsyncJobService {
         assert jobName
 
         def job = AsyncJob.findByJobName(jobName)
-        assert "${jobName} is not found.", job
+        assert '' + jobName + ' is not found.', job
 
         job.jobInputsJson
         def jobInputsJsonObj = new JsonSlurper().parseText(job.jobInputsJson)

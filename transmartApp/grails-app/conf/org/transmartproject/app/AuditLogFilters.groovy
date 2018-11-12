@@ -48,9 +48,9 @@ class AuditLogFilters {
                 def exportTypes = getExportTypes(params).join('+')
 
                 accessLogService.report(currentUserBean, 'Data Export',
-                    eventMessage: "User (IP: ${ip}) requested export of data. Http request parameters: ${params}",
+                    eventMessage: 'User (IP: ' + ip + ') requested export of data. Http request parameters: ' + params,
                     requestURL: fullUrl)
-                auditLogService.report("Clinical Data Exported - ${exportTypes}", request,
+                auditLogService.report('Clinical Data Exported - ' + exportTypes, request,
                     study: studies,
                     user: currentUserBean
                 )
@@ -60,7 +60,7 @@ class AuditLogFilters {
             after = { model ->
                 def ip = request.getHeader('X-FORWARDED-FOR') ?: request.remoteAddr
                 accessLogService.report(currentUserBean, 'Data Export',
-                        eventMessage: "User (IP: ${ip}) downloaded an exported file.",
+                        eventMessage: 'User (IP: ' + ip + ') downloaded an exported file.',
                         requestURL: "${request.forwardURI}${request.queryString ? '?' + request.queryString : ''}")
             }
         }
@@ -76,9 +76,9 @@ class AuditLogFilters {
                 if (studies.empty) {
                     studies = studyIdService.getStudyIdsForQueries([result_instance_id1, result_instance_id2])
                 }
-                def task = "Summary Statistics"
-                if (actionName == "childConceptPatientCounts") {
-                    task = "Clinical Data Access"
+                def task = 'Summary Statistics'
+                if (actionName == 'childConceptPatientCounts') {
+                    task = 'Clinical Data Access'
                 }
                 auditLogService.report(task, request,
                         study: studies,
@@ -96,7 +96,7 @@ class AuditLogFilters {
                     studies = studyIdService.getStudyIdForConceptKey(params.concept_key, studyConceptOnly: true)
                 }
                 if (studies == null) return
-                def task = "Clinical Data Access"
+                def task = 'Clinical Data Access'
                 auditLogService.report(task, request,
                         study: studies,
                         user: currentUserBean
@@ -105,7 +105,7 @@ class AuditLogFilters {
         }
         rwg(controller: 'RWG', action: 'getFacetResults') {
             before = { model ->
-                auditLogService.report("Clinical Data Active Filter", request,
+                auditLogService.report('Clinical Data Active Filter', request,
                         query: params.searchTerms,
                         user: currentUserBean,
                 )
@@ -113,14 +113,14 @@ class AuditLogFilters {
         }
         userlanding(controller: 'userLanding', action: '*', actionExclude:'checkHeartBeat') {
             before = { model ->
-                auditLogService.report("User Access", request,
+                auditLogService.report('User Access', request,
                         user: currentUserBean,
                 )
             }
         }
         oauth(controller: 'oauth', action: '*') {
             before = { model ->
-                auditLogService.report("OAuth authentication", request,
+                auditLogService.report('OAuth authentication', request,
                         user: currentUserBean,
                 )
             }

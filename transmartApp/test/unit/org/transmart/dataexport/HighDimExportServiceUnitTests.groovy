@@ -22,14 +22,14 @@ class HighDimExportServiceUnitTests {
 
     @Test
     void testRelativeFolderPathForAcrossStudyNode() {
-        String testFullName = "\\Clinical Information\\${forbiddenFileNameSymbols}\\"
+        String testFullName = '\\Clinical Information\\' + forbiddenFileNameSymbols + '\\'
 
         String relativePath = testee.getRelativeFolderPathForSingleNode([
                 getFullName: { testFullName },
                 getStudy   : { null },
         ] as OntologyTerm)
 
-        def matcher = relativePath =~ "Clinical(.)Information${Pattern.quote(File.separator)}(.+)"
+        def matcher = relativePath =~ 'Clinical(.)Information' + Pattern.quote(File.separator) + '(.+)'
         assertTrue relativePath, matcher.matches()
 
         assertFalse forbiddenFileNameSymbols.contains(matcher[0][1])
@@ -38,14 +38,14 @@ class HighDimExportServiceUnitTests {
         assertThat encodedFolderName, not(isEmptyOrNullString())
 
         Set forbiddenSymbolsFound = (encodedFolderName as List).intersect(forbiddenFileNameSymbols as List)
-        assertThat "Forbidden symbols ${forbiddenSymbolsFound} are found in folder name: ${relativePath}",
+        assertThat 'Forbidden symbols ' + forbiddenSymbolsFound + ' are found in folder name: ' + relativePath,
                 forbiddenSymbolsFound, hasSize(0)
     }
 
     @Test
     void testRelativeFolderPathForTheNodeInsideStudy() {
         String studyFolder = '\\Test Studies\\Study-1\\'
-        String testFullName = "${studyFolder}Sub Folder\\${forbiddenFileNameSymbols}\\"
+        String testFullName = '' + studyFolder + 'Sub Folder\\' + forbiddenFileNameSymbols + '\\'
 
         String relativePath = testee.getRelativeFolderPathForSingleNode([
                 getFullName: { testFullName },
@@ -60,7 +60,7 @@ class HighDimExportServiceUnitTests {
                 },
         ] as OntologyTerm)
 
-        def matcher = relativePath =~ "Sub(.)Folder${Pattern.quote(File.separator)}(.+)"
+        def matcher = relativePath =~ 'Sub(.)Folder' + Pattern.quote(File.separator) + '(.+)'
         assertTrue relativePath, matcher.matches()
 
         assertFalse forbiddenFileNameSymbols.contains(matcher[0][1])
@@ -69,7 +69,7 @@ class HighDimExportServiceUnitTests {
         assertThat encodedFolderName, not(isEmptyOrNullString())
 
         Set forbiddenSymbolsFound = (encodedFolderName as List).intersect(forbiddenFileNameSymbols as List)
-        assertThat "Forbidden symbols ${forbiddenSymbolsFound} are found in folder name: ${relativePath}",
+        assertThat 'Forbidden symbols ' + forbiddenSymbolsFound + ' are found in folder name: ' + relativePath,
                 forbiddenSymbolsFound, hasSize(0)
     }
 }

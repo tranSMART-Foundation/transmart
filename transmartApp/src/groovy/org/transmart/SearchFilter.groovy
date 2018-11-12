@@ -28,15 +28,15 @@ class SearchFilter {
 
     def acttab = {
 
-        if ("trial".equals(datasource))
+        if ('trial'.equals(datasource))
             return 0
-        else if ("experiment".equals(datasource))
+        else if ('experiment'.equals(datasource))
             return 1
-        else if ("profile".equals(datasource))
+        else if ('profile'.equals(datasource))
             return 2
-        else if (datasource?.startsWith("literature"))
+        else if (datasource?.startsWith('literature'))
             return 3
-        else if ("document".equals(datasource))
+        else if ('document'.equals(datasource))
             return 4
         else
             return 5
@@ -44,25 +44,25 @@ class SearchFilter {
 
     def acttabname = {
 
-        if ("trial".equals(datasource))
-            return "trial"
-        else if ("experiment".equals(datasource))
-            return "pretrial"
-        else if ("profile".equals(datasource))
-            return "profile"
-        else if (datasource?.startsWith("literature"))
-            return "jubilant"
-        else if ("document".equals(datasource))
-            return "doc"
+        if ('trial'.equals(datasource))
+            return 'trial'
+        else if ('experiment'.equals(datasource))
+            return 'pretrial'
+        else if ('profile'.equals(datasource))
+            return 'profile'
+        else if (datasource?.startsWith('literature'))
+            return 'jubilant'
+        else if ('document'.equals(datasource))
+            return 'doc'
         else
-            return datasource;
+            return datasource
     }
 
     def createPictorTerms = {
 
-        def geneFilters = globalFilter.getGeneFilters();
+        def geneFilters = globalFilter.getGeneFilters()
         // Get all pathway ids from globalFilter
-        def pathwayIds = globalFilter.formatIdList(globalFilter.getAllListFilters(), ",")
+        def pathwayIds = globalFilter.formatIdList(globalFilter.getAllListFilters(), ',')
         // If there are pathways, then get all genes in pathways and add them to the geneFilters (hash set)
         if (pathwayIds.size() > 0) {
             geneFilters.addAll(searchKeywordService.expandAllListToGenes(pathwayIds))
@@ -70,58 +70,59 @@ class SearchFilter {
 
         // Format the gene filter keywords into comma separated strings
         if (geneFilters?.size() > 0) {
-            pictorTerms = globalFilter.formatKeywordList(geneFilters, ",", "", 1900)
-        } else {
+            pictorTerms = globalFilter.formatKeywordList(geneFilters, ',', '', 1900)
+        }
+        else {
             pictorTerms = null
         }
 
     }
 
     def marshal() {
-        def s = new StringBuilder("<SearchFilter.searchText:").append(searchText).append(">");
+        def s = new StringBuilder('<SearchFilter.searchText:').append(searchText).append('>')
         // todo -- add filter stuff in
-        return s.toString();
+        return s.toString()
     }
 
     /** This method is used for the ResNet and the GeneGo tabs */
     def getExternalTerms() {
         StringBuilder s = new StringBuilder()
 
-        def geneFilters = globalFilter.getGeneFilters();
-        def pathwayIds = globalFilter.formatIdList(globalFilter.getAllListFilters(), ",")
+        def geneFilters = globalFilter.getGeneFilters()
+        def pathwayIds = globalFilter.formatIdList(globalFilter.getAllListFilters(), ',')
         if (pathwayIds.size() > 0) {
             geneFilters.addAll(searchKeywordService.expandAllListToGenes(pathwayIds))
         }
         if (geneFilters?.size() > 0) {
-            s.append(globalFilter.formatKeywordList(geneFilters, " OR ", "", 1900))
+            s.append(globalFilter.formatKeywordList(geneFilters, ' OR ', '', 1900))
         }
 
         if (!globalFilter.getTextFilters().isEmpty()) {
             if (s.length() > 0) {
-                s.append(" AND ")
+                s.append(' AND ')
             }
-            s.append(globalFilter.formatKeywordList(globalFilter.getTextFilters(), " OR ", "", 1900))
+            s.append(globalFilter.formatKeywordList(globalFilter.getTextFilters(), ' OR ', '', 1900))
         }
 
         if (!globalFilter.getDiseaseFilters().isEmpty()) {
             if (s.length() > 0) {
-                s.append(" AND ")
+                s.append(' AND ')
             }
-            s.append(globalFilter.formatKeywordList(globalFilter.getDiseaseFilters(), " OR ", "", 1900))
+            s.append(globalFilter.formatKeywordList(globalFilter.getDiseaseFilters(), ' OR ', '', 1900))
         }
 
         if (!globalFilter.getCompoundFilters().isEmpty()) {
             if (s.length() > 0) {
-                s.append(" AND ")
+                s.append(' AND ')
             }
-            s.append(globalFilter.formatKeywordList(globalFilter.getCompoundFilters(), " OR ", "", 1900))
+            s.append(globalFilter.formatKeywordList(globalFilter.getCompoundFilters(), ' OR ', '', 1900))
         }
 
         if (!globalFilter.getTrialFilters().isEmpty()) {
             if (s.length() > 0) {
-                s.append(" AND ")
+                s.append(' AND ')
             }
-            s.append(globalFilter.formatKeywordList(globalFilter.getTrialFilters(), " OR ", "", 1900))
+            s.append(globalFilter.formatKeywordList(globalFilter.getTrialFilters(), ' OR ', '', 1900))
         }
 
         if (s.length() < 1) {

@@ -15,7 +15,7 @@ grails.project.dependency.resolver = 'maven'
 grails.project.fork = [test: forkSettingsOther, run: forkSettingsRun, war: false, console: forkSettingsOther]
 grails.project.source.level = 1.7
 grails.project.target.level = 1.7
-grails.project.war.file = "target/${appName}.war"
+grails.project.war.file = 'target/' + appName + '.war'
 grails.project.work.dir = 'target'
 grails.servlet.version = '3.0'
 
@@ -123,7 +123,7 @@ grails.project.dependency.resolution = {
 		runtime ':prototype:1.0'
 		runtime ':resources:1.2.14'
 
-		//test ":code-coverage:1.2.6" // Doesn't work with forked tests yet
+		//test ':code-coverage:1.2.6' // Doesn't work with forked tests yet
 
 		String tmVersion = '16.4-SNAPSHOT'
 		if (!dm) {

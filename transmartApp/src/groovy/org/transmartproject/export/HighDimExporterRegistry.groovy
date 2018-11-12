@@ -35,10 +35,11 @@ class HighDimExporterRegistry {
         final Set<HighDimExporter> exporters
         if (fileFormat) {
             if (!exporterRegistry.containsKey(fileFormat)) {
-                throw new NoSuchExporterException("Unknown format: ${fileFormat}")
+                throw new NoSuchExporterException('Unknown format: ' + fileFormat)
             }
             exporters = exporterRegistry.get(fileFormat) as Set
-        } else {
+        }
+        else {
             exporters = exporterRegistry.values() as Set
         }
 
@@ -46,7 +47,8 @@ class HighDimExporterRegistry {
             exporters.findAll { exporter ->
                 exporter.isDataTypeSupported(dataType)
             }
-        } else {
+        }
+        else {
             exporters
         }
     }

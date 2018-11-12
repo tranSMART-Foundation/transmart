@@ -20,7 +20,7 @@ class AuthUserDetails extends GrailsUser {
     // This is a convenience function that is here to keep compatibility with AuthUser.isAdmin()
     // This should be removed as all call the the former are removed.
     public boolean isAdmin() {
-        def i2b2HelperService = Holders.applicationContext.getBean("i2b2HelperService")
+        def i2b2HelperService = Holders.applicationContext.getBean('i2b2HelperService')
         i2b2HelperService.isAdmin(this)
     }
 }

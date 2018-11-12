@@ -46,8 +46,8 @@ public class WizardModelDetails extends ModelDetails {
      * add an empty other ConceptCode item
      */
     public static void addOtherItem(List<ConceptCode> items, String optionId) {
-        if (optionId == null) optionId = "other"
-        items.add(new ConceptCode(bioConceptCode: optionId, codeName: "other"))
+        if (optionId == null) optionId = 'other'
+        items.add(new ConceptCode(bioConceptCode: optionId, codeName: 'other'))
     }
 
 }

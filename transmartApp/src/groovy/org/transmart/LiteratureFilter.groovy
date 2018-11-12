@@ -41,13 +41,13 @@ class LiteratureFilter {
 
     LiteratureFilter() {
 
-        alterationTypes.put("Epigenetic Event", true)
-        alterationTypes.put("Expression", true)
-        alterationTypes.put("Gene Amplification", true)
-        alterationTypes.put("Genomic Level Change", true)
-        alterationTypes.put("LOH", true)
-        alterationTypes.put("Mutation", true)
-        alterationTypes.put("PTM", true)
+        alterationTypes.put('Epigenetic Event', true)
+        alterationTypes.put('Expression', true)
+        alterationTypes.put('Gene Amplification', true)
+        alterationTypes.put('Genomic Level Change', true)
+        alterationTypes.put('LOH', true)
+        alterationTypes.put('Mutation', true)
+        alterationTypes.put('PTM', true)
 
     }
 
@@ -56,27 +56,27 @@ class LiteratureFilter {
     }
 
     def hasDiseaseSite() {
-        return diseaseSite != null && diseaseSite.size() > 0 && (diseaseSite.iterator().next() != "");
+        return diseaseSite != null && diseaseSite.size() > 0 && (diseaseSite.iterator().next() != '')
     }
 
     def hasComponent() {
-        return componentList != null && componentList.size() > 0 && (componentList.iterator().next() != "");
+        return componentList != null && componentList.size() > 0 && (componentList.iterator().next() != '')
     }
 
     def hasMutationType() {
-        return mutationType != null && mutationType.length() > 0;
+        return mutationType != null && mutationType.length() > 0
     }
 
     def hasMutationSite() {
-        return mutationSite != null && mutationSite.length() > 0;
+        return mutationSite != null && mutationSite.length() > 0
     }
 
     def hasEpigeneticType() {
-        return epigeneticType != null && epigeneticType.length() > 0;
+        return epigeneticType != null && epigeneticType.length() > 0
     }
 
     def hasEpigeneticRegion() {
-        return epigeneticRegion != null && epigeneticRegion.length() > 0;
+        return epigeneticRegion != null && epigeneticRegion.length() > 0
     }
 
     def hasAlterationType() {
@@ -87,56 +87,56 @@ class LiteratureFilter {
             }
         }
         // NOTE: Only want to filter if any of the types are not selected.
-        return count < alterationTypes.size();
+        return count < alterationTypes.size()
     }
 
     def hasMoleculeType() {
-        return moleculeType != null && moleculeType.length() > 0;
+        return moleculeType != null && moleculeType.length() > 0
     }
 
     def hasRegulation() {
-        return regulation != null && regulation.length() > 0;
+        return regulation != null && regulation.length() > 0
     }
 
     def hasPtmType() {
-        return ptmType != null && ptmType.length() > 0;
+        return ptmType != null && ptmType.length() > 0
     }
 
     def hasPtmRegion() {
-        return ptmRegion != null && ptmRegion.length() > 0;
+        return ptmRegion != null && ptmRegion.length() > 0
     }
 
     def hasSource() {
-        return source != null && source.length() > 0;
+        return source != null && source.length() > 0
     }
 
     def hasTarget() {
-        return target != null && target.length() > 0;
+        return target != null && target.length() > 0
     }
 
     def hasExperimentalModel() {
-        return experimentalModel != null && experimentalModel.length() > 0;
+        return experimentalModel != null && experimentalModel.length() > 0
     }
 
     def hasMechanism() {
-        return mechanism != null && mechanism.length() > 0;
+        return mechanism != null && mechanism.length() > 0
     }
 
     def hasTrialType() {
 
-        return trialType != null && trialType.length() > 0;
+        return trialType != null && trialType.length() > 0
     }
 
     def hasTrialPhase() {
-        return trialPhase != null && trialPhase.length() > 0;
+        return trialPhase != null && trialPhase.length() > 0
     }
 
     def hasInhibitorName() {
-        return inhibitorName != null && inhibitorName.length() > 0;
+        return inhibitorName != null && inhibitorName.length() > 0
     }
 
     def hasTrialExperimentalModel() {
-        return trialExperimentalModel != null && trialExperimentalModel.length() > 0;
+        return trialExperimentalModel != null && trialExperimentalModel.length() > 0
     }
 
     /**
@@ -148,7 +148,7 @@ class LiteratureFilter {
         Set returnSet = new HashSet()
         for (key in alterationTypes.keySet()) {
             if (alterationTypes.get(key) == true) {
-                returnSet.add(key.toUpperCase().replace("_", " "))
+                returnSet.add(key.toUpperCase().replace('_', ' '))
             }
         }
         return returnSet
@@ -158,7 +158,8 @@ class LiteratureFilter {
         if (list != null) {
             if (list instanceof String) {
                 diseaseSite.add(list)
-            } else {
+            }
+            else {
                 for (item in list) {
                     diseaseSite.add(item)
                 }
@@ -173,15 +174,16 @@ class LiteratureFilter {
         if (list != null) {
             if (list instanceof String && list.trim().length() > 0) {
                 componentList.add(list)
-                def compArray = list.split(",")
-                pairCompList.add(compArray[0].replace("[", "").trim())
-                pairGeneList.add(compArray[1].replace("]", "").trim())
-            } else {
+                def compArray = list.split(',')
+                pairCompList.add(compArray[0].replace('[', '').trim())
+                pairGeneList.add(compArray[1].replace(']', '').trim())
+            }
+            else {
                 for (item in list) {
                     componentList.add(item)
-                    def compArray = item.split(",")
-                    pairCompList.add(compArray[0].replace("[", "").trim())
-                    pairGeneList.add(compArray[1].replace("]", "").trim())
+                    def compArray = item.split(',')
+                    pairCompList.add(compArray[0].replace('[', '').trim())
+                    pairGeneList.add(compArray[1].replace(']', '').trim())
                 }
             }
         }

@@ -15,8 +15,8 @@ import org.springframework.core.type.filter.TypeFilter
 @Slf4j('logger')
 public class MarshallerRegistrarService implements FactoryBean {
 
-    private final static PACKAGE = "org.transmart.marshallers"
-    private final static RESOURCE_PATTERN = "**/*Marshaller.class"
+    private final static PACKAGE = 'org.transmart.marshallers'
+    private final static RESOURCE_PATTERN = '**/*Marshaller.class'
 
     final Class objectType = null
     final boolean singleton = true
@@ -33,7 +33,7 @@ public class MarshallerRegistrarService implements FactoryBean {
                     @Override
                     protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
                         Set<BeanDefinitionHolder> superValue = super.doScan(basePackages)
-                        logger.debug "Found marshallers: $superValue"
+                        logger.debug 'Found marshallers: ' + superValue
 
                         superValue.each { holder ->
                             def bean = ctx.getBean(holder.beanName)
@@ -47,7 +47,7 @@ public class MarshallerRegistrarService implements FactoryBean {
         scanner.setResourcePattern(RESOURCE_PATTERN)
         scanner.addIncludeFilter({
             MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory ->
-                metadataReader.classMetadata.className.matches(".+Marshaller")
+                metadataReader.classMetadata.className.matches('.+Marshaller')
         } as TypeFilter)
 
         scanner.scan(PACKAGE)

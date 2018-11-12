@@ -38,7 +38,7 @@ class ChildProcessAppenderTests {
     @Rule
     public TemporaryFolder temp = new TemporaryFolder()
 
-    static String TESTSTRING = "hello world! testing org.transmart.logging.ChildProcessAppender\n"
+    static String TESTSTRING = 'hello world! testing org.transmart.logging.ChildProcessAppender\n'
 
     static sh(cmd) { return ['sh', '-c', cmd] }
     // escape shell strings, based on http://stackoverflow.com/a/1250279/264177
@@ -52,8 +52,8 @@ class ChildProcessAppenderTests {
     @Test
     void testLoggingEvent() {
         File output = temp.newFile('output')
-        def p = new ChildProcessAppender(command: sh("cat >"+path(output)))
-        LoggingEvent e = new LoggingEvent("", new Category('debug'), Level.DEBUG, [foo: 'bar', baz: 'quux'], null)
+        def p = new ChildProcessAppender(command: sh('cat >'+path(output)))
+        LoggingEvent e = new LoggingEvent('', new Category('debug'), Level.DEBUG, [foo: 'bar', baz: 'quux'], null)
         p.doAppend(e)
         p.close()
         waitForChild(p)
@@ -63,7 +63,7 @@ class ChildProcessAppenderTests {
     @Test
     void testOutput() {
         File output = temp.newFile('output')
-        def p = new ChildProcessAppender(command: sh("cat > "+path(output)))
+        def p = new ChildProcessAppender(command: sh('cat > '+path(output)))
         p.write(TESTSTRING)
         waitForChild(p)
         assertThat readFileToString(output), is(TESTSTRING)
@@ -71,7 +71,7 @@ class ChildProcessAppenderTests {
 
     @Test(expected=ChildFailedException.class)
     void testFail() {
-        def p = new ChildProcessAppender(command: ["false"], restartLimit: 3, throwOnFailure: true)
+        def p = new ChildProcessAppender(command: ['false'], restartLimit: 3, throwOnFailure: true)
         p.write(TESTSTRING)
         waitForChild(p)
         p.write(TESTSTRING)
@@ -100,10 +100,10 @@ class ChildProcessAppenderTests {
         writeStringToFile(runcount, '0\n')
         String command = """
             countfile=${path(runcount)}
-            count=`cat "\$countfile"`
-            if [ "\$count" -le ${restarts} ]
+            count=`cat '\' + countfile`
+            if [ '\' + count -le ${restarts} ]
             then
-                echo `expr "\$count" + 1` > "\$countfile"
+                echo `expr '\' + count + 1` > '\' + countfile
                 exit
             else
                 cat > ${path(output)}

@@ -35,15 +35,16 @@ class DataExportController {
     def downloadFileExists() {
         checkJobAccess params.jobname
 
-        def InputStream inputStream = exportService.downloadFile(params);
+        def InputStream inputStream = exportService.downloadFile(params)
         def result = [:]
 
         if (inputStream) {
             result.fileStatus = true
             inputStream.close()
-        } else {
+        }
+        else {
             result.fileStatus = false
-            result.message = "Download failed as file could not be found on the server"
+            result.message = 'Download failed as file could not be found on the server'
         }
 
         render result as JSON
@@ -54,13 +55,13 @@ class DataExportController {
 
         def InputStream inputStream = exportService.downloadFile(params)
 
-        def fileName = params.jobname + ".zip"
+        def fileName = params.jobname + '.zip'
         response.setContentType 'application/zip'
-        response.setHeader "Content-disposition", "attachment;filename=${fileName}"
+        response.setHeader 'Content-disposition', 'attachment;filename=' + fileName
         response.outputStream << inputStream
         response.outputStream.flush()
-        inputStream.close();
-        return true;
+        inputStream.close()
+        return true
     }
 
     /**
@@ -70,7 +71,7 @@ class DataExportController {
     def createnewjob() {
         def result = exportService.createExportDataAsyncJob(params, springSecurityService.getPrincipal().username)
 
-        response.setContentType("text/json")
+        response.setContentType('text/json')
         response.outputStream << result.toString()
     }
 
@@ -82,7 +83,7 @@ class DataExportController {
 
         def jsonResult = exportService.exportData(params, currentUserBean.username)
 
-        response.setContentType("text/json")
+        response.setContentType('text/json')
         response.outputStream << jsonResult.toString()
     }
 
@@ -97,7 +98,7 @@ class DataExportController {
      * The previous implementation of this method would return an empty list if the key named 'result_instance_id1' was not found.
      * Even if the key named 'result_instance_id2' was present.
      * This caused AssertionException's being thrown by dataExportService.isUserAllowedToExport.
-     * Also the checkRightsToExport method would throw an InvalidArgumentsException("No result instance id provided")
+     * Also the checkRightsToExport method would throw an InvalidArgumentsException('No result instance id provided')
      * when trying to export data if subset2 existed, but not subset1
      * Current implementation will in this case (i.e. only key 'result_instance_id2' is present) return a list
      * with the first element equal to null and the second equal to the value of 'result_instance_id2'.
@@ -115,14 +116,14 @@ class DataExportController {
 
     private void checkRightsToExport(List<Long> resultInstanceIds) {
         if (!resultInstanceIds) {
-            throw new InvalidArgumentsException("No result instance id provided")
+            throw new InvalidArgumentsException('No result instance id provided')
         }
 
         if (!dataExportService
                 .isUserAllowedToExport(currentUserBean,
                     resultInstanceIds)) {
-            throw new AccessDeniedException("User ${currentUserBean.username} has no EXPORT permission" +
-                    " on one of the result sets: ${resultInstanceIds}")
+            throw new AccessDeniedException('User ' + currentUserBean.username + ' has no EXPORT permission' +
+                    ' on one of the result sets: ' + resultInstanceIds)
         }
     }
 
@@ -135,11 +136,11 @@ class DataExportController {
         String jobUsername = extractUserFromJobName(jobName)
 
         if (jobUsername != loggedInUsername) {
-            logger.warn("Denying access to job $jobName because the " +
-                    "corresponding username ($jobUsername) does not match " +
-                    "that of the current user")
-            throw new AccessDeniedException("Job $jobName was not started by " +
-                    "this user")
+            logger.warn('Denying access to job ' + jobName + ' because the ' +
+                    'corresponding username (' + jobUsername + ') does not match ' +
+                    'that of the current user')
+            throw new AccessDeniedException('Job ' + jobName + ' was not started by ' +
+                    'this user')
         }
     }
 

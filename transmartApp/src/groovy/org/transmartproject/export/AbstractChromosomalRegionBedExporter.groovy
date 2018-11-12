@@ -32,7 +32,7 @@ abstract class AbstractChromosomalRegionBedExporter implements HighDimExporter {
     @Override
     void export(TabularResult tabularResult, Projection projection,
                 Closure<OutputStream> newOutputStream, Closure<Boolean> isCancelled) {
-        logger.info("started exporting to $format ")
+        logger.info('started exporting to ' + format + ' ')
         def startTime = System.currentTimeMillis()
 
         if (isCancelled && isCancelled()) {
@@ -54,29 +54,30 @@ abstract class AbstractChromosomalRegionBedExporter implements HighDimExporter {
                         return
                     }
                     if (!datarow[assay]) {
-                        logger.debug("(datrow.id=${datarow.id}, assay.id=${assay.id}) No cell data.")
+                        logger.debug('(datrow.id=' + datarow.id + ', assay.id=' + assay.id + ') No cell data.')
                         continue
                     }
                     List row = calculateRow(datarow, assay)
                     if (row[0..2].any { !it }) {
-                        logger.debug("(datrow.id=${datarow.id}, assay.id=${assay.id}) Row has not required values: ${row}. Skip it.")
+                        logger.debug('(datrow.id=' + datarow.id + ', assay.id=' + assay.id + ') Row has not required values: ' + row + '. Skip it.')
                         continue
                     }
                     Writer writer = streamsPerSample[assay.id]
                     if (writer == null) {
                         writer = new BufferedWriter(
                                     new OutputStreamWriter(
-                                            newOutputStream("${assay.sampleCode}_${assay.id}", format), 'UTF-8'))
+                                            newOutputStream('' + assay.sampleCode + '_' + assay.id, format), 'UTF-8'))
 
                         //Write header line
-                        writer << "track name=\"${assay.sampleCode}\" "
+                        writer << 'track name=\'${assay.sampleCode}\' '
                         if (row.size() >= ITEM_RGB_COLUMN_POSITION) {
-                            writer << "itemRgb=\"On\" "
-                        } else {
-                            writer << "useScore=\"1\" "
+                            writer << 'itemRgb=\'On\' '
+                        }
+                        else {
+                            writer << 'useScore=\'1\' '
                         }
                         if (datarow.platform) {
-                            writer << "genome_build=\"${datarow.platform.genomeReleaseId}\""
+                            writer << 'genome_build=\'${datarow.platform.genomeReleaseId}\''
                         }
                         writer << '\n'
 
@@ -84,22 +85,23 @@ abstract class AbstractChromosomalRegionBedExporter implements HighDimExporter {
                     }
                     String chromosome = row[CHROMOSOME_COLUMN_POSITION - 1]
                     if (!chromosome.toLowerCase().startsWith('chr')) {
-                        row[CHROMOSOME_COLUMN_POSITION - 1] = "chr${chromosome}"
+                        row[CHROMOSOME_COLUMN_POSITION - 1] = 'chr' + chromosome
                     }
                     writer << row.join(COLUMN_SEPARATOR) << '\n'
                     rowNumber += 1
                 }
                 if (rowNumber < assayList.size()) {
-                    logger.warn("${assayList.size() - rowNumber} rows from ${assayList.size()} were skipped.")
+                    logger.warn('' + assayList.size() - rowNumber + ' rows from ' + assayList.size() + ' were skipped.')
                 }
             }
-        } finally {
+        }
+        finally {
             streamsPerSample.values().each {
                 it.close()
             }
         }
 
-        logger.info("Exporting data took ${System.currentTimeMillis() - startTime} ms")
+        logger.info('Exporting data took ' + System.currentTimeMillis() - startTime + ' ms')
     }
 
     protected abstract calculateRow(RegionRow datarow, AssayColumn assay)

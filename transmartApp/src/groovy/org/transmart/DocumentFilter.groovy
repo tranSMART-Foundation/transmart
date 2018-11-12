@@ -7,7 +7,7 @@ package org.transmart
  */
 class DocumentFilter {
     LinkedHashMap repositories = new LinkedHashMap()
-    String path = ""
+    String path = ''
     boolean type_excel = true
     boolean type_html = true
     boolean type_pdf = true
@@ -18,10 +18,10 @@ class DocumentFilter {
 
     DocumentFilter() {
 
-        repositories.put("Biomarker", true)
-        repositories.put("Conferences", true)
-        repositories.put("DIP", true)
-        repositories.put("Jubilant Oncology", true)
+        repositories.put('Biomarker', true)
+        repositories.put('Conferences', true)
+        repositories.put('DIP', true)
+        repositories.put('Jubilant Oncology', true)
 
     }
 
@@ -34,53 +34,54 @@ class DocumentFilter {
             // Other checked and one or more types checked - use NOTEXTENSION filter
             if (type_other) {
                 if (!type_excel) {
-                    types.add("xls")
-                    types.add("xlsx")
+                    types.add('xls')
+                    types.add('xlsx')
                 }
                 if (!type_html) {
-                    types.add("htm")
-                    types.add("html")
+                    types.add('htm')
+                    types.add('html')
                 }
                 if (!type_pdf) {
-                    types.add("pdf")
+                    types.add('pdf')
                 }
                 if (!type_powerpoint) {
-                    types.add("ppt")
-                    types.add("pptx")
+                    types.add('ppt')
+                    types.add('pptx')
                 }
                 if (!type_text) {
-                    types.add("txt")
+                    types.add('txt')
                 }
                 if (!type_word) {
-                    types.add("doc")
-                    types.add("docx")
+                    types.add('doc')
+                    types.add('docx')
                 }
-                filters.put("NOTEXTENSION", types)
-            } else {
+                filters.put('NOTEXTENSION', types)
+            }
+            else {
                 if (type_excel) {
-                    types.add("xls")
-                    types.add("xlsx")
+                    types.add('xls')
+                    types.add('xlsx')
                 }
                 if (type_html) {
-                    types.add("htm")
-                    types.add("html")
+                    types.add('htm')
+                    types.add('html')
                 }
                 if (type_pdf) {
-                    types.add("pdf")
+                    types.add('pdf')
                 }
                 if (type_powerpoint) {
-                    types.add("ppt")
-                    types.add("pptx")
+                    types.add('ppt')
+                    types.add('pptx')
                 }
                 if (type_text) {
-                    types.add("txt")
+                    types.add('txt')
                 }
                 if (type_word) {
-                    types.add("doc")
-                    types.add("docx")
+                    types.add('doc')
+                    types.add('docx')
                 }
                 if (types.size() > 0) {
-                    filters.put("EXTENSION", types)
+                    filters.put('EXTENSION', types)
                 }
             }
         }
@@ -91,12 +92,12 @@ class DocumentFilter {
             }
         }
         if (repos.size() > 0 && repos.size() != repositories.size()) {
-            filters.put("REPOSITORY", repos)
+            filters.put('REPOSITORY', repos)
         }
         ArrayList<String> paths = new ArrayList<String>()
         if (path.length() > 0) {
             paths.add(path)
-            filters.put("PATH", paths)
+            filters.put('PATH', paths)
         }
 
         return filters

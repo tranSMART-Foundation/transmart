@@ -13,7 +13,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.transmartproject.core.users.User
 
 /**
- * Creates a proxy bean that provides the "current user" appropriate for context
+ * Creates a proxy bean that provides the 'current user' appropriate for context
  * of the caller.
  *
  * The current user has to be available to transmart services in several
@@ -78,16 +78,18 @@ class CurrentUserBeanProxyFactory implements FactoryBean<User>, BeanFactoryAware
             if (RequestContextHolder.requestAttributes) {
                 // request context is active
                 cbf.getBean SUB_BEAN_REQUEST
-            } else {
+            }
+            else {
                 for (beanName in extraBeansToTry) {
                     try {
                         return cbf.getBean(beanName)
-                    } catch (BeansException e) {
-                        logger.debug("BeansException for bean ${beanName}")
+                    }
+                    catch (BeansException e) {
+                        logger.debug('BeansException for bean ' + beanName)
                     }
                 }
 
-                throw new IllegalStateException("Tried to fetch " +
+                throw new IllegalStateException('Tried to fetch ' +
                         "current user, but it's not available")
             }
         }
@@ -100,7 +102,7 @@ class CurrentUserBeanProxyFactory implements FactoryBean<User>, BeanFactoryAware
 
     @Override
     void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        ConfigurableBeanFactory cbf = (ConfigurableBeanFactory) beanFactory;
+        ConfigurableBeanFactory cbf = (ConfigurableBeanFactory) beanFactory
 
         ProxyFactory pf = new ProxyFactory([User] as Class[])
         pf.targetSource = new CurrentUserBeanTargetSource(cbf: cbf)

@@ -9,12 +9,12 @@ import org.springframework.core.NamedThreadLocal
 class QuartzSpringScope implements Scope {
 
     private static ThreadLocal<Map<String, Object>> SCOPE_MAP =
-            new NamedThreadLocal<Map<String, Object>>("JobScope") {
+            new NamedThreadLocal<Map<String, Object>>('JobScope') {
                 @Override
                 protected Map<String, Object> initialValue() {
                     new HashMap<String, Object>()
                 }
-            };
+            }
 
     void setProperty(String name, Object value) {
         SCOPE_MAP.get().put name, value
@@ -34,8 +34,8 @@ class QuartzSpringScope implements Scope {
         }
 
         throw new IllegalStateException("No bean named '$name' " +
-                "has bean submitted to this scope. This scope does " +
-                "not create beans")
+                'has bean submitted to this scope. This scope does ' +
+                'not create beans')
     }
 
     @Override
@@ -45,8 +45,8 @@ class QuartzSpringScope implements Scope {
 
     @Override
     void registerDestructionCallback(String name, Runnable callback) {
-        logger.warn "Destruction callbacks are not supported; tried to add one " +
-                "for $name"
+        logger.warn 'Destruction callbacks are not supported; tried to add one ' +
+                'for ' + name
     }
 
     @Override

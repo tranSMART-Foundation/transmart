@@ -15,13 +15,13 @@ class GenericJobController {
      */
     def createnewjob = {
         def userName = springSecurityService.getPrincipal().username
-        def analysis = request.getParameter("analysis")
-        def jobStatus = "Started"
+        def analysis = request.getParameter('analysis')
+        def jobStatus = 'Started'
 
         def newJob = new AsyncJob(lastRunOn: new Date())
         newJob.save()
 
-        def jobName = userName + "-" + analysis + "-" + newJob.id
+        def jobName = userName + '-' + analysis + '-' + newJob.id
         newJob.jobName = jobName
         newJob.jobStatus = jobStatus
         newJob.jobType = analysis
@@ -30,11 +30,11 @@ class GenericJobController {
         jobResultsService[jobName] = [:]
         asyncJobService.updateStatus(jobName, jobStatus)
 
-        logger.debug("Sending ${jobName} back to the client")
+        logger.debug('Sending ' + jobName + ' back to the client')
         JSONObject result = new JSONObject()
-        result.put("jobName", jobName)
-        result.put("jobStatus", jobStatus)
-        response.setContentType("text/json")
+        result.put('jobName', jobName)
+        result.put('jobStatus', jobStatus)
+        response.setContentType('text/json')
         response.outputStream << result.toString()
     }
 }

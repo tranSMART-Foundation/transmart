@@ -11,7 +11,7 @@ class PluginControllerTests {
 
     @Before
     void setUp() {
-        mockDomain(Plugin);
+        mockDomain(Plugin)
         def p = new Plugin(
                 name: 'Test Plugin',
                 pluginName: 'TestPlugin',
@@ -25,7 +25,7 @@ class PluginControllerTests {
     void testIndex() {
         controller.index()
         assert response.status == 302
-        assert response.redirectedUrl == "/plugin/list"
+        assert response.redirectedUrl == '/plugin/list'
     }
 
     void testList() {

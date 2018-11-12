@@ -39,7 +39,7 @@ class AcghBedExporterTests {
     }
 
     @Test
-    void "test whether aCGH data is exported properly"() {
+    void 'test whether aCGH data is exported properly'() {
 
         tabularResult = createMockAcghTabularResult()
 
@@ -53,8 +53,8 @@ class AcghBedExporterTests {
 
             assertThat outputStreams, hasSize(2)
 
-            String assay1Output = outputStreams[0].toString("UTF-8")
-            String assay2Output = outputStreams[1].toString("UTF-8")
+            String assay1Output = outputStreams[0].toString('UTF-8')
+            String assay2Output = outputStreams[1].toString('UTF-8')
 
             List assay1Lines = assay1Output.readLines()
             //NOTE: bioMarker is used as label if it's present
@@ -76,7 +76,7 @@ class AcghBedExporterTests {
     }
 
     @Test
-    void "test custom color scheme"() {
+    void 'test custom color scheme'() {
 
         exporter.acghBedExporterRgbColorScheme = [
                 //white
@@ -105,8 +105,8 @@ class AcghBedExporterTests {
 
             assertThat outputStreams, hasSize(2)
 
-            String assay1Output = outputStreams[0].toString("UTF-8")
-            String assay2Output = outputStreams[1].toString("UTF-8")
+            String assay1Output = outputStreams[0].toString('UTF-8')
+            String assay2Output = outputStreams[1].toString('UTF-8')
 
             List assay1Lines = assay1Output.readLines()
             //NOTE: bioMarker is used as label if it's present
@@ -131,29 +131,29 @@ class AcghBedExporterTests {
         // Setup tabularResult and projection to test with
         List<AssayColumn> sampleAssays = createSampleAssays(2)
         Map<String, List<Object>> dataRows = [
-                "row1": [
-                        ["flag": -1],
-                        ["flag": 0]
+                'row1': [
+                        ['flag': -1],
+                        ['flag': 0]
                 ],
-                "row2": [
-                        ["flag": 1],
-                        ["flag": 2]
+                'row2': [
+                        ['flag': 1],
+                        ['flag': 2]
                 ],
-                "row3": [
-                        ["flag": 11],
-                        ["flag": -1]
+                'row3': [
+                        ['flag': 11],
+                        ['flag': -1]
                 ],
         ]
 
         Map<String, Map> acghRowProperties = [
-                "row1": [
+                'row1': [
                         chromosome: 'chrX',
                         start     : 1234,
                         end       : 1300,
                         name      : 'test-region1',
                         platform  : [genomeReleaseId: 'hg19']
                 ],
-                "row2": [
+                'row2': [
                         chromosome: 'CHRY',
                         start     : 1301,
                         end       : 1400,
@@ -161,7 +161,7 @@ class AcghBedExporterTests {
                         bioMarker : 'test-bio-marker',
                         platform  : [genomeReleaseId: 'hg19']
                 ],
-                "row3": [
+                'row3': [
                         chromosome: '9',
                         start     : 1000,
                         end       : 2000,

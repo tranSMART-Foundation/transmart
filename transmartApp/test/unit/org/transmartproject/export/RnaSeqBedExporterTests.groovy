@@ -35,7 +35,7 @@ class RnaSeqBedExporterTests {
     }
 
     @Test
-    void "test whether RNASeq data is exported properly"() {
+    void 'test whether RNASeq data is exported properly'() {
 
         tabularResult = createMockRnaSeqTabularResult()
 
@@ -49,8 +49,8 @@ class RnaSeqBedExporterTests {
 
             assertThat outputStreams, hasSize(2)
 
-            String assay1Output = outputStreams[0].toString("UTF-8")
-            String assay2Output = outputStreams[1].toString("UTF-8")
+            String assay1Output = outputStreams[0].toString('UTF-8')
+            String assay2Output = outputStreams[1].toString('UTF-8')
 
             List assay1Lines = assay1Output.readLines()
             //NOTE: bioMarker is used as label if it's present
@@ -75,29 +75,29 @@ class RnaSeqBedExporterTests {
         // Setup tabularResult and projection to test with
         List<AssayColumn> sampleAssays = createSampleAssays(2)
         Map<String, List<Object>> dataRows = [
-                "row1": [
-                        ["readcount": 100],
-                        ["readcount": 200]
+                'row1': [
+                        ['readcount': 100],
+                        ['readcount': 200]
                 ],
-                "row2": [
-                        ["readcount": 300],
-                        ["readcount": 400]
+                'row2': [
+                        ['readcount': 300],
+                        ['readcount': 400]
                 ],
-                "row3": [
-                        ["readcount": 500],
-                        ["readcount": 600]
+                'row3': [
+                        ['readcount': 500],
+                        ['readcount': 600]
                 ],
         ]
 
         Map<String, Map> rnaSeqRowProperties = [
-                "row1": [
+                'row1': [
                         chromosome: 'chrX',
                         start     : 1234,
                         end       : 1300,
                         name      : 'test-region1',
                         platform  : [genomeReleaseId: 'hg19']
                 ],
-                "row2": [
+                'row2': [
                         chromosome: 'CHRY',
                         start     : 1301,
                         end       : 1400,
@@ -105,7 +105,7 @@ class RnaSeqBedExporterTests {
                         bioMarker : 'test-bio-marker',
                         platform  : [genomeReleaseId: 'hg19']
                 ],
-                "row3": [
+                'row3': [
                         chromosome: '9',
                         start     : 1000,
                         end       : 2000,

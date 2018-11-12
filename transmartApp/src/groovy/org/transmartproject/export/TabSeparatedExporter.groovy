@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct
 
 @Slf4j('logger')
 class TabSeparatedExporter implements HighDimExporter {
-    final static String SEPARATOR = "\t"
+    final static String SEPARATOR = '\t'
 
     @Autowired
     HighDimensionResource highDimensionResourceService
@@ -37,7 +37,8 @@ class TabSeparatedExporter implements HighDimExporter {
                     highDimensionResourceService.getSubResourceForType(dataType)
             return projection in
                     dataTypeResource.supportedProjections
-        } catch (NoSuchResourceException e) {
+        }
+        catch (NoSuchResourceException e) {
             // No resource found for datatype, so not supported.
             logger.warn(e.getMessage())
             return false
@@ -46,12 +47,12 @@ class TabSeparatedExporter implements HighDimExporter {
 
     @Override
     public String getFormat() {
-        return "TSV"
+        return 'TSV'
     }
 
     @Override
     public String getDescription() {
-        return "Tab separated file"
+        return 'Tab separated file'
     }
 
     @Override
@@ -64,7 +65,7 @@ class TabSeparatedExporter implements HighDimExporter {
     public void export(TabularResult tabularResult, Projection projection,
                        Closure<OutputStream> newOutputStream, Closure<Boolean> isCancelled) {
 
-        logger.info("started exporting to $format ")
+        logger.info('started exporting to ' + format + ' ')
         def startTime = System.currentTimeMillis()
 
         if (isCancelled()) {
@@ -79,7 +80,7 @@ class TabSeparatedExporter implements HighDimExporter {
             [it.key, getFieldTranslation(it.key).toUpperCase()]
         }
 
-        newOutputStream("data", format).withWriter("UTF-8") { writer ->
+        newOutputStream('data', format).withWriter('UTF-8') { writer ->
 
             // First write the header
             writeLine(writer, createHeader(dataKeys.values() + rowKeys.values()))
@@ -122,7 +123,7 @@ class TabSeparatedExporter implements HighDimExporter {
             }
         }
 
-        logger.info("Exporting data took ${System.currentTimeMillis() - startTime} ms")
+        logger.info('Exporting data took ' + System.currentTimeMillis() - startTime + ' ms')
     }
 
     /**
@@ -133,7 +134,7 @@ class TabSeparatedExporter implements HighDimExporter {
      */
     protected List<String> createHeader(List additionalHeaderFields) {
         [
-                "Assay ID",
+                'Assay ID',
         ] + (additionalHeaderFields ?: [])
     }
 
@@ -171,7 +172,7 @@ class TabSeparatedExporter implements HighDimExporter {
      * @param data List of string to be written
      */
     protected void writeLine(Writer writer, List<String> data) {
-        writer << data.join(SEPARATOR) << "\n"
+        writer << data.join(SEPARATOR) << '\n'
 
     }
 

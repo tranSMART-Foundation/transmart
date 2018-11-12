@@ -1,6 +1,6 @@
 class ReqconsultController {
 
-    def defaultAction = "newrequest"
+    def defaultAction = 'newrequest'
     def newrequest = {}
 
     def saverequest = {

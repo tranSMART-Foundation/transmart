@@ -28,7 +28,7 @@ public class GexDao {
     private static final log = LogFactory.getLog('grails.app.' + GexDao.class.name)
 
     //This is the SQL query we use to get our data.
-    private String sqlQuery = ""
+    private String sqlQuery = ''
 
     private Map sampleCdsMap = [:]
 
@@ -49,7 +49,7 @@ public class GexDao {
                 //Add the subquery to the main query.
                 sqlQuery = createMRNAHeatmapPathwayQuery(study, resultInstanceId, pathway, timepoint, sampleTypes)
 
-                println("mRNAData : " + sqlQuery)
+                println('mRNAData : ' + sqlQuery)
 
             }
             def outFile = writeData(resultInstanceId, studyDir, fileName, jobName)
@@ -57,8 +57,9 @@ public class GexDao {
                 pivotData(outFile)
             }
 
-        } catch (Exception e) {
-            logger.info(e.getMessage());
+        }
+        catch (Exception e) {
+            logger.info(e.getMessage())
         }
 
     }
@@ -76,19 +77,19 @@ public class GexDao {
     def String createMRNAHeatmapPathwayQuery(String study, String resultInstanceId, String pathwayName, String timepoint, String sampleTypes) throws Exception {
 
         //Get the list of trial names based on patient IDs.
-        //def trialNames  = getTrialName(ids);
+        //def trialNames  = getTrialName(ids)
 
         //Get the list of assay Ids based on resultInstanceId, sample types, and timepoints.
-        //String assayIds = getAssayIds(resultInstanceId, sampleTypes, timepoint);
+        //String assayIds = getAssayIds(resultInstanceId, sampleTypes, timepoint)
 
         //If we didn't find any assay Id's, abandon all hope.
         //if (assayIds.equals(''))
-        //	throw new Exception("No heatmap data for the specified parameters.");
+        //	throw new Exception('No heatmap data for the specified parameters.')
 
         //If a pathway was specified add the gene filter.
-        String genes;
+        String genes
         if (pathwayName != null && pathwayName.length() > 0) {
-            genes = getGenes(pathwayName);
+            genes = getGenes(pathwayName)
         }
 
         //Build the string to get the sample data.
@@ -107,41 +108,41 @@ public class GexDao {
 				INNER JOIN (SELECT DISTINCT sc.patient_num FROM qt_patient_set_collection sc, patient_dimension pd
 		 		WHERE sc.result_instance_id = ? AND pd.sourcesystem_cd NOT LIKE '%:S:%'
 		 		AND sc.patient_num = pd.patient_num) sub ON ssm.patient_id = sub.patient_num
-				""");
+				""")
         //TODO replace study within query as parameter to query
         s.append(" WHERE a.trial_name = '").append(study).append("' ")
-        //.append(" AND a.assay_id IN (").append(assayIds).append(")")
+        //.append(' AND a.assay_id IN (').append(assayIds).append(')')
 
         if (pathwayName != null && pathwayName.length() > 0) {
-            s.append(" AND b.gene_id IN (").append(genes).append(")");
+            s.append(' AND b.gene_id IN (').append(genes).append(')')
         }
 
-        s.append(" ORDER BY probe_id, patient_id")
+        s.append(' ORDER BY probe_id, patient_id')
 
-        //logger.debug(s.toString());
-        return s.toString();
+        //logger.debug(s.toString())
+        return s.toString()
     }
 
     def String createDownloadCELFilesQuery(String study, String subjectIds, String timepoint, String sampleTypes) throws Exception {
         StringBuilder s = new StringBuilder()
         //Get the list of assay Ids based on patient ids, sample types, and timepoints.
-        String assayIds = getAssayIds(subjectIds, sampleTypes, timepoint);
+        String assayIds = getAssayIds(subjectIds, sampleTypes, timepoint)
         //If we didn't find any assay Id's, abandon all hope.
         if (StringUtils.isNotEmpty(assayIds)) {
             //Build the string to get the sample data.
-            s.append("""
+            s.append('''
 					SELECT DISTINCT /*+ parallel(de_subject_microarray_data,4) */ 
 					a.PATIENT_ID, ssm.sample_type, ssm.timepoint, ssm.tissue_type, ssm.sample_cd, ssm.trial_name
 					FROM de_subject_microarray_data a
 					INNER JOIN de_subject_sample_mapping ssm ON (ssm.trial_name = A.trial_name AND ssm.assay_id = A.assay_id)
-					""");
+					''')
             //TODO replace study within query as parameter to query
             s.append(" WHERE a.trial_name = '").append(study).append("' ")
-                    .append(" AND a.assay_id IN (").append(assayIds).append(")")
-            s.append(" ORDER BY patient_id")
+                    .append(' AND a.assay_id IN (').append(assayIds).append(')')
+            s.append(' ORDER BY patient_id')
         }
 
-        return s.toString();
+        return s.toString()
     }
 
     /**
@@ -155,44 +156,44 @@ public class GexDao {
         checkQueryResultAccess resultInstanceId
 
         //Sql command used to retrieve Assay IDs.
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 
         //SQL Query string.
-        StringBuilder assayS = new StringBuilder("select distinct s.assay_id  from de_subject_sample_mapping s");
-        assayS.append(", (SELECT DISTINCT sc.patient_num FROM qt_patient_set_collection sc, patient_dimension pd")
+        StringBuilder assayS = new StringBuilder('select distinct s.assay_id  from de_subject_sample_mapping s')
+        assayS.append(', (SELECT DISTINCT sc.patient_num FROM qt_patient_set_collection sc, patient_dimension pd')
                 .append(" WHERE sc.result_instance_id = ? AND pd.sourcesystem_cd NOT LIKE '%:S:%'")
-                .append(" AND sc.patient_num = pd.patient_num) A where s.patient_id = A.patient_num");
+                .append(' AND sc.patient_num = pd.patient_num) A where s.patient_id = A.patient_num')
 
         //If we have a sample type, append it to the query.
         if (sampleTypes != null && sampleTypes.length() > 0) {
-            assayS.append(" AND s.sample_type_cd IN ").append(convertStringToken(sampleTypes));
+            assayS.append(' AND s.sample_type_cd IN ').append(convertStringToken(sampleTypes))
         }
 
         //If we have timepoints, append it to the query.
         if (timepoint != null && timepoint.trim().length() > 0) {
-            assayS.append(" AND s.timepoint_cd IN ").append(convertStringToken(timepoint));
+            assayS.append(' AND s.timepoint_cd IN ').append(convertStringToken(timepoint))
         }
 
         //Always add an order by to the query.
-        assayS.append(" ORDER BY s.assay_id");
+        assayS.append(' ORDER BY s.assay_id')
 
-        logger.debug("getAssayIds used this query: " + assayS.toString());
-        println("getAssayIds used this query: " + assayS.toString());
+        logger.debug('getAssayIds used this query: ' + assayS.toString())
+        println('getAssayIds used this query: ' + assayS.toString())
 
         //Add each result to an array.
-        def assayIdsArray = [];
+        def assayIdsArray = []
 
         sql.eachRow(assayS.toString(), [resultInstanceId], { row ->
             if (row.assay_id != null) {
                 assayIdsArray.add(row.assay_id)
             }
         }
-        );
+        )
 
         //TODO: Why is there a max here?
         //Make a string of the assay IDs.
-        String assayIds = convertList(assayIdsArray, false, 1000);
-        return assayIds;
+        String assayIds = convertList(assayIdsArray, false, 1000)
+        return assayIds
     }
 
     /**
@@ -205,29 +206,29 @@ public class GexDao {
     def String getTrialName(String ids) {
 
         //SQL Object used to retrieve trials.
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 
         //Query used to get trials.
-        StringBuilder trialQ = new StringBuilder("select distinct s.trial_name from de_subject_sample_mapping s ");
+        StringBuilder trialQ = new StringBuilder('select distinct s.trial_name from de_subject_sample_mapping s ')
 
         //Append the patient ids.
-        trialQ.append(" where s.patient_id in (").append(ids).append(") and s.platform = 'MRNA_AFFYMETRIX'");
+        trialQ.append(" where s.patient_id in (').append(ids).append(') and s.platform = 'MRNA_AFFYMETRIX'")
 
-        //logger.debug("getTrialName used this query: " + trialQ.toString());
+        //logger.debug('getTrialName used this query: ' + trialQ.toString())
 
         //Add the trial names to a string.
-        String trialNames = "";
+        String trialNames = ''
         sql.eachRow(trialQ.toString(), { row ->
 
             if (trialNames.length() > 0) {
-                trialNames += ",";
+                trialNames += ','
             }
 
-            String tName = row.trial_name;
-            trialNames += "'" + tName + "'";
+            String tName = row.trial_name
+            trialNames += "'" + tName + "'"
         }
-        );
-        return trialNames;
+        )
+        return trialNames
     }
 
     /**
@@ -236,23 +237,23 @@ public class GexDao {
      * @param biomarker probeset (mRNA), component (Protein) and antigen_name (RBM)
      * @param ids1
      * @param ids2
-     * @param prefix1 usually use "S1_"
-     * @param prefix2 usually use "S2_"
+     * @param prefix1 usually use 'S1_'
+     * @param prefix2 usually use 'S2_'
      * @return
      */
     def String listHeatmapColumns(String biomarker, String ids1, String ids2, String prefix1, String prefix2) {
 
-        StringBuilder s = new StringBuilder();
-        s.append(" " + biomarker + ", gene_symbol ")
+        StringBuilder s = new StringBuilder()
+        s.append(' ' + biomarker + ', gene_symbol ')
 
         if ((ids1 != null) && (ids1.length() > 0)) {
-            def idArray = ids1.split(",")
-            for (id in idArray) s.append(", round(" + prefix1 + id + ", 4) as " + prefix1 + id)
+            def idArray = ids1.split(',')
+            for (id in idArray) s.append(', round(' + prefix1 + id + ', 4) as ' + prefix1 + id)
         }
 
         if ((ids2 != null) && (ids2.length() > 0)) {
-            def idArray = ids2.split(",")
-            for (id in idArray) s.append(", round(" + prefix2 + id + ", 4) as " + prefix2 + id)
+            def idArray = ids2.split(',')
+            for (id in idArray) s.append(', round(' + prefix2 + id + ', 4) as ' + prefix2 + id)
         }
 
         return s
@@ -265,48 +266,49 @@ public class GexDao {
      */
     def String getGenes(String pathwayName) {
 
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 
         //Determine if a gene signature or list was used based on the string passed in.
-        StringBuilder pathwayS = new StringBuilder();
+        StringBuilder pathwayS = new StringBuilder()
 
-        if (pathwayName.startsWith("GENESIG") || pathwayName.startsWith("GENELIST")) {
-            pathwayS.append(" select  distinct bm.primary_external_id as gene_id from ")
-                    .append("search_keyword sk, ")
-                    .append(" search_bio_mkr_correl_fast_mv sbm,")
-                    .append(" bio_marker bm")
-                    .append(" where sk.bio_data_id = sbm.domain_object_id")
-                    .append(" and sbm.asso_bio_marker_id = bm.bio_marker_id")
-                    .append(" and sk.unique_id IN ");
-        } else {
-            pathwayS.append(" select  distinct bm.primary_external_id as gene_id from ")
-                    .append("search_keyword sk, ")
-                    .append(" bio_marker_correl_mv sbm,")
-                    .append(" bio_marker bm")
-                    .append(" where sk.bio_data_id = sbm.bio_marker_id")
-                    .append(" and sbm.asso_bio_marker_id = bm.bio_marker_id")
-                    .append(" and sk.SEARCH_KEYWORD_ID IN ");
+        if (pathwayName.startsWith('GENESIG') || pathwayName.startsWith('GENELIST')) {
+            pathwayS.append(' select  distinct bm.primary_external_id as gene_id from ')
+                    .append('search_keyword sk, ')
+                    .append(' search_bio_mkr_correl_fast_mv sbm,')
+                    .append(' bio_marker bm')
+                    .append(' where sk.bio_data_id = sbm.domain_object_id')
+                    .append(' and sbm.asso_bio_marker_id = bm.bio_marker_id')
+                    .append(' and sk.unique_id IN ')
+        }
+        else {
+            pathwayS.append(' select  distinct bm.primary_external_id as gene_id from ')
+                    .append('search_keyword sk, ')
+                    .append(' bio_marker_correl_mv sbm,')
+                    .append(' bio_marker bm')
+                    .append(' where sk.bio_data_id = sbm.bio_marker_id')
+                    .append(' and sbm.asso_bio_marker_id = bm.bio_marker_id')
+                    .append(' and sk.SEARCH_KEYWORD_ID IN ')
         }
 
-        //pathwayS.append(pathwayName.replaceAll("'","''")).append("'");
+        //pathwayS.append(pathwayName.replaceAll("'","''")).append("'")
 
-        //Construct an in list in case the user had multiple genes separated by ",".
-        pathwayS.append(convertStringToken(pathwayName));
+        //Construct an in list in case the user had multiple genes separated by ','.
+        pathwayS.append(convertStringToken(pathwayName))
 
-        logger.debug("query to get genes from pathway: " + pathwayS.toString());
+        logger.debug('query to get genes from pathway: ' + pathwayS.toString())
 
         //Add genes to an array.
-        def genesArray = [];
+        def genesArray = []
         sql.eachRow(pathwayS.toString(), { row ->
             if (row.gene_id != null) {
-                genesArray.add(row.gene_id);
+                genesArray.add(row.gene_id)
             }
         }
-        );
+        )
 
         //Convert the genes array to a string.
-        String genes = convertList(genesArray, false, 1000);
-        return genes;
+        String genes = convertList(genesArray, false, 1000)
+        return genes
     }
 
     /**
@@ -314,35 +316,31 @@ public class GexDao {
      *
      * @param biomarker probeset (mRNA), component (Protein) and antigen_name (RBM)
      * @param idMap
-     * @param prefix usually use "S"
+     * @param prefix usually use 'S'
      * @return
      */
     def String listHeatmapColumnsFromMap(String biomarker, String prefix, boolean roundColumn) {
         //This has no use.........yet!
         /*
          //This is the start of our string.
-         StringBuilder s = new StringBuilder();
-         if(biomarker != "") s.append(" " + biomarker + ", gene_symbol, ")
+         StringBuilder s = new StringBuilder()
+         if(biomarker != '') s.append(' ' + biomarker + ', gene_symbol, ')
          //Loop over the JSON object and add the ID's with the .
-         sampleIdList.each
-         {
+         sampleIdList.each {
          subsetItem ->
          def subsetItems = subsetItem.value
          //Each subset has a list of IDs.
-         subsetItems.each
-         {
+         subsetItems.each {
          SampleInfo sampleInfo = sampleInfoMap.get(it)
-         if(roundColumn)
-         {
-         s.append ("round(" + prefix + subsetItem.key + "_" + sampleInfo.patientId + ", 4) as " + prefix + subsetItem.key + "_" + sampleInfo.patientId + ",")
+         if(roundColumn) {
+         s.append ('round(' + prefix + subsetItem.key + '_' + sampleInfo.patientId + ', 4) as ' + prefix + subsetItem.key + '_' + sampleInfo.patientId + ',')
          }
-         else
-         {
+         else {
          s.append ("'" + prefix + subsetItem.key + "_" + sampleInfo.patientId + "' as " + prefix + subsetItem.key + "_" + sampleInfo.patientId + ",")
          }
          }
          }
-         return s.substring(0, s.length()-1);
+         return s.substring(0, s.length()-1)
          */
     }
 
@@ -350,66 +348,67 @@ public class GexDao {
      *
      */
     def convertStringToken(String t) {
-        String[] ts = t.split(",");
-        StringBuilder s = new StringBuilder("(");
+        String[] ts = t.split(',')
+        StringBuilder s = new StringBuilder('(')
         for (int i = 0; i < ts.length; i++) {
             if (i > 0)
-                s.append(",");
-            s.append("'");
-            s.append(ts[i]);
-            s.append("'");
+                s.append(',')
+            s.append("'")
+            s.append(ts[i])
+            s.append("'")
         }
-        s.append(")");
-        return s.toString();
+        s.append(')')
+        return s.toString()
     }
 
     /**
      * convert id list
      */
     def convertList(idList, boolean isString, int max) {
-        StringBuilder s = new StringBuilder();
-        int i = 0;
+        StringBuilder s = new StringBuilder()
+        int i = 0
         for (id in idList) {
             if (i < max) {
                 if (s.length() > 0) {
-                    s.append(",");
+                    s.append(',')
                 }
                 if (isString) {
-                    s.append("'");
+                    s.append("'")
                 }
-                s.append(id);
+                s.append(id)
                 if (isString) {
-                    s.append("'");
+                    s.append("'")
                 }
-            } else {
-                break;
             }
-            i++;
+            else {
+                break
+            }
+            i++
         }
-        return s.toString();
+        return s.toString()
     }
 
     private String writeData(String resultInstanceId, File studyDir, String fileName, String jobName) {
         def filePath = null
         //TODO Get the dataTypeName from the list of DataTypeNames either from DB or from config file
-        def dataTypeName = "mRNA";
-        //TODO set this to either "Raw_Files/Findings" or NULL for processed_files
-        def dataTypeFolder = "Processed_Data";
+        def dataTypeName = 'mRNA'
+        //TODO set this to either 'Raw_Files/Findings' or NULL for processed_files
+        def dataTypeFolder = 'Processed_Data'
         //Build the query to get the gene expression data.
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 
-        def char separator = '\t';
-        logger.info("started file writing")
-        def output;
-        def outFile;
+        def char separator = '\t'
+        logger.info('started file writing')
+        def output
+        def outFile
 
-        FileWriterUtil writerUtil = new FileWriterUtil(studyDir, fileName, jobName, dataTypeName, dataTypeFolder, separator);
+        FileWriterUtil writerUtil = new FileWriterUtil(studyDir, fileName, jobName, dataTypeName, dataTypeFolder, separator)
         outFile = writerUtil.outputFile
         output = outFile.newWriter(true)
 
-        output << "PATIENT ID\tSAMPLE\tASSAY ID\tVALUE\tZSCORE\tLOG2ED\tPROBE ID\tPROBESET ID\tGENE_ID\tSEARCH_KEYWORD_ID\tGENE_SYMBOL\n"
+        output << 'PATIENT ID\tSAMPLE\tASSAY ID\tVALUE\tZSCORE\tLOG2ED\tPROBE ID\tPROBESET ID\tGENE_ID\tSEARCH_KEYWORD_ID\tGENE_SYMBOL\n'
 
-        //writerUtil.writeLine(["PATIENT ID", "SAMPLE", "ASSAY ID", "VALUE", "LOG2ED", "PROBE ID", "PROBESET ID"] as String[])
+        //writerUtil.writeLine(['PATIENT ID', 'SAMPLE', 'ASSAY ID', 'VALUE', 'LOG2ED', 'PROBE ID', 'PROBESET ID'] as String[])
         //def listToWrite = []
         def sample, log2, value, rawIntensity, zscore, lineToWrite = null
         try {
@@ -425,7 +424,8 @@ public class GexDao {
                 if (rawIntensity != null) {
                     value = Math.log(rawIntensity) / Math.log(2)
                     log2 = 1
-                } else {
+                }
+                else {
                     value = zscore
                     log2 = 0
                 }
@@ -451,22 +451,24 @@ public class GexDao {
                 zscore = null
                 lineToWrite = null
             })
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.info(e.getMessage())
             logger.info(e.printStackTrace())
-        } finally {
+        }
+        finally {
             output?.close()
             filePath = outFile?.getAbsolutePath()
-            //writerUtil.finishWriting();
-            logger.info("completed file writing")
-            sql?.close();
+            //writerUtil.finishWriting()
+            logger.info('completed file writing')
+            sql?.close()
         }
         return filePath
     }
 
     private void pivotData(String inputFileLoc) {
         logger.info('Pivot File started')
-        if (inputFileLoc != "") {
+        if (inputFileLoc != '') {
             File inputFile = new File(inputFileLoc)
             if (inputFile) {
                 String rOutputDirectory = inputFile.getParent()
@@ -491,23 +493,23 @@ public class GexDao {
     }
 
     private String derivePathwayName(pathway_name) {
-        //logger.debug("Derived pathway name as ${pathway_name}")
+        //logger.debug('Derived pathway name as ' + pathway_name)
 
-        //logger.debug("Pathway name has been set to ${pathway_name}")
+        //logger.debug('Pathway name has been set to ' + pathway_name)
 
-        if (pathway_name == null || pathway_name.length() == 0 || pathway_name == "null") {
-            //logger.debug("Resetting pathway name to null")
+        if (pathway_name == null || pathway_name.length() == 0 || pathway_name == 'null') {
+            //logger.debug('Resetting pathway name to null')
             pathway_name = null
         }
 
         //grailsApplication.config.com.recomdata.search.genepathway=='native'
         boolean nativeSearch = true
 
-        //logger.debug("nativeSearch: ${nativeSearch}")
+        //logger.debug('nativeSearch: ' + nativeSearch)
 
         if (!nativeSearch && pathway_name != null) {
-            //pathway_name = SearchKeyword.get(Long.valueOf(pathway_name)).uniqueId;
-            //logger.debug("pathway_name has been set to a keyword ID: ${pathway_name}")
+            //pathway_name = SearchKeyword.get(Long.valueOf(pathway_name)).uniqueId
+            //logger.debug('pathway_name has been set to a keyword ID: ' + pathway_name)
         }
 
         return pathway_name
@@ -516,7 +518,7 @@ public class GexDao {
     private String getCELLocation(String studyName) {
         //Build the query to get the clinical data.
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        sqlQuery = "SELECT cel_location FROM bio_content WHERE study_name = ?"
+        sqlQuery = 'SELECT cel_location FROM bio_content WHERE study_name = ?'
         def row = sql.firstRow(sqlQuery, [studyName])
 
         return row?.CEL_LOCATION
@@ -557,7 +559,7 @@ public class GexDao {
 
             if (sampleCdsMap.size() > 0) {
                 sampleCdsMap.each { key, value ->
-                    def keyList = key.toString().tokenize("/")
+                    def keyList = key.toString().tokenize('/')
                     def studyName = (keyList.size() == 2) ? keyList.get(0) : null
                     if (studyName) {
                         def celLocation = getCELLocation(studyName)
@@ -568,22 +570,23 @@ public class GexDao {
                     }
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.info(e.getMessage())
-        } finally {
+        }
+        finally {
             sql?.close()
         }
     }
 
     private File downloadCELFile(File studyDir, String jobName, String fileName, String CELFileURL) {
-        def char separator = '\t';
-        FileWriterUtil writerUtil = new FileWriterUtil(studyDir, fileName, jobName, "mRNA", "Raw_data", separator);
+        def char separator = '\t'
+        FileWriterUtil writerUtil = new FileWriterUtil(studyDir, fileName, jobName, 'mRNA', 'Raw_data', separator)
         //def file = writerUtil.outputFile
 
         //Uses Java NIO (New I/O)
         writerUtil.writeFile(CELFileURL, writerUtil.outputFile)
-        /*use (FileBinaryCategory)
-        {
+        /*use (FileBinaryCategory) {
           file << CELFileURL.toURL()
         }*/
     }
