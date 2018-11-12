@@ -12,14 +12,15 @@ class TransmartGwasGrailsPlugin {
 
     // TODO Fill in these fields
     def author = "David Newton"
-    def authorEmail = "davinewton@deloitte.com"
+//    def authorEmail = "davinewton@deloitte.com"
+    def authorEmail = "support@transmartfoundation.org"
     def title = "tranSMART GWAS Plugin"
     def description = '''\\
 Plugin to support the display of GWAS data, including eQTL and metabolic GWAS.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/transmart-gwas"
+    def documentation = "http://github.com/tranSMART-Foundation/transmart"
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before

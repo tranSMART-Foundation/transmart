@@ -122,7 +122,7 @@
                     doc_href="http://acgh.thehyve.net"
                     mapmaster="http://acgh.thehyve.net">
 
-            <maintainer email="office@thehyve.nl" />
+            <maintainer email="support@transmartfoundation.org" />
             <pattern>acgh-gain-(\d+)(?:-(\S+))?</pattern>
             <version uri="acgh-gain" created="2013-08-31">
                 <class>org.transmartproject.das.mydas.AcghDS</class>
@@ -265,8 +265,8 @@
         <datasource uri="vcf"
                     title="minor allele freq"
                     description="Minor Allele Frequency of selected cohort"
-                    doc_href="http://www.transmartproject.org/"
-                    mapmaster="http://www.transmartproject.org/">
+                    doc_href="http://github.com/tranSMART-Foundation/transmart"
+                    mapmaster="http://github.com/tranSMART-Foundation/transmart">
 
             <maintainer email="office@thehyve.nl" />
             <pattern>vcf-(\d+)(?:-(\S+))?</pattern>
@@ -295,8 +295,8 @@
         <datasource uri="http://thehyve.nl"
                     title="summary of minor allele freq"
                     description="Minor Allele Frequency (MAF) whole study level"
-                    doc_href="http://www.transmartproject.org/"
-                    mapmaster="http://www.transmartproject.org/">
+                    doc_href="http://github.com/tranSMART-Foundation/transmart"
+                    mapmaster="http://github.com/tranSMART-Foundation/transmart">
 
             <maintainer email="office@thehyve.nl" />
             <pattern>smaf-(\d+)(?:-(\S+))?</pattern>
@@ -325,8 +325,8 @@
         <datasource uri="http://thehyve.nl"
                     title="quality of depth"
                     description="Quality of Depth of whole study level"
-                    doc_href="http://www.transmartproject.org/"
-                    mapmaster="http://www.transmartproject.org/">
+                    doc_href="http://github.com/tranSMART-Foundation/transmart"
+                    mapmaster="http://github.com/tranSMART-Foundation/transmart">
 
             <maintainer email="office@thehyve.nl" />
             <pattern>qd-(\d+)(?:-(\S+))?</pattern>
@@ -355,8 +355,8 @@
         <datasource uri="gv"
                     title="variants"
                     description="Genomic Variants of selected cohort"
-                    doc_href="http://www.transmartproject.org/"
-                    mapmaster="http://www.transmartproject.org/">
+                    doc_href="http://github.com/tranSMART-Foundation/transmart"
+                    mapmaster="http://github.com/tranSMART-Foundation/transmart">
 
             <maintainer email="office@thehyve.nl" />
             <pattern>gv-(\d+)(?:-(\S+))?</pattern>
@@ -385,8 +385,8 @@
         <datasource uri="vcfInfo"
                     title="VCF INFO"
                     description="Custom INFO field of selected cohort"
-                    doc_href="http://www.transmartproject.org/"
-                    mapmaster="http://www.transmartproject.org/">
+                    doc_href="http://github.com/tranSMART-Foundation/transmart"
+                    mapmaster="http://github.com/tranSMART-Foundation/transmart">
 
             <maintainer email="office@thehyve.nl" />
             <pattern>vcfInfo-([^\-]+)-(\d+)(?:-(\S+))?</pattern>

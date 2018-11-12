@@ -38,13 +38,13 @@ class TransmartCoreGrailsPlugin {
 
     def title = 'Transmart Core DB Plugin'
     def author = 'Transmart Foundation'
-    def authorEmail = 'admin@transmartproject.org'
+    def authorEmail = 'support@transmartfoundation.org'
     def description = '''\
 A runtime dependency for tranSMART that implements the Core API
 '''
 
     // URL to the plugin's documentation
-    def documentation = 'http://transmartproject.org'
+    def documentation = 'http://github.com/tranSMART-Foundation/transmart'
 
     def license = 'GPL3'
 
@@ -61,7 +61,7 @@ A runtime dependency for tranSMART that implements the Core API
 //    def issueManagement = [ system: 'JIRA', url: 'http://jira.grails.org/browse/GPMYPLUGIN' ]
 
     // Online location of the plugin's browseable source code.
-    def scm = [ url: 'https://fisheye.ctmmtrait.nl/browse/transmart_core_db' ]
+    def scm = [ url: 'https://github.com/tranSMART-Foundation/transmart' ]
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before

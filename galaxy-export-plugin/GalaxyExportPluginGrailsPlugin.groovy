@@ -14,13 +14,13 @@ class GalaxyExportPluginGrailsPlugin {
     // TODO Fill in these fields
     def title = "Galaxy Export Plugin" // Headline display name of the plugin
     def author = "Transmart Foundation"
-    def authorEmail = "admin@transmartproject.org"
+    def authorEmail = "support@transmartfoundation.org"
     def description = '''\
 Brief summary/description of the plugin.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/galaxy-export-plugin"
+    def documentation = 'http://github.com/tranSMART-Foundation/transmart'
 
     // Extra (optional) plugin metadata
 

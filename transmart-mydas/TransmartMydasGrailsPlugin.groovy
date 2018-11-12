@@ -11,13 +11,14 @@ class TransmartMydasGrailsPlugin {
     // TODO Fill in these fields
     def title = "Transmart Mydas Plugin" // Headline display name of the plugin
     def author = "Ruslan Forostianov"
-    def authorEmail = "ruslan@thehyve.nl"
+//    def authorEmail = "ruslan@thehyve.nl"
+    def authorEmail = "support@transmartfoundation.org"
     def description = '''\
 Brief summary/description of the plugin.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/transmart-mydas"
+    def documentation = "http://github.com/tranSMART-Foundation/transmart"
 
     // Extra (optional) plugin metadata
 

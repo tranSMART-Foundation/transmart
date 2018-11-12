@@ -9,7 +9,7 @@ class TransmartRestApiGrailsPlugin {
     def grailsVersion = "2.3 > *"
     def title = "Transmart Rest Api Plugin"
     def author = "Transmart Foundation"
-    def authorEmail = "admin@transmartproject.org"
+    def authorEmail = "support@transmartfoundation.org"
     def description = '''\
         Plugin adds rest api to transmart applicaion
     '''
@@ -25,7 +25,7 @@ class TransmartRestApiGrailsPlugin {
 
     def issueManagement = [system: "JIRA", url: "https://jira.thehyve.nl/browse/CHERKASY"]
 
-    def scm = [url: "https://fisheye.ctmmtrait.nl/browse/transmart_rest_api"]
+    def scm = [url: "http://github.com/tranSMART-Foundation/transmart"]
 
     def doWithSpring = {
         xmlns context: 'http://www.springframework.org/schema/context'
