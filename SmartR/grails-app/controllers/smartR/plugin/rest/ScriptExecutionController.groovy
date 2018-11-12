@@ -82,7 +82,7 @@ class ScriptExecutionController {
             List errorStrings = command.errors.allErrors.collect {
                 g.message(error:it, encodeAs: 'raw')
             }
-            throw new InvalidArgumentsException("Invalid input: $errorStrings")
+            throw new InvalidArgumentsException('Invalid input: ' + errorStrings)
         }
     }
 }

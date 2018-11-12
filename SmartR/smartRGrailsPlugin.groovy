@@ -12,50 +12,50 @@ class smartRGrailsPlugin {
     public static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
     // the plugin version
-    def version = "16.4-SNAPSHOT"
+    def version = '16.4-SNAPSHOT'
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.3 > *"
+    def grailsVersion = '2.3 > *'
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-        "grails-app/views/error.gsp"
+        'grails-app/views/error.gsp'
     ]
 
     // TODO Fill in these fields
-    def title = "SmartR Plugin" // Headline display name of the plugin
-    def author = ""
-    def authorEmail = ""
+    def title = 'SmartR Plugin' // Headline display name of the plugin
+    def author = ''
+    def authorEmail = ''
     def description =
             '''
             Brief summary/description of the plugin.
             '''
 
     // URL to the plugin's documentation
-    def documentation = ""
+    def documentation = ''
 
     // Extra (optional) plugin metadata
 
     // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = "APACHE"
+//    def license = 'APACHE'
 
     // Details of company behind the plugin (if there is one)
-//    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]
+//    def organization = [ name: 'My Company', url: 'http://www.my-company.com/' ]
 
 
     // Any additional developers beyond the author specified above.
-//    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
+//    def developers = [ [ name: 'Joe Bloggs', email: 'joe@bloggs.net' ]]
 
     // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
+//    def issueManagement = [ system: 'JIRA', url: 'http://jira.grails.org/browse/GPMYPLUGIN' ]
 
     // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
+//    def scm = [ url: 'http://svn.codehaus.org/grails-plugins/' ]
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
     def doWithSpring = {
-        xmlns context:"http://www.springframework.org/schema/context"
+        xmlns context:'http://www.springframework.org/schema/context'
 
         context.'component-scan'('base-package': 'heim') {
             context.'include-filter'(
@@ -75,7 +75,8 @@ class smartRGrailsPlugin {
             }.pluginPath
 
             smartRDir = ctx.getResource(pluginPath).file
-        } else {
+        }
+        else {
             smartRDir = new File(smartRDir, 'web-app')
         }
         if (!smartRDir) {
@@ -84,7 +85,7 @@ class smartRGrailsPlugin {
         }
 
         constants.pluginScriptDirectory = new File(smartRDir.canonicalPath, 'HeimScripts')
-        logger.info("Directory for heim scripts is ${constants.pluginScriptDirectory}")
+        logger.info('Directory for heim scripts is ' + constants.pluginScriptDirectory)
 
         if (!skipRScriptsTransfer(config)) {
             def remoteScriptDirectory =  config.smartR.remoteScriptDirectory
@@ -92,10 +93,11 @@ class smartRGrailsPlugin {
                 remoteScriptDirectory = DEFAULT_REMOTE_RSCRIPTS_DIRECTORY
             }
             constants.remoteScriptDirectoryDir = remoteScriptDirectory
-            logger.info("Location for R scripts in the Rserve server is ${constants.remoteScriptDirectoryDir}")
+            logger.info('Location for R scripts in the Rserve server is ' + constants.remoteScriptDirectoryDir)
 
             ctx.getBean(RScriptsSynchronizer).start()
-        } else {
+        }
+        else {
             logger.info('Skipping copying of R script in development mode with local Rserve')
             constants.remoteScriptDirectoryDir = constants.pluginScriptDirectory.absoluteFile
             ctx.getBean(RScriptsSynchronizer).skip()

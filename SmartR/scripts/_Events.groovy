@@ -1,7 +1,7 @@
 eventCreatePluginArchiveStart = { stagingDir ->
-    event("BuildInfoAddPropertiesStart", [stagingDir])
-    writeProperties(getEnvProperties(), "${stagingDir}/application.properties")
-    event("BuildInfoAddPropertiesEnd", [stagingDir])
+    event('BuildInfoAddPropertiesStart', [stagingDir])
+    writeProperties(getEnvProperties(), '' + stagingDir + '/application.properties')
+    event('BuildInfoAddPropertiesEnd', [stagingDir])
 }
 
 private void writeProperties(Map properties, String propertyFile) {
@@ -52,13 +52,14 @@ def getRevision() {
     // maybe a local git?
     if (!scmVersion) {
         try {
-            def command = """git rev-parse HEAD"""
+            def command = '''git rev-parse HEAD'''
             def proc = command.execute()
             proc.waitFor()
             if (proc.exitValue() == 0) {
                 scmVersion = proc.in.text
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             // oh well
         }
     }
@@ -93,7 +94,8 @@ private String getRevisionFromSvnCli() {
             def slurper = new XmlSlurper().parseText(out.toString())
             return slurper.entry.@revision
         }
-    } catch (ignore) {
+    }
+    catch (ignore) {
         return null
     }
 }
@@ -102,17 +104,18 @@ def getEstimateRevisionFromGitFolder() {
     try {
         //on system which do not have git in the PATH, try the file system
         //the head this might not always provide accurate commit hash
-        def headFile = new File(".git/HEAD")
+        def headFile = new File('.git/HEAD')
         def refsHeadPath = ''
         if (headFile.exists()) {
             def headContents = headFile.text.trim()
             refsHeadPath = headContents.split(':')[1].trim()
-            def refsHeadFile = new File(".git/${refsHeadPath}")
+            def refsHeadFile = new File('.git/' + refsHeadPath)
             if (refsHeadFile.isFile()) {
                 return refsHeadFile.text.trim()
             }
         }
-    } catch (ignore) {
+    }
+    catch (ignore) {
         return null
     }
 }

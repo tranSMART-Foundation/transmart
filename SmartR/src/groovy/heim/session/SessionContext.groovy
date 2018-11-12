@@ -63,7 +63,7 @@ class SessionContext {
     void destroy() {
         destructionCallbacks.asMap().each { String bean,
                                             Collection<Runnable> callbacks ->
-            logger.debug("Calling destruction callbacks for bean $bean")
+            logger.debug('Calling destruction callbacks for bean ' + bean)
             callbacks.each {
                 it.run()
             }

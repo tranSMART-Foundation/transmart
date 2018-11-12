@@ -17,10 +17,10 @@ class RScriptOutputManagerSpec extends Specification {
     }
 
     def cleanup() {
-        new File(SmartRRuntimeConstants.instance.baseDir, "bogusfolder/init/plot.png").delete() // Access to a property of SmartRRuntimeConstants and "instance" mechanism inspired by http://stackoverflow.com/a/13846141/535203
+        new File(SmartRRuntimeConstants.instance.baseDir, 'bogusfolder/init/plot.png').delete() // Access to a property of SmartRRuntimeConstants and 'instance' mechanism inspired by http://stackoverflow.com/a/13846141/535203
     }
 
-    void "test getScriptOutput() returning single plot"() {
+    void 'test getScriptOutput() returning single plot'() {
         given:
         def conn = new RConnection()
         conn.eval('png("plot.png")')
@@ -30,12 +30,12 @@ class RScriptOutputManagerSpec extends Specification {
         def taskId = UUID.randomUUID()
         def mngr = new RScriptOutputManager(conn, sessionId, taskId, SmartRRuntimeConstants.instance)
 
-        when: ""
+        when: ''
             def result = mngr.downloadFiles()
-        then: "Result is a list containing plot.png and only that one file."
+        then: 'Result is a list containing plot.png and only that one file.'
             result
             result.size() == 1
             result[0] instanceof File
-            result[0].getAbsolutePath() == SmartRRuntimeConstants.instance.baseDir.toString()+"/$sessionId/$taskId/plot.png"
+            result[0].getAbsolutePath() == SmartRRuntimeConstants.instance.baseDir.toString()+'/' + sessionId + '/' + taskId + '/plot.png'
     }
 }

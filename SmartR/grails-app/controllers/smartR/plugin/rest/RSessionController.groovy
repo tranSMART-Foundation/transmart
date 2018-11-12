@@ -62,13 +62,14 @@ class RSessionController {
         def json = request.JSON
         if (!json.sessionId || !(json.sessionId instanceof String)) {
             throw new InvalidArgumentsException(
-                    "No session id provided or not string: ${json.sessionId}")
+                    'No session id provided or not string: ' + json.sessionId)
         }
         try {
             UUID.fromString(json.sessionId)
-        } catch (IllegalArgumentException iae) {
+        }
+        catch (IllegalArgumentException iae) {
             throw new InvalidArgumentsException(
-                    "Invalid session id (not a UUID): ${json.sessionId}")
+                    'Invalid session id (not a UUID): ' + json.sessionId)
         }
     }
 

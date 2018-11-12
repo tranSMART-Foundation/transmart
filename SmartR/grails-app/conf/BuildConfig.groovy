@@ -17,15 +17,16 @@ grails.project.fork = [
         war    : false,
         console: forkSettingsOther]
 
-grails.project.class.dir = "target/classes"
-grails.project.test.class.dir = "target/test-classes"
-grails.project.test.reports.dir = "target/test-reports"
+grails.project.class.dir = 'target/classes'
+grails.project.test.class.dir = 'target/test-classes'
+grails.project.test.reports.dir = 'target/test-reports'
 
 def dm, dmClass
 try {
     dmClass = new GroovyClassLoader().parseClass(
             new File('../transmart-dev/SmartRDependencyManagement.groovy'))
-} catch (Exception e) {
+}
+catch (Exception e) {
 }
 if (dmClass) {
     dm = dmClass.newInstance()
@@ -33,7 +34,7 @@ if (dmClass) {
 
 grails.project.dependency.resolver = 'maven'
 grails.project.dependency.resolution = {
-    log "warn"
+    log 'warn'
     legacyResolve false
     inherits('global') {}
     if (!dm) {
@@ -43,7 +44,8 @@ grails.project.dependency.resolution = {
             mavenCentral()
             mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
         }
-    } else {
+    }
+    else {
         dm.configureRepositories delegate
     }
     dependencies {
@@ -69,7 +71,7 @@ grails.project.dependency.resolution = {
     }
     plugins {
     	// for release support (e.g. to 'publish' plugin to nexus)
-        build "org.grails.plugins:release:3.1.2"
+        build 'org.grails.plugins:release:3.1.2'
 
         // FIXME: Advanced workflows gets buggy when updating resources plugin to 1.2.14
         runtime ':resources:1.2.14'
@@ -86,7 +88,8 @@ grails.project.dependency.resolution = {
 
             test ':transmart-core:16.4-SNAPSHOT'
             test ':transmart-core-db-tests:16.4-SNAPSHOT'
-        } else {
+        }
+        else {
             dm.internalDependencies delegate
         }
 

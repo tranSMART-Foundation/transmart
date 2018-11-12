@@ -68,13 +68,15 @@ class SessionService implements DisposableBean {
         Lock lock
         if (write) {
             lock = sessionBookKeepingLock.writeLock()
-        } else {
+        }
+        else {
             lock = sessionBookKeepingLock.readLock()
         }
         lock.lock()
         try {
             closure.call()
-        } finally {
+        }
+        finally {
             lock.unlock()
         }
     }
@@ -89,8 +91,8 @@ class SessionService implements DisposableBean {
 
     UUID createSession(User user, String workflowType) {
         SessionContext newSession = new SessionContext(user, workflowType)
-        logger.debug("Created session with id ${newSession.sessionId} and " +
-                "workflow type $workflowType")
+        logger.debug('Created session with id ' + newSession.sessionId + ' and ' +
+                'workflow type ' + workflowType)
 
         withSessionBookKeepingLock(true) {
             currentSessions[newSession.sessionId] = newSession
@@ -101,7 +103,7 @@ class SessionService implements DisposableBean {
 
     void destroySession(UUID sessionId) {
         if (sessionId == null) {
-            throw new NullPointerException("sessionId must be given")
+            throw new NullPointerException('sessionId must be given')
         }
 
         SessionContext sessionContext
@@ -109,20 +111,20 @@ class SessionService implements DisposableBean {
             sessionContext = fetchOperationalSessionContext(sessionId)
             if (!sessionContext) {
                 throw new InvalidArgumentsException(
-                        "No such operational session: $sessionId")
+                        'No such operational session: ' + sessionId)
             }
 
             sessionsShuttingDown << sessionId
         }
 
         smartRExecutorService.submit({
-            logger.debug("Started callable for destroying session $sessionId")
+            logger.debug('Started callable for destroying session ' + sessionId)
             SmartRSessionSpringScope.withActiveSession(sessionContext) {
                 logger.debug(
-                        "Running destruction callbacks for session $sessionId")
+                        'Running destruction callbacks for session ' + sessionId)
                 sessionContext.destroy()
-                logger.debug("Finished running destruction " +
-                        "callbacks for session $sessionId")
+                logger.debug('Finished running destruction ' +
+                        'callbacks for session ' + sessionId)
 
                 withSessionBookKeepingLock(true) {
                     currentSessions.remove(sessionId)
@@ -131,7 +133,7 @@ class SessionService implements DisposableBean {
             }
         } as Callable<Void>)
 
-        logger.debug("Submmitted session $sessionId for destruction")
+        logger.debug('Submmitted session ' + sessionId + ' for destruction')
     }
 
     UUID createTask(Map<String, Object> arguments,
@@ -152,7 +154,7 @@ class SessionService implements DisposableBean {
             def state = jobTasksService.getTaskState(taskUUID)
             if (!state) {
                 throw new NoSuchResourceException(
-                        "No task $taskUUID for session $sessionUUID")
+                        'No task ' + taskUUID + ' for session ' + sessionUUID)
             }
 
             TaskResult result
@@ -161,7 +163,8 @@ class SessionService implements DisposableBean {
                 if (state == TaskState.QUEUED || state == TaskState.RUNNING) {
                     state = jobTasksService.getTaskState(taskUUID)
                 }
-            } else {
+            }
+            else {
                 // not great code, this may be out of sync with the state we got before
                 result = jobTasksService.getTaskResult(taskUUID)
             }
@@ -177,7 +180,7 @@ class SessionService implements DisposableBean {
         SessionContext context = fetchOperationalSessionContext(sessionUUID)
         if (context == null) {
             throw new NoSuchResourceException(
-                    "No such operational session: $sessionUUID")
+                    'No such operational session: ' + sessionUUID)
         }
         context.updateLastModified()
         SmartRSessionSpringScope.withActiveSession(
@@ -213,9 +216,9 @@ class SessionService implements DisposableBean {
             doWithSession(sessionId) {}
         }
         catch (NoSuchResourceException e) {
-            logger.warn("Attempted to touch non-existent or shutting down " +
-                    "session: $sessionId. This is normal if the session was " +
-                    "destroyed with tasks running.")
+            logger.warn('Attempted to touch non-existent or shutting down ' +
+                    'session: ' + sessionId + '. This is normal if the session was ' +
+                    'destroyed with tasks running.')
         }
     }
 
@@ -226,7 +229,7 @@ class SessionService implements DisposableBean {
                 return null
             }
             if (sessionId in sessionsShuttingDown) {
-                logger.warn("Session is shutting down: $sessionId")
+                logger.warn('Session is shutting down: ' + sessionId)
                 return null
             }
             sessionContext
@@ -237,7 +240,7 @@ class SessionService implements DisposableBean {
     private SessionContext fetchSessionContext(UUID sessionId) {
         SessionContext sessionContext = currentSessions[sessionId]
         if (!sessionContext) {
-            logger.warn("No such session: $sessionId")
+            logger.warn('No such session: ' + sessionId)
             return null
         }
         sessionContext
@@ -257,10 +260,11 @@ class SessionService implements DisposableBean {
                     if (isStale(sessionId, lastActivity)) {
                         if (!sessionsShuttingDown.contains(sessionId)) {
                             destroySession(sessionId)
-                            logger.info("Terminated session: ${sessionId} " +
-                                    "due to inactivity.")
-                        } else {
-                            logger.info("Session $sessionId is stale, but " +
+                            logger.info('Terminated session: ' + sessionId + ' ' +
+                                    'due to inactivity.')
+                        }
+                        else {
+                            logger.info('Session ' + sessionId + ' is stale, but ' +
                                     "it's already shutting down")
                         }
                     }
@@ -272,8 +276,8 @@ class SessionService implements DisposableBean {
     private boolean isStale(UUID sessionId, Date lastTouched) {
         SessionContext context = fetchOperationalSessionContext(sessionId)
         if (context == null) {
-            logger.debug("Session $sessionId shut down between call to " +
-                    "getCurrentSessions() and fetchOperationalSessionContext()?")
+            logger.debug('Session ' + sessionId + ' shut down between call to ' +
+                    'getCurrentSessions() and fetchOperationalSessionContext()?')
             return false
         }
 
@@ -286,11 +290,12 @@ class SessionService implements DisposableBean {
 
             boolean res = deltaPassed && !hasActiveTasks
             if (res && logger.debugEnabled) {
-                logger.debug("Session $sessionId deemed stale " +
-                        "($delta > $SESSION_LIFESPAN and no active tasks)")
-            } else if (!res && logger.debugEnabled) {
-                logger.debug("Session $sessionId deemed active " +
-                        "($delta <= $SESSION_LIFESPAN) or (active tasks: $hasActiveTasks)")
+                logger.debug('Session ' + sessionId + ' deemed stale ' +
+                        '(' + delta + ' > ' + SESSION_LIFESPAN + ' and no active tasks)')
+            }
+            else if (!res && logger.debugEnabled) {
+                logger.debug('Session ' + sessionId + ' deemed active ' +
+                        '(' + delta + ' <= ' + SESSION_LIFESPAN + ') or (active tasks: ' + hasActiveTasks + ')')
             }
 
             res

@@ -20,8 +20,8 @@ log4j = {
     //debug 'org.hibernate.SQL'
 }
 
-grails.views.default.codec="none" // none, html, base64
-grails.views.gsp.encoding="UTF-8"
+grails.views.default.codec='none' // none, html, base64
+grails.views.gsp.encoding='UTF-8'
 
 grails.databinding.convertEmptyStringsToNull = false
 grails.databinding.trimStrings = false

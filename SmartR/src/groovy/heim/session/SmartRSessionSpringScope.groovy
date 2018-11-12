@@ -84,7 +84,7 @@ class SmartRSessionSpringScope implements Scope, BeanFactoryPostProcessor, Order
     @Override
     Object resolveContextualObject(String key) {
         if (sessionContext.hasProperty(key)) {
-            sessionContext."$key"
+            sessionContext[key]
         }
     }
 

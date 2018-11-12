@@ -36,7 +36,7 @@ class JobInstanceImpl implements JobInstance {
                 taskFactories.find { it.handles(name, arguments) }
 
         if (!selectedTaskFactory) {
-            throw new InvalidArgumentsException("No task factory found for " +
+            throw new InvalidArgumentsException('No task factory found for ' +
                     "task name '$name' and arguments $arguments")
         }
 

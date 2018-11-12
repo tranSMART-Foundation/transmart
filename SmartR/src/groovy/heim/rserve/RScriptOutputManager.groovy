@@ -23,7 +23,7 @@ class RScriptOutputManager {
 
     List<File> downloadFiles() {
         if (!outputPath.mkdirs()) {
-            throw new IOException("Failed creating $outputPath")
+            throw new IOException('Failed creating ' + outputPath)
         }
 
         List<String> files = listFiles()
@@ -46,7 +46,7 @@ class RScriptOutputManager {
     private File downloadFromRserve(String name) {
         File targetFile = new File(outputPath, name)
         if (targetFile.parentFile != outputPath) {
-            throw new RuntimeException("$targetFile is a child of $outputPath")
+            throw new RuntimeException('' + targetFile + ' is a child of ' + outputPath)
         }
 
         conn.openFile(name).withStream { InputStream is ->

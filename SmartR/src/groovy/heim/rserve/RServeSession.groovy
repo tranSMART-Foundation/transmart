@@ -38,22 +38,23 @@ class RServeSession implements DisposableBean {
      */
     public <R> R doWithRConnection(Closure<R> callable) {
         if (shuttingDown) {
-            logger.warn("Rserve session already shutting down; " +
+            logger.warn('Rserve session already shutting down; ' +
                     "won't execute code")
             return null
         }
 
         rConnectionLock.lockInterruptibly()
         rConnectionHoldingThread = Thread.currentThread()
-        logger.debug "Thread ${Thread.currentThread().name} " +
-                "got access to R connection in session $sessionId"
+        logger.debug 'Thread ' + Thread.currentThread().name + ' ' +
+                'got access to R connection in session ' + sessionId
         try {
             return callable.call(rConnection)
-        } finally {
+        }
+        finally {
             rConnectionLock.unlock()
             rConnectionHoldingThread = null
-            logger.debug "Thread ${Thread.currentThread().name} has released " +
-                    "access to R connection in session $sessionId"
+            logger.debug 'Thread ' + Thread.currentThread().name + ' has released ' +
+                    'access to R connection in session ' + sessionId
         }
     }
 
@@ -61,9 +62,9 @@ class RServeSession implements DisposableBean {
     void destroy() throws Exception {
         shuttingDown = true
         if (rConnection.isConnected()) {
-            logger.debug("Asked to disconnect R connection $rConnection")
+            logger.debug('Asked to disconnect R connection ' + rConnection)
             if (rConnectionHoldingThread) {
-                logger.info("Trying to interrupt thread holding the R connection")
+                logger.info('Trying to interrupt thread holding the R connection')
                 rConnectionHoldingThread.interrupt()
             }
 
@@ -72,11 +73,13 @@ class RServeSession implements DisposableBean {
                 boolean result = rConnection.close()
                 if (!result) {
                     logger.warn(
-                            "Close() returned false on R connection $rConnection")
-                } else {
-                    logger.debug("Closed R connection $rConnection")
+                            'Close() returned false on R connection ' + rConnection)
                 }
-            } finally {
+                else {
+                    logger.debug('Closed R connection ' + rConnection)
+                }
+            }
+            finally {
                 rConnection.unlock()
             }
         }

@@ -54,48 +54,49 @@ class DataFetchTaskFactory implements TaskFactory, ApplicationContextAware {
 
         if (!conceptKeysArg) {
             throw new InvalidArgumentsException(
-                    "Parameter $CONCEPT_KEYS_PARAMETER_NAME not passed")
+                    'Parameter ' + CONCEPT_KEYS_PARAMETER_NAME + ' not passed')
         }
         if (!(conceptKeysArg instanceof Map)) {
             throw new InvalidArgumentsException(
-                    "Expected $CONCEPT_KEYS_PARAMETER_NAME to be a map")
+                    'Expected ' + CONCEPT_KEYS_PARAMETER_NAME + ' to be a map')
         }
         // normalize keys and values to strings
         conceptKeysArg = conceptKeysArg.collectEntries() { k, v ->
             try {
                 [k as String, conceptsResource.getByKey(v as String)]
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 // should be IllegalArgumentException | NoSuchResourceException
                 // but that's broken in the version of Groovy used
                 throw new InvalidArgumentsException("The string '$v' " +
                         "(with label prefix '$k') is not a valid concept " +
-                        "key: $ex.message", ex)
+                        'key: ' + ex.message, ex)
             }
         } /* is Map<String, OntologyTerm> after this */
 
         // one null is allowed (either s1 or s2 empty)
         if (ridsArg == null) {
             throw new InvalidArgumentsException(
-                    "Parameter $RESULT_INSTANCE_IDS_PARAMETER_NAME not passed")
+                    'Parameter ' + RESULT_INSTANCE_IDS_PARAMETER_NAME + ' not passed')
         }
         if (!(ridsArg instanceof List)) {
-            throw new InvalidArgumentsException("Parameter " +
-                    "$RESULT_INSTANCE_IDS_PARAMETER_NAME must be a list")
+            throw new InvalidArgumentsException('Parameter ' +
+                    '' + RESULT_INSTANCE_IDS_PARAMETER_NAME + ' must be a list')
         }
         if (ridsArg.any { it && !(it as String).isLong() }) {
             throw new InvalidArgumentsException(
-                    "Parameter $RESULT_INSTANCE_IDS_PARAMETER_NAME can only " +
-                            "have integer or null values, got: " +
+                    'Parameter ' + RESULT_INSTANCE_IDS_PARAMETER_NAME + ' can only ' +
+                            'have integer or null values, got: ' +
                             ridsArg.find { it && !(it as String).isLong() })
         }
         if (Lists.newArrayList(ridsArg).unique().size() < ridsArg.size()) {
-            "Parameter $RESULT_INSTANCE_IDS_PARAMETER_NAME has " +
-                    "duplicate values"
+            'Parameter ' + RESULT_INSTANCE_IDS_PARAMETER_NAME + ' has ' +
+                    'duplicate values'
         }
         if (ridsArg.findAll().size() == 0) {
             if (Environment.current != Environment.TEST) {
-                throw new InvalidArgumentsException("Parameter $ridsArg " +
-                        "cannot be an empty list or have only nulls")
+                throw new InvalidArgumentsException('Parameter ' + ridsArg + ' ' +
+                        'cannot be an empty list or have only nulls')
             } else { // is test environment
                 ridsArg = [null]
             }

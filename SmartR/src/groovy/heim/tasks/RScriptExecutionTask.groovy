@@ -43,7 +43,7 @@ class RScriptExecutionTask extends AbstractTask {
     private void injectScriptDir(RConnection conn) {
         def remoteScriptDir = fileToLoad.getParentFile().getParentFile()  // We need the HeimScripts root
         String path = RUtil.escapeRStringContent(remoteScriptDir.absolutePath)
-        runRCommand(conn, "remoteScriptDir <- \"$path\"")
+        runRCommand(conn, 'remoteScriptDir <- \'$path\'')
     }
 
     private void sourceCoreUtils(RConnection conn) {
@@ -61,7 +61,7 @@ class RScriptExecutionTask extends AbstractTask {
         runRCommand(conn, "source('" +
                 "${RUtil.escapeRStringContent(fileToLoad.toString())}')")
         def namedArguments = arguments.collect { RFunctionArg arg ->
-            "${arg.name}=${arg.asRExpression()}"
+            '' + arg.name + '=' + arg.asRExpression()
         }
         runRCommand(conn, "main(${namedArguments.join(', ')})")
     }
