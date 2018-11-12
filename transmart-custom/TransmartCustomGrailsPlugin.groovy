@@ -3,7 +3,7 @@ import org.transmart.plugin.custom.CmsService
 import org.transmart.plugin.custom.CustomizationConfig
 
 class TransmartCustomGrailsPlugin {
-	String version = '18.1-SNAPSHOT'
+	String version = '16.4-SNAPSHOT'
 	String grailsVersion = '2.3 > *'
 	String title = 'tranSMART Customization Plugin'
 	String author = 'Burt Beckwith'
