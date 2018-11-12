@@ -20,12 +20,12 @@ package org.transmart.searchapp
  ******************************************************************/
 class Role {
     // role types
-    static def ADMIN_ROLE = "ROLE_ADMIN"
-    static def STUDY_OWNER_ROLE = "ROLE_STUDY_OWNER"
-    static def SPECTATOR_ROLE = "ROLE_SPECTATOR"
-    static def DS_EXPLORER_ROLE = "ROLE_DATASET_EXPLORER_ADMIN"
-    static def PUBLIC_USER_ROLE = "ROLE_PUBLIC_USER"
-    static def TRAINING_USER_ROLE = "ROLE_TRAINING_USER"
+    static def ADMIN_ROLE = 'ROLE_ADMIN'
+    static def STUDY_OWNER_ROLE = 'ROLE_STUDY_OWNER'
+    static def SPECTATOR_ROLE = 'ROLE_SPECTATOR'
+    static def DS_EXPLORER_ROLE = 'ROLE_DATASET_EXPLORER_ADMIN'
+    static def PUBLIC_USER_ROLE = 'ROLE_PUBLIC_USER'
+    static def TRAINING_USER_ROLE = 'ROLE_TRAINING_USER'
 
     static hasMany = [people: AuthUser]
 

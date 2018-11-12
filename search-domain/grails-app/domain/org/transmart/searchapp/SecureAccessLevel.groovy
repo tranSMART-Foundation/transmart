@@ -18,7 +18,7 @@ package org.transmart.searchapp
  *
  ******************************************************************/
 class SecureAccessLevel {
-    static def OWN = "OWN"
+    static def OWN = 'OWN'
     Long accessLevelValue
     Long id
     String accessLevelName

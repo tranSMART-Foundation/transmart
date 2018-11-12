@@ -55,7 +55,7 @@ static constraints = {
 	   }
 
 def getDisplayDate(){
-	def dateFormat = new SimpleDateFormat("MM-dd-yyyy")
+	def dateFormat = new SimpleDateFormat('MM-dd-yyyy')
 	return dateFormat.format(timestamp)
 }
 

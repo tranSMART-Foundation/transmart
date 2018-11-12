@@ -47,7 +47,7 @@ class GeneSignatureItem {
             id column: 'ID'
             geneSignature column: 'SEARCH_GENE_SIGNATURE_ID'
             bioMarker column: 'BIO_MARKER_ID'
-            foldChgMetric column: "FOLD_CHG_METRIC"
+            foldChgMetric column: 'FOLD_CHG_METRIC'
             bioDataUniqueId column: 'BIO_DATA_UNIQUE_ID'
             probesetId column: 'PROBESET_ID'
         }
@@ -62,9 +62,9 @@ class GeneSignatureItem {
     }
 
     def getProbeset() {
-        def probename = ""
+        def probename = ''
         if (probesetId != null) {
-            def annot = de.DeMrnaAnnotation.find("from DeMrnaAnnotation as a where a.probesetId=?", [probesetId])
+            def annot = de.DeMrnaAnnotation.find('from DeMrnaAnnotation as a where a.probesetId=?', [probesetId])
             if (annot != null) probename = annot.probeId
         }
         return probename
@@ -74,8 +74,9 @@ class GeneSignatureItem {
         def symbol = []
         if (bioMarker != null) {
             symbol.add(bioMarker.name)
-        } else if (probesetId != null) {
-            def annot = de.DeMrnaAnnotation.findAll("from DeMrnaAnnotation as a where a.probesetId=?", [probesetId])
+        }
+        else if (probesetId != null) {
+            def annot = de.DeMrnaAnnotation.findAll('from DeMrnaAnnotation as a where a.probesetId=?', [probesetId])
             if (annot != null) {
                 for (g in annot*.geneSymbol) {
                     symbol.add(g)

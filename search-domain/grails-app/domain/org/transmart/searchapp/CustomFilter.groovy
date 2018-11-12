@@ -30,7 +30,7 @@ class CustomFilter {
     String privateFlag
     String summary
     static hasMany = [items: CustomFilterItem]
-    static transients = ["summary"]
+    static transients = ['summary']
     static mapping = {
         table 'SEARCH_CUSTOM_FILTER'
         version false

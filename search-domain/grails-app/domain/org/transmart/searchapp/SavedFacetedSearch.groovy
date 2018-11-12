@@ -36,13 +36,13 @@ class SavedFacetedSearch {
 		 id generator:'sequence', params:[sequence:'SEQ_SAVED_FACETED_SEARCH_ID']
 		 columns {
 			id column:'SAVED_FACETED_SEARCH_ID'
-			userId column: "USER_ID"
+			userId column: 'USER_ID'
 			name column: 'NAME'
 			keywords column:'KEYWORDS'
 			analysisIds column:'ANALYSIS_IDS'
-			searchType column:"SEARCH_TYPE"
-			createDt column:"CREATE_DT"
-			modifiedDt column:"MODIFIED_DT"
+			searchType column:'SEARCH_TYPE'
+			createDt column:'CREATE_DT'
+			modifiedDt column:'MODIFIED_DT'
 		 }
 	 }
 	 

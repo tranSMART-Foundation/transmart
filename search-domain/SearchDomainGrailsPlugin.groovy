@@ -1,25 +1,25 @@
 class SearchDomainGrailsPlugin {
     // the plugin version
-    def version = "16.4-SNAPSHOT"
+    def version = '16.4-SNAPSHOT'
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.3.7 > *"
+    def grailsVersion = '2.3.7 > *'
     // the other plugins this plugin depends on
     def dependsOn = [:]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-            "grails-app/views/error.gsp"
+            'grails-app/views/error.gsp'
     ]
 
     // TODO Fill in these fields
-    def author = "David Newton"
-    def authorEmail = "davinewton@deloitte.com"
-    def title = "tranSMART SearchApp Domain Objects"
+    def author = 'David Newton'
+    def authorEmail = 'davinewton@deloitte.com'
+    def title = 'tranSMART SearchApp Domain Objects'
     def description = '''\\
 Domain objects for the tranSMART SearchApp schema
 '''
 
     // URL to the plugin's documentation
-    def documentation = ""
+    def documentation = ''
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
