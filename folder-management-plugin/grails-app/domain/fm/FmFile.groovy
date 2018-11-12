@@ -30,7 +30,7 @@ class FmFile {
         table 'fm_file'
         version false
         cache true
-        sort "displayName"
+        sort 'displayName'
         id column: 'file_id', generator: 'sequence', params: [sequence: 'seq_fm_id']
         folders joinTable: [name: 'fm_folder_file_association', key: 'file_id', column: 'folder_id']
     }
@@ -51,9 +51,9 @@ class FmFile {
      */
     FmFolder getFolder() {
         if (folders != null && !folders.isEmpty()) {
-            return folders.iterator().next();
+            return folders.iterator().next()
         }
-        return null;
+        return null
     }
 
     /**
@@ -61,7 +61,7 @@ class FmFile {
      * @param folder
      */
     def setFolder(FmFolder folder) {
-        this.addToFolders(folder);
+        this.addToFolders(folder)
     }
 
     /**
@@ -70,14 +70,14 @@ class FmFile {
      */
     String getUniqueId() {
         if (uniqueId == null) {
-            FmData data = FmData.get(id);
+            FmData data = FmData.get(id)
             if (data != null) {
                 uniqueId = data.uniqueId
-                return data.uniqueId;
+                return data.uniqueId
             }
-            return null;
+            return null
         }
-        return uniqueId;
+        return uniqueId
     }
 
     /**
@@ -86,12 +86,12 @@ class FmFile {
      * @return file with matching uniqueId or null, if match not found.
      */
     static FmFile findByUniqueId(String uniqueId) {
-        FmFile file;
-        FmData data = FmData.findByUniqueId(uniqueId);
+        FmFile file
+        FmData data = FmData.findByUniqueId(uniqueId)
         if (data != null) {
-            file = FmFile.get(data.id);
+            file = FmFile.get(data.id)
         }
-        return file;
+        return file
     }
 
 }

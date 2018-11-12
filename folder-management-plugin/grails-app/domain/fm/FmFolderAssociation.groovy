@@ -15,8 +15,8 @@ import groovy.util.logging.Slf4j
         table 'fm_folder_association'
         version false
         cache true
-        sort "objectUid"
-        id composite: ["objectUid", "fmFolder"]
+        sort 'objectUid'
+        id composite: ['objectUid', 'fmFolder']
         fmFolder column: 'folder_id'
     }
 
@@ -37,12 +37,13 @@ import groovy.util.logging.Slf4j
     }
 
     public getBioObject() {
-        logger.info "ObjectUID=" + this.objectUid
+        logger.info 'ObjectUID=' + this.objectUid
         def bioData = org.transmart.biomart.BioData.findByUniqueId(this.objectUid)
         def clazz = lookupDomainClass()
         if (!clazz || !bioData) {
             return null
-        } else {
+        }
+        else {
 //			return clazz.getObjectUid(this.objectUid)
             return clazz.get(bioData.id)
         }
@@ -69,10 +70,10 @@ import groovy.util.logging.Slf4j
      * override display
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("objectUid: ").append(this.objectUid).append(", objectType: ").append(this.objectType);
-        sb.append(", Folder: ").append(this.fmFolder.id);
-        return sb.toString();
+        StringBuffer sb = new StringBuffer()
+        sb.append('objectUid: ').append(this.objectUid).append(', objectType: ').append(this.objectType)
+        sb.append(', Folder: ').append(this.fmFolder.id)
+        return sb.toString()
     }
 
 

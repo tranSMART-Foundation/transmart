@@ -25,7 +25,7 @@ class FmFolder implements Buildable {
     static mapping = {
         table 'fm_folder'
         version false
-        sort "folderName"
+        sort 'folderName'
         id column: 'folder_id', generator: 'sequence', params: [sequence: 'seq_fm_id']
         fmFiles joinTable: [name: 'fm_folder_file_association', key: 'folder_id', column: 'file_id'], lazy: false, cascade: "all-delete-orphan"
     }
@@ -46,30 +46,31 @@ class FmFolder implements Buildable {
     String getUniqueId() {
         if (uniqueId == null) {
             if (id) {
-                FmData data = FmData.get(id);
+                FmData data = FmData.get(id)
                 if (data != null) {
                     uniqueId = data.uniqueId
-                    return data.uniqueId;
+                    return data.uniqueId
                 }
-                return null;
-            } else {
-                return null;
+                return null
+            }
+            else {
+                return null
             }
         }
-        return uniqueId;
+        return uniqueId
     }
 
     String getPluralFolderTypeName() {
         if (this.folderType == FolderType.ANALYSIS.name()) {
-            return "ANALYSES"
+            return 'ANALYSES'
         }
 
         if (this.folderType == FolderType.PROGRAM.name() || this.folderType == FolderType.ASSAY.name() || this.folderType == FolderType.FOLDER.name()) {
-            return this.folderType + "S"
+            return this.folderType + 'S'
         }
 
         if (this.folderType == FolderType.STUDY.name()) {
-            return "STUDIES"
+            return 'STUDIES'
         }
 
     }
@@ -91,12 +92,12 @@ class FmFolder implements Buildable {
      * @return folder with matching uniqueId or null, if match not found.
      */
     static FmFolder findByUniqueId(String uniqueId) {
-        FmFolder folder;
-        FmData data = FmData.findByUniqueId(uniqueId);
+        FmFolder folder
+        FmData data = FmData.findByUniqueId(uniqueId)
         if (data != null) {
-            folder = FmFolder.get(data.id);
+            folder = FmFolder.get(data.id)
         }
-        return folder;
+        return folder
     }
 
     /**
@@ -123,7 +124,7 @@ class FmFolder implements Buildable {
                 folderType(this.folderType)
 
                 List<FmFolder> subFolderList = FmFolder.findAll("from FmFolder as fd where fd.folderFullName like :fn escape '*' and fd.folderLevel = :fl",
-                        [fn: this.folderFullName + "%", fl: (this.folderLevel + 1)])
+                        [fn: this.folderFullName + '%', fl: (this.folderLevel + 1)])
 
                 unescaped << '<fmFolders>'
                 subFolderList.each {
@@ -143,11 +144,11 @@ class FmFolder implements Buildable {
      * override display
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("ID: ").append(this.id).append(", Folder Name: ").append(this.folderName);
-        sb.append(", Folder Full Name: ").append(this.folderFullName).append(", Folder Level: ").append(this.folderLevel);
-        sb.append(", Folder Type: ").append(this.folderType).append(", uniqueId: ").append(this.uniqueId).append(", Description: ").append(this.description);
-        return sb.toString();
+        StringBuffer sb = new StringBuffer()
+        sb.append('ID: ').append(this.id).append(', Folder Name: ').append(this.folderName)
+        sb.append(', Folder Full Name: ').append(this.folderFullName).append(', Folder Level: ').append(this.folderLevel)
+        sb.append(', Folder Type: ').append(this.folderType).append(', uniqueId: ').append(this.uniqueId).append(', Description: ').append(this.description)
+        return sb.toString()
     }
 
 

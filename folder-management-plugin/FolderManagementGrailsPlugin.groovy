@@ -1,25 +1,25 @@
 class FolderManagementGrailsPlugin {
     // the plugin version
-    def version = "16.4-SNAPSHOT"
+    def version = '16.4-SNAPSHOT'
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.3.7 > *"
+    def grailsVersion = '2.3.7 > *'
     // the other plugins this plugin depends on
     def dependsOn = [:]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-            "grails-app/views/error.gsp"
+            'grails-app/views/error.gsp'
     ]
 
     // TODO Fill in these fields
-    def author = "Florian Guitton"
-    def authorEmail = "f.guitton@imperial.ac.uk"
-    def title = "Folder Management and Annotation for tranSMART"
+    def author = 'Florian Guitton'
+    def authorEmail = 'f.guitton@imperial.ac.uk'
+    def title = 'Folder Management and Annotation for tranSMART'
     def description = '''\\
 Adds folder management features to tranSMART, allowing files to be attached to studies and analyses. Also contains annotation domain and controller
 '''
 
     // URL to the plugin's documentation
-    def documentation = ""
+    def documentation = ''
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
