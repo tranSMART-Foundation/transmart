@@ -113,12 +113,12 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
         private Map<String, String> getPatientAndValueByPath(sql, paths, allowCategorical) {
             def hasCategorical = false
             def rawData = [:]
-            sql.rows("''\
+            sql.rows("""
                 select patient_num, tval_char, nval_num
                   from      i2b2demodata.observation_fact of
                        join i2b2demodata.concept_dimension cd on cd.concept_cd=of.concept_cd
                  where concept_path in ( ${(['?'] * paths.size()).join(',')} )
-            "''.stripIndent(), paths).each {
+            """.stripIndent(), paths).each {
                 def patientId = it.patient_num as String
                 def isNumeric = it.tval_char == 'E'
                 if (!hasCategorical && !isNumeric) {
@@ -167,14 +167,14 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
             Map<String, Map> patients = null
             Map<String, String> valueForPhenotypeByPatient = null, valueForCovariatesByPatient = null
             try {
-                patients = sql.rows("''
+                patients = sql.rows("""
                     select pd.sourcesystem_cd, max(ps.result_instance_id) as result_instance_id, ps.patient_num
                     from i2b2demodata.qt_patient_set_collection ps, i2b2demodata.patient_dimension pd
                     where ps.patient_num = pd.patient_num and ps.result_instance_id IN (${
                     (['?'] * resultInstanceIds.size()).join(',')
                 })
                     group by pd.sourcesystem_cd, ps.patient_num
-                "'', resultInstanceIds).collectEntries {
+                """, resultInstanceIds).collectEntries {
                     def sourceSystemCd = it.sourcesystem_cd as String
                     def parts = sourceSystemCd.split(':', 2)
                     def patientNum = it.patient_num as String
@@ -331,7 +331,7 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
 
             int exitCode = process.waitFor()
             if (exitCode == 127) {
-                throw new NoSuchResourceException('`plink` exited with exit code ' + exitCode. + ' Most probably `plink` was not found by configured path')
+                throw new NoSuchResourceException('`plink` exited with exit code ' + exitCode + '. Most probably `plink` was not found by configured path')
             }
             else if (exitCode != 0) {
                 throw new UnexpectedResultException("`plink` exited with error: ${error.exists() ? error.text : 'unknown'}")
