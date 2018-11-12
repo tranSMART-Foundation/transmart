@@ -120,7 +120,7 @@ class CustomizationTagLib {
 
 	protected assertAttribute(String name, Map attrs, String tag) {
 		if (!attrs.containsKey(name)) {
-			throwTagError "Tag [$tag] is missing required attribute [$name]"
+			throwTagError 'Tag [' + tag + '] is missing required attribute [' + name + ']'
 		}
 		attrs.remove name
 	}

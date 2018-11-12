@@ -41,7 +41,7 @@ class CmsTagLib {
 
 	private assertAttribute(String name, Map attrs, String tag) {
 		if (!attrs.containsKey(name)) {
-			throwTagError "Tag [${namespace}.$tag] is missing required attribute [$name]"
+			throwTagError 'Tag [' + namespace + '.' + tag + '] is missing required attribute [' + name + ']'
 		}
 		attrs.remove name
 	}
