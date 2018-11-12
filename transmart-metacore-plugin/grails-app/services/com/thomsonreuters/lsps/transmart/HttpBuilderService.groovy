@@ -15,10 +15,10 @@ class HttpBuilderService {
 		HTTPBuilder site = new HTTPBuilder(uri)
 			
 		if (System.properties.proxyHost && System.properties.proxyPort) {
-			logger.info "Using proxy -> ${System.properties.proxyHost}:${System.properties.proxyPort}"
+			logger.info 'Using proxy -> ' + System.properties.proxyHost + ':' + System.properties.proxyPort
 			if (System.properties.proxyUser) {
-				logger.info "Authenticating with proxy as ${System.properties.proxyUser}"
-				if (System.properties.proxyNTLMDomain) logger.info "NTLM domain: ${System.properties.proxyNTLMDomain}"
+				logger.info 'Authenticating with proxy as ' + System.properties.proxyUser
+				if (System.properties.proxyNTLMDomain) logger.info 'NTLM domain: ' + System.properties.proxyNTLMDomain
 				site.client.getCredentialsProvider().setCredentials(
 				    new AuthScope(System.properties.proxyHost, System.properties.proxyPort.toInteger()),
 				    new NTCredentials(System.properties.proxyUser, System.properties.proxyPassword, 

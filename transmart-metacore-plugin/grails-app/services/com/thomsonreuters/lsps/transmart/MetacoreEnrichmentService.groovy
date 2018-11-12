@@ -35,7 +35,7 @@ class MetacoreEnrichmentService {
 
 		if (areSettingsConfigured()) {
 
-			def mode = UserSettings.getSetting(userid, "com.thomsonreuters.transmart.metacoreSettingsMode")
+			def mode = UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreSettingsMode')
 
 			if (mode == 'demo' || mode == 'system' || mode == 'user')
 				return mode
@@ -54,28 +54,28 @@ class MetacoreEnrichmentService {
 		def userid = user?.id
 
 		if (mode == 'demo' || mode == 'system' || mode == 'user')
-			UserSettings.setSetting(userid, "com.thomsonreuters.transmart.metacoreSettingsMode", mode)
+			UserSettings.setSetting(userid, 'com.thomsonreuters.transmart.metacoreSettingsMode', mode)
 	}
 
 	def setMetacoreBaseUrl(url) {
 		def user = springSecurityService.getPrincipal()
 		def userid = user?.id
 
-		UserSettings.setSetting(userid, "com.thomsonreuters.transmart.metacoreURL", url)
+		UserSettings.setSetting(userid, 'com.thomsonreuters.transmart.metacoreURL', url)
 	}
 
 	def setMetacoreLogin(login) {
 		def user = springSecurityService.getPrincipal()
 		def userid = user?.id
 
-		UserSettings.setSetting(userid, "com.thomsonreuters.transmart.metacoreLogin", login)
+		UserSettings.setSetting(userid, 'com.thomsonreuters.transmart.metacoreLogin', login)
 	}
 
 	def setMetacorePassword(pass) {
 		def user = springSecurityService.getPrincipal()
 		def userid = user?.id
 
-		UserSettings.setSetting(userid, "com.thomsonreuters.transmart.metacorePassword", pass)
+		UserSettings.setSetting(userid, 'com.thomsonreuters.transmart.metacorePassword', pass)
 	}
 
 	def getMetacoreParams() {
@@ -96,7 +96,7 @@ class MetacoreEnrichmentService {
 
 			if (settingsMode == 'user') {
 				return [
-					baseUrl: UserSettings.getSetting(userid, "com.thomsonreuters.transmart.metacoreURL")?:defaultMetacoreParams['baseUrl'],
+					baseUrl: UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreURL')?:defaultMetacoreParams['baseUrl'],
 					login: UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreLogin')?:defaultMetacoreParams['login'],
 					password: UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacorePassword')?:defaultMetacoreParams['password']
 				]
@@ -114,7 +114,7 @@ class MetacoreEnrichmentService {
 
 
 	// cohortGeneList = [ IdType: id_type, Data: [list1, list2] ], where list is just a list of EntrezGene IDs
-	// metacoreParams = [ "baseUrl": url, "login": login, "password": password ]
+	// metacoreParams = [ 'baseUrl': url, 'login': login, 'password': password ]
     def getEnrichmentByMaps(cohortGeneLists, metacoreParams) {
 		def res
 		def baseUrl = ''
@@ -137,7 +137,7 @@ class MetacoreEnrichmentService {
 		if (settingsMode == 'demo') {
 			// demo enrichment
 
-			logger.info "Running demo enrichment: ${baseUrl}"
+			logger.info 'Running demo enrichment: ' + baseUrl
 
             site.post( path: '/enrichmentApp/enrichment',
                     body: [ limit: 50, idtype: cohortGeneLists['IdType'], id: cohortGeneLists['Data'][0] ]) {
@@ -159,7 +159,7 @@ class MetacoreEnrichmentService {
 				  if (authKey) {
 					  logger.info 'MetaCore - running enrichment'
 
-					  EntityUtils.consumeQuietly(resp.entity) // avoid "IllegalStateException: Invalid use of BasicClientConnManager: connection still allocated" thanks to http://stackoverflow.com/a/16211729/535203
+					  EntityUtils.consumeQuietly(resp.entity) // avoid 'IllegalStateException: Invalid use of BasicClientConnManager: connection still allocated' thanks to http://stackoverflow.com/a/16211729/535203
 
 					  site.post( path: '/api/rpc.cgi',
 						body: [ proc: 'getEnrichment', diagram_type: 'maps', limit: 50, lists_origin: 'ids', list_name: 'Cohort 1',
@@ -170,7 +170,7 @@ class MetacoreEnrichmentService {
 						  	res = json2
 						  }
 
-						  EntityUtils.consumeQuietly(resp2.entity) // avoid "IllegalStateException: Invalid use of BasicClientConnManager: connection still allocated" thanks to http://stackoverflow.com/a/16211729/535203
+						  EntityUtils.consumeQuietly(resp2.entity) // avoid 'IllegalStateException: Invalid use of BasicClientConnManager: connection still allocated' thanks to http://stackoverflow.com/a/16211729/535203
 					  }
 
 					  logger.info 'MetaCore - logging out'
@@ -191,7 +191,7 @@ class MetacoreEnrichmentService {
 		def userid = user?.id
 
 		def res =
-			UserSettings.getSetting(userid, "com.thomsonreuters.transmart.metacoreURL") \
+			UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreURL') \
 			&& UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreLogin') \
 			&& UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacorePassword')
 
