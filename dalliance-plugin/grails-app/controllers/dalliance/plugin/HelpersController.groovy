@@ -15,7 +15,7 @@ class HelpersController {
     def getPluginPath = {
 
         def pluginPath = pluginManager.getGrailsPlugin('dalliance-plugin').pluginPath
-        response.outputStream << "$request.contextPath/static$pluginPath"
+        response.outputStream << '' + request.contextPath + '/static' + pluginPath
 
     }
 }

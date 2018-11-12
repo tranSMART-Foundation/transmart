@@ -6,7 +6,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class DallianceController {
 
     def index() {
-        render (view: "main")
+        render (view: 'main')
     }
 
     def loadScripts = {
@@ -21,16 +21,16 @@ class DallianceController {
         for (file in scripts) {
 
             JSONObject aScript = new JSONObject()
-            aScript.put("path", file.toString())
-            aScript.put("type", "script")
+            aScript.put('path', file.toString())
+            aScript.put('type', 'script')
             rows.put(aScript)
         }
 
-        result.put("success", true)
-        result.put("totalCount", scripts.size())
-        result.put("files", rows)
+        result.put('success', true)
+        result.put('totalCount', scripts.size())
+        result.put('files', rows)
 
-        response.setContentType("text/json")
+        response.setContentType('text/json')
         response.outputStream << result.toString()
     }
 }
