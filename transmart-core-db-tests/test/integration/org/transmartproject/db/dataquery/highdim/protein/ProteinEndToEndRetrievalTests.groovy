@@ -143,7 +143,7 @@ class ProteinEndToEndRetrievalTests {
         contains testData.data.
                 findAll { it.annotation == annotation }.
                 sort    { it.assay.id }. // data is sorted by assay id
-                collect { closeTo it."$property" as Double, DELTA }
+                collect { closeTo it[property] as Double, DELTA }
     }
 
     @Test

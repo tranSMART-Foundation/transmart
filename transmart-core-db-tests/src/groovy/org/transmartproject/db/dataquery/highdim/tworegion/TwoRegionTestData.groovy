@@ -63,16 +63,16 @@ class TwoRegionTestData {
         //2nd event: deletion assay1, chrX 2-10 - chr3 12-18
         //junction without event assay1, chrY 2-10 - chr3 12-18
         def event = new DeTwoRegionEvent()
-        event.cgaType = "deletion"
+        event.cgaType = 'deletion'
         def junction = new DeTwoRegionJunction(
-                downChromosome: "1",
+                downChromosome: '1',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "3",
+                downStrand: '+',
+                upChromosome: '3',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[0]
         )
@@ -86,14 +86,14 @@ class TwoRegionTestData {
         junction.junctionEvents = [junctionEvent]
 
         junction = new DeTwoRegionJunction(
-                downChromosome: "10",
+                downChromosome: '10',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "13",
+                downStrand: '+',
+                upChromosome: '13',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[0]
         )
@@ -110,25 +110,25 @@ class TwoRegionTestData {
 
         def gene = new DeTwoRegionEventGene(
                 geneId: 'TP53',
-                effect: "fusion"
+                effect: 'fusion'
         )
 
         event = new DeTwoRegionEvent(
-                soapClass: "translocation",
+                soapClass: 'translocation',
                 eventGenes: [gene]
         )
         gene.event = event
         eventGenes.add(gene)
 
         def junction2 = new DeTwoRegionJunction(
-                downChromosome: "X",
+                downChromosome: 'X',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "3",
+                downStrand: '+',
+                upChromosome: '3',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[1]
         )
@@ -149,28 +149,28 @@ class TwoRegionTestData {
         events.add(event)
 
         junction = new DeTwoRegionJunction(
-                downChromosome: "Y",
+                downChromosome: 'Y',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "3",
+                downStrand: '+',
+                upChromosome: '3',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[1]
         )
         junctions.add(junction)
 
         junction = new DeTwoRegionJunction(
-                downChromosome: "Y",
+                downChromosome: 'Y',
                 downPos: 2,
                 downEnd: 10,
-                downStrand: "+",
-                upChromosome: "3",
+                downStrand: '+',
+                upChromosome: '3',
                 upPos: 12,
                 upEnd: 18,
-                upStrand: "-",
+                upStrand: '-',
                 isInFrame: true,
                 assay: assays[2],
         )

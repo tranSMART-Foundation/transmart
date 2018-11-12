@@ -40,7 +40,7 @@ class PatientIdListConstraintTests {
 
     @Test
     void basicTest() {
-        final def targetId = "SUBJ_ID_2"
+        final def targetId = 'SUBJ_ID_2'
 
         def wantedPatients = testData.patients.findAll { it.inTrialId == targetId }
         def wantedAssays = testData.assays.findAll {
@@ -63,7 +63,7 @@ class PatientIdListConstraintTests {
     void testNonExistant() {
         def result = new AssayQuery([
                 new PatientIdListCriteriaConstraint(
-                        patientIdList: ["NONEXISTANT_PATIENT_567395367"]
+                        patientIdList: ['NONEXISTANT_PATIENT_567395367']
                 )
         ]).list()
 

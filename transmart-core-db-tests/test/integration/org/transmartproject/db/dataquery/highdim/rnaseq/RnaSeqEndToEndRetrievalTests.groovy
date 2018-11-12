@@ -363,7 +363,7 @@ class RnaSeqEndToEndRetrievalTests {
         contains testData.rnaseqData.
                 findAll { it.region == region }.
                 sort { it.assay.id }. // data is sorted by assay id
-                collect { closeTo it."$property" as Double, DELTA }
+                collect { closeTo it[property] as Double, DELTA }
     }
 
     @Test

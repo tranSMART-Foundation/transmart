@@ -106,7 +106,7 @@ class HighDimTestData {
             def res = new SearchKeywordCoreDb(
                     keyword: it.name,
                     bioDataId: it.id,
-                    uniqueId: "$it.type:$it.externalId",
+                    uniqueId: '' + it.type + ':' + it.externalId,
                     dataCategory: it.type,
             )
             res.id = --baseId
@@ -120,7 +120,7 @@ class HighDimTestData {
             def res = new SearchKeywordCoreDb(
                     keyword: sig.name,
                     bioDataId: sig.id,
-                    uniqueId: "GENESIG:$sig.id",
+                    uniqueId: 'GENESIG:' + sig.id,
                     dataCategory: 'GENESIG',
             )
             res.id = --baseId
@@ -149,7 +149,7 @@ class HighDimTestData {
                     registryTable.get(right.type, left.type)
             if (correlationType == null) {
                 throw new RuntimeException("Didn't know I could associate " +
-                        "$left.type with $right.type")
+                        '' + left.type + ' with ' + right.type)
             }
 
             BioDataCorrelDescr descr =

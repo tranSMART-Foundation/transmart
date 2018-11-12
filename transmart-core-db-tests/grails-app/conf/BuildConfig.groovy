@@ -34,10 +34,10 @@ if (enableClover) {
         ]
 
         reporttask = { ant, binding, plugin ->
-            def reportDir = "${binding.projectTargetDir}/clover/report"
+            def reportDir = '' + binding.projectTargetDir + '/clover/report'
             ant.'clover-report' {
                 ant.current(outfile: reportDir, title: 'transmart-core-db') {
-                    format(type: "html", reportStyle: 'adg')
+                    format(type: 'html', reportStyle: 'adg')
                     testresults(dir: 'target/test-reports', includes: '*.xml')
                     ant.columns {
                         lineCount()
@@ -46,8 +46,8 @@ if (enableClover) {
                         totalPercentageCovered()
                     }
                 }
-                ant.current(outfile: "${reportDir}/clover.xml") {
-                    format(type: "xml")
+                ant.current(outfile: '' + reportDir + '/clover.xml') {
+                    format(type: 'xml')
                     testresults(dir: 'target/test-reports', includes: '*.xml')
                 }
             }
@@ -78,7 +78,7 @@ grails.project.dependency.resolution = {
 //        test 'com.h2database:h2:1.3.175'
 
         if (enableClover) {
-            compile ":clover:$CLOVER_VERSION", {
+            compile ':clover:' + CLOVER_VERSION, {
                 export = false
             }
         }
@@ -113,7 +113,7 @@ grails.project.dependency.resolution = {
         }
 
         if (enableClover) {
-            compile ":clover:$CLOVER_VERSION", {
+            compile ':clover:' + CLOVER_VERSION, {
                 export = false
             }
         }

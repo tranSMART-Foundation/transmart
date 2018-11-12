@@ -37,18 +37,18 @@ class VcfDataRowTests {
                 // Chromosome to define the position
                 chromosome: 1,
                 position: 500,
-                rsId: "rs0001",
+                rsId: 'rs0001',
 
                 // Reference and alternatives for this position
-                referenceAllele: "G",
-                alternatives: "A,T,CT",
+                referenceAllele: 'G',
+                alternatives: 'A,T,CT',
 
                 // Study level properties are irrelevant for the cohort statistics
                 quality: 1.0,
-                filter: "",
-                info: "DP=88;AF1=1;QD=2;DP4=0,0,80,0;MQ=60;FQ=-268;NOVAL",
-                format: "",
-                variants: "",
+                filter: '',
+                info: 'DP=88;AF1=1;QD=2;DP4=0,0,80,0;MQ=60;FQ=-268;NOVAL',
+                format: '',
+                variants: '',
 
                 data: []
         )
@@ -61,7 +61,7 @@ class VcfDataRowTests {
                 hasEntry(equalTo('MQ'), equalTo('60')),
                 hasEntry(equalTo('FQ'), equalTo('-268')),
 
-                hasEntry(equalTo("NOVAL"), equalTo(true))
+                hasEntry(equalTo('NOVAL'), equalTo(true))
         )
     }
 
@@ -71,18 +71,18 @@ class VcfDataRowTests {
                 // Chromosome to define the position
                 chromosome: 1,
                 position: 500,
-                rsId: "rs0001",
+                rsId: 'rs0001',
 
                 // Reference and alternatives for this position
-                referenceAllele: "G",
-                alternatives: "A,T,CT",
+                referenceAllele: 'G',
+                alternatives: 'A,T,CT',
 
                 // Study level properties are irrelevant for the cohort statistics
                 quality: 0.8,
-                filter: "",
-                info: "DP=1.0;AB=1,201;TS=.;NOVAL",
-                format: "",
-                variants: "",
+                filter: '',
+                info: 'DP=1.0;AB=1,201;TS=.;NOVAL',
+                format: '',
+                variants: '',
 
                 data: []
         )
@@ -96,18 +96,18 @@ class VcfDataRowTests {
                 // Chromosome to define the position
                 chromosome: 1,
                 position: 500,
-                rsId: "rs0001",
+                rsId: 'rs0001',
 
                 // Reference and alternatives for this position
-                referenceAllele: "G",
-                alternatives: "A,T,CT",
+                referenceAllele: 'G',
+                alternatives: 'A,T,CT',
 
                 // Study level properties are irrelevant for the cohort statistics
                 quality: 1.0,
-                filter: "",
-                info: "DP=1.0;AB=1,201;TS=.;NOVAL;QD=0.2",
-                format: "",
-                variants: "",
+                filter: '',
+                info: 'DP=1.0;AB=1,201;TS=.;NOVAL;QD=0.2',
+                format: '',
+                variants: '',
 
                 data: []
         )
@@ -119,7 +119,7 @@ class VcfDataRowTests {
     void testQualityOfDepthDotInInfoField() {
         def dataRow = new VcfDataRow(
                 quality: 0.9,
-                info: "QD=.;AB=1,201;"
+                info: 'QD=.;AB=1,201;'
         )
 
         assertThat 'QD=.', dataRow.qualityOfDepth, closeTo(0.9 as Double, ERROR)

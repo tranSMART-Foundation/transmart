@@ -125,7 +125,7 @@ class StudiesResourceServiceTests {
 
     @Test
     void testGetStudyByOntologyTermOptimization() {
-        /* Terms marked with the"Study" visual attribute can be assumed to
+        /* Terms marked with the'Study' visual attribute can be assumed to
          * refer to studies, a fact for which we optimize */
         I2b2 concept = createI2b2Concept(code: -9999, level: 1,
                 fullName: '\\foo\\Study Visual Attribute\\',

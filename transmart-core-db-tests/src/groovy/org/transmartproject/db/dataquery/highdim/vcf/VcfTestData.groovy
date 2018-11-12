@@ -106,7 +106,7 @@ class VcfTestData  {
                 markerType: 'mrna')
         otherPlatform.id = 'BOGUSGPLMRNA'
 
-        assays += HighDimTestData.createTestAssays(patients, -1800, otherPlatform, "OTHER_TRIAL")
+        assays += HighDimTestData.createTestAssays(patients, -1800, otherPlatform, 'OTHER_TRIAL')
 
         bioMarkerTestData = bioMarkerTestData ?: new SampleBioMarkerTestData()
     }
@@ -132,9 +132,9 @@ class VcfTestData  {
                     info:  info,
                     format: 'GT',
                     dataset: dataset,
-                    variant: "" + position + "/" + position + "\t" +
-                            (position + 1) + "/" + (position + 1) + "\t" +
-                            (position * 2) + "/" + (position * 2)
+                    variant: '' + position + '/' + position + '\t' +
+                            (position + 1) + '/' + (position + 1) + '\t' +
+                            (position * 2) + '/' + (position * 2)
             )
     }
 

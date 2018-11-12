@@ -81,8 +81,8 @@ class AccessLogServiceTests {
         def numOfEntries = 2
         def testParams   = { num ->
             [
-               eventMessage: "event message #${num}".toString(),
-               requestURL  : "http://loclhost/test/${num}".toString(),
+               eventMessage: 'event message #' + num.toString(),
+               requestURL  : 'http://loclhost/test/' + num.toString(),
                accessTime  : new Date((long) nowInMs + num)
             ]
         }
@@ -115,8 +115,8 @@ class AccessLogServiceTests {
         def numOfEntries = 4
         def testParams   = { num ->
             [
-               eventMessage: "event message #${num}".toString(),
-               requestURL  : "http://loclhost/test/${num}".toString(),
+               eventMessage: 'event message #' + num.toString(),
+               requestURL  : 'http://loclhost/test/' + num.toString(),
                accessTime  : new Date((long) nowInMs + num)
             ]
         }

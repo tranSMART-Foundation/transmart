@@ -90,7 +90,7 @@ class RbmTestData {
                     patient:      assay.patient,
                     value:        value,
                     logIntensity: Math.log(value),
-                    unit:         unit ? "(${unit})" : null,
+                    unit:         unit ? '(' + unit + ')' : null,
                     zscore:       (value - 0.35) / 0.1871,
             )
         }

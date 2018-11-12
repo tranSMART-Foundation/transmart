@@ -87,9 +87,9 @@ class QueriesResourceServiceTests {
     void setUp() {
         /* 1. Define concepts */
         def concepts = [ /* level, concept_path, concept_cd */
-                [0, "\\a\\",      'A'],
-                [1, "\\a\\b\\", 'A:B'],
-                [1, "\\a\\c\\", 'A:C'],
+                [0, '\\a\\',      'A'],
+                [1, '\\a\\b\\', 'A:B'],
+                [1, '\\a\\c\\', 'A:C'],
         ]
         addTableAccess(level: 0, fullName: '\\a\\', name: 'foo',
                 tableCode: 'i2b2tc', tableName: 'i2b2')
@@ -141,15 +141,15 @@ class QueriesResourceServiceTests {
 
         def result = queriesResourceService.runQuery(definition)
         assertThat result, allOf(
-                hasProperty("id", notNullValue()),
-                hasProperty("setSize", equalTo(7L /* 100-106 */)),
-                hasProperty("status", equalTo(QueryStatus.FINISHED)),
-                hasProperty("errorMessage", nullValue()),
+                hasProperty('id', notNullValue()),
+                hasProperty('setSize', equalTo(7L /* 100-106 */)),
+                hasProperty('status', equalTo(QueryStatus.FINISHED)),
+                hasProperty('errorMessage', nullValue()),
         )
     }
 
     private void assertPatientSet(QueryResult result, List patientNums) {
-        assertThat result, hasProperty("setSize", equalTo(
+        assertThat result, hasProperty('setSize', equalTo(
                 Long.valueOf(patientNums.size())))
 
         def patientSet = QtPatientSetCollection.where {
@@ -339,7 +339,8 @@ class QueriesResourceServiceTests {
             QueryResult result = queriesResourceService.runQuery(inputDefinition)
 
             assertThat result, hasProperty('status', equalTo(QueryStatus.ERROR))
-        } finally {
+        }
+        finally {
             queriesResourceService.patientSetQueryBuilderService = orig
         }
     }
@@ -363,7 +364,8 @@ class QueriesResourceServiceTests {
         QueryResult result = queriesResourceService.runQuery(inputDefinition)
 
         assertThat result, hasProperty('status', equalTo(QueryStatus.ERROR))
-        } finally {
+        }
+        finally {
             queriesResourceService.patientSetQueryBuilderService = orig
         }
     }

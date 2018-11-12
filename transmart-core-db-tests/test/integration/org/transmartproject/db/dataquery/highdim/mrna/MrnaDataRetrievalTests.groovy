@@ -314,7 +314,7 @@ class MrnaDataRetrievalTests {
          * data won't be cleaned up afterwards.
          * Try to save the database state and restore it later */
         Session session = sessionFactory.currentSession
-        File schemaDump = File.createTempFile("coredb-database-dump", ".sql")
+        File schemaDump = File.createTempFile('coredb-database-dump', '.sql')
         Sql sql = new Sql(dataSource)
         sql.execute "SCRIPT DROP TO '${schemaDump.absolutePath}'"
 
@@ -322,16 +322,16 @@ class MrnaDataRetrievalTests {
                 SELECT constraint_name FROM information_schema.constraints
                 WHERE table_name = 'DE_SUBJECT_MICROARRAY_DATA' AND column_list = 'PROBESET_ID'
         ''').list()[0]
-        runStatement "ALTER TABLE deapp.de_subject_microarray_data DROP CONSTRAINT $constraint"
+        runStatement 'ALTER TABLE deapp.de_subject_microarray_data DROP CONSTRAINT ' + constraint
         runStatement 'ALTER TABLE deapp.de_mrna_annotation DROP PRIMARY KEY'
         try {
-            runStatement """
+            runStatement "''
                     insert into deapp.de_mrna_annotation(probeset_id, probe_id, gene_symbol, gene_id)
                     values('${testData.annotations[0].id}',
                             '${testData.annotations[0].probeId}',
                             'Z_EXTRA_GENE_SYMB',
                             '0')
-                    """
+                    "''
 
             trialNameConstraint = new DefaultTrialNameCriteriaConstraint(trialName: MrnaTestData.TRIAL_NAME)
             List assayConstraints = [trialNameConstraint]
@@ -356,8 +356,9 @@ class MrnaDataRetrievalTests {
                                             collect {
                                                 closeTo(it.rawIntensity as Double, DELTA)
                                             }))))
-        } finally {
-            sql.execute "RUNSCRIPT FROM ${schemaDump.absolutePath}"
+        }
+        finally {
+            sql.execute 'RUNSCRIPT FROM ' + schemaDump.absolutePath
             session.clear()
             schemaDump.delete()
         }

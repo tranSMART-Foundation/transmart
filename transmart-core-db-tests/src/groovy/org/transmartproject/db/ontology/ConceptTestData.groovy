@@ -166,14 +166,14 @@ class ConceptTestData {
         assert createTableAccess(properties).save() != null
     }
 
-    static List<I2b2> createMultipleI2B2(int count, String basePath = "\\test", String codePrefix = "test", int level = 1) {
+    static List<I2b2> createMultipleI2B2(int count, String basePath = '\\test', String codePrefix = 'test', int level = 1) {
         (1..count).collect { int i ->
-            def name = "concept$i"
-            def fullName = "$basePath\\$name\\"
+            def name = 'concept' + i
+            def fullName = '' + basePath + '\\' + name + '\\'
             def props = [
                 name: name,
                 fullName: fullName,
-                code: "$codePrefix$i",
+                code: '' + codePrefix + i,
                 level: level,
                 dimensionCode: fullName
             ]
@@ -200,8 +200,8 @@ class ConceptTestData {
             (1..number).collect { iteration ->
                 new I2b2Tag(
                         ontologyTermFullName: i2b2.fullName,
-                        name: "${i2b2.code} name ${iteration}",
-                        description: "${i2b2.code} description ${iteration}",
+                        name: '' + i2b2.code + ' name ' + iteration,
+                        description: '' + i2b2.code + ' description ' + iteration,
                         //for reverse order
                         position: number - iteration + 1
                 )
@@ -212,7 +212,7 @@ class ConceptTestData {
     static def checkValidForOntologyQueries(I2b2 input) {
         def missing = TestDataHelper.getMissingValueFields(input, ontologyQueryRequiredFields)
         if (missing.size() > 0) {
-            throw new IllegalArgumentException("Some I2b2 instances miss fields required for ontology queries: $missing")
+            throw new IllegalArgumentException('Some I2b2 instances miss fields required for ontology queries: ' + missing)
         }
     }
 
@@ -234,10 +234,10 @@ class ConceptTestData {
 
         initListsIfNull()
 
-        tableAccesses << createTableAccess(fullName: "\\$root\\", name: root, tableCode: tableCode, tableName: 'i2b2')
-        i2b2List << createI2b2Concept(level: 1, fullName: "\\$root\\$study\\", name: study,
+        tableAccesses << createTableAccess(fullName: '\\' + root + '\\', name: root, tableCode: tableCode, tableName: 'i2b2')
+        i2b2List << createI2b2Concept(level: 1, fullName: '\\' + root + '\\' + study + '\\', name: study,
                 code: study, cVisualattributes: 'FA')
-        I2b2 result = createI2b2Concept(level: 2, fullName: "\\$root\\$study\\$concept\\", name: concept,
+        I2b2 result = createI2b2Concept(level: 2, fullName: '\\' + root + '\\' + study + '\\' + concept + '\\', name: concept,
                 code: code,  cVisualattributes: 'LA')
 
         i2b2List << result

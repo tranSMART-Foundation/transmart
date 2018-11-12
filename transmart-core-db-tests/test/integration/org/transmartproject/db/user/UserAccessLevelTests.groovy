@@ -70,9 +70,9 @@ class UserAccessLevelTests {
     void testEveryoneHasAccessToPublicStudy() {
         // study1 is public
         accessLevelTestData.users.each { u ->
-            println "Testing for user $u"
+            println 'Testing for user ' + u
             assertThat u.canPerform(API_READ, getStudy(STUDY1)), is(true)
-            println "Passed"
+            println 'Passed'
         }
     }
 
@@ -124,9 +124,9 @@ class UserAccessLevelTests {
         // EVERYONE_GROUP has access to study 3
 
         accessLevelTestData.users.each { u ->
-            println "Testing for user $u"
+            println 'Testing for user ' + u
             assertThat u.canPerform(API_READ, getStudy(STUDY3)), is(true)
-            println "Passed"
+            println 'Passed'
         }
     }
 

@@ -68,7 +68,8 @@ class H2Views {
             createI2b2TrialNodes()
             createModifierDimensionView()
             createDeVariantSummaryDetailGene()
-        } finally {
+        }
+        finally {
             this.sql.close()
         }
     }
@@ -456,27 +457,27 @@ class H2Views {
     private ObjectStatus getCurrentStatus(String schema, String viewName) {
         def res
 
-        res = sql.firstRow """
+        res = sql.firstRow '''
             SELECT EXISTS(
                 SELECT TABLE_NAME
                 FROM INFORMATION_SCHEMA.VIEWS
-                WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)"""
+                WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)'''
         if (res[0]) {
-            logger.debug "Object $schema.$viewName is a already view"
+            logger.debug 'Object ' + schema + '.' + viewName + ' is a already view'
             return IS_VIEW
         }
 
-        res = sql.firstRow """
+        res = sql.firstRow '''
             SELECT EXISTS(
                 SELECT TABLE_NAME
                 FROM INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)"""
+                WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)'''
         if (res[0]) {
-            logger.debug "Object $schema.$viewName is a table"
+            logger.debug 'Object ' + schema + '.' + viewName + ' is a table'
             return IS_TABLE
         }
 
-        logger.debug "Object $schema.$viewName does not exist"
+        logger.debug 'Object ' + schema + '.' + viewName + ' does not exist'
         DOES_NOT_EXIST
     }
 
@@ -485,9 +486,9 @@ class H2Views {
             case DOES_NOT_EXIST:
                 return false
             case IS_TABLE:
-                logger.info "Dropping table $schema.$viewName because we are " +
-                        "creating a view with that name"
-                sql.execute("DROP TABLE $schema.$viewName" as String)
+                logger.info 'Dropping table ' + schema + '.' + viewName + ' because we are ' +
+                        'creating a view with that name'
+                sql.execute('DROP TABLE ' + schema + '.' + viewName as String)
                 return false
             case IS_VIEW:
                 return true

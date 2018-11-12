@@ -134,7 +134,8 @@ class ClinicalTestData {
             of.valueType = ObservationFact.TYPE_NUMBER
             of.textValue = 'E' //equal to
             of.numberValue = value as BigDecimal
-        } else if (value != null) {
+        }
+        else if (value != null) {
             of.valueType = ObservationFact.TYPE_TEXT
             of.textValue = value as String
         }
@@ -147,7 +148,7 @@ class ClinicalTestData {
         List<ObservationFact> list1 = concepts[0..1].collect { ConceptDimension concept ->
             patients.collect { PatientDimension patient ->
                 createObservationFact(concept, patient, --encounterNum,
-                        "value for $concept.conceptCode/$patient.id")
+                        'value for ' + concept.conceptCode + '/' + patient.id)
             }
         }.inject([], { accum, factList -> accum + factList })
 
