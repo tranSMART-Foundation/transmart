@@ -87,7 +87,7 @@ sudo -v
 sudo apt-get -q install -y curl
 sudo apt-get -q install -y unzip
 if ! [ -e transmart-data-release-16.4.zip ] ; then
-    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart-data-release-16.4.zip --output transmart-data-release-16.4.zip
+    curl http://library.transmartfoundation.org/release/release16_4_0_artifacts/transmart-data-release-16.4.zip --output transmart-data-release-16.4.zip
 fi
 if ! [ -e transmart-data ] ; then
 	unzip transmart-data-release-16.4.zip
