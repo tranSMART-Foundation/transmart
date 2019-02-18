@@ -353,7 +353,7 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
     }
 
     @Override
-    protected getForwardPath() {
+    protected String getForwardPath() {
         "/gwasPlink/resultOutput?jobName=${name}&analysisName=${getAnalysisName()}&previewFileName=${getPreviewFileName() ?: ''}&previewRowsCount=${getParams().previewRowsCount ?: ''}"
     }
 }
