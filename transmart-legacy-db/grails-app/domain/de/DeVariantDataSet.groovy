@@ -17,32 +17,24 @@
  *
  ******************************************************************/
 
-
 package de
 
 class DeVariantDataSet {
-    String id
     String dataSource
-    String etlId
     Date etlDate
+    String etlId
     String genomeVersion
+    String id
     String metadata
     String varientDatasetType
 
-
     static mapping = {
-        table 'DE_VARIANT_DATASET'
+	table 'DEAPP.DE_VARIANT_DATASET'
+	id generator: 'assigned', column: 'DATASET_ID'
         version false
-        id generator: 'assigned'
-        columns {
-            id column: 'DATASET_ID'
-            dataSource column: 'DATASOURCE_ID'
-            etlId column: 'ETL_ID'
-            etlDate column: 'ETL_DATE'
-            genomeVersion column: 'GENOME'
-            metadata column: 'METADATA_COMMENT'
-            varientDatasetType column: 'VARIANT_DATASET_TYPE'
-        }
-    }
 
+        dataSource column: 'DATASOURCE_ID'
+        genomeVersion column: 'GENOME'
+        metadata column: 'METADATA_COMMENT'
+    }
 }

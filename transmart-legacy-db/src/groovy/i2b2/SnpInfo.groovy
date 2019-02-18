@@ -17,13 +17,14 @@
  *
  ******************************************************************/
 
-
 package i2b2
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class SnpInfo {
-    Long id
-    String name
     String chrom
     Long chromPos
-
+    Long id
+    String name
 }

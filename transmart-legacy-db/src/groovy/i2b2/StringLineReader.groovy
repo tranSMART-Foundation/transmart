@@ -17,37 +17,38 @@
  *
  ******************************************************************/
 
-
 package i2b2
 
-
 class StringLineReader {
-    public static String LINE_BREAK = '\n'
+    public static final String LINE_BREAK = "\n"
 
     String str
 
     int pos = 0
     int len = 0
 
-    public StringLineReader() {}
+    StringLineReader() {}
 
-    public StringLineReader(String str) {
+    StringLineReader(String str) {
         this.str = str
         this.len = str.length()
     }
 
-    public String readLine() {
-        if (str == null || pos > len) return null
+    String readLine() {
+	if (str == null || pos > len) {
+	    return null
+	}
         int idx = str.indexOf(LINE_BREAK, pos)
         if (idx == 0 || idx == pos) {    // The first line is empty, or the next line is empty
             pos++
-            return ''
+	    return ""
         }
         else if (idx > 0) {
             String result = str.substring(pos, idx).trim()
             pos = idx + 1
             return result
-        } else if (idx < 0 && pos <= len) {    // Reach the end
+	}
+	else if (idx < 0 && pos <= len) {    // Reach the end
             String result = str.substring(pos)
             pos = len + 1
             return result
@@ -58,35 +59,34 @@ class StringLineReader {
         }
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         String test1 = '''1\n2\n3'''
         String test2 = '''\n\n1\n2\n3'''
         String test3 = '''\n\n1\n2\n\n3'''
         String test4 = '''\n\n1\n2\n3\n\n\n'''
 
-        print 'Start testing 1:'
+	print "Start testing 1:"
         test(test1)
-        print 'Finished testing 1:'
+	print "Finished testing 1:"
 
-        print 'Start testing 2:'
+	print "Start testing 2:"
         test(test2)
-        print 'Finished testing 2:'
+	print "Finished testing 2:"
 
-        print 'Start testing 3:'
+	print "Start testing 3:"
         test(test3)
-        print 'Finished testing 3:'
+	print "Finished testing 3:"
 
-        print 'Start testing 4:'
+	print "Start testing 4:"
         test(test4)
-        print 'Finished testing 4:'
-
+	print "Finished testing 4:"
     }
 
-    public static void test(String str) {
+    static void test(String str) {
         StringLineReader reader = new StringLineReader(str)
-        String line = null
+	String line
         while ((line = reader.readLine()) != null) {
-            print line + '\n'
+	    print line + "\n"
         }
     }
 }

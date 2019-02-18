@@ -5,43 +5,40 @@ class UserSettings {
     String name
     String value
 
-    // static belongsTo = [AuthUser]
-
     static mapping = {
-        version false
         table 'searchapp.search_user_settings'
-        id column: 'ID', generator: 'sequence', params: [sequence: 'SEARCHAPP.HIBERNATE_SEQUENCE']
-        userId column: 'USER_ID'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.HIBERNATE_SEQUENCE']
+	version false
+
         name column: 'SETTING_NAME'
         value column: 'SETTING_VALUE'
     }
 
     static boolean isConfigured() {
         try {
-            UserSettings.count()
-            return true
+	    count()
+	    true
         }
-        catch (e) {
-            return false
+	catch (ignored) {
+	    false
         }
     }
 
     static String getSetting(Long userid, String name) {
         try {
-            def res = UserSettings.findByUserIdAndName(userid, name)
-            return res?.value
+	    findByUserIdAndName(userid, name)?.value
         }
-        catch (e) {
-            return null
-        }
+	catch (ignored) {}
     }
 
-    static String setSetting(Long userid, String name, String value) {
-        def res = UserSettings.findByUserIdAndName(userid, name)
-        if (res)
+    static void setSetting(Long userid, String name, String value) {
+	UserSettings res = findByUserIdAndName(userid, name)
+	if (res) {
             res.value = value
-        else
+	}
+	else {
             res = new UserSettings(userId: userid, name: name, value: value)
+	}
 
         res.save()
     }

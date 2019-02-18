@@ -17,24 +17,18 @@
  *
  ******************************************************************/
 
-
 package i2b2
 
 class Comparison {
-    Long id
     Long queryResultId1
     Long queryResultId2
 
-
     static mapping = {
-        table 'DE_SAVED_COMPARISON'
+	table 'DEAPP.DE_SAVED_COMPARISON'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID'], column: 'COMPARISON_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            id column: 'COMPARISON_ID'
-            queryResultId1 column: 'QUERY_ID1'
-            queryResultId2 column: 'QUERY_ID2'
-        }
-    }
 
+        queryResultId1 column: 'QUERY_ID1'
+        queryResultId2 column: 'QUERY_ID2'
+    }
 }

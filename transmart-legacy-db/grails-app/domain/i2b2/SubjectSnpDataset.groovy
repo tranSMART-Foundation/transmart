@@ -17,55 +17,32 @@
  *
  ******************************************************************/
 
-/**
- * $Id
- * @author $Author
- * @version $Revision
- *
- */
-
 package i2b2
 
 class SubjectSnpDataset {
 
-    public static String SAMPLE_TYPE_NORMAL = 'NORMAL'
-    public static String SAMPLE_TYPE_DISEASE = 'DISEASE'
-
-    Long id
-    String datasetName
+    public static final String SAMPLE_TYPE_NORMAL = 'NORMAL'
+    public static final String SAMPLE_TYPE_DISEASE = 'DISEASE'
 
     String conceptCd
-
-    String platformName
-    String trialName
-    Long patientNum
+    String datasetName
+    Long pairedDatasetId
     String patientGender
-    String timePoint
+    Long patientNum
+    String platformName
     String subjectId
+    String timePoint
+    String trialName
 
     /* This is used to organized paired datasets in GenePattern sample info text file
      The value is stored in database table 'de_subject_snp_dataset', column 'sample_type' */
     String sampleType
 
-    Long pairedDatasetId
-
-
     static mapping = {
-        table 'DE_SUBJECT_SNP_DATASET'
-        version false
-        columns {
-            id column: 'SUBJECT_SNP_DATASET_ID'
-            datasetName column: 'DATASET_NAME'
-            conceptCd column: 'CONCEPT_CD'
-            platformName column: 'PLATFORM_NAME'
-            trialName column: 'TRIAL_NAME'
-            patientNum column: 'PATIENT_NUM'
-            patientGender column: 'PATIENT_GENDER'
-            timePoint column: 'TIMEPOINT'
-            subjectId column: 'SUBJECT_ID'
-            sampleType column: 'SAMPLE_TYPE'
-            pairedDatasetId column: 'PAIRED_DATASET_ID'
-        }
+	table 'DEAPP.DE_SUBJECT_SNP_DATASET'
+        id column: 'SUBJECT_SNP_DATASET_ID'
+	version false
+
+        timePoint column: 'TIMEPOINT'
     }
 }
-

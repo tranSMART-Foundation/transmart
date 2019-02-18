@@ -17,42 +17,31 @@
  *
  ******************************************************************/
 
-
 package de
 
 class DeVariantSubjectDetail {
-    Long id
-    String chromosome
-    Long position
-    String rsID
-    String ref
     String alt
-    String quality
-    String filter
-    String info
-    String format
+    String chromosome
     String dataset
+    String filter
+    String format
+    String info
+    Long position
+    String quality
+    String ref
+    String rsID
     String variant
 
-
     static mapping = {
-        table 'DE_VARIANT_SUBJECT_DETAIL'
+	table 'DEAPP.DE_VARIANT_SUBJECT_DETAIL'
+	id generator: 'sequence', params: [sequence: 'DEAPP.SEQ_BIO_DATA_ID'], column: 'VARIANT_SUBJECT_DETAIL_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'VARIANT_SUBJECT_DETAIL_ID'
-            dataset column: 'DATASET_ID'
-            chromosome column: 'CHR'
-            position column: 'POS'
-            rsID column: 'RS_ID'
-            ref column: 'REF'
-            alt column: 'ALT'
-            quality column: 'QUAL'
-            filter column: 'FILTER'
-            info column: 'INFO'
-            format column: 'FORMAT'
-            variant column: 'VARIANT_VALUE', sqlType: 'clob'
-        }
-    }
 
+        dataset column: 'DATASET_ID'
+	chromosome column: 'CHR'
+        position column: 'POS'
+        rsID column: 'RS_ID'
+	quality column: 'QUAL'
+        variant column: 'VARIANT_VALUE', sqlType: 'clob'
+    }
 }

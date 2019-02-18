@@ -17,18 +17,15 @@
  *
  ******************************************************************/
 
-
 package i2b2
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class GeneWithSnp {
     Long entrezId
     String name
     String chrom
 
-    SortedMap<Long, SnpInfo> snpMap;    // <chromPos, SnpInfo>
-    static mapWith = 'none';    // Somehow Grails automatically tries to map SortedMap varables to database
-
-    public GeneWithSnp() {
-        snpMap = new TreeMap<Long, SnpInfo>()
-    }
+    SortedMap<Long, SnpInfo> snpMap = new TreeMap<Long, SnpInfo>() // <chromPos, SnpInfo>
 }

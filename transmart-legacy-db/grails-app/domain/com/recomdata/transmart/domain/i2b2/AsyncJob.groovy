@@ -17,7 +17,6 @@
  *
  ******************************************************************/
 
-
 package com.recomdata.transmart.domain.i2b2
 
 import groovy.time.TimeCategory
@@ -25,58 +24,51 @@ import groovy.time.TimeDuration
 
 class AsyncJob {
 
-    final Set<String> TERMINATION_STATES = ['Completed', 'Cancelled', 'Error'] as Set
+    static final Set<String> TERMINATION_STATES = ['Completed', 'Cancelled', 'Error']
 
+    String altViewerURL
+    String jobInputsJson
     String jobName
     String jobStatus
-    Date lastRunOn
     Date jobStatusTime
-    String viewerURL
-    String altViewerURL
-    String results
     String jobType
-    String jobInputsJson
+    Date lastRunOn
+    String results
+    String viewerURL
 
     static mapping = {
-        id generator: 'sequence',
-                params:    [sequence: 'hibernate_sequence', schema: 'searchapp']
         table 'I2B2DEMODATA.ASYNC_JOB'
+	id generator: 'sequence', params: [sequence: 'searchapp.hibernate_sequence']
         version false
-        jobName column: 'JOB_NAME'
-        jobStatus column: 'JOB_STATUS'
-        lastRunOn column: 'LAST_RUN_ON'
-        jobStatusTime column: 'JOB_STATUS_TIME'
+
         viewerURL column: 'VIEWER_URL'
         altViewerURL column: 'ALT_VIEWER_URL'
         results column: 'JOB_RESULTS'
-        jobType column: 'JOB_TYPE'
-        jobInputsJson column: 'JOB_INPUTS_JSON'
     }
 
     static constraints = {
-        jobName(nullable: true)
-        jobStatus(nullable: true)
-        lastRunOn(nullable: true)
-        jobStatusTime(nullable: true)
-        viewerURL(nullable: true)
-        altViewerURL(nullable: true)
-        results(nullable: true)
-        jobType(nullable: true)
-        jobInputsJson(nullable: true)
+	altViewerURL nullable: true
+	jobInputsJson nullable: true
+	jobName nullable: true
+	jobStatus nullable: true
+	jobStatusTime nullable: true
+	jobType nullable: true
+	lastRunOn nullable: true
+	results nullable: true
+	viewerURL nullable: true
     }
 
     TimeDuration getRunTime() {
-        def lastTime = TERMINATION_STATES.contains(jobStatus) ?
-                jobStatusTime : new Date()
+	Date lastTime = TERMINATION_STATES.contains(jobStatus) ? jobStatusTime : new Date()
         lastRunOn && lastTime ? TimeCategory.minus(lastTime, lastRunOn) : null
     }
 
-    void setJobStatus(String jobStatus) {
-        if (this.jobStatus == jobStatus) {
+    void setJobStatus(String status) {
+	if (jobStatus == status) {
             return
         }
 
-        this.jobStatusTime = new Date()
-        this.jobStatus = jobStatus
+	jobStatus = status
+	jobStatusTime = new Date()
     }
 }

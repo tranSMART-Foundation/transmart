@@ -17,27 +17,23 @@
  *
  ******************************************************************/
 
-
 class NewsUpdate {
-
-    Integer id
+    String commentField
+    String dataSetName
+    String operation
     String ranByUser
     Integer rowsAffected
-    String operation
-    String dataSetName
     Date updateDate
-    String commentField
 
     static mapping = {
         table 'i2b2DemoData.news_updates'
-        version false
         id column: 'newsid'
+	version false
+
         ranByUser column: 'ranByUser'
         rowsAffected column: 'rowsAffected'
-        operation column: 'operation'
         dataSetName column: 'dataSetName'
         updateDate column: 'updateDate'
         commentField column: 'commentField'
     }
-
 }

@@ -20,23 +20,13 @@
 package de
 
 class DeVariantSubjectIdx {
-    Long id
     DeVariantDataSet dataset
-    String SubjectId
     Long position
-
+    String SubjectId
 
     static mapping = {
-        table 'DE_VARIANT_SUBJECT_IDX'
+	table 'DEAPP.DE_VARIANT_SUBJECT_IDX'
+	id column: 'VARIANT_SUBJECT_IDX_ID', generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID']
         version false
-        id column: 'VARIENT_SUBJECT_IDX_ID'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            dataset column: 'DATASET_ID'
-            subjectId column: 'SUBJECT_ID'
-            position column: 'POSITION'
-
-        }
     }
-
 }

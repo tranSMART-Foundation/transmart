@@ -17,26 +17,18 @@
  *
  ******************************************************************/
 
-
 package i2b2
 
 class SnpProbeSortedDef {
-    Long id
-    String platformName
-    Integer numProbe
     String chrom
+    Integer numProbe
+    String platformName
     String probeDef
     String snpIdDef
 
     static mapping = {
-        table 'DE_SNP_PROBE_SORTED_DEF'
-        version false
-        columns {
-            id column: 'SNP_PROBE_SORTED_DEF_ID'
-            platformName column: 'PLATFORM_NAME'
-            numProbe column: 'NUM_PROBE'
-            chrom column: 'CHROM'
-            probeDef column: 'PROBE_DEF'
-        }
+	table 'DEAPP.DE_SNP_PROBE_SORTED_DEF'
+        id column: 'SNP_PROBE_SORTED_DEF_ID'
+	version false
     }
 }

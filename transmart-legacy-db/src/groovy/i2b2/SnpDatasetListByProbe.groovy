@@ -17,20 +17,22 @@
  *
  ******************************************************************/
 
-
 package i2b2
 
+import groovy.transform.CompileStatic
+
 /**
- * This class contains SNP data from multiple datasets. 
+ * Contains SNP data from multiple datasets.
  */
+@CompileStatic
 class SnpDatasetListByProbe {
     String trialName
     List<Long> patientNumList_1
     List<Long> patientNumList_2
     List<SnpDataset> datasetList = []    // The list of SnpDataset in the order of final xcn file
-    List<String> datasetNameForSNPViewerList = [] // The list of SnpDataset names in the order of final xcn file, like S1_ and S2_
+    List<String> datasetNameForSNPViewerList = []
+    //	The list of SnpDataset names in the order of final xcn file, like S1_ and S2_
     Map<Long, SnpDataset[]> snpDatasetBySubjectMap = [:]    // <PatientNum, [Normal Dataset, Disease Dataset]>
-    Map<Long, Integer> datasetCompactLocationMap = [:]    // <dataset ID, order in the compacted String>
+    Map<Long, Integer> datasetCompactLocationMap = [:] // <dataset ID, order in the compacted String>
     Map<String, List<SnpDataByProbe>> snpDataByChromMap = [:] // <Chrom, List<SnpDataByProbe> in the order of chromPos>
-
 }

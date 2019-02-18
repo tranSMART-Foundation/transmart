@@ -17,16 +17,12 @@
  *
  ******************************************************************/
 
-
 package i2b2
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class SnpDatasetByPatient {
-    SnpDataset snpDataset
-
-    Map<String, SnpDataByPatient> snpDataByChromMap
-
-    public SnpDatasetByPatient() {
-        snpDataset = new SnpDataset()
-        snpDataByChromMap = new HashMap<String, SnpDataByPatient>()
-    }
+    SnpDataset snpDataset = new SnpDataset()
+    Map<String, SnpDataByPatient> snpDataByChromMap = [:]
 }

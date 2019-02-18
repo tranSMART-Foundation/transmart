@@ -17,13 +17,15 @@
  *
  ******************************************************************/
 
-
 package i2b2
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class SnpDataByPatient {
-    Long id
-    String trialName
-    Long patientNum
     String chrom
     String dataByPatient
+    Long id
+    Long patientNum
+    String trialName
 }

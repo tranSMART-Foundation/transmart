@@ -1,14 +1,22 @@
 package com.recomdata.transmart.plugin
 
+import groovy.transform.CompileStatic
+
 /**
- * Created by Florian on 05/01/14.
+ * @author Florian
  */
-public enum PluginModuleCategory {
-    DEFAULT("Default"),HEATMAP("Heatmap")
+@CompileStatic
+enum PluginModuleCategory {
+    DEFAULT('Default'),
+	HEATMAP('Heatmap')
+
     final String value
 
-    PluginModuleCategory(String value) { this.value = value }
+    private PluginModuleCategory(String value) {
+	this.value = value
+    }
 
     String toString() { value }
+
     String getKey() { name() }
 }

@@ -17,30 +17,26 @@
  *
  ******************************************************************/
 
-
 package com.recomdata.transmart.plugin
 
 class Plugin {
-
-    long id
-    String name
-    String pluginName
-    Boolean hasModules
     Boolean active
-    Boolean hasForm
     String defaultLink
     String formLink
     String formPage
+    Boolean hasForm
+    Boolean hasModules
+    String name
+    String pluginName
 
     static hasMany = [modules: PluginModule]
 
     static mapping = {
         table 'SEARCHAPP.PLUGIN'
-        cache true
+	id column: 'PLUGIN_SEQ', generator: 'sequence', params: [sequence: 'SEARCHAPP.PLUGIN_SEQ']
         version false
-        id column: 'PLUGIN_SEQ',
-                generator: 'sequence',
-                params: [sequence: 'SEARCHAPP.PLUGIN_SEQ']
+	cache true
+
         active type: 'yes_no'
         hasModules type: 'yes_no'
         hasForm type: 'yes_no'
@@ -48,12 +44,7 @@ class Plugin {
     }
 
     static constraints = {
-        name(nullable: false)
-        pluginName(nullable: false)
-        hasModules(nullable: false)
-        hasForm(nullable: false)
-        defaultLink(nullable: false)
-        formLink(nullable: true)
-        formPage(nullable: true)
+	formLink nullable: true
+	formPage nullable: true
     }
 }

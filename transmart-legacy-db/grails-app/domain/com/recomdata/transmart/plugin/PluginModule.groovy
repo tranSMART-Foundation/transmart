@@ -1,53 +1,46 @@
 package com.recomdata.transmart.plugin
+
 import grails.converters.JSON
 
 class PluginModule {
-
-    def pluginService
-
-    long id
-    String name
-    String moduleName
-    String params
-    String version
     Boolean active
-    Boolean hasForm
+    PluginModuleCategory category
     String formLink
     String formPage
-    PluginModuleCategory category
+    Boolean hasForm
+    String moduleName
+    String name
+    String params
+    String version
+
+    static transients = ['paramsStr']
 
     static belongsTo = [plugin: Plugin]
 
     static mapping = {
         table 'SEARCHAPP.PLUGIN_MODULE'
+	id column: 'MODULE_SEQ', generator: 'sequence', params: [sequence: 'SEARCHAPP.PLUGIN_MODULE_SEQ']
         version false
-        id column:'MODULE_SEQ',
-                generator: 'sequence',
-                params: [sequence:'SEARCHAPP.PLUGIN_MODULE_SEQ']
+
         active type:'yes_no'
         hasForm type:'yes_no'
         plugin column:'PLUGIN_SEQ'
         params lazy: true
-        version false
     }
 
     static constraints = {
-        name(nullable:false)
-        moduleName(nullable:false, unique:true)
-        active(nullable:false)
-        hasForm(nullable:false)
-        formLink(nullable:true)
-        formPage(nullable:true)
+	formLink nullable: true
+	formPage nullable: true
+	moduleName unique: true
     }
 
-    def private setParamsStr(moduleParams) {
+    void  setParamsStr(String moduleParams) {
         if (moduleParams?.trim()) {
-            def jsonObject = JSON.parse(moduleParams)
-            params = jsonObject?.toString()
+	    params = JSON.parse(moduleParams)?.toString()
         }
     }
 
-    def private getParamsStr() {
-        return params
+    String getParamsStr() {
+	params
     }
 }
