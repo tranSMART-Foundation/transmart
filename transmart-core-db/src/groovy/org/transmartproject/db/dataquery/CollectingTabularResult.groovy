@@ -20,10 +20,7 @@
 package org.transmartproject.db.dataquery
 
 import com.google.common.collect.AbstractIterator
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
+import groovy.util.logging.Slf4j
 import org.hibernate.ScrollableResults
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.TabularResult
@@ -81,11 +78,8 @@ import org.transmartproject.core.exceptions.UnexpectedResultException
  * @param < C > the type for the columns
  * @param < R > the type for the rows
  */
-@CompileStatic
-abstract class CollectingTabularResult<C, R extends DataRow>
-        implements TabularResult<C, R>, Iterable<R> {
-
-    static Log LOG = LogFactory.getLog(this.class)
+@Slf4j('logger')
+abstract class CollectingTabularResult<C, R extends DataRow> implements TabularResult<C, R>, Iterable<R> {
 
     String            rowsDimensionLabel
     String            columnsDimensionLabel
@@ -95,30 +89,28 @@ abstract class CollectingTabularResult<C, R extends DataRow>
     Closure<Boolean>  inSameGroup
     Closure<R>        finalizeGroup
 
-    Boolean           allowMissingColumns = false
-    Closure<Object>   columnIdFromRow
+    boolean allowMissingColumns = false
+    Closure columnIdFromRow
+    
+    boolean closeSession = true
 
-    Boolean           closeSession = true
+    private boolean getRowsCalled = false
+    private boolean closeCalled = false
 
-    private Boolean   getRowsCalled = false
-    private Boolean   closeCalled = false
+    protected abstract String getColumnEntityName()
 
-    abstract protected String getColumnEntityName()
-
-    /* exception created for printing the stack trace in case we detect the
-     * object has not been properly closed */
-    private RuntimeException initialException =
-        new RuntimeException('Instantiated at this point')
+    // exception created for printing the stack trace in case we detect the object has not been properly closed
+    private RuntimeException initialException = new RuntimeException('Instantiated at this point')
 
     // We expect results.next() to already be called before the first time this method is called.
     // Compiler crashes with the correct return type of R on groovy 2.2.0
-    def /*R*/ getNextRow() {
-        def firstEntry = results.get()
+    R getNextRow() {
+        Object[] firstEntry = results.get()
         if (firstEntry == null) {
             return null
         }
 
-        def collectedEntries = new ArrayList(indicesList.size())
+        List collectedEntries = new ArrayList(indicesList.size())
         addToCollectedEntries collectedEntries, firstEntry
 
         while (results.next() && inSameGroup(firstEntry, results.get())) {
@@ -130,29 +122,25 @@ abstract class CollectingTabularResult<C, R extends DataRow>
         finalizeGroup collectedEntries
     }
 
-    protected void finalizeCollectedEntries(ArrayList collectedEntries) {
+    protected void finalizeCollectedEntries(List collectedEntries) {
         if (collectedEntries.size() == indicesList.size()) {
             return
         }
 
         if (collectedEntries.size() > indicesList.size()) {
             throw new UnexpectedResultException(
-                    'Got more ' + columnEntityName + 's than expected in a row group. ' +
-                            'This can generally only happen if primary keys on ' +
-                            'the data table are not being enforced and the same ' +
-                            '' + columnEntityName + ' appears twice for same row ' +
-                            'entity (current label for rows is ' +
-                            "'$rowsDimensionLabel'). Collected " +
-                            '' + columnEntityName + 's for this row: ' + indicesList + '')
+		"Got more ${columnEntityName}s than expected in a row group. " +
+		    "This can generally only happen if primary keys on " +
+		    "the data table are not being enforced and the same " +
+		    "${columnEntityName} appears twice for same row " +
+		    "entity (current label for rows is " +
+                    "'$rowsDimensionLabel'). Collected " +
+		    "${columnEntityName}s for this row: $indicesList")
         }
 
         if (allowMissingColumns) {
             /* fill with nulls till we have the expected size */
-            collectedEntries.addAll(Collections.nCopies(
-                    indicesList.size() - collectedEntries.size(),
-                    null
-            ))
-
+            collectedEntries.addAll Collections.nCopies(indicesList.size() - collectedEntries.size(), null)
             return
         }
 
@@ -160,70 +148,61 @@ abstract class CollectingTabularResult<C, R extends DataRow>
         Set columnsNotFound
         if (columnIdFromRow) {
             Set expectedColumnIds = indicesList*.getAt('id') as Set
-            Set gottenColumnIds = collectedEntries.collect { row ->
-                columnIdFromRow.call(row)
-            } as Set
+	    Set gottenColumnIds = collectedEntries.collect { row -> columnIdFromRow(row) } as Set
             columnsNotFound = expectedColumnIds - gottenColumnIds
         }
 
-        String message = 'Expected row group to be of size ' + indicesList.size() + '; ' +
-                'got ' + collectedEntries.size() + ' objects'
+	String message = "Expected row group to be of size ${indicesList.size()}; got ${collectedEntries.size()} objects"
         if (columnsNotFound) {
-            message += '. ' + columnEntityName.capitalize() + ' ids not found: ' +
-                    '' + columnsNotFound + ''
+	    message += ". ${columnEntityName.capitalize()} ids not found: ${columnsNotFound}"
         }
 
         throw new UnexpectedResultException(message)
     }
 
-    protected Object getIndexObjectId(C object) {
-        object.getAt('id')
+    protected getIndexObjectId(C object) {
+	object['id']
     }
 
-    private void addToCollectedEntries(List collectedEntries, Object row) {
+    private void addToCollectedEntries(List collectedEntries, row) {
         if (allowMissingColumns) {
-            def currentColumnId = columnIdFromRow.call(row)
-            def startSize = collectedEntries.size()
-            def i
-            for (i = startSize;
-                    indicesList[i] != null &&
-                            getIndexObjectId(indicesList[i]) != currentColumnId;
-                    i++) {
-                collectedEntries.add null
+	    def currentColumnId = columnIdFromRow(row)
+            int startSize = collectedEntries.size()
+            int i
+	    for (i = startSize; indicesList[i] != null && getIndexObjectId(indicesList[i]) != currentColumnId; i++) {
+		collectedEntries << null
             }
             if (indicesList[i] == null) {
                 String rowAsString
                 try {
                     rowAsString = row.toString()
                 }
-                catch (Exception e) {
-                    rowAsString = '<Could not convert row to string, ' +
-                            'error was ' + e.message + '>'
-                }
-                throw new IllegalStateException('Starting at position ' +
-                        '' + startSize + ' in the ' + columnEntityName + ' list, could not ' +
-                        'find ' + columnEntityName + ' with id ' + currentColumnId + '. ' +
-                        'Possible causes: repeated ' + columnEntityName + ' for ' +
-                        'the same row, bad order by clause in module ' +
-                        'query or bad columnIdFromRow closure. ' +
-                        'Row was: ' + rowAsString + '. ' +
-                        '' + columnEntityName.capitalize() + ' id list was ' +
-                        indicesList.collect { getIndexObjectId it })
+		catch (e) {
+		    rowAsString = "<Could not convert row to string, error was ${e.message}>"
+		}
+		throw new IllegalStateException("Starting at position " +
+						"$startSize in the $columnEntityName list, could not " +
+						"find $columnEntityName with id $currentColumnId. " +
+						"Possible causes: repeated $columnEntityName for " +
+						"the same row, bad order by clause in module " +
+						"query or bad columnIdFromRow closure. " +
+						"Row was: $rowAsString. " +
+						"${columnEntityName.capitalize()} id list was " +
+						indicesList.collect { getIndexObjectId it })
             }
         }
 
-        collectedEntries.add row
+	collectedEntries << row
     }
 
-    @Override
     Iterator<R> getRows() {
         if (getRowsCalled) {
             throw new IllegalStateException('getRows() cannot be called more than once')
         }
+
         getRowsCalled = true
         if (allowMissingColumns && !columnIdFromRow) {
-            throw new IllegalArgumentException(
-                    'columnIdFromRow must be set when allowMissingColumns is true')
+	    throw new IllegalArgumentException('columnIdFromRow must be set when allowMissingColumns is true')
         }
 
         // Load first result
@@ -231,15 +210,12 @@ abstract class CollectingTabularResult<C, R extends DataRow>
 
         // A correctly typed AbstractIterator<R> crashes the compiler on groovy 2.2.0
         return new AbstractIterator() {
-            @Override def computeNext() {
+	    def computeNext() {
                 getNextRow() ?: endOfData()
             }
         }
     }
 
-
-    @CompileDynamic
-    @Override
     void close() throws IOException {
         closeCalled = true
         results?.close()
@@ -248,17 +224,14 @@ abstract class CollectingTabularResult<C, R extends DataRow>
         }
     }
 
-    @Override
     Iterator<R> iterator() {
         getRows()
     }
 
-    @Override
     protected void finalize() throws Throwable {
         super.finalize()
         if (!closeCalled) {
-            LOG.error('Failed to call close before the object was scheduled to ' +
-                    'be garbage collected', initialException)
+	    logger.error 'Failed to call close before the object was scheduled to be garbage collected', initialException
             close()
         }
     }

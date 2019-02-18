@@ -34,18 +34,15 @@ class AssayQuery extends AbstractEntityQuery<Assay> {
     private final DetachedCriteria<DeSubjectSampleMapping> criteria
 
     AssayQuery(List<AssayCriteriaConstraint> constraints) {
-        this.criteria =
-            DeSubjectSampleMapping.where {
-                constraints.each { AssayCriteriaConstraint assayConstraint ->
-                    assayConstraint.addToCriteria(it)
-                }
-                order 'id'
+        criteria = DeSubjectSampleMapping.where {
+            for (AssayCriteriaConstraint assayConstraint in constraints) {
+		assayConstraint.addToCriteria it
             }
+            order 'id'
+        }
     }
 
-    @Override
     DetachedCriteria<Assay> forEntities() {
-        criteria
+        criteria as DetachedCriteria
     }
-
 }

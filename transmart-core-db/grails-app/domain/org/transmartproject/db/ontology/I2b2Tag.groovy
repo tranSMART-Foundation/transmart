@@ -4,21 +4,20 @@ import org.transmartproject.core.ontology.OntologyTermTag
 
 class I2b2Tag implements OntologyTermTag {
 
-    String ontologyTermFullName
-    String name
     String description
+    String name
+    String ontologyTermFullName
     Long position
 
     static  mapping = {
-        table                   name: 'i2b2_tags', schema: 'i2b2metadata'
+        table 'i2b2metadata.i2b2_tags'
+        id                      column: 'tag_id', generator: 'sequence', params: [sequence: 'i2b2metadata.seq_i2b2_data_id']
         version                 false
 
-        id                      column: 'tag_id', generator: 'sequence', params: [sequence: 'seq_i2b2_data_id']
-        ontologyTermFullName    column: 'path'
-        name                    column: 'tag_type'
         description             column: 'tag'
+        name                    column: 'tag_type'
+        ontologyTermFullName    column: 'path'
         position                column: 'tags_idx'
         sort                    'position'
     }
-
 }

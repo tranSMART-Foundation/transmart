@@ -29,17 +29,13 @@ class DefaultPatientSetCriteriaConstraint implements AssayCriteriaConstraint {
 
     QueryResult queryResult
 
-    @Override
     void addToCriteria(Criteria criteria) {
-        criteria.in('patient.id',
-            QtPatientSetCollection.where {
-                projections {
-                    property 'patient.id'
-                }
-
-                eq 'resultInstance', this.queryResult
+        criteria.in 'patient.id', QtPatientSetCollection.where {
+            projections {
+                property 'patient.id'
             }
-        )
-    }
 
+            eq 'resultInstance', this.queryResult
+        }
+    }
 }

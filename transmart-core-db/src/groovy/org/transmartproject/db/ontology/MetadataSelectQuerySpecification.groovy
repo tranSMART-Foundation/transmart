@@ -58,8 +58,6 @@ interface MetadataSelectQuerySpecification {
 
     /**
      * The type of data returned by {@link #getDimensionCode()}}/
-     *
-     * @return
      */
     String getColumnDataType()
 

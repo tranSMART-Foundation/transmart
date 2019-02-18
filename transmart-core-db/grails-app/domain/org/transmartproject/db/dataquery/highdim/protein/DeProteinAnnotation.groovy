@@ -23,40 +23,40 @@ import org.transmartproject.db.dataquery.highdim.DeGplInfo
 
 class DeProteinAnnotation {
 
+    String   chromosome
+    Long     endBp
+    String   gplId
     String   peptide
+    Long     startBp
     String   uniprotId
     String   uniprotName
-    String   gplId
-
-    String   chromosome
-    Long     startBp
-    Long     endBp
 
     // irrelevant
     //String biomarkerId
     //String organism
 
-    static belongsTo = [ platform: DeGplInfo ]
+    static hasMany = [dataRows: DeSubjectProteinData]
 
-    static hasMany = [ dataRows: DeSubjectProteinData ]
+    static belongsTo = [platform: DeGplInfo]
 
-    static mappedBy = [ dataRows: 'annotation' ]
+    static mappedBy = [dataRows: 'annotation']
 
     static mapping = {
         table    schema:    'deapp'
         id       generator: 'assigned'
-        platform column:    'gpl_id'
-        gplId    insertable: false, updateable: false
         version  false
+
+        gplId    insertable: false, updateable: false
+        platform column:    'gpl_id'
     }
 
     static constraints = {
+        chromosome  nullable: true
+        endBp       nullable: true
         peptide     maxSize:  800
+        startBp     nullable: true
         uniprotId   nullable: true, maxSize: 200
         uniprotName nullable: true, maxSize: 200
-        chromosome  nullable: true
-        startBp     nullable: true
-        endBp       nullable: true
 
         //biomarkerId nullable: true, maxSize: 400
         //organism    nullable: true, maxSize: 800

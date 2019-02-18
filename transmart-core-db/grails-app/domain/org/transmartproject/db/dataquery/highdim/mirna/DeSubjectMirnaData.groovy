@@ -26,8 +26,8 @@ import org.transmartproject.db.i2b2data.PatientDimension
 @EqualsAndHashCode(includes = 'assay,probe')
 class DeSubjectMirnaData implements Serializable {
 
-    BigDecimal rawIntensity
     BigDecimal logIntensity
+    BigDecimal rawIntensity
     BigDecimal zscore
 
     DeQpcrMirnaAnnotation jProbe //see comment on mapping
@@ -37,20 +37,18 @@ class DeSubjectMirnaData implements Serializable {
     //String trialName
     //PatientDimension patient
 
-    static belongsTo = [
-            assay: DeSubjectSampleMapping,
-            probe: DeQpcrMirnaAnnotation,
-            patient: PatientDimension
-    ]
-
+    static belongsTo = [assay: DeSubjectSampleMapping,
+			patient: PatientDimension,
+			probe: DeQpcrMirnaAnnotation]
 
     static mapping = {
         table schema: 'deapp'
         id    composite: ['assay', 'probe']
+        version false
 
-        assay   column: 'assay_id'
+//        assay   column: 'assay_id'
+//        patient column: 'patient_id'
         probe   column: 'probeset_id'
-        patient column: 'patient_id'
 
         // irrelevant
         //patient column: 'patient_id'
@@ -58,14 +56,12 @@ class DeSubjectMirnaData implements Serializable {
         // this is needed due to a Criteria bug.
         // see https://forum.hibernate.org/viewtopic.php?f=1&t=1012372
         jProbe column: 'probeset_id', insertable: false, updateable: false
-
-        version false
     }
 
     static constraints = {
         assay        nullable: true
-        rawIntensity nullable: true, scale: 4
         logIntensity nullable: true, scale: 4
+        rawIntensity nullable: true, scale: 4
         zscore       nullable: true, scale: 4
         //trialSource  nullable: true, maxSize: 200
         //trialName    nullable: true, maxSize: 50

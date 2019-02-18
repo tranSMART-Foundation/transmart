@@ -19,38 +19,46 @@
 
 package org.transmartproject.db.dataquery.highdim
 
+import groovy.util.logging.Slf4j
+import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.i2b2data.PatientDimension
 
-import static org.transmartproject.db.dataquery.highdim.HighDimTestData.*
+import static org.transmartproject.db.dataquery.highdim.HighDimTestData.createTestAssays
+import static org.transmartproject.db.dataquery.highdim.HighDimTestData.createTestPatients
+
 /**
- * Sample, generic high dimensional test data, not bound to any specific
- * data type.
+ * Sample, generic high dimensional test data, not bound to any specific data type.
  */
-class SampleHighDimTestData {
+@Slf4j('logger')
+class SampleHighDimTestData extends AbstractTestData {
 
-    public static final String TRIAL_NAME = 'GENERIC_SAMPLE_TRIAL'
+	public static final String TRIAL_NAME = 'GENERIC_SAMPLE_TRIAL'
 
-    DeGplInfo platform = {
-        def p = new DeGplInfo(
-                title: 'Test Generic Platform',
-                organism: 'Homo Sapiens',
-                markerType: 'generic',
-                annotationDate: Date.parse('yyyy-MM-dd', '2013-05-03'),
-                genomeReleaseId: 'hg18',
-        )
-        p.id = 'test-generic-platform'
-        p
-    }()
+	DeGplInfo platform
+	List<PatientDimension> patients
+	List<DeSubjectSampleMapping> assays
 
-    List<PatientDimension> patients = createTestPatients(2, -2000, TRIAL_NAME)
+	SampleHighDimTestData() {
+		createTestData()
+	}
 
-    List<DeSubjectSampleMapping> assays = createTestAssays(
-            patients, -3000L, platform, TRIAL_NAME)
+	void saveAll() {
+		save platform, logger
+		saveAll patients, logger
+		saveAll assays, logger
+	}
 
-    void saveAll() {
-        save([ platform ])
-        save patients
-        save assays
-    }
+	private void createTestData() {
+		platform = new DeGplInfo(
+				title: 'Test Generic Platform',
+				organism: 'Homo Sapiens',
+				markerType: 'generic',
+				annotationDate: Date.parse('yyyy-MM-dd', '2013-05-03'),
+				genomeReleaseId: 'hg18')
+		platform.id = 'test-generic-platform'
 
+		patients = createTestPatients(2, -2000, TRIAL_NAME)
+
+		assays = createTestAssays(patients, -3000L, platform, TRIAL_NAME)
+	}
 }

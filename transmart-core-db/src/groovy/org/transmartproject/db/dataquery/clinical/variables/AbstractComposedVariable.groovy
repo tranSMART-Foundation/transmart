@@ -19,13 +19,15 @@
 
 package org.transmartproject.db.dataquery.clinical.variables
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.clinical.ClinicalVariable
 import org.transmartproject.core.dataquery.clinical.ClinicalVariableColumn
 import org.transmartproject.core.dataquery.clinical.ComposedVariable
 
+@CompileStatic
 abstract class AbstractComposedVariable implements ComposedVariable {
     List<ClinicalVariable> innerClinicalVariables
 
-    abstract Object getVariableValue(DataRow<ClinicalVariableColumn, Object> clinicalVariableColumn)
+    abstract getVariableValue(DataRow<ClinicalVariableColumn, Object> clinicalVariableColumn)
 }

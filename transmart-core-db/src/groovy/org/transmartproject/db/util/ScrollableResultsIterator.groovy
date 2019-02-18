@@ -12,48 +12,43 @@ class ScrollableResultsIterator<T> implements Iterator<T>, Closeable {
     private Boolean hasNext = null
     private boolean closed
 
-    ScrollableResultsIterator(ScrollableResults scrollableResults) {
-        this.scrollableResults = scrollableResults
+    ScrollableResultsIterator(ScrollableResults results) {
+        scrollableResults = results
     }
 
-    @Override
     boolean hasNext() {
         if (hasNext == null) {
             hasNext = scrollableResults.next()
-        } else {
+        }
+	else {
             hasNext
         }
     }
 
-    @Override
     T next() {
         if (hasNext()) {
             hasNext = null
             (T) scrollableResults.get(0)
-        } else {
+        }
+	else {
             throw new NoSuchElementException()
         }
     }
 
-    @Override
     void remove() {
         throw new UnsupportedOperationException()
     }
 
-    @Override
     void close() throws IOException {
-        this.scrollableResults.close()
+        scrollableResults.close()
         closed = true
     }
 
-    @Override
     protected void finalize() throws Throwable {
         super.finalize()
         if (!closed) {
-            logger.error('Failed to call close before the object was scheduled to ' +
-                    'be garbage collected')
+            logger.error 'Failed to call close before the object was scheduled to be garbage collected'
             close()
         }
     }
-
 }

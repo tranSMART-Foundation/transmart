@@ -19,8 +19,9 @@
 
 package org.transmartproject.db.dataquery.clinical
 
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.querytool.QueryResult
-import org.transmartproject.db.TestDataHelper
+import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.i2b2data.ConceptDimension
 import org.transmartproject.db.i2b2data.ObservationFact
 import org.transmartproject.db.i2b2data.PatientDimension
@@ -31,137 +32,132 @@ import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.L
 import static org.transmartproject.db.querytool.QueryResultData.createQueryResult
 import static org.transmartproject.db.querytool.QueryResultData.getQueryResultFromMaster
 
-class ClinicalTestData {
+@Slf4j('logger')
+class ClinicalTestData extends AbstractTestData {
 
-    public static final long DUMMY_ENCOUNTER_ID = -300
-    List<PatientDimension> patients
-    List<ObservationFact> facts
+	public static final long DUMMY_ENCOUNTER_ID = -300
 
-    @Lazy
-    QtQueryMaster patientsQueryMaster = createQueryResult patients
+	List<PatientDimension> patients
+	List<ObservationFact> facts
 
-    QueryResult getQueryResult() {
-        getQueryResultFromMaster patientsQueryMaster
-    }
+	@Lazy
+	QtQueryMaster patientsQueryMaster = createQueryResult(patients)
 
-    static ClinicalTestData createDefault(List<I2b2> concepts, List<PatientDimension> patients) {
-        List<ObservationFact> facts = createDiagonalFacts(2, concepts, patients)
-        new ClinicalTestData(patients: patients, facts: facts)
-    }
+	QueryResult getQueryResult() {
+		getQueryResultFromMaster patientsQueryMaster
+	}
 
-    /**
-     * Creates <code>count<code> facts from <code>count</code> leaf concepts
-     * and <code>count</code> patients. Non-leaf concepts are ignored.
-     *
-     * All <code>count</code> patients and concepts will have exactly one
-     * observation. The patients and concepts will be paired according to the
-     * order they appear in their lists. The first patient will be paired with
-     * the first concept, the second with the second, and so on.
-     *
-     * All the observations created will be numeric, with value
-     * <code>10^i+1</code>, where <code>i = 0, 1, ... count - 1</code>.
-     *
-     * @param count number of facts to be created and expected minimum amount of patients and leaf concepts
-     * @param concepts
-     * @param patients
-     * @return facts for leaf_concept[0] / patients[0], leaf_concept[1] / patients[1], etc...
-     */
-    static List<ObservationFact> createDiagonalFacts(int count, List<I2b2> concepts, List<PatientDimension> patients) {
+	static ClinicalTestData createDefault(List<I2b2> concepts, List<PatientDimension> patients) {
+		List<ObservationFact> facts = createDiagonalFacts(2, concepts, patients)
+		new ClinicalTestData(patients: patients, facts: facts)
+	}
 
-        assert patients.size() >= count
+	/**
+	 * Creates <code>count<code> facts from <code>count</code> leaf concepts
+	 * and <code>count</code> patients. Non-leaf concepts are ignored.
+	 *
+	 * All <code>count</code> patients and concepts will have exactly one
+	 * observation. The patients and concepts will be paired according to the
+	 * order they appear in their lists. The first patient will be paired with
+	 * the first concept, the second with the second, and so on.
+	 *
+	 * All the observations created will be numeric, with value
+	 * <code>10^i+1</code>, where <code>i = 0, 1, ... count - 1</code>.
+	 *
+	 * @param count number of facts to be created and expected minimum amount of patients and leaf concepts
+	 * @return facts for leaf_concept[0] / patients[0], leaf_concept[1] / patients[1], etc...
+	 */
+	static List<ObservationFact> createDiagonalFacts(int count, List<I2b2> concepts,
+	                                                 List<PatientDimension> patients) {
 
-        def leafConceptsCodes = concepts.findAll {
-            LEAF in it.visualAttributes
-        } collect { it.code }
+		assert patients.size() >= count
 
-        assert leafConceptsCodes.size() >= count
+		List<String> leafConceptsCodes = concepts.findAll { LEAF in it.visualAttributes }*.code
 
-        List<ObservationFact> facts = []
-        for (int i = 0; i < count; i++) {
-            facts << createObservationFact(leafConceptsCodes[i], patients[i],
-                    DUMMY_ENCOUNTER_ID, Math.pow(10, i + 1))
-        }
-        facts
-    }
+		assert leafConceptsCodes.size() >= count
 
-    static List<ObservationFact> createDiagonalCategoricalFacts(
-            int count, List<I2b2> concepts /* terminal */, List<PatientDimension> patients) {
+		List<ObservationFact> facts = []
+		for (int i = 0; i < count; i++) {
+			facts << createObservationFact(leafConceptsCodes[i], patients[i],
+					DUMMY_ENCOUNTER_ID, Math.pow(10, i + 1))
+		}
 
-        assert patients.size() >= count
-        assert concepts.size() > 0
+		facts
+	}
 
-       Map<PatientDimension, I2b2> map = [:]
-        for (int i = 0; i < count; i++) {
-            int j = i % concepts.size()
-            assert LEAF in concepts[j].visualAttributes //leaf
-            assert !concepts[j].metadata?.okToUseValues  //non-numeric
+	static List<ObservationFact> createDiagonalCategoricalFacts(int count, List<I2b2> concepts /* terminal */,
+	                                                            List<PatientDimension> patients) {
 
-            map[patients[i]] = concepts[j]
-        }
+		assert patients.size() >= count
+		assert concepts
 
-        createCategoricalFacts map
-    }
+		Map<PatientDimension, I2b2> map = [:]
+		for (int i = 0; i < count; i++) {
+			int j = i % concepts.size()
+			assert LEAF in concepts[j].visualAttributes //leaf
+			assert !((Map) concepts[j].metadata)?.okToUseValues  //non-numeric
 
-    static List<ObservationFact> createCategoricalFacts(Map<PatientDimension, I2b2> values) {
-        values.collect { patient, i2b2 ->
-            createObservationFact(
-                    i2b2.code, patient, DUMMY_ENCOUNTER_ID, i2b2.name)
-        }
-    }
+			map[patients[i]] = concepts[j]
+		}
 
-    static ObservationFact createObservationFact(ConceptDimension concept,
-                                                 PatientDimension patient,
-                                                 Long encounterId,
-                                                 value) {
-        createObservationFact(concept.conceptCode, patient, encounterId, value)
-    }
+		createCategoricalFacts map
+	}
 
-    static ObservationFact createObservationFact(String conceptCode,
-                                                 PatientDimension patient,
-                                                 Long encounterId,
-                                                 value) {
-        ObservationFact of = new ObservationFact(
-                encounterNum:   encounterId as BigDecimal,
-                providerId:     'fakeProviderId',
-                modifierCd:     'fakeModifierCd',
-                patient:        patient,
-                conceptCode:    conceptCode,
-                startDate:      new Date(),
-                sourcesystemCd: patient.trial,
-                instanceNum:    0)
+	static List<ObservationFact> createCategoricalFacts(Map<PatientDimension, I2b2> values) {
+		values.collect { PatientDimension patient, I2b2 i2b2 ->
+			createObservationFact i2b2.code, patient, DUMMY_ENCOUNTER_ID, i2b2.name
+		}
+	}
 
-        if (value instanceof Number) {
-            of.valueType = ObservationFact.TYPE_NUMBER
-            of.textValue = 'E' //equal to
-            of.numberValue = value as BigDecimal
-        }
-        else if (value != null) {
-            of.valueType = ObservationFact.TYPE_TEXT
-            of.textValue = value as String
-        }
+	static ObservationFact createObservationFact(ConceptDimension concept, PatientDimension patient,
+	                                             Long encounterId, value) {
+		createObservationFact concept.conceptCode, patient, encounterId, value
+	}
 
-        of
-    }
+	static ObservationFact createObservationFact(String conceptCode, PatientDimension patient,
+	                                             Long encounterId, value) {
+		ObservationFact of = new ObservationFact(
+				encounterNum: encounterId as BigDecimal,
+				providerId: 'fakeProviderId',
+				modifierCd: 'fakeModifierCd',
+				patient: patient,
+				conceptCode: conceptCode,
+				startDate: new Date(),
+				sourcesystemCd: patient.trial,
+				instanceNum: 0)
 
-    static List<ObservationFact> createFacts(List<ConceptDimension> concepts, List<PatientDimension> patients)  {
-        long encounterNum = -200
-        List<ObservationFact> list1 = concepts[0..1].collect { ConceptDimension concept ->
-            patients.collect { PatientDimension patient ->
-                createObservationFact(concept, patient, --encounterNum,
-                        'value for ' + concept.conceptCode + '/' + patient.id)
-            }
-        }.inject([], { accum, factList -> accum + factList })
+		if (value instanceof Number) {
+			of.valueType = ObservationFact.TYPE_NUMBER
+			of.textValue = 'E' //equal to
+			of.numberValue = value as BigDecimal
+		}
+		else if (value != null) {
+			of.valueType = ObservationFact.TYPE_TEXT
+			of.textValue = value as String
+		}
 
-        list1 + [
-                // missing fact for patients[0]
-                createObservationFact(concepts[2], patients[1], --encounterNum, ''), //empty value
-                createObservationFact(concepts[2], patients[2], --encounterNum, -45.42) //numeric value
-        ]
-    }
+		of
+	}
 
-    void saveAll() {
-        TestDataHelper.save([patientsQueryMaster])
-        TestDataHelper.save facts
-    }
+	static List<ObservationFact> createFacts(List<ConceptDimension> concepts, List<PatientDimension> patients) {
+		long encounterNum = -200
+		List<ObservationFact> facts = []
+		for (ConceptDimension concept in concepts[0..1]) {
+			for (PatientDimension patient in patients) {
+				facts << createObservationFact(concept, patient, --encounterNum,
+						'value for ' + concept.conceptCode + '/' + patient.id)
+			}
+		}
 
+		// missing fact for patients[0]
+		facts << createObservationFact(concepts[2], patients[1], --encounterNum, '') //empty value
+		facts << createObservationFact(concepts[2], patients[2], --encounterNum, -45.42) //numeric value
+
+		facts
+	}
+
+	void saveAll() {
+		save patientsQueryMaster, logger
+		saveAll facts, logger
+	}
 }

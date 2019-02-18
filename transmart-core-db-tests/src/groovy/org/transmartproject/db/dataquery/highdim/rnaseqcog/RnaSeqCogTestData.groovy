@@ -19,6 +19,8 @@
 
 package org.transmartproject.db.dataquery.highdim.rnaseqcog
 
+import groovy.util.logging.Slf4j
+import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.biomarker.BioMarkerCoreDb
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
@@ -27,86 +29,88 @@ import org.transmartproject.db.dataquery.highdim.SampleBioMarkerTestData
 import org.transmartproject.db.i2b2data.PatientDimension
 import org.transmartproject.db.ontology.ConceptTestData
 
-import static org.transmartproject.db.dataquery.highdim.HighDimTestData.save
+@Slf4j('logger')
+class RnaSeqCogTestData extends AbstractTestData {
 
-class RnaSeqCogTestData {
+	public static final String TRIAL_NAME = 'RNASEQ_COG_SAMP_TRIAL'
 
-    public static final String TRIAL_NAME = 'RNASEQ_COG_SAMP_TRIAL'
+	SampleBioMarkerTestData biomarkerTestData = new SampleBioMarkerTestData()
+	ConceptTestData concept
+	DeGplInfo platform
+	List<PatientDimension> patients
+	List<DeSubjectSampleMapping> assays
+	List<DeRnaseqAnnotation> annotations
+	List<DeSubjectRnaData> data
 
-    SampleBioMarkerTestData biomarkerTestData = new SampleBioMarkerTestData()
+	RnaSeqCogTestData() {
+		createTestData()
+	}
 
-    ConceptTestData concept = HighDimTestData.createConcept('RNASEQCOGPUBLIC', 'concept code #1', TRIAL_NAME, 'PROTEIN_CONCEPT')
+	List<BioMarkerCoreDb> getGenes() {
+		biomarkerTestData.geneBioMarkers
+	}
 
-    DeGplInfo platform = {
-        def res = new DeGplInfo(
-                title: 'Bogus RNA-Seq platform',
-                organism: 'Homo Sapiens',
-                markerType: 'RNASEQ')
-        res.id = 'BOGUS_RNA-SEQ_PLATFORM'                  // ?? what should be here
-        res
-    }()
+	void saveAll() {
+		biomarkerTestData.saveGeneData()
 
-    List<PatientDimension> patients =
-        HighDimTestData.createTestPatients(2, -300, TRIAL_NAME)
+		save platform, logger
+		saveAll patients, logger
+		saveAll assays, logger
+		saveAll annotations, logger
+		saveAll data, logger
 
-    List<DeSubjectSampleMapping> assays =
-        HighDimTestData.createTestAssays(patients, -400, platform, TRIAL_NAME)
+		concept.saveAll()
+	}
 
-    List<DeRnaseqAnnotation> annotations = {
-        def createAnnotation = { id, BioMarkerCoreDb gene ->
-            def res = new DeRnaseqAnnotation(
-                    geneSymbol:   gene.name,
-                    geneId:       gene.externalId,
-                    platform:     platform
-            )
-            res.id = id
-            res
-        }
+	private void createTestData() {
+		concept = HighDimTestData.createConcept('RNASEQCOGPUBLIC', 'concept code #1',
+				TRIAL_NAME, 'PROTEIN_CONCEPT')
 
-        long id = -500L
+		platform = new DeGplInfo(
+				title: 'Bogus RNA-Seq platform',
+				organism: 'Homo Sapiens',
+				markerType: 'RNASEQ')
+		platform.id = 'BOGUS_RNA-SEQ_PLATFORM' // ?? what should be here
 
-        biomarkerTestData.geneBioMarkers[0..2].collect {
-            createAnnotation(--id as String, it)
-        }
-    }()
 
-    List<DeSubjectRnaData> data = {
-        def createDataEntry = { assay, annotation, intensity ->
-            new DeSubjectRnaData(
-                    assay: assay,
-                    patient: assay.patient,
-                    annotation:   annotation,
-                    jAnnotation:   annotation,
-                    rawIntensity: intensity,
-                    logIntensity: Math.log(intensity),
-                    zscore:       (intensity - 0.35) / 0.1871
-            )
-        }
+		patients = HighDimTestData.createTestPatients(2, -300, TRIAL_NAME)
 
-        def res = []
-        Double intensity = 0
-        annotations.each { annotation ->
-            assays.each { assay ->
-                res += createDataEntry assay, annotation, (intensity += 0.1)
-            }
-        }
+		assays = HighDimTestData.createTestAssays(patients, -400, platform, TRIAL_NAME)
 
-        res
-    }()
+		long id = -500
+		annotations = biomarkerTestData.geneBioMarkers[0..2].collect {
+			createAnnotation(--id as String, it)
+		}
 
-    List<BioMarkerCoreDb> getGenes() {
-        biomarkerTestData.geneBioMarkers
-    }
+		double intensity = 0
+		data = []
+		annotations.each { annotation ->
+			for (DeSubjectSampleMapping assay in assays) {
+				data << createDataEntry(assay, annotation, intensity += 0.1)
+			}
+		}
+	}
 
-    void saveAll() {
-        biomarkerTestData.saveGeneData()
+	private DeRnaseqAnnotation createAnnotation(id, BioMarkerCoreDb gene) {
+		DeRnaseqAnnotation res = new DeRnaseqAnnotation(
+				geneSymbol: gene.name,
+				geneId: gene.externalId,
+				platform: platform)
+		res.id = id
+		res
+	}
 
-        save([platform])
-        save patients
-        save assays
-        save annotations
-        save data
-
-        concept.saveAll()
-    }
+	private DeSubjectRnaData createDataEntry(DeSubjectSampleMapping assay,
+	                                         DeRnaseqAnnotation annotation,
+	                                         double intensity) {
+		new DeSubjectRnaData(
+				assay: assay,
+				patient: assay.patient,
+				annotation: annotation,
+				jAnnotation: annotation,
+				rawIntensity: intensity,
+				logIntensity: Math.log(intensity),
+				zscore: (intensity - 0.35) / 0.1871
+		)
+	}
 }

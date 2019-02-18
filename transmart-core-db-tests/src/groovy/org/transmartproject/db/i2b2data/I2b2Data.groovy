@@ -19,38 +19,38 @@
 
 package org.transmartproject.db.i2b2data
 
-import static org.transmartproject.db.TestDataHelper.save
+import groovy.util.logging.Slf4j
+import org.transmartproject.db.AbstractTestData
 
-class I2b2Data {
+@Slf4j('logger')
+class I2b2Data extends AbstractTestData {
 
-    final static String DEFAULT_TRIAL_NAME = 'STUDY_ID_1'
-    String trialName
-    List<PatientDimension> patients
-    List<PatientTrialCoreDb> patientTrials
+	static final String DEFAULT_TRIAL_NAME = 'STUDY_ID_1'
 
-    static I2b2Data createDefault() {
-        List<PatientDimension> patients = createTestPatients(3, -100, DEFAULT_TRIAL_NAME)
-        List<PatientTrialCoreDb> patientTrials = createPatientTrialLinks(patients, DEFAULT_TRIAL_NAME)
-        new I2b2Data(trialName: DEFAULT_TRIAL_NAME, patients: patients, patientTrials: patientTrials)
-    }
+	String trialName
+	List<PatientDimension> patients
+	List<PatientTrialCoreDb> patientTrials
 
-    static List<PatientDimension> createTestPatients(int n, long baseId, String trialName = 'SAMP_TRIAL') {
-        (1..n).collect { int i ->
-            def p = new PatientDimension(sourcesystemCd: '' + trialName + ':SUBJ_ID_' + i)
-            p.id = baseId - i
-            p
-        }
-    }
+	static I2b2Data createDefault() {
+		List<PatientDimension> patients = createTestPatients(3, -100, DEFAULT_TRIAL_NAME)
+		List<PatientTrialCoreDb> patientTrials = createPatientTrialLinks(patients, DEFAULT_TRIAL_NAME)
+		new I2b2Data(trialName: DEFAULT_TRIAL_NAME, patients: patients, patientTrials: patientTrials)
+	}
 
-    static List<PatientTrialCoreDb> createPatientTrialLinks(Collection<PatientDimension> patients, String trialName) {
-        patients.collect {
-            new PatientTrialCoreDb(patient: it, study: trialName)
-        }
-    }
+	static List<PatientDimension> createTestPatients(int n, long baseId, String trialName = 'SAMP_TRIAL') {
+		(1..n).collect { int i ->
+			PatientDimension p = new PatientDimension(sourcesystemCd: trialName + ':SUBJ_ID_' + i)
+			p.id = baseId - i
+			p
+		}
+	}
 
-    void saveAll() {
-        save patients
-        save patientTrials
-    }
+	static List<PatientTrialCoreDb> createPatientTrialLinks(Collection<PatientDimension> patients, String trialName) {
+		patients.collect { new PatientTrialCoreDb(patient: it, study: trialName) }
+	}
 
+	void saveAll() {
+		saveAll patients, logger
+		saveAll patientTrials, logger
+	}
 }

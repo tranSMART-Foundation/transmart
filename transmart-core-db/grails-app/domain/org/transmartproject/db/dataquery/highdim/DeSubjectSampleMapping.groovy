@@ -27,38 +27,30 @@ import org.transmartproject.db.i2b2data.PatientDimension
 
 class DeSubjectSampleMapping implements Assay {
 
+    String assayUid
+    String categoryCd
+    String conceptCode
+    String dataUid
+    Long omicPatientId
+    String omicSourceStudy
+    String patientInTrialId
+    String patientUid
     DeGplInfo platform
-
-    String   siteId
-    String   patientInTrialId
-    String   subjectType
-    String   conceptCode
-
-    String   trialName
-
-    String   timepointName
-    String   timepointCd
-
-    String   sampleCode
-    String   sampleTypeName
-    String   sampleTypeCd
-
-    String   tissueTypeName
-    String   tissueTypeCd
-
-    /* unused */
-    String   patientUid
-    String   assayUid
-    String   platformType
-    String   platformTypeCd
-    String   dataUid
-    String   rbmPanel
-    Long     sampleId
-    String   categoryCd
-    String   sourceCd
-    String   omicSourceStudy
-    Long     omicPatientId
-
+    String platformType
+    String platformTypeCd
+    String rbmPanel
+    String sampleCode
+    Long sampleId
+    String sampleTypeCd
+    String sampleTypeName
+    String siteId
+    String sourceCd
+    String subjectType
+    String timepointCd
+    String timepointName
+    String tissueTypeCd
+    String tissueTypeName
+    String trialName
 
     static transients = ['timepoint', 'sampleType', 'tissueType']
 
@@ -66,25 +58,23 @@ class DeSubjectSampleMapping implements Assay {
 
     static mapping = {
         table            schema: 'deapp'
-
         id               column: 'assay_id',    generator: 'assigned'
+	version false
 
-        patient          column: 'patient_id', cascade: 'save-update'
+        patient                                cascade: 'save-update'
         patientInTrialId column: 'subject_id'
         platform         column: 'gpl_id',     cascade: 'save-update'
         platformType     column: 'platform'
         platformTypeCd   column: 'platform_cd'
-        timepointName    column: 'timepoint'
         sampleCode       column: 'sample_cd'
         sampleTypeName   column: 'sample_type'
+        timepointName    column: 'timepoint'
         tissueTypeName   column: 'tissue_type'
 
         sort           id:     'asc'
+    }
 
-		version false
-	}
-
-	static constraints = {
+    static constraints = {
         assayUid         nullable: true, maxSize: 100
         categoryCd       nullable: true, maxSize: 1000
         conceptCode      nullable: true, maxSize: 1000
@@ -92,6 +82,7 @@ class DeSubjectSampleMapping implements Assay {
         omicPatientId    nullable: true
         omicSourceStudy  nullable: true, maxSize: 200
         patient          nullable: true
+        patientInTrialId nullable: true, maxSize: 100
         patientUid       nullable: true, maxSize: 50
         platform         nullable: true
         platformType     nullable: true, maxSize: 50
@@ -103,7 +94,6 @@ class DeSubjectSampleMapping implements Assay {
         sampleTypeName   nullable: true, maxSize: 100
         siteId           nullable: true, maxSize: 100
         sourceCd         nullable: true, maxSize: 50
-        patientInTrialId nullable: true, maxSize: 100
         subjectType      nullable: true, maxSize: 100
         timepointCd      nullable: true, maxSize: 50
         timepointName    nullable: true, maxSize: 100
@@ -113,17 +103,14 @@ class DeSubjectSampleMapping implements Assay {
 	}
 
     //  region Properties with values generated on demand
-    @Override
     Timepoint getTimepoint() {
         new Timepoint(code: timepointCd, label: timepointName)
     }
 
-    @Override
     SampleType getSampleType() {
         new SampleType(code: sampleTypeCd, label: sampleTypeName)
     }
 
-    @Override
     TissueType getTissueType() {
         new TissueType(code: tissueTypeCd, label: tissueTypeName)
     }

@@ -5,21 +5,21 @@ import org.transmartproject.core.dataquery.highdim.tworegion.Junction
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 
 /**
- * Created by j.hudecek on 4-12-2014.
+ * @author j.hudecek
  */
 @EqualsAndHashCode()
 class DeTwoRegionJunction implements Serializable, Junction {
 
-    Long upEnd
-    String upChromosome
-    Long upPos
-    Character upStrand
-    Long downEnd
+    DeSubjectSampleMapping assay
     String downChromosome
+    Long downEnd
     Long downPos
     Character downStrand
     Boolean isInFrame
-    DeSubjectSampleMapping assay
+    String upChromosome
+    Long upEnd
+    Long upPos
+    Character upStrand
 
     Boolean isInFrame() {
         isInFrame
@@ -28,31 +28,29 @@ class DeTwoRegionJunction implements Serializable, Junction {
     static hasMany = [junctionEvents: DeTwoRegionJunctionEvent]
 
     static constraints = {
-        upChromosome(maxSize: 50)
-        downChromosome(maxSize: 50)
-        upStrand(nullable: true)
-        downStrand(nullable: true)
-        isInFrame(nullable: true)
+        downChromosome maxSize: 50
+        downStrand nullable: true
+        isInFrame nullable: true
+        upChromosome maxSize: 50
+        upStrand nullable: true
     }
 
     static mapping = {
-        table schema: 'deapp', name: 'de_two_region_junction'
-        version false
+        table 'deapp.de_two_region_junction'
         id column: 'two_region_junction_id'
+        version false
 
-        upEnd column: 'up_end'
-        upPos column: 'up_pos'
-        upChromosome column: 'up_chr'
-        upStrand column: 'up_strand', sqlType: "char", length: 1
-        downEnd column: 'down_end'
-        downPos column: 'down_pos'
         downChromosome column: 'down_chr'
-        downStrand column: 'down_strand', sqlType: "char", length: 1
+//        downEnd column: 'down_end'
+//        downPos column: 'down_pos'
+        downStrand column: 'down_strand', sqlType: 'char', length: 1
         isInFrame column: 'is_in_frame'
+        upChromosome column: 'up_chr'
+//        upEnd column: 'up_end'
+//        upPos column: 'up_pos'
+        upStrand column: 'up_strand', sqlType: 'char', length: 1
 
         /* references */
-        assay column: 'assay_id'
-
-        version false
+//        assay column: 'assay_id'
     }
 }

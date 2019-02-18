@@ -44,86 +44,79 @@ import static org.hamcrest.Matchers.is
 class FastMatchers {
 
     /**
-     * @param map
      * @return allOf(hasEntry()) Matcher for the given map
      */
     static Matcher mapWith(Map map) {
-        allOf(map.collect { entryOf(it.key, it.value) })
+	allOf(map.collect { entryOf(it.key, it.value) })
     }
 
     /**
      * Creates an entryOf matcher, recursing and promoting the value (and key) when needed
-     * @param key
-     * @param value
-     * @return
      */
     private static Matcher entryOf(Object key, Object value) {
-        if (value instanceof Matcher) {
-            return hasEntry(matcherOf(key), value)
-        } else if (value instanceof Map) {
-            return hasEntry(matcherOf(key), mapWith(value))
-        } else if (value instanceof List) {
-            return hasEntry(matcherOf(key), listOf(value))
-        } else {
-            //if both key and value are 'regular' objects, then will match them directly (not wrapping with is())
-            return hasEntry(fix(key), fix(value))
-        }
+	if (value instanceof Matcher) {
+	    hasEntry matcherOf(key), value
+	}
+	else if (value instanceof Map) {
+	    hasEntry matcherOf(key), mapWith(value)
+	}
+	else if (value instanceof List) {
+	    hasEntry matcherOf(key), listOf(value)
+	}
+	else {
+	    //if both key and value are 'regular' objects, then will match them directly (not wrapping with is())
+	    hasEntry fix(key), fix(value)
+	}
     }
 
     /**
-     * @param map
-     * @return allOd(hasProperty()) for the given map
+     * @return allOf(hasProperty()) for the given map
      */
     static Matcher propsWith(Map map) {
-        allOf(map.collect { hasProperty(it.key, matcherOf(it.value)) })
+	allOf(map.collect { hasProperty((String) it.key, matcherOf(it.value)) })
     }
 
     /**
-     * @param list
      * @return containsInAnyOrder() for the given list
      */
     static Matcher listOf(List list) {
-        if (list.isEmpty()) {
-            throw new IllegalArgumentException('List cannot be empty')
-        }
-        return containsInAnyOrder(list.collect { matcherOf(it) })
+	Assert.notEmpty list, 'List cannot be empty'
+
+	containsInAnyOrder list.collect { matcherOf(it) }
     }
 
     /**
-     * @param list
      * @return contains() for the given list
      */
     static Matcher listOfWithOrder(List list) {
-        if (list.isEmpty()) {
-            throw new IllegalArgumentException('List cannot be empty')
-        }
-        contains(list.collect { matcherOf(it) })
+	Assert.notEmpty list, 'List cannot be empty'
+
+	contains list.collect { matcherOf(it) }
     }
 
     /**
      * Generic entry point to promote an object to a Matcher
-     * @param obj
      * @return Matcher for the given object, or itself (if is already a Matcher)
      */
-    private static Matcher matcherOf(Object obj) {
-        if (obj instanceof Matcher) {
-            return obj //already a matcher
-        } else if (obj instanceof Map) {
-            mapWith(obj) //promoted to a mapWith
-        } else if (obj instanceof List) {
-            listOf(obj) //promoted to a listOf
-        } else {
-            is(fix(obj)) //promoted to a is, with some check
-        }
+    private static Matcher matcherOf(obj) {
+	if (obj instanceof Matcher) {
+	    (Matcher) obj //already a matcher
+	}
+	else if (obj instanceof Map) {
+	    mapWith obj //promoted to a mapWith
+	}
+	else if (obj instanceof List) {
+	    listOf obj //promoted to a listOf
+	}
+	else {
+	    is fix(obj) //promoted to a is, with some check
+	}
     }
 
     /**
      * Fixes (if necessary) the value to avoid some groovy/java interoperability pitfalls
-     * @param obj
-     * @return
      */
-    private static Object fix(Object obj) {
-        obj instanceof GString ? obj.toString() : obj
+    private static fix(obj) {
+	obj instanceof GString ? obj.toString() : obj
     }
-
 }

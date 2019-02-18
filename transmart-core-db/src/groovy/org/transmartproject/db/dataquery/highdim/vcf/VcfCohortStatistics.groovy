@@ -39,21 +39,17 @@ class VcfCohortStatistics implements VcfCohortInfo {
     
     VcfCohortStatistics( VcfDataRow dataRow ) {
         this.dataRow = dataRow
-        
         computeCohortStatistics()
     }
     
-    @Override
     List<Double> getAlleleFrequency() {
         alleleCount.collect {  it / totalAlleleCount }
     }
 
-    @Override
     String getReferenceAllele() {
         dataRow.referenceAllele
     }
 
-    @Override
     List<String> getAlternativeAlleles() {
         alleles - referenceAllele
     }
@@ -61,23 +57,24 @@ class VcfCohortStatistics implements VcfCohortInfo {
     /**
      * Computes cohort level statistics
      */
-    protected computeCohortStatistics() {
+    protected void computeCohortStatistics() {
         Map<String,Integer> numAlleles = countAlleles()
-
-        if( !numAlleles )
+	if (!numAlleles) {
             return
+	}
 
         // Store generic allele distribution
         //TODO the order of keys and values is predictable and corresponds implicitly in this case (LinkedHashMap).
-        alleles = new ArrayList<String>(numAlleles.keySet())
-        alleleCount = new ArrayList<Integer>(numAlleles.values())
+	alleles = numAlleles.keySet() as List
+	alleleCount = numAlleles.values() as List
         totalAlleleCount = alleleCount.sum()
 
         // Find the most frequent and second most frequent alleles
         majorAllele = numAlleles.max { it.value }?.key
         minorAllele = numAlleles.findAll { it.key != majorAllele }.max { it.value }?.key ?: '.'
-        if( minorAllele != '.' )
+	if (minorAllele != '.') {
             minorAlleleFrequency = numAlleles.getAt( minorAllele ) / totalAlleleCount
+	}
             
         // Determine genomic variant types, with the major allele as a reference
         genomicVariantTypes = getGenomicVariantTypes( majorAllele, alleles)
@@ -86,33 +83,34 @@ class VcfCohortStatistics implements VcfCohortInfo {
     // Allele distribution for the current cohort
     Map<String,Integer> countAlleles( ) {
         List alleleNames = [] + dataRow.referenceAllele + dataRow.alternativeAlleles
-        def alleleDistribution = [:].withDefault { 0 }
-        
+	Map alleleDistribution = [:].withDefault { 0 }
+
         numberOfSamplesWithData = 0
         for (sampleData in dataRow.data) {
-            if ( !sampleData )
+	    if (!sampleData) {
                 continue
-            
+	    };
+
             boolean sampleHasData = false
             if (sampleData.allele1 != null && sampleData.allele1 != '.') {
                 def allele1 = alleleNames[sampleData.allele1]
                 alleleDistribution[allele1]++
                 sampleHasData = true
             }
-            
+
             if (sampleData.allele2 != null && sampleData.allele2 != '.') {
                 def allele2 = alleleNames[sampleData.allele2]
                 alleleDistribution[allele2]++
                 sampleHasData = true
             }
-            
+
             if (sampleHasData) {
                 numberOfSamplesWithData++
             }
         }
         alleleDistribution
     }
-    
+
     List<GenomicVariantType> getGenomicVariantTypes(Collection<String> alleleCollection) {
         getGenomicVariantTypes(majorAllele, altCollection)
     }
@@ -120,22 +118,6 @@ class VcfCohortStatistics implements VcfCohortInfo {
     List<GenomicVariantType> getGenomicVariantTypes(String ref, Collection<String> alleleCollection) {
         alleleCollection.collect{
             ref == it ? null : GenomicVariantType.getGenomicVariantType(ref, it) 
-        }
-    }
-
-    private List<Double> parseNumbersList(String numbersString) {
-        parseCsvString(numbersString) {
-            it.isNumber() ? Double.valueOf(it) : null
-        }
-    }
-
-    private List parseCsvString(String string, Closure typeConverterClosure = { it }) {
-        if (!string) {
-            return []
-        }
-
-        string.split(/\s*,\s*/).collect {
-            typeConverterClosure(it)
         }
     }
 }

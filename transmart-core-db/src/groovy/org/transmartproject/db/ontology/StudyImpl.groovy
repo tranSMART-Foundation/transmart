@@ -30,15 +30,12 @@ class StudyImpl implements Study {
     String id
     OntologyTerm ontologyTerm
 
-    @Override
     Set<Patient> getPatients() {
-        new PatientQuery([
-                new StudyPatientsConstraint(this)
-        ]).list() as Set
+        new PatientQuery([new StudyPatientsConstraint(this)]).list() as Set
     }
 
     boolean equals(o) {
-        if (this.is(o)) {
+        if (is(o)) {
             return true
         }
         if (getClass() != o.class) {

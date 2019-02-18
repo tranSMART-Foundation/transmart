@@ -26,28 +26,26 @@ import org.transmartproject.db.i2b2data.PatientDimension
 @EqualsAndHashCode(includes = 'assay,annotation')
 class DeSubjectMetabolomicsData implements Serializable {
 
-    double zscore
-    double rawIntensity
-    double logIntensity
     DeMetaboliteAnnotation jAnnotation
+    double logIntensity
+    double rawIntensity
+    double zscore
 
-    static belongsTo = [
-            assay:      DeSubjectSampleMapping,
-            annotation: DeMetaboliteAnnotation,
-            patient:    PatientDimension
-    ]
+    static belongsTo = [annotation: DeMetaboliteAnnotation,
+			assay:      DeSubjectSampleMapping,
+			patient:    PatientDimension]
 
     static mapping = {
         table      schema:    'deapp'
         id         composite: ['assay', 'annotation']
+        version false
 
-        assay      column:    'assay_id'
+//        assay      column:    'assay_id'
         annotation column:    'metabolite_annotation_id'
-        patient    column:    'patient_id'
+//        patient    column:    'patient_id'
 
         // this is needed due to a Criteria bug.
         // see https://forum.hibernate.org/viewtopic.php?f=1&t=1012372
         jAnnotation column: 'metabolite_annotation_id', updateable: false, insertable: false
-        version false
     }
 }

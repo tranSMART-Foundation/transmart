@@ -1,7 +1,7 @@
 /*
  * Copyright © 2013-2014 The Hyve B.V.
  *
- * This file is part of transmart-core-db
+ * This file is part of transmart-core-db.
  *
  * Transmart-core-db is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -39,47 +39,47 @@ import static org.transmartproject.db.test.H2Views.ObjectStatus.IS_VIEW
 @Slf4j('logger')
 class H2Views {
 
-    private static enum ObjectStatus {
-    	    IS_VIEW,
-	    IS_TABLE,
-	    DOES_NOT_EXIST
-    }
+	private static enum ObjectStatus {
+		IS_VIEW,
+		IS_TABLE,
+		DOES_NOT_EXIST
+	}
 
-    @Autowired DataSource dataSource
+	@Autowired DataSource dataSource
 
-    private Sql sql
+	private Sql sql
 
-    @PostConstruct
-    void init() {
-        this.sql = new Sql(dataSource.connection)
+	@PostConstruct
+	void init() {
+		sql = new Sql(dataSource.connection)
 
-        try {
-            if (!isH2()) {
-                return
-            }
+		try {
+			if (!isH2()) {
+				return
+			}
 
-            logger.info 'Executing H2Views init actions'
+			logger.info 'Executing H2Views init actions'
 
-            createSearchBioMkrCorrelView()
-            createSearchAuthUserSecAccessV()
-            createBioMarkerCorrelMv()
-            createSubPathwayCorrelView()
-            createSuperPathwayCorrelView()
-            createI2b2TrialNodes()
-            createModifierDimensionView()
-            createDeVariantSummaryDetailGene()
-        }
-        finally {
-            this.sql.close()
-        }
-    }
+			createSearchBioMkrCorrelView()
+			createSearchAuthUserSecAccessV()
+			createBioMarkerCorrelMv()
+			createSubPathwayCorrelView()
+			createSuperPathwayCorrelView()
+			createI2b2TrialNodes()
+			createModifierDimensionView()
+			createDeVariantSummaryDetailGene()
+		}
+		finally {
+			sql.close()
+		}
+	}
 
-    void createBioMarkerCorrelMv() {
-        if (handleCurrentState('BIOMART', 'BIO_MARKER_CORREL_MV')) {
-            return
-        }
+	void createBioMarkerCorrelMv() {
+		if (handleCurrentState('BIOMART', 'BIO_MARKER_CORREL_MV')) {
+			return
+		}
 
-        sql.execute '''
+		sql.execute '''
             CREATE VIEW BIOMART.BIO_MARKER_CORREL_MV (
                 BIO_MARKER_ID,
                 ASSO_BIO_MARKER_ID,
@@ -90,30 +90,24 @@ class H2Views {
                 b.bio_marker_id AS asso_bio_marker_id,
                 'GENE' AS correl_type,
                 1 AS mv_id
-            FROM
-                    biomart.bio_marker b
-            WHERE
-                    b.bio_marker_type = 'GENE'
+            FROM biomart.bio_marker b
+            WHERE b.bio_marker_type = 'GENE'
             UNION
             SELECT DISTINCT
                 b.bio_marker_id,
                 b.bio_marker_id AS asso_bio_marker_id,
                 'PROTEIN' AS correl_type,
                 4 AS mv_id
-            FROM
-                biomart.bio_marker b
-            WHERE
-               b.bio_marker_type = 'PROTEIN'
+            FROM biomart.bio_marker b
+            WHERE b.bio_marker_type = 'PROTEIN'
             UNION
             SELECT DISTINCT
                 b.bio_marker_id,
                 b.bio_marker_id AS asso_bio_marker_id,
                 'MIRNA' AS correl_type,
                 7 AS mv_id
-            FROM
-                biomart.bio_marker b
-            WHERE
-               b.bio_marker_type = 'MIRNA'
+            FROM biomart.bio_marker b
+            WHERE b.bio_marker_type = 'MIRNA'
             UNION
             SELECT DISTINCT
                 c.bio_data_id AS bio_marker_id,
@@ -194,16 +188,16 @@ class H2Views {
                 biomart.bio_marker b
             WHERE
                b.bio_marker_type = 'METABOLITE';'''
-    }
+	}
 
-    void createSearchAuthUserSecAccessV() {
-        if (handleCurrentState('SEARCHAPP', 'SEARCH_AUTH_USER_SEC_ACCESS_V')) {
-            return
-        }
+	void createSearchAuthUserSecAccessV() {
+		if (handleCurrentState('SEARCHAPP', 'SEARCH_AUTH_USER_SEC_ACCESS_V')) {
+			return
+		}
 
-        logger.info 'Creating SEARCHAPP.SEARCH_AUTH_USER_SEC_ACCESS_V'
+		logger.info 'Creating SEARCHAPP.SEARCH_AUTH_USER_SEC_ACCESS_V'
 
-        sql.execute '''
+		sql.execute '''
             CREATE VIEW SEARCHAPP.SEARCH_AUTH_USER_SEC_ACCESS_V(
                 search_auth_user_sec_access_id,
                 search_auth_user_id,
@@ -243,16 +237,16 @@ class H2Views {
                     ON sag.id = sasoa.auth_principal_id
             WHERE
                 sag.group_category = 'EVERYONE_GROUP';'''
-    }
+	}
 
-    void createSearchBioMkrCorrelView() {
-        if (handleCurrentState('SEARCHAPP', 'SEARCH_BIO_MKR_CORREL_VIEW')) {
-            return
-        }
+	void createSearchBioMkrCorrelView() {
+		if (handleCurrentState('SEARCHAPP', 'SEARCH_BIO_MKR_CORREL_VIEW')) {
+			return
+		}
 
-        logger.info 'Creating SEARCHAPP.SEARCH_BIO_MKR_CORREL_VIEW'
+		logger.info 'Creating SEARCHAPP.SEARCH_BIO_MKR_CORREL_VIEW'
 
-        sql.execute '''
+		sql.execute '''
             CREATE VIEW SEARCHAPP.SEARCH_BIO_MKR_CORREL_VIEW (
                 DOMAIN_OBJECT_ID,
                 ASSO_BIO_MARKER_ID,
@@ -302,16 +296,16 @@ class H2Views {
                         AND gs.DELETED_FLAG IS FALSE
                         AND bada.bio_assay_feature_group_id = i.bio_assay_feature_group_id
                         AND i.bio_assay_feature_group_id IS NOT NULL ) A; '''
-    }
+	}
 
-    void createSubPathwayCorrelView() {
-        if (handleCurrentState('BIOMART', 'BIO_METAB_SUBPATHWAY_VIEW')) {
-            return
-        }
+	void createSubPathwayCorrelView() {
+		if (handleCurrentState('BIOMART', 'BIO_METAB_SUBPATHWAY_VIEW')) {
+			return
+		}
 
-        logger.info 'Creating BIOMART.BIO_METAB_SUBPATHWAY_VIEW'
+		logger.info 'Creating BIOMART.BIO_METAB_SUBPATHWAY_VIEW'
 
-        sql.execute '''
+		sql.execute '''
             CREATE VIEW BIOMART.BIO_METAB_SUBPATHWAY_VIEW(
                 SUBPATHWAY_ID,
                 ASSO_BIO_MARKER_ID,
@@ -327,16 +321,16 @@ class H2Views {
                 INNER JOIN biomart.bio_marker B ON (
                     B.bio_marker_type = 'METABOLITE' AND
                     B.primary_external_id = M.hmdb_id);'''
-    }
+	}
 
-    void createSuperPathwayCorrelView() {
-        if (handleCurrentState('BIOMART', 'BIO_METAB_SUPERPATHWAY_VIEW')) {
-            return
-        }
+	void createSuperPathwayCorrelView() {
+		if (handleCurrentState('BIOMART', 'BIO_METAB_SUPERPATHWAY_VIEW')) {
+			return
+		}
 
-        logger.info 'Creating BIOMART.BIO_METAB_SUPERPATHWAY_VIEW'
+		logger.info 'Creating BIOMART.BIO_METAB_SUPERPATHWAY_VIEW'
 
-        sql.execute '''
+		sql.execute '''
             CREATE VIEW BIOMART.BIO_METAB_SUPERPATHWAY_VIEW(
                 SUPERPATHWAY_ID,
                 ASSO_BIO_MARKER_ID,
@@ -353,16 +347,16 @@ class H2Views {
                 INNER JOIN biomart.bio_marker B ON (
                     B.bio_marker_type = 'METABOLITE' AND
                     B.primary_external_id = M.hmdb_id);'''
-    }
+	}
 
-    void createI2b2TrialNodes() {
-        if (handleCurrentState('I2B2METADATA', 'I2B2_TRIAL_NODES')) {
-            return
-        }
+	void createI2b2TrialNodes() {
+		if (handleCurrentState('I2B2METADATA', 'I2B2_TRIAL_NODES')) {
+			return
+		}
 
-        logger.info 'Creating I2B2METADATA.I2B2_TRIAL_NODES'
+		logger.info 'Creating I2B2METADATA.I2B2_TRIAL_NODES'
 
-        sql.execute '''
+		sql.execute '''
             CREATE VIEW I2B2METADATA.I2B2_TRIAL_NODES(C_FULLNAME, TRIAL) AS
             SELECT
                 A.c_fullname,
@@ -378,16 +372,16 @@ class H2Views {
                     GROUP BY c_comment) B ON (
                         A.c_comment = B.c_comment
                         AND length (A.c_fullname) = B.min_length);'''
-    }
+	}
 
-    void createModifierDimensionView() {
-        if (handleCurrentState('I2B2DEMODATA', 'MODIFIER_DIMENSION_VIEW')) {
-            return
-        }
+	void createModifierDimensionView() {
+		if (handleCurrentState('I2B2DEMODATA', 'MODIFIER_DIMENSION_VIEW')) {
+			return
+		}
 
-        logger.info 'Creating I2B2DEMODATA.MODIFIER_DIMENSION_VIEW'
+		logger.info 'Creating I2B2DEMODATA.MODIFIER_DIMENSION_VIEW'
 
-        sql.execute '''
+		sql.execute '''
             CREATE VIEW I2B2DEMODATA.MODIFIER_DIMENSION_VIEW AS
             SELECT
                 MD.modifier_path,
@@ -403,16 +397,16 @@ class H2Views {
                 I2B2DEMODATA.MODIFIER_DIMENSION MD
                 LEFT JOIN I2B2DEMODATA.MODIFIER_METADATA MM ON (
                     MD.modifier_cd = MM.modifier_cd)'''
-    }
+	}
 
-    void createDeVariantSummaryDetailGene() {
-        if (handleCurrentState('DEAPP', 'DE_VARIANT_SUMMARY_DETAIL_GENE')) {
-            return
-        }
+	void createDeVariantSummaryDetailGene() {
+		if (handleCurrentState('DEAPP', 'DE_VARIANT_SUMMARY_DETAIL_GENE')) {
+			return
+		}
 
-        logger.info 'Creating DEAPP.DE_VARIANT_SUMMARY_DETAIL_GENE'
+		logger.info 'Creating DEAPP.DE_VARIANT_SUMMARY_DETAIL_GENE'
 
-        sql.execute '''
+		sql.execute '''
             CREATE OR REPLACE VIEW DEAPP.DE_VARIANT_SUMMARY_DETAIL_GENE AS
             SELECT summary.variant_subject_summary_id,
                 summary.chr,
@@ -452,50 +446,46 @@ class H2Views {
                 geneid.chr = summary.chr AND
                 geneid.pos = summary.pos AND
                 geneid.info_name = 'GID' '''
-    }
+	}
 
-    private ObjectStatus getCurrentStatus(String schema, String viewName) {
-        def res
-
-        res = sql.firstRow '''
+	private ObjectStatus getCurrentStatus(String schema, String viewName) {
+		def res = sql.firstRow """
             SELECT EXISTS(
                 SELECT TABLE_NAME
                 FROM INFORMATION_SCHEMA.VIEWS
-                WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)'''
-        if (res[0]) {
-            logger.debug 'Object ' + schema + '.' + viewName + ' is a already view'
-            return IS_VIEW
-        }
+                WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)"""
+		if (res[0]) {
+			logger.debug 'Object {}.{} is a already view', schema, viewName
+			return IS_VIEW
+		}
 
-        res = sql.firstRow '''
+		res = sql.firstRow """
             SELECT EXISTS(
                 SELECT TABLE_NAME
                 FROM INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)'''
-        if (res[0]) {
-            logger.debug 'Object ' + schema + '.' + viewName + ' is a table'
-            return IS_TABLE
-        }
+                WHERE TABLE_SCHEMA = $schema AND TABLE_NAME = $viewName)"""
+		if (res[0]) {
+			logger.debug 'Object {}.{} is a table', schema, viewName
+			return IS_TABLE
+		}
 
-        logger.debug 'Object ' + schema + '.' + viewName + ' does not exist'
-        DOES_NOT_EXIST
-    }
+		logger.debug 'Object {}.{} does not exist', schema, viewName
+		DOES_NOT_EXIST
+	}
 
-    private boolean handleCurrentState(String schema, String viewName) {
-        switch (getCurrentStatus(schema, viewName)) {
-            case DOES_NOT_EXIST:
-                return false
-            case IS_TABLE:
-                logger.info 'Dropping table ' + schema + '.' + viewName + ' because we are ' +
-                        'creating a view with that name'
-                sql.execute('DROP TABLE ' + schema + '.' + viewName as String)
-                return false
-            case IS_VIEW:
-                return true
-        }
-    }
+	private boolean handleCurrentState(String schema, String viewName) {
+		switch (getCurrentStatus(schema, viewName)) {
+			case DOES_NOT_EXIST: return false
+			case IS_TABLE:
+				logger.info 'Dropping table {}.{} because we are creating a view with that name',
+						schema, viewName
+				sql.execute 'DROP TABLE ' + schema + '.' + viewName
+				return false
+			case IS_VIEW: return true
+		}
+	}
 
-    Boolean isH2() {
-        sql.connection.metaData.databaseProductName.equalsIgnoreCase('h2')
-    }
+	private boolean isH2() {
+		sql.connection.metaData.databaseProductName.equalsIgnoreCase('h2')
+	}
 }

@@ -20,6 +20,7 @@
 package org.transmartproject.db.dataquery.highdim
 
 import com.google.common.collect.HashMultimap
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.transmartproject.core.dataquery.assay.Assay
@@ -33,6 +34,7 @@ import org.transmartproject.db.dataquery.highdim.assayconstraints.AssayCriteriaC
 import org.transmartproject.db.dataquery.highdim.parameterproducers.StandardAssayConstraintFactory
 
 @Component
+@Slf4j('logger')
 class HighDimensionResourceService implements HighDimensionResource {
 
     private static final int MAX_CACHED_DATA_TYPE_RESOURCES = 50
@@ -55,73 +57,61 @@ class HighDimensionResourceService implements HighDimensionResource {
     @Autowired
     StandardAssayConstraintFactory assayConstraintFactory
 
-    Map<String, Closure<HighDimensionDataTypeResource>> dataTypeRegistry = new HashMap()
+    Map<String, Closure<HighDimensionDataTypeResource>> dataTypeRegistry = [:]
 
-    @Override
     Set<String> getKnownTypes() {
         dataTypeRegistry.keySet()
     }
 
-    @Override
-    HighDimensionDataTypeResource getSubResourceForType(String dataTypeName)
-            throws NoSuchResourceException {
+    HighDimensionDataTypeResource getSubResourceForType(String dataTypeName) throws NoSuchResourceException {
         if (!dataTypeRegistry.containsKey(dataTypeName)) {
-            throw new NoSuchResourceException('Unknown data type: ' + dataTypeName)
+	    throw new NoSuchResourceException("Unknown data type: $dataTypeName")
         }
         dataTypeRegistry[dataTypeName].call name: dataTypeName
     }
 
-    @Override
-    Map<HighDimensionDataTypeResource, Collection<Assay>> getSubResourcesAssayMultiMap(
-            List<AssayConstraint> assayConstraints) {
+    Map<HighDimensionDataTypeResource, Collection<Assay>> getSubResourcesAssayMultiMap(List<AssayConstraint> assayConstraints) {
 
         List<DeSubjectSampleMapping> assays = DeSubjectSampleMapping.withCriteria {
             platform {
                 // fetch platforms
             }
 
-            assayConstraints.each { AssayCriteriaConstraint constraint ->
-                constraint.addToCriteria owner.delegate
+	    assayConstraints.each { AssayConstraint constraint ->
+		((AssayCriteriaConstraint) constraint).addToCriteria owner.delegate
             }
 
             isNotNull 'platform'
-        } /* one row per assay */
+	} // one row per assay
 
         HashMultimap multiMap = HashMultimap.create()
         for (Assay a in assays) {
-            String dataTypeName =
-                    cachingDataTypeResourceForPlatform.call a.platform
-            if (!dataTypeName) {
-                continue
+	    String dataTypeName = cachingDataTypeResourceForPlatform.call(a.platform)
+	    if (dataTypeName) {
+		multiMap.put cachingDataTypeResourceProducer.call(dataTypeName), a
             }
-
-            multiMap.put cachingDataTypeResourceProducer.call(dataTypeName), a
-        }
+	}
 
         multiMap.asMap()
     }
 
-    @Override
     AssayConstraint createAssayConstraint(Map<String, Object> params, String name) {
-        def res = assayConstraintFactory.createFromParameters(name, params,
-                this.&createAssayConstraint)
-
+	def res = assayConstraintFactory.createFromParameters(name, params, this.&createAssayConstraint)
         if (!res) {
-            throw new InvalidArgumentsException(
-                    'Unsupported assay constraint: ' + name)
+	    throw new InvalidArgumentsException('Unsupported assay constraint: ' + name)
         }
         res
     }
 
-    @Lazy Closure<String> cachingDataTypeResourceForPlatform = { Platform p ->
-        dataTypeRegistry.keySet().
-                find { String dataTypeName ->
-                    cachingDataTypeResourceProducer.call(dataTypeName).
-                            matchesPlatform(p)
-                } /* may return null */
+    @Lazy
+    Closure<String> cachingDataTypeResourceForPlatform = { Platform p ->
+	dataTypeRegistry.keySet().find { String dataTypeName ->
+	    cachingDataTypeResourceProducer.call(dataTypeName).matchesPlatform(p)
+	} // may return null
     }.memoizeAtMost(MAX_CACHED_PLATFORM_MAPPINGS)
 
-    @Lazy Closure<HighDimensionDataTypeResourceImpl> cachingDataTypeResourceProducer =
+    @Lazy
+    Closure<HighDimensionDataTypeResourceImpl> cachingDataTypeResourceProducer =
         this.&getSubResourceForType.memoizeAtMost(MAX_CACHED_DATA_TYPE_RESOURCES)
 
     /**
@@ -130,27 +120,19 @@ class HighDimensionResourceService implements HighDimensionResource {
      *
      * The factory should produce objects that, if not identical, are at least
      * equal to each other.
-     * @param moduleName
-     * @param factory
      */
-    void registerHighDimensionDataTypeModule(String moduleName,
-                                             Closure<HighDimensionDataTypeResource> factory) {
-        this.dataTypeRegistry[moduleName] = factory
-        HighDimensionResourceService.log.debug "Registered high dimensional data type module '$moduleName'"
+    void registerHighDimensionDataTypeModule(String moduleName, Closure<HighDimensionDataTypeResource> factory) {
+	dataTypeRegistry[moduleName] = factory
+	logger.debug 'Registered high dimensional data type module "{}"', moduleName
     }
 
     HighDimensionDataTypeResource getHighDimDataTypeResourceFromConcept(String conceptKey) {
         def constraints = []
 
         constraints << createAssayConstraint(
-                AssayConstraint.DISJUNCTION_CONSTRAINT,
-                subconstraints: [
-                        (AssayConstraint.ONTOLOGY_TERM_CONSTRAINT):
-                                [concept_key: conceptKey]])
+            AssayConstraint.DISJUNCTION_CONSTRAINT,
+	    subconstraints: [(AssayConstraint.ONTOLOGY_TERM_CONSTRAINT): [concept_key: conceptKey]])
 
-        def assayMultiMap = getSubResourcesAssayMultiMap(constraints)
-
-        HighDimensionDataTypeResource dataTypeResource = assayMultiMap.keySet()[0]
-        return dataTypeResource
+	getSubResourcesAssayMultiMap(constraints).keySet()[0]
     }
 }

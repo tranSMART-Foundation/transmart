@@ -21,32 +21,31 @@ package org.transmartproject.db.biomarker
 
 class BioMarkerCoreDb {
 
-    String name
     String description
+    String externalId
+    String name
     String organism
     String sourceCode
-    String externalId
     String type
 
     static mapping = {
-        table       name:   'bio_marker',    schema:    'biomart'
+        table 'biomart.bio_marker'
         id          column: 'bio_marker_id', generator: 'assigned'
-
-        name        column: 'bio_marker_name'
-        description column: 'bio_marker_description'
-        sourceCode  column: 'primary_source_code'
-        externalId  column: 'primary_external_id'
-        type        column: 'bio_marker_type'
-
         version false
+
+        description column: 'bio_marker_description'
+        externalId  column: 'primary_external_id'
+        name        column: 'bio_marker_name'
+        sourceCode  column: 'primary_source_code'
+        type        column: 'bio_marker_type'
     }
 
     static constraints = {
-        name              nullable: true, maxSize: 400
         description       nullable: true, maxSize: 2000
+        externalId        nullable: true, maxSize: 400
+        name              nullable: true, maxSize: 400
         organism          nullable: true, maxSize: 400
         sourceCode        nullable: true, maxSize: 400
-        externalId        nullable: true, maxSize: 400
         type              maxSize:  400
     }
 }

@@ -20,7 +20,8 @@
 package org.transmartproject.db.dataquery.highdim.vcf
 
 import grails.orm.HibernateCriteriaBuilder
-import org.hibernate.Criteria
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.hibernate.ScrollableResults
 import org.hibernate.engine.SessionImplementor
 import org.hibernate.transform.Transformers
@@ -29,7 +30,6 @@ import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.exceptions.InvalidArgumentsException
-import org.transmartproject.core.querytool.ConstraintByOmicsValue
 import org.transmartproject.core.querytool.HighDimensionFilterType
 import org.transmartproject.db.dataquery.highdim.AbstractHighDimensionDataTypeModule
 import org.transmartproject.db.dataquery.highdim.DefaultHighDimensionTabularResult
@@ -42,12 +42,11 @@ import org.transmartproject.db.dataquery.highdim.parameterproducers.MapBasedPara
 
 import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
 
+@CompileStatic
 class VcfModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'vcf'
-
     final String description = 'Genomic Variant data'
-
     final List<String> platformMarkerTypes = ['VCF']
 
     // VCF specific projection names
@@ -68,69 +67,55 @@ class VcfModule extends AbstractHighDimensionDataTypeModule {
     final Map<String, Class> rowProperties = typesMap(VcfDataRow,
     ['chromosome', 'position', 'rsId', 'referenceAllele'])
 
-    @Autowired
-    DataRetrievalParameterFactory standardAssayConstraintFactory
+    @Autowired DataRetrievalParameterFactory standardAssayConstraintFactory
+    @Autowired DataRetrievalParameterFactory standardDataConstraintFactory
+    @Autowired ChromosomeSegmentConstraintFactory chromosomeSegmentConstraintFactory
+    @Autowired CorrelationTypesRegistry correlationTypesRegistry
 
-    @Autowired
-    DataRetrievalParameterFactory standardDataConstraintFactory
-
-    @Autowired
-    ChromosomeSegmentConstraintFactory chromosomeSegmentConstraintFactory
-
-    @Autowired
-    CorrelationTypesRegistry correlationTypesRegistry
-
-    @Override
     protected List<DataRetrievalParameterFactory> createAssayConstraintFactories() {
         [ standardAssayConstraintFactory ]
     }
 
-    @Override
     protected List<DataRetrievalParameterFactory> createDataConstraintFactories() {
         chromosomeSegmentConstraintFactory.segmentPrefix           = 'summary.'
         chromosomeSegmentConstraintFactory.segmentChromosomeColumn = 'chr'
         chromosomeSegmentConstraintFactory.segmentStartColumn      = 'pos'
         chromosomeSegmentConstraintFactory.segmentEndColumn        = 'pos'
         //customize the segment constraint factory to produce constraints targeting the right DeVariantSubjectSummaryCoreDb columns
-        [
-            standardDataConstraintFactory,
-            chromosomeSegmentConstraintFactory,
-            new SearchKeywordDataConstraintFactory(correlationTypesRegistry,
-                    'GENE', 'summary', 'geneId')
-        ]
+
+	[standardDataConstraintFactory,
+         chromosomeSegmentConstraintFactory,
+         new SearchKeywordDataConstraintFactory(correlationTypesRegistry,
+						'GENE', 'summary', 'geneId')]
     }
 
-    @Override
+    @CompileDynamic
     protected List<DataRetrievalParameterFactory> createProjectionFactories() {
-        [
-                new MapBasedParameterFactory(
-                        (COHORT_PROJECTION): { Map<String, Object> params ->
-                            if (!params.isEmpty()) {
-                                throw new InvalidArgumentsException('Expected no parameters here')
-                            }
-                            new CohortProjection()
-                        },
-                        (VARIANT_PROJECTION): { Map<String, Object> params ->
-                            if (!params.isEmpty()) {
-                                throw new InvalidArgumentsException('Expected no parameters here')
-                            }
-                            new VariantProjection()
-                        }
-                ),
-                new AllDataProjectionFactory(dataProperties, rowProperties)
-        ]
+	[new MapBasedParameterFactory(
+            (COHORT_PROJECTION): { Map<String, Object> params ->
+		if (params) {
+                    throw new InvalidArgumentsException('Expected no parameters here')
+                }
+                new CohortProjection()
+            },
+            (VARIANT_PROJECTION): { Map<String, Object> params ->
+		if (params) {
+                    throw new InvalidArgumentsException('Expected no parameters here')
+                }
+                new VariantProjection()
+	    }),
+	 new AllDataProjectionFactory(dataProperties, rowProperties)]
     }
 
-    @Override
+    @CompileDynamic
     HibernateCriteriaBuilder prepareDataQuery(Projection projection, SessionImplementor session) {
-        HibernateCriteriaBuilder criteriaBuilder =
-                createCriteriaBuilder(DeVariantSummaryDetailGene, 'summary', session)
+	HibernateCriteriaBuilder criteriaBuilder = createCriteriaBuilder(
+	    DeVariantSummaryDetailGene, 'summary', session)
 
         criteriaBuilder.with {
             projections {
                 // These fields are needed to fill the VcfDataRow
-                // Fields describing the actual data are added by
-                // the projections
+		// Fields describing the actual data are added by the projections
                 property 'dataset.id'       ,'dataset_id'
                 property 'chr'              ,'chr'
                 property 'pos'              ,'pos'
@@ -162,73 +147,67 @@ class VcfModule extends AbstractHighDimensionDataTypeModule {
         criteriaBuilder
     }
 
-    @Override
+    @CompileDynamic
     TabularResult transformResults(ScrollableResults results, List<AssayColumn> assays, Projection projection) {
         /* assumption here is the assays in the passed in list are in the same
          * order as the assays in the result set */
         Map assayIndexMap = createAssayIndexMap assays
 
         new DefaultHighDimensionTabularResult(
-                rowsDimensionLabel:    'Regions',
-                columnsDimensionLabel: 'Sample codes',
-                allowMissingAssays:    true,
-                indicesList:           assays,
-                results:               results,
-                assayIdFromRow:        { it[0].assayId } ,
-                inSameGroup:           { a, b -> a[0].chr == b[0].chr && a[0].pos == b[0].pos && a[0].rsId == b[0].rsId },
-                finalizeGroup:         { List list -> /* list of all the results belonging to a group defined by inSameGroup */
-                    /* list of arrays with one element: a map */
-                    /* we may have nulls if allowMissingAssays is true,
-                     *, but we're guaranteed to have at least one non-null */
-                    def firstNonNullCell = list.find()
-                    new VcfDataRow(
-                            datasetId: firstNonNullCell[0].dataset_id,
-                            
-                            // Chromosome to define the position
-                            chromosome: firstNonNullCell[0].chr,
-                            position: firstNonNullCell[0].pos,
-                            rsId: firstNonNullCell[0].rsId,
+            rowsDimensionLabel:    'Regions',
+            columnsDimensionLabel: 'Sample codes',
+            allowMissingAssays:    true,
+            indicesList:           assays,
+            results:               results,
+            assayIdFromRow:        { it[0].assayId } ,
+            inSameGroup:           { a, b -> a[0].chr == b[0].chr && a[0].pos == b[0].pos && a[0].rsId == b[0].rsId },
+            finalizeGroup:         { List list -> /* list of all the results belonging to a group defined by inSameGroup */
+                /* list of arrays with one element: a map */
+                /* we may have nulls if allowMissingAssays is true,
+                 *, but we're guaranteed to have at least one non-null */
+                def firstNonNullCell = list.find()
+                new VcfDataRow(
+                    datasetId: firstNonNullCell[0].dataset_id,
 
-                            // Reference and alternatives for this position
-                            referenceAllele: firstNonNullCell[0].ref,
-                            alternatives: firstNonNullCell[0].alt,
-                            reference: firstNonNullCell[0].reference,
+                    // Chromosome to define the position
+                    chromosome: firstNonNullCell[0].chr,
+                    position: firstNonNullCell[0].pos,
+                    rsId: firstNonNullCell[0].rsId,
 
-                            // Study level properties
-                            quality: firstNonNullCell[0].quality,
-                            filter: firstNonNullCell[0].filter,
-                            info:  firstNonNullCell[0].info,
-                            format: firstNonNullCell[0].format,
-                            variants: firstNonNullCell[0].variants,
+                    // Reference and alternatives for this position
+                    referenceAllele: firstNonNullCell[0].ref,
+                    alternatives: firstNonNullCell[0].alt,
+                    reference: firstNonNullCell[0].reference,
 
-                            geneName: firstNonNullCell[0].geneName,
+                    // Study level properties
+                    quality: firstNonNullCell[0].quality,
+                    filter: firstNonNullCell[0].filter,
+                    info:  firstNonNullCell[0].info,
+                    format: firstNonNullCell[0].format,
+                    variants: firstNonNullCell[0].variants,
 
-                            assayIndexMap: assayIndexMap,
-                            data: list.collect {
-                                projection.doWithResult it?.getAt(0)
-                            }
-                    )
-                }
+                    geneName: firstNonNullCell[0].geneName,
+
+                    assayIndexMap: assayIndexMap,
+		    data: list.collect { projection.doWithResult it?.getAt(0) }
+                )
+            }
         )
     }
 
-    @Override
     List<String> searchAnnotation(String concept_code, String search_term, String search_property) {
         //TODO VCF annotation searching not yet supported
         []
     }
 
-    @Override
     List<String> getSearchableAnnotationProperties() {
         ['chromosome', 'position', 'rsId', 'referenceAllele']
     }
 
-    @Override
     HighDimensionFilterType getHighDimensionFilterType() {
         HighDimensionFilterType.VCF
     }
 
-    @Override
     List<String> getSearchableProjections() {
         [Projection.VAR_CLASS, Projection.VAR_TYPE, Projection.REF_ALT]
     }

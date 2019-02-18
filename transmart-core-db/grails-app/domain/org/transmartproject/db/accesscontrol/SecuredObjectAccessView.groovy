@@ -39,25 +39,20 @@ class SecuredObjectAccessView implements Serializable {
      *   column) will be replaced with NULL.
      */
 
+    AccessLevel          accessLevel
+    SecuredObject        securedObject
     SecuredObjectAccess  securedObjectAccess
     User                 user
-    SecuredObject        securedObject
-    AccessLevel          accessLevel
-
-
 
     static mapping = {
-        table schema: 'searchapp', name: 'search_auth_user_sec_access_v'
-
+        table 'searchapp.search_auth_user_sec_access_v'
         id composite: ['securedObjectAccess', 'user', 'securedObject', 'accessLevel']
-
-        securedObjectAccess column: 'search_auth_user_sec_access_id'
-        user                column: 'search_auth_user_id'
-        securedObject       column: 'search_secure_object_id'
-        accessLevel         column: 'search_sec_access_level_id'
-
+        version false
         cache usage: 'read-only'
 
-        version false
+        accessLevel         column: 'search_sec_access_level_id'
+        securedObject       column: 'search_secure_object_id'
+        securedObjectAccess column: 'search_auth_user_sec_access_id'
+        user                column: 'search_auth_user_id'
     }
 }

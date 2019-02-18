@@ -19,54 +19,47 @@
 
 package org.transmartproject.db.ontology
 
-import org.transmartproject.core.ontology.OntologyTerm
+import groovy.transform.CompileStatic
 import org.transmartproject.core.concept.ConceptKey
+import org.transmartproject.core.ontology.OntologyTerm
 
 import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.FOLDER
 import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.LEAF
 
+@CompileStatic
 class AcrossTrialsOntologyTerm extends AbstractAcrossTrialsOntologyTerm {
 
     ModifierDimensionView modifierDimension
 
-    @Override
     Integer getLevel() {
         modifierDimension.level + 1 /* because of ACROSS_TRIALS_BEFORE */
     }
 
-    @Override
     String getKey() {
         new ConceptKey(ACROSS_TRIALS_TABLE_CODE, fullName)
     }
 
-    @Override
     String getFullName() {
         "\\${ACROSS_TRIALS_TOP_TERM_NAME}${modifierDimension.path}"
     }
 
-    @Override
     String getName() {
         modifierDimension.name
     }
 
-    @Override
     String getCode() {
         modifierDimension.code
     }
 
-    @Override
     String getTooltip() {
         name
     }
 
-    @Override
     EnumSet<OntologyTerm.VisualAttributes> getVisualAttributes() {
-        EnumSet.of(modifierDimension.nodeType == 'F' ?
-                FOLDER : LEAF)
+        EnumSet.of modifierDimension.nodeType == 'F' ? FOLDER : LEAF
     }
 
-    @Override
-    Object getMetadata() {
+    def getMetadata() {
         [okToUseValues: modifierDimension.valueType == 'N']
     }
 }

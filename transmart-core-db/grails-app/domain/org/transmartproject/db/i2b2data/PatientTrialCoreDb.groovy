@@ -31,13 +31,11 @@ class PatientTrialCoreDb implements Serializable {
     //String secureObjToken
 
     static mapping = {
-        table   name: 'patient_trial', schema: 'i2b2demodata'
-
+        table 'i2b2demodata.patient_trial'
         id      composite: ['patient', 'study']
+        version false
 
         patient column: 'patient_num'
-        study   column: 'trial',      index: 'trial_idx', unique: false
-
-        version false
+        study   column: 'trial',      index: 'trial_idx'
     }
 }

@@ -20,7 +20,7 @@
 package org.transmartproject.db.dataquery.clinical
 
 import com.google.common.collect.Lists
-import com.google.common.collect.Maps
+import grails.orm.HibernateCriteriaBuilder
 import org.hibernate.ScrollMode
 import org.hibernate.ScrollableResults
 import org.hibernate.engine.SessionImplementor
@@ -40,25 +40,23 @@ import static org.transmartproject.db.util.GormWorkarounds.getHibernateInCriteri
  */
 class AcrossTrialsDataQuery {
 
+    private boolean initialized
+
     List<AcrossTrialsTerminalVariable> clinicalVariables
-
     Iterable<PatientDimension> patients
-
     SessionImplementor session
-
-    private boolean inited
 
     void init() {
         fillInAcrossTrialsTerminalVariables()
-        inited = true
+        initialized = true
     }
 
     ScrollableResults openResultSet() {
-        if (!inited) {
+        if (!initialized) {
             throw new IllegalStateException('init() not called successfully yet')
         }
 
-        def criteriaBuilder = createCriteriaBuilder(ObservationFact, 'obs', session)
+        HibernateCriteriaBuilder criteriaBuilder = createCriteriaBuilder(ObservationFact, 'obs', session)
         criteriaBuilder.with {
             projections {
                 property 'patient.id'
@@ -72,36 +70,34 @@ class AcrossTrialsDataQuery {
         }
 
         if (patients instanceof PatientQuery) {
-            criteriaBuilder.add(getHibernateInCriterion('patient.id',
-                    patients.forIds()))
+	    criteriaBuilder.add getHibernateInCriterion('patient.id', patients.forIds())
         }
         else {
-            criteriaBuilder.in('patient',  Lists.newArrayList(patients))
+	    criteriaBuilder.in 'patient', Lists.newArrayList(patients)
         }
 
-        criteriaBuilder.in('modifierCd', clinicalVariables*.code)
+	criteriaBuilder.in 'modifierCd', clinicalVariables*.code
 
         criteriaBuilder.scroll ScrollMode.FORWARD_ONLY
     }
 
     private void fillInAcrossTrialsTerminalVariables() {
-        Map<String, AcrossTrialsTerminalVariable> conceptPaths = Maps.newHashMap()
+	Map<String, AcrossTrialsTerminalVariable> conceptPaths = [:]
 
         if (!clinicalVariables) {
             throw new InvalidArgumentsException('No clinical variables specified')
         }
 
-        clinicalVariables.each { ClinicalVariable it ->
+	for (ClinicalVariable it in clinicalVariables) {
             if (!(it instanceof AcrossTrialsTerminalVariable)) {
-                throw new InvalidArgumentsException(
-                        'Only across trial terminal variables are supported')
+		throw new InvalidArgumentsException('Only across trial terminal variables are supported')
             }
 
             if (!it.modifierCode) {
                 if (conceptPaths.containsKey(it.conceptPath)) {
-                    throw new InvalidArgumentsException('Specified multiple ' +
-                            'variables with the same concept path: ' +
-                            it.conceptPath)
+		    throw new InvalidArgumentsException("Specified multiple " +
+							"variables with the same concept path: " +
+							it.conceptPath)
                 }
                 conceptPaths[convertPath(it.conceptPath)] = it
             }
@@ -117,17 +113,14 @@ class AcrossTrialsDataQuery {
         }
 
         for (modifier in res) {
-            String path = modifier[0],
-                   code = modifier[1]
-
-            AcrossTrialsTerminalVariable variable = conceptPaths[path]
-            variable.modifierCode = code
+            String path = modifier[0]
+	    String code = modifier[1]
+	    conceptPaths[path].modifierCode = code
         }
 
         for (var in conceptPaths.values()) {
             if (var.modifierCode == null) {
-                throw new InvalidArgumentsException('Concept path ' +
-                        "'${var.conceptPath}' did not yield any results")
+		throw new InvalidArgumentsException("Concept path '${var.conceptPath}' did not yield any results")
             }
         }
     }

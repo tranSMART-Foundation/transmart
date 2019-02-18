@@ -28,9 +28,13 @@ import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.querytool.QueriesResource
 import org.transmartproject.core.querytool.QueryResult
-import org.transmartproject.db.dataquery.highdim.assayconstraints.*
-
-import static org.transmartproject.db.dataquery.highdim.parameterproducers.BindingUtils.*
+import org.transmartproject.db.dataquery.highdim.assayconstraints.AssayIdListCriteriaConstraint
+import org.transmartproject.db.dataquery.highdim.assayconstraints.DefaultOntologyTermCriteriaConstraint
+import org.transmartproject.db.dataquery.highdim.assayconstraints.DefaultPatientSetCriteriaConstraint
+import org.transmartproject.db.dataquery.highdim.assayconstraints.DefaultTrialNameCriteriaConstraint
+import org.transmartproject.db.dataquery.highdim.assayconstraints.DisjunctionAssayCriteriaConstraint
+import org.transmartproject.db.dataquery.highdim.assayconstraints.NoopAssayCriteriaConstraint
+import org.transmartproject.db.dataquery.highdim.assayconstraints.PatientIdListCriteriaConstraint
 
 @Component
 class StandardAssayConstraintFactory extends AbstractMethodBasedParameterFactory {
@@ -42,42 +46,40 @@ class StandardAssayConstraintFactory extends AbstractMethodBasedParameterFactory
     QueriesResource queriesResource
 
     private DisjunctionConstraintFactory disjunctionConstraintFactory =
-            new DisjunctionConstraintFactory(DisjunctionAssayCriteriaConstraint, NoopAssayCriteriaConstraint)
+        new DisjunctionConstraintFactory(DisjunctionAssayCriteriaConstraint, NoopAssayCriteriaConstraint)
 
     @ProducerFor(AssayConstraint.ONTOLOGY_TERM_CONSTRAINT)
     AssayConstraint createOntologyTermConstraint(Map<String, Object> params) {
         if (params.size() != 1) {
-            throw new InvalidArgumentsException('Expected exactly one parameter (concept_key), got ' + params)
+	    throw new InvalidArgumentsException("Expected exactly one parameter (concept_key), got $params")
         }
 
-        def conceptKey = getParam params, 'concept_key', String
+	String conceptKey = BindingUtils.getParam(params, 'concept_key')
 
-        OntologyTerm term
         try {
-            term = conceptsResource.getByKey conceptKey
+	    OntologyTerm term = conceptsResource.getByKey(conceptKey)
+	    new DefaultOntologyTermCriteriaConstraint(term: term)
         }
-        catch (NoSuchResourceException nse) {
-            throw new InvalidArgumentsException(nse)
+	catch (NoSuchResourceException e) {
+	    throw new InvalidArgumentsException(e)
         }
-
-        new DefaultOntologyTermCriteriaConstraint(term: term)
     }
 
     @ProducerFor(AssayConstraint.PATIENT_SET_CONSTRAINT)
     AssayConstraint createPatientSetConstraint(Map<String, Object> params) {
         if (params.size() != 1) {
-            throw new InvalidArgumentsException('Expected exactly one parameter (result_instance_id), got ' + params)
+	    throw new InvalidArgumentsException("Expected exactly one parameter (result_instance_id), got $params")
         }
 
-        def resultInstanceId = getParam params, 'result_instance_id', Object
-        resultInstanceId = convertToLong 'result_instance_id', resultInstanceId
+	Long resultInstanceId = BindingUtils.convertToLong(
+	    'result_instance_id', BindingUtils.getParam(params, 'result_instance_id', Object))
 
         QueryResult result
         try {
-            result = queriesResource.getQueryResultFromId resultInstanceId
+	    result = queriesResource.getQueryResultFromId(resultInstanceId)
         }
-        catch (NoSuchResourceException nse) {
-            throw new InvalidArgumentsException(nse)
+	catch (NoSuchResourceException e) {
+	    throw new InvalidArgumentsException(e)
         }
 
         new DefaultPatientSetCriteriaConstraint(queryResult: result)
@@ -85,34 +87,27 @@ class StandardAssayConstraintFactory extends AbstractMethodBasedParameterFactory
 
     @ProducerFor(AssayConstraint.TRIAL_NAME_CONSTRAINT)
     AssayConstraint createTrialNameConstraint(Map<String, Object> params) {
-
-        validateParameterNames(['name'], params)
-        def name = getParam params, 'name', String
-
+	BindingUtils.validateParameterNames(['name'], params)
+	String name = BindingUtils.getParam(params, 'name')
         new DefaultTrialNameCriteriaConstraint(trialName: name)
     }
 
     @ProducerFor(AssayConstraint.ASSAY_ID_LIST_CONSTRAINT)
     AssayConstraint createAssayIdListConstraint(Map<String, Object> params) {
-        validateParameterNames(['ids'], params)
-        def ids = processLongList 'ids', params.ids
-
+	BindingUtils.validateParameterNames(['ids'], params)
+	List<Long> ids = BindingUtils.processLongList('ids', params)
         new AssayIdListCriteriaConstraint(ids: ids)
     }
 
     @ProducerFor(AssayConstraint.PATIENT_ID_LIST_CONSTRAINT)
     AssayConstraint createPatientIdListConstraint(Map<String, Object> params) {
-        validateParameterNames(['ids'], params)
-        def ids = processStringList 'ids', params.ids
-
+	BindingUtils.validateParameterNames(['ids'], params)
+	List<String> ids = BindingUtils.processStringList('ids', params)
         new PatientIdListCriteriaConstraint(patientIdList: ids)
     }
 
     @ProducerFor(AssayConstraint.DISJUNCTION_CONSTRAINT)
-    AssayConstraint createDisjunctionConstraint(Map<String, Object> params,
-                                                Object createConstraint) {
-        disjunctionConstraintFactory.
-                createDisjunctionConstraint params, createConstraint
+    AssayConstraint createDisjunctionConstraint(Map<String, Object> params, createConstraint) {
+	disjunctionConstraintFactory.createDisjunctionConstraint params, createConstraint
     }
-
 }

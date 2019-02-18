@@ -31,16 +31,15 @@ class DeMetaboliteSubPathway {
     static belongsTo = [superPathway: DeMetaboliteSuperPathway]
 
     static mapping = {
-        table        schema:    'deapp',   name: 'de_metabolite_sub_pathways'
+        table 'deapp.de_metabolite_sub_pathways'
         id           generator: 'assigned'
+        version     false
 
-        annotations  joinTable: [name:   'de_metabolite_sub_pway_metab',
+        annotations  joinTable: [name:   'deapp.de_metabolite_sub_pway_metab',
                                  key:    'sub_pathway_id',
                                  column: 'metabolite_id']
         name         column: 'sub_pathway_name'
         superPathway column: 'super_pathway_id'
-
-        version     false
     }
 
     static constraints = {

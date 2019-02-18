@@ -43,7 +43,7 @@ class DeSubjectSampleMappingTests {
     }
 
     Object getProperty(String name) {
-        testData[name]
+        testData."$name"
     }
 
     @Test

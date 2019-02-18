@@ -19,8 +19,8 @@
 
 package org.transmartproject.db.dataquery.highdim.rnaseq
 
-import org.transmartproject.core.dataquery.assay.Assay
-import org.transmartproject.core.dataquery.highdim.chromoregion.Region
+import groovy.util.logging.Slf4j
+import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 import org.transmartproject.db.dataquery.highdim.HighDimTestData
@@ -31,131 +31,118 @@ import org.transmartproject.db.ontology.ConceptTestData
 import org.transmartproject.db.querytool.QtQueryMaster
 import org.transmartproject.db.search.SearchKeywordCoreDb
 
-import static org.transmartproject.db.dataquery.highdim.HighDimTestData.*
+import static org.transmartproject.db.dataquery.highdim.HighDimTestData.createTestAssays
+import static org.transmartproject.db.dataquery.highdim.HighDimTestData.createTestPatients
 import static org.transmartproject.db.querytool.QueryResultData.createQueryResult
 
-class RnaSeqTestData {
+@Slf4j('logger')
+class RnaSeqTestData extends AbstractTestData {
 
-    static final String TRIAL_NAME = 'REGION_SAMP_TRIAL_RNASEQ'
+	static final String REGION_PLATFORM_MARKER_TYPE = 'RNASEQ_RCNT'
+	static final String TRIAL_NAME = 'REGION_SAMP_TRIAL_RNASEQ'
 
-    static final String REGION_PLATFORM_MARKER_TYPE = 'RNASEQ_RCNT'
+	private String conceptCode
 
-    SampleBioMarkerTestData bioMarkerTestData
+	SampleBioMarkerTestData bioMarkerTestData
+	ConceptTestData concept
+	List<SearchKeywordCoreDb> searchKeywords
+	DeGplInfo regionPlatform
+	DeGplInfo bogusTypePlatform
+	List<DeChromosomalRegion> regions
+	List<PatientDimension> patients
+	QtQueryMaster allPatientsQueryResult
+	List<DeSubjectSampleMapping> assays
+	List<DeSubjectRnaseqData> rnaseqData
 
-    ConceptTestData concept = HighDimTestData.createConcept('RNASEQPUBLIC', 'concept code #1', TRIAL_NAME, 'RNASEQ_CONCEPT')
+	RnaSeqTestData(String conceptCode = 'concept code #1',
+	               SampleBioMarkerTestData bioMarkerTestData = null) {
+		this.conceptCode = conceptCode
+		this.bioMarkerTestData = bioMarkerTestData ?: new SampleBioMarkerTestData()
+		createTestData()
+	}
 
-    private String conceptCode
+	DeSubjectRnaseqData createRNASEQData(DeChromosomalRegion region, DeSubjectSampleMapping assay,
+	                                     int readcount = 0, double normalizedreadcount = 0.0) {
+		new DeSubjectRnaseqData(
+				region: region,
+				jRegion: region,
+				assay: assay,
+				patient: assay.patient,
+				readcount: readcount,
+				normalizedReadcount: normalizedreadcount,
+				logNormalizedReadcount: Math.log(normalizedreadcount) / Math.log(2.0),
+				zscore: ((Math.log(normalizedreadcount) / Math.log(2.0)) - 0.5) / 1.5)
+	}
 
-    RnaSeqTestData(String conceptCode = 'concept code #1',
-                 SampleBioMarkerTestData bioMarkerTestData = null) {
-        this.conceptCode = conceptCode
-        this.bioMarkerTestData = bioMarkerTestData ?: new SampleBioMarkerTestData()
-    }
+	void saveAll() {
+		bioMarkerTestData.saveGeneData()
 
-    @Lazy List<SearchKeywordCoreDb> searchKeywords = {
-        bioMarkerTestData.geneSearchKeywords +
-                bioMarkerTestData.proteinSearchKeywords +
-                bioMarkerTestData.geneSignatureSearchKeywords
-    }()
+		save regionPlatform, logger
+		save bogusTypePlatform, logger
+		saveAll regions, logger
+		saveAll patients, logger
+		save allPatientsQueryResult, logger
+		saveAll assays, logger
+		saveAll rnaseqData, logger
 
-    DeGplInfo regionPlatform = {
-        def p = new DeGplInfo(
-                title: 'Test Region Platform',
-                organism: 'Homo Sapiens',
-                annotationDate: Date.parse('yyyy-MM-dd', '2013-05-03'),
-                markerType: REGION_PLATFORM_MARKER_TYPE,
-                genomeReleaseId: 'hg18',
-        )
-        p.id = 'test-region-platform_rnaseq'
-        p
-    }()
+		concept.saveAll()
+	}
 
-    DeGplInfo bogusTypePlatform = {
-        def p = new DeGplInfo(
-                markerTypeId: 'bogus marker type',
-        )
-        p.id = 'bogus-marker-platform_rnaseq'
-        p
-    }()
+	private void createTestData() {
+		concept = HighDimTestData.createConcept('RNASEQPUBLIC', 'concept code #1', TRIAL_NAME, 'RNASEQ_CONCEPT')
 
-    List<DeChromosomalRegion> regions = {
-        def r = [
-                new DeChromosomalRegion(
-                        platform: regionPlatform,
-                        chromosome: '1',
-                        start: 33,
-                        end: 9999,
-                        numberOfProbes: 42,
-                        cytoband: '1p12.1',
-                        name: 'region 1:33-9999',
-                        geneSymbol: 'ADIRF',
-                        geneId: -130753,
-			gplId: 'gplId'
-		),
-                new DeChromosomalRegion(
-                        platform: regionPlatform,
-                        chromosome: '2',
-                        start: 66,
-                        end: 99,
-                        numberOfProbes: 2,
-                        cytoband: '2q7.2',
-                        name: 'region 2:66-99',
-                        geneSymbol: 'AURKA',
-                        geneId: -130751,
-			gplId: 'gplId'
-                ),
-        ]
-        r[0].id = -1011L
-        r[1].id = -1012L
-        r
-    }()
+		searchKeywords = bioMarkerTestData.geneSearchKeywords +
+				bioMarkerTestData.proteinSearchKeywords +
+				bioMarkerTestData.geneSignatureSearchKeywords
 
-    List<PatientDimension> patients = createTestPatients(2, -2010, 'REGION_SAMP_TRIAL_RNASEQ')
+		regionPlatform = new DeGplInfo(
+				title: 'Test Region Platform',
+				organism: 'Homo Sapiens',
+				annotationDate: Date.parse('yyyy-MM-dd', '2013-05-03'),
+				markerType: REGION_PLATFORM_MARKER_TYPE,
+				genomeReleaseId: 'hg18')
+		regionPlatform.id = 'test-region-platform_rnaseq'
 
-    QtQueryMaster allPatientsQueryResult = createQueryResult(patients)
+		bogusTypePlatform = new DeGplInfo(markerTypeId: 'bogus marker type')
+		bogusTypePlatform.id = 'bogus-marker-platform_rnaseq'
 
-    List<DeSubjectSampleMapping> assays = createTestAssays(patients,
-                                                           -3010L,
-                                                           regionPlatform,
-                                                           TRIAL_NAME)
+		regions = [
+				new DeChromosomalRegion(
+						platform: regionPlatform,
+						chromosome: '1',
+						start: 33,
+						end: 9999,
+						numberOfProbes: 42,
+						cytoband: '1p12.1',
+						name: 'region 1:33-9999',
+						geneSymbol: 'ADIRF',
+						geneId: -130753,
+						gplId: 'gplId'),
+				new DeChromosomalRegion(
+						platform: regionPlatform,
+						chromosome: '2',
+						start: 66,
+						end: 99,
+						numberOfProbes: 2,
+						cytoband: '2q7.2',
+						name: 'region 2:66-99',
+						geneSymbol: 'AURKA',
+						geneId: -130751,
+						gplId: 'gplId'),
+		]
+		regions[0].id = -1011L
+		regions[1].id = -1012L
 
-    DeSubjectRnaseqData createRNASEQData(Region region,
-                                         Assay assay,
-                                         readcount = 0,
-                                         normalizedreadcount = 0.0
-                                        ) {
-        new DeSubjectRnaseqData(
-                region:                     region,
-                jRegion:                    region,
-                assay:                      assay,
-                patient:                    assay.patient,
-                readcount:                  readcount,
-                normalizedReadcount:        normalizedreadcount,
-                logNormalizedReadcount:     Math.log(normalizedreadcount)/Math.log(2.0),
-                zscore:                     ((Math.log(normalizedreadcount)/Math.log(2.0))-0.5)/1.5,
-        )
-    }
+		patients = createTestPatients(2, -2010, 'REGION_SAMP_TRIAL_RNASEQ')
 
-    List<DeSubjectRnaseqData> rnaseqData = {
-        [
-                createRNASEQData(regions[0], assays[0], 1, 1.0),
-                createRNASEQData(regions[0], assays[1], 10, 4.0),
-                createRNASEQData(regions[1], assays[0], 2, 0.5),
-                createRNASEQData(regions[1], assays[1], 2, 2.0),
-        ]
-    }()
+		allPatientsQueryResult = createQueryResult(patients)
 
-    void saveAll() {
-        bioMarkerTestData.saveGeneData()
+		assays = createTestAssays(patients, -3010L, regionPlatform, TRIAL_NAME)
 
-        save([ regionPlatform, bogusTypePlatform ])
-        save regions
-        save patients
-        save([ allPatientsQueryResult ])
-        save assays
-        save rnaseqData
-
-        concept.saveAll()
-    }
-
+		rnaseqData = [
+				createRNASEQData(regions[0], assays[0], 1, 1.0),
+				createRNASEQData(regions[0], assays[1], 10, 4.0),
+				createRNASEQData(regions[1], assays[0], 2, 0.5),
+				createRNASEQData(regions[1], assays[1], 2, 2.0)]
+	}
 }

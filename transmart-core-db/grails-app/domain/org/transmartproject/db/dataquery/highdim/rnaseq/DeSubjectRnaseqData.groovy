@@ -28,10 +28,10 @@ import org.transmartproject.db.i2b2data.PatientDimension
 @EqualsAndHashCode(includes = [ 'assay', 'region' ])
 class DeSubjectRnaseqData implements RnaSeqValues, Serializable {
 
-    String  trialName
-    Integer readcount
-    Double  normalizedReadcount
     Double  logNormalizedReadcount
+    Double  normalizedReadcount
+    Integer readcount
+    String  trialName
     Double  zscore
 
     // see comment in mapping
@@ -40,44 +40,39 @@ class DeSubjectRnaseqData implements RnaSeqValues, Serializable {
     /* unused; should be the same as assay.patient */
     PatientDimension patient
 
-    static belongsTo = [
-            region: DeChromosomalRegion,
-            assay:  DeSubjectSampleMapping,
-            patient: PatientDimension
-    ]
+    static belongsTo = [assay:  DeSubjectSampleMapping,
+			patient: PatientDimension,
+			region: DeChromosomalRegion]
 
     static mapping = {
         table schema: 'deapp'
-
         id composite: [ 'assay', 'region' ]
-
+        version     false
+        sort    assay:  'asc'
 
         /* references */
-        region                 column: 'region_id'
-        assay                  column: 'assay_id'
-        patient                column: 'patient_id'
-        readcount              column: 'readcount'
-        normalizedReadcount    column: 'normalized_readcount'
-        logNormalizedReadcount column: 'log_normalized_readcount'
-        zscore                 column: 'zscore'
-        patient                column: 'patient_id'
+//        region                 column: 'region_id'
+//        assay                  column: 'assay_id'
+//        patient                column: 'patient_id'
+//        readcount              column: 'readcount'
+//        normalizedReadcount    column: 'normalized_readcount'
+//        logNormalizedReadcount column: 'log_normalized_readcount'
+//        zscore                 column: 'zscore'
+//        patient                column: 'patient_id'
 
         // this duplicate mapping is needed due to a Criteria bug.
         // see https://forum.hibernate.org/viewtopic.php?f=1&t=1012372
         jRegion  column: 'region_id', insertable: false, updateable: false
-
-        sort    assay:  'asc'
-
-        version     false
     }
 
     static constraints = {
-        trialName              nullable: true, maxSize: 50
-        region                 nullable: true
         assay                  nullable: true
-        readcount              nullable: true
-        normalizedReadcount    nullable: true
         logNormalizedReadcount nullable: true
+        normalizedReadcount    nullable: true
+        patient                nullable: true
+        readcount              nullable: true
+        region                 nullable: true
+        trialName              nullable: true, maxSize: 50
         zscore                 nullable: true
-        patient                nullable: true }
+    }
 }

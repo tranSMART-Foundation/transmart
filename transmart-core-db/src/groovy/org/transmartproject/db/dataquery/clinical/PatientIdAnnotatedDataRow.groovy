@@ -19,36 +19,34 @@
 
 package org.transmartproject.db.dataquery.clinical
 
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.clinical.ClinicalVariableColumn
 
+@CompileStatic
 @ToString(includes = ['patientId', 'data'])
 class PatientIdAnnotatedDataRow implements DataRow<ClinicalVariableColumn, Object> {
 
     Long patientId
 
-    List<Object> data
+    List data
 
     Map<ClinicalVariableColumn, Integer> columnToIndex
 
-    @Override
     String getLabel() {
         throw new UnsupportedOperationException()
     }
 
-    @Override
-    Object getAt(int index) {
+    def getAt(int index) {
         data[index]
     }
 
-    @Override
-    Object getAt(ClinicalVariableColumn column) {
+    def getAt(ClinicalVariableColumn column) {
         data[columnToIndex[column]]
     }
 
-    @Override
-    Iterator<Object> iterator() {
+    Iterator iterator() {
         data.iterator()
     }
 }

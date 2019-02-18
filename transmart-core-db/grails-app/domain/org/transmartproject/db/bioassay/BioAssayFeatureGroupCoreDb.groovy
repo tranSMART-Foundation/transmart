@@ -28,16 +28,13 @@ class BioAssayFeatureGroupCoreDb implements Serializable {
     static hasMany = [ markers: BioMarkerCoreDb ]
 
     static mapping = {
-        table schema: 'biomart', name: 'bio_assay_feature_group'
-
+        table 'biomart.bio_assay_feature_group'
         id column: 'bio_assay_feature_group_id', generator:'assigned'
+        version false
 
+        markers joinTable: [name: 'biomart.bio_assay_data_annotation', key: 'bio_assay_feature_group_id']
         name column: 'feature_group_name'
         type column: 'feature_group_type'
-
-        markers joinTable: [ name: 'bio_assay_data_annotation', key: 'bio_assay_feature_group_id' ]
-
-        version false
     }
 
     static constraints = {

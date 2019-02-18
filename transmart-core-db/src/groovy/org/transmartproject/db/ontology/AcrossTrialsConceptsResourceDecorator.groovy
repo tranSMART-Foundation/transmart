@@ -19,51 +19,59 @@
 
 package org.transmartproject.db.ontology
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import org.transmartproject.core.concept.ConceptFullName
+import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.ontology.OntologyTerm
-import org.transmartproject.core.concept.ConceptKey
 
 import static org.transmartproject.db.ontology.AbstractAcrossTrialsOntologyTerm.ACROSS_TRIALS_TABLE_CODE
 import static org.transmartproject.db.ontology.AbstractAcrossTrialsOntologyTerm.ACROSS_TRIALS_TOP_TERM_NAME
 
+@CompileStatic
 class AcrossTrialsConceptsResourceDecorator implements ConceptsResource {
 
     ConceptsResource inner
 
     private final OntologyTerm topTerm = new AcrossTrialsTopTerm()
 
-    @Override
     List<OntologyTerm> getAllCategories() {
-        [topTerm] + inner.allCategories
+	([topTerm] + inner.allCategories) as List
     }
 
-    @Override
     OntologyTerm getByKey(String conceptKey) throws NoSuchResourceException {
-        def conceptKeyObj = new ConceptKey(conceptKey)
+	ConceptKey conceptKeyObj = new ConceptKey(conceptKey)
 
         if (conceptKeyObj.tableCode != ACROSS_TRIALS_TABLE_CODE) {
             return inner.getByKey(conceptKey)
         }
 
-        def fullName = conceptKeyObj.conceptFullName
+	ConceptFullName fullName = conceptKeyObj.conceptFullName
         if (fullName[0] != ACROSS_TRIALS_TOP_TERM_NAME) {
-            throw new NoSuchResourceException("All the across trials terms' " +
-                    'first path component should be ' +
-                    '' + ACROSS_TRIALS_TOP_TERM_NAME)
+	    throw new NoSuchResourceException(
+		"All the across trials terms' first path component should be " +
+		    ACROSS_TRIALS_TOP_TERM_NAME)
         }
 
         if (fullName.length == 1) {
             topTerm
-        } else { // > 1
-            String modifier_path = "\\${fullName[1..-1].join '\\'}\\"
-            def modifier = ModifierDimensionView.get(modifier_path)
+	}
+	else { // > 1
+	    String modifierPath = buildModifierPath(fullName)
+	    ModifierDimensionView modifier = ModifierDimensionView.get(modifierPath)
             if (!modifier) {
-                throw new NoSuchResourceException('Could not find across ' +
-                        'trials node with modifier_path ' + modifier_path)
+		throw new NoSuchResourceException(
+		    'Could not find across trials node with modifier_path ' + modifierPath)
             }
 
             new AcrossTrialsOntologyTerm(modifierDimension: modifier)
         }
+    }
+
+    @CompileDynamic
+    private String buildModifierPath(ConceptFullName fullName) {
+	"\\${fullName[1..-1].join '\\'}\\"
     }
 }

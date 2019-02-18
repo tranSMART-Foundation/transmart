@@ -53,47 +53,42 @@ class PatientDimension implements Patient {
     static hasMany = [assays: DeSubjectSampleMapping]
 
     static mapping = {
-        table         name:      'patient_dimension', schema: 'i2b2demodata'
-
-        id            generator: 'assigned', column: 'patient_num', type: Long
+        table 'i2b2demodata.patient_dimension'
+        id         generator: 'assigned', column: 'patient_num'
+        version false
 
         age           column:    'age_in_years_num'
-        race          column:    'race_cd'
         maritalStatus column:    'marital_status_cd'
+        patientBlob  sqlType:   'text'
+        race          column:    'race_cd'
         religion      column:    'religion_cd'
-
-        patientBlob   sqlType:   'text'
-
-        version false
     }
 
     static constraints = {
-        vitalStatusCd    nullable: true, maxSize: 50
+        age              nullable: true
         birthDate        nullable: true
         deathDate        nullable: true
-        sexCd            nullable: true, maxSize: 50
-        age              nullable: true
-        languageCd       nullable: true, maxSize: 50
-        race             nullable: true, maxSize: 50
-        maritalStatus    nullable: true, maxSize: 50
-        religion         nullable: true, maxSize: 50
-        zipCd            nullable: true, maxSize: 10
-        statecityzipPath nullable: true, maxSize: 700
-        incomeCd         nullable: true, maxSize: 50
-        patientBlob      nullable: true
-        updateDate       nullable: true
         downloadDate     nullable: true
         importDate       nullable: true
+        incomeCd         nullable: true, maxSize: 50
+        languageCd       nullable: true, maxSize: 50
+        maritalStatus    nullable: true, maxSize: 50
+        patientBlob      nullable: true
+        race             nullable: true, maxSize: 50
+        religion         nullable: true, maxSize: 50
+        sexCd            nullable: true, maxSize: 50
         sourcesystemCd   nullable: true, maxSize: 50
+        statecityzipPath nullable: true, maxSize: 700
+        updateDate       nullable: true
         uploadId         nullable: true
+        vitalStatusCd    nullable: true, maxSize: 50
+        zipCd            nullable: true, maxSize: 10
     }
 
-    @Override
     String getTrial() {
         sourcesystemCd?.split(/:/, 2)[0]
     }
 
-    @Override
     String getInTrialId() {
         if (sourcesystemCd == null) {
             return null
@@ -101,9 +96,7 @@ class PatientDimension implements Patient {
         (sourcesystemCd.split(/:/, 2) as List)[1] /* cast to avoid exception */
     }
 
-    @Override
     Sex getSex() {
         Sex.fromString sexCd
     }
-
 }

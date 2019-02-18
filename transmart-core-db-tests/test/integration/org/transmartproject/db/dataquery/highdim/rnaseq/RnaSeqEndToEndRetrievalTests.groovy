@@ -257,7 +257,7 @@ class RnaSeqEndToEndRetrievalTests {
                                 (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [
                                         /* test region wider then the segment */
                                         [chromosome: '1', start: 44, end: 8888],
-                                        /* segment aligned at the end of test region
+                                        /* segment aligned at the end of test region;
                                          *segment shorter than region */
                                         [chromosome: '2', start: 88, end: 99],
                                 ]
@@ -271,6 +271,7 @@ class RnaSeqEndToEndRetrievalTests {
                 annotationDate: Date.parse('yyyy-MM-dd', '2013-08-03'),
                 markerType: 'RNASEQ_RCNT',
                 genomeReleaseId: 'hg19',
+	        gplId: 'gpl_id'
         )
         anotherPlatform.id = 'test-another-platform'
         anotherPlatform.save failOnError: true, flush: true
@@ -283,7 +284,7 @@ class RnaSeqEndToEndRetrievalTests {
                 end: 10,
                 numberOfProbes: 42,
                 name: 'region 1:1-10',
-		gplId: 'gplId'
+	        gplId: 'gpl_id'
         )
         anotherRegion.id = -2010L
         anotherRegion.save failOnError: true, flush: true
@@ -363,7 +364,7 @@ class RnaSeqEndToEndRetrievalTests {
         contains testData.rnaseqData.
                 findAll { it.region == region }.
                 sort { it.assay.id }. // data is sorted by assay id
-                collect { closeTo it[property] as Double, DELTA }
+                collect { closeTo it."$property" as Double, DELTA }
     }
 
     @Test
@@ -372,7 +373,7 @@ class RnaSeqEndToEndRetrievalTests {
         assertThat gene_symbols, allOf(
                 hasSize(1),
                 contains(
-                        equalTo('ADIRF')
+                        equalTo("ADIRF")
                 )
         )
     }
@@ -383,7 +384,7 @@ class RnaSeqEndToEndRetrievalTests {
         assertThat cytoband, allOf(
                 hasSize(1),
                 contains(
-                        equalTo('1p12.1')
+                        equalTo("1p12.1")
                 )
         )
     }
@@ -395,8 +396,8 @@ class RnaSeqEndToEndRetrievalTests {
                 hasSize ( 2 ),
                 // should be in alphabetical order
                 contains (
-                        equalTo ( 'region 1:33-9999' ),
-                        equalTo ( 'region 2:66-99' )
+                        equalTo ( "region 1:33-9999" ),
+                        equalTo ( "region 2:66-99" )
                 )
         )
     }

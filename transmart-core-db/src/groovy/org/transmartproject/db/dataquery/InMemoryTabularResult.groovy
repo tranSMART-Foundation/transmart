@@ -36,14 +36,11 @@ class InMemoryTabularResult<I extends DataColumn, R extends DataRow> implements 
         internalRows = delegate.rows.collect() as List
     }
 
-    @Override
     Iterator<R> iterator() {
         internalRows.iterator()
     }
 
-    @Override
     Iterator<R> getRows() {
         internalRows.iterator()
     }
-
 }

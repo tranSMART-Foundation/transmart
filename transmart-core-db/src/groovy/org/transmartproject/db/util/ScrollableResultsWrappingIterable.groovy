@@ -10,17 +10,14 @@ class ScrollableResultsWrappingIterable<T> extends AbstractOneTimeCallIterable<T
     protected final ScrollableResultsIterator scrollableResultsIterator
 
     ScrollableResultsWrappingIterable(ScrollableResults scrollableResults) {
-        this.scrollableResultsIterator = new ScrollableResultsIterator(scrollableResults)
+        scrollableResultsIterator = new ScrollableResultsIterator(scrollableResults)
     }
 
-    @Override
     protected Iterator getIterator() {
         scrollableResultsIterator
     }
 
-    @Override
     void close() throws IOException {
         scrollableResultsIterator.close()
     }
-
 }

@@ -30,12 +30,11 @@ class I2b2TrialNodes implements Serializable {
     String trial
 
     static mapping = {
-        table    name:      'i2b2_trial_nodes', schema: 'i2b2metadata'
+        table    'i2b2metadata.i2b2_trial_nodes'
         id       composite: ['fullName', 'trial']
+        version  false
 
         fullName column: 'c_fullname'
-
-        version  false
 
         /* I don't think it's possible to create an association to I2b2 here
          * For some reason, the id of I2b2 is [C_FULLNAME, C_NAME].

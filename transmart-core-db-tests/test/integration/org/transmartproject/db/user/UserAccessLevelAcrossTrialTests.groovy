@@ -62,7 +62,7 @@ class UserAccessLevelAcrossTrialTests {
         sessionFactory.currentSession.flush()
 
         /* add entry in I2b2Secure to make sure we're not allowing the thing
-         * because of the 'public by default' behavior */
+         * because of the "public by default" behavior */
         OntologyTerm term = new AcrossTrialsOntologyTerm(
                 modifierDimension: ModifierDimensionView.get(
                         acrossTrialsTestData.modifierDimensions[0].path))

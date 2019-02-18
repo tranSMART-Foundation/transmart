@@ -19,25 +19,19 @@
 
 package org.transmartproject.db.dataquery.highdim.metabolite
 
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import org.transmartproject.core.dataquery.highdim.BioMarkerDataRow
 import org.transmartproject.db.dataquery.highdim.AbstractDataRow
 
+@CompileStatic
 @ToString(includes=['label', 'bioMarker', 'data'])
 class MetaboliteDataRow extends AbstractDataRow implements BioMarkerDataRow<Object> {
 
+    String biochemicalName
     String hmdbId
 
-    String biochemicalName
+    String getLabel() { biochemicalName }
 
-    @Override
-    String getLabel() {
-        biochemicalName
-    }
-
-    @Override
-    String getBioMarker() {
-        hmdbId
-    }
-
+    String getBioMarker() { hmdbId }
 }

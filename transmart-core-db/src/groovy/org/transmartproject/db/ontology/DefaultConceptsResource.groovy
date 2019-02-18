@@ -19,10 +19,10 @@
 
 package org.transmartproject.db.ontology
 
+import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.ontology.OntologyTerm
-import org.transmartproject.core.concept.ConceptKey
 
 /**
  * Handles loading {@link OntologyTerm}s from <code>table_access</code> and
@@ -30,28 +30,23 @@ import org.transmartproject.core.concept.ConceptKey
  */
 class DefaultConceptsResource implements ConceptsResource {
 
-    @Override
     List<OntologyTerm> getAllCategories() {
         TableAccess.getCategories(true, true)
     }
 
-    @Override
     OntologyTerm getByKey(String conceptKey) throws NoSuchResourceException {
-        def ck, domainClass, result
-        ck = new ConceptKey(conceptKey)
-        domainClass = TableAccess.findByTableCode(ck.tableCode)?.
-                ontologyTermDomainClassReferred
-        if (!domainClass)
-            throw new NoSuchResourceException('Unknown or unmapped table ' +
-                    'code: ' + ck.tableCode)
-        result = domainClass.findByFullNameAndCSynonymCd(ck.conceptFullName
-                .toString(), 'N' as Character)
+	ConceptKey ck = new ConceptKey(conceptKey)
+	Class domainClass = TableAccess.findByTableCode(ck.tableCode)?.ontologyTermDomainClassReferred
+	if (!domainClass) {
+	    throw new NoSuchResourceException("Unknown or unmapped table code: $ck.tableCode")
+	}
+
+	OntologyTerm result = domainClass.findByFullNameAndCSynonymCd(ck.conceptFullName.toString(), 'N' as Character)
         if (!result) {
-            throw new NoSuchResourceException('No non-synonym concept with ' +
-                    "fullName '$ck.conceptFullName' found for type " +
-                    '' + domainClass)
+	    throw new NoSuchResourceException('No non-synonym concept with fullName "' +
+					      ck.conceptFullName + '" found for type ' + domainClass.name)
         }
-        result.setTableCode(ck.tableCode)
+	result.tableCode = ck.tableCode
         result
     }
 }

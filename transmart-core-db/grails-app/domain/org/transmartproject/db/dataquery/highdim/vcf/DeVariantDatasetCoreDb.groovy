@@ -21,27 +21,28 @@ package org.transmartproject.db.dataquery.highdim.vcf
 
 class DeVariantDatasetCoreDb {
 
-    String id
     String datasourceId
-    String etlId
     Date etlDate
+    String etlId
     String genome
+    String id
     String metadataComment
     String variantDatasetType
 
-    static hasMany = [summaries: DeVariantSubjectSummaryCoreDb, details: DeVariantSubjectDetailCoreDb]
+    static hasMany = [details: DeVariantSubjectDetailCoreDb,
+		      summaries: DeVariantSubjectSummaryCoreDb]
 
     static constraints = {
-        datasourceId(nullable: true)
-        etlId(nullable: true)
-        etlDate(nullable: true)
-        metadataComment(nullable: true)
-        variantDatasetType(nullable: true)
+        datasourceId nullable: true
+        etlDate nullable: true
+        etlId nullable: true
+        metadataComment nullable: true
+        variantDatasetType nullable: true
     }
 
     static mapping = {
-        table schema: 'deapp', name:  'de_variant_dataset'
-        version false
+        table 'deapp.de_variant_dataset'
         id column:'dataset_id', generator: 'assigned'
+        version false
     }
 }

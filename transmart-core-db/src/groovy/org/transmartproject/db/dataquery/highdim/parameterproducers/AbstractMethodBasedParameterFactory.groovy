@@ -25,10 +25,11 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
 /**
- * Created by glopes on 11/18/13.
+ * @author glopes
  */
 class AbstractMethodBasedParameterFactory implements DataRetrievalParameterFactory {
-    @Lazy private volatile Map<String, Method> producerMap = {
+    @Lazy
+    private volatile Map<String, Method> producerMap = {
         def result = [:]
         for (method in delegate.getClass().methods) {
             def producerFor = AnnotationUtils.findAnnotation method, ProducerFor
@@ -39,20 +40,15 @@ class AbstractMethodBasedParameterFactory implements DataRetrievalParameterFacto
         result
     }()
 
-    @Override
     Set<String> getSupportedNames() {
         producerMap.keySet()
     }
 
-    @Override
     boolean supports(String name) {
         supportedNames.contains name
     }
 
-    @Override
-    def createFromParameters(String name,
-                             Map<String, Object> params,
-                             Object createProducer) {
+    def createFromParameters(String name, Map<String, Object> params, Closure createProducer) {
 
         Method producerMethod = producerMap[name]
         if (!producerMethod) {
@@ -67,12 +63,12 @@ class AbstractMethodBasedParameterFactory implements DataRetrievalParameterFacto
                 producerMethod.invoke this, params, createProducer
             }
             else {
-                throw new RuntimeException('The producer method should take either ' +
-                        'one or two parameters; not the case for ' + producerMethod)
+                throw new RuntimeException("The producer method should take either one or two parameters; " +
+					   "not the case for $producerMethod")
             }
         }
-        catch (InvocationTargetException ite) {
-            throw ite.targetException
+	catch (InvocationTargetException e) {
+	    throw e.targetException
         }
     }
 }

@@ -25,10 +25,9 @@ class DisjunctionAssayCriteriaConstraint implements AssayCriteriaConstraint {
 
     List<AssayCriteriaConstraint> constraints
 
-    @Override
     void addToCriteria(Criteria criteria) {
         criteria.or {
-            constraints.each { AssayCriteriaConstraint subConstraint ->
+            for (AssayCriteriaConstraint subConstraint in constraints) {
                 subConstraint.addToCriteria criteria
             }
         }

@@ -19,7 +19,8 @@
 
 package org.transmartproject.db.dataquery.highdim.acgh
 
-import org.transmartproject.core.dataquery.assay.Assay
+import groovy.util.logging.Slf4j
+import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 import org.transmartproject.db.dataquery.highdim.HighDimTestData
@@ -30,132 +31,121 @@ import org.transmartproject.db.ontology.ConceptTestData
 import org.transmartproject.db.querytool.QtQueryMaster
 import org.transmartproject.db.search.SearchKeywordCoreDb
 
-import static org.transmartproject.db.dataquery.highdim.HighDimTestData.*
+import static org.transmartproject.db.dataquery.highdim.HighDimTestData.createTestAssays
+import static org.transmartproject.db.dataquery.highdim.HighDimTestData.createTestPatients
 import static org.transmartproject.db.querytool.QueryResultData.createQueryResult
 
-class AcghTestData {
+@Slf4j('logger')
+class AcghTestData extends AbstractTestData {
 
-    static final String TRIAL_NAME = 'REGION_SAMP_TRIAL'
+	static final String ACGH_PLATFORM_MARKER_TYPE = 'Chromosomal'
+	static final String TRIAL_NAME = 'REGION_SAMP_TRIAL'
 
-    static final String ACGH_PLATFORM_MARKER_TYPE = 'Chromosomal'
+	private String conceptCode
 
-    SampleBioMarkerTestData bioMarkerTestData
+	SampleBioMarkerTestData bioMarkerTestData
+	ConceptTestData concept
+	DeGplInfo regionPlatform
+	DeGplInfo bogusTypePlatform
+	List<DeChromosomalRegion> regions
+	List<PatientDimension> patients
+	QtQueryMaster allPatientsQueryResult
+	List<DeSubjectSampleMapping> assays
+	List<DeSubjectAcghData> acghData
+	List<SearchKeywordCoreDb> searchKeywords
 
-    private String conceptCode
+	AcghTestData(String code = 'concept code #1', SampleBioMarkerTestData testData = null) {
+		conceptCode = code
+		bioMarkerTestData = testData ?: new SampleBioMarkerTestData()
+		createTestData()
+	}
 
-    ConceptTestData concept = HighDimTestData.createConcept('ACGHPUBLIC', 'concept code #1', TRIAL_NAME, 'REGION_CONCEPT', 'acgh i2b2 main')
+	void saveAll() {
+		bioMarkerTestData.saveGeneData()
 
-    AcghTestData(String conceptCode = 'concept code #1',
-                 SampleBioMarkerTestData bioMarkerTestData = null) {
-        this.conceptCode = conceptCode
-        this.bioMarkerTestData = bioMarkerTestData ?: new SampleBioMarkerTestData()
-    }
+		save regionPlatform, logger
+		save bogusTypePlatform, logger
+		saveAll regions, logger
+		saveAll patients, logger
+		save allPatientsQueryResult, logger
+		saveAll assays, logger
+		saveAll acghData, logger
+		concept.saveAll()
+	}
 
-    @Lazy List<SearchKeywordCoreDb> searchKeywords = {
-        bioMarkerTestData.geneSearchKeywords +
-                bioMarkerTestData.proteinSearchKeywords +
-                bioMarkerTestData.geneSignatureSearchKeywords
-    }()
+	private DeSubjectAcghData createACGHData(DeChromosomalRegion region,
+	                                         DeSubjectSampleMapping assay, int flag) {
+		new DeSubjectAcghData(
+				region: region,
+				jRegion: region,
+				assay: assay,
+				patient: assay.patient,
+				chipCopyNumberValue: 0.11d,
+				segmentCopyNumberValue: 0.12d,
+				flag: flag,
+				probabilityOfLoss: 0.11d + (flag == -1 ? 0.08d : 0),
+				probabilityOfNormal: 0.13d + (flag == 0 ? 0.08d : 0),
+				probabilityOfGain: 0.14d + (flag == 1 ? 0.08d : 0),
+				probabilityOfAmplification: 0.15d + (flag == 2 ? 0.08d : 0),
+		)
+	}
 
-    DeGplInfo regionPlatform = {
-        def p = new DeGplInfo(
-                title: 'Test Region Platform',
-                organism: 'Homo Sapiens',
-                annotationDate: Date.parse('yyyy-MM-dd', '2013-05-03'),
-                markerType: ACGH_PLATFORM_MARKER_TYPE,
-                genomeReleaseId: 'hg18',
-        )
-        p.id = 'test-region-platform'
-        p
-    }()
+	private void createTestData() {
+		concept = HighDimTestData.createConcept('ACGHPUBLIC', 'concept code #1',
+				TRIAL_NAME, 'REGION_CONCEPT', 'acgh i2b2 main')
 
-    DeGplInfo bogusTypePlatform = {
-        def p = new DeGplInfo(
-                markerTypeId: 'bogus marker type',
-        )
-        p.id = 'bogus-marker-platform'
-        p
-    }()
+		regionPlatform = new DeGplInfo(
+				title: 'Test Region Platform',
+				organism: 'Homo Sapiens',
+				annotationDate: Date.parse('yyyy-MM-dd', '2013-05-03'),
+				markerType: ACGH_PLATFORM_MARKER_TYPE,
+				genomeReleaseId: 'hg18')
+		regionPlatform.id = 'test-region-platform'
 
-    List<DeChromosomalRegion> regions = {
-        def r = [
-                new DeChromosomalRegion(
-                        platform: regionPlatform,
-                        chromosome: '1',
-                        start: 33,
-                        end: 9999,
-                        numberOfProbes: 42,
-                        name: 'region 1:33-9999',
-                        cytoband: 'cytoband1',
-                        geneSymbol: 'ADIRF',
-                        geneId: -130753,
-			gplId: 'gplId'
-                ),
-                new DeChromosomalRegion(
-                        platform: regionPlatform,
-                        chromosome: '2',
-                        start: 66,
-                        end: 99,
-                        numberOfProbes: 2,
-                        name: 'region 2:66-99',
-                        cytoband: 'cytoband2',
-                        geneSymbol: 'AURKA',
-                        geneId: -130751,
-			gplId: 'gplId'
-                ),
-        ]
-        r[0].id = -1001L
-        r[1].id = -1002L
-        r
-    }()
+		bogusTypePlatform = new DeGplInfo(markerTypeId: 'bogus marker type')
+		bogusTypePlatform.id = 'bogus-marker-platform'
 
-    List<PatientDimension> patients = createTestPatients(2, -2000, 'REGION_SAMP_TRIAL')
 
-    QtQueryMaster allPatientsQueryResult = createQueryResult(patients)
+		regions = [
+				new DeChromosomalRegion(
+						platform: regionPlatform,
+						chromosome: '1',
+						start: 33,
+						end: 9999,
+						numberOfProbes: 42,
+						name: 'region 1:33-9999',
+						cytoband: 'cytoband1',
+						geneSymbol: 'ADIRF',
+						geneId: -130753,
+						gplId: 'gplId'),
+				new DeChromosomalRegion(
+						platform: regionPlatform,
+						chromosome: '2',
+						start: 66,
+						end: 99,
+						numberOfProbes: 2,
+						name: 'region 2:66-99',
+						cytoband: 'cytoband2',
+						geneSymbol: 'AURKA',
+						geneId: -130751,
+						gplId: 'gplId')]
+		regions[0].id = -1001L
+		regions[1].id = -1002L
 
-    List<DeSubjectSampleMapping> assays = createTestAssays(patients,
-                                                           -3000L,
-                                                           regionPlatform,
-                                                           TRIAL_NAME,
-                                                           conceptCode)
+		patients = createTestPatients(2, -2000, 'REGION_SAMP_TRIAL')
 
-    DeSubjectAcghData createACGHData(DeChromosomalRegion region,
-                                     Assay assay,
-                                     flag = 0) {
-        new DeSubjectAcghData(
-                region:                     region,
-                jRegion:                   region,
-                assay:                      assay,
-                patient:                    assay.patient,
-                chipCopyNumberValue:        0.11d,
-                segmentCopyNumberValue:     0.12d,
-                flag:                       flag,
-                probabilityOfLoss:          0.11d + (flag == -1 ? 0.08d : 0),
-                probabilityOfNormal:        0.13d + (flag == 0 ? 0.08d : 0),
-                probabilityOfGain:          0.14d + (flag == 1 ? 0.08d : 0),
-                probabilityOfAmplification: 0.15d + (flag == 2 ? 0.08d : 0),
-        )
-    }
+		allPatientsQueryResult = createQueryResult(patients)
 
-    List<DeSubjectAcghData> acghData = {
-        [
-                createACGHData(regions[0], assays[0], -1),
-                createACGHData(regions[0], assays[1], 0),
-                createACGHData(regions[1], assays[0], 1),
-                createACGHData(regions[1], assays[1], 2),
-        ]
-    }()
+		assays = createTestAssays(patients, -3000L, regionPlatform, TRIAL_NAME, conceptCode)
 
-    void saveAll() {
-        bioMarkerTestData.saveGeneData()
+		acghData = [
+				createACGHData(regions[0], assays[0], -1),
+				createACGHData(regions[0], assays[1], 0),
+				createACGHData(regions[1], assays[0], 1),
+				createACGHData(regions[1], assays[1], 2)]
 
-        save([ regionPlatform, bogusTypePlatform ])
-        save regions
-        save patients
-        save([ allPatientsQueryResult ])
-        save assays
-        save acghData
-        concept.saveAll()
-    }
-
+		searchKeywords = bioMarkerTestData.geneSearchKeywords +
+				bioMarkerTestData.proteinSearchKeywords +
+				bioMarkerTestData.geneSignatureSearchKeywords
+	}
 }

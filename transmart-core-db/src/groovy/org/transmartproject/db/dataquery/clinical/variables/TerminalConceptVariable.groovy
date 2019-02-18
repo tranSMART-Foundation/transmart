@@ -19,41 +19,38 @@
 
 package org.transmartproject.db.dataquery.clinical.variables
 
+import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import org.transmartproject.core.concept.ConceptFullName
 import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.dataquery.DataColumn
 
+@CompileStatic
 @EqualsAndHashCode(includes = [ 'conceptCode', 'conceptPath' ])
 @ToString
 class TerminalConceptVariable implements TerminalClinicalVariable, DataColumn {
 
-    public final static String GROUP_NAME = this.simpleName
+    public static final String GROUP_NAME = TerminalConceptVariable.simpleName
 
-    /* when created, only one needs to be filled, but then a postprocessing
-     * step must fill the other */
-    String conceptCode,
-           conceptPath
+    // when created, only one needs to be filled, but then a postprocessing step must fill the other
+    String conceptCode
+    String conceptPath
 
-    @Override
     String getLabel() {
         conceptPath
     }
 
-    @Override
     String getGroup() {
         GROUP_NAME
     }
 
-    @Override
     String getCode() {
         conceptCode
     }
 
-    @Override
     ConceptKey getKey() {
-        def fullName = new ConceptFullName(conceptPath)
+        ConceptFullName fullName = new ConceptFullName(conceptPath)
         new ConceptKey(fullName.parts[0], fullName.toString())
     }
 }

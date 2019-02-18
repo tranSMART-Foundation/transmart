@@ -28,51 +28,48 @@ import org.transmartproject.db.i2b2data.PatientDimension
 
 class QtQueryResultInstance implements QueryResult {
 
-    Short             resultTypeId = 1
-    Long              setSize
-    Date              startDate
-    Date              endDate
-    String            deleteFlag = 'N'
-    Short             statusTypeId
-    String            errorMessage
-    String            description
-    Long              realSetSize
-    String            obfuscMethod
-    QtQueryInstance   queryInstance
+    String deleteFlag = 'N'
+    String description
+    Date endDate
+    String errorMessage
+    String obfuscMethod
+    QtQueryInstance queryInstance
+    Long realSetSize
+    Short resultTypeId = 1
+    Long setSize
+    Date startDate
+    Short statusTypeId
 
-	static belongsTo = QtQueryInstance
+    static transients = ['username']
 
     static hasMany = [patientSet: QtPatientSetCollection,
                       patientsA:  PatientDimension]
 
-    static transients = ['username']
+    static belongsTo = QtQueryInstance
 
-	static mapping = {
+    static mapping = {
         table          schema: 'I2B2DEMODATA'
-
         /* use sequence instead of identity because our Oracle schema doesn't
          * have a trigger that fills the column in this case */
-        id             column: 'result_instance_id', generator: 'sequence',
-                       params: [sequence: 'qt_sq_qri_qriid', schema: 'i2b2demodata']
-        errorMessage   column: 'message'
-        queryInstance  column: 'query_instance_id', fetch: 'join'
+        id             column: 'result_instance_id', generator: 'sequence', params: [sequence: 'i2b2demodata.qt_sq_qri_qriid']
+	version false
 
+        errorMessage   column: 'message'
         patientsA      joinTable: [name:   'qt_patient_set_collection',
                                    key:    'result_instance_id',
                                    column: 'patient_num']
+        queryInstance  column: 'query_instance_id', fetch: 'join'
+    }
 
-		version false
-	}
-
-	static constraints = {
-        setSize        nullable:   true
-        endDate        nullable:   true
+    static constraints = {
         deleteFlag     nullable:   true,   maxSize:   3
-        errorMessage   nullable:   true
         description    nullable:   true,   maxSize:   200
-        realSetSize    nullable:   true
+        endDate        nullable:   true
+        errorMessage   nullable:   true
         obfuscMethod   nullable:   true,   maxSize:   500
-	}
+        realSetSize    nullable:   true
+        setSize        nullable:   true
+    }
 
     @Override
     QueryStatus getStatus() {
@@ -81,9 +78,7 @@ class QtQueryResultInstance implements QueryResult {
 
     @Override
     Set<Patient> getPatients() {
-        new PatientQuery([
-                new PatientSetsConstraint([this])
-        ]).list() as Set
+        new PatientQuery([new PatientSetsConstraint([this])]).list()
     }
 
     @Override

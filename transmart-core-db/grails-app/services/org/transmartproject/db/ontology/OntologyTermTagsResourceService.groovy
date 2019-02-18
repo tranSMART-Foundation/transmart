@@ -1,23 +1,26 @@
 package org.transmartproject.db.ontology
 
+import org.transmart.plugin.shared.Utils
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.OntologyTermTag
 import org.transmartproject.core.ontology.OntologyTermTagsResource
 
 class OntologyTermTagsResourceService implements OntologyTermTagsResource {
 
-    @Override
+    static transactional = false
+
     Map<OntologyTerm, List<OntologyTermTag>> getTags(Set<OntologyTerm> ontologyTerms, boolean includeDescendantsTags) {
         if (!ontologyTerms) {
             return [:]
         }
 
-        def orderedTags = I2b2Tag.createCriteria().list {
+        List<I2b2Tag> orderedTags = I2b2Tag.createCriteria().list {
             or {
-                ontologyTerms.each { OntologyTerm term ->
+                for (OntologyTerm term in ontologyTerms) {
                     if (includeDescendantsTags) {
-                        like 'ontologyTermFullName', (term.fullName.asLikeLiteral() + '%')
-                    } else {
+                        like 'ontologyTermFullName', Utils.asLikeLiteral(term.fullName) + '%'
+                    }
+		    else {
                         eq 'ontologyTermFullName', term.fullName
                     }
                 }
@@ -26,13 +29,12 @@ class OntologyTermTagsResourceService implements OntologyTermTagsResource {
             order 'position'
         }
 
-        def terms = I2b2.findAllByFullNameInList((orderedTags*.ontologyTermFullName).unique())
-        def termsMap = terms.collectEntries { [it.fullName, it] }
+        List<I2b2> terms = I2b2.findAllByFullNameInList((orderedTags*.ontologyTermFullName).unique())
+        Map<String, I2b2> termsMap = terms.collectEntries { I2b2 i2b2 -> [i2b2.fullName, i2b2] }
 
-        def result  = orderedTags.groupBy { termsMap[it.ontologyTermFullName] }
+        Map<OntologyTerm, List<OntologyTermTag>> result  = orderedTags.groupBy { I2b2Tag i2b2Tag -> termsMap[i2b2Tag.ontologyTermFullName] }
         //remove tags that point to non-existing concept
-        result.remove(null)
+        result.remove null
         result
     }
-
 }

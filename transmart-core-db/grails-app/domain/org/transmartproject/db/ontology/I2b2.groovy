@@ -24,6 +24,8 @@ import org.transmartproject.core.ontology.Study
 
 class I2b2 extends AbstractI2b2Metadata implements Serializable {
 
+    static final String backingTable = 'I2B2'
+
     BigDecimal   cTotalnum
     String       cComment
     String       mAppliedPath
@@ -36,35 +38,28 @@ class I2b2 extends AbstractI2b2Metadata implements Serializable {
     String       cPath
     String       cSymbol
 
-    static String backingTable = 'I2B2'
-
     static transients = AbstractI2b2Metadata.transients + ['studyId', 'study']
 
     static mapping = {
-        table    name: 'I2B2', schema: 'I2B2METADATA'
+        table  'i2b2metadata.i2b2'
+	id composite: ['fullName', 'name'] // hibernate needs an id, see http://docs.jboss.org/hibernate/orm/3.3/reference/en/html/mapping.html#mapping-declaration-id
         version  false
-
-        /* hibernate needs an id, see
-         * http://docs.jboss.org/hibernate/orm/3.3/reference/en/html/mapping.html#mapping-declaration-id
-         */
-        id       composite: ['fullName', 'name']
 
         AbstractI2b2Metadata.mapping.delegate = delegate
         AbstractI2b2Metadata.mapping()
     }
 
     static constraints = {
-        cTotalnum      nullable: true
         cComment       nullable: true
-        mAppliedPath   nullable: false, maxSize: 700
-        downloadDate   nullable: true
-        updateDate     nullable: false
-        importDate     nullable: true
-        sourcesystemCd nullable: true,  maxSize: 50
-        valuetypeCd    nullable: true,  maxSize: 50
-        mExclusionCd   nullable: true,  maxSize: 25
         cPath          nullable: true,  maxSize: 700
         cSymbol        nullable: true,  maxSize: 50
+        cTotalnum      nullable: true
+        downloadDate   nullable: true
+        importDate     nullable: true
+        mAppliedPath                    maxSize: 700
+        mExclusionCd   nullable: true,  maxSize: 25
+        sourcesystemCd nullable: true,  maxSize: 50
+        valuetypeCd    nullable: true,  maxSize: 50
 
         AbstractI2b2Metadata.constraints.delegate = delegate
         AbstractI2b2Metadata.constraints()
@@ -95,9 +90,9 @@ class I2b2 extends AbstractI2b2Metadata implements Serializable {
 
         def res = query.list()
         if (res.size() > 1) {
-            throw new UnexpectedResultException('More than one study with name ' + trial)
+            throw new UnexpectedResultException("More than one study with name $trial")
         }
-        else if (res.size() == 1) {
+        if (res.size() == 1) {
             new StudyImpl(ontologyTerm: res[0], id: trial)
         }
         else {

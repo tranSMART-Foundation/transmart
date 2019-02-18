@@ -79,7 +79,7 @@ class VcfEndToEndRetrievalTests {
         List dataConstraints = [vcfResource.createDataConstraint(
                 DataConstraint.DISJUNCTION_CONSTRAINT,
                 subconstraints: [
-                        (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [chromosome: '1', start: 1, end: 2]
+                        (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [chromosome: "1", start: 1, end: 2]
                 ]
         )]
         def projection = vcfResource.createProjection [:], 'cohort'
@@ -120,7 +120,7 @@ class VcfEndToEndRetrievalTests {
         List dataConstraints = [vcfResource.createDataConstraint(
                 DataConstraint.DISJUNCTION_CONSTRAINT,
                 subconstraints: [
-                        (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [chromosome: '1', start: 1, end: 2]
+                        (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [chromosome: "1", start: 1, end: 2]
                 ]
         )]
         def projection = vcfResource.createProjection [:], 'cohort'
@@ -284,7 +284,7 @@ class VcfEndToEndRetrievalTests {
 
                 // Please note: the order of the assays is opposite from the order of creation
                 // as the assayId is decreased while creating the assays
-                contains( 'A/A', 'C/A', 'A/C' )
+                contains( "A/A", "C/A", "A/C" )
         ))
     }
 
@@ -310,7 +310,7 @@ class VcfEndToEndRetrievalTests {
         List dataConstraints = [vcfResource.createDataConstraint(
                 DataConstraint.DISJUNCTION_CONSTRAINT,
                 subconstraints: [
-                        (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [chromosome: '1', start: 3, end: 3]
+                        (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [chromosome: "1", start: 3, end: 3]
                 ]
         )]
         def projection = vcfResource.createProjection [:], 'cohort'
@@ -363,9 +363,9 @@ class VcfEndToEndRetrievalTests {
         // Please note: the order of the assays is opposite from the order of creation
         // as the assayId is decreased while creating the assays
         def expected = [
-            ['2/2', '2/2', '1/1'],
-            ['4/4', '3/3', '2/2'],
-            ['6/6', '4/4', '3/3'],
+            ["2/2", "2/2", "1/1"],
+            ["4/4", "3/3", "2/2"],
+            ["6/6", "4/4", "3/3"],
         ]
         
         def assays = dataQueryResult.indicesList

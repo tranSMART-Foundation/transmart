@@ -30,10 +30,10 @@ import javax.annotation.PostConstruct
 @Component
 class CorrelationTypesRegistry {
 
-    /* R: target type, C: source type, V: correlation type */
+    // R: target type, C: source type, V: correlation type
     Table<String, String, CorrelationType> registryTable = HashBasedTable.create()
 
-    /* source type -> data constraint name */
+    // source type -> data constraint name
     Map<String, String> constraintMap = [:]
 
     @PostConstruct
@@ -98,18 +98,14 @@ class CorrelationTypesRegistry {
         registryTable.row(targetType).values()
     }
 
-    /* constraint name -> correlation type for source type of constraint and
-     *                    specified target type */
+    // constraint name -> correlation type for source type of constraint and specified target type
     Map<String, CorrelationType> getConstraintsForTargetType(String targetType) {
-        registryTable.row(targetType).collectEntries { String sourceType,
-                                                       CorrelationType correlation ->
+        registryTable.row(targetType).collectEntries { String sourceType, CorrelationType correlation ->
             if (!constraintMap[sourceType]) {
-                throw new InvalidArgumentsException('Source type ' + sourceType + ' ' +
-                        'has no registered constraint name')
+                throw new InvalidArgumentsException("Source type $sourceType has no registered constraint name")
             }
 
-            [ constraintMap[sourceType], correlation ]
+            [constraintMap[sourceType], correlation]
         }
     }
-
 }

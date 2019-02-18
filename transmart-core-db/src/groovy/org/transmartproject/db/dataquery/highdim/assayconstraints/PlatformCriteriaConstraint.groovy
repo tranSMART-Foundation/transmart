@@ -28,7 +28,6 @@ class PlatformCriteriaConstraint implements AssayCriteriaConstraint {
 
     Collection<String> gplIds
 
-    @Override
     void addToCriteria(Criteria criteria) {
         /** @see org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping */
         if (gplIds) {

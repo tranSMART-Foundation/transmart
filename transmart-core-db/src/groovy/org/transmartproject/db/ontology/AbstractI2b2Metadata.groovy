@@ -19,17 +19,16 @@
 
 package org.transmartproject.db.ontology
 
-import grails.orm.HibernateCriteriaBuilder
 import groovy.transform.EqualsAndHashCode
+import groovy.util.slurpersupport.GPathResult
+import org.transmart.plugin.shared.Utils
+import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.ontology.OntologyTerm
-import org.transmartproject.core.ontology.OntologyTerm.VisualAttributes
 import org.transmartproject.core.ontology.Study
-import org.transmartproject.core.concept.ConceptKey
 
 @EqualsAndHashCode(includes = [ 'fullName', 'name' ])
-abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType
-        implements OntologyTerm {
+abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType implements OntologyTerm {
 
     Integer      level
     String       fullName
@@ -38,47 +37,45 @@ abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType
     String       tooltip
     String       metadataxml
 
-    /* properties abstracted with other properties */
+    // properties abstracted with other properties
     String       cVisualattributes = ''
     Character    cSynonymCd = 'N'
 
-    /* Transient */
+    // Transient
     String       tableCode
 
     static transients = [ 'synonym', 'metadata', 'tableCode' ]
 
     static mapping = {
-        fullName           column: 'C_FULLNAME'
-        level              column: 'C_HLEVEL'
-        name               column: 'C_NAME'
         code               column: 'C_BASECODE'
-        tooltip            column: 'C_TOOLTIP'
-        factTableColumn    column: 'C_FACTTABLECOLUMN'
-        dimensionTableName column: 'C_TABLENAME'
-        columnName         column: 'C_COLUMNNAME'
         columnDataType     column: 'C_COLUMNDATATYPE'
-        operator           column: 'C_OPERATOR'
+	columnName         column: 'C_COLUMNNAME'
         dimensionCode      column: 'C_DIMCODE'
+	dimensionTableName column: 'C_TABLENAME'
+	factTableColumn    column: 'C_FACTTABLECOLUMN'
+	fullName           column: 'C_FULLNAME'
+	level              column: 'C_HLEVEL'
         metadataxml        column: 'C_METADATAXML'
+	name               column: 'C_NAME'
+	operator           column: 'C_OPERATOR'
+	tooltip            column: 'C_TOOLTIP'
     }
 
     static constraints = {
-        level             nullable: false, min:     0
-        fullName          nullable: false, size:    2..700
-        name              nullable: false, size:    1..2000
         code              nullable: true,  maxSize: 50
-        tooltip           nullable: true,  maxSize: 900
-        cVisualattributes nullable: false, size:    1..3
-        cSynonymCd        nullable: false
+	cVisualattributes size: 1..3
+	fullName          size: 2..700
+	level             min: 0
         metadataxml       nullable: true
+	name              size: 1..2000
+	tooltip           nullable: true, maxSize: 900
 
         AbstractQuerySpecifyingType.constraints.delegate = delegate
         AbstractQuerySpecifyingType.constraints()
     }
 
-    @Override
-    EnumSet<VisualAttributes> getVisualAttributes() {
-        VisualAttributes.forSequence(cVisualattributes)
+    EnumSet<OntologyTerm.VisualAttributes> getVisualAttributes() {
+	OntologyTerm.VisualAttributes.forSequence cVisualattributes
     }
 
     boolean isSynonym() {
@@ -95,18 +92,17 @@ abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType
         }
 
         TableAccess candidate = null
-        TableAccess.list().each {
-            if (fullName.startsWith(it.fullName)) {
-                if (!candidate ||
-                        it.fullName.length() > candidate.fullName.length()) {
-                    candidate = it
+	for  (TableAccess ta in TableAccess.list()) {
+	    if (fullName.startsWith(ta.fullName)) {
+		if (!candidate || ta.fullName.length() > candidate.fullName.length()) {
+		    candidate = ta
                 }
             }
         }
 
-        if (!candidate)
-            throw new RuntimeException('Could not determine table code for ' +
-                    '' + this)
+	if (!candidate) {
+	    throw new RuntimeException("Could not determine table code for $this")
+	}
 
         tableCode = candidate.tableCode
         tableCode
@@ -116,65 +112,55 @@ abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType
         new ConceptKey(getTableCode(), fullName)
     }
 
-    @Override
     String getKey() {
         conceptKey.toString()
     }
 
-    @Override
-    Object getMetadata() {
-        if (!metadataxml)
+    Map getMetadata() {
+	if (!metadataxml) {
             return null
+	}
 
-        def slurper = new XmlSlurper().parseText(metadataxml)
-        def ret = [:]
+	GPathResult slurper = new XmlSlurper().parseText(metadataxml)
+	Map metadata = [:]
 
-        /* right now we only care about normalunits and oktousevalues */
-        ret.okToUseValues = slurper.Oktousevalues == 'Y' ? true : false
-        ret.unitValues = [
-                normalUnits: slurper.UnitValues?.NormalUnits?.toString(),
-                equalUnits: slurper.UnitValues?.EqualUnits?.toString(),
+	// right now we only care about normalunits and oktousevalues
+	metadata.okToUseValues = slurper.Oktousevalues == 'Y'
+	metadata.unitValues = [
+            normalUnits: slurper.UnitValues?.NormalUnits?.toString(),
+            equalUnits: slurper.UnitValues?.EqualUnits?.toString(),
         ]
 
         def seriesMeta = slurper.SeriesMeta
         if (seriesMeta) {
-            ret.seriesMeta = [
-                    'unit': seriesMeta.Unit?.toString(),
-                    'value': seriesMeta.Value?.toString(),
-                    'label': seriesMeta.DisplayName?.toString(),
+	    metadata.seriesMeta = [
+		unit : seriesMeta.Unit?.toString(),
+		value: seriesMeta.Value?.toString(),
+		label: seriesMeta.DisplayName?.toString(),
             ]
         }
-        ret
+
+	metadata
     }
 
-    @Override
     Study getStudy() {
         // since Study (in this sense) is a transmart concept, this only makes
         // sense for objects from tranSMART's i2b2 metadata table: I2b2
-        null
     }
 
-    List<OntologyTerm> getChildren(boolean showHidden = false,
-                                   boolean showSynonyms = false) {
-
-        getDescendants(false, showHidden, showSynonyms)
+    List<OntologyTerm> getChildren(boolean showHidden = false, boolean showSynonyms = false) {
+	getDescendants false, showHidden, showSynonyms
     }
 
-    //@Override
-    List<OntologyTerm> getAllDescendants(boolean showHidden = false,
-                                         boolean showSynonyms = false) {
-        getDescendants(true, showHidden, showSynonyms)
+    List<OntologyTerm> getAllDescendants(boolean showHidden = false, boolean showSynonyms = false) {
+	getDescendants true, showHidden, showSynonyms
     }
 
-    private List<OntologyTerm> getDescendants(boolean allDescendants,
-                                              boolean showHidden = false,
+    private List<OntologyTerm> getDescendants(boolean allDescendants, boolean showHidden = false,
                                               boolean showSynonyms = false) {
-        HibernateCriteriaBuilder c
-        def fullNameSearch = this.conceptKey.conceptFullName.toString()
-                .asLikeLiteral() + '%'
+	String fullNameSearch = Utils.asLikeLiteral(conceptKey.conceptFullName.toString()) + '%'
 
-        c = createCriteria()
-        def ret = c.list {
+	List<OntologyTerm> ret = createCriteria().list {
             and {
                 like 'fullName', fullNameSearch
                 if (allDescendants) {
@@ -191,20 +177,23 @@ abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType
                     eq 'cSynonymCd', 'N' as char
                 }
             }
-            order('name')
+	    order 'name'
         }
-        ret.each { it.setTableCode(getTableCode()) }
+
+	String tableCode = getTableCode()
+	for (it in ret) {
+	    it.tableCode = tableCode
+	}
+
         ret
     }
 
-    @Override
     List<Patient> getPatients() {
         super.getPatients(this)
     }
 
-    @Override
     String toString() {
         getClass().canonicalName + "[${attached?'attached':'not attached'}" +
-                '] [ fullName=' + fullName + ', level=' + level + ',  ]'
+	    "] [ fullName=$fullName, level=$level,  ]"
     }
 }

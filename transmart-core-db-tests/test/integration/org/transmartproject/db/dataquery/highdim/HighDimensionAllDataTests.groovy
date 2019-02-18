@@ -156,7 +156,7 @@ class HighDimensionAllDataTests {
             }
             genericProjection.rowProperties.each { prop, type ->
                 assertThat firstrow, hasProperty(prop)
-                assertThat '' + owner.type.dataTypeName + ': ' + prop + ' is not of expected type.',
+                assertThat "${owner.type.dataTypeName}: $prop is not of expected type.",
                         firstrow."$prop".getClass(), typeCompatibleWith(type)
             }
 
@@ -185,11 +185,10 @@ class HighDimensionAllDataTests {
                     }
                 }
 
-                assertThat  '' + owner.type.dataTypeName + ': ' + col + ' is not of expected type.',
+                assertThat  "${owner.type.dataTypeName}: $col is not of expected type.",
                         data."$col".getClass(), typeCompatibleWith(targetType)
             }
-        }
-        finally {
+        } finally {
             result?.close()
         }
     }

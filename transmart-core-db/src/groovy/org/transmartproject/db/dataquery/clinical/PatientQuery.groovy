@@ -30,17 +30,14 @@ class PatientQuery extends AbstractEntityQuery<Patient> {
     private final DetachedCriteria<PatientDimension> criteria
 
     PatientQuery(List<PatientConstraint> constraints) {
-        this.criteria =
-            PatientDimension.where {
-                constraints.each { PatientConstraint assayConstraint ->
-                    assayConstraint.addToCriteria(it)
-                }
+        criteria = PatientDimension.where {
+            for (PatientConstraint assayConstraint in constraints) {
+		assayConstraint.addToCriteria it
             }
+        }
     }
 
-    @Override
     DetachedCriteria<Patient> forEntities() {
         criteria
     }
-
 }

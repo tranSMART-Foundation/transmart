@@ -20,10 +20,11 @@
 package org.transmartproject.db.dataquery.highdim.dataconstraints
 
 import grails.orm.HibernateCriteriaBuilder
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class NoopDataConstraint implements CriteriaDataConstraint {
 
-    @Override
     void doWithCriteriaBuilder(HibernateCriteriaBuilder criteria) {
         // purposefully left empty
     }

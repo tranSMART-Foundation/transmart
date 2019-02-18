@@ -18,9 +18,11 @@
  */
 
 package org.transmartproject.db.dataquery.highdim.mirna
+
 import grails.orm.HibernateCriteriaBuilder
 import org.hibernate.ScrollableResults
 import org.hibernate.engine.SessionImplementor
+import org.hibernate.sql.JoinFragment
 import org.hibernate.transform.Transformers
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.TabularResult
@@ -33,75 +35,69 @@ import org.transmartproject.db.dataquery.highdim.DefaultHighDimensionTabularResu
 import org.transmartproject.db.dataquery.highdim.correlations.CorrelationType
 import org.transmartproject.db.dataquery.highdim.correlations.CorrelationTypesRegistry
 import org.transmartproject.db.dataquery.highdim.correlations.SearchKeywordDataConstraintFactory
-import org.transmartproject.db.dataquery.highdim.parameterproducers.*
+import org.transmartproject.db.dataquery.highdim.parameterproducers.AllDataProjectionFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.DataRetrievalParameterFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleAnnotationConstraintFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleRealProjectionsFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.StandardAssayConstraintFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.StandardDataConstraintFactory
 
 import javax.annotation.PostConstruct
 
-import static org.hibernate.sql.JoinFragment.INNER_JOIN
 import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
-/*
+
+/**
  * Mirna QPCR and Mirna SEQ are different data types (according to the user), but they have basically the same
  * implementation. We solve that by having a shared implementation in AbstractMirnaSharedModule.
  */
-
 abstract class AbstractMirnaSharedModule extends AbstractHighDimensionDataTypeModule {
 
     final Map<String, Class> dataProperties = typesMap(DeSubjectMirnaData,
-            ['rawIntensity', 'logIntensity', 'zscore'])
-
+						       ['rawIntensity', 'logIntensity', 'zscore'])
     final Map<String, Class> rowProperties = typesMap(MirnaProbeRow,
-            ['probeId', 'mirnaId'])
+						      ['probeId', 'mirnaId'])
 
-    @Autowired
-    StandardAssayConstraintFactory standardAssayConstraintFactory
-
-    @Autowired
-    StandardDataConstraintFactory standardDataConstraintFactory
-
-    @Autowired
-    CorrelationTypesRegistry correlationTypesRegistry
+    @Autowired CorrelationTypesRegistry correlationTypesRegistry
+    @Autowired StandardAssayConstraintFactory standardAssayConstraintFactory
+    @Autowired StandardDataConstraintFactory standardDataConstraintFactory
 
     @PostConstruct
-    @Override
     void init() {
         super.init()
         correlationTypesRegistry.registerConstraint('MIRNA', 'mirnas')
         correlationTypesRegistry.registerCorrelation(
-                new CorrelationType(name: 'MIRNA', sourceType: 'MIRNA', targetType: 'MIRNA'))
+            new CorrelationType(name: 'MIRNA', sourceType: 'MIRNA', targetType: 'MIRNA'))
     }
 
-    @Override
     protected List<DataRetrievalParameterFactory> createAssayConstraintFactories() {
         [ standardAssayConstraintFactory ]
     }
 
-    @Lazy private DataRetrievalParameterFactory searchKeywordDataConstraintFactory =
+    @Lazy
+    private DataRetrievalParameterFactory searchKeywordDataConstraintFactory =
         new SearchKeywordDataConstraintFactory(correlationTypesRegistry,
-                'MIRNA', 'p', 'mirnaId')
+					       'MIRNA', 'p', 'mirnaId')
 
-    @Override
     protected List<DataRetrievalParameterFactory> createDataConstraintFactories() {
         [ searchKeywordDataConstraintFactory,
-                new SimpleAnnotationConstraintFactory(field: 'probe', annotationClass: DeQpcrMirnaAnnotation.class),
-                standardDataConstraintFactory ]
+         new SimpleAnnotationConstraintFactory(field: 'probe', annotationClass: DeQpcrMirnaAnnotation.class),
+         standardDataConstraintFactory ]
     }
 
-    @Override
     protected List<DataRetrievalParameterFactory> createProjectionFactories() {
         [ new SimpleRealProjectionsFactory(
-                (Projection.LOG_INTENSITY_PROJECTION): 'logIntensity',
-                (Projection.DEFAULT_REAL_PROJECTION): 'rawIntensity',
-                (Projection.ZSCORE_PROJECTION):       'zscore'),
-        new AllDataProjectionFactory(dataProperties, rowProperties)]
+            (Projection.LOG_INTENSITY_PROJECTION): 'logIntensity',
+            (Projection.DEFAULT_REAL_PROJECTION): 'rawIntensity',
+            (Projection.ZSCORE_PROJECTION):       'zscore'),
+         new AllDataProjectionFactory(dataProperties, rowProperties)]
     }
 
-    @Override
     HibernateCriteriaBuilder prepareDataQuery(Projection projection, SessionImplementor session) {
-        HibernateCriteriaBuilder criteriaBuilder =
-            createCriteriaBuilder(DeSubjectMirnaData, 'm', session)
+	HibernateCriteriaBuilder criteriaBuilder = createCriteriaBuilder(
+	    DeSubjectMirnaData, 'm', session)
 
         criteriaBuilder.with {
-            createAlias 'jProbe', 'p', INNER_JOIN
+	    createAlias 'jProbe', 'p', JoinFragment.INNER_JOIN
 
             projections {
                 property 'assay.id',   'assayId'
@@ -121,59 +117,53 @@ abstract class AbstractMirnaSharedModule extends AbstractHighDimensionDataTypeMo
         criteriaBuilder
     }
 
-    @Override
-    TabularResult transformResults(ScrollableResults results,
-                                   List<AssayColumn> assays,
-                                   Projection projection) {
+    TabularResult transformResults(ScrollableResults results, List<AssayColumn> assays, Projection projection) {
 
-        Map assayIndexes = createAssayIndexMap assays
+	Map assayIndexes = createAssayIndexMap(assays)
 
         new DefaultHighDimensionTabularResult(
-                rowsDimensionLabel:    'Probes',
-                columnsDimensionLabel: 'Sample codes',
-                indicesList:           assays,
-                results:               results,
-                allowMissingAssays:    true,
-                assayIdFromRow:        { it[0].assayId },
-                inSameGroup:           { a, b -> a.probeId == b.probeId },
-                finalizeGroup:         { List list -> /* list of arrays with one element: a map */
-                    def firstNonNullCell = list.find()
-                    new MirnaProbeRow(
-                            probeId:       firstNonNullCell[0].probeId,
-                            mirnaId:       firstNonNullCell[0].mirna,
-                            assayIndexMap: assayIndexes,
-                            data:          list.collect { projection.doWithResult it?.getAt(0) }
-                    )
-                }
+            rowsDimensionLabel:    'Probes',
+            columnsDimensionLabel: 'Sample codes',
+            indicesList:           assays,
+            results:               results,
+            allowMissingAssays:    true,
+            assayIdFromRow:        { it[0].assayId },
+            inSameGroup:           { a, b -> a.probeId == b.probeId },
+            finalizeGroup:         { List list -> /* list of arrays with one element: a map */
+                def firstNonNullCell = list.find()
+                new MirnaProbeRow(
+                    probeId:       firstNonNullCell[0].probeId,
+                    mirnaId:       firstNonNullCell[0].mirna,
+                    assayIndexMap: assayIndexes,
+                    data:          list.collect { projection.doWithResult it?.getAt(0) }
+                )
+            }
         )
     }
 
-    @Override
     List<String> searchAnnotation(String concept_code, String search_term, String search_property) {
-        if (!getSearchableAnnotationProperties().contains(search_property))
+	if (!getSearchableAnnotationProperties().contains(search_property)) {
             return []
+	}
+
         DeQpcrMirnaAnnotation.createCriteria().list {
             dataRows {
                 'in'('assay', DeSubjectSampleMapping.createCriteria().listDistinct {eq('conceptCode', concept_code)} )
             }
-            ilike(search_property, search_term + '%')
+	    ilike search_property, search_term + '%'
             projections { distinct(search_property) }
-            order(search_property, 'ASC')
-            maxResults(100)
+	    order search_property, 'ASC'
         }
     }
 
-    @Override
     List<String> getSearchableAnnotationProperties() {
         ['detector', 'mirnaId']
     }
 
-    @Override
     HighDimensionFilterType getHighDimensionFilterType() {
         HighDimensionFilterType.SINGLE_NUMERIC
     }
 
-    @Override
     List<String> getSearchableProjections() {
         [Projection.LOG_INTENSITY_PROJECTION, Projection.DEFAULT_REAL_PROJECTION, Projection.ZSCORE_PROJECTION]
     }

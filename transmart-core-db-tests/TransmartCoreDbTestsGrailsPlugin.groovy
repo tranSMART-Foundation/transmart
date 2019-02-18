@@ -26,12 +26,7 @@ class TransmartCoreDbTestsGrailsPlugin {
     def title = 'Transmart Core Db Tests Plugin'
     def author = 'Transmart Foundation'
     def authorEmail = 'support@transmartfoundation.org'
-    def description = '''\
-        The aim of this plugin is to reuse logic for populating db with test data.
-        It also contains tests for core-db project to prevent circular
-        plugin dependencies, which grails does not resolve.
-    '''
-
+    def description = 'Reuses logic for populating db with test data; also contains tests for core-db project to prevent circular plugin dependencies'
     def documentation = 'http://github.com/tranSMART-Foundation/transmart'
 
     def scm = [ url: 'http://github.com/tranSMART-Foundation/transmart' ]

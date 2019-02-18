@@ -4,50 +4,48 @@ import groovy.transform.EqualsAndHashCode
 import org.transmartproject.core.dataquery.highdim.tworegion.JunctionEvent
 
 /**
- * Created by j.hudecek on 4-12-2014.
+ * @author j.hudecek
  */
 @EqualsAndHashCode()
 class DeTwoRegionJunctionEvent implements Serializable, JunctionEvent {
 
-    Integer readsSpan
-    Integer readsJunction
-    Integer pairsSpan
-    Integer pairsJunction
-    Integer pairsEnd
-    Integer pairsCounter
     Double baseFreq
     DeTwoRegionEvent event
     DeTwoRegionJunction junction
+    Integer pairsCounter
+    Integer pairsEnd
+    Integer pairsJunction
+    Integer pairsSpan
+    Integer readsJunction
+    Integer readsSpan
 
     static constraints = {
-        readsSpan(nullable: true)
-        readsJunction(nullable: true)
-        pairsSpan(nullable: true)
-        pairsJunction(nullable: true)
-        pairsEnd(nullable: true)
-        pairsCounter(nullable: true)
-        baseFreq(nullable: true)
+        baseFreq nullable: true
+        pairsCounter nullable: true
+        pairsEnd nullable: true
+        pairsJunction nullable: true
+        pairsSpan nullable: true
+        readsJunction nullable: true
+        readsSpan nullable: true
     }
 
-
     static mapping = {
-        table schema: 'deapp', name: 'de_two_region_junction_event'
+        table 'deapp.de_two_region_junction_event'
         id column: 'two_region_junction_event_id'
+        version false
 
-        readsSpan column: 'reads_span'
-        readsJunction column: 'reads_junction'
-        pairsSpan column: 'pairs_span'
-        pairsJunction column: 'pairs_junction'
-        pairsEnd column: 'pairs_end'
-        pairsCounter column: 'reads_counter'
         baseFreq column: 'base_freq'
-
-        /* references */
-        event column: 'event_id'
         event fetch: 'join'
         junction fetch: 'join'
+        pairsCounter column: 'reads_counter'
+        pairsEnd column: 'pairs_end'
+        pairsJunction column: 'pairs_junction'
+        pairsSpan column: 'pairs_span'
+        readsJunction column: 'reads_junction'
+        readsSpan column: 'reads_span'
 
-        version false
+        /* references */
+//        event column: 'event_id'
     }
 }
 

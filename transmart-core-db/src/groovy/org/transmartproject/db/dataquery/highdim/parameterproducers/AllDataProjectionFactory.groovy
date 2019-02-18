@@ -19,10 +19,12 @@
 
 package org.transmartproject.db.dataquery.highdim.parameterproducers
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.db.dataquery.highdim.projections.AllDataProjectionImpl
 
+@CompileStatic
 class AllDataProjectionFactory implements DataRetrievalParameterFactory {
 
     private Map<String, Class> dataProperties
@@ -33,27 +35,21 @@ class AllDataProjectionFactory implements DataRetrievalParameterFactory {
         this.rowProperties = rowProperties
     }
 
-    @Override
     Set<String> getSupportedNames() {
         [Projection.ALL_DATA_PROJECTION] as Set
     }
 
-    @Override
     boolean supports(String name) {
         Projection.ALL_DATA_PROJECTION == name
     }
 
-    @Override
-    def createFromParameters(String name,
-                             Map<String, Object> params,
-                             Object createParameter) {
+    def createFromParameters(String name, Map<String, Object> params, Closure createParameter) {
         if (!supports(name)) {
             return null
         }
 
-        if (!params.isEmpty()) {
-            throw new InvalidArgumentsException(
-                    'This projection takes no parameters')
+        if (params) {
+            throw new InvalidArgumentsException('This projection takes no parameters')
         }
 
         new AllDataProjectionImpl(dataProperties, rowProperties)

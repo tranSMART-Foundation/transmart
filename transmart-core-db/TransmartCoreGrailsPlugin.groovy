@@ -17,7 +17,6 @@
  * transmart-core-db.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import org.springframework.stereotype.Component
 import org.transmartproject.db.dataquery.clinical.variables.ClinicalVariableFactory
 import org.transmartproject.db.dataquery.highdim.AbstractHighDimensionDataTypeModule
@@ -27,11 +26,8 @@ import org.transmartproject.db.ontology.DefaultConceptsResource
 import org.transmartproject.db.support.DatabasePortabilityService
 
 class TransmartCoreGrailsPlugin {
-    // the plugin version
     def version = '16.4-SNAPSHOT'
-    // the version or versions of Grails the plugin is designed for
     def grailsVersion = '2.3 > *'
-    // resources that are excluded from plugin packaging
     def pluginExcludes = [
         'grails-app/views/error.gsp'
     ]
@@ -39,42 +35,25 @@ class TransmartCoreGrailsPlugin {
     def title = 'Transmart Core DB Plugin'
     def author = 'Transmart Foundation'
     def authorEmail = 'support@transmartfoundation.org'
-    def description = '''\
-A runtime dependency for tranSMART that implements the Core API
-'''
-
-    // URL to the plugin's documentation
+    def description = 'A runtime dependency for tranSMART that implements the Core API'
     def documentation = 'http://github.com/tranSMART-Foundation/transmart'
-
     def license = 'GPL3'
-
-    // Details of company behind the plugin (if there is one)
-//    def organization = [ name: 'My Company', url: 'http://www.my-company.com/' ]
-
-    // Any additional developers beyond the author specified above.
+    def organization = [name: 'i2b2-tranSMART Foundation', url: 'http://transmartfoundation.org/']
     def developers = [
-            [ name: 'Kees van Bochove',  email: 'kees@thehyve.nl'],
-            [ name: 'Gustavo Lopes'   ,  email: 'gustavo@thehyve.nl' ],
+        [name: 'Kees van Bochove',  email: 'kees@thehyve.nl'],
+        [name: 'Gustavo Lopes',  email: 'gustavo@thehyve.nl'],
+	[name: 'Burt Beckwith', email: 'burt_beckwith@hms.harvard.edu']
     ]
-
-    // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: 'JIRA', url: 'http://jira.grails.org/browse/GPMYPLUGIN' ]
-
-    // Online location of the plugin's browseable source code.
-    def scm = [ url: 'https://github.com/tranSMART-Foundation/transmart' ]
-
-    def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional), this event occurs before
-    }
+    def issueManagement = [system: 'JIRA', url: 'http://jira.transmartfoundation.org/']
+    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart']
 
     def doWithSpring = {
         xmlns context:'http://www.springframework.org/schema/context'
 
-        def config = application.config
+        def conf = application.config.org.transmartproject
 
-        /* unless explicitly disabled, enable across trials functionality */
-        def haveAcrossTrials =
-                config.org.transmartproject.enableAcrossTrials != false
+        // unless explicitly disabled, enable across trials functionality
+        boolean haveAcrossTrials = conf.enableAcrossTrials != false
 
         businessExceptionResolver(BusinessExceptionResolver)
 
@@ -92,45 +71,23 @@ A runtime dependency for tranSMART that implements the Core API
         }
 
         context.'component-scan'('base-package': 'org.transmartproject.db.dataquery.highdim') {
-            context.'include-filter'(
-                    type:       'assignable',
-                    expression: AbstractHighDimensionDataTypeModule.canonicalName)
+            context.'include-filter'(type: 'assignable', expression: AbstractHighDimensionDataTypeModule.canonicalName)
         }
 
         context.'component-scan'('base-package': 'org.transmartproject.db') {
-            context.'include-filter'(
-                    type:       'annotation',
-                    expression: Component.canonicalName)
+            context.'include-filter'(type: 'annotation', expression: Component.canonicalName)
         }
 
-        if (!config.org.transmartproject.i2b2.user_id) {
-            config.org.transmartproject.i2b2.user_id = 'i2b2'
+        if (!conf.i2b2.user_id) {
+            conf.i2b2.user_id = 'i2b2'
         }
-        if (!config.org.transmartproject.i2b2.group_id) {
-            config.org.transmartproject.i2b2.group_id = 'Demo'
+        if (!conf.i2b2.group_id) {
+            conf.i2b2.group_id = 'Demo'
         }
     }
 
-    def doWithDynamicMethods = { ctx ->
-        String.metaClass.asLikeLiteral = { replaceAll(/[\\%_]/, '\\\\$0') }
-
-        /* Force this bean to be initialized, as it has some dynamic methods
-         * to register during its init() method */
+    def doWithApplicationContext = { ctx ->
+        // Force this bean to be initialized, as it has some dynamic methods to register during its init() method
         ctx.getBean DatabasePortabilityService
-    }
-
-    def onChange = { event ->
-        // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-    }
-
-    def onConfigChange = { event ->
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
-    }
-
-    def onShutdown = { event ->
-        // TODO Implement code that is executed when the application shuts down (optional)
     }
 }

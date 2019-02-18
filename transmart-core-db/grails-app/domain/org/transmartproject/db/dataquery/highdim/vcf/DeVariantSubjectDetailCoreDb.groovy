@@ -21,46 +21,46 @@ package org.transmartproject.db.dataquery.highdim.vcf
 
 import groovy.transform.EqualsAndHashCode
 
-@EqualsAndHashCode()
+@EqualsAndHashCode
 class DeVariantSubjectDetailCoreDb implements Serializable {
 
-    String chr
-    Long   pos
-    String rsId
-    String ref
     String alt
-    String quality
+    String chr
     String filter
-    String info
     String format
+    String info
+    Long pos
+    String quality
+    String ref
+    String rsId
     String variant
 
     static belongsTo = [dataset: DeVariantDatasetCoreDb] //TODO: implement constraint on dataset
 
     static constraints = {
         alt     nullable: true
-        quality nullable: true
         filter  nullable: true
-        info    nullable: true
         format  nullable: true
+        info    nullable: true
+        quality nullable: true
         variant nullable: true
     }
 
     static mapping = {
-        table     schema:  'deapp', name: 'de_variant_subject_detail'
+        table 'deapp.de_variant_subject_detail'
+        id composite: ['dataset', 'rsId', 'chr', 'pos']
         version   false
 
-        id composite: ['dataset', 'rsId', 'chr', 'pos']
-
-        dataset column: 'dataset_id'
-        rsId    column: 'rs_id'
-        ref     column: 'ref'
-        alt     column: 'alt'
+//        alt     column: 'alt'
+//	chr     column: 'chr'
+//        dataset column: 'dataset_id'
+//        filter  column: 'filter'
+//        format  column: 'format'
+//        info    column: 'info'
+//	pos     column: 'pos'
         quality column: 'qual'
-        filter  column: 'filter'
-        info    column: 'info'
-        format  column: 'format'
+//        ref     column: 'ref'
+//        rsId    column: 'rs_id'
         variant column: 'variant_value', sqlType: 'clob'
     }
-
 }

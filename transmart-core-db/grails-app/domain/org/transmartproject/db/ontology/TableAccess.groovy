@@ -22,86 +22,78 @@ package org.transmartproject.db.ontology
 import grails.orm.HibernateCriteriaBuilder
 import grails.util.Holders
 import groovy.transform.EqualsAndHashCode
+import org.transmart.plugin.shared.Utils
+import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.OntologyTerm.VisualAttributes
 import org.transmartproject.core.ontology.Study
-import org.transmartproject.core.concept.ConceptKey
 
 @EqualsAndHashCode(includes = [ 'tableCode' ])
-class TableAccess extends AbstractQuerySpecifyingType implements
-        OntologyTerm, Serializable {
+class TableAccess extends AbstractQuerySpecifyingType implements OntologyTerm, Serializable {
 
-    Integer      level
-    String       fullName
-    String       name
-    String       code
+    Date cChangeDate
+    String cComment
+    Date cEntryDate
+    String cMetadataxml
+    String code
+    Character cProtectedAccess
+    Character cStatusCd
+    Character cSynonymCd = 'N'
+    BigDecimal cTotalnum
+    String cVisualattributes = ''
+    String fullName
+    Integer level
+    String name
+    String tableCode
+    String tableName
+    String tooltip
+    String valuetypeCd
 
-    String       tableName
+    static mapping = {
+        table 'i2b2metadata.table_access'
+	id composite: ['tableCode']
+	// hibernate needs an id, see http://docs.jboss.org/hibernate/orm/3.3/reference/en/html/mapping.html#mapping-declaration-id
+	version false
 
-    String       tableCode
-    Character    cProtectedAccess
-    Character    cSynonymCd = 'N'
-    String       cVisualattributes = ''
-
-    BigDecimal   cTotalnum
-    String       cMetadataxml
-    String       cComment
-    String       tooltip
-    Date         cEntryDate
-    Date         cChangeDate
-    Character    cStatusCd
-    String       valuetypeCd
-
-	static mapping = {
-        table   name: 'table_access', schema: 'I2B2METADATA'
-		version false
-
-        /* hibernate needs an id, see
-         * http://docs.jboss.org/hibernate/orm/3.3/reference/en/html/mapping.html#mapping-declaration-id
-         */
-        id          composite: ['tableCode']
-
+        code                 column:   'C_BASECODE'
+        columnDataType       column:   'C_COLUMNDATATYPE'
+        columnName           column:   'C_COLUMNNAME'
+        dimensionCode        column:   'C_DIMCODE'
+        dimensionTableName   column:   'C_DIMTABLENAME'
+        factTableColumn      column:   'C_FACTTABLECOLUMN'
         fullName             column:   'C_FULLNAME'
         level                column:   'C_HLEVEL'
         name                 column:   'C_NAME'
-        code                 column:   'C_BASECODE'
-        tooltip              column:   'C_TOOLTIP'
-        tableName            column:   'C_TABLE_NAME'
-        tableCode            column:   'C_TABLE_CD'
-
-        factTableColumn      column:   'C_FACTTABLECOLUMN'
-        dimensionTableName   column:   'C_DIMTABLENAME'
-        columnName           column:   'C_COLUMNNAME'
-        columnDataType       column:   'C_COLUMNDATATYPE'
         operator             column:   'C_OPERATOR'
-        dimensionCode        column:   'C_DIMCODE'
+        tableCode            column:   'C_TABLE_CD'
+        tableName            column:   'C_TABLE_NAME'
+        tooltip              column:   'C_TOOLTIP'
 	}
 
 	static constraints = {
-        tableCode           maxSize:    50
-        tableName           maxSize:    50
+        cChangeDate         nullable:   true
+        cComment            nullable:   true
+        cEntryDate          nullable:   true
+        cMetadataxml        nullable:   true
+        code                nullable:   true,   maxSize:   50
         cProtectedAccess    nullable:   true
+        cStatusCd           nullable:   true
+        cSynonymCd          nullable:   true
+        cTotalnum           nullable:   true
+        cVisualattributes   maxSize:    3
         fullName            maxSize:    700
         name                maxSize:    2000
-        cSynonymCd          nullable:   true
-        cVisualattributes   maxSize:    3
-        cTotalnum           nullable:   true
-        code                nullable:   true,   maxSize:   50
-        cMetadataxml        nullable:   true
-        cComment            nullable:   true
+        tableCode           maxSize:    50
+        tableName           maxSize:    50
         tooltip             nullable:   true,   maxSize:   900
-        cEntryDate          nullable:   true
-        cChangeDate         nullable:   true
-        cStatusCd           nullable:   true
         valuetypeCd         nullable:   true,   maxSize:   50
 
         AbstractQuerySpecifyingType.constraints.delegate = delegate
         AbstractQuerySpecifyingType.constraints()
 	}
 
-    static List<OntologyTerm> getCategories(showHidden = false,
-                                            showSynonyms = false) {
+    static List<OntologyTerm> getCategories(boolean showHidden = false, boolean showSynonyms = false) {
         withCriteria {
             if (!showHidden) {
                 not { like 'cVisualattributes', '_H%' }
@@ -114,7 +106,7 @@ class TableAccess extends AbstractQuerySpecifyingType implements
 
     Class getOntologyTermDomainClassReferred() {
         def domainClass = Holders.getGrailsApplication().domainClasses.find {
-                    AbstractI2b2Metadata.class.isAssignableFrom(it.clazz) &&
+                    AbstractI2b2Metadata.isAssignableFrom(it.clazz) &&
                             tableName.equalsIgnoreCase(it.clazz.backingTable)
                 }
         domainClass?.clazz
@@ -124,18 +116,15 @@ class TableAccess extends AbstractQuerySpecifyingType implements
         new ConceptKey(tableCode, fullName)
     }
 
-    @Override
     String getKey() {
         conceptKey.toString()
     }
 
-    @Override
     EnumSet<VisualAttributes> getVisualAttributes() {
         VisualAttributes.forSequence(cVisualattributes)
     }
 
-    @Override
-    Object getMetadata() {
+    def getMetadata() {
         null /* no metadata on categories supported */
     }
 
@@ -143,37 +132,31 @@ class TableAccess extends AbstractQuerySpecifyingType implements
         cSynonymCd != 'Y'
     }
 
-    List<OntologyTerm> getChildren(boolean showHidden = false,
-                                   boolean showSynonyms = false) {
-
+    List<OntologyTerm> getChildren(boolean showHidden = false, boolean showSynonyms = false) {
         getDescendants(false, showHidden, showSynonyms)
     }
 
-    List<OntologyTerm> getAllDescendants(boolean showHidden = false,
-                                         boolean showSynonyms = false) {
+    List<OntologyTerm> getAllDescendants(boolean showHidden = false, boolean showSynonyms = false) {
         getDescendants(true, showHidden, showSynonyms)
     }
 
-    private List<OntologyTerm> getDescendants(boolean allDescendants,
-                                              boolean showHidden = false,
-                                              boolean showSynonyms = false) {
+    private List<OntologyTerm> getDescendants(boolean allDescendants, boolean showHidden = false, boolean showSynonyms = false) {
 
         HibernateCriteriaBuilder c
 
         /* extract table code from concept key and resolve it to a table name */
-        c = TableAccess.createCriteria()
+        c = createCriteria()
         String tableName = c.get {
             projections {
                 distinct('tableName')
             }
-            eq('tableCode', this.conceptKey.tableCode)
+            eq('tableCode', conceptKey.tableCode)
         }
 
         /* validate this table name */
-        def domainClass = this.ontologyTermDomainClassReferred
+        def domainClass = ontologyTermDomainClassReferred
         if (!domainClass) {
-            throw new RuntimeException('Metadata table ' + tableName + ' is not ' +
-                    'mapped')
+            throw new RuntimeException("Metadata table ${tableName} is not mapped")
         }
 
         /* select level on the original table (is this really necessary?) */
@@ -188,13 +171,13 @@ class TableAccess extends AbstractQuerySpecifyingType implements
                 eq 'cSynonymCd', 'N' as char
             }
         }
-        if (parentLevel == null)
-            throw new RuntimeException("Could not determine parent's level; " +
-                    "could not find it in ${domainClass}'s table (fullname: " +
-                    '' + fullName + ')')
+        if (parentLevel == null) {
+            throw new RuntimeException("Could not determine parent's level; could not find it in " + domainClass.name +
+		"'s table (fullname: " + fullName + ")")
+	}
 
         /* Finally select the relevant stuff */
-        def fullNameSearch = fullName.asLikeLiteral() + '%'
+        String fullNameSearch = Utils.asLikeLiteral(fullName) + '%'
 
         c = domainClass.createCriteria()
         c.list {
@@ -218,9 +201,8 @@ class TableAccess extends AbstractQuerySpecifyingType implements
         }
     }
 
-    @Override
     Study getStudy() {
-        /* never has an associated tranSMART study
+        /* never has an associated tranSMART study;
          * in tranSMART table access will only have 'Public Studies' and
          * 'Private Studies' nodes */
         null
@@ -228,12 +210,10 @@ class TableAccess extends AbstractQuerySpecifyingType implements
 
     @Override
     List<Patient> getPatients() {
-        return super.getPatients(this)
+        super.getPatients(this)
     }
 
-    @Override
     String toString() {
-        getClass().canonicalName + "[${attached?'attached':'not attached'}" +
-                '] [ fullName=' + fullName + ' ]'
+        getClass().canonicalName + "[${attached?'attached':'not attached'}] [ fullName=$fullName ]"
     }
 }

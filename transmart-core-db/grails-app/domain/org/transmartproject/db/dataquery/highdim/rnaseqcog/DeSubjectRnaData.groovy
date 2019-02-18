@@ -26,8 +26,8 @@ import org.transmartproject.db.i2b2data.PatientDimension
 @EqualsAndHashCode(includes = [ 'assay', 'annotation' ])
 class DeSubjectRnaData implements Serializable {
 
-    BigDecimal rawIntensity
     BigDecimal logIntensity
+    BigDecimal rawIntensity
     BigDecimal zscore
 
     DeRnaseqAnnotation jAnnotation //due to criteria bug
@@ -37,33 +37,28 @@ class DeSubjectRnaData implements Serializable {
     //String     trialName
     //Long       patientId
 
-    static belongsTo = [
-            annotation: DeRnaseqAnnotation,
-            assay:      DeSubjectSampleMapping,
-            patient:    PatientDimension
-    ]
+    static belongsTo = [annotation: DeRnaseqAnnotation,
+			assay:      DeSubjectSampleMapping,
+			patient:    PatientDimension]
 
     static mapping = {
         table schema: 'deapp'
-
         id composite: [ 'assay', 'annotation' ]
+        version     false
 
         annotation  column: 'probeset_id' // poor name; no probes involved
-        assay       column: 'assay_id'
-        patient     column: 'patient_id'
+//        assay       column: 'assay_id'
+//        patient     column: 'patient_id'
 
         // here due to criteria bug
         jAnnotation column: 'probeset_id', insertable: false, updateable: false
-
-        version     false
-
     }
 
     static constraints = {
         annotation   nullable: true
         assay        nullable: true
-        rawIntensity nullable: true, scale: 4
         logIntensity nullable: true, scale: 4
+        rawIntensity nullable: true, scale: 4
         zscore       nullable: true, scale: 4
 
         // irrelevant

@@ -31,17 +31,15 @@ class AcghValuesProjection implements CriteriaProjection<AcghValues>, MultiValue
         it.name != 'class' ? [(it.name): it.type] : [:]
     }
 
-    @Override
     void doWithCriteriaBuilder(HibernateCriteriaBuilder builder) {
         // AcghModule.prepareDataQuery already projects all the columns
     }
 
-    @Override
-    AcghValues doWithResult(Object object) {
+    AcghValues doWithResult(object) {
         new AcghValuesImpl(data: object)
     }
 
-    class AcghValuesImpl implements AcghValues {
+    static class AcghValuesImpl implements AcghValues {
 
         def data
 

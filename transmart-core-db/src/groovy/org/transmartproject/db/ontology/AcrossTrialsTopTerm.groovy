@@ -19,8 +19,10 @@
 
 package org.transmartproject.db.ontology
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.ontology.OntologyTerm
 
+@CompileStatic
 class AcrossTrialsTopTerm extends AbstractAcrossTrialsOntologyTerm {
 
     public final static String ACROSS_TRIALS_TERM_CODE = '-99'
@@ -39,5 +41,5 @@ class AcrossTrialsTopTerm extends AbstractAcrossTrialsOntologyTerm {
     final EnumSet<OntologyTerm.VisualAttributes> visualAttributes =
             EnumSet.of(OntologyTerm.VisualAttributes.CONTAINER)
 
-    final Object metadata = null
+    final metadata = null
 }

@@ -22,25 +22,24 @@ package org.transmartproject.db.dataquery.clinical.variables
 import org.transmartproject.core.concept.ConceptFullName
 import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.dataquery.DataRow
+import org.transmartproject.core.dataquery.clinical.ClinicalVariable
 import org.transmartproject.core.dataquery.clinical.ClinicalVariableColumn
 import org.transmartproject.core.exceptions.UnexpectedResultException
 
-class CategoricalVariable extends AbstractComposedVariable implements
-        ClinicalVariableColumn {
+class CategoricalVariable extends AbstractComposedVariable implements ClinicalVariableColumn {
 
     String conceptPath
 
-    @Override
     String getVariableValue(DataRow<ClinicalVariableColumn, Object> dataRow) {
-        for (var in innerClinicalVariables) {
+        for (ClinicalVariable var in innerClinicalVariables) {
             def currentValue = dataRow.getAt(var)
 
             if (currentValue) {
                 if (!(currentValue instanceof String)) {
-                    throw new UnexpectedResultException('Expected a string ' +
-                            'for observation in row ' + dataRow + ', categorical ' +
-                            'variable ' + this + ', when looking at child variable ' +
-                            "$var. Instead, got '$currentValue'")
+                    throw new UnexpectedResultException("Expected a string " +
+							"for observation in row $dataRow, categorical " +
+							"variable $this, when looking at child variable " +
+							"$var. Instead, got '$currentValue'")
                 }
 
                 return currentValue
@@ -50,14 +49,12 @@ class CategoricalVariable extends AbstractComposedVariable implements
         null
     }
 
-    @Override
     String getLabel() {
         conceptPath
     }
 
-    @Override
     ConceptKey getKey() {
-        def fullName = new ConceptFullName(conceptPath)
+        ConceptFullName fullName = new ConceptFullName(conceptPath)
         new ConceptKey(fullName.parts[0], fullName.toString())
     }
 }

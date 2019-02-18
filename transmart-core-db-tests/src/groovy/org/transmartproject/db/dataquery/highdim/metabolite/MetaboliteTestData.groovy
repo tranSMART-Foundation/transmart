@@ -19,6 +19,8 @@
 
 package org.transmartproject.db.dataquery.highdim.metabolite
 
+import groovy.util.logging.Slf4j
+import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 import org.transmartproject.db.dataquery.highdim.HighDimTestData
@@ -27,151 +29,143 @@ import org.transmartproject.db.i2b2data.PatientDimension
 import org.transmartproject.db.ontology.ConceptTestData
 import org.transmartproject.db.search.SearchKeywordCoreDb
 
-import static org.transmartproject.db.dataquery.highdim.HighDimTestData.save
+@Slf4j('logger')
+class MetaboliteTestData extends AbstractTestData {
 
-class MetaboliteTestData {
-    public static final String TRIAL_NAME = 'METABOLITE_EXAMPLE_TRIAL'
+	public static final String TRIAL_NAME = 'METABOLITE_EXAMPLE_TRIAL'
 
-    SampleBioMarkerTestData biomarkerTestData = new SampleBioMarkerTestData()
+	private long deMetaboliteSubPathwayId = -700
+	private long searchKeywordCoreDbId = -800
+	private long otherSearchKeywordCoreDbId = -900
 
-    ConceptTestData concept = HighDimTestData.createConcept('METABOLITEPUBLIC', 'concept code #1', TRIAL_NAME, 'METABOLITE_CONCEPT')
+	SampleBioMarkerTestData biomarkerTestData = new SampleBioMarkerTestData()
+	ConceptTestData concept
+	DeGplInfo platform
+	List<PatientDimension> patients
+	List<DeSubjectSampleMapping> assays
+	List<DeMetaboliteSuperPathway> superPathways
+	List<DeMetaboliteSubPathway> subPathways
+	List<SearchKeywordCoreDb> searchKeywordsForSubPathways
+	List<SearchKeywordCoreDb> searchKeywordsForSuperPathways
+	List<DeMetaboliteAnnotation> annotations
+	List<DeSubjectMetabolomicsData> data
 
-    DeGplInfo platform = {
-        def res = new DeGplInfo(
-                title: 'Bogus metabolite platform',
-                organism: 'Homo Sapiens',
-                markerType: 'METABOLOMICS')
-        res.id = 'BOGUS_METABOLITE_PLATFORM'
-        res
-    }()
+	MetaboliteTestData() {
+		createTestData()
+	}
 
-    List<PatientDimension> patients =
-        HighDimTestData.createTestPatients(2, -300, TRIAL_NAME)
+	void saveAll() {
+		biomarkerTestData.saveMetabolomicsData()
 
-    List<DeSubjectSampleMapping> assays =
-        HighDimTestData.createTestAssays(patients, -400, platform, TRIAL_NAME)
+		save platform, logger
+		saveAll patients, logger
+		saveAll assays, logger
+		saveAll superPathways, logger
+		saveAll searchKeywordsForSuperPathways, logger
+		saveAll subPathways, logger
+		saveAll searchKeywordsForSubPathways, logger
+		saveAll annotations, logger
+		saveAll data, logger
+		concept.saveAll()
+	}
 
-    List<DeMetaboliteSuperPathway> superPathways = {
-        def ret = [ /* keep in sync with SampleBioMarkerTestData */
-                new DeMetaboliteSuperPathway(
-                        name: 'Carboxylic Acid',
-                        gplId: platform),
-                new DeMetaboliteSuperPathway(
-                        name: 'Phosphoric Acid',
-                        gplId: platform),
-        ]
-        ret[0].id = -601
-        ret[1].id = -602
-        ret
-    }()
+	private void createTestData() {
+		concept = HighDimTestData.createConcept('METABOLITEPUBLIC', 'concept code #1',
+				TRIAL_NAME, 'METABOLITE_CONCEPT')
 
-    List<DeMetaboliteSubPathway> subPathways = {
-        def id = -700
-        def createSubPathway = { String name,
-                                 DeMetaboliteSuperPathway superPathway ->
-            def ret = new DeMetaboliteSubPathway(
-                    name: name,
-                    superPathway: superPathway,
-                    gplId: platform)
-            ret.id = --id
-            ret
-        }
+		platform = new DeGplInfo(
+				title: 'Bogus metabolite platform',
+				organism: 'Homo Sapiens',
+				markerType: 'METABOLOMICS')
+		platform.id = 'BOGUS_METABOLITE_PLATFORM'
 
-        [ /* keep in sync with SampleBioMarkerTestData */
-                createSubPathway('No superpathway subpathway', null),
-                createSubPathway('Cholesterol biosynthesis', superPathways[0]),
-                createSubPathway('Squalene synthesis', superPathways[0]),
-                createSubPathway('Pentose Metabolism', superPathways[1]),
-        ]
-    }()
+		patients = HighDimTestData.createTestPatients(2, -300, TRIAL_NAME)
 
-    List<SearchKeywordCoreDb> searchKeywordsForSubPathways = {
-        def baseId = -800
-        subPathways.collect {
-            def res = new SearchKeywordCoreDb(
-                    keyword: it.name,
-                    bioDataId: it.id,
-                    uniqueId: "METABOLITE_SUBPATHWAY:$it.id", /* no actual external pk */
-                    dataCategory: 'METABOLITE_SUBPATHWAY',
-            )
-            res.id = --baseId
-            res
-        }
-    }()
+		assays = HighDimTestData.createTestAssays(patients, -400, platform, TRIAL_NAME)
 
-    List<SearchKeywordCoreDb> searchKeywordsForSuperPathways = {
-        def baseId = -900
-        superPathways.collect {
-            def res = new SearchKeywordCoreDb(
-                    keyword: it.name,
-                    bioDataId: it.id,
-                    uniqueId: "METABOLITE_SUPERPATHWAY:$it.id", /* no actual external pk */
-                    dataCategory: 'METABOLITE_SUPERPATHWAY',
-            )
-            res.id = --baseId
-            res
-        }
-    }()
+		// keep in sync with SampleBioMarkerTestData
+		superPathways = [
+				new DeMetaboliteSuperPathway(name: 'Carboxylic Acid', gplId: platform),
+				new DeMetaboliteSuperPathway(name: 'Phosphoric Acid', gplId: platform)]
+		superPathways[0].id = -601L
+		superPathways[1].id = -602L
 
-    List<DeMetaboliteAnnotation> annotations = {
-        def createAnnotation = { id,
-                                 metaboliteName,
-                                 metabolite,
-                                 List<DeMetaboliteSubPathway> subpathways ->
-            def res = new DeMetaboliteAnnotation(
-                    biochemicalName: metaboliteName,
-                    hmdbId:          metabolite,
-                    platform:        platform
-            )
-            subpathways.each {
-                it.addToAnnotations(res)
-            }
-            res.id = id
-            res
-        }
-        [ /* keep in sync with SampleBioMarkerTestData */
-                createAnnotation(-501, 'Cryptoxanthin epoxide', 'HMDB30538', []),
-                createAnnotation(-502, 'Cryptoxanthin 5,6:5\',8\'-diepoxide', 'HMDB30537', subPathways[0..1]),
-                createAnnotation(-503, 'Majoroside F4', 'HMDB30536', subPathways[1..3]),
-        ]
-    }()
+		// keep in sync with SampleBioMarkerTestData
+		subPathways = [
+				createSubPathway('No superpathway subpathway', null),
+				createSubPathway('Cholesterol biosynthesis', superPathways[0]),
+				createSubPathway('Squalene synthesis', superPathways[0]),
+				createSubPathway('Pentose Metabolism', superPathways[1])]
 
-    List<DeSubjectMetabolomicsData> data = {
-        def createDataEntry = { assay, annotation, intensity ->
-            new DeSubjectMetabolomicsData(
-                    assay: assay,
-                    patient: assay.patient,
-                    annotation: annotation,
-                    jAnnotation: annotation,
-                    rawIntensity: intensity,
-                    logIntensity: Math.log(intensity),
-                    zscore:    (intensity - 0.35) / 0.1871
-            )
-        }
 
-        def res = []
-        Double intensity = 0
-        annotations.each { annotation ->
-            assays.each { assay ->
-                res += createDataEntry assay, annotation, (intensity += 0.1)
-            }
-        }
+		searchKeywordsForSubPathways = subPathways.collect { DeMetaboliteSubPathway it ->
+			SearchKeywordCoreDb res = new SearchKeywordCoreDb(
+					keyword: it.name,
+					bioDataId: it.id,
+					uniqueId: 'METABOLITE_SUBPATHWAY' + it.id, // no actual external pk
+					dataCategory: 'METABOLITE_SUBPATHWAY')
+			res.id = --searchKeywordCoreDbId
+			res
+		}
 
-        res
-    }()
+		searchKeywordsForSuperPathways = superPathways.collect { DeMetaboliteSuperPathway it ->
+			SearchKeywordCoreDb res = new SearchKeywordCoreDb(
+					keyword: it.name,
+					bioDataId: it.id,
+					uniqueId: 'METABOLITE_SUPERPATHWAY' + it.id, // no actual external pk
+					dataCategory: 'METABOLITE_SUPERPATHWAY')
+			res.id = --otherSearchKeywordCoreDbId
+			res
+		}
 
-    void saveAll() {
-        biomarkerTestData.saveMetabolomicsData()
+		// keep in sync with SampleBioMarkerTestData
+		annotations = [
+				createAnnotation(-501, 'Cryptoxanthin epoxide', 'HMDB30538', []),
+				createAnnotation(-502, 'Cryptoxanthin 5,6:5\',8\'-diepoxide', 'HMDB30537', subPathways[0..1]),
+				createAnnotation(-503, 'Majoroside F4', 'HMDB30536', subPathways[1..3])]
 
-        save([platform])
-        save patients
-        save assays
-        save superPathways
-        save searchKeywordsForSuperPathways
-        save subPathways
-        save searchKeywordsForSubPathways
-        save annotations
-        save data
-        concept.saveAll()
-    }
+		double intensity = 0
+		data = []
+		for (DeMetaboliteAnnotation annotation in annotations) {
+			for (DeSubjectSampleMapping assay in assays) {
+				data << createDataEntry(assay, annotation, intensity += 0.1)
+			}
+		}
+	}
+
+	private DeMetaboliteSubPathway createSubPathway(String name, DeMetaboliteSuperPathway superPathway) {
+		DeMetaboliteSubPathway ret = new DeMetaboliteSubPathway(
+				name: name,
+				superPathway: superPathway,
+				gplId: platform)
+		ret.id = --deMetaboliteSubPathwayId
+		ret
+	}
+
+	private DeMetaboliteAnnotation createAnnotation(long id, String metaboliteName, String metabolite,
+	                                                List<DeMetaboliteSubPathway> subpathways) {
+		DeMetaboliteAnnotation res = new DeMetaboliteAnnotation(
+				biochemicalName: metaboliteName,
+				hmdbId: metabolite,
+				platform: platform)
+		res.id = id
+		for (DeMetaboliteSubPathway it in subpathways) {
+			it.addToAnnotations res
+		}
+		res
+	}
+
+	private DeSubjectMetabolomicsData createDataEntry(DeSubjectSampleMapping assay,
+	                                                  DeMetaboliteAnnotation annotation,
+	                                                  double intensity) {
+		new DeSubjectMetabolomicsData(
+				assay: assay,
+				patient: assay.patient,
+				annotation: annotation,
+				jAnnotation: annotation,
+				rawIntensity: intensity,
+				logIntensity: Math.log(intensity),
+				zscore: (intensity - 0.35) / 0.1871
+		)
+	}
 }

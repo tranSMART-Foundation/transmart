@@ -20,59 +20,64 @@
 package org.transmartproject.db.querytool
 
 import groovy.util.logging.Slf4j
-import org.apache.commons.lang.StringEscapeUtils
+import org.transmart.plugin.shared.Utils
+import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.exceptions.InvalidRequestException
 import org.transmartproject.core.exceptions.NoSuchResourceException
+import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.querytool.ConstraintByOmicsValue
 import org.transmartproject.core.querytool.ConstraintByValue
-import org.transmartproject.core.querytool.HighDimensionFilterType
 import org.transmartproject.core.querytool.Item
 import org.transmartproject.core.querytool.Panel
 import org.transmartproject.core.querytool.QueryDefinition
+import org.transmartproject.db.dataquery.highdim.HighDimensionResourceService
 import org.transmartproject.db.ontology.MetadataSelectQuerySpecification
+import org.transmartproject.db.support.DatabasePortabilityService
 import org.transmartproject.db.user.User
 
-import java.util.regex.Pattern
+import java.util.regex.Matcher
 
-import static org.transmartproject.core.querytool.ConstraintByValue.Operator.*
+import static org.transmartproject.core.querytool.ConstraintByValue.Operator.BETWEEN
+import static org.transmartproject.core.querytool.ConstraintByValue.Operator.EQUAL_TO
+import static org.transmartproject.core.querytool.ConstraintByValue.Operator.GREATER_OR_EQUAL_TO
+import static org.transmartproject.core.querytool.ConstraintByValue.Operator.GREATER_THAN
+import static org.transmartproject.core.querytool.ConstraintByValue.Operator.LOWER_OR_EQUAL_TO
+import static org.transmartproject.core.querytool.ConstraintByValue.Operator.LOWER_THAN
 import static org.transmartproject.db.support.DatabasePortabilityService.DatabaseType.ORACLE
 
 @Slf4j('logger')
 class PatientSetQueryBuilderService {
 
-    def conceptsResourceService
-    def databasePortabilityService
-    def highDimensionResourceService
-    def i2b2HelperService
+    static transactional = false
 
-    String buildPatientIdListQuery(QueryDefinition definition,
-                                   User user = null)
-            throws InvalidRequestException {
+    ConceptsResource conceptsResourceService
+    DatabasePortabilityService databasePortabilityService
+    HighDimensionResourceService highDimensionResourceService
 
-        generalDefinitionValidation(definition)
+    String buildPatientIdListQuery(QueryDefinition definition, User user = null) throws InvalidRequestException {
 
-        def panelNum = 1
-        def panelClauses = definition.panels.collect { Panel panel ->
+        generalDefinitionValidation definition
 
-            def itemPredicates = panel.items.collect { Item it ->
+        int panelNum = 1
+        List<Map> panelClauses = definition.panels.collect { Panel panel ->
+
+            def itemPredicates = panel.items.collect { Item item ->
                 OntologyTerm term
                 try {
-                    term = conceptsResourceService.getByKey(it.conceptKey)
+                    term = conceptsResourceService.getByKey(item.conceptKey)
                     if (!(term instanceof MetadataSelectQuerySpecification)) {
-                        throw new InvalidArgumentsException('Ontology term ' +
-                                'with key ' + it.conceptKey + ' does not specify ' +
-                                'a query')
+                        throw new InvalidArgumentsException("Ontology term with key $item.conceptKey does not specify a query")
                     }
                 }
                 catch (NoSuchResourceException nsr) {
-                    throw new InvalidRequestException('No such concept key: ' +
-                            '' + it.conceptKey, nsr)
+                    throw new InvalidRequestException("No such concept key: $item.conceptKey", nsr)
                 }
 
-                doItem(term, it, user)
+                doItem term, item, user
             }
+
             /*
              * itemPredicates are similar to this example:
              * concept_cd IN
@@ -85,18 +90,15 @@ class PatientSetQueryBuilderService {
              *      (valtype_cd = 'N' AND nval_num >= 50 AND tval_char = 'G')
              * )
              */
-            def bigPredicate = itemPredicates.collect { '(' + it + ')' }.join(' OR ')
+            String bigPredicate = itemPredicates.collect { '(' + it + ')' }.join(' OR ')
 
             if (panel.items.size() > 1) {
                 bigPredicate = '(' + bigPredicate + ')'
             }
 
-            [
-                    id: panelNum++,
-                    select: 'SELECT patient_num ' +
-                            "FROM observation_fact WHERE $bigPredicate AND concept_cd != 'SECURITY'",
-                    invert: panel.invert,
-            ]
+            [id: panelNum++,
+             select: "SELECT patient_num FROM I2B2DEMODATA.observation_fact WHERE $bigPredicate AND concept_cd != 'SECURITY'",
+             invert: panel.invert]
         }.sort { a, b ->
             (a.invert && !b.invert) ? 1
                     : (!a.invert && b.invert) ? -1
@@ -104,55 +106,51 @@ class PatientSetQueryBuilderService {
         }
 
         if (panelClauses.size() == 1) {
-            def panel = panelClauses[0]
+            Map panel = panelClauses[0]
             if (!panel.invert) {
                 /* The intersect/expect is not enough for deleting duplicates
-                 * because there is only one select; we must adda a group by */
-                '' + panel.select + ' GROUP BY patient_num'
+                 * because there is only one select; we must add a group by */
+                panel.select + ' GROUP BY patient_num'
             }
             else {
-                'SELECT patient_num FROM patient_dimension ' +
-                        '' + databasePortabilityService.complementOperator + ' (' + panel.select + ')'
+                'SELECT patient_num FROM I2B2DEMODATA.patient_dimension ' +
+                        databasePortabilityService.complementOperator + ' (' + panel.select + ')'
             }
         }
         else {
             panelClauses.inject('') { String acc, panel ->
-                acc +
-                        (acc.empty
-                                ? ''
-                                : panel.invert
-                                ? ' ' + databasePortabilityService.complementOperator + ' '
-                                : ' INTERSECT ') +
-                        '(' + panel.select + ')'
+                acc + (acc.empty
+                       ? ''
+                       : panel.invert
+                       ? " $databasePortabilityService.complementOperator "
+                       : ' INTERSECT ') +
+                    '(' + panel.select + ')'
             }
         }
     }
 
-    String buildPatientSetQuery(QtQueryResultInstance resultInstance,
-                                QueryDefinition definition,
-                                User user = null)
-            throws InvalidRequestException {
+    String buildPatientSetQuery(QtQueryResultInstance resultInstance, QueryDefinition definition,
+                                User user = null) throws InvalidRequestException {
 
         if (!resultInstance.id) {
             throw new RuntimeException('QtQueryResultInstance has not been persisted')
         }
 
-        def patientSubQuery = buildPatientIdListQuery definition, user
+        String patientSubQuery = buildPatientIdListQuery(definition, user)
 
         //$patientSubQuery has result set with single column: 'patient_num'
-        def windowFunctionOrderBy = ''
+        String windowFunctionOrderBy = ''
         if (databasePortabilityService.databaseType == ORACLE) {
             //Oracle requires this, PostgreSQL supports it, and H2 rejects it
             windowFunctionOrderBy = 'ORDER BY patient_num'
         }
 
-        def sql = 'INSERT INTO qt_patient_set_collection (result_instance_id,' +
-                ' patient_num, set_index) ' +
-                'SELECT ' + resultInstance.id + ', P.patient_num, ' +
-                ' row_number() OVER (' + windowFunctionOrderBy + ') ' +
-                'FROM (' + patientSubQuery + ' ORDER BY 1) P'
+        String sql = 'INSERT INTO I2B2DEMODATA.qt_patient_set_collection (result_instance_id, patient_num, set_index) ' +
+                "SELECT ${resultInstance.id}, P.patient_num, " +
+                " row_number() OVER ($windowFunctionOrderBy) " +
+                "FROM ($patientSubQuery ORDER BY 1) P"
 
-        logger.debug 'SQL statement: ' + sql
+        logger.debug 'SQL statement: {}', sql
 
         sql
     }
@@ -160,7 +158,7 @@ class PatientSetQueryBuilderService {
     /* Mapping between the number value constraint and the SQL predicates. The
      * value constraint may correspond to one or two SQL predicates ORed
      * together */
-    private static final def NUMBER_QUERY_MAPPING = [
+    private static final Map<ConstraintByValue.Operator, List> NUMBER_QUERY_MAPPING = [
             (LOWER_THAN):          [['<',  ['E', 'LE']], ['<=', ['L']]],
             (LOWER_OR_EQUAL_TO):   [['<=', ['E', 'LE', 'L']]],
             (EQUAL_TO):            [['=',  ['E']]],
@@ -169,21 +167,16 @@ class PatientSetQueryBuilderService {
             (GREATER_OR_EQUAL_TO): [['>=', ['E', 'GE', 'G']]]
     ]
 
-    private String doItem(MetadataSelectQuerySpecification term,
-                          Item item,
-                          User user) {
+    private String doItem(MetadataSelectQuerySpecification term, Item item, User user) {
         /* constraint represented by the ontology term */
-        def clause = generateObservationFactConstraint(user, term)
-        def conceptcd_subclause = clause
+        String clause = generateObservationFactConstraint(user, term)
         /* additional (and optional) constraint by value */
-        def constraint = item.constraint
-        def omics_value_constraint = item.constraintByOmicsValue
+        ConstraintByValue constraint = item.constraint
+        ConstraintByOmicsValue omicsValueConstraint = item.constraintByOmicsValue
         if (constraint) {
             if (constraint.valueType == ConstraintByValue.ValueType.NUMBER) {
-                def spec = NUMBER_QUERY_MAPPING[constraint.operator]
-                def constraintValue = doConstraintNumber(constraint.operator,
-                        constraint.constraint)
-
+                List spec = NUMBER_QUERY_MAPPING[constraint.operator]
+                String constraintValue = doConstraintNumber(constraint.operator, constraint.constraint)
                 def predicates = spec.collect {
                     "valtype_cd = 'N' AND nval_num ${it[0]} $constraintValue AND " +
                             'tval_char ' + (it[1].size() == 1
@@ -191,36 +184,34 @@ class PatientSetQueryBuilderService {
                             : "IN (${it[1].collect { "'$it'" }.join ', '})")
                 }
 
-                clause += ' AND (' + predicates.collect { '(' + it + ')' }.join(' OR ') + ")"
+                clause += ' AND (' + predicates.collect { '(' + it + ')' }.join(' OR ') + ')'
             }
             else if (constraint.valueType == ConstraintByValue.ValueType.FLAG) {
-                clause += ' AND (valueflag_cd = ' + doConstraintFlag(constraint.constraint) + ')'
+                clause += " AND (valueflag_cd = ${doConstraintFlag(constraint.constraint)})"
             }
         }
 
-        if (omics_value_constraint) {
-            def resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(item.conceptKey)
-
-            if (resource != null) {
-                def distribution = resource.getDistribution(omics_value_constraint, item.conceptKey, null)
-                def patient_ids = distribution.keySet()
-                clause += 'AND patient_num IN (' + patient_ids.collect {it.toString()}.join(',') + ')'
+        if (omicsValueConstraint) {
+            HighDimensionDataTypeResource resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(item.conceptKey)
+            if (resource) {
+                Map distribution = resource.getDistribution(omicsValueConstraint, item.conceptKey, null)
+                clause += 'AND patient_num IN (' + distribution.keySet().collect {it.toString()}.join(',') + ')'
             }
             else {
-                logger.warn('No implementation exists for building a patient set query for ' + resource.getHighDimensionFilterType() + ' data.')
+                logger.warn 'No implementation exists for building a patient set query for {} data.',
+		    resource.highDimensionFilterType
             }
         }
         clause
     }
 
     private String doConstraintNumber(ConstraintByValue.Operator operator,
-                                      String value) throws
-            NumberFormatException, InvalidRequestException {
+				      String value) throws NumberFormatException, InvalidRequestException {
 
         /* validate constraint value to prevent injection */
         try {
             if (operator == BETWEEN) {
-                def matcher = value =~
+                Matcher matcher = value =~
                         /([+-]?[0-9]+(?:\.[0-9]*)?)(?i: and )([+-]?[0-9]+(?:\.[0-9]*)?)/
                 if (matcher.matches()) {
                     return Double.parseDouble(matcher.group(1).toString()) +
@@ -234,28 +225,24 @@ class PatientSetQueryBuilderService {
                 }
             }
         }
-        catch (NumberFormatException nfe) {
+        catch (NumberFormatException e) {
             /* may fail because the number is too large, for instance.
              * We'd rather fail here than failing when the SQL statement is
              * compiled. */
-            throw new InvalidRequestException('Error parsing ' +
-                    'constraint value: ' + nfe.message, nfe)
+            throw new InvalidRequestException('Error parsing constraint value: ' + e.message, e)
         }
 
-        throw new InvalidRequestException("The value '$value' is an " +
-                'invalid number constraint value for the operator ' + operator)
+        throw new InvalidRequestException("The value '" + value +
+                "' is an invalid number constraint value for the operator " + operator)
     }
 
-    private String doConstraintFlag(String value) throws
-            InvalidRequestException {
+    private String doConstraintFlag(String value) throws InvalidRequestException {
 
         if (['L', 'H', 'N'].contains(value)) {
             return "'$value'"
         }
-        else {
-            throw new InvalidRequestException("A flag value constraint's " +
-                    "operand must be either 'L', 'H' or 'N'; got '$value'")
-        }
+
+        throw new InvalidRequestException("A flag value constraint's operand must be either 'L', 'H' or 'N'; got '$value'")
     }
 
     private void generalDefinitionValidation(QueryDefinition definition) {
@@ -275,29 +262,26 @@ class PatientSetQueryBuilderService {
             }
         }
         if (anyItem { it == null }) {
-            throw new InvalidRequestException('Found panel with null value in' +
-                    ' its item list')
+            throw new InvalidRequestException('Found panel with null value in its item list')
         }
         if (anyItem { Item it -> it.conceptKey == null }) {
             throw new InvalidRequestException('Found item with null conceptKey')
         }
         if (anyItem { it.constraint && it.constraint.constraint == null }) {
-            throw new InvalidRequestException('Found item constraint with ' +
-                    'null constraint value')
+            throw new InvalidRequestException('Found item constraint with null constraint value')
         }
         if (anyItem { it.constraint && it.constraint.operator == null }) {
-            throw new InvalidRequestException('Found item constraint with ' +
-                    'null operator')
+            throw new InvalidRequestException('Found item constraint with null operator')
         }
         if (anyItem { it.constraint && it.constraint.valueType == null }) {
-            throw new InvalidRequestException('Found item constraint with ' +
-                    'null value type')
+            throw new InvalidRequestException('Found item constraint with null value type')
         }
-        if (anyItem { Item it -> it.constraint && it.constraint.valueType ==
-                ConstraintByValue.ValueType.FLAG &&
-                it.constraint.operator != EQUAL_TO }) {
-            throw new InvalidRequestException('Found item flag constraint ' +
-                    'with an operator different from EQUAL_TO')
+        if (anyItem { Item it ->
+	    it.constraint &&
+		it.constraint.valueType == ConstraintByValue.ValueType.FLAG &&
+                it.constraint.operator != EQUAL_TO
+	}) {
+            throw new InvalidRequestException('Found item flag constraint with an operator different from EQUAL_TO')
         }
     }
 
@@ -314,7 +298,7 @@ class PatientSetQueryBuilderService {
                         if (v[-1] != '\\') {
                             v += '\\'
                         }
-                        v = v.asLikeLiteral() + '%'
+                        v = Utils.asLikeLiteral(v) + '%'
                     }
                 }
             }
@@ -327,22 +311,21 @@ class PatientSetQueryBuilderService {
         }
 
         if (spec.operator.equalsIgnoreCase('in')) {
-            v = '(' + v + ')'
+            v = "($v)"
         }
 
         v
     }
 
-    String generateObservationFactConstraint(User userInContext,
-                                             MetadataSelectQuerySpecification spec) {
-        def res = 'SELECT ' + spec.factTableColumn + ' ' +
-                'FROM ' + spec.dimensionTableName + ' ' +
-                'WHERE ' + spec.columnName + ' ' + spec.operator + ' ' + getProcessedDimensionCode(spec)
+    String generateObservationFactConstraint(User userInContext, MetadataSelectQuerySpecification spec) {
+        String res = "SELECT $spec.factTableColumn " +
+				"FROM $spec.dimensionTableName " +
+				"WHERE $spec.columnName $spec.operator ${getProcessedDimensionCode(spec)}"
         if (spec.operator.equalsIgnoreCase('like') &&
                 databasePortabilityService.databaseType == ORACLE) {
             res += " ESCAPE '\\'"
         }
 
-        spec.postProcessQuery '' + spec.factTableColumn + ' IN (' + res + ')', userInContext
+        spec.postProcessQuery "$spec.factTableColumn IN ($res)", userInContext
     }
 }

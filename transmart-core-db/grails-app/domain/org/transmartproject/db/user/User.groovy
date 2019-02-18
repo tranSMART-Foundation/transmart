@@ -42,15 +42,15 @@ class User extends PrincipalCoreDb implements org.transmartproject.core.users.Us
     /* not mapped (only on thehyve/master) */
     //String federatedId
 
-	static hasMany = [groups: Group,
-	                  roles : RoleCoreDb]
+    static hasMany = [groups: Group,
+	              roles : RoleCoreDb]
 
     static transients = ['accessControlChecks', 'admin', 'accessibleStudies']
 
     static mapping = {
-		table 'searchapp.search_auth_user'
-		version false
-		cache usage: 'read-only', include: 'non-lazy' /* don't cache groups */
+	table 'searchapp.search_auth_user'
+	version false
+	cache usage: 'read-only', include: 'non-lazy' /* don't cache groups */
 
         hash    column: 'passwd'
 
@@ -59,31 +59,28 @@ class User extends PrincipalCoreDb implements org.transmartproject.core.users.Us
         roles   joinTable: [name:   'searchapp.search_role_auth_user',
                             key:    'authorities_id',
                             column: 'people_id'], // insane column naming!
-                fetch: FetchMode.JOIN
+            fetch: FetchMode.JOIN
 
+        discriminator name: 'USER', column: 'unique_id'
         groups  joinTable: [name:   'searchapp.search_auth_group_member',
                             key:    'auth_user_id',
                             column: 'auth_group_id']
-
-        discriminator name: 'USER', column: 'unique_id'
-
         realName column: 'user_real_name'
-
     }
 
     static constraints = {
-        email        nullable: true, maxSize: 255
+        email        nullable: true
         emailShow    nullable: true
-        hash         nullable: true, maxSize: 255
-        realName     nullable: true, maxSize: 255
-        username     nullable: true, maxSize: 255
+        hash         nullable: true
+        realName     nullable: true
+        username     nullable: true
         //federatedId nullable: true, unique: true
     }
 
     // not in api
 
     boolean isAdmin() {
-        roles.find { it.authority == RoleCoreDb.ROLE_ADMIN_AUTHORITY }
+        roles.find { it.authority == Roles.ADMIN.authority }
     }
 
     boolean canPerform(ProtectedOperation protectedOperation, ProtectedResource protectedResource) {
@@ -95,9 +92,9 @@ class User extends PrincipalCoreDb implements org.transmartproject.core.users.Us
         }
 
         if (admin) {
-            /* administrators bypass all the checks */
-            logger.debug 'Bypassing check for ' + protectedOperation + ' on ' +
-                    '' + protectedResource + ' for user ' + this + ' because he is an administrator'
+            // administrators bypass all the checks
+            logger.debug 'Bypassing check for {} on {} for user {} because he is an administrator',
+					protectedOperation, protectedResource, this
             return true
         }
 
@@ -108,7 +105,7 @@ class User extends PrincipalCoreDb implements org.transmartproject.core.users.Us
 
     Set<Study> getAccessibleStudies() {
         Set<Study> studies = accessControlChecks.getAccessibleStudiesForUser(this)
-        logger.debug 'User ' + this + ' has access to studies: ' + studies*.id
+        logger.debug 'User {} has access to studies: {}', this, studies*.id
         studies
     }
 }

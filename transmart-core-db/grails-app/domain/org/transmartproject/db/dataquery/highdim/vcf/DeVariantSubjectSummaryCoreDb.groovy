@@ -23,40 +23,42 @@ import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
 
 class DeVariantSubjectSummaryCoreDb {
 
-    static final Integer REF_ALLELE = 0
-    String subjectId
-    String rsId
-    String variant
-    String variantFormat
-    String variantType
-    Boolean reference
+    static final int REF_ALLELE = 0
+
     Integer allele1
     Integer allele2
     String chr
-    Long pos
-
+//    DeVariantDatasetCoreDb dataset
     DeVariantSubjectDetailCoreDb jDetail
+    Long pos
+    Boolean reference
+    String rsId
+    String subjectId
     DeVariantSubjectIdxCoreDb subjectIndex
+    String variant
+    String variantFormat
+    String variantType
 
-    static belongsTo = [dataset: DeVariantDatasetCoreDb, assay: DeSubjectSampleMapping]   //TODO: implement constraint on dataset
+    static belongsTo = [assay: DeSubjectSampleMapping,
+			dataset: DeVariantDatasetCoreDb]
+    //TODO: implement constraint on dataset
 
     static constraints = {
-        variant(nullable: true)
-        variantFormat(nullable: true)
-        variantType(nullable: true)
-        subjectIndex(nullable: true)
+        subjectIndex nullable: true
+        variant nullable: true
+        variantFormat nullable: true
+        variantType nullable: true
     }
 
     static mapping = {
-        table schema: 'deapp', name: 'de_variant_subject_summary'
-        version false
+        table 'deapp.de_variant_subject_summary'
         id  column:'variant_subject_summary_id',
-            generator: 'sequence',
-            params: [sequence: 'de_variant_subject_summary_seq', schema: 'deapp']
+            generator: 'sequence', params: [sequence: 'deapp.de_variant_subject_summary_seq']
+        version false
             
-        dataset column: 'dataset_id'
-        assay   column: 'assay_id'
-        subjectId column: 'subject_id'
+//        assay column: 'assay_id'
+//        dataset column: 'dataset_id'
+//        subjectId column: 'subject_id'
 
         // this is needed due to a Criteria bug.
         // see https://forum.hibernate.org/viewtopic.php?f=1&t=1012372
@@ -70,6 +72,7 @@ class DeVariantSubjectSummaryCoreDb {
             subjectIndex(insertable: false, updateable: false) {
                 column name: 'dataset_id'
                 column name: 'subject_id'
+//		column name: 'pos'
             }
         }
     }

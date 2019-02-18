@@ -19,39 +19,44 @@
 
 package org.transmartproject.db.ontology
 
+import groovy.util.logging.Slf4j
+import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.dataquery.clinical.ClinicalTestData
 import org.transmartproject.db.i2b2data.ConceptDimension
 import org.transmartproject.db.i2b2data.I2b2Data
 import org.transmartproject.db.i2b2data.ObservationFact
 
-import static org.transmartproject.db.TestDataHelper.save
+@Slf4j('logger')
+class StudyTestData extends AbstractTestData {
 
-class StudyTestData {
+	I2b2Data i2b2Data
+	ConceptTestData conceptData
+	List<ObservationFact> facts
+	List<I2b2> i2b2List
+	TableAccess tableAccess
+	List<ConceptDimension> concepts
 
-    I2b2Data i2b2Data = I2b2Data.createDefault()
+	StudyTestData() {
+		createTestData()
+	}
 
-    ConceptTestData conceptData = ConceptTestData.createDefault()
+	void saveAll() {
+		i2b2Data.saveAll()
+		conceptData.saveAll()
+		saveAll facts, logger
+	}
 
-    List<ObservationFact> facts = {
-        ClinicalTestData.createFacts(conceptData.conceptDimensions, i2b2Data.patients)
-    }()
+	private void createTestData() {
+		i2b2Data = I2b2Data.createDefault()
 
-    List<I2b2> i2b2List = {
-        conceptData.i2b2List
-    }()
+		conceptData = ConceptTestData.createDefault()
 
-    TableAccess tableAccess = {
-       conceptData.tableAccesses[0]
-    }()
+		facts = ClinicalTestData.createFacts(conceptData.conceptDimensions, i2b2Data.patients)
 
-    List<ConceptDimension> concepts = {
-       conceptData.conceptDimensions
-    }()
+		i2b2List = conceptData.i2b2List
 
-    void saveAll() {
-        i2b2Data.saveAll()
-        conceptData.saveAll()
-        save facts
-    }
+		tableAccess = conceptData.tableAccesses[0]
 
+		concepts = conceptData.conceptDimensions
+	}
 }

@@ -8,21 +8,18 @@ class StudyPatientsConstraint implements PatientConstraint {
 
     private final Study study
 
-    StudyPatientsConstraint(final Study study) {
-        this.study = study
-
-        assert this.study
-        assert this.study.id
+    StudyPatientsConstraint(Study study) {
+	assert study
+	assert study.id
+	this.study = study
     }
 
-    @Override
     void addToCriteria(Criteria criteria) {
-        criteria.in 'id', PatientTrialCoreDb.where {
-            projections {
-                property 'patient.id'
-            }
-            eq('study', this.study.id)
-        }
+	criteria.in 'id', PatientTrialCoreDb.where {
+	    projections {
+		property 'patient.id'
+	    }
+	    eq 'study', this.study.id
+	}
     }
-
 }

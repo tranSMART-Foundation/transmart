@@ -33,27 +33,24 @@ class DeVariantSummaryDetailGene implements Serializable {
 
     DeVariantSubjectIdxCoreDb subjectIndex
 
-    static belongsTo = [
-            dataset: DeVariantDatasetCoreDb,
-            assay  : DeSubjectSampleMapping
-    ]
+    static belongsTo = [dataset: DeVariantDatasetCoreDb,
+			assay  : DeSubjectSampleMapping]
 
     static mapping = {
         table schema: 'deapp'
         id column: 'variant_subject_summary_id'
+        version false
 
+//        assay column: 'assay_id'
+        dataset insertable: false, updateable: false
         quality column: 'qual'
-
-        dataset column: 'dataset_id', insertable: false, updateable: false
-        assay column: 'assay_id'
         subjectId column: 'subject_id', insertable: false, updateable: false
+//        pos column: 'pos', insertable: false, updateable: false
 
         subjectIndex {
             column name: 'dataset_id'
             column name: 'subject_id'
+//	    column name: 'pos'
         }
-
-        version false
     }
-
 }

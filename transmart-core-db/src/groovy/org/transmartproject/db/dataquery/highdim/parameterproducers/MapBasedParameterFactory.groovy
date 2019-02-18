@@ -19,11 +19,13 @@
 
 package org.transmartproject.db.dataquery.highdim.parameterproducers
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 
 /**
- * Created by glopes on 11/18/13.
+ * @author glopes
  */
+@CompileStatic
 class MapBasedParameterFactory implements DataRetrievalParameterFactory {
 
     private Map<String, Closure> producerMap
@@ -41,29 +43,25 @@ class MapBasedParameterFactory implements DataRetrievalParameterFactory {
         this.producerMap = producerMap
     }
 
-    @Override
     Set<String> getSupportedNames() {
         producerMap.keySet()
     }
 
-    @Override
     boolean supports(String name) {
         producerMap.containsKey name
     }
 
-    @Override
-    def createFromParameters(String name,
-                             Map<String, Object> params,
-                             Object createParameter) {
+    def createFromParameters(String name, Map<String, Object> params, Closure createParameter) {
         Closure producer = producerMap[name]
         if (!producer) {
             return null
         }
 
         if (producer.maximumNumberOfParameters == 1) {
-            producer.call params
-        } else {
-            producer.call params, createParameter
+            producer(params)
+        }
+	else {
+            producer(params, createParameter)
         }
     }
 }

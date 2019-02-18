@@ -26,7 +26,6 @@ class PatientIdListCriteriaConstraint implements AssayCriteriaConstraint {
 
     List<String> patientIdList
 
-    @Override
     void addToCriteria(Criteria criteria) {
         /** @see org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping */
         InQuery.addIn(criteria, 'patientInTrialId', patientIdList)

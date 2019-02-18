@@ -22,9 +22,6 @@ import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.DataRow
 
 /**
- * Created by j.hudecek on 18-1-2015.
- */
-/**
  * Extension of {@link org.transmartproject.db.dataquery.CollectingTabularResult}.
  * Relaxes the invariant that hold for <code>list</code> variable passed to
  * <code>finalizeGroup</code> closure - the list can no longer be assumed to be
@@ -34,12 +31,11 @@ import org.transmartproject.core.dataquery.DataRow
  *
  * @param < C > the type for the columns
  * @param < R > the type for the rows
+ * @author j.hudecek
  */
 @CompileStatic
 class MultiTabularResult<C, R extends DataRow> extends CollectingTabularResult {
     final String columnEntityName = 'assay'
-    protected void finalizeCollectedEntries(ArrayList collectedEntries) {
-            return
-    }
 
+    protected void finalizeCollectedEntries(List collectedEntries) {}
 }

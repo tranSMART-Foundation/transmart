@@ -16,15 +16,13 @@
  * You should have received a copy of the GNU General Public License along with
  * transmart-core-db.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.transmartproject.db.support
 
 import grails.orm.HibernateCriteriaBuilder
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.hibernate.Criteria
 import org.hibernate.criterion.LikeExpression
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 
 import javax.annotation.PostConstruct
 import javax.sql.DataSource
@@ -32,33 +30,28 @@ import java.sql.Connection
 import java.sql.DatabaseMetaData
 
 /**
- * Helper service to make it easier to write code that works on both Oracle and
- * PostgreSQL. Of course, the best option in this respect is to use Hibernate.
+ * Makes it easier to write code that works on both Oracle and PostgreSQL.
+ * Of course, the best option in this respect is to use Hibernate.
  */
-
 @Slf4j('logger')
 class DatabasePortabilityService {
 
-    @Autowired
-    @Qualifier('dataSource')
-    DataSource dataSource
+    static transactional = false
 
+    DataSource dataSource
     DatabaseType databaseType
 
-    enum DatabaseType {
+    @CompileStatic
+    static enum DatabaseType {
         POSTGRESQL,
         ORACLE
     }
 
     private runCorrectImplementation(Closure postgresImpl, Closure oracleImpl) {
         switch (getDatabaseType()) {
-            case DatabaseType.POSTGRESQL:
-                return postgresImpl()
-            case DatabaseType.ORACLE:
-                return oracleImpl()
-            default:
-                throw new IllegalStateException('Should not reach this point. ' +
-                        'Value of databaseType is ' + databaseType + '')
+            case DatabaseType.POSTGRESQL: return postgresImpl()
+            case DatabaseType.ORACLE: return oracleImpl()
+            default: throw new IllegalStateException('Should not reach this point. Value of databaseType is ' + databaseType)
         }
     }
 
@@ -69,23 +62,17 @@ class DatabasePortabilityService {
      * @return the relative complement operator
      */
     String getComplementOperator() {
-        runCorrectImplementation(
-                { 'EXCEPT' },
-                { 'MINUS' }
-        )
+        runCorrectImplementation({ -> 'EXCEPT' }, { -> 'MINUS' })
     }
 
     String getCurrentDateTimeFunc() {
-        runCorrectImplementation(
-                { 'now()' },
-                { 'sysdate' }
-        )
+        runCorrectImplementation({  -> 'now()' }, {  -> 'sysdate' })
     }
 
     String createTopNQuery(String s) {
         runCorrectImplementation(
-                { '' + s + ' LIMIT ?' },
-                { 'SELECT * FROM (' + s + ') WHERE ROWNUM <= ?' }
+            { -> "$s LIMIT ?" },
+            { -> "SELECT * FROM ($s) WHERE ROWNUM <= ?" }
         )
     }
 
@@ -95,62 +82,58 @@ class DatabasePortabilityService {
      * That is, there should not be rows comparing equal.
      *
      * @param s the string to transform
-     * @param rowNumberColName the name of the column with the row index,
-     *                         or null for none
+     * @param rowNumberColName the name of the column with the row index, or null for none
      * @return the transformed query
      */
     String createPaginationQuery(String s, String rowNumberColName=null) {
         runCorrectImplementation(
-                /* PostgreSQL */ {
-                    if (rowNumberColName == null) {
-                        '' + s + ' LIMIT ? OFFSET ?'
-                    }
-                    else {
-                        """
-                        SELECT
-                            row_number() OVER () AS $rowNumberColName, *
-                        FROM ( $s ) pag_a
-                        LIMIT ?
-                        OFFSET ?
-                        """
-                    }
-                },
-                /* Oracle */ {
-                    String rowColumnFragment = ''
-                    if (rowNumberColName != null) {
-                        rowColumnFragment = ', rnum AS ' + rowNumberColName + ''
-                    }
-
-                    /* see http://www.oracle.com/technetwork/issue-archive/2006/06-sep/o56asktom-086197.html */
+            // PostgreSQL
+            {
+		if (!rowNumberColName) {
+                    "$s LIMIT ? OFFSET ?"
+		}
+		else {
                     """
-                    SELECT
-                        *$rowColumnFragment
-                    FROM (
-                            SELECT
-                                /*+ FIRST_ROWS(n) */
-                                pag_a.*,
-                                ROWNUM rnum
-                            FROM ( $s ) pag_a
-                            WHERE
-                                ROWNUM <= ? /* last row to include */ )
-                    WHERE
-                        rnum >= ? /* first row to include */"""
-                }
-        )
+                    SELECT row_number() OVER () AS $rowNumberColName, *
+                    FROM ( $s ) pag_a
+                    LIMIT ?
+                    OFFSET ?
+                    """
+		}
+            },
+            // Oracle
+	    {
+		String rowColumnFragment = ''
+		if (rowNumberColName) {
+                    rowColumnFragment = ", rnum AS $rowNumberColName"
+		}
+
+		// see http://www.oracle.com/technetwork/issue-archive/2006/06-sep/o56asktom-086197.html
+		"""
+                SELECT *$rowColumnFragment
+                FROM (SELECT
+                     /*+ FIRST_ROWS(n) */
+                     pag_a.*, ROWNUM rnum
+                     FROM ( $s ) pag_a
+                     WHERE ROWNUM <= ? /* last row to include */
+                     )
+                    WHERE rnum >= ? /* first row to include */"""
+	    }
+	)
     }
 
     /* Convert limit into Oracle's first row number to exclude, if applicable */
     List convertLimitStyle(Number limit, Number offset) {
         runCorrectImplementation(
-                { [limit, offset] }, /* do not convert for PostgreSQL */
-                { [offset + limit, offset + 1] }
+            { [limit, offset] }, /* do not convert for PostgreSQL */
+            { [offset + limit, offset + 1] }
         )
     }
 
     String toChar(String expr){
         runCorrectImplementation(
-                {'CAST(' + expr + ' as character varying)'},
-                {'to_char(' + expr + ')'}
+            {"CAST($expr as character varying)"},
+	    {"to_char($expr)"}
         )
     }
 
@@ -165,8 +148,8 @@ class DatabasePortabilityService {
      */
     List convertRangeStyle(Number start /* incl, 1-based */, Number end /* incl */) {
         runCorrectImplementation(
-                { [end - start + 1, start - 1] },
-                { [end, start] } /* do not convert for Oracle */
+            { [end - start + 1, start - 1] },
+            { [end, start] } /* do not convert for Oracle */
         )
     }
 
@@ -177,8 +160,8 @@ class DatabasePortabilityService {
      */
     String getNextSequenceValueSql(String schema, String sequenceName) {
         runCorrectImplementation(
-                { "SELECT nextval('${schema}.${sequenceName}')" },
-                { 'SELECT ' + schema + '.' + sequenceName + '.nextval FROM DUAL' }
+            { "SELECT nextval('${schema}.${sequenceName}')" },
+            { "SELECT ${schema}.${sequenceName}.nextval FROM DUAL" }
         )
     }
 
@@ -192,7 +175,8 @@ class DatabasePortabilityService {
         finally {
             connection.close()
         }
-        def databaseName = metaData.databaseProductName.toLowerCase()
+
+        String databaseName = metaData.databaseProductName.toLowerCase()
 
         switch (databaseName) {
         case ~/postgresql.*/:
@@ -204,14 +188,14 @@ class DatabasePortabilityService {
             break
 
         default:
-            logger.warn 'Could not detect data source driver as either ' +
+	    logger.warn 'Could not detect data source driver as either ' +
                     'PostgreSQL or Oracle; defaulting to PostgreSQL ' +
                     '(this is OK if running H2 in Postgres compatibility ' +
                     'mode)'
-            databaseType = DatabaseType.POSTGRESQL
+		databaseType = DatabaseType.POSTGRESQL
         }
 
-        logger.debug 'Selected database type is ' + databaseType
+        logger.debug 'Selected database type is {}', databaseType
 
         doFixups()
     }

@@ -19,26 +19,24 @@
 
 package org.transmartproject.db.dataquery.highdim.mrna
 
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import org.transmartproject.core.dataquery.highdim.BioMarkerDataRow
 import org.transmartproject.db.dataquery.highdim.AbstractDataRow
 
+@CompileStatic
 @ToString(excludes = [ 'assayIndexMap' ])
-class ProbeRow extends AbstractDataRow implements BioMarkerDataRow<Object> {
-
-    String probe
-
-    String geneSymbol
+class ProbeRow extends AbstractDataRow implements BioMarkerDataRow {
 
     String geneId
+    String geneSymbol
+    String probe
 
-    @Override
     String getLabel() {
-        probe
+	probe
     }
 
-    @Override
     String getBioMarker() {
-        geneSymbol
+	geneSymbol
     }
 }

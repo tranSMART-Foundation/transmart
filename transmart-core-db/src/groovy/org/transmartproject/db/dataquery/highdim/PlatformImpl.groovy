@@ -1,7 +1,9 @@
 package org.transmartproject.db.dataquery.highdim
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.highdim.Platform
 
+@CompileStatic
 class PlatformImpl implements Platform {
 
     String  id
@@ -11,8 +13,7 @@ class PlatformImpl implements Platform {
     String  markerType
     String  genomeReleaseId
 
-    @Override
-    Iterable<?> getTemplate() {
+    Iterable getTemplate() {
         throw new UnsupportedOperationException()
     }
 }

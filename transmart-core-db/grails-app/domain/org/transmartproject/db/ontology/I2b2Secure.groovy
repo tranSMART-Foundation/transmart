@@ -21,15 +21,15 @@ package org.transmartproject.db.ontology
 
 class I2b2Secure extends AbstractI2b2Metadata implements Serializable {
 
-    String secureObjectToken
+    static final String backingTable = 'I2B2_SECURE'
 
-    static String backingTable = 'I2B2_SECURE'
+    String secureObjectToken
 
     static mapping = {
         table         name: 'I2B2_SECURE', schema: 'I2B2METADATA'
+	id name: 'fullName', generator: 'assigned'
+//        id composite: ['fullName', 'name']
         version       false
-
-        id composite: ['fullName', 'name']
 
         secureObjectToken column: 'secure_obj_token'
 
@@ -38,10 +38,8 @@ class I2b2Secure extends AbstractI2b2Metadata implements Serializable {
     }
 
     static constraints = {
-        cSynonymCd          nullable:   false
-
+//        cSynonymCd          nullable:   false
         AbstractI2b2Metadata.constraints.delegate = delegate
         AbstractI2b2Metadata.constraints()
     }
-
 }

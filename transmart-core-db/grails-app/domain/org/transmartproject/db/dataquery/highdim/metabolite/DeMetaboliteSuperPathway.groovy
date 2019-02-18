@@ -31,10 +31,11 @@ class DeMetaboliteSuperPathway {
     static mappedBy = [subPathways: 'superPathway']
 
     static mapping = {
-        table   schema:    'deapp',            name: 'de_metabolite_super_pathways'
+        table 'deapp.de_metabolite_super_pathways'
         id      generator: 'assigned'
-        name    column:    'super_pathway_name'
         version false
+
+        name    column:    'super_pathway_name'
     }
 
     static constraints = {

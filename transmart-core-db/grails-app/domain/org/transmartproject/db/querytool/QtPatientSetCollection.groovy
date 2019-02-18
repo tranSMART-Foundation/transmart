@@ -23,28 +23,24 @@ import org.transmartproject.db.i2b2data.PatientDimension
 
 class QtPatientSetCollection {
 
-	Long            setIndex
+    Long            setIndex
 
-    static belongsTo = [
-            resultInstance: QtQueryResultInstance,
-            patient:        PatientDimension,
-    ]
+    static belongsTo = [patient: PatientDimension,
+			resultInstance: QtQueryResultInstance]
 
-	static mapping = {
+    static mapping = {
         table          schema:   'I2B2DEMODATA'
-
         id             column:   'patient_set_coll_id', generator: 'identity'
-        resultInstance column:   'result_instance_id'
-        patient        column:   'patient_num'
-
+	version false
         sort           setIndex: 'asc'
 
-		version false
-	}
+        patient        column:   'patient_num'
+//	resultInstance column:   'result_instance_id'
+    }
 
-	static constraints = {
+    static constraints = {
+	patient          nullable: true
         resultInstance   nullable: true
-		setIndex         nullable: true
-		patient          nullable: true
-	}
+	setIndex         nullable: true
+    }
 }

@@ -19,8 +19,11 @@
 
 package org.transmartproject.db.dataquery.highdim.mirna
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class MirnaQpcrTestData extends MirnaTestData {
-    MirnaQpcrTestData() {
-        super('mirnaqpcr')
-    }
+	MirnaQpcrTestData() {
+		super('mirnaqpcr')
+	}
 }

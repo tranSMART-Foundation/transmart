@@ -2,12 +2,12 @@ package org.transmartproject.db.ontology
 
 class ModifierDimensionCoreDb {
 
-    String path
     String code
-    String name
     Long   level
-    String studyId
+    String name
     String nodeType
+    String path
+    String studyId
 
     // unused
 //    String modifierBlob
@@ -17,25 +17,25 @@ class ModifierDimensionCoreDb {
 //    Long uploadId
 
     static mapping = {
-        table   schema: 'i2b2demodata', name: 'modifier_dimension'
+        table 'i2b2demodata.modifier_dimension'
         id      name: 'path', generator: 'assigned'
         version false
 
-        path     column: 'modifier_path'
         code     column: 'modifier_cd'
-        name     column: 'name_char'
         level    column: 'modifier_level'
-        studyId  column: 'sourcesystem_cd'
+	name     column: 'name_char'
         nodeType column: 'modifier_node_type' // known values: {L, F}
+        path     column: 'modifier_path'
+        studyId  column: 'sourcesystem_cd'
     }
 
     static constraints = {
-        path           maxSize:  700
         code           nullable: true, maxSize: 50
-        name           nullable: true, maxSize: 2000
         level          nullable: true
-        studyId        nullable: true, maxSize: 50
+        name           nullable: true, maxSize: 2000
         nodeType       nullable: true, maxSize: 10
+        path           maxSize:  700
+        studyId        nullable: true, maxSize: 50
 
         // unused:
 //        modifierBlob   nullable: true

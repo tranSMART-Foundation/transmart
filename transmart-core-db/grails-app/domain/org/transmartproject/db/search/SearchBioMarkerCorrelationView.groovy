@@ -26,28 +26,26 @@ class SearchBioMarkerCorrelationView implements Serializable {
 
     //is a view!
 
-	Long domainObjectId
-	Long associatedBioMarkerId
-	String correlationType
-	Long valueMetric
-	Long mvId
+    Long associatedBioMarkerId
+    String correlationType
+    Long domainObjectId
+    Long mvId
+    Long valueMetric
 
-	static mapping = {
-        table                 schema:    'searchapp', name: 'search_bio_mkr_correl_view'
-
+    static mapping = {
+        table 'searchapp.search_bio_mkr_correl_view'
         id                    composite: ['domainObjectId',   'associatedBioMarkerId', 'correlationType', 'valueMetric', 'mvId']
+        version               false
 
         associatedBioMarkerId column:    'asso_bio_marker_id'
         correlationType       column:    'correl_type'
+    }
 
-        version               false
-	}
-
-	static constraints = {
-        domainObjectId        nullable: true
+    static constraints = {
         associatedBioMarkerId nullable: true
         correlationType       nullable: true, maxSize: 19
-        valueMetric           nullable: true
+        domainObjectId        nullable: true
         mvId                  nullable: true
-	}
+        valueMetric           nullable: true
+    }
 }

@@ -17,18 +17,14 @@
  * transmart-core-db.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 package org.transmartproject.db.ontology
 
-import grails.orm.HibernateCriteriaBuilder
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.querytool.Item
 import org.transmartproject.core.querytool.Panel
 import org.transmartproject.core.querytool.QueryDefinition
 import org.transmartproject.db.i2b2data.PatientDimension
-import org.transmartproject.db.support.InQuery
 import org.transmartproject.db.user.User
 
 /**
@@ -37,35 +33,30 @@ import org.transmartproject.db.user.User
  */
 abstract class AbstractQuerySpecifyingType implements MetadataSelectQuerySpecification {
 
-    String       factTableColumn
-    String       dimensionTableName
-    String       columnName
-    String       columnDataType
-    String       operator
-    String       dimensionCode
+    String columnDataType
+    String columnName
+    String dimensionCode
+    String dimensionTableName
+    String factTableColumn
+    String operator
 
     def patientSetQueryBuilderService
     def sessionFactory
     def databasePortabilityService
 
     static constraints = {
-        factTableColumn      nullable:   false,   maxSize:   50
-        dimensionTableName   nullable:   false,   maxSize:   50
-        columnName           nullable:   false,   maxSize:   50
-        columnDataType       nullable:   false,   maxSize:   50
-        operator             nullable:   false,   maxSize:   10
-        dimensionCode        nullable:   false,   maxSize:   700
+	columnDataType     maxSize: 50
+	columnName         maxSize: 50
+	dimensionCode      maxSize: 700
+	dimensionTableName maxSize: 50
+	factTableColumn    maxSize: 50
+	operator           maxSize: 10
     }
 
     protected List<Patient> getPatients(OntologyTerm term) {
 
-        def definition = new QueryDefinition([
-                new Panel(
-                        invert: false,
-                        items:  [
-                                new Item(conceptKey: term.key)
-                        ]
-                )
+	QueryDefinition definition = new QueryDefinition([
+	    new Panel(invert: false, items: [new Item(conceptKey: term.key)])
         ])
 
         def patientsSql = patientSetQueryBuilderService.buildPatientIdListQuery(definition)
@@ -82,14 +73,12 @@ abstract class AbstractQuerySpecifyingType implements MetadataSelectQuerySpecifi
          -implement our own IdentityGenerator and use it in this column
          I don't like either, and until we decide on it i will leave it as it is
          */
-        if (patientIdList.size() > 0 && patientIdList[0].getClass() != Long) {
+	if (patientIdList && patientIdList[0].getClass() != Long) {
             patientIdList = patientIdList.collect( {it as Long} )
         }
-
-        InQuery.addIn(PatientDimension.createCriteria(), 'id', patientIdList).list()
+	PatientDimension.findAllByIdInList patientIdList
     }
 
-    @Override
     String postProcessQuery(String sql, User user) {
         sql
     }

@@ -27,49 +27,49 @@ import org.transmartproject.db.dataquery.highdim.rnaseq.DeSubjectRnaseqData
 class DeChromosomalRegion implements Region {
 
     String  chromosome
-    Long    start
-    Long    end
-    Integer numberOfProbes
-    String  name
     String  cytoband
-    String  geneSymbol
+    Long    end
     Long    geneId
+    String  geneSymbol
     String  gplId
-    /* unused */
-    String  organism
+    String  name
+    Integer numberOfProbes
+    Long    start
 
-    static belongsTo = [platform: DeGplInfo]
+    String organism // unused
+
     static hasMany = [dataRowsRnaSeq: DeSubjectRnaseqData,
                       dataRowsAcgh: DeSubjectAcghData]
+
+    static belongsTo = [platform: DeGplInfo]
+
     static mappedBy = [dataRowsRnaSeq: 'region',
                        dataRowsAcgh: 'region']
 
-	static mapping = {
+    static mapping = {
         table          schema: 'deapp'
+        id             column:  'region_id',  generator: 'assigned'
+        version false
 
-        id             column:  "region_id",  generator: "assigned"
-
-        start          column: 'start_bp'
         end            column: 'end_bp'
+        gplId          insertable: false, updateable: false
         name           column: 'region_name'
         numberOfProbes column: 'num_probes'
         platform       column: 'gpl_id'
-        gplId          insertable: false, updateable: false
-        version false
-
-	}
-
-	static constraints = {
-        platform       nullable: true
+        start          column: 'start_bp'
+    }
+    
+    static constraints = {
         chromosome     nullable: true, maxSize: 2
-        start          nullable: true
-        end            nullable: true
-        numberOfProbes nullable: true
-        name           nullable: true, maxSize: 100
         cytoband       nullable: true, maxSize: 100
-        geneSymbol     nullable: true, maxSize: 100
+        end            nullable: true
         geneId         nullable: true
+        geneSymbol     nullable: true, maxSize: 100
+        name           nullable: true, maxSize: 100
+        numberOfProbes nullable: true
         organism       nullable: true, maxSize: 200
-	}
+        platform       nullable: true
+        start          nullable: true
+    }
 
 }

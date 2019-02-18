@@ -19,7 +19,11 @@
 
 package org.transmartproject.db.dataquery.clinical
 
-import com.google.common.collect.*
+import com.google.common.collect.AbstractIterator
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableMap
+import com.google.common.collect.Iterators
+import com.google.common.collect.PeekingIterator
 import com.google.common.io.Closer
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
@@ -54,49 +58,43 @@ class ClinicalDataTabularResult implements TabularResult<TerminalClinicalVariabl
         def indexOwnerBuilder  = ImmutableMap.builder()
         def indicesListBuilder = ImmutableList.builder()
 
-        tabResults.each { TerminalClinicalVariablesTabularResult tabResult ->
-            tabResult.indicesList.each { TerminalClinicalVariable variable ->
+	for (TerminalClinicalVariablesTabularResult tabResult in tabResults) {
+	    for (TerminalClinicalVariable variable in tabResult.indicesList) {
                 indexOwnerBuilder.put variable, tabResult
                 indicesListBuilder.add variable
             }
         }
 
         this.tabResults    = tabResults
-        this.indexOwnerMap = indexOwnerBuilder.build()
-        this.indicesList   = indicesListBuilder.build()
+	indexOwnerMap = indexOwnerBuilder.build()
+	indicesList = indicesListBuilder.build()
     }
 
-    @Override
     Iterator<PatientRow> getRows() {
         new ClinicalDataJoinedIterator(this)
     }
 
-    @Override
     Iterator<PatientRow> iterator() {
         rows
     }
 
-    @Override
     String getColumnsDimensionLabel() {
         tabResults.first().columnsDimensionLabel
     }
 
-    @Override
     String getRowsDimensionLabel() {
         tabResults.first().rowsDimensionLabel
     }
 
-    @Override
     @CompileStatic(TypeCheckingMode.SKIP)
     void close() throws IOException {
         Closer closer = Closer.create()
-        /* session must be last thing to be closed, so we have to add it to the
-         * the closer first */
-        closer.register(new Closeable() {
+	// session must be last thing to be closed, so we have to add it to the the closer first
+	closer.register new Closeable() {
             void close() throws IOException {
                 session.close()
             }
-        })
+	}
         tabResults.each { closer.register it }
         closer.close()
     }
@@ -107,20 +105,16 @@ class ClinicalDataTabularResult implements TabularResult<TerminalClinicalVariabl
 class ClinicalDataJoinedIterator extends AbstractIterator<PatientRow> {
 
     ClinicalDataTabularResult outer
-
-    Iterator<Map.Entry<Long, Patient>> idToPatientEntries =
-            outer.patientMap.entrySet().iterator()
-
+    Iterator<Map.Entry<Long, Patient>> idToPatientEntries
     List<PeekingIterator<PatientIdAnnotatedDataRow>> innerIterators = []
-
     Map<Iterator<PatientIdAnnotatedDataRow>, DataRow> emptyRows = [:]
-
     Map<Iterator<PatientIdAnnotatedDataRow>, String> groups = [:]
 
     @CompileStatic(TypeCheckingMode.SKIP)
     ClinicalDataJoinedIterator(ClinicalDataTabularResult outer) {
         this.outer = outer
-        outer.tabResults.each { tr ->
+	idToPatientEntries = outer.patientMap.entrySet().iterator()
+	for (tr in outer.tabResults) {
             def newIterator = Iterators.peekingIterator(tr.iterator())
             innerIterators << newIterator
             emptyRows[newIterator] = createEmptyRow tr.indicesList
@@ -128,12 +122,11 @@ class ClinicalDataJoinedIterator extends AbstractIterator<PatientRow> {
         }
     }
 
-    @Override
     protected PatientRow computeNext() {
         if (!idToPatientEntries.hasNext()) {
             if (innerIterators*.hasNext().any()) {
                 throw new UnexpectedResultException(
-                        'Found end of patient list before end of data result set')
+                    'Found end of patient list before end of data result set')
             }
             return endOfData()
         }
@@ -148,29 +141,28 @@ class ClinicalDataJoinedIterator extends AbstractIterator<PatientRow> {
 
         Map delegatingDataRows = innerIterators.collectEntries {
             PeekingIterator<PatientIdAnnotatedDataRow> innerIt ->
-                if (!innerIt.hasNext() ||
-                        currentPatient.id != innerIt.peek().patientId) {
-                    // empty row
-                    [groups[innerIt], emptyRows[innerIt]]
-                } else {
-                    [groups[innerIt], innerIt.next()]
-                }
+	    if (!innerIt.hasNext() || currentPatient.id != innerIt.peek().patientId) {
+                // empty row
+                [groups[innerIt], emptyRows[innerIt]]
+	    }
+	    else {
+                [groups[innerIt], innerIt.next()]
+            }
         }
 
         new PatientRowImpl(
-                patient: currentPatient,
-                flattenedIndices: outer.indicesList,
-                delegatingDataRows: delegatingDataRows)
+            patient: currentPatient,
+            flattenedIndices: outer.indicesList,
+	    delegatingDataRows: delegatingDataRows as Map)
     }
 
-    private PatientIdAnnotatedDataRow createEmptyRow(
-            List<TerminalClinicalVariable> indices) {
+    private PatientIdAnnotatedDataRow createEmptyRow(List<TerminalClinicalVariable> indices) {
         int i = 0
 
         // we don't need to actually fill the patient
         // we actually use that fact to reuse the object
         new PatientIdAnnotatedDataRow(
-                data: indices.collect { null },
-                columnToIndex: indices.collectEntries { [it, i++] })
+            data: indices.collect { null },
+            columnToIndex: indices.collectEntries { [it, i++] })
     }
 }

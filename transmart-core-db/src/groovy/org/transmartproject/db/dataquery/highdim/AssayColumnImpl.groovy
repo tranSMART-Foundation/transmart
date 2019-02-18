@@ -19,10 +19,12 @@
 
 package org.transmartproject.db.dataquery.highdim
 
+import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import org.transmartproject.core.dataquery.assay.Assay
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 
+@CompileStatic
 @ToString(includes = ['assay', 'label'])
 class AssayColumnImpl implements AssayColumn {
 
@@ -31,19 +33,16 @@ class AssayColumnImpl implements AssayColumn {
 
     final String label
 
-    public AssayColumnImpl(Assay assay) {
+    AssayColumnImpl(Assay assay) {
         this.assay = assay
-        this.label = assay.sampleCode
+        label = assay.sampleCode
     }
 
-    @Override
     boolean equals(Object other) {
-        other instanceof AssayColumnImpl &&
-                this.assay.id == other.assay.id
+        other instanceof AssayColumnImpl && assay.id == other.assay.id
     }
 
-    @Override
     int hashCode() {
-        this.assay.id.hashCode()
+        assay.id.hashCode()
     }
 }

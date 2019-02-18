@@ -19,11 +19,12 @@
 
 package org.transmartproject.db.dataquery.highdim.assayconstraints
 
+import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.query.api.Criteria
 
+@CompileStatic
 class NoopAssayCriteriaConstraint implements AssayCriteriaConstraint {
 
-    @Override
     void addToCriteria(Criteria criteria) {
         // purposefully left empty
     }

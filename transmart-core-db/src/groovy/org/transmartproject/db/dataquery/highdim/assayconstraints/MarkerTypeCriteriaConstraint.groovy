@@ -27,7 +27,6 @@ class MarkerTypeCriteriaConstraint implements AssayCriteriaConstraint {
 
     List platformNames
 
-    @Override
     void addToCriteria(Criteria criteria) {
         /** @see org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping */
         // This criteria does not work with the InQuery.addIn workaround

@@ -19,23 +19,17 @@
 
 package org.transmartproject.db.dataquery.highdim.mirna
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.highdim.BioMarkerDataRow
 import org.transmartproject.db.dataquery.highdim.AbstractDataRow
 
+@CompileStatic
 class MirnaProbeRow extends AbstractDataRow implements BioMarkerDataRow<Object> {
 
     String probeId
+    String mirnaId // the miR id
 
-    String mirnaId /* the miR id */
+    String getLabel() { probeId }
 
-    @Override
-    String getLabel() {
-        probeId
-    }
-
-    @Override
-    String getBioMarker() {
-        mirnaId
-    }
-
+    String getBioMarker() { mirnaId }
 }

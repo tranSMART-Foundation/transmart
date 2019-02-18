@@ -73,7 +73,7 @@ class TwoRegionEndToEndRetrievalTests {
     @Test
     void basicTestWithConstraints() {
         List dataConstraints = [resource.createDataConstraint(
-                [chromosome: '1', start: 6, end: 12], DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT
+                [chromosome: "1", start: 6, end: 12], DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT
         )]
 
         def projection = resource.createProjection [:], Projection.ALL_DATA_PROJECTION
@@ -83,7 +83,7 @@ class TwoRegionEndToEndRetrievalTests {
 
         def resultList = Lists.newArrayList(dataQueryResult)
 
-        //resultList[0].data.find({it && it.junctions.size() == 1})
+        //resultList[0].data.find({it && it.junctions.size() == 1});
         assertThat resultList, hasSize(1) //only one junctionsrow is returned
         assertThat resultList[0].junction, allOf(
                 hasProperty('downChromosome', equalTo("1")),
@@ -105,7 +105,7 @@ class TwoRegionEndToEndRetrievalTests {
     @Test
     void testMultiple() {
         def dataConstraints = [resource.createDataConstraint(
-                [chromosome: '3', start: 6, end: 12], DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT
+                [chromosome: "3", start: 6, end: 12], DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT
         )]
 
         def projection = resource.createProjection [:], Projection.ALL_DATA_PROJECTION

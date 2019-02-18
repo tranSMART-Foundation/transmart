@@ -27,7 +27,6 @@ class DefaultTrialNameCriteriaConstraint implements AssayCriteriaConstraint {
 
     String trialName
 
-    @Override
     void addToCriteria(Criteria criteria) {
         /** @see org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping */
         criteria.eq 'trialName', trialName

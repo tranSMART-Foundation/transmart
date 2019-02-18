@@ -97,7 +97,7 @@ class AcrossTrialsConceptsResourceTests {
 
     @Test
     void testGetByKeyInvalidAcrossTrialsNode() {
-        // the first element is not 'Across Trials'
+        // the first element is not "Across Trials"
         shouldFail NoSuchResourceException, {
             testee.getByKey('\\\\xtrials\\FOO BAR\\a\\')
         }

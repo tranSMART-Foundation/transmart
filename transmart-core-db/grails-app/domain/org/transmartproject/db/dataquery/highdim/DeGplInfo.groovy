@@ -23,33 +23,30 @@ import org.transmartproject.core.dataquery.highdim.Platform
 
 class DeGplInfo implements Platform {
 
-    String  id
-    String  title
-    String  organism
     Date    annotationDate
-    String  markerType
     String  genomeReleaseId
+    String  id
+    String  markerType
+    String  organism
+    String  title
 
     static mapping = {
         table         schema: 'deapp'
-
         id              column: 'platform',   generator: 'assigned'
-        genomeReleaseId column: 'genome_build'
-
         version      false
+
+        genomeReleaseId column: 'genome_build'
     }
 
     static constraints = {
-        id             maxSize:  50
-
-        title           nullable: true, maxSize: 500
-        organism        nullable: true, maxSize: 100
         annotationDate  nullable: true
-        markerType      nullable: true, maxSize: 100
         genomeReleaseId nullable: true
+        id             maxSize:  50
+        markerType      nullable: true, maxSize: 100
+        organism        nullable: true, maxSize: 100
+        title           nullable: true, maxSize: 500
     }
 
-    @Override
     Iterable<?> getTemplate() {
         throw new UnsupportedOperationException()
     }

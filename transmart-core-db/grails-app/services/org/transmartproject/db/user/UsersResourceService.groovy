@@ -25,9 +25,9 @@ import org.transmartproject.core.users.UsersResource
 
 class UsersResourceService implements UsersResource {
 
-    @Override
-    org.transmartproject.core.users.User getUserFromUsername(String username)
-            throws NoSuchResourceException {
+    static transactional = false
+
+    org.transmartproject.core.users.User getUserFromUsername(String username) throws NoSuchResourceException {
 
         /* prefetch the roles so that the object can be used when detached.
          * This saves us from having to reattach (or more likely refetch, since
@@ -39,27 +39,22 @@ class UsersResourceService implements UsersResource {
          * clear that the User implementation is an Hibernate object.
          */
 
-        def user = User.withSession { session ->
+        User user = User.withSession { session ->
             if (session.respondsTo('createQuery', String)) {
-                Query query = session.createQuery(
-                        'FROM User u LEFT JOIN FETCH u.roles WHERE u.username = ?')
+                Query query = session.createQuery('FROM User u LEFT JOIN FETCH u.roles WHERE u.username = ?')
                 query.setParameter 0, username
-                def users = query.list()
-
-                users[0]
+		query.list()[0]
             }
             else {
                 // in case hibernate is not in use (unit tests)
                 def user = User.findByUsername username
                 user?.roles
-
                 user
             }
         }
 
         if (!user) {
-            throw new NoSuchResourceException('No user with username ' +
-                    '' + username + ' was found')
+            throw new NoSuchResourceException("No user with username $username was found")
         }
         
         user

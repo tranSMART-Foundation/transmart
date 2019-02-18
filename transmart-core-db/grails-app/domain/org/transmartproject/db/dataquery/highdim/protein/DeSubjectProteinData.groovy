@@ -27,8 +27,8 @@ import org.transmartproject.db.i2b2data.PatientDimension
 class DeSubjectProteinData implements Serializable {
 
     BigDecimal intensity
-    BigDecimal zscore
     BigDecimal logIntensity
+    BigDecimal zscore
 
     // irrelevant...
     //String     trialName
@@ -46,30 +46,28 @@ class DeSubjectProteinData implements Serializable {
 
     DeProteinAnnotation jAnnotation
 
-    static belongsTo = [
-            assay:      DeSubjectSampleMapping,
-            annotation: DeProteinAnnotation,
-            patient:    PatientDimension
-    ]
+    static belongsTo = [annotation: DeProteinAnnotation,
+			assay:      DeSubjectSampleMapping,
+			patient:    PatientDimension]
 
     static mapping = {
         table schema:    'deapp'
         id    composite: ['assay', 'annotation']
+        version false
 
-        assay      column: 'assay_id'
         annotation column: 'protein_annotation_id'
-        patient    column: 'patient_id'
+//        assay      column: 'assay_id'
+//        patient    column: 'patient_id'
 
         // this is needed due to a Criteria bug.
         // see https://forum.hibernate.org/viewtopic.php?f=1&t=1012372
         jAnnotation column: 'protein_annotation_id', updateable: false, insertable: false
-        version false
     }
 
     static constraints = {
         intensity    nullable: true, scale: 4
-        zscore       nullable: true, scale: 4
         logIntensity nullable: true, scale: 4
+        zscore       nullable: true, scale: 4
 
         // irrelevant:
         //trialName       nullable: true, maxSize: 15

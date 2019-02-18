@@ -24,22 +24,19 @@ import org.transmartproject.db.biomarker.BioMarkerCoreDb
 
 @EqualsAndHashCode(includes = [ 'bioMarker', 'probeSet' ])
 class BioAssayDataAnnotationCoreDb implements Serializable {
+    private static final long serialVersionUID = 1
+
     String dataTable
 
-    static belongsTo = [
-            bioMarker: BioMarkerCoreDb,
-            probeSet:  BioAssayFeatureGroupCoreDb,
-    ]
+    static belongsTo = [bioMarker: BioMarkerCoreDb,
+			probeSet:  BioAssayFeatureGroupCoreDb]
 
     static mapping = {
-        table schema: 'biomart', name: 'bio_assay_data_annotation'
-
+        table 'biomart.bio_assay_data_annotation'
         id composite: [ 'bioMarker', 'probeSet' ]
-
-        bioMarker column: 'bio_marker_id'
-        probeSet  column: 'bio_assay_feature_group_id'
-
         version false
+
+        probeSet  column: 'bio_assay_feature_group_id'
     }
 
     static constraints = {

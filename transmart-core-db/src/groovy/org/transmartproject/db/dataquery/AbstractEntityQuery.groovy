@@ -36,9 +36,7 @@ abstract class AbstractEntityQuery<T> implements Iterable<T> {
         forEntities().list()
     }
 
-    @Override
     Iterator<Assay> iterator() {
         list().iterator()
     }
-
 }

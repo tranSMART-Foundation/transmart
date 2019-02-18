@@ -34,19 +34,16 @@ interface HighDimensionDataTypeModule {
 
     /**
      * The name of the data type supported by this module.
-     * @return
      */
     String getName()
 
     /**
      * A human-readable description of this datatype
-     * @return
      */
     String getDescription()
 
     /**
      * The session factory used by this module.
-     * @return
      */
     SessionFactory getSessionFactory()
 
@@ -67,33 +64,22 @@ interface HighDimensionDataTypeModule {
 
     /**
      * Creates an assay constraint from a name a set of parameters.
-     * @param name
-     * @param params
-     * @return
      */
     AssayConstraint createAssayConstraint(Map<String, Object> params, String name)
 
     /**
      * Creates a data constraint from a name a set of parameters.
-     * @param name
-     * @param params
-     * @return
      */
     DataConstraint createDataConstraint(Map<String, Object> params, String name)
 
     /**
      * Creates a projection from a name a set of parameters.
-     * @param name
-     * @param params
-     * @return
      */
     Projection createProjection(Map<String, Object> params, String name)
 
     /**
      * Prepares the Criteria-based query to be issued. The data constraints will
      * have the opportunity to modify the criteria before it is issued.
-     * @param projection
-     * @return
      */
     HibernateCriteriaBuilder prepareDataQuery(Projection projection, SessionImplementor session)
 
@@ -101,9 +87,7 @@ interface HighDimensionDataTypeModule {
      * Transform the query result into the final object to be returned by
      * {@link HighDimensionDataTypeResource#retrieveData(List, List, Projection)}.
      */
-    TabularResult transformResults(ScrollableResults results,
-                                     List<AssayColumn> assays,
-                                     Projection projection)
+    TabularResult transformResults(ScrollableResults results, List<AssayColumn> assays, Projection projection)
 
     /**
      * Returns a list of markertypes that are supported by this module
@@ -111,16 +95,13 @@ interface HighDimensionDataTypeModule {
      * See {@link HighDimensionDataTypeResource#matchesPlatform(Platform)}.
      * See {@link DeGplInfo#getMarkerType()}.
      *
-     * @return List of marker types supported by this module
+     * @return marker types supported by this module
      */
     List<String> getPlatformMarkerTypes()
 
     /**
      * Search through the annotations of a given concept_code, for entries in search_property
      * starting with search_term.
-     * @param concept_code
-     * @param search_term
-     * @param search_property
      * @return An alphabetical list of annotations that start with search_term (case insensitive match),
      * or an empty list if the search_property is unsupported
      */

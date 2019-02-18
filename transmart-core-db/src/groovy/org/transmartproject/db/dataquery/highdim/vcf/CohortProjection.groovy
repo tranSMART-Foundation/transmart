@@ -27,11 +27,10 @@ import org.transmartproject.db.dataquery.highdim.projections.CriteriaProjection
 import static org.hibernate.sql.JoinFragment.LEFT_OUTER_JOIN
 
 /**
- * Created by j.hudecek on 21-2-14.
+ * @author j.hudecek
  */
 class CohortProjection implements CriteriaProjection<Map> {
 
-    @Override
     void doWithCriteriaBuilder(HibernateCriteriaBuilder builder) {
         // Retrieving the criteriabuilder projection (which contains
         // the fields to be retrieved from the database)
@@ -45,34 +44,29 @@ class CohortProjection implements CriteriaProjection<Map> {
         }
 
         // add an alias to make this ALIAS_TO_ENTITY_MAP-friendly
-        ['allele1', 'allele2', 'subjectId'].each { field ->
-            projection.add(
-                    Projections.alias(
-                            Projections.property('summary.' + field),
-                            field))
+	for (String field in ['allele1', 'allele2', 'subjectId']) {
+	    projection.add Projections.alias(
+                Projections.property('summary.' + field),
+		field)
         }
         
-        builder.createAlias('subjectIndex', 'subjectIndex', LEFT_OUTER_JOIN)
-        projection.add(
-                Projections.alias(
-                        Projections.property('subjectIndex.position'),
-                        'subjectPosition'))
+	builder.createAlias 'subjectIndex', 'subjectIndex', LEFT_OUTER_JOIN
+	projection.add Projections.alias(
+            Projections.property('subjectIndex.position'),
+	    'subjectPosition')
     }
 
-    @Override
-    Map doWithResult(Object object) {
+    Map doWithResult(object) {
         if (object == null) {
-            return null /* missing data for an assay */
+	    return null // missing data for an assay
         }
 
         // For computing the cohort properties, we need only
         // the allele1 and allele2 properties, as we
         // are interested in computing cohort level statistics
-        [ 
-                allele1:         object.allele1,
-                allele2:         object.allele2,
-                subjectId:       object.subjectId,
-                subjectPosition: object.subjectPosition 
-        ]
+	[allele1        : object.allele1,
+         allele2:         object.allele2,
+         subjectId:       object.subjectId,
+	 subjectPosition: object.subjectPosition]
     }
 }

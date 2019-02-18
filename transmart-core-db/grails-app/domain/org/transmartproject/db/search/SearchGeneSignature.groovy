@@ -21,106 +21,100 @@ package org.transmartproject.db.search
 
 import org.transmartproject.db.user.User
 
+// This is a very basic mapping; It's not supposed to support inserts, unlike the version in transmartApp
 class SearchGeneSignature {
 
-    /* This is a very basic mapping
-     * It's not supposed to support inserts, unlike the version in transmartApp
-     */
-
-    String              name
-    String              description
-    String              uniqueId
-    Date                createDate
-    User                creator
-    Date                lastModifiedDate
-    User                modifier
-    String              versionNumber
-    Boolean             publicFlag = false
-    Boolean             deletedFlag = false
+    Long analysisMethodConceptId
+    String analysisMethodOther
+    String analystName
+    Long analyticCatConceptId
+    String analyticCatOther
+    Long bioAssayPlatformId
+    Date createDate
+    User creator
+    Boolean deletedFlag = false
+    String description
+    String experimentTypeAtccRef
+    Long experimentTypeCellLineId
+    Long experimentTypeConceptId
+    String experimentTypeInVivoDescr
+    Long foldChgMetricConceptId
+    Date lastModifiedDate
+    User modifier
+    Boolean multipleTestingCorrection
+    String name
+    Long normMethodConceptId
+    String normMethodOther
+    Long ownerConceptId
     SearchGeneSignature parentGeneSignature
-    Long                sourceConceptId
-    String              sourceOther
-    Long                ownerConceptId
-    String              stimulusDescription
-    String              stimulusDosing
-    String              treatmentDescription
-    String              treatmentDosing
-    Long                treatmentBioCompoundId
-    String              treatmentProtocolNumber
-    String              pmidList
-    Long                speciesConceptId
-    Long                speciesMouseSrcConceptId
-    String              speciesMouseDetail
-    Long                tissueTypeConceptId
-    Long                experimentTypeConceptId
-    String              experimentTypeInVivoDescr
-    String              experimentTypeAtccRef
-    Long                analyticCatConceptId
-    String              analyticCatOther
-    Long                bioAssayPlatformId
-    String              analystName
-    Long                normMethodConceptId
-    String              normMethodOther
-    Long                analysisMethodConceptId
-    String              analysisMethodOther
-    Boolean             multipleTestingCorrection
-    Long                PValueCutoffConceptId
-    String              uploadFile
-    Long                searchGeneSigFileSchemaId //should actually reference search_gene_sig_file_schema
-    Long                foldChgMetricConceptId
-    Long                experimentTypeCellLineId
+    String pmidList
+    Boolean publicFlag = false
+    Long PValueCutoffConceptId
+    Long searchGeneSigFileSchemaId //should actually reference search_gene_sig_file_schema
+    Long sourceConceptId
+    String sourceOther
+    Long speciesConceptId
+    String speciesMouseDetail
+    Long speciesMouseSrcConceptId
+    String stimulusDescription
+    String stimulusDosing
+    Long tissueTypeConceptId
+    Long treatmentBioCompoundId
+    String treatmentDescription
+    String treatmentDosing
+    String treatmentProtocolNumber
+    String uniqueId
+    String uploadFile
+    String versionNumber
 
+    static hasMany = [ searchGeneSignatures: SearchGeneSignature ]
 
-	static hasMany = [ searchGeneSignatures: SearchGeneSignature ]
-
-	static mapping = {
+    static mapping = {
         table schema: 'searchapp'
+	id                      column: 'search_gene_signature_id',  generator: 'assigned'
+	version false
 
-		id                      column: 'search_gene_signature_id',  generator: 'assigned'
         creator                 column: 'created_by_auth_user_id'
         modifier                column: 'modified_by_auth_user_id'
-
         parentGeneSignature     column: 'parent_gene_signature_id'
         'PValueCutoffConceptId' column: 'p_value_cutoff_concept_id'
+    }
 
-		version false
-	}
-
-	static constraints = {
-        name                      maxSize:  100
-        description               nullable: true, maxSize: 1000
-        uniqueId                  nullable: true, maxSize: 50
-        lastModifiedDate          nullable: true
-        modifier                  nullable: true
-        versionNumber             nullable: true, maxSize: 50
-        publicFlag                nullable: true
-        deletedFlag               nullable: true
-        sourceConceptId           nullable: true
-        sourceOther               nullable: true
-        ownerConceptId            nullable: true
-        stimulusDescription       nullable: true, maxSize: 1000
-        stimulusDosing            nullable: true
-        treatmentDescription      nullable: true, maxSize: 1000
-        treatmentDosing           nullable: true
-        treatmentBioCompoundId    nullable: true
-        treatmentProtocolNumber   nullable: true, maxSize: 50
-        pmidList                  nullable: true
-        speciesMouseSrcConceptId  nullable: true
-        speciesMouseDetail        nullable: true
-        tissueTypeConceptId       nullable: true
-        experimentTypeConceptId   nullable: true
-        experimentTypeInVivoDescr nullable: true
-        experimentTypeAtccRef     nullable: true
-        analyticCatConceptId      nullable: true
-        analyticCatOther          nullable: true
-        analystName               nullable: true, maxSize: 100
-        normMethodConceptId       nullable: true
-        normMethodOther           nullable: true
-        analysisMethodConceptId   nullable: true
-        analysisMethodOther       nullable: true
-        multipleTestingCorrection nullable: true
-        searchGeneSigFileSchemaId nullable: true
-        foldChgMetricConceptId    nullable: true
-        experimentTypeCellLineId  nullable: true
-	}
+    static constraints = {
+	analysisMethodConceptId nullable: true
+	analysisMethodOther nullable: true
+	analystName nullable: true, maxSize: 100
+	analyticCatConceptId nullable: true
+	analyticCatOther nullable: true
+	deletedFlag nullable: true
+	description nullable: true, maxSize: 1000
+	experimentTypeAtccRef nullable: true
+	experimentTypeCellLineId nullable: true
+	experimentTypeConceptId nullable: true
+	experimentTypeInVivoDescr nullable: true
+	foldChgMetricConceptId nullable: true
+	lastModifiedDate nullable: true
+	modifier nullable: true
+	multipleTestingCorrection nullable: true
+	name maxSize: 100
+	normMethodConceptId nullable: true
+	normMethodOther nullable: true
+	ownerConceptId nullable: true
+	pmidList nullable: true
+	publicFlag nullable: true
+	searchGeneSigFileSchemaId nullable: true
+	sourceConceptId nullable: true
+	sourceOther nullable: true
+	speciesMouseDetail nullable: true
+	speciesMouseSrcConceptId nullable: true
+	stimulusDescription nullable: true, maxSize: 1000
+	stimulusDosing nullable: true
+	tissueTypeConceptId nullable: true
+	treatmentBioCompoundId nullable: true
+	treatmentDescription nullable: true, maxSize: 1000
+	treatmentDosing nullable: true
+	treatmentProtocolNumber nullable: true, maxSize: 50
+	uniqueId nullable: true, maxSize: 50
+	versionNumber nullable: true, maxSize: 50
+    }
 }

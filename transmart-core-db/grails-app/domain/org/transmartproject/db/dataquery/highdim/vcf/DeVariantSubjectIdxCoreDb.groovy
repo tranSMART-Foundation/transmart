@@ -23,20 +23,18 @@ import groovy.transform.EqualsAndHashCode
 
 @EqualsAndHashCode
 class DeVariantSubjectIdxCoreDb implements Serializable {
-    DeVariantDatasetCoreDb dataset
-    String subjectId
     Long position
+    String subjectId
 
     static belongsTo = [dataset: DeVariantDatasetCoreDb]
 
     static mapping = {
-        table schema: 'deapp', name: 'de_variant_subject_idx'
-        version false
+        table 'deapp.de_variant_subject_idx'
         id composite: ['dataset', 'subjectId']
+        version false
 
-        dataset   column: 'dataset_id'
-        subjectId column: 'subject_id'
-        position  column: 'position'
+//        dataset   column: 'dataset_id'
+//        subjectId column: 'subject_id'
+//        position  column: 'position'
     }
-
 }

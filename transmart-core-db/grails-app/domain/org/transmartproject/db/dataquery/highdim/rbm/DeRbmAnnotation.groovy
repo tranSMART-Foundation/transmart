@@ -23,31 +23,31 @@ import org.transmartproject.db.dataquery.highdim.DeGplInfo
 
 class DeRbmAnnotation {
 
-    Long id
-    String gplId
     String antigenName
+    String geneId
+    String geneSymbol
+    String gplId
     String uniprotId
     String uniprotName
-    String geneSymbol
-    String geneId
 
     static belongsTo = [ platform: DeGplInfo ]
 
     static mapping = {
         table   schema:    'deapp',   name: 'de_rbm_annotation'
         id      generator: 'assigned'
-        platform column: 'gpl_id'
-        gplId    insertable: false, updateable: false
         version false
+
+        gplId    insertable: false, updateable: false
+        platform column: 'gpl_id'
     }
 
-    static constraints = {
-        gplId       maxSize:  50
+    static constraints = { 
         antigenName maxSize:  800
+        geneId      nullable: true, maxSize: 400
+        geneSymbol  nullable: true, maxSize: 200
+	gplId       maxSize:  50
+        platform    nullable: true
         uniprotId   nullable: true, maxSize: 200
         uniprotName nullable: true, maxSize: 200
-        geneSymbol  nullable: true, maxSize: 200
-        geneId      nullable: true, maxSize: 400
-        platform    nullable: true
     }
 }

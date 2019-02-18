@@ -22,7 +22,7 @@ package org.transmartproject.db.test
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
-import org.hamcrest.DiagnosingMatcher
+import org.hamcrest.DiagnosingMatcher;
 
 class Matchers {
     //TODO Print failDetails in fail description
@@ -70,19 +70,18 @@ class Matchers {
                 }
 
                 !(diff1 || diff2)
-            }
-            else {
-                description.appendText  '' + interf + ' is not assignable from ' + item.class + ''
+            } else {
+                description.appendText  "$interf is not assignable from ${item.class}"
                 false
             }
         }
 
         @Override
         void describeTo(Description description) {
-            description.appendText('hasSameInterfaceProperties(')
-                    .appendValue(interf.name).appendText(', ')
-                    .appendValue(value.toString()).appendText(', ')
-                    .appendValue(excludes.toString()).appendText(')')
+            description.appendText("hasSameInterfaceProperties(")
+                    .appendValue(interf.name).appendText(", ")
+                    .appendValue(value.toString()).appendText(", ")
+                    .appendValue(excludes.toString()).appendText(")")
         }
     }
 
@@ -102,21 +101,21 @@ class Matchers {
             public boolean matches(final Object item) {
                 for (int i=1;i<properties.length;i++)
                     if (value[properties[i]] != value[properties[0]])
-                        return false
-                return true
+                        return false;
+                return true;
             }
             @Override
             public void describeTo(final Description description) {
-                description.appendText('Properties are not equal ')
+                description.appendText("Properties are not equal ");
                 for (int i=1;i<properties.length;i++)
-                    description.appendValue( properties[i])
+                    description.appendValue( properties[i]);
             }
             @Override
             public void describeMismatch(final Object item, final
             Description description) {
                 for (int i=1;i<properties.length;i++)
                     if (value[properties[i]] != value[properties[0]])
-                        description.appendValue(properties[i]).appendText('was').appendValue(value[properties[i]])
+                        description.appendValue(properties[i]).appendText("was").appendValue(value[properties[i]]);
             }
         }
 

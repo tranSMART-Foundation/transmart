@@ -19,16 +19,24 @@
 
 package org.transmartproject.db.clinical
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.dataquery.clinical.PatientsResource
 import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.db.i2b2data.PatientDimension
 
+@CompileStatic
 class PatientsResourceService implements PatientsResource {
 
-    @Override
+    static transactional = false
+
     Patient getPatientById(Long id) throws NoSuchResourceException {
-        PatientDimension.get(id) ?:
-                { throw new NoSuchResourceException('No patient with number ' + id) }()
+	Patient patient = PatientDimension.get(id)
+	if (patient) {
+	    patient
+	}
+	else {
+	    throw new NoSuchResourceException('No patient with number ' + id)
+	}
     }
 }

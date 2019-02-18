@@ -19,18 +19,24 @@
 
 package org.transmartproject.db.clinical
 
-import com.google.common.collect.Maps
 import groovy.util.logging.Slf4j
+import org.hibernate.SessionFactory
+import org.hibernate.StatelessSession
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.dataquery.TabularResult
-import org.transmartproject.core.dataquery.clinical.*
+import org.transmartproject.core.dataquery.clinical.ClinicalDataResource
+import org.transmartproject.core.dataquery.clinical.ClinicalVariable
+import org.transmartproject.core.dataquery.clinical.ClinicalVariableColumn
+import org.transmartproject.core.dataquery.clinical.ComposedVariable
+import org.transmartproject.core.dataquery.clinical.PatientRow
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.ontology.Study
 import org.transmartproject.core.querytool.QueryResult
 import org.transmartproject.db.dataquery.clinical.ClinicalDataTabularResult
 import org.transmartproject.db.dataquery.clinical.InnerClinicalTabularResultFactory
 import org.transmartproject.db.dataquery.clinical.PatientQuery
+import org.transmartproject.db.dataquery.clinical.TerminalClinicalVariablesTabularResult
 import org.transmartproject.db.dataquery.clinical.patientconstraints.PatientSetsConstraint
 import org.transmartproject.db.dataquery.clinical.patientconstraints.StudyPatientsConstraint
 import org.transmartproject.db.dataquery.clinical.variables.ClinicalVariableFactory
@@ -42,7 +48,7 @@ class ClinicalDataResourceService implements ClinicalDataResource {
 
     static transactional = false
 
-    def sessionFactory
+    SessionFactory sessionFactory
 
     @Autowired
     ClinicalVariableFactory clinicalVariableFactory
@@ -50,26 +56,16 @@ class ClinicalDataResourceService implements ClinicalDataResource {
     @Autowired
     InnerClinicalTabularResultFactory innerResultFactory
 
-    @Override
     TabularResult<ClinicalVariableColumn, PatientRow> retrieveData(List<QueryResult> queryResults,
                                            List<ClinicalVariable> variables) {
-        def patientQuery = new PatientQuery([
-                new PatientSetsConstraint(queryResults)
-        ])
-        retrieveDataImpl(patientQuery, variables)
+        retrieveDataImpl new PatientQuery([new PatientSetsConstraint(queryResults)]), variables
     }
 
-    @Override
     TabularResult<ClinicalVariableColumn, PatientRow> retrieveData(Study study,
                                                                    List<ClinicalVariable> variables) {
-
-        def studyPatientsQuery = new PatientQuery([
-                new StudyPatientsConstraint(study)
-        ])
-        retrieveDataImpl(studyPatientsQuery, variables)
+        retrieveDataImpl new PatientQuery([new StudyPatientsConstraint(study)]), variables
     }
 
-    @Override
     TabularResult<ClinicalVariableColumn, PatientRow> retrieveData(Set<Patient> patientCollection,
                                                                    List<ClinicalVariable> variables) {
         retrieveDataImpl(patientCollection, variables)
@@ -79,33 +75,31 @@ class ClinicalDataResourceService implements ClinicalDataResource {
                                                                    List<ClinicalVariable> variables) {
 
         if (!variables) {
-            throw new InvalidArgumentsException(
-                    'No variables passed to #retrieveData()')
+            throw new InvalidArgumentsException('No variables passed to #retrieveData()')
         }
 
-        def session = sessionFactory.openStatelessSession()
+        StatelessSession session = sessionFactory.openStatelessSession()
 
         try {
-            def patientMap = Maps.newTreeMap()
+            TreeMap<Long, PatientDimension> patientMap = new TreeMap<>()
 
-            patients.each { patientMap[it.id] = it }
+	    for (PatientDimension pd in patients) {
+		patientMap[pd.id] = pd
+	    }
 
             List<TerminalConceptVariable> flattenedVariables = []
-            flattenClinicalVariables(flattenedVariables, variables)
+            flattenClinicalVariables flattenedVariables, variables
 
-            def intermediateResults = []
-            if (patientMap) {
-                intermediateResults = innerResultFactory.
-                        createIntermediateResults(session,
-                                patients, flattenedVariables)
-            }
-            else {
-                logger.info('No patients passed to retrieveData() with' +
-                        'variables ' + variables + '; will skip main queries')
-            }
+	    Collection<TerminalClinicalVariablesTabularResult> intermediateResults
+	    if (patientMap) {
+		intermediateResults = innerResultFactory.createIntermediateResults(session, patients, flattenedVariables)
+	    }
+	    else {
+		intermediateResults = []
+		logger.info 'No patients passed to retrieveData() with variables {}; will skip main queries', variables
+	    }
 
-            new ClinicalDataTabularResult(
-                    session, intermediateResults, patientMap)
+	    new ClinicalDataTabularResult(session, intermediateResults, patientMap)
         }
         catch (Throwable t) {
             session.close()
@@ -113,9 +107,8 @@ class ClinicalDataResourceService implements ClinicalDataResource {
         }
     }
 
-    private void flattenClinicalVariables(List<TerminalConceptVariable> target,
-                                          List<ClinicalVariable> variables) {
-        variables.each { var ->
+    private void flattenClinicalVariables(List<TerminalConceptVariable> target, List<ClinicalVariable> variables) {
+        for (ClinicalVariable var in variables) {
             if (var instanceof ComposedVariable) {
                 flattenClinicalVariables target, var.innerClinicalVariables
             }
@@ -125,7 +118,6 @@ class ClinicalDataResourceService implements ClinicalDataResource {
         }
     }
 
-    @Override
     TabularResult<ClinicalVariableColumn, PatientRow> retrieveData(QueryResult patientSet,
                                                                    List<ClinicalVariable> variables) {
         assert patientSet
@@ -133,10 +125,7 @@ class ClinicalDataResourceService implements ClinicalDataResource {
         retrieveData([patientSet], variables)
     }
 
-    @Override
-    ClinicalVariable createClinicalVariable(Map<String, Object> params,
-                                            String type) throws InvalidArgumentsException {
-
+    ClinicalVariable createClinicalVariable(Map<String, Object> params, String type) throws InvalidArgumentsException {
         clinicalVariableFactory.createClinicalVariable params, type
     }
 }

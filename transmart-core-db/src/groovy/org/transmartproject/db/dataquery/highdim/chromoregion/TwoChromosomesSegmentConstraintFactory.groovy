@@ -1,19 +1,23 @@
 package org.transmartproject.db.dataquery.highdim.chromoregion
 
+import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstraint
+import org.transmartproject.db.dataquery.highdim.dataconstraints.CriteriaDataConstraint
 import org.transmartproject.db.dataquery.highdim.dataconstraints.DisjunctionDataConstraint
 import org.transmartproject.db.dataquery.highdim.parameterproducers.AbstractMethodBasedParameterFactory
 import org.transmartproject.db.dataquery.highdim.parameterproducers.ProducerFor
 
 /**
- * Created by j.hudecek on 5-12-2014.
+ * @author j.hudecek
  */
+@CompileStatic
 @Component
 @Scope('prototype')
 class TwoChromosomesSegmentConstraintFactory extends AbstractMethodBasedParameterFactory {
+
     String setSegmentPrefix(String value) {
         chromosomeSegmentConstraintFactoryUp.segmentPrefix = value
     }
@@ -55,9 +59,9 @@ class TwoChromosomesSegmentConstraintFactory extends AbstractMethodBasedParamete
     @ProducerFor(DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT)
     DisjunctionDataConstraint createTwoChromosomeSegmentConstraints(Map<String, Object> params) {
 
-        def chr = chromosomeSegmentConstraintFactoryUp.createChromosomeSegmentConstraint(params)
-        def chr2 = chromosomeSegmentConstraintFactoryDown.createChromosomeSegmentConstraint(params)
+        ChromosomeSegmentConstraint chr = chromosomeSegmentConstraintFactoryUp.createChromosomeSegmentConstraint(params)
+        ChromosomeSegmentConstraint chr2 = chromosomeSegmentConstraintFactoryDown.createChromosomeSegmentConstraint(params)
 
-        return new DisjunctionDataConstraint(constraints: [chr, chr2])
+        new DisjunctionDataConstraint(constraints: [chr, chr2] as List<CriteriaDataConstraint> )
     }
 }

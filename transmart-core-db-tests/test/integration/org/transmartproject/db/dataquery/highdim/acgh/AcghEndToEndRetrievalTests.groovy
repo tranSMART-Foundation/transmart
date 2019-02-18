@@ -194,7 +194,7 @@ class AcghEndToEndRetrievalTests {
                                 (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [
                                         /* test region wider then the segment */
                                         [ chromosome: '1', start: 44, end: 8888 ],
-                                        /* segment aligned at the end of test region
+                                        /* segment aligned at the end of test region;
                                          *segment shorter than region */
                                         [ chromosome: '2', start: 88, end: 99 ],
                                 ]
@@ -208,6 +208,7 @@ class AcghEndToEndRetrievalTests {
                 annotationDate: Date.parse('yyyy-MM-dd', '2013-08-03'),
                 markerType:     'Chromosomal',
                 genomeReleaseId:'hg19',
+	    gplId: 'gpl_id'
         )
         anotherPlatform.id = 'test-another-platform'
         anotherPlatform.save failOnError: true, flush: true
@@ -220,7 +221,7 @@ class AcghEndToEndRetrievalTests {
                 end:            10,
                 numberOfProbes: 42,
                 name:           'region 1:1-10',
-		gplId: 'gplId'
+	        gplId:          'gpl_id'
         )
         anotherRegion.id = -2000L
         anotherRegion.save failOnError: true, flush: true

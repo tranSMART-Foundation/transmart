@@ -57,6 +57,9 @@ if (enableClover) {
 
 grails.project.work.dir = 'target'
 
+grails.project.target.level = 1.8
+grails.project.source.level = 1.8
+
 grails.project.dependency.resolver = 'maven'
 grails.project.dependency.resolution = {
 

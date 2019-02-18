@@ -210,9 +210,9 @@ class MrnaEndToEndRetrievalTests {
                 hasSize(3),
                 // should be in alphabetical order
                 contains(
-                        equalTo('BOGUSCPO'),
-                        equalTo('BOGUSRQCD1'),
-                        equalTo('BOGUSVNN3')
+                        equalTo("BOGUSCPO"),
+                        equalTo("BOGUSRQCD1"),
+                        equalTo("BOGUSVNN3")
                 )
         )
     }

@@ -24,29 +24,29 @@ package org.transmartproject.db.log
 
 public class AccessLogEntry implements org.transmartproject.core.log.AccessLogEntry {
 
-    String username
+    Date accessTime
     String event
     String eventMessage
     String requestURL
-    Date accessTime
+    String username
 
     static mapping = {
-        table 'SEARCH_APP_ACCESS_LOG'
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
+        table 'searchapp.search_app_access_log'
+        id generator: 'sequence', params: [sequence: 'searchapp.seq_search_data_id']
         version false
-        id column: 'id'
-        username column: 'USER_NAME'
-        event column: 'EVENT'
-        eventMessage column: 'EVENT_MESSAGE', type: 'text'
-        requestURL column: 'REQUEST_URL'
-        accessTime column: 'ACCESS_TIME'
+
+//        accessTime column: 'ACCESS_TIME'
+//        event column: 'EVENT'
+        eventMessage column: 'event_message', type: 'text'
+        requestURL column: 'request_url'
+        username column: 'user_name'
     }
 
     static constraints = {
-        username(blank: false)
-        event(nullable: false)
-        eventMessage(nullable: true)
-        requestURL(nullable: true)
-        accessTime(nullable: false)
+//        accessTime nullable: false
+//        event nullable: false
+        eventMessage nullable: true
+        requestURL nullable: true
+        username blank: false
     }
 }

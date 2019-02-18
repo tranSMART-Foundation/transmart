@@ -24,8 +24,8 @@ import groovy.transform.EqualsAndHashCode
 @EqualsAndHashCode(includes = ['encounterNum', 'conceptCode', 'providerId', 'startDate', 'modifierCd', 'instanceNum'])
 class ObservationFact implements Serializable {
 
-    public static String TYPE_TEXT   = 'T'
-    public static String TYPE_NUMBER = 'N'
+    public static final String TYPE_TEXT   = 'T'
+    public static final String TYPE_NUMBER = 'N'
 
     /* links to concept_dimension, but concept_code is not primary key in
      * concept_dimension. Hence, i2b2 1.3 added a concept_path column here */
@@ -44,7 +44,6 @@ class ObservationFact implements Serializable {
     Date       startDate
     String     modifierCd
     Long       instanceNum
-
     // unused for now
     //BigDecimal quantityNum
     //String     unitsCd
@@ -57,37 +56,31 @@ class ObservationFact implements Serializable {
     //Date       importDate
     //BigDecimal uploadId
 
-    static belongsTo = [
-            patient: PatientDimension,
-    ]
+    static belongsTo = [patient: PatientDimension]
 
     static mapping = {
-        table        name: 'observation_fact', schema: 'I2B2DEMODATA'
-
+        table 'i2b2demodata.observation_fact'
         id           composite: ['encounterNum', 'patient', 'conceptCode', 'providerId', 'startDate', 'modifierCd']
+        version false
 
         conceptCode  column: 'concept_cd'
-        patient      column: 'patient_num'
-        valueType    column: 'valtype_cd'
-        textValue    column: 'tval_char'
         numberValue  column: 'nval_num'
+        patient      column: 'patient_num'
+        textValue    column: 'tval_char'
         valueFlag    column: 'valueflag_cd'
-
-        version false
+        valueType    column: 'valtype_cd'
     }
 
     static constraints = {
-        patient           nullable:   true
         conceptCode       maxSize:    50
-        providerId        maxSize:    50
         modifierCd        maxSize:    100
-        valueType         nullable:   true,   maxSize:   50
-        textValue         nullable:   true
         numberValue       nullable:   true,   scale:     5
-        valueFlag         nullable:   true,   maxSize:   50
+        patient           nullable:   true
+        providerId        maxSize:    50
         sourcesystemCd    nullable:   true,   maxSize:   50
-
-
+        textValue         nullable:   true
+        valueFlag         nullable:   true,   maxSize:   50
+        valueType         nullable:   true,   maxSize:   50
         // unused for now
         //quantityNum       nullable:   true,   scale:     5
         //unitsCd           nullable:   true,   maxSize:   50

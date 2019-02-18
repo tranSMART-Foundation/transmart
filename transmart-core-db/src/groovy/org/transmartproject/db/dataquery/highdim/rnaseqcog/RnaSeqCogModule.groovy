@@ -18,9 +18,11 @@
  */
 
 package org.transmartproject.db.dataquery.highdim.rnaseqcog
+
 import grails.orm.HibernateCriteriaBuilder
 import org.hibernate.ScrollableResults
 import org.hibernate.engine.SessionImplementor
+import org.hibernate.sql.JoinFragment
 import org.hibernate.transform.Transformers
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.TabularResult
@@ -33,10 +35,15 @@ import org.transmartproject.db.dataquery.highdim.DefaultHighDimensionTabularResu
 import org.transmartproject.db.dataquery.highdim.RepeatedEntriesCollectingTabularResult
 import org.transmartproject.db.dataquery.highdim.correlations.CorrelationTypesRegistry
 import org.transmartproject.db.dataquery.highdim.correlations.SearchKeywordDataConstraintFactory
-import org.transmartproject.db.dataquery.highdim.parameterproducers.*
+import org.transmartproject.db.dataquery.highdim.parameterproducers.AllDataProjectionFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.DataRetrievalParameterFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleAnnotationConstraintFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleRealProjectionsFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.StandardAssayConstraintFactory
+import org.transmartproject.db.dataquery.highdim.parameterproducers.StandardDataConstraintFactory
 
-import static org.hibernate.sql.JoinFragment.INNER_JOIN
 import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
+
 /**
  * Module for RNA-seq, as implemented for Oracle by Cognizant.
  * This name is to distinguish it from the TraIT implementation.
@@ -44,33 +51,23 @@ import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
 class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'rnaseq_cog'
-
-    final String description = 'Messenger RNA data (Sequencing)'
-
+    final String description = "Messenger RNA data (Sequencing)"
     final List<String> platformMarkerTypes = ['RNASEQ']
-
     final Map<String, Class> dataProperties = typesMap(DeSubjectRnaData,
-            ['rawIntensity', 'logIntensity', 'zscore'])
-
+						       ['rawIntensity', 'logIntensity', 'zscore'])
     final Map<String, Class> rowProperties = typesMap(RnaSeqCogDataRow,
-            ['annotationId', 'geneSymbol', 'geneId'])
+						      ['annotationId', 'geneSymbol', 'geneId'])
 
-    @Autowired
-    StandardAssayConstraintFactory standardAssayConstraintFactory
+    @Autowired StandardAssayConstraintFactory standardAssayConstraintFactory
+    @Autowired StandardDataConstraintFactory standardDataConstraintFactory
+    @Autowired CorrelationTypesRegistry correlationTypesRegistry
 
-    @Autowired
-    StandardDataConstraintFactory standardDataConstraintFactory
-
-    @Autowired
-    CorrelationTypesRegistry correlationTypesRegistry
-
-    @Override
     HibernateCriteriaBuilder prepareDataQuery(Projection projection, SessionImplementor session) {
-        HibernateCriteriaBuilder criteriaBuilder =
-            createCriteriaBuilder(DeSubjectRnaData, 'rnadata', session)
+	HibernateCriteriaBuilder criteriaBuilder = createCriteriaBuilder(
+	    DeSubjectRnaData, 'rnadata', session)
 
         criteriaBuilder.with {
-            createAlias 'jAnnotation', 'ann', INNER_JOIN
+	    createAlias 'jAnnotation', 'ann', JoinFragment.INNER_JOIN
 
             projections {
                 property 'assay.id',         'assayId'
@@ -91,73 +88,70 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
         criteriaBuilder
     }
 
-    @Override
     TabularResult transformResults(ScrollableResults results, List<AssayColumn> assays, Projection projection) {
-        Map assayIndexMap = createAssayIndexMap assays
+	Map assayIndexMap = createAssayIndexMap(assays)
 
-        def preliminaryResult = new DefaultHighDimensionTabularResult(
-                rowsDimensionLabel:    'Transcripts',
-                columnsDimensionLabel: 'Sample codes',
-                indicesList:           assays,
-                results:               results,
-                allowMissingAssays:    true,
-                assayIdFromRow:        { it[0].assayId },
-                inSameGroup:           { a, b -> a.annotationId == b.annotationId && a.geneSymbol == b.geneSymbol },
-                finalizeGroup:         { List list -> /* list of arrays with one element: a map */
-                    def firstNonNullCell = list.find()
-                    new RnaSeqCogDataRow(
-                            annotationId:  firstNonNullCell[0].annotationId,
-                            geneSymbol:    firstNonNullCell[0].geneSymbol,
-                            geneId:        firstNonNullCell[0].geneId,
-                            assayIndexMap: assayIndexMap,
-                            data:          list.collect { projection.doWithResult it?.getAt(0) }
-                    )
-                }
+	DefaultHighDimensionTabularResult preliminaryResult = new DefaultHighDimensionTabularResult(
+            rowsDimensionLabel:    'Transcripts',
+            columnsDimensionLabel: 'Sample codes',
+            indicesList:           assays,
+            results:               results,
+            allowMissingAssays:    true,
+            assayIdFromRow:        { it[0].assayId },
+            inSameGroup:           { a, b -> a.annotationId == b.annotationId && a.geneSymbol == b.geneSymbol },
+            finalizeGroup:         { List list -> /* list of arrays with one element: a map */
+                def firstNonNullCell = list.find()
+                new RnaSeqCogDataRow(
+                    annotationId:  firstNonNullCell[0].annotationId,
+                    geneSymbol:    firstNonNullCell[0].geneSymbol,
+                    geneId:        firstNonNullCell[0].geneId,
+                    assayIndexMap: assayIndexMap,
+                    data:          list.collect { projection.doWithResult it?.getAt(0) }
+                )
+            }
         )
 
         new RepeatedEntriesCollectingTabularResult(
-                tabularResult: preliminaryResult,
-                collectBy: { it.annotationId },
-                resultItem: { collectedList ->
-                    if (collectedList) {
-                        new RnaSeqCogDataRow(
-                                annotationId:  collectedList[0].annotationId,
-                                geneSymbol:    collectedList*.geneSymbol.join('/'),
-                                geneId:        collectedList*.geneId.join('/'),
-                                assayIndexMap: collectedList[0].assayIndexMap,
-                                data:          collectedList[0].data
-                        )
-            }
+            tabularResult: preliminaryResult,
+            collectBy: { it.annotationId },
+            resultItem: { collectedList ->
+                if (collectedList) {
+                    new RnaSeqCogDataRow(
+                        annotationId:  collectedList[0].annotationId,
+                        geneSymbol:    collectedList*.geneSymbol.join('/'),
+                        geneId:        collectedList*.geneId.join('/'),
+                        assayIndexMap: collectedList[0].assayIndexMap,
+                        data:          collectedList[0].data
+                    )
+		}
             }
         )
     }
 
-    @Override
     protected List<DataRetrievalParameterFactory> createAssayConstraintFactories() {
         [ standardAssayConstraintFactory ]
     }
 
-    @Override
     protected List<DataRetrievalParameterFactory> createDataConstraintFactories() {
         [ standardDataConstraintFactory,
-                new SimpleAnnotationConstraintFactory(field: 'annotation', annotationClass: DeRnaseqAnnotation.class),
-                new SearchKeywordDataConstraintFactory(correlationTypesRegistry,
-                        'GENE', 'ann', 'geneId') ]
+         new SimpleAnnotationConstraintFactory(field: 'annotation', annotationClass: DeRnaseqAnnotation.class),
+         new SearchKeywordDataConstraintFactory(correlationTypesRegistry,
+						'GENE', 'ann', 'geneId') ]
     }
 
-    @Override
     protected List<DataRetrievalParameterFactory> createProjectionFactories() {
         [ new SimpleRealProjectionsFactory(
-                (Projection.LOG_INTENSITY_PROJECTION): 'logIntensity',
-                (Projection.DEFAULT_REAL_PROJECTION): 'rawIntensity',
-                (Projection.ZSCORE_PROJECTION):       'zscore'),
-        new AllDataProjectionFactory(dataProperties, rowProperties)]
+            (Projection.LOG_INTENSITY_PROJECTION): 'logIntensity',
+            (Projection.DEFAULT_REAL_PROJECTION): 'rawIntensity',
+            (Projection.ZSCORE_PROJECTION):       'zscore'),
+         new AllDataProjectionFactory(dataProperties, rowProperties)]
     }
 
-    @Override
     List<String> searchAnnotation(String concept_code, String search_term, String search_property) {
-        if (!getSearchableAnnotationProperties().contains(search_property))
+	if (!getSearchableAnnotationProperties().contains(search_property)) {
             return []
+	}
+
         DeRnaseqAnnotation.createCriteria().list {
             dataRows {
                 'in'('assay', DeSubjectSampleMapping.createCriteria().listDistinct {eq('conceptCode', concept_code)} )
@@ -169,17 +163,14 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
         }
     }
 
-    @Override
     List<String> getSearchableAnnotationProperties() {
-        ['geneSymbol','transcriptId']
+	['geneSymbol', 'transcriptId']
     }
 
-    @Override
     HighDimensionFilterType getHighDimensionFilterType() {
         HighDimensionFilterType.SINGLE_NUMERIC
     }
 
-    @Override
     List<String> getSearchableProjections() {
         [Projection.LOG_INTENSITY_PROJECTION, Projection.DEFAULT_REAL_PROJECTION, Projection.ZSCORE_PROJECTION]
     }

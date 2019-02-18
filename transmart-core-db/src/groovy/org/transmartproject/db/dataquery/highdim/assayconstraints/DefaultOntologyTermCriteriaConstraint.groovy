@@ -18,6 +18,7 @@
  */
 
 package org.transmartproject.db.dataquery.highdim.assayconstraints
+
 import groovy.transform.Canonical
 import org.grails.datastore.mapping.query.api.Criteria
 import org.transmartproject.core.ontology.OntologyTerm
@@ -28,17 +29,13 @@ class DefaultOntologyTermCriteriaConstraint implements AssayCriteriaConstraint {
 
     OntologyTerm term
 
-    @Override
     void addToCriteria(Criteria criteria) {
-        criteria.in('conceptCode',
-            ConceptDimension.where {
-                projections {
-                    property 'conceptCode'
-                }
-
-                eq 'conceptPath', this.term.fullName
+        criteria.in 'conceptCode', ConceptDimension.where {
+            projections {
+                property 'conceptCode'
             }
-        )
-    }
 
+            eq 'conceptPath', term.fullName
+        }
+    }
 }

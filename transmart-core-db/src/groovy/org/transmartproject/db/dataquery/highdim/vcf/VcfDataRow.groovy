@@ -27,8 +27,7 @@ import org.transmartproject.core.dataquery.highdim.vcf.VcfCohortInfo
 import org.transmartproject.core.dataquery.highdim.vcf.VcfValues
 import org.transmartproject.db.dataquery.highdim.AbstractDataRow
 
-class VcfDataRow extends AbstractDataRow
-        implements VcfValues, RegionRow, BioMarkerDataRow {
+class VcfDataRow extends AbstractDataRow implements VcfValues, RegionRow, BioMarkerDataRow {
     String datasetId
     
     // Chromosome to define the position
@@ -52,91 +51,59 @@ class VcfDataRow extends AbstractDataRow
     String geneName
     
     List<String> getAlternativeAlleles() {
-        return alternatives.split(',')
+		alternatives.split ','
     }
     
     @Lazy
-    Double qualityOfDepth = {
-        [infoFields.QD, quality].find { it?.double } as Double
-    }()
+    Double qualityOfDepth = { [infoFields.QD, quality].find { it?.double } as Double }()
 
     @Lazy
-    Map<String, String> infoFields = {
-        parseVcfInfo info
-    }()
+    Map<String, String> infoFields = { parseVcfInfo info }()
     
     @Lazy
-    List<String> formatFields = {
-        format.split ':'
-    }()
+    List<String> formatFields = { format.split ':' }()
 
     @Lazy
-    VcfCohortInfo cohortInfo = {
-       new VcfCohortStatistics(this) 
-    }()
+    VcfCohortInfo cohortInfo = { new VcfCohortStatistics(this) }()
 
     @Lazy
     private Map<String,String> allOriginalSubjectData = {
-        def subjectVariants = [:]
-        def variantsInOrder = variants.tokenize '\t'
+	Map<String, String> subjectVariants = [:]
+	List<String> variantsInOrder = variants.tokenize '\t'
         
-        data.each { 
-            if (it && it.subjectPosition != null && it.subjectId != null) {
+	for (d in data) {
+	    if (d && d.subjectPosition != null && d.subjectId != null) {
                 // Position starts at 1
-                def index = (int) it.subjectPosition - 1
+		int index = (int) d.subjectPosition - 1
                 if (index < variantsInOrder.size()) {
-                    subjectVariants[it.subjectId] = variantsInOrder[index]
+		    subjectVariants[d.subjectId] = variantsInOrder[index]
                 }
             }
         }
-        
+
         subjectVariants
     }()
-    
+
     String getOriginalSubjectData(Assay assay) {
         allOriginalSubjectData[assay.sampleCode]
     }
-    
+
     //RegionRow implementation
-    @Override
-    String getLabel() {
-        return 'VCF: ' + chromosome + ":" + position
-    }
+    String getLabel() { 'VCF: ' + chromosome + ':' + position }
 
-    @Override
-    Long getId() {
-        return rsId
-    }
+    Long getId() { rsId }
 
-    @Override
-    String getName() {
-        return rsId
-    }
+    String getName() { rsId }
 
-    @Override
-    String getCytoband() {
-        return rsId
-    }
+    String getCytoband() { rsId }
 
-    @Override
-    Platform getPlatform() {
-        return null
-    }
+    Platform getPlatform() {}
 
-    @Override
-    Long getStart() {
-        return position
-    }
+    Long getStart() { position }
 
-    @Override
-    Long getEnd() {
-        return position
-    }
+    Long getEnd() { position }
 
-    @Override
-    Integer getNumberOfProbes() {
-        return 1
-    }
+    Integer getNumberOfProbes() { 1 }
     
     private Map parseVcfInfo(String info) {
         if (!info) {
@@ -144,12 +111,11 @@ class VcfDataRow extends AbstractDataRow
         }
 
         info.split(';').collectEntries {
-            def keyValues = it.split('=')
+	    String[] keyValues = it.split('=')
             [(keyValues[0]): keyValues.length > 1 ? keyValues[1] : true]
         }
     }
 
-    @Override
     String getBioMarker() {
         geneName
     }

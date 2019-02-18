@@ -26,47 +26,40 @@ import org.transmartproject.db.i2b2data.PatientDimension
 
 class QueryResultData {
 
-    static QtQueryMaster createQueryResult(List<PatientDimension> patients) {
-        QtQueryMaster queryMaster = new QtQueryMaster(
-                name       : 'test-fake-query-1',
-                userId     : 'fake-user',
-                groupId    : 'fake group',
-                createDate : new Date(),
-                requestXml : ''
-        )
+	static QtQueryMaster createQueryResult(List<PatientDimension> patients) {
+		QtQueryMaster queryMaster = new QtQueryMaster(
+				name: 'test-fake-query-1',
+				userId: 'fake-user',
+				groupId: 'fake group',
+				createDate: new Date(),
+				requestXml: '')
 
-        QtQueryInstance queryInstance = new QtQueryInstance(
-                userId       : 'fake-user',
-                groupId      : 'fake group',
-                startDate    : new Date(),
-                statusTypeId : QueryStatus.COMPLETED.id,
-                queryMaster  : queryMaster,
-        )
-        queryMaster.addToQueryInstances(queryInstance)
+		QtQueryInstance queryInstance = new QtQueryInstance(
+				userId: 'fake-user',
+				groupId: 'fake group',
+				startDate: new Date(),
+				statusTypeId: QueryStatus.COMPLETED.id,
+				queryMaster: queryMaster)
+		queryMaster.addToQueryInstances queryInstance
 
-        QtQueryResultInstance resultInstance = new QtQueryResultInstance(
-                statusTypeId  : QueryStatus.FINISHED.id,
-                startDate     : new Date(),
-                queryInstance : queryInstance,
-                setSize       : patients.size(),
-                realSetSize   : patients.size(),
-        )
-        queryInstance.addToQueryResults(resultInstance)
+		QtQueryResultInstance resultInstance = new QtQueryResultInstance(
+				statusTypeId: QueryStatus.FINISHED.id,
+				startDate: new Date(),
+				queryInstance: queryInstance,
+				setSize: patients.size(),
+				realSetSize: patients.size())
+		queryInstance.addToQueryResults resultInstance
 
-        def i = 0
-        patients.each { patient ->
-            resultInstance.addToPatientSet(new QtPatientSetCollection(
-                    setIndex: i++,
-                    patient: patient
-            ))
-        }
+		int i = 0
+		for (PatientDimension patient in patients) {
+			resultInstance.addToPatientSet new QtPatientSetCollection(setIndex: i++, patient: patient)
+		}
 
-        queryMaster
-    }
+		queryMaster
+	}
 
-    static QueryResult getQueryResultFromMaster(QtQueryMaster master) {
-        def f = { Iterables.getFirst it, null }
-        f(f(master.queryInstances).queryResults)
-    }
-
+	static QueryResult getQueryResultFromMaster(QtQueryMaster master) {
+		def f = { Iterables.getFirst it, null }
+		f(f(master.queryInstances).queryResults)
+	}
 }

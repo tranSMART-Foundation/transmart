@@ -21,8 +21,8 @@ package org.transmartproject.db.dataquery.clinical
 
 import com.google.common.collect.HashMultiset
 import com.google.common.collect.Lists
-import com.google.common.collect.Maps
 import com.google.common.collect.Multiset
+import grails.orm.HibernateCriteriaBuilder
 import org.hibernate.ScrollMode
 import org.hibernate.ScrollableResults
 import org.hibernate.engine.SessionImplementor
@@ -38,25 +38,24 @@ import static org.transmartproject.db.util.GormWorkarounds.getHibernateInCriteri
 
 class TerminalConceptVariablesDataQuery {
 
-    List<TerminalConceptVariable> clinicalVariables
+    private boolean initialized
 
+    List<TerminalConceptVariable> clinicalVariables
     Iterable<PatientDimension> patients
 
     SessionImplementor session
 
-    private boolean inited
-
     void init() {
         fillInTerminalConceptVariables()
-        inited = true
+        initialized = true
     }
 
     ScrollableResults openResultSet() {
-        if (!inited) {
+        if (!initialized) {
             throw new IllegalStateException('init() not called successfully yet')
         }
 
-        def criteriaBuilder = createCriteriaBuilder(ObservationFact, 'obs', session)
+        HibernateCriteriaBuilder criteriaBuilder = createCriteriaBuilder(ObservationFact, 'obs', session)
         criteriaBuilder.with {
             projections {
                 property 'patient.id'
@@ -70,11 +69,10 @@ class TerminalConceptVariablesDataQuery {
         }
 
         if (patients instanceof PatientQuery) {
-            criteriaBuilder.add(getHibernateInCriterion('patient.id',
-                    patients.forIds()))
+	    criteriaBuilder.add getHibernateInCriterion('patient.id', patients.forIds())
         }
         else {
-            criteriaBuilder.in('patient',  Lists.newArrayList(patients))
+            criteriaBuilder.in 'patient',  Lists.newArrayList(patients)
         }
 
         clinicalVariables.collate(1000).each { criteriaBuilder.in('conceptCode', it*.code) } // used to avoid "ORA-01795: maximum number of expressions in a list is 1000" thanks to https://stackoverflow.com/a/21837744/535203
@@ -83,39 +81,39 @@ class TerminalConceptVariablesDataQuery {
     }
 
     private void fillInTerminalConceptVariables() {
-        Map<String, TerminalConceptVariable> conceptPaths = Maps.newHashMap()
-        Map<String, TerminalConceptVariable> conceptCodes = Maps.newHashMap()
-
         if (!clinicalVariables) {
             throw new InvalidArgumentsException('No clinical variables specified')
         }
 
-        clinicalVariables.each { ClinicalVariable it ->
-            if (!(it instanceof TerminalConceptVariable)) {
+	Map<String, TerminalConceptVariable> conceptPaths = [:]
+	Map<String, TerminalConceptVariable> conceptCodes = [:]
+
+	for (ClinicalVariable var in clinicalVariables) {
+	    if (!(var instanceof TerminalConceptVariable)) {
                 throw new InvalidArgumentsException(
-                        'Only terminal concept variables are supported')
+                    'Only terminal concept variables are supported')
             }
 
-            if (it.conceptCode) {
-                if (conceptCodes.containsKey(it.conceptCode)) {
-                    throw new InvalidArgumentsException('Specified multiple ' +
-                            'variables with the same concept code: ' +
-                            it.conceptCode)
+	    if (var.conceptCode) {
+		if (conceptCodes.containsKey(var.conceptCode)) {
+		    throw new InvalidArgumentsException("Specified multiple " +
+							"variables with the same concept code: " +
+							var.conceptCode)
+		}
+		conceptCodes[var.conceptCode] = var
+	    }
+	    else if (var.conceptPath) {
+		if (conceptPaths.containsKey(var.conceptPath)) {
+		    throw new InvalidArgumentsException("Specified multiple " +
+							"variables with the same concept path: " +
+							var.conceptPath)
                 }
-                conceptCodes[it.conceptCode] = it
-            }
-            else if (it.conceptPath) {
-                if (conceptPaths.containsKey(it.conceptPath)) {
-                    throw new InvalidArgumentsException('Specified multiple ' +
-                            'variables with the same concept path: ' +
-                            it.conceptPath)
-                }
-                conceptPaths[it.conceptPath] = it
+		conceptPaths[var.conceptPath] = var
             }
         }
 
         // find the concepts
-        def res = ConceptDimension.withCriteria {
+        List<String[]> res = ConceptDimension.withCriteria {
             projections {
                 property 'conceptPath'
                 property 'conceptCode'
@@ -131,17 +129,15 @@ class TerminalConceptVariablesDataQuery {
             }
         }
 
-        for (concept in res) {
-            String conceptPath = concept[0],
-                   conceptCode = concept[1]
+	for (String[] concept in res) {
+	    String conceptPath = concept[0]
+	    String conceptCode = concept[1]
 
             if (conceptPaths[conceptPath]) {
-                TerminalConceptVariable variable = conceptPaths[conceptPath]
-                variable.conceptCode = conceptCode
+		conceptPaths[conceptPath].conceptCode = conceptCode
             }
             if (conceptCodes[conceptCode]) {
-                TerminalConceptVariable variable = conceptCodes[conceptCode]
-                variable.conceptPath = conceptPath
+		conceptCodes[conceptCode].conceptPath = conceptPath
             }
             // if both ifs manage we have the variable repeated (specified once
             // with concept code and once with concept path), and we'll catch
@@ -151,25 +147,25 @@ class TerminalConceptVariablesDataQuery {
         // check we found all the concepts
         for (var in conceptPaths.values()) {
             if (var.conceptCode == null) {
-                throw new InvalidArgumentsException('Concept path ' +
-                        "'${var.conceptPath}' did not yield any results")
+		throw new InvalidArgumentsException("Concept path " +
+						    "'${var.conceptPath}' did not yield any results")
             }
         }
         for (var in conceptCodes.values()) {
             if (var.conceptPath == null) {
-                throw new InvalidArgumentsException('Concept code ' +
-                        "'${var.conceptCode}' did not yield any results")
+		throw new InvalidArgumentsException("Concept code " +
+						    "'${var.conceptCode}' did not yield any results")
             }
         }
 
         Multiset multiset = HashMultiset.create clinicalVariables
         if (multiset.elementSet().size() < clinicalVariables.size()) {
-            throw new InvalidArgumentsException('Repeated variables in the ' +
-                    'query (though once their concept path was specified and ' +
-                    'on the second time their concept code was specified): ' +
-                    multiset.elementSet().findAll {
-                            multiset.count(it) > 1
-                    })
+	    throw new InvalidArgumentsException("Repeated variables in the " +
+						"query (though once their concept path was specified and " +
+						"on the second time their concept code was specified): " +
+						multiset.elementSet().findAll {
+                    multiset.count(it) > 1
+                })
         }
     }
 }

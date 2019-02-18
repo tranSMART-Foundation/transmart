@@ -30,13 +30,11 @@ class RnaSeqValuesProjection implements CriteriaProjection<RnaSeqValues>, MultiV
         it.name != 'class' ? [(it.name): it.type] : [:]
     }
 
-    @Override
     void doWithCriteriaBuilder(HibernateCriteriaBuilder builder) {
         // RnaSeqModule.prepareDataQuery already projects all the columns
     }
 
-    @Override
-    RnaSeqValues doWithResult(Object object) {
+    RnaSeqValues doWithResult(object) {
         new RnaSeqValuesImpl(data: object)
     }
 

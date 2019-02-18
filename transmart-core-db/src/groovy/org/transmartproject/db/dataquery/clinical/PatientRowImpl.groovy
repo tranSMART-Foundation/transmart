@@ -41,25 +41,23 @@ class PatientRowImpl implements PatientRow {
         patient.inTrialId
     }
 
-    @Override
-    Object getAt(int index) {
-        getAt(flattenedIndices[index])
+    def getAt(int index) {
+        getAt flattenedIndices[index]
     }
 
-    @Override
-    Object getAt(ClinicalVariableColumn column) {
-        /* the delegating data row only knows about TerminalConceptVariables */
+    def getAt(ClinicalVariableColumn column) {
+        // the delegating data row only knows about TerminalConceptVariables
         if (column instanceof AbstractComposedVariable) {
-            column.getVariableValue(this)
-        } else {
+            column.getVariableValue this
+        }
+	else {
             assert column instanceof TerminalClinicalVariable
-            delegatingDataRows[column.group].getAt(column)
+            delegatingDataRows[column.group].getAt column
         }
     }
 
-    @Override
-    Iterator<Object> iterator() {
+    Iterator iterator() {
         def innerIterators = delegatingDataRows.values()*.iterator()
-        Iterators.concat(innerIterators.iterator())
+        Iterators.concat innerIterators.iterator()
     }
 }

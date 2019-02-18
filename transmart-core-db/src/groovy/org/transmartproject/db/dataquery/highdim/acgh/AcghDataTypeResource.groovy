@@ -21,24 +21,23 @@ package org.transmartproject.db.dataquery.highdim.acgh
 
 import groovy.transform.InheritConstructors
 import groovy.util.logging.Slf4j
-import org.hibernate.Query
 import org.transmartproject.core.dataquery.highdim.acgh.ChromosomalSegment
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 import org.transmartproject.core.exceptions.EmptySetException
 import org.transmartproject.db.dataquery.highdim.AssayQuery
 import org.transmartproject.db.dataquery.highdim.HighDimensionDataTypeResourceImpl
+import org.transmartproject.db.dataquery.highdim.chromoregion.DeChromosomalRegion
 
 /**
- * Created by glopes on 11/22/13.
+ * @author glopes
  */
 @InheritConstructors
 @Slf4j('logger')
 class AcghDataTypeResource extends HighDimensionDataTypeResourceImpl {
 
-    List<ChromosomalSegment> retrieveChromosomalSegments(
-            List<AssayConstraint> assayConstraints) {
+    List<ChromosomalSegment> retrieveChromosomalSegments(List<AssayConstraint> assayConstraints) {
 
-        def assayQuery = new AssayQuery(assayConstraints)
+        AssayQuery assayQuery = new AssayQuery(assayConstraints)
         def assayPlatformsQuery = assayQuery.forEntities().where {
             projections {
                 distinct 'platform.id'
@@ -46,28 +45,26 @@ class AcghDataTypeResource extends HighDimensionDataTypeResourceImpl {
             }
         }
 
-        def platformIds = assayPlatformsQuery.list().collect { it[0] } as Set
-
-        if (platformIds.empty) {
-            throw new EmptySetException(
-                    'No assays satisfy the provided criteria')
+        Set platformIds = assayPlatformsQuery.list().collect { it[0] }
+        if (!platformIds) {
+            throw new EmptySetException('No assays satisfy the provided criteria')
         }
 
-        logger.debug 'Now getting regions for platforms: ' + platformIds
+        logger.debug 'Now getting regions for platforms: {}', platformIds
 
-        Query q = module.sessionFactory.currentSession.createQuery('''
+        List<Object[]> rows = DeChromosomalRegion.executeQuery('''
             SELECT region.chromosome, min(region.start), max(region.end)
             FROM DeChromosomalRegion region
             WHERE region.platform.id in (:platformIds)
-            GROUP BY region.chromosome''')
-        q.setParameterList('platformIds', platformIds)
+            GROUP BY region.chromosome''',
+		[platformIds: platformIds])
 
-        q.list().collect {
-            new ChromosomalSegment(chromosome: it[0], start: it[1], end: it[2])
-        }
-        ?: {
-            throw new EmptySetException(
-                    'No regions found for platform ids: ' + platformIds)
-        }()
+	if (!rows) {
+	    throw new EmptySetException("No regions found for platform ids: $platformIds")
+	}
+
+	rows.collect { Object[] it ->
+	    new ChromosomalSegment(chromosome: (String) it[0], start: (long) it[1], end: (long) it[2])
+	}
     }
 }

@@ -40,7 +40,7 @@ class DisjunctionDataConstraintFactoryTests {
     @Test
     void testWithTwoSubConstraints() {
         String         nameOfSubconstraint1  = 'subcontraint_1',
-                       nameOfSubconstraint2  = 'subcontraint_2'
+                       nameOfSubconstraint2  = 'subcontraint_2';
         Map            paramsOfSubconstraint = [ param1: 'param1 value' ]
         DataConstraint fakeConstraint1 = mock(DataConstraint),
                        fakeConstraint2 = mock(DataConstraint)

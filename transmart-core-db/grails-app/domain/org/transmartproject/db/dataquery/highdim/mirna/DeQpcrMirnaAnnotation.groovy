@@ -23,12 +23,14 @@ import org.transmartproject.db.dataquery.highdim.DeGplInfo
 
 class DeQpcrMirnaAnnotation implements Serializable {
 
-    String mirnaId
     String detector
     String gplId
+    String mirnaId
+
+    static hasMany = [dataRows: DeSubjectMirnaData]
 
     static belongsTo = [ platform: DeGplInfo ]
-    static hasMany = [dataRows: DeSubjectMirnaData]
+
     static mappedBy = [dataRows: 'probe']
 
     // unused or irrelevant:
@@ -40,15 +42,16 @@ class DeQpcrMirnaAnnotation implements Serializable {
     static mapping = {
         table    schema: 'deapp'
         id       column: 'probeset_id', generator: 'assigned'
-        platform column: 'gpl_id'
+        version  false
+
         detector column: 'mirna_symbol' // column name is scheduled to be changed
         gplId    insertable: false, updateable: false
-        version  false
+        platform column: 'gpl_id'
     }
 
     static constraints = {
-        mirnaId  nullable: true, maxSize: 100
         detector nullable: true, maxSize: 100
+        mirnaId  nullable: true, maxSize: 100
         platform nullable: true
         // unused or irrelevant:
         //idRef       nullable: true, maxSize: 100

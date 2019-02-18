@@ -27,19 +27,19 @@ class PropertyDataConstraint implements CriteriaDataConstraint {
 
     String property
 
-    Object values // list or single object
+    def values // list or single object
 
-    @Override
     void doWithCriteriaBuilder(HibernateCriteriaBuilder criteria) {
         criteria.with {
             if (values instanceof Collection) {
                 if (!values.isEmpty()) {
                     InQuery.addIn(criteria, property, values as List)
                 } else {
-                    criteria.addToCriteria(Restrictions.sqlRestriction(
-                            "'empty_in_criteria_for_$property' = ''"))
+                    criteria.addToCriteria Restrictions.sqlRestriction(
+                            "'empty_in_criteria_for_$property' = ''")
                 }
-            } else {
+            }
+	    else {
                 eq property, values
             }
         }

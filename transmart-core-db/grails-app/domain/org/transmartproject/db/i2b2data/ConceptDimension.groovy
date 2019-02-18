@@ -21,8 +21,8 @@ package org.transmartproject.db.i2b2data
 
 class ConceptDimension {
 
-    String       conceptPath
     String       conceptCode
+    String       conceptPath
 
     // not used
     //String       nameChar
@@ -36,16 +36,14 @@ class ConceptDimension {
     static mapping = {
         table   schema: 'i2b2demodata'
         id      name:   'conceptPath', generator: 'assigned'
+        version false
 
         conceptCode column: 'concept_cd'
-
-        version false
     }
 
     static constraints = {
-        conceptPath      maxSize:    700
         conceptCode      maxSize:    50
-
+        conceptPath      maxSize:    700
         // not used
         //nameChar         nullable:   true,   maxSize:   2000
         //conceptBlob      nullable:   true

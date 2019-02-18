@@ -19,6 +19,7 @@
 
 package org.transmartproject.db.dataquery.highdim.correlations
 
+import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 
 /**
@@ -33,6 +34,7 @@ import groovy.transform.EqualsAndHashCode
  *
  * Mere container; has no behavior.
  */
+@CompileStatic
 @EqualsAndHashCode(includes = [ 'name' ])
 class CorrelationType {
 
@@ -78,5 +80,4 @@ class CorrelationType {
      * the primary key of a gene signature object.
      */
     String leftSideColumn = 'BIO_MARKER_ID'
-
 }

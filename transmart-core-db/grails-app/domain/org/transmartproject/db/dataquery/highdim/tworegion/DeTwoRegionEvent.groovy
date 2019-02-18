@@ -4,7 +4,7 @@ import groovy.transform.EqualsAndHashCode
 import org.transmartproject.core.dataquery.highdim.tworegion.Event
 
 /**
- * Created by j.hudecek on 4-12-2014.
+ * @author j.hudecek
  */
 @EqualsAndHashCode()
 class DeTwoRegionEvent implements Serializable, Event {
@@ -15,19 +15,20 @@ class DeTwoRegionEvent implements Serializable, Event {
     static hasMany = [eventGenes: DeTwoRegionEventGene]
 
     static constraints = {
-        cgaType(nullable: true, maxSize: 500)
-        soapClass(nullable: true, maxSize: 500)
-        eventGenes(nullable: true)
+        cgaType nullable: true, maxSize: 500
+        eventGenes nullable: true
+        soapClass nullable: true, maxSize: 500
     }
 
     static mapping = {
         table schema: 'deapp', name: 'de_two_region_event'
-        version false
         id column: 'two_region_event_id'
+        version false
+
         eventGenes fetch: 'join'
 
-        cgaType column: 'cga_type'
-        soapClass column: 'soap_class'
+//        cgaType column: 'cga_type'
+//        soapClass column: 'soap_class'
 
     }
 }

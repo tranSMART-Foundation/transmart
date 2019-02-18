@@ -19,11 +19,13 @@
 
 package org.transmartproject.db.dataquery.highdim.parameterproducers
 
+import groovy.transform.CompileStatic
 import org.springframework.stereotype.Component
 import org.transmartproject.core.dataquery.highdim.dataconstraints.DataConstraint
 import org.transmartproject.db.dataquery.highdim.dataconstraints.DisjunctionDataConstraint
 import org.transmartproject.db.dataquery.highdim.dataconstraints.NoopDataConstraint
 
+@CompileStatic
 @Component
 class StandardDataConstraintFactory extends AbstractMethodBasedParameterFactory {
 
@@ -31,8 +33,7 @@ class StandardDataConstraintFactory extends AbstractMethodBasedParameterFactory 
             new DisjunctionConstraintFactory(DisjunctionDataConstraint, NoopDataConstraint)
 
     @ProducerFor(DataConstraint.DISJUNCTION_CONSTRAINT)
-    DataConstraint createDisjunctionConstraint(Map<String, Object> params,
-                                               Object createConstraint) {
-        disjunctionConstraintFactory.createDisjunctionConstraint params, createConstraint
+    DataConstraint createDisjunctionConstraint(Map<String, Object> params, Closure createConstraint) {
+        (DataConstraint) disjunctionConstraintFactory.createDisjunctionConstraint(params, createConstraint)
     }
 }

@@ -2,36 +2,35 @@ package org.transmartproject.db.dataquery.highdim.vcf
 
 class DeVariantPopulationDataCoreDb {
 
-    DeVariantDatasetCoreDb dataset
     String chromosome
-    Long position
-    String infoName
-    Integer infoIndex
-    Long integerValue
+    DeVariantDatasetCoreDb dataset
     Double floatValue
+    Integer infoIndex
+    String infoName
+    Long integerValue
+    Long position
     String textValue
 
     static constraints = {
-        infoName(nullable: true)
-        infoIndex(nullable: true)
-        integerValue(nullable: true)
-        floatValue(nullable: true)
-        textValue(nullable: true)
+        floatValue nullable: true
+        infoIndex nullable: true
+        infoName nullable: true
+        integerValue nullable: true
+        textValue nullable: true
     }
 
     static mapping = {
-        table schema: 'deapp', name: 'de_variant_population_data'
+        table 'deapp.de_variant_population_data'
+        id column:'variant_population_data_id', generator: 'sequence'
         version false
 
-        id column:'variant_population_data_id', generator: 'sequence'
-
-        dataset      column: 'dataset_id'
         chromosome   column: 'chr'
+//        dataset      column: 'dataset_id'
+//        floatValue   column: 'float_value'
+//        infoIndex    column: 'info_index'
+//        infoName     column: 'info_name'
+//        integerValue column: 'integer_value'
         position     column: 'pos'
-        infoName     column: 'info_name'
-        infoIndex    column: 'info_index'
-        integerValue column: 'integer_value'
-        floatValue   column: 'float_value'
-        textValue    column: 'text_value'
+//        textValue    column: 'text_value'
     }
 }

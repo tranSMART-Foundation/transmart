@@ -18,7 +18,9 @@
  */
 
 package org.transmartproject.db.dataquery.highdim.mrna
-import grails.util.Holders
+
+import groovy.util.logging.Slf4j
+import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.biomarker.BioMarkerCoreDb
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
@@ -28,123 +30,114 @@ import org.transmartproject.db.i2b2data.PatientDimension
 import org.transmartproject.db.ontology.ConceptTestData
 import org.transmartproject.db.search.SearchKeywordCoreDb
 
-import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.is
-import static org.hamcrest.Matchers.notNullValue
-import static org.transmartproject.db.dataquery.highdim.HighDimTestData.save
+@Slf4j('logger')
+class MrnaTestData extends AbstractTestData {
 
-class MrnaTestData {
+	public static final String TRIAL_NAME = 'MRNA_SAMP_TRIAL'
 
-    public static final String TRIAL_NAME = 'MRNA_SAMP_TRIAL'
+	private String conceptCode
 
-    SampleBioMarkerTestData bioMarkerTestData
+	SampleBioMarkerTestData bioMarkerTestData
+	ConceptTestData concept
+	DeGplInfo platform
+	List<PatientDimension> patients
+	List<SearchKeywordCoreDb> searchKeywords
+	List<DeMrnaAnnotationCoreDb> annotations
+	List<DeSubjectSampleMapping> assays
+	List<DeSubjectMicroarrayDataCoreDb> microarrayData
 
-    private String conceptCode
+	MrnaTestData(String conceptCode = 'concept code #1',
+	             SampleBioMarkerTestData bioMarkerTestData = null) {
+		this.conceptCode = conceptCode
+		this.bioMarkerTestData = bioMarkerTestData ?: new SampleBioMarkerTestData()
+		createTestData()
+	}
 
-    ConceptTestData concept = HighDimTestData.createConcept('MRNAPUBLIC', conceptCode, TRIAL_NAME, 'MRNA_CONCEPT', 'mrna i2b2 main')
+	List<BioMarkerCoreDb> getBioMarkers() {
+		bioMarkerTestData.geneBioMarkers
+	}
 
-    DeGplInfo platform = {
-        def res = new DeGplInfo(
-                title: 'Affymetrix Human Genome U133A 2.0 Array',
-                organism: 'Homo Sapiens',
-                markerType: 'Gene Expression',
-                genomeReleaseId: 'hg19')
-        res.id = 'BOGUSGPL570'
-        res
-    }()
+	void saveAll(boolean skipBioMarkerData = false) {
+		if (!skipBioMarkerData) {
+			bioMarkerTestData.saveGeneData()
+		}
 
-    MrnaTestData(String conceptCode = 'concept code #1',
-                 SampleBioMarkerTestData bioMarkerTestData = null) {
-        this.conceptCode = conceptCode
-        this.bioMarkerTestData = bioMarkerTestData ?: new SampleBioMarkerTestData()
-    }
+		save platform, logger
+		saveAll annotations, logger
+		saveAll patients, logger
+		saveAll assays, logger
+		saveAll microarrayData, logger
 
-    List<BioMarkerCoreDb> getBioMarkers() {
-        bioMarkerTestData.geneBioMarkers
-    }
+		concept.saveAll()
+	}
 
-    @Lazy List<SearchKeywordCoreDb> searchKeywords = {
-        bioMarkerTestData.geneSearchKeywords +
-                bioMarkerTestData.proteinSearchKeywords +
-                bioMarkerTestData.geneSignatureSearchKeywords
-    }()
+	void updateDoubleScaledValues() {
+		//making sure BigDecimals use the scale specified in the db (otherwise toString() will yield different results)
+		flush()
 
-    @Lazy List<DeMrnaAnnotationCoreDb> annotations = {
-        def createAnnotation = { probesetId, probeId, BioMarkerCoreDb bioMarker ->
-            def res = new DeMrnaAnnotationCoreDb(
-                    gplId: platform.id,
-                    probeId: probeId,
-                    geneSymbol: bioMarker.name,
-                    geneId: bioMarker.externalId,
-                    organism: 'Homo sapiens',
-                    platform: platform
-            )
-            res.id = probesetId
-            res
-        }
-        [
-                createAnnotation(-201, '1553506_at', bioMarkers[0]),
-                createAnnotation(-202, '1553510_s_at', bioMarkers[1]),
-                createAnnotation(-203, '1553513_at', bioMarkers[2]),
-        ]
-    }()
+		for (DeSubjectMicroarrayDataCoreDb it in microarrayData) {
+			it.refresh()
+		}
+	}
 
-    List<PatientDimension> patients =
-        HighDimTestData.createTestPatients(2, -300, TRIAL_NAME)
+	private void createTestData() {
+		concept = HighDimTestData.createConcept('MRNAPUBLIC', conceptCode, TRIAL_NAME,
+				'MRNA_CONCEPT', 'mrna i2b2 main')
 
-    @Lazy List<DeSubjectSampleMapping> assays = {
-        HighDimTestData.createTestAssays(patients, -400, platform, TRIAL_NAME, conceptCode) }()
+		platform = new DeGplInfo(
+				title: 'Affymetrix Human Genome U133A 2.0 Array',
+				organism: 'Homo Sapiens',
+				markerType: 'Gene Expression',
+				genomeReleaseId: 'hg19')
+		platform.id = 'BOGUSGPL570'
 
-    @Lazy List<DeSubjectMicroarrayDataCoreDb> microarrayData = {
-        def common = [
-                trialName: TRIAL_NAME,
-                //trialSource: "$TRIAL_NAME:STD" (not mapped)
-        ]
-        def createMicroarrayEntry = { DeSubjectSampleMapping assay,
-                                      DeMrnaAnnotationCoreDb probe,
-                                      double intensity ->
-            new DeSubjectMicroarrayDataCoreDb(
-                    probe: probe,
-                    jProbe: probe,
-                    assay: assay,
-                    patient: assay.patient,
-                    rawIntensity: intensity,
-                    logIntensity: Math.log(intensity) / Math.log(2),
-                    zscore: intensity * 2, /* non-sensical value */
-                    *: common,
-            )
-        }
+		patients = HighDimTestData.createTestPatients(2, -300, TRIAL_NAME)
 
-        def res = []
-        //doubles loose some precision when adding 0.1, so i use BigDecimals instead
-        BigDecimal intensity = BigDecimal.ZERO
-        annotations.each { probe ->
-            assays.each { assay ->
-                intensity = intensity + 0.1
-                res += createMicroarrayEntry assay, probe, intensity
-            }
-        }
+		searchKeywords = bioMarkerTestData.geneSearchKeywords +
+				bioMarkerTestData.proteinSearchKeywords +
+				bioMarkerTestData.geneSignatureSearchKeywords
 
-        res
-    }()
+		annotations = [
+				createAnnotation(-201, '1553506_at', bioMarkers[0]),
+				createAnnotation(-202, '1553510_s_at', bioMarkers[1]),
+				createAnnotation(-203, '1553513_at', bioMarkers[2])]
 
-    void saveAll(boolean skipBioMarkerData = false) {
-        if (!skipBioMarkerData) {
-            bioMarkerTestData.saveGeneData()
-        }
+		assays = HighDimTestData.createTestAssays(patients, -400, platform, TRIAL_NAME, conceptCode)
 
-        assertThat platform.save(), is(notNullValue(DeGplInfo))
-        save annotations
-        save patients
-        save assays
-        save microarrayData
+		// doubles lose some precision when adding 0.1, so use BigDecimals instead
+		BigDecimal intensity = BigDecimal.ZERO
+		microarrayData = []
+		for (DeMrnaAnnotationCoreDb probe in annotations) {
+			for (DeSubjectSampleMapping assay in assays) {
+				intensity += 0.1
+				microarrayData << createMicroarrayEntry(assay, probe, intensity)
+			}
+		}
+	}
 
-        concept.saveAll()
-    }
+	private DeMrnaAnnotationCoreDb createAnnotation(long probesetId, String probeId, BioMarkerCoreDb bioMarker) {
+		DeMrnaAnnotationCoreDb res = new DeMrnaAnnotationCoreDb(
+				gplId: platform.id,
+				probeId: probeId,
+				geneSymbol: bioMarker.name,
+				geneId: bioMarker.externalId as Long,
+				organism: 'Homo sapiens',
+				platform: platform)
+		res.id = probesetId
+		res
+	}
 
-    void updateDoubleScaledValues() {
-        //making sure BigDecimals use the scale specified in the db (otherwise toString() will yield different results)
-        Holders.applicationContext.sessionFactory.currentSession.flush()
-        microarrayData.each { it.refresh() }
-    }
+	private DeSubjectMicroarrayDataCoreDb createMicroarrayEntry(DeSubjectSampleMapping assay,
+	                                                            DeMrnaAnnotationCoreDb probe,
+	                                                            double intensity) {
+		new DeSubjectMicroarrayDataCoreDb(
+				probe: probe,
+				jProbe: probe,
+				assay: assay,
+				patient: assay.patient,
+				rawIntensity: intensity,
+				logIntensity: Math.log(intensity) / Math.log(2),
+				zscore: intensity * 2, // non-sensical value
+				trialName: TRIAL_NAME)
+	}
 }

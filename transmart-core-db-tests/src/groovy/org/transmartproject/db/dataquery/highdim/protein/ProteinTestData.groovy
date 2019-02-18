@@ -19,6 +19,8 @@
 
 package org.transmartproject.db.dataquery.highdim.protein
 
+import groovy.util.logging.Slf4j
+import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.biomarker.BioMarkerCoreDb
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 import org.transmartproject.db.dataquery.highdim.DeSubjectSampleMapping
@@ -27,88 +29,88 @@ import org.transmartproject.db.dataquery.highdim.SampleBioMarkerTestData
 import org.transmartproject.db.i2b2data.PatientDimension
 import org.transmartproject.db.ontology.ConceptTestData
 
-import static org.transmartproject.db.dataquery.highdim.HighDimTestData.save
+@Slf4j('logger')
+class ProteinTestData extends AbstractTestData {
 
-class ProteinTestData {
+	public static final String TRIAL_NAME = 'PROTEIN_SAMP_TRIAL'
 
-    public static final String TRIAL_NAME = 'PROTEIN_SAMP_TRIAL'
+	SampleBioMarkerTestData biomarkerTestData = new SampleBioMarkerTestData()
+	DeGplInfo platform
+	ConceptTestData concept
+	List<PatientDimension> patients
+	List<DeSubjectSampleMapping> assays
+	List<DeProteinAnnotation> annotations
+	List<DeSubjectProteinData> data
 
-    SampleBioMarkerTestData biomarkerTestData = new SampleBioMarkerTestData()
+	ProteinTestData() {
+		createTestData()
+	}
 
-    DeGplInfo platform = {
-        def res = new DeGplInfo(
-                title: 'Bogus protein platform',
-                organism: 'Homo Sapiens',
-                markerType: 'PROTEOMICS') 
-        res.id = 'BOGUS_PROTEIN_PLATFORM'                  // ?? what should be here
-        res
-    }()
+	List<BioMarkerCoreDb> getProteins() {
+		biomarkerTestData.proteinBioMarkers
+	}
 
-    ConceptTestData concept = HighDimTestData.createConcept('PROTEINPUBLIC', 'concept code #1', TRIAL_NAME, 'PROTEIN_CONCEPT')
+	void saveAll() {
+		biomarkerTestData.saveProteinData()
 
-    List<PatientDimension> patients =
-        HighDimTestData.createTestPatients(2, -300, TRIAL_NAME)
+		save platform, logger
+		saveAll patients, logger
+		saveAll assays, logger
+		saveAll annotations, logger
+		saveAll data, logger
 
-    List<DeSubjectSampleMapping> assays =
-        HighDimTestData.createTestAssays(patients, -400, platform, TRIAL_NAME)
+		concept.saveAll()
+	}
 
-    List<DeProteinAnnotation> annotations = {
-        def createAnnotation = { id, proteinName, uniprotName, peptide ->
-            def res = new DeProteinAnnotation(
-                    peptide:     peptide,
-                    uniprotId:   biomarkerTestData.proteinBioMarkers.find { it.name == proteinName }.externalId,
-                    uniprotName: uniprotName,
-                    platform:    platform,
-                    gplId:       'gplId'
-            )
-            res.id = id
-            res
-        }
-        [
-                // not the actual full sequences here...
-                createAnnotation(-501, 'Adipogenesis regulatory factor', 'PVR_HUMAN1', 'MASKGLQDLK'),
-                createAnnotation(-502, 'Adiponectin',                    'PVR_HUMAN2', 'MLLLGAVLLL'),
-                createAnnotation(-503, 'Urea transporter 2',             'PVR_HUMAN3', 'MSDPHSSPLL'),
-        ]
-    }()
+	private void createTestData() {
+		platform = new DeGplInfo(
+				title: 'Bogus protein platform',
+				organism: 'Homo Sapiens',
+				markerType: 'PROTEOMICS')
+		platform.id = 'BOGUS_PROTEIN_PLATFORM' // ?? what should be here
 
-    List<DeSubjectProteinData> data = {
-        def createDataEntry = { assay, annotation, intensity ->
-            new DeSubjectProteinData(
-                    assay: assay,
-                    patient: assay.patient,
-                    annotation: annotation,
-                    jAnnotation: annotation,
-                    intensity: intensity,
-                    logIntensity: Math.log(intensity),
-                    zscore:    (intensity - 0.35) / 0.1871
-            )
-        }
+		concept = HighDimTestData.createConcept('PROTEINPUBLIC', 'concept code #1',
+				TRIAL_NAME, 'PROTEIN_CONCEPT')
 
-        def res = []
-        Double intensity = 0
-        annotations.each { annotation ->
-            assays.each { assay ->
-                res += createDataEntry assay, annotation, (intensity += 0.1)
-            }
-        }
+		patients = HighDimTestData.createTestPatients(2, -300, TRIAL_NAME)
 
-        res
-    }()
+		assays = HighDimTestData.createTestAssays(patients, -400, platform, TRIAL_NAME)
 
-    List<BioMarkerCoreDb> getProteins() {
-        biomarkerTestData.proteinBioMarkers
-    }
+		annotations = [
+				// not the actual full sequences here...
+				createAnnotation(-501, 'Adipogenesis regulatory factor', 'PVR_HUMAN1', 'MASKGLQDLK'),
+				createAnnotation(-502, 'Adiponectin', 'PVR_HUMAN2', 'MLLLGAVLLL'),
+				createAnnotation(-503, 'Urea transporter 2', 'PVR_HUMAN3', 'MSDPHSSPLL')]
 
-    void saveAll() {
-        biomarkerTestData.saveProteinData()
+		double intensity = 0
+		data = []
+		for (DeProteinAnnotation annotation in annotations) {
+			for (DeSubjectSampleMapping assay in assays) {
+				data << createDataEntry(assay, annotation, intensity += 0.1)
+			}
+		}
+	}
 
-        save([platform])
-        save patients
-        save assays
-        save annotations
-        save data
+	private DeProteinAnnotation createAnnotation(long id, String proteinName, String uniprotName, String peptide) {
+		DeProteinAnnotation res = new DeProteinAnnotation(
+				peptide: peptide,
+				uniprotId: biomarkerTestData.proteinBioMarkers.find { it.name == proteinName }.externalId,
+				uniprotName: uniprotName,
+				platform: platform,
+				gplId: 'gplId')
+		res.id = id
+		res
+	}
 
-        concept.saveAll()
-    }
+	private DeSubjectProteinData createDataEntry(DeSubjectSampleMapping assay, DeProteinAnnotation annotation,
+	                                             double intensity) {
+		new DeSubjectProteinData(
+				assay: assay,
+				patient: assay.patient,
+				annotation: annotation,
+				jAnnotation: annotation,
+				intensity: intensity,
+				logIntensity: Math.log(intensity),
+				zscore: (intensity - 0.35) / 0.1871)
+	}
 }

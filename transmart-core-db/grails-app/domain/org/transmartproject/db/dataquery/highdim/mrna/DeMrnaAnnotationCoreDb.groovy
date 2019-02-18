@@ -24,34 +24,37 @@ import org.transmartproject.db.dataquery.highdim.DeGplInfo
 
 class DeMrnaAnnotationCoreDb {
 
-    String     gplId
-    String     probeId    /* a string user probe name */
+    Long       geneId     // aka primary external id
     String     geneSymbol
-    Long       geneId     /* aka primary external id */
+    String     gplId
     String     organism
+    String     probeId    // a string user probe name
 
     static transients = [ 'bioMarkerGene' ]
-    static belongsTo = [ platform: DeGplInfo ]
+
     static hasMany = [dataRows: DeSubjectMicroarrayDataCoreDb]
+
+    static belongsTo = [ platform: DeGplInfo ]
 
     static mappedBy = [dataRows: 'probe']
 
     static mapping = {
+        table 'deapp.de_mrna_annotation'
         id          column: 'probeset_id',       generator: 'assigned'
-        table       name:  'de_mrna_annotation', schema:     'deapp'
-        platform    column: 'gpl_id'
-        sort        id: 'asc'
-        gplId       insertable: false, updateable: false
         version     false
+        sort        id: 'asc'
+
+        gplId       insertable: false, updateable: false
+        platform    column: 'gpl_id'
     }
 
     static constraints = {
-        gplId      nullable: true, maxSize: 100
-        probeId    nullable: true, maxSize: 100
-        geneSymbol nullable: true, maxSize: 100
         geneId     nullable: true
+        geneSymbol nullable: true, maxSize: 100
+        gplId      nullable: true, maxSize: 100
         organism   nullable: true, maxSize: 200
         platform   nullable: true
+        probeId    nullable: true, maxSize: 100
     }
 
     BioMarkerCoreDb getBioMarkerGene() {

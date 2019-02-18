@@ -31,15 +31,13 @@ class ChromosomeSegmentConstraint implements CriteriaDataConstraint {
     String regionEndColumn
 
     String chromosome
-    Long   start,
-           end
+    Long start
+    Long end
 
     //after construction, chromosome || (start && end)
 
-    @Override
     void doWithCriteriaBuilder(HibernateCriteriaBuilder criteria) {
-        // NOTE: depends on the alias of DeChromosomalRegion in the Criteria
-        //       being called 'region'
+        // NOTE: depends on the alias of DeChromosomalRegion in the Criteria being called 'region'
         criteria.with {
             and {
                 if (chromosome) {

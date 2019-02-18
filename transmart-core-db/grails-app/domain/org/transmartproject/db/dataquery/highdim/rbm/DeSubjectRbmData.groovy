@@ -24,36 +24,35 @@ import org.transmartproject.db.i2b2data.PatientDimension
 
 class DeSubjectRbmData {
 
-    BigDecimal value
     BigDecimal logIntensity
-    BigDecimal zscore
     String unit
+    BigDecimal value
+    BigDecimal zscore
 
     static hasMany = [annotations: DeRbmAnnotation]
 
-    static belongsTo = [
-            annotations: DeRbmAnnotation,
-            assay: DeSubjectSampleMapping,
-            patient: PatientDimension
-    ]
+    static belongsTo = [annotations: DeRbmAnnotation,
+			assay: DeSubjectSampleMapping,
+			patient: PatientDimension]
 
     static mapping = {
-        table schema: 'deapp', name: 'de_subject_rbm_data'
-        id generator: 'sequence', params: [sequence: 'de_subject_rbm_data_seq', schema: 'deapp']
-        assay column: 'assay_id'
-        patient column: 'patient_id'
-        annotations joinTable: [
-                name: 'de_rbm_data_annotation_join',
-                column: 'annotation_id',
-                key: 'data_id']
+        table 'deapp.de_subject_rbm_data'
+        id generator: 'sequence', params: [sequence: 'deapp.de_subject_rbm_data_seq']
         version false
+
+        annotations joinTable: [
+//        assay column: 'assay_id'
+//        patient column: 'patient_id'
+            column: 'annotation_id',
+            key: 'data_id',
+            name: 'deapp.de_rbm_data_annotation_join']
     }
 
     static constraints = {
         assay nullable: true
-        value nullable: true, scale: 17
-        zscore nullable: true, scale: 17
         logIntensity nullable: true, scale: 17
         unit nullable: true, maxSize: 150
+        value nullable: true, scale: 17
+        zscore nullable: true, scale: 17
     }
 }

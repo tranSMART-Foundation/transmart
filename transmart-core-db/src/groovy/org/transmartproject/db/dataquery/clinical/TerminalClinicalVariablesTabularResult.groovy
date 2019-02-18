@@ -21,7 +21,6 @@ package org.transmartproject.db.dataquery.clinical
 
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
-import com.google.common.collect.Maps
 import groovy.transform.CompileStatic
 import org.hibernate.ScrollableResults
 import org.transmartproject.core.exceptions.InvalidArgumentsException
@@ -52,67 +51,60 @@ class TerminalClinicalVariablesTabularResult extends
 
     BiMap<TerminalClinicalVariable, Integer> localIndexMap = HashBiMap.create()
 
-    /* variant of above map with variables replaced with their concept code */
-    private Map<String, Integer> codeToIndex = Maps.newHashMap()
+    // variant of above map with variables replaced with their concept code
+    private Map<String, Integer> codeToIndex = [:]
 
     final String variableGroup
 
     TerminalClinicalVariablesTabularResult(ScrollableResults results,
-                                          List<TerminalClinicalVariable> indicesList) {
+                                           List<TerminalClinicalVariable> indicesList) {
         this.results = results
+	this.indicesList = indicesList
 
-        this.indicesList = indicesList
-
-        this.indicesList.each { TerminalClinicalVariable it ->
-            localIndexMap[it] = indicesList.indexOf it
+        for (TerminalClinicalVariable index in indicesList) {
+            localIndexMap[index] = indicesList.indexOf(index)
         }
 
         localIndexMap.each { TerminalClinicalVariable var, Integer index ->
             codeToIndex[var.code] = index
         }
 
-        if (indicesList.empty) {
-            throw new InvalidArgumentsException('Indices list is empty')
+	if (!indicesList) {
+	    throw new InvalidArgumentsException("Indices list is empty")
         }
 
-        def groups = indicesList*.group.unique()
+        Collection<String> groups = indicesList*.group.unique()
         if (groups.size() != 1) {
-            throw new InvalidArgumentsException('Expected all the clinical ' +
-                    'variables in this sub-result to have the same type, ' +
-                    'found these: ' + groups)
+	    throw new InvalidArgumentsException("Expected all the clinical " +
+						"variables in this sub-result to have the same type, " +
+						"found these: $groups")
         }
-        this.variableGroup = groups[0]
+        variableGroup = groups[0]
 
-        /* ** */
         columnsDimensionLabel = 'Clinical Variables'
         rowsDimensionLabel    = 'Patients'
-        // actually yes, but this skips the complex logic in
-        // addToCollectedEntries() and just adds the row to the list
+        // actually yes, but this skips the complex logic in addToCollectedEntries() and just adds the row to the list
         allowMissingColumns   = false
 
-        columnIdFromRow = { Object[] row ->
-            row[CODE_COLUMN_INDEX]
-        }
-        inSameGroup = { Object[] row1,
-                        Object[] row2 ->
+	columnIdFromRow = { Object[] row -> row[CODE_COLUMN_INDEX] }
+	inSameGroup = { Object[] row1, Object[] row2 ->
             row1[PATIENT_NUM_COLUMN_INDEX] == row2[PATIENT_NUM_COLUMN_INDEX]
         }
 
         finalizeGroup = this.&finalizePatientGroup
 
-        /* session is managed outside, in ClinicalDataTabularResult */
+	// session is managed outside, in ClinicalDataTabularResult
         closeSession = false
     }
 
-
     final String columnEntityName = 'concept'
 
-    protected Object getIndexObjectId(TerminalConceptVariable object) {
+    protected getIndexObjectId(TerminalConceptVariable object) {
         object.conceptCode
     }
 
-    protected void finalizeCollectedEntries(ArrayList collectedEntries) {
-        /* nothing to do here. All the logic in finalizePatientGroup */
+    protected void finalizeCollectedEntries(List collectedEntries) {
+	// nothing to do here. All the logic in finalizePatientGroup
     }
 
     private PatientIdAnnotatedDataRow finalizePatientGroup(List<Object[]> list) {
@@ -120,42 +112,39 @@ class TerminalClinicalVariablesTabularResult extends
 
         Object[] transformedData = new Object[localIndexMap.size()]
 
-        /* don't take Object[] otherwise would be vararg func and
-         * further unwrapping needed */
-        list.each { Object rawRowUntyped ->
-            /* array with 5 elements */
-            if (!rawRowUntyped) {
-                return
+        for (Object[] rawRow in list) {
+	    // array with 5 elements
+            if (!rawRow) {
+		continue
             }
-            Object[] rawRow = (Object[])rawRowUntyped
 
-            /* find out the position of this concept in the final result */
+	    // find out the position of this concept in the final result
             Integer index = codeToIndex[rawRow[CODE_COLUMN_INDEX] as String]
             if (index == null) {
-                throw new IllegalStateException('Unexpected concept code ' +
-                        "'${rawRow[CODE_COLUMN_INDEX]}' at this point; " +
-                        'expected one of ' + codeToIndex.keySet())
+		throw new IllegalStateException("Unexpected concept code " +
+						"'${rawRow[CODE_COLUMN_INDEX]}' at this point; " +
+						"expected one of ${codeToIndex.keySet()}")
             }
 
-            /* and the corresponding variable */
+	    // and the corresponding variable
             TerminalClinicalVariable var = indexToColumn[index]
 
             if (transformedData[index] != null) {
-                throw new UnexpectedResultException('Got more than one fact for ' +
-                        'patient ' + rawRow[PATIENT_NUM_COLUMN_INDEX] + ' and ' +
-                        'code ' + var.code + '. This is currently unsupported')
+		throw new UnexpectedResultException("Got more than one fact for " +
+						    "patient ${rawRow[PATIENT_NUM_COLUMN_INDEX]} and " +
+						    "code $var.code. This is currently unsupported")
             }
 
             transformedData[index] = getVariableValue(rawRow)
         }
 
         new PatientIdAnnotatedDataRow(
-                patientId:     (list.find { it != null})[PATIENT_NUM_COLUMN_INDEX] as Long,
-                data:          Arrays.asList(transformedData) as List,
-                columnToIndex: localIndexMap as Map)
+            patientId:     (list.find { it != null})[PATIENT_NUM_COLUMN_INDEX] as Long,
+	    data: Arrays.asList(transformedData),
+            columnToIndex: localIndexMap as Map)
     }
 
-    private Object getVariableValue(Object[] rawRow) {
+    private getVariableValue(Object[] rawRow) {
         String valueType = rawRow[VALUE_TYPE_COLUMN_INDEX]
 
         if (valueType == TEXT_VALUE_TYPE) {

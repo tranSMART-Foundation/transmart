@@ -26,17 +26,17 @@ class DeMetaboliteAnnotation {
     String biochemicalName
     String hmdbId
 
-    static belongsTo = [ platform: DeGplInfo ]
+    static hasMany =   [dataRows: DeSubjectMetabolomicsData]
 
-    static hasMany =   [ dataRows: DeSubjectMetabolomicsData ]
+    static belongsTo = [ platform: DeGplInfo ]
 
     static mappedBy =  [ dataRows: 'annotation' ]
 
     static mapping = {
         table    schema:    'deapp'
         id       generator: 'assigned'
-        platform column:    'gpl_id'
-
         version   false
+
+        platform column:    'gpl_id'
     }
 }

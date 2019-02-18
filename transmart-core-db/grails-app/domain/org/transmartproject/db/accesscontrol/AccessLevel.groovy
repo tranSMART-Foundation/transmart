@@ -19,12 +19,18 @@
 
 package org.transmartproject.db.accesscontrol
 
+import com.google.common.base.Objects
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
 import org.transmartproject.core.users.Permission
 import org.transmartproject.core.users.ProtectedOperation
 
-import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.*
+import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.API_READ
+import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.BUILD_COHORT
+import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.EXPORT
+import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.RUN_ANALYSIS
+import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.SHOW_IN_TABLE
+import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.SHOW_SUMMARY_STATISTICS
 
 class AccessLevel implements Permission {
 
@@ -34,13 +40,12 @@ class AccessLevel implements Permission {
     static hasMany = [searchAuthSecObjectAccesses: SecuredObjectAccess]
 
     static mapping = {
-        table schema: 'searchapp', name: 'search_sec_access_level'
-
+        table 'searchapp.search_sec_access_level'
         id    column: 'search_sec_access_level_id', generator: 'assigned'
+        version false
+
         name  column: 'access_level_name'
         value column: 'access_level_value'
-
-        version false
     }
 
     static constraints = {
@@ -64,29 +69,25 @@ class AccessLevel implements Permission {
     static Multimap<String, ProtectedOperation> permissionToOperations = {
         def mapBuilder = ImmutableMultimap.builder()
 
-        [API_READ, BUILD_COHORT, SHOW_SUMMARY_STATISTICS, RUN_ANALYSIS, EXPORT,
-                SHOW_IN_TABLE].each {
-            mapBuilder.put 'OWN', it
-            mapBuilder.put 'EXPORT', it
+        for (operation in [API_READ, BUILD_COHORT, SHOW_SUMMARY_STATISTICS, RUN_ANALYSIS, EXPORT, SHOW_IN_TABLE]) {
+            mapBuilder.put 'OWN', operation
+            mapBuilder.put 'EXPORT', operation
         }
 
         // all but api read, export and show in table to VIEW
-        [BUILD_COHORT, SHOW_SUMMARY_STATISTICS, RUN_ANALYSIS].each {
-            mapBuilder.put 'VIEW', it
+        for (operation in [BUILD_COHORT, SHOW_SUMMARY_STATISTICS, RUN_ANALYSIS]) {
+            mapBuilder.put 'VIEW', operation
         }
 
         mapBuilder.build()
     }()
 
-
-    @Override
-    public String toString() {
-        com.google.common.base.Objects.toStringHelper(this)
-                .add('name', name)
-                .add('value', value).toString()
+    String toString() {
+        Objects.toStringHelper(this)
+            .add('name', name)
+            .add('value', value).toString()
     }
 
-    @Override
     boolean isCase(ProtectedOperation operation) {
         permissionToOperations.containsEntry(name, operation)
     }

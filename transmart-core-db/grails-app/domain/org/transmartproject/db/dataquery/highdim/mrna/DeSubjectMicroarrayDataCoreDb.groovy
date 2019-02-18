@@ -26,9 +26,9 @@ import org.transmartproject.db.i2b2data.PatientDimension
 @EqualsAndHashCode(includes = [ 'assay', 'probe' ])
 class DeSubjectMicroarrayDataCoreDb implements Serializable {
 
-    String     trialName
+    BigDecimal logIntensity // log2(rawIntensity)
     BigDecimal rawIntensity
-    BigDecimal logIntensity /* log2(rawIntensity) */
+    String     trialName
     BigDecimal zscore
 
     /* not mapped (only used in Oracle?) */
@@ -43,35 +43,31 @@ class DeSubjectMicroarrayDataCoreDb implements Serializable {
 
     DeMrnaAnnotationCoreDb jProbe //see comment on mapping
 
-    static belongsTo = [
-            probe: DeMrnaAnnotationCoreDb,
-            assay: DeSubjectSampleMapping,
-            patient: PatientDimension,
-    ]
+    static belongsTo = [assay:   DeSubjectSampleMapping,
+			patient: PatientDimension,
+			probe:   DeMrnaAnnotationCoreDb]
 
     static mapping = {
-        table    schema: 'deapp', name: 'de_subject_microarray_data'
-
+        table 'deapp.de_subject_microarray_data'
         id       composite: [ 'assay', 'probe' ]
+        version  false
 
+//        assay    column: 'assay_id'
+//        patient  column: 'patient_id'
         probe    column: 'probeset_id'
-        assay    column: 'assay_id'
-        patient  column: 'patient_id'
 
         // this is needed due to a Criteria bug.
         // see https://forum.hibernate.org/viewtopic.php?f=1&t=1012372
         jProbe   column: 'probeset_id', insertable: false, updateable: false
-
-        version  false
     }
 
     static constraints = {
-        trialName    nullable: true, maxSize: 50
-        probe        nullable: true
         assay        nullable: true
-        patient      nullable: true
-        rawIntensity nullable: true
         logIntensity nullable: true, scale: 4
+        patient      nullable: true
+        probe        nullable: true
+        rawIntensity nullable: true
+        trialName    nullable: true, maxSize: 50
         zscore       nullable: true
         //trialSource  nullable: true, maxSize: 200
         //sampleId     nullable: true

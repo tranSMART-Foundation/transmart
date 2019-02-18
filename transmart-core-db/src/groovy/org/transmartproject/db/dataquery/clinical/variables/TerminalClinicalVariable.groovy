@@ -21,7 +21,7 @@ package org.transmartproject.db.dataquery.clinical.variables
 
 import org.transmartproject.core.dataquery.clinical.ClinicalVariableColumn
 
-public interface TerminalClinicalVariable extends ClinicalVariableColumn {
+interface TerminalClinicalVariable extends ClinicalVariableColumn {
 
     String getGroup()
 

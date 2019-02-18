@@ -32,7 +32,7 @@ class RepeatedEntriesCollectingTabularResult<T extends AbstractDataRow> {
     @Delegate
     TabularResult<DataColumn, T> tabularResult
 
-    Closure<Object> collectBy = Closure.IDENTITY
+    Closure collectBy = Closure.IDENTITY
 
     Closure<T> resultItem = { List<T> it -> (T) it[0] }
 
@@ -45,7 +45,7 @@ class RepeatedEntriesCollectingTabularResult<T extends AbstractDataRow> {
     }
 
     @CompileStatic
-    public class RepeatedEntriesCollectingIterator extends AbstractIterator<T> {
+    class RepeatedEntriesCollectingIterator extends AbstractIterator<T> {
 
         PeekingIterator<T> sourceIterator
 
@@ -53,7 +53,6 @@ class RepeatedEntriesCollectingTabularResult<T extends AbstractDataRow> {
             this.sourceIterator = (PeekingIterator<T>) Iterators.peekingIterator((Iterator) sourceIterator)
         }
 
-        @Override
         protected T computeNext() {
             List<T> collected = []
             if (!sourceIterator.hasNext()) {
@@ -61,7 +60,7 @@ class RepeatedEntriesCollectingTabularResult<T extends AbstractDataRow> {
                 return
             }
 
-            collected.add((T) sourceIterator.next())
+            collected << (T) sourceIterator.next()
             while (sourceIterator.hasNext() &&
                     collectBy.call(sourceIterator.peek()) != null &&
                     collectBy.call(sourceIterator.peek()) == collectBy.call(collected[0])) {

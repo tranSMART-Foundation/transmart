@@ -25,11 +25,10 @@ class DisjunctionDataConstraint implements CriteriaDataConstraint {
 
     List<CriteriaDataConstraint> constraints
 
-    @Override
     void doWithCriteriaBuilder(HibernateCriteriaBuilder criteria) {
         criteria.with {
             or {
-                constraints.each { CriteriaDataConstraint subConstraint ->
+                for (CriteriaDataConstraint subConstraint in constraints) {
                     subConstraint.doWithCriteriaBuilder criteria
                 }
             }

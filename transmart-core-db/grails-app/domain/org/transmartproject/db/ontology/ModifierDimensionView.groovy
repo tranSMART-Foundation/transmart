@@ -29,14 +29,14 @@ class ModifierDimensionView {
 
     // it's a view!
 
-    String path
     String code
-    String name
     Long   level
-    String studyId
+    String name
     String nodeType
-    String valueType
+    String path
+    String studyId
     String unit
+    String valueType
     String visitInd = 'N'
 
     static transients = ['visit']
@@ -48,22 +48,21 @@ class ModifierDimensionView {
     }
 
     void setVisit(Boolean visit) {
-        visitInd == visit == null ? null :
-                visit ? 'Y' : 'N'
+        visitInd == visit == null ? null : visit ? 'Y' : 'N'
     }
 
     static mapping = {
-        table   schema: 'i2b2demodata', name: 'modifier_dimension_view'
+        table 'i2b2demodata.modifier_dimension_view'
         id      name: 'path', generator: 'assigned'
         version false
 
-        path      column: 'modifier_path'
         code      column: 'modifier_cd'
-        name      column: 'name_char'
         level     column: 'modifier_level'
-        studyId   column: 'sourcesystem_cd'
+        name      column: 'name_char'
         nodeType  column: 'modifier_node_type' // known values: {L, F}
-        valueType column: 'valtype_cd'
+        path      column: 'modifier_path'
+        studyId   column: 'sourcesystem_cd'
         unit      column: 'std_units'
+        valueType column: 'valtype_cd'
     }
 }

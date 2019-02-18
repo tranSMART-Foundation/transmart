@@ -19,11 +19,13 @@
 
 package org.transmartproject.db.dataquery.highdim.chromoregion
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.highdim.BioMarkerDataRow
 import org.transmartproject.core.dataquery.highdim.Platform
 import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
 import org.transmartproject.db.dataquery.highdim.AbstractDataRow
 
+@CompileStatic
 final class RegionRowImpl extends AbstractDataRow implements RegionRow, BioMarkerDataRow {
 
     Long     id
@@ -39,18 +41,11 @@ final class RegionRowImpl extends AbstractDataRow implements RegionRow, BioMarke
     RegionRowImpl() {}  // Enforce that default constructor is generated along with next explicit constructor
                         // Else map constructors will fail.
 
-    @Override
     String getLabel() {
         name
     }
 
-    @Override
-    public java.lang.String toString() {
-        return 'RegionRowImpl{' +
-                'regionId=' + id +
-                ', regionName=' + name +
-                ', data=' + data.toListString() +
-                ', assayIndexMap=' + assayIndexMap.toMapString() +
-                '}'
+    String toString() {
+	"RegionRowImpl{regionId=$id, regionName=$name, data=${data.toListString()}, assayIndexMap=${assayIndexMap.toMapString()}"
     }
 }

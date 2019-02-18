@@ -22,7 +22,5 @@ package org.transmartproject.db.dataquery
 import org.grails.datastore.mapping.query.api.Criteria
 
 interface CriteriaConstraint {
-
     void addToCriteria(Criteria criteria)
-
 }
