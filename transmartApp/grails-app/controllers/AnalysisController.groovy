@@ -1,1146 +1,946 @@
+import com.recomdata.asynchronous.GenePatternService
 import com.recomdata.export.IgvFiles
 import com.recomdata.export.PlinkFiles
 import com.recomdata.export.SnpViewerFiles
 import com.recomdata.genepattern.JobStatus
 import com.recomdata.genepattern.WorkflowStatus
 import grails.converters.JSON
+import groovy.sql.Sql
 import groovy.util.logging.Slf4j
-import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.genepattern.webservice.JobResult
 import org.genepattern.webservice.WebServiceException
 import org.json.JSONException
 import org.json.JSONObject
+import org.springframework.beans.factory.annotation.Value
 import org.transmart.CohortInformation
 import org.transmart.HeatmapValidator
-import org.transmart.searchapp.AccessLog
+import org.transmart.plugin.shared.SecurityService
+import org.transmartproject.db.log.AccessLogService
+
+import javax.sql.DataSource
 
 /**
- * $Id: AnalysisController.groovy 11302 2011-12-23 02:59:44Z mkapoor $
- * @author $Author: mkapoor $
- * @version $Revision: 11302 $
- *
+ * @author mkapoor
  */
 @Slf4j('logger')
 class AnalysisController {
 
-    def index = {}
-    def i2b2HelperService
-    def genePatternService
-    def dataSource
-    def springSecurityService
-    def solrService
-    def plinkService
-    def analysisService
-    def snpService
-    def igvService
+    private static final String geneInputPrefix = 'Gene>'
+    private static
+    final List<String> chroms = ['ALL', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13',
+	                         '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y'].asImmutable()
 
+    AccessLogService accessLogService
+    AnalysisService analysisService
+    DataSource dataSource
+    GenePatternService genePatternService
+    I2b2HelperService i2b2HelperService
+    IgvService igvService
+    PlinkService plinkService
+    SnpService snpService
+    SolrService solrService
+    SecurityService securityService
 
-    def heatmapvalidate = {
-        def platform = ''
-        logger.debug('Received heatmap validation request')
-        String resultInstanceID1 = request.getParameter('result_instance_id1')
-        if (resultInstanceID1 != null && resultInstanceID1.length() == 0) {
-            resultInstanceID1 = null
-        }
-        String resultInstanceID2 = request.getParameter('result_instance_id2')
-        if (resultInstanceID2 != null && resultInstanceID2.length() == 0) {
-            resultInstanceID2 = null
-        }
+    @Value('${com.recomdata.datasetExplorer.genePatternURL:}')
+    private String genePatternUrl
 
-        String analysis = request.getParameter('analysis')
-        logger.debug('analysis type: ' + analysis)
+    @Value('${com.recomdata.solr.baseURL:}')
+    private String solrUrl
 
-        logger.debug('\tresultInstanceID1: ' + resultInstanceID1)
-        logger.debug('\tresultInstanceID2: ' + resultInstanceID2)
-        def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'DatasetExplorer-Before Heatmap', eventmessage: 'RID1:' + resultInstanceID1 + ' RID2:' + resultInstanceID2, accesstime: new java.util.Date())
-        al.save()
-        String pathwayName = request.getParameter('pathway_name')
+    @Value('${com.recomdata.solr.maxRows:0}')
+    private int solrMaxRows
+
+    @Value('${com.recomdata.analysis.genepattern.file.dir:}')
+    private String genePatternFileDir
+
+    @Value('${com.recomdata.datasetExplorer.enableGenePattern:false}')
+    private boolean enableGenePattern
+
+    def index() {}
+
+    def heatmapvalidate(String result_instance_id1, String result_instance_id2, String analysis) {
+ 	logger.debug 'Received heatmap validation request'
+	result_instance_id1 = result_instance_id1 ?: null
+	result_instance_id2 = result_instance_id2 ?: null
+	logger.debug 'analysis type: {}', analysis
+
+	logger.debug '\tresult_instance_id1: {}', result_instance_id1
+	logger.debug '\tresult_instance_id2: {}', result_instance_id2
+	accessLogService.report 'DatasetExplorer-Before Heatmap',
+	    'RID1:' + result_instance_id1 + ' RID2:' + result_instance_id2
+
+	String markerType = ''
 
         List<String> subjectIds1
-        List<String> subjectIds2
         List<String> concepts1
+        HeatmapValidator hv1 = new HeatmapValidator()
+        CohortInformation ci1 = new CohortInformation()
+
+        if (result_instance_id1 != null) {
+	    subjectIds1 = i2b2HelperService.getSubjectsAsList(result_instance_id1)
+	    concepts1 = i2b2HelperService.getConceptsAsList(result_instance_id1)
+	    i2b2HelperService.fillHeatmapValidator(subjectIds1, concepts1, hv1)
+	    i2b2HelperService.fillCohortInformation(subjectIds1, concepts1, ci1, CohortInformation.TRIALS_TYPE)
+	    i2b2HelperService.fillDefaultGplInHeatMapValidator(hv1, ci1, concepts1)
+	    i2b2HelperService.fillDefaultRbmpanelInHeatMapValidator(hv1, ci1, concepts1)
+	    markerType = i2b2HelperService.getMarkerTypeFromConceptCd(concepts1[0])
+        }
+
+        List<String> subjectIds2
         List<String> concepts2
-        def hv1 = new HeatmapValidator()
-        def hv2 = new HeatmapValidator()
-        def ci1 = new CohortInformation()
-        def ci2 = new CohortInformation()
-
-        def markerType = ''
-
-        if (resultInstanceID1 != null) {
-            subjectIds1 = i2b2HelperService.getSubjectsAsList(resultInstanceID1)
-            concepts1 = i2b2HelperService.getConceptsAsList(resultInstanceID1)
-            i2b2HelperService.fillHeatmapValidator(subjectIds1, concepts1, hv1)
-            i2b2HelperService.fillCohortInformation(subjectIds1, concepts1, ci1, CohortInformation.TRIALS_TYPE)
-            i2b2HelperService.fillDefaultGplInHeatMapValidator(hv1, ci1, concepts1)
-            i2b2HelperService.fillDefaultRbmpanelInHeatMapValidator(hv1, ci1, concepts1)
-            markerType = i2b2HelperService.getMarkerTypeFromConceptCd(concepts1[0])
+        HeatmapValidator hv2 = new HeatmapValidator()
+        CohortInformation ci2 = new CohortInformation()
+        if (result_instance_id2 != null) {
+	    subjectIds2 = i2b2HelperService.getSubjectsAsList(result_instance_id2)
+	    concepts2 = i2b2HelperService.getConceptsAsList(result_instance_id2)
+	    i2b2HelperService.fillHeatmapValidator(subjectIds2, concepts2, hv2)
+	    i2b2HelperService.fillCohortInformation(subjectIds2, concepts2, ci2, CohortInformation.TRIALS_TYPE)
+	    i2b2HelperService.fillDefaultGplInHeatMapValidator(hv2, ci2, concepts2)
+	    i2b2HelperService.fillDefaultRbmpanelInHeatMapValidator(hv2, ci2, concepts2)
         }
 
-        if (resultInstanceID2 != null) {
-            subjectIds2 = i2b2HelperService.getSubjectsAsList(resultInstanceID2)
-            concepts2 = i2b2HelperService.getConceptsAsList(resultInstanceID2)
-            i2b2HelperService.fillHeatmapValidator(subjectIds2, concepts2, hv2)
-            i2b2HelperService.fillCohortInformation(subjectIds2, concepts2, ci2, CohortInformation.TRIALS_TYPE)
-            i2b2HelperService.fillDefaultGplInHeatMapValidator(hv2, ci2, concepts2)
-            i2b2HelperService.fillDefaultRbmpanelInHeatMapValidator(hv2, ci2, concepts2)
-        }
-
-        def result = [defaultPlatforms      : [
-                hv1.getFirstPlatform(),
-                hv2.getFirstPlatform()
-        ],
-                      defaultPlatformLabels : [
-                              hv1.getFirstPlatformLabel(),
-                              hv2.getFirstPlatformLabel()
-                      ],
-                      trials                : [
-                              ci1.getAllTrials(),
-                              ci2.getAllTrials()
-                      ],
-                      defaultTimepoints     : [
-                              hv1.getAllTimepoints(),
-                              hv2.getAllTimepoints()
-                      ],
-                      defaultTimepointLabels: [
-                              hv1.getAllTimepointLabels(),
-                              hv2.getAllTimepointLabels()
-                      ],
-                      defaultSamples        : [
-                              hv1.getAllSamples(),
-                              hv2.getAllSamples()
-                      ],
-                      defaultSampleLabels   : [
-                              hv1.getAllSampleLabels(),
-                              hv2.getAllSampleLabels()
-                      ],
-                      defaultGpls           : [
-                              hv1.getAll('gpls'),
-                              hv2.getAll('gpls')
-                      ],
-                      defaultGplLabels      : [
-                              hv1.getAll('gplLabels'),
-                              hv2.getAll('gplLabels')
-                      ],
-                      defaultTissues        : [
-                              hv1.getAll('tissues'),
-                              hv2.getAll('tissues')
-                      ],
-                      defaultTissueLabels   : [
-                              hv1.getAll('tissueLabels'),
-                              hv2.getAll('tissueLabels')
-                      ],
-                      defaultRbmpanels      : [
-                              hv1.getAll('rbmpanels'),
-                              hv2.getAll('rbmpanels')
-                      ],
-                      defaultRbmpanelLabels : [
-                              hv1.getAll('rbmpanelsLabels'),
-                              hv2.getAll('rbmpanelsLabels')
-                      ],
-                      markerType            : markerType]
-        //logger.debug(result as JSON)
-        render result as JSON
+	Map result = [defaultPlatforms      : [hv1.getFirstPlatform(), hv2.getFirstPlatform()],
+		      defaultPlatformLabels : [hv1.getFirstPlatformLabel(), hv2.getFirstPlatformLabel()],
+		      trials                : [ci1.getAllTrials(), ci2.getAllTrials()],
+		      defaultTimepoints     : [hv1.getAllTimepoints(), hv2.getAllTimepoints()],
+		      defaultTimepointLabels: [hv1.getAllTimepointLabels(), hv2.getAllTimepointLabels()],
+		      defaultSamples        : [hv1.getAllSamples(), hv2.getAllSamples()],
+		      defaultSampleLabels   : [hv1.getAllSampleLabels(), hv2.getAllSampleLabels()],
+		      defaultGpls           : [hv1.getAll('gpls'), hv2.getAll('gpls')],
+		      defaultGplLabels      : [hv1.getAll('gplLabels'), hv2.getAll('gplLabels')],
+		      defaultTissues        : [hv1.getAll('tissues'), hv2.getAll('tissues')],
+		      defaultTissueLabels   : [hv1.getAll('tissueLabels'), hv2.getAll('tissueLabels')],
+		      defaultRbmpanels      : [hv1.getAll('rbmpanels'), hv2.getAll('rbmpanels')],
+		      defaultRbmpanelLabels : [hv1.getAll('rbmpanelsLabels'), hv2.getAll('rbmpanelsLabels')],
+		      markerType            : markerType]
+	render result as JSON
     }
 
-    def getCohortInformation = {
-        String infoType = request.getParameter('INFO_TYPE')
-        String platform = request.getParameter('PLATFORM')
-        String rbmpanels = request.getParameter('RBMPANEL')
-        String gpls = request.getParameter('GPL')
-        String trial = request.getParameter('TRIAL')
-        String tissues = request.getParameter('TISSUE')
-        String samples = request.getParameter('SAMPLES')
-        def ci = new CohortInformation()
-        ci.platforms.add(platform)
-        if ((rbmpanels != null) && (rbmpanels.length() > 0))
-            ci.rbmpanels.addAll(Arrays.asList(rbmpanels.split(',')))
-        if (trial != null)
-            ci.trials.addAll(Arrays.asList(trial.split(',')))
-        if ((samples != null) && (samples.length() > 0))
-            ci.samples.addAll(Arrays.asList(samples.split(',')))
-        if ((tissues != null) && (tissues.length() > 0))
-            ci.tissues.addAll(Arrays.asList(tissues.split(',')))
-        if ((gpls != null) && (gpls.length() > 0))
-            ci.gpls.addAll(Arrays.asList(gpls.split(',')))
+    def getCohortInformation() {
+	String infoType = params.INFO_TYPE
+	String platform = params.PLATFORM
+	String rbmpanels = params.RBMPANEL
+	String gpls = params.GPL
+	String trial = params.TRIAL
+	String tissues = params.TISSUE
+	String samples = params.SAMPLES
 
-        def result = null
-        def ifT = infoType != null ? Integer.parseInt(infoType) : 0
+	CohortInformation ci = new CohortInformation()
+	ci.platforms.add platform
 
-        i2b2HelperService.fillCohortInformation(null, null, ci, ifT)
+	if (rbmpanels) {
+	    ci.rbmpanels.addAll Arrays.asList(rbmpanels.split(','))
+	}
 
-        switch (ifT) {
-            case CohortInformation.GPL_TYPE:
-                result = [rows: ci.gpls]
-                break
-            case CohortInformation.TISSUE_TYPE:
-                result = [rows: ci.tissues]
-                break
-            case CohortInformation.TIMEPOINTS_TYPE:
-                result = [rows: ci.timepoints]
-                break
-            case CohortInformation.SAMPLES_TYPE:
-                result = [rows: ci.samples]
-                break
-            case CohortInformation.PLATFORMS_TYPE:
-                result = [rows: ci.platforms]
-                break
-            case CohortInformation.RBM_PANEL_TYPE:
-                result = [rows: ci.rbmpanels]
-                break
-            default:
-                result = [rows: []]
-        }
-        render params.callback + '(' + (result as JSON) + ')'
+	if (trial) {
+	    ci.trials.addAll Arrays.asList(trial.split(','))
+	}
+
+	if (samples) {
+	    ci.samples.addAll Arrays.asList(samples.split(','))
+	}
+
+	if (tissues) {
+	    ci.tissues.addAll Arrays.asList(tissues.split(','))
+	}
+
+	if (gpls) {
+	    ci.gpls.addAll Arrays.asList(gpls.split(','))
+	}
+
+	int ifT = infoType ? Integer.parseInt(infoType) : 0
+
+	i2b2HelperService.fillCohortInformation(null, null, ci, ifT)
+
+	Map result
+	switch (ifT) {
+	    case CohortInformation.GPL_TYPE: result = [rows: ci.gpls]; break
+	    case CohortInformation.TISSUE_TYPE: result = [rows: ci.tissues]; break
+	    case CohortInformation.TIMEPOINTS_TYPE: result = [rows: ci.timepoints]; break
+	    case CohortInformation.SAMPLES_TYPE: result = [rows: ci.samples]; break
+	    case CohortInformation.PLATFORMS_TYPE: result = [rows: ci.platforms]; break
+	    case CohortInformation.RBM_PANEL_TYPE: result = [rows: ci.rbmpanels]; break
+	    default: result = [rows: []]
+	}
+
+	render params.callback + '(' + (result as JSON) + ')'
     }
 
-    /**
-     * This code will accept a list of Sample IDs to generate a heatmap.
-     */
-    def heatMapFromSample = {
+    def showSNPViewer(String result_instance_id1, String result_instance_id2, String chroms,
+	              String genes, String geneAndIdList, String snps) {
+	JSONObject result = new JSONObject()
 
-        String sampleIdList = request.getParameter('idList')
-        //[{'SampleID':'PatientID'},{}]
-        String patientIdList = getPatientIdsFromSampleIds(sampleIdList)
-        println(idList)
+	WorkflowStatus wfstatus = initWorkflowStatus('SnpViewer')
 
-        render 'Done!'
+	try {
+	    logger.debug 'Received SNPViewer rendering request: {}', request
+
+	    logger.debug '\tresult_instance_id1: {}', result_instance_id1
+	    logger.debug '\tresult_instance_id2: {}', result_instance_id2
+
+	    chroms = chroms ?: 'ALL'
+
+	    if (!hasValue(result_instance_id1)) {
+		logger.debug '\tresult_instance_id2 == undefined or null'
+		result_instance_id1 = null
+	    }
+	    if (!hasValue(result_instance_id2)) {
+		logger.debug '\tresult_instance_id2 == undefined or null'
+		result_instance_id2 = null
+	    }
+
+	    accessLogService.report 'DatasetExplorer-ShowSNPViewer',
+		'RID1:' + result_instance_id1 + ' RID2:' + result_instance_id2
+
+	    String subjectIds1 = i2b2HelperService.getSubjects(result_instance_id1)
+	    String subjectIds2 = i2b2HelperService.getSubjects(result_instance_id2)
+
+	    if (!subjectIds1 && !subjectIds2) {
+		result.put('error', 'No subject was selected')
+		response.outputStream << result.toString()
+		return
+	    }
+
+	    List<Long> geneSearchIdList = []
+	    List<String> geneNameList = []
+	    if (genes) {
+		getGeneSearchIdListFromRequest genes, geneAndIdList, geneSearchIdList, geneNameList
+	    }
+
+	    List<String> snpNameList = snps ? snps.split(',') as List : null
+
+	    boolean isByPatient = !geneSearchIdList && !snpNameList
+
+	    SnpViewerFiles snpFiles = new SnpViewerFiles()
+	    StringBuilder geneSnpPageBuf = new StringBuilder()
+	    try {
+		if (isByPatient) {
+		    i2b2HelperService.getSNPViewerDataByPatient subjectIds1, subjectIds2, chroms, snpFiles
+		}
+		else {
+		    i2b2HelperService.getSNPViewerDataByProbe subjectIds1, subjectIds2, geneSearchIdList, geneNameList,
+			snpNameList, snpFiles, geneSnpPageBuf
+		}
+	    }
+	    catch (e) {
+		result.put('error', e.message)
+		return
+	    }
+
+	    JobResult[] jresult
+	    try {
+		jresult = genePatternService.snpViewer(snpFiles.dataFile, snpFiles.sampleFile)
+	    }
+	    catch (WebServiceException e) {
+		result.put('error', 'WebServiceException: ' + e.message)
+		return
+	    }
+
+	    String viewerURL
+	    try {
+		result.put('jobNumber', jresult[1].jobNumber)
+		viewerURL = genePatternUrl +
+		    '/gp/jobResults/' +
+		    jresult[1].jobNumber +
+		    '?openVisualizers=true'
+		logger.debug 'URL for viewer: {}', viewerURL
+		result.put('viewerURL', viewerURL)
+		result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
+
+		logger.debug 'result: {}', result
+	    }
+	    catch (JSONException e) {
+		logger.error 'JSON Exception: {}', e.message
+		result.put('error', 'JSON Exception: ' + e.message)
+	    }
+	}
+	finally {
+	    wfstatus.result = result
+	    wfstatus.setCompleted()
+	}
     }
 
-    def showSNPViewer = {
-        JSONObject result = new JSONObject()
+    def showSNPViewerSample(String chroms, String genes, String geneAndIdList, String snps,
+	                    String result_instance_id1, String result_instance_id2) {
+	JSONObject result = new JSONObject()
 
-        def wfstatus = new WorkflowStatus()
-        session['workflowstatus'] = wfstatus
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Initializing Workflow', status: 'C'))
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Retrieving Data', status: 'R'))
-        session['workflowstatus'].addNewJob('ConvertLineEndings')
-        session['workflowstatus'].addNewJob('SnpViewer')
+	//Set the workflow status that gets show in the status popup.
+	WorkflowStatus wfstatus = initWorkflowStatus('SnpViewer')
 
+	try {
+	    logger.debug 'Received SNPViewer rendering request: {}', request
 
-        try {
-            logger.debug('Received SNPViewer rendering request: ' + request)
+	    //The JSON we received should be [1:[category:[]]]
+	    def subsetListJSON = request.JSON.SearchJSON
 
-            String resultInstanceID1 = request.getParameter('result_instance_id1')
-            logger.debug('\tresultInstanceID1: ' + resultInstanceID1)
-            String resultInstanceID2 = request.getParameter('result_instance_id2')
-            logger.debug('\tresultInstanceID2: ' + resultInstanceID2)
+	    //We need to get an ID list per subset. Build the subset from the JSON Data.
+	    Map subsetList = solrService.buildSubsetList(subsetListJSON)
 
-            String chroms = request.getParameter('chroms')
-            if (chroms == null || chroms.trim().length() == 0) chroms = 'ALL'
+	    //Change the chroms text if the param was empty.
+	    if (!chroms?.trim()) {
+		chroms = 'ALL'
+	    }
 
-            String genes = request.getParameter('genes')
-            String geneAndIdListStr = request.getParameter('geneAndIdList')
-            String snps = request.getParameter('snps')
+	    accessLogService.report 'DatasetExplorer-ShowSNPViewer',
+		'RID1:' + result_instance_id1 + ' RID2:' + result_instance_id2
 
-            if (resultInstanceID1 == 'undefined' || resultInstanceID1 == 'null' || resultInstanceID1 == '') {
-                logger.debug '\tresultInstanceID1 == undefined or null'
-                resultInstanceID1 = null
-            }
-            if (resultInstanceID2 == 'undefined' || resultInstanceID2 == 'null' || resultInstanceID2 == '') {
-                logger.debug '\tresultInstanceID2 == undefined or null'
-                resultInstanceID2 = null
-            }
+	    List<List<Long>> patientNumList
 
-            def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'DatasetExplorer-ShowSNPViewer', eventmessage: 'RID1:' + resultInstanceID1 + ' RID2:' + resultInstanceID2, accesstime: new java.util.Date())
-            al.save()
+	    boolean foundPatients = false
 
-            String subjectIds1 = i2b2HelperService.getSubjects(resultInstanceID1)
-            String subjectIds2 = i2b2HelperService.getSubjects(resultInstanceID2)
+	    for (Map.Entry subsetItem in subsetList) {
+		def subsetSampleList = subsetItem.value
 
-            if ((subjectIds1 == null || subjectIds1.length() == 0) &&
-                    (subjectIds2 == null || subjectIds2.length() == 0)) {
-                result.put('error', 'No subject was selected')
-                response.outputStream << result.toString()
-                return
-            }
+		//Don't add a subset if there are no items in the subset.
+		if (subsetSampleList) {
+		    //Add the list to the list of lists.
+		    List<Long> tempPatientList = i2b2HelperService.getSubjectsAsListFromSampleLong(subsetSampleList)
 
-            boolean isByPatient = true
-            List<Long> geneSearchIdList = new ArrayList<Long>()
-            List<String> geneNameList = new ArrayList<String>()
-            if (genes != null && genes.length() != 0) {
-                getGeneSearchIdListFromRequest(genes, geneAndIdListStr, geneSearchIdList, geneNameList)
-            }
-            List<String> snpNameList = null
-            if (snps != null && snps.length() != 0) {
-                snpNameList = new ArrayList<String>()
-                String[] snpNameArray = snps.split(',')
-                for (String snpName : snpNameArray) {
-                    snpNameList.add(snpName.trim())
-                }
-            }
-            if ((geneSearchIdList != null && geneSearchIdList.size() != 0) ||
-                    (snpNameList != null && snpNameList.size() != 0)) {
-                isByPatient = false
-            }
+		    //If we found patients, add them to the list and set our boolean to indicate we found some.
+		    if (tempPatientList) {
+			foundPatients = true
+			patientNumList << tempPatientList
+		    }
+		}
+	    }
 
-            SnpViewerFiles snpFiles = new SnpViewerFiles()
-            StringBuffer geneSnpPageBuf = new StringBuffer()
-            try {
-                if (isByPatient)
-                    i2b2HelperService.getSNPViewerDataByPatient(subjectIds1, subjectIds2, chroms, snpFiles)
-                else {
-                    i2b2HelperService.getSNPViewerDataByProbe(subjectIds1, subjectIds2, geneSearchIdList, geneNameList, snpNameList, snpFiles, geneSnpPageBuf)
-                }
-            }
-            catch (Exception e) {
-                result.put('error', e.getMessage())
-                return
-            }
+	    //If we didn't find any patients, send a message to the output stream.
+	    if (!foundPatients) {
+		result.put('error', 'No subject was selected')
+		response.outputStream << result.toString()
+		return
+	    }
 
-            JobResult[] jresult
+	    //Parse the gene list passed to this action to get the actual list of genes.
+	    List<Long> geneSearchIdList = []
+	    List<String> geneNameList = []
+	    if (genes) {
+		getGeneSearchIdListFromRequest genes, geneAndIdList, geneSearchIdList, geneNameList
+	    }
 
-            try {
-                jresult = genePatternService.snpViewer(snpFiles.getDataFile(), snpFiles.getSampleFile())
-            }
-            catch (WebServiceException e) {
-                result.put('error', 'WebServiceException: ' + e.getMessage())
-                return
-            }
+	    List<String> snpNameList = snps ? snps.split(',')*.trim() : null
 
-            String viewerURL
-            String altviewerURL
+	    // whether to retrieve SNP data by patient or by probe.
+	    boolean isByPatient = !geneSearchIdList && !snpNameList
 
-            try {
-                result.put('jobNumber', jresult[1].getJobNumber())
-                viewerURL =
-                        grailsApplication.config.com.recomdata.datasetExplorer.genePatternURL +
-                                '/gp/jobResults/' +
-                                jresult[1].getJobNumber() +
-                                '?openVisualizers=true'
-                logger.debug('URL for viewer: ' + viewerURL)
-                result.put('viewerURL', viewerURL)
+	    // the files to write the SNP data to.
+	    SnpViewerFiles snpFiles = new SnpViewerFiles()
 
-                result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
+	    //A page is used to display the items the user selected? I think?
+	    // This buffer holds a page, it gets filled in during a helper method call within the SNP service.
+	    StringBuilder geneSnpPageBuf = new StringBuilder()
 
-                logger.debug('result: ' + result)
-            }
-            catch (JSONException e) {
-                logger.error('JSON Exception: ' + e.getMessage())
-                result.put('error', 'JSON Exception: ' + e.getMessage())
-            }
-        }
-        finally {
-            session['workflowstatus'].result = result
-            session['workflowstatus'].setCompleted()
-        }
+	    try {
+		if (isByPatient) {
+		    snpService.getSNPViewerDataByPatient(patientNumList as List<Long>[], chroms, snpFiles)
+		}
+		else {
+		    snpService.getSNPViewerDataByProbe(patientNumList as List<Long>[], geneSearchIdList, geneNameList, snpNameList, snpFiles, geneSnpPageBuf)
+		}
+	    }
+	    catch (Exception e) {
+		result.put('error', e.message)
+		return
+	    }
+
+	    JobResult[] jresult
+
+	    try {
+		jresult = genePatternService.snpViewer(snpFiles.getDataFile(), snpFiles.getSampleFile())
+	    }
+	    catch (WebServiceException e) {
+		result.put('error', 'WebServiceException: ' + e.message)
+		return
+	    }
+
+	    String viewerURL
+	    try {
+		result.put('jobNumber', jresult[1].getJobNumber())
+		viewerURL = genePatternUrl +
+		    '/gp/jobResults/' +
+		    jresult[1].getJobNumber() +
+		    '?openVisualizers=true'
+		logger.debug 'URL for viewer: {}', viewerURL
+		result.put('viewerURL', viewerURL)
+
+		result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
+
+		logger.debug 'result: {}', result
+	    }
+	    catch (JSONException e) {
+		logger.error 'JSON Exception: {}', e.message
+		result.put('error', 'JSON Exception: ' + e.message)
+	    }
+	}
+	finally {
+	    wfstatus.result = result
+	    wfstatus.setCompleted()
+	}
     }
 
-    def showSNPViewerSample = {
-        JSONObject result = new JSONObject()
+    def showIgv(String result_instance_id1, String result_instance_id2, String chroms, String genes,
+	        String geneAndIdList, String snps) {
+	JSONObject result = new JSONObject()
 
-        //Set the workflow status that gets show in the status popup.
-        def wfstatus = new WorkflowStatus()
-        session['workflowstatus'] = wfstatus
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Initializing Workflow', status: 'C'))
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Retrieving Data', status: 'R'))
-        session['workflowstatus'].addNewJob('ConvertLineEndings')
-        session['workflowstatus'].addNewJob('SnpViewer')
+	WorkflowStatus wfstatus = initWorkflowStatus('IGV')
 
+	try {
+	    logger.debug 'Received IGV rendering request: {}', request
 
-        try {
-            logger.debug('Received SNPViewer rendering request: ' + request)
+	    logger.debug '\tresult_instance_id1: {}', result_instance_id1
+	    logger.debug '\tresult_instance_id2: {}', result_instance_id2
 
-            //Get parameters from the form.
-            String chroms = request.getParameter('chroms')
-            String genes = request.getParameter('genes')
-            String geneAndIdListStr = request.getParameter('geneAndIdList')
-            String snps = request.getParameter('snps')
-            //The JSON we received should be [1:[category:[]]]
-            def subsetListJSON = request.JSON.SearchJSON
+	    chroms = chroms ?: 'ALL'
 
-            //We need to get an ID list per subset. Build the subset from the JSON Data.
-            def subsetList = solrService.buildSubsetList(subsetListJSON)
+	    if (!hasValue(result_instance_id1)) {
+		logger.debug '\tresult_instance_id1 == undefined or null'
+		result_instance_id1 = null
+	    }
+	    if (!hasValue(result_instance_id2)) {
+		logger.debug '\tresult_instance_id2 == undefined or null'
+		result_instance_id2 = null
+	    }
 
-            //Change the chroms text if the param was empty.
-            if (chroms == null || chroms.trim().length() == 0) chroms = 'ALL'
+	    accessLogService.report 'DatasetExplorer-ShowIgv',
+		'RID1:' + result_instance_id1 + ' RID2:' + result_instance_id2
 
-            //Log the access to this action.
-            def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'DatasetExplorer-ShowSNPViewer', eventmessage: 'RID1:' + resultInstanceID1 + ' RID2:' + resultInstanceID2, accesstime: new java.util.Date())
-            al.save()
+	    String subjectIds1 = i2b2HelperService.getSubjects(result_instance_id1)
+	    String subjectIds2 = i2b2HelperService.getSubjects(result_instance_id2)
 
-            //Gather subjects from Sample IDs.
-            //Form a list of lists of longs. We will convert the outside list to an array in a later method.
-            List<List<Long>> patientNumList
+	    if (!subjectIds1 && !subjectIds2) {
+		result.put('error', 'No subject was selected')
+		return
+	    }
 
-            //We will use this to determine if our queries return ANY patients.
-            boolean foundPatients = false
+	    int snpDatasetNum1 = 0
+	    int snpDatasetNum2 = 0
+	    if (result_instance_id1?.trim()) {
+		List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds1)
+		if (idList != null) {
+		    snpDatasetNum1 = idList.size()
+		}
+	    }
+	    if (result_instance_id2?.trim()) {
+		List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds2)
+		if (idList != null) {
+		    snpDatasetNum2 = idList.size()
+		}
+	    }
+	    if (snpDatasetNum1 == 0 && snpDatasetNum2 == 0) {
+		result.put('error', 'No SNP dataset was selected')
+		return
+	    }
 
-            //For each subset get a list of subjects.
-            subsetList.each {
-                        subsetItem ->
+	    List<Long> geneSearchIdList = []
+	    List<String> geneNameList = []
+	    if (genes) {
+		getGeneSearchIdListFromRequest genes, geneAndIdList, geneSearchIdList, geneNameList
+	    }
+	    List<String> snpNameList = null
+	    if (snps) {
+		snpNameList = []
+		String[] snpNameArray = snps.split(',')
+		for (String snpName : snpNameArray) {
+		    snpNameList.add(snpName.trim())
+		}
+	    }
 
-                            def subsetSampleList = subsetItem.value
+	    boolean isByPatient = !geneSearchIdList && !snpNameList
 
-                            //Don't add a subset if there are no items in the subset.
-                            if (subsetSampleList.size() > 0) {
-                                //Add the list to the list of lists.
-                                List<Long> tempPatientList = i2b2HelperService.getSubjectsAsListFromSampleLong(subsetSampleList)
+	    String newIGVLink = createLink(controller: 'analysis', action: 'getGenePatternFile', absolute: true)
 
-                                //If we found patients, add them to the list and set our boolean to indicate we found some.
-                                if (tempPatientList.size() > 0) {
-                                    foundPatients = true
-                                    patientNumList.add(tempPatientList)
-                                }
+	    IgvFiles igvFiles = new IgvFiles(getGenePatternFileDirName(), newIGVLink)
+	    StringBuilder geneSnpPageBuf = new StringBuilder()
+	    try {
+		if (isByPatient) {
+		    igvService.getIgvDataByPatient(subjectIds1, subjectIds2, chroms, igvFiles)
+		}
+		else {
+		    igvService.getIgvDataByProbe(subjectIds1, subjectIds2, geneSearchIdList, geneNameList, snpNameList, igvFiles, geneSnpPageBuf)
+		}
+	    }
+	    catch (Exception e) {
+		logger.error e.message, e
+		result.put('error', e.message)
+		return
+	    }
 
-                            }
-                    }
+	    JobResult[] jresult
 
-            //If we didn't find any patients, send a message to the output stream.
-            if (!foundPatients) {
-                result.put('error', 'No subject was selected')
-                response.outputStream << result.toString()
-                return
-            }
+	    try {
+		jresult = genePatternService.igvViewer(igvFiles, null, null,
+						       securityService.currentUsername())
+	    }
+	    catch (WebServiceException e) {
+		logger.error e.message, e
+		result.put('error', 'WebServiceException: ' + e.message)
+		return
+	    }
 
-            //This will decide whether we retrieve SNP data by patient or by probe.
-            boolean isByPatient = true
+	    String viewerURL
+	    String altviewerURL
 
-            //Parse the gene list passed to this action to get the actual list of genes.
-            List<Long> geneSearchIdList = new ArrayList<Long>()
-            List<String> geneNameList = new ArrayList<String>()
-            List<String> snpNameList = null
+	    try {
+		result.put('jobNumber', jresult[1].getJobNumber())
+		viewerURL = genePatternUrl +
+		    '/gp/jobResults/' +
+		    jresult[1].getJobNumber() +
+		    '?openVisualizers=true'
+		logger.debug 'URL for viewer: {}', viewerURL
+		result.put('viewerURL', viewerURL)
 
-            if (genes != null && genes.length() != 0) {
-                getGeneSearchIdListFromRequest(genes, geneAndIdListStr, geneSearchIdList, geneNameList)
-            }
+		result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
 
-            //Convert the string of snps into an ArrayList.
-            if (snps != null && snps.length() != 0) {
-                snpNameList = new ArrayList<String>()
-                String[] snpNameArray = snps.split(',')
-                for (String snpName : snpNameArray) {
-                    snpNameList.add(snpName.trim())
-                }
-            }
-
-            //If the gene list is not empty or the snp list is not empty, we don't retrieve by patient, we retrieve by probe.
-            if ((geneSearchIdList != null && geneSearchIdList.size() != 0) || (snpNameList != null && snpNameList.size() != 0)) {
-                isByPatient = false
-            }
-
-            //These are the files we write the SNP data to.
-            SnpViewerFiles snpFiles = new SnpViewerFiles()
-
-            //A page is used to display the items the user selected? I think? This buffer holds a page, it gets filled in during a helper method call within the SNP service.
-            StringBuffer geneSnpPageBuf = new StringBuffer()
-
-            try {
-                if (isByPatient)
-                    snpService.getSNPViewerDataByPatient(patientNumList as List<Long>[], chroms, snpFiles)
-                else {
-                    snpService.getSNPViewerDataByProbe(patientNumList as List<Long>[], geneSearchIdList, geneNameList, snpNameList, snpFiles, geneSnpPageBuf)
-                }
-            }
-            catch (Exception e) {
-                result.put('error', e.getMessage())
-                return
-            }
-
-            JobResult[] jresult
-
-            try {
-                jresult = genePatternService.snpViewer(snpFiles.getDataFile(), snpFiles.getSampleFile())
-            }
-            catch (WebServiceException e) {
-                result.put('error', 'WebServiceException: ' + e.getMessage())
-                return
-            }
-
-            String viewerURL
-            String altviewerURL
-
-            try {
-                result.put('jobNumber', jresult[1].getJobNumber())
-                viewerURL =
-                        grailsApplication.config.com.recomdata.datasetExplorer.genePatternURL +
-                                '/gp/jobResults/' +
-                                jresult[1].getJobNumber() +
-                                '?openVisualizers=true'
-                logger.debug('URL for viewer: ' + viewerURL)
-                result.put('viewerURL', viewerURL)
-
-                result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
-
-                logger.debug('result: ' + result)
-            }
-            catch (JSONException e) {
-                logger.error('JSON Exception: ' + e.getMessage())
-                result.put('error', 'JSON Exception: ' + e.getMessage())
-            }
-        }
-        finally {
-            session['workflowstatus'].result = result
-            session['workflowstatus'].setCompleted()
-        }
+		logger.debug 'result: {}', result
+	    }
+	    catch (JSONException e) {
+		logger.error 'JSON Exception: {}', e.message
+		result.put('error', 'JSON Exception: ' + e.message)
+	    }
+	}
+	finally {
+	    wfstatus.result = result
+	    wfstatus.setCompleted()
+	}
     }
 
-    def showIgv = {
-        JSONObject result = new JSONObject()
+    def showIgvSample(String genes, String geneAndIdList, String snps, String chroms) {
+	JSONObject result = new JSONObject()
 
-        def wfstatus = new WorkflowStatus()
-        session['workflowstatus'] = wfstatus
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Initializing Workflow', status: 'C'))
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Retrieving Data', status: 'R'))
-        session['workflowstatus'].addNewJob('ConvertLineEndings')
-        session['workflowstatus'].addNewJob('IGV')
+	WorkflowStatus wfstatus = initWorkflowStatus('IGV')
 
+	try {
+	    logger.debug 'Received IGV rendering request: {}', request
 
-        try {
-            logger.debug('Received IGV rendering request: ' + request)
+	    //The JSON we received should be [1:[category:[]]]
+	    def subsetListJSON = request.JSON.SearchJSON
 
-            String resultInstanceID1 = request.getParameter('result_instance_id1')
-            logger.debug('\tresultInstanceID1: ' + resultInstanceID1)
-            String resultInstanceID2 = request.getParameter('result_instance_id2')
-            logger.debug('\tresultInstanceID2: ' + resultInstanceID2)
+	    //We need to get an ID list per subset. Build the subset from the JSON Data.
+	    def subsetList = solrService.buildSubsetList(subsetListJSON)
 
-            String chroms = request.getParameter('chroms')
-            if (chroms == null || chroms.trim().length() == 0) chroms = 'ALL'
+	    chroms = chroms ?: 'ALL'
 
-            String genes = request.getParameter('genes')
-            String geneAndIdListStr = request.getParameter('geneAndIdList')
-            String snps = request.getParameter('snps')
+//			accessLogService.report 'DatasetExplorer-ShowIgv',
+//					'RID1:' + resultInstanceID1 + ' RID2:' + resultInstanceID2
 
-            if (resultInstanceID1 == 'undefined' || resultInstanceID1 == 'null' || resultInstanceID1 == '') {
-                logger.debug '\tresultInstanceID1 == undefined or null'
-                resultInstanceID1 = null
-            }
-            if (resultInstanceID2 == 'undefined' || resultInstanceID2 == 'null' || resultInstanceID2 == '') {
-                logger.debug '\tresultInstanceID2 == undefined or null'
-                resultInstanceID2 = null
-            }
+	    //Gather subjects from Sample IDs.
+	    //Form a list of lists of longs. We will convert the outside list to an array in a later method.
+	    List<List<Long>> patientNumList
 
-            def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'DatasetExplorer-ShowIgv', eventmessage: 'RID1:' + resultInstanceID1 + ' RID2:' + resultInstanceID2, accesstime: new java.util.Date())
-            al.save()
+	    //We will use this to determine if our queries return ANY patients.
+	    boolean foundPatients = false
+	    boolean foundSNPData = false
 
-            String subjectIds1 = i2b2HelperService.getSubjects(resultInstanceID1)
-            String subjectIds2 = i2b2HelperService.getSubjects(resultInstanceID2)
+	    //For each subset get a list of subjects.
+	    for (subsetItem in subsetList) {
 
-            if ((subjectIds1 == null || subjectIds1.length() == 0) &&
-                    (subjectIds2 == null || subjectIds2.length() == 0)) {
-                result.put('error', 'No subject was selected')
-                return
-            }
+		def subsetSampleList = subsetItem.value
 
-            def snpDatasetNum_1 = 0, snpDatasetNum_2 = 0
-            if (resultInstanceID1 != null && resultInstanceID1.trim().length() != 0) {
-                List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds1)
-                if (idList != null) snpDatasetNum_1 = idList.size()
-            }
-            if (resultInstanceID2 != null && resultInstanceID2.trim().length() != 0) {
-                List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds2)
-                if (idList != null) snpDatasetNum_2 = idList.size()
-            }
-            if (snpDatasetNum_1 == 0 && snpDatasetNum_2 == 0) {
-                result.put('error', 'No SNP dataset was selected')
-                return
-            }
+		//Don't add a subset if there are no items in the subset.
+		if (subsetSampleList) {
+		    //Add the list to the list of lists.
+		    List<Long> tempPatientList = i2b2HelperService.getSubjectsAsListFromSampleLong(subsetSampleList)
 
-            boolean isByPatient = true
-            List<Long> geneSearchIdList = new ArrayList<Long>()
-            List<String> geneNameList = new ArrayList<String>()
-            if (genes != null && genes.length() != 0) {
-                getGeneSearchIdListFromRequest(genes, geneAndIdListStr, geneSearchIdList, geneNameList)
-            }
-            List<String> snpNameList = null
-            if (snps != null && snps.length() != 0) {
-                snpNameList = new ArrayList<String>()
-                String[] snpNameArray = snps.split(',')
-                for (String snpName : snpNameArray) {
-                    snpNameList.add(snpName.trim())
-                }
-            }
-            if ((geneSearchIdList != null && geneSearchIdList.size() != 0) ||
-                    (snpNameList != null && snpNameList.size() != 0)) {
-                isByPatient = false
-            }
+		    //If we found patients, add them to the list and set our boolean to indicate we found some.
+		    if (tempPatientList) {
+			foundPatients = true
+			patientNumList.add(tempPatientList)
+		    }
 
-            String newIGVLink = new ApplicationTagLib().createLink(controller: 'analysis', action: 'getGenePatternFile', absolute: true)
+		    //TODO: This needs to be a string.
+		    List<Long> idList = i2b2HelperService.getSNPDatasetIdList(tempPatientList)
+		    if (idList) {
+			foundSNPData = true
+		    }
+		}
+	    }
 
-            IgvFiles igvFiles = new IgvFiles(getGenePatternFileDirName(), newIGVLink)
-            StringBuffer geneSnpPageBuf = new StringBuffer()
-            try {
-                if (isByPatient)
-                    igvService.getIgvDataByPatient(subjectIds1, subjectIds2, chroms, igvFiles)
-                else {
-                    igvService.getIgvDataByProbe(subjectIds1, subjectIds2, geneSearchIdList, geneNameList, snpNameList, igvFiles, geneSnpPageBuf)
-                }
-            }
-            catch (Exception e) {
-                logger.error(e.getMessage(), e)
-                result.put('error', e.getMessage())
-                return
-            }
+	    //If we didn't find SNP data, add an error message to the results.
+	    if (!foundSNPData) {
+		result.put('error', 'No SNP dataset was selected')
+		return
+	    }
 
-            JobResult[] jresult
+	    //If we didn't find any patients, send a message to the output stream.
+	    if (!foundPatients) {
+		result.put('error', 'No subject was selected')
+		response.outputStream << result.toString()
+		return
+	    }
 
-            try {
-                String userName = springSecurityService.getPrincipal().username
-                jresult = genePatternService.igvViewer(igvFiles, null, null, userName)
-            }
-            catch (WebServiceException e) {
-                logger.error(e.getMessage(), e)
-                result.put('error', 'WebServiceException: ' + e.getMessage())
-                return
-            }
+	    List<Long> geneSearchIdList = []
+	    List<String> geneNameList = []
+	    if (genes) {
+		getGeneSearchIdListFromRequest(genes, geneAndIdList, geneSearchIdList, geneNameList)
+	    }
+	    List<String> snpNameList = null
+	    if (snps) {
+		snpNameList = snps.split(',')*.trim()
+	    }
 
-            String viewerURL
-            String altviewerURL
+	    boolean isByPatient = !geneSearchIdList && !snpNameList
 
-            try {
-                result.put('jobNumber', jresult[1].getJobNumber())
-                viewerURL =
-                        grailsApplication.config.com.recomdata.datasetExplorer.genePatternURL +
-                                '/gp/jobResults/' +
-                                jresult[1].getJobNumber() +
-                                '?openVisualizers=true'
-                logger.debug('URL for viewer: ' + viewerURL)
-                result.put('viewerURL', viewerURL)
+	    String newIGVLink = createLink(controller: 'analysis', action: 'getGenePatternFile', absolute: true)
 
-                result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
+	    IgvFiles igvFiles = new IgvFiles(getGenePatternFileDirName(), newIGVLink)
+	    StringBuilder geneSnpPageBuf = new StringBuilder()
+	    try {
+		if (isByPatient) {
+		    igvService.getIgvDataByPatientSample(patientNumList as List<Long>[], chroms, igvFiles)
+		}
+		else {
+		    igvService.getIgvDataByProbeSample(patientNumList as List<Long>[], geneSearchIdList, geneNameList, snpNameList, igvFiles, geneSnpPageBuf)
+		}
+	    }
+	    catch (Exception e) {
+		result.put('error', e.message)
+		return
+	    }
 
-                logger.debug('result: ' + result)
-            }
-            catch (JSONException e) {
-                logger.error('JSON Exception: ' + e.getMessage())
-                result.put('error', 'JSON Exception: ' + e.getMessage())
-            }
-        }
-        finally {
-            session['workflowstatus'].result = result
-            session['workflowstatus'].setCompleted()
-        }
+	    JobResult[] jresult
+
+	    try {
+		jresult = genePatternService.igvViewer(igvFiles, null, null,
+						       securityService.currentUsername())
+	    }
+	    catch (WebServiceException e) {
+		result.put('error', 'WebServiceException: ' + e.message)
+		return
+	    }
+
+	    String viewerURL
+	    String altviewerURL
+
+	    try {
+		result.put('jobNumber', jresult[1].getJobNumber())
+		viewerURL = genePatternUrl +
+		    '/gp/jobResults/' +
+		    jresult[1].getJobNumber() +
+		    '?openVisualizers=true'
+		logger.debug 'URL for viewer: {}', viewerURL
+		result.put('viewerURL', viewerURL)
+
+		result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
+
+		logger.debug 'result: {}', result
+	    }
+	    catch (JSONException e) {
+		logger.error 'JSON Exception: {}', e.message
+		result.put('error', 'JSON Exception: ' + e.message)
+	    }
+	}
+	finally {
+	    wfstatus.result = result
+	    wfstatus.setCompleted()
+	}
     }
 
-    def showIgvSample = {
-        JSONObject result = new JSONObject()
+    def showPlink(String result_instance_id1, String result_instance_id2, String chroms) {
+	JSONObject result = new JSONObject()
 
-        def wfstatus = new WorkflowStatus()
-        session['workflowstatus'] = wfstatus
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Initializing Workflow', status: 'C'))
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Retrieving Data', status: 'R'))
-        session['workflowstatus'].addNewJob('ConvertLineEndings')
-        session['workflowstatus'].addNewJob('IGV')
+	WorkflowStatus wfstatus = initWorkflowStatus('PLINK')
 
+	try {
+	    logger.debug 'Received PLINK rendering request: {}', request
 
-        try {
-            logger.debug('Received IGV rendering request: ' + request)
+	    logger.debug '\tresult_instance_id1: {}', result_instance_id1
+	    logger.debug '\tresult_instance_id2: {}', result_instance_id2
 
-            String genes = request.getParameter('genes')
-            String geneAndIdListStr = request.getParameter('geneAndIdList')
-            String snps = request.getParameter('snps')
+	    chroms = chroms ?: 'ALL'
 
-            //The JSON we received should be [1:[category:[]]]
-            def subsetListJSON = request.JSON.SearchJSON
+	    List<String> conceptCodeList1
+	    if (!hasValue(result_instance_id1)) {
+		logger.debug '\tresult_instance_id2 == undefined or null'
+		result_instance_id1 = null
+	    }
+	    else {
+		conceptCodeList1 = i2b2HelperService.getConceptsAsList(result_instance_id1)
+	    }
 
-            //We need to get an ID list per subset. Build the subset from the JSON Data.
-            def subsetList = solrService.buildSubsetList(subsetListJSON)
+	    List<String> conceptCodeList2
+	    if (!hasValue(result_instance_id2)) {
+		logger.debug '\tresult_instance_id2 == undefined or null'
+		result_instance_id2 = null
+	    }
+	    else {
+		conceptCodeList2 = i2b2HelperService.getConceptsAsList(result_instance_id2)
+	    }
 
-            String chroms = request.getParameter('chroms')
-            if (chroms == null || chroms.trim().length() == 0) chroms = 'ALL'
+	    String subjectIds1 = i2b2HelperService.getSubjects(result_instance_id1)
+	    String subjectIds2 = i2b2HelperService.getSubjects(result_instance_id2)
 
-            def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'DatasetExplorer-ShowIgv', eventmessage: 'RID1:' + resultInstanceID1 + ' RID2:' + resultInstanceID2, accesstime: new java.util.Date())
-            al.save()
+	    accessLogService.report 'DatasetExplorer-ShowPlink',
+		'RID1:' + result_instance_id1 + ' RID2:' + result_instance_id2
 
-            //Gather subjects from Sample IDs.
-            //Form a list of lists of longs. We will convert the outside list to an array in a later method.
-            List<List<Long>> patientNumList
+	    if (!subjectIds1 || !subjectIds2) {
+		result.put('error', 'No subject was selected')
+		return
+	    }
 
-            //We will use this to determine if our queries return ANY patients.
-            boolean foundPatients = false
-            boolean foundSNPData = false
+	    PlinkFiles plinkFiles = new PlinkFiles()
 
-            //For each subset get a list of subjects.
-            subsetList.each {
-                        subsetItem ->
+	    plinkService.getMapDataByChromosome(subjectIds1, chroms, plinkFiles.mapFile)
 
-                            def subsetSampleList = subsetItem.value
+	    // set the subset1 as 'unaffected' or 'control' and the subset2 as 'affected' or 'case'
+	    plinkService.getSnpDataBySujectChromosome(subjectIds1, chroms, plinkFiles.pedFile, conceptCodeList1, '1')
+	    plinkService.getSnpDataBySujectChromosome(subjectIds2, chroms, plinkFiles.pedFile, conceptCodeList2, '2')
 
-                            //Don't add a subset if there are no items in the subset.
-                            if (subsetSampleList.size() > 0) {
-                                //Add the list to the list of lists.
-                                List<Long> tempPatientList = i2b2HelperService.getSubjectsAsListFromSampleLong(subsetSampleList)
+	    String viewerUrl
 
-                                //If we found patients, add them to the list and set our boolean to indicate we found some.
-                                if (tempPatientList.size() > 0) {
-                                    foundPatients = true
-                                    patientNumList.add(tempPatientList)
-                                }
-
-                                //TODO: This needs to be a string.
-                                List<Long> idList = i2b2HelperService.getSNPDatasetIdList(tempPatientList)
-                                if (idList != null && idList.size() > 0) foundSNPData = true
-
-                            }
-                    }
-
-            //If we didn't find SNP data, add an error message to the results.
-            if (!foundSNPData) {
-                result.put('error', 'No SNP dataset was selected')
-                return
-            }
-
-            //If we didn't find any patients, send a message to the output stream.
-            if (!foundPatients) {
-                result.put('error', 'No subject was selected')
-                response.outputStream << result.toString()
-                return
-            }
-
-
-            boolean isByPatient = true
-            List<Long> geneSearchIdList = new ArrayList<Long>()
-            List<String> geneNameList = new ArrayList<String>()
-            if (genes != null && genes.length() != 0) {
-                getGeneSearchIdListFromRequest(genes, geneAndIdListStr, geneSearchIdList, geneNameList)
-            }
-            List<String> snpNameList = null
-            if (snps != null && snps.length() != 0) {
-                snpNameList = new ArrayList<String>()
-                String[] snpNameArray = snps.split(',')
-                for (String snpName : snpNameArray) {
-                    snpNameList.add(snpName.trim())
-                }
-            }
-            if ((geneSearchIdList != null && geneSearchIdList.size() != 0) ||
-                    (snpNameList != null && snpNameList.size() != 0)) {
-                isByPatient = false
-            }
-
-            String newIGVLink = new ApplicationTagLib().createLink(controller: 'analysis', action: 'getGenePatternFile', absolute: true)
-
-            IgvFiles igvFiles = new IgvFiles(getGenePatternFileDirName(), newIGVLink)
-            StringBuffer geneSnpPageBuf = new StringBuffer()
-            try {
-                if (isByPatient)
-                    igvService.getIgvDataByPatientSample(patientNumList as List<Long>[], chroms, igvFiles)
-                else {
-                    igvService.getIgvDataByProbeSample(patientNumList as List<Long>[], geneSearchIdList, geneNameList, snpNameList, igvFiles, geneSnpPageBuf)
-                }
-            }
-            catch (Exception e) {
-                result.put('error', e.getMessage())
-                return
-            }
-
-            JobResult[] jresult
-
-            try {
-                String userName = springSecurityService.getPrincipal().username
-                jresult = genePatternService.igvViewer(igvFiles, null, null, userName)
-            }
-            catch (WebServiceException e) {
-                result.put('error', 'WebServiceException: ' + e.getMessage())
-                return
-            }
-
-            String viewerURL
-            String altviewerURL
-
-            try {
-                result.put('jobNumber', jresult[1].getJobNumber())
-                viewerURL =
-                        grailsApplication.config.com.recomdata.datasetExplorer.genePatternURL +
-                                '/gp/jobResults/' +
-                                jresult[1].getJobNumber() +
-                                '?openVisualizers=true'
-                logger.debug('URL for viewer: ' + viewerURL)
-                result.put('viewerURL', viewerURL)
-
-                result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
-
-                logger.debug('result: ' + result)
-            }
-            catch (JSONException e) {
-                logger.error('JSON Exception: ' + e.getMessage())
-                result.put('error', 'JSON Exception: ' + e.getMessage())
-            }
-        }
-        finally {
-            session['workflowstatus'].result = result
-            session['workflowstatus'].setCompleted()
-        }
+	    try {
+		logger.debug 'URL for viewer: {}', viewerUrl
+		result.put('viewerURL', viewerUrl)
+//		result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
+		logger.debug 'result: {}', result
+	    }
+	    catch (JSONException e) {
+		logger.error 'JSON Exception: {}', e.message
+		result.put('error', 'JSON Exception: ' + e.message)
+	    }
+	}
+	finally {
+	    wfstatus.result = result
+	    wfstatus.setCompleted()
+	}
     }
 
-
-    def showPlink = {
-        JSONObject result = new JSONObject()
-
-        def wfstatus = new WorkflowStatus()
-        session['workflowstatus'] = wfstatus
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Initializing Workflow', status: 'C'))
-        session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'Retrieving Data', status: 'R'))
-        session['workflowstatus'].addNewJob('ConvertLineEndings')
-        session['workflowstatus'].addNewJob('PLINK')
-
-        try {
-            logger.debug('Received PLINK rendering request: ' + request)
-
-            String resultInstanceID1 = request.getParameter('result_instance_id1')
-            logger.debug('\tresultInstanceID1: ' + resultInstanceID1)
-            String resultInstanceID2 = request.getParameter('result_instance_id2')
-            logger.debug('\tresultInstanceID2: ' + resultInstanceID2)
-
-            String chroms = request.getParameter('chroms')
-            if (chroms == null || chroms.trim().length() == 0) chroms = 'ALL'
-
-            /*
-            String genes = request.getParameter('genes')
-            String geneAndIdListStr = request.getParameter('geneAndIdList')
-            String snps = request.getParameter('snps')
-            */
-
-            List<String> conceptCodeList1
-            List<String> conceptCodeList2
-
-            if (resultInstanceID1 == 'undefined' || resultInstanceID1 == 'null' || resultInstanceID1 == '') {
-                logger.debug '\tresultInstanceID1 == undefined or null'
-                resultInstanceID1 = null
-            }
-            else {
-                conceptCodeList1 = i2b2HelperService.getConceptsAsList(resultInstanceID1)
-            }
-
-            if (resultInstanceID2 == 'undefined' || resultInstanceID2 == 'null' || resultInstanceID2 == '') {
-                logger.debug '\tresultInstanceID2 == undefined or null'
-                resultInstanceID2 = null
-            }
-            else {
-                conceptCodeList2 = i2b2HelperService.getConceptsAsList(resultInstanceID2)
-            }
-
-            String subjectIds1 = i2b2HelperService.getSubjects(resultInstanceID1)
-            String subjectIds2 = i2b2HelperService.getSubjects(resultInstanceID2)
-
-            def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'DatasetExplorer-ShowPlink', eventmessage: 'RID1:' + resultInstanceID1 + ' RID2:' + resultInstanceID2, accesstime: new java.util.Date())
-            al.save()
-
-            if ((subjectIds1 == null || subjectIds1.length() == 0) ||
-                    (subjectIds2 == null || subjectIds2.length() == 0)) {
-                result.put('error', 'No subject was selected')
-                return
-            }
-
-            /*
-            boolean isByPatient = true
-            List<Long> geneSearchIdList = null
-            if (genes != null && genes.length() != 0) {
-                geneSearchIdList = getGeneSearchIdListFromRequest(genes, geneAndIdListStr)
-            }
-
-            List<String> snpNameList = null
-            if (snps != null && snps.length() != 0) {
-                snpNameList = new ArrayList<String>()
-                String[] snpNameArray = snps.split(',')
-                for (String snpName : snpNameArray) {
-                    snpNameList.add(snpName.trim())
-                }
-            }
-
-            if ((geneSearchIdList != null && geneSearchIdList.size() != 0) ||
-                (snpNameList != null && snpNameList.size() != 0)) {
-                isByPatient = false
-            }
-            */
-
-            PlinkFiles plinkFiles = new PlinkFiles()
-            File mapFile = plinkFiles.getMapFile()
-            File pedFile = plinkFiles.getPedFile()
-
-            plinkService.getMapDataByChromosome(subjectIds1, chroms, mapFile)
-
-            // set the subset1 as 'unaffected' or 'control' and the subset2 as 'affected' or 'case'
-            plinkService.getSnpDataBySujectChromosome(subjectIds1, chroms, pedFile, conceptCodeList1, '1')
-            plinkService.getSnpDataBySujectChromosome(subjectIds2, chroms, pedFile, conceptCodeList2, '2')
-
-            /*JobResult[] jresult
-
-            try {
-                String userName = springSecurityService.getPrincipal().username
-                jresult = genePatternService.PLINK(pedFile, mapFile)
-            }
-            catch (WebServiceException e) {
-                result.put('error', 'WebServiceException: ' + e.getMessage())
-                return
-            }*/
-
-            String viewerURL
-            String altviewerURL
-
-            try {
-                /*result.put('jobNumber', jresult[1].getJobNumber())
-                viewerURL = grailsApplication.config.com.recomdata.datasetExplorer.genePatternURL +
-                            '/gp/jobResults/' +
-                            jresult[1].getJobNumber() +
-                            '?openVisualizers=true';*/
-                logger.debug('URL for viewer: ' + viewerURL)
-                result.put('viewerURL', viewerURL)
-
-                result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
-
-                logger.debug('result: ' + result)
-            }
-            catch (JSONException e) {
-                logger.error('JSON Exception: ' + e.getMessage())
-                result.put('error', 'JSON Exception: ' + e.getMessage())
-            }
-
-        }
-        finally {
-            session['workflowstatus'].result = result
-            session['workflowstatus'].setCompleted()
-        }
-
-    }
-
-/**
- * This function parse the ','-separated gene string like 'Gene>MET', and return a list of gene search ID and a list of matching gene names.
- */
-
-    public static String geneInputPrefix = 'Gene>'
-
+    //This function parses the ','-separated gene strings like 'Gene>MET', and returns a list of gene search IDs and a list of matching gene names.
     void getGeneSearchIdListFromRequest(String genes, String geneAndIdListStr, List<Long> geneSearchIdList, List<String> geneNameList) {
-        if (genes == null || genes.length() == 0 || geneAndIdListStr == null || geneAndIdListStr.length() == 0 ||
-                geneSearchIdList == null || geneNameList == null)
-            return
-        Map<String, Long> geneIdMap = new HashMap<String, Long>()
-        String[] geneAndIdList = geneAndIdListStr.split('\\|\\|\\|')
-        for (String geneAndIdStr : geneAndIdList) {
-            String[] geneIdPair = geneAndIdStr.split('\\|\\|')
-            geneIdMap.put(geneIdPair[0].trim(), new Long(geneIdPair[1].trim()))
-        }
-        String[] geneValues = genes.split(',')
-        for (String geneStr : geneValues) {
-            geneStr = geneStr.trim()
-            Long geneId = geneIdMap.get(geneStr.trim())
-            geneSearchIdList.add(geneId)
-            if (geneStr.startsWith(geneInputPrefix))
-                geneStr = geneStr.substring(geneInputPrefix.length())
-            geneNameList.add(geneStr.trim())
-        }
+	if (!genes || !geneAndIdListStr || !geneSearchIdList || !geneNameList) {
+	    return
+	}
+
+	Map<String, Long> geneIdMap = [:]
+	String[] geneAndIdList = geneAndIdListStr.split('\\|\\|\\|')
+	for (String geneAndIdStr : geneAndIdList) {
+	    String[] geneIdPair = geneAndIdStr.split('\\|\\|')
+	    geneIdMap[geneIdPair[0].trim()] = Long.valueOf(geneIdPair[1].trim())
+	}
+	String[] geneValues = genes.split(',')
+	for (String geneStr : geneValues) {
+	    geneStr = geneStr.trim()
+	    Long geneId = geneIdMap.get(geneStr.trim())
+	    geneSearchIdList.add(geneId)
+	    if (geneStr.startsWith(geneInputPrefix)) {
+		geneStr = geneStr.substring(geneInputPrefix.length())
+	    }
+	    geneNameList.add(geneStr.trim())
+	}
     }
 
-    def showHaploviewGeneSelector = {
-        //logger.debug('called test happleview')
-        String resultInstanceID1 = request.getParameter('result_instance_id1')
-        //logger.debug(resultInstanceID1)
-        String resultInstanceID2 = request.getParameter('result_instance_id2')
-        //logger.debug('*'+resultInstanceID2+'*')
-        def genes1
-        def genes2
-        if (resultInstanceID1 != null && resultInstanceID1 != '') {
-            genes1 = i2b2HelperService.getGenesForHaploviewFromResultInstanceId(resultInstanceID1)
-        }
-        if (resultInstanceID2 != null && resultInstanceID2 != '') {
-            genes2 = i2b2HelperService.getGenesForHaploviewFromResultInstanceId(resultInstanceID2)
-        }
-        def combined = [:]
-        genes1.each { gene -> combined.put(gene, 'gene')
-        }
-        genes2.each { gene -> combined.put(gene, 'gene')
-        }
-        def genes = combined.keySet()
-        genes.sort()
-        render(template: 'haploviewGeneSelector', model: [genes: genes])
+    def showHaploviewGeneSelector(String result_instance_id1, String result_instance_id2) {
+	Set<String> combined = []
+	if (result_instance_id1) {
+	    combined.addAll i2b2HelperService.getGenesForHaploviewFromResultInstanceId(result_instance_id1)
+	}
+	if (result_instance_id2) {
+	    combined.addAll i2b2HelperService.getGenesForHaploviewFromResultInstanceId(result_instance_id2)
+	}
+	render template: 'haploviewGeneSelector', model: [genes: combined.sort()]
     }
 
-//Use the search JSON to get the list of samples. Find the Genes associated with those samples.
-    def showHaploviewGeneSelectorSample = {
+    //Use the search JSON to get the list of samples. Find the Genes associated with those samples.
+    def showHaploviewGeneSelectorSample() {
 
-        //We need to first retrieve the list of Sample ID's for the dataset we have selected.
-        //Grab the URL of the solr server.
-        String solrURL = grailsApplication.config.com.recomdata.solr.baseURL
-        //Grab the string for the maximum number of result rows to return.
-        String solrMaxRows = grailsApplication.config.com.recomdata.solr.maxRows
+	//We need to first retrieve the list of Sample ID's for the dataset we have selected.
 
-        //Get the list of Sample ID's based on the criteria in the JSON object.
-        //We need to get an ID list per subset. The JSON we received should be [1:[category:[]]]
-        def subsetList = request.JSON.SearchJSON
+	//Get the list of Sample ID's based on the criteria in the JSON object.
+	//We need to get an ID list per subset. The JSON we received should be [1:[category:[]]]
+	def subsetList = request.JSON.SearchJSON
 
-        //Build the subset from the JSON Data.
-        def result = solrService.buildSubsetList(solrURL, solrMaxRows, subsetList)
+	//Build the subset from the JSON Data.
+	def result = solrService.buildSubsetList(solrUrl, solrMaxRows, subsetList)
 
-        //We use this map to get a list of distinct genes.
-        def genes = analysisService.getGenesForHaploviewFromSampleId(result)
-
-        //Sort the list of genes.
-        genes = genes.keySet()
-        genes.sort()
-
-        render(template: 'haploviewGeneSelector', model: [genes: genes])
+	render template: 'haploviewGeneSelector', model: [
+	    genes: analysisService.getGenesForHaploviewFromSampleId(result)]
     }
 
-    def showSNPViewerSelection = {
-        String resultInstanceID1 = request.getParameter('result_instance_id1')
-        String resultInstanceID2 = request.getParameter('result_instance_id2')
+    def showSNPViewerSelection(String result_instance_id1, String result_instance_id2) {
+	int snpDatasetNum1 = 0
+	if (result_instance_id1) {
+	    String subjectIds1 = i2b2HelperService.getSubjects(result_instance_id1)
+	    List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds1)
+	    if (idList) {
+		snpDatasetNum1 = idList.size()
+	    }
+	}
 
-        def snpDatasetNum_1 = 0, snpDatasetNum_2 = 0
-        if (resultInstanceID1 != null && resultInstanceID1.trim().length() != 0) {
-            String subjectIds1 = i2b2HelperService.getSubjects(resultInstanceID1)
-            List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds1)
-            if (idList != null) snpDatasetNum_1 = idList.size()
-        }
-        if (resultInstanceID2 != null && resultInstanceID2.trim().length() != 0) {
-            String subjectIds2 = i2b2HelperService.getSubjects(resultInstanceID2)
-            List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds2)
-            if (idList != null) snpDatasetNum_2 = idList.size()
-        }
+	int snpDatasetNum2 = 0
+	if (result_instance_id2) {
+	    String subjectIds2 = i2b2HelperService.getSubjects(result_instance_id2)
+	    List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds2)
+	    if (idList) {
+		snpDatasetNum2 = idList.size()
+	    }
+	}
 
-        String warningMsg = null
-        if (snpDatasetNum_1 + snpDatasetNum_2 > 10) {
-            warningMsg = 'Note: The performance may be slow with more than 10 SNP datasets. Please consider displaying individual chromosomes.'
-        }
-        def chroms = ['ALL', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
-        [chroms: chroms, snpDatasetNum_1: snpDatasetNum_1, snpDatasetNum_2: snpDatasetNum_2, warningMsg: warningMsg, chromDefault: 'ALL']
+	String warningMsg = null
+	if (snpDatasetNum1 + snpDatasetNum2 > 10) {
+	    warningMsg = 'Note: The performance may be slow with more than 10 SNP datasets. Please consider displaying individual chromosomes.'
+	}
+	
+	[chroms: chroms, snpDatasetNum_1: snpDatasetNum1, snpDatasetNum_2: snpDatasetNum2, warningMsg: warningMsg, chromDefault: 'ALL']
     }
 
-//Get the data for the display elements in the SNP selection window.
-    def showSNPViewerSelectionSample = {
+    //Get the data for the display elements in the SNP selection window.
+    def showSNPViewerSelectionSample() {
 
-        //We need to first retrieve the list of Sample ID's for the dataset we have selected.
-        //Grab the URL of the solr server.
-        String solrURL = grailsApplication.config.com.recomdata.solr.baseURL
-        //Grab the string for the maximum number of result rows to return.
-        String solrMaxRows = grailsApplication.config.com.recomdata.solr.maxRows
+	//We need to first retrieve the list of Sample ID's for the dataset we have selected.
 
-        //Get the list of Sample ID's based on the criteria in the JSON object.
-        //We need to get an ID list per subset. The JSON we received should be [1:[category:[]]]
-        def subsetList = request.JSON.SearchJSON
+	//Get the list of Sample ID's based on the criteria in the JSON object.
+	//We need to get an ID list per subset. The JSON we received should be [1:[category:[]]]
+	def subsetList = request.JSON.SearchJSON
 
-        //Build the subset from the JSON Data.
-        def result = solrService.buildSubsetList(solrURL, solrMaxRows, subsetList)
+	//Build the subset from the JSON Data.
+	def result = solrService.buildSubsetList(solrUrl, solrMaxRows, subsetList)
 
-        //We need to show the users a count of how many datasets exist for each subset. As we gather the lists, stash the count in a hashmap.
-        def datasetCount = [:]
+	//We need to show the users a count of how many datasets exist for each subset. As we gather the lists, stash the count in a map.
+	def datasetCount = [:]
 
-        //Keep track of the total number of datasets so we can warn the user if > 10 datasets are available.
-        int datasetCounter = 0
+	//Keep track of the total number of datasets so we can warn the user if > 10 datasets are available.
+	int datasetCounter = 0
 
-        //For each subset we need to get a list of the Dataset Ids.
-        result.each {
-                    subsetItem ->
+	//For each subset we need to get a list of the Dataset Ids.
+	for (subsetItem in result) {
 
-                        def subsetSampleList = subsetItem.value
+	    def subsetSampleList = subsetItem.value
 
-                        //Verify we have samples in this subset.
-                        if (subsetSampleList.size() > 0) {
+	    //Verify we have samples in this subset.
+	    if (subsetSampleList) {
 
-                            //Get the list of subjects from the subject sample mapping table based on Sample_ID
-                            String subjectIds = i2b2HelperServer.getSubjectsAsListFromSample(subsetItem.value)
+		//Get the list of subjects from the subject sample mapping table based on Sample_ID
+		String subjectIds = i2b2HelperServer.getSubjectsAsListFromSample(subsetItem.value)
 
-                            //Use the list of subjects to get the dataset ID List.
-                            List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds)
+		//Use the list of subjects to get the dataset ID List.
+		List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds)
 
-                            //Make sure we retrieved Data Set Ids.
-                            if (idList != null) {
-                                //Put the count of dataset items in the hashmap.
-                                datasetCount[subseyItem.key] = idList.size()
+		//Make sure we retrieved Data Set Ids.
+		if (idList != null) {
+		    //Put the count of dataset items in the map.
+		    datasetCount[subseyItem.key] = idList.size()
 
-                                //Add the number of datasets to our total counter.
-                                datasetCounter += idList.size()
-                            }
-                        }
-                }
+		    //Add the number of datasets to our total counter.
+		    datasetCounter += idList.size()
+		}
+	    }
+	}
 
-        //Warn the user if there are over 10 SNP Datasets selected.
-        String warningMsg = null
-        if (datasetCounter > 10) {
-            warningMsg = 'Note: The performance may be slow with more than 10 SNP datasets. Please consider displaying individual chromosomes.'
-        }
+	//Warn the user if there are over 10 SNP Datasets selected.
+	String warningMsg = null
+	if (datasetCounter > 10) {
+	    warningMsg = 'Note: The performance may be slow with more than 10 SNP datasets. Please consider displaying individual chromosomes.'
+	}
 
-        def chroms = ['ALL', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
-
-        //Render the showSNPViewerSelectionSample template.
-        [chroms: chroms, snpDatasets: datasetCount, warningMsg: warningMsg, chromDefault: 'ALL']
+	//Render the showSNPViewerSelectionSample template.
+	[chroms: chroms, snpDatasets: datasetCount, warningMsg: warningMsg, chromDefault: 'ALL']
     }
 
-    def showIgvSelection = {
-        String resultInstanceID1 = request.getParameter('result_instance_id1')
-        String resultInstanceID2 = request.getParameter('result_instance_id2')
+    def showIgvSelection(String result_instance_id1, String result_instance_id2) {
+	int snpDatasetNum1 = 0
+	if (result_instance_id1?.trim()) {
+	    String subjectIds1 = i2b2HelperService.getSubjects(result_instance_id1)
+	    List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds1)
+	    if (idList != null) {
+		snpDatasetNum1 = idList.size()
+	    }
+	}
 
-        def snpDatasetNum_1 = 0, snpDatasetNum_2 = 0
-        if (resultInstanceID1 != null && resultInstanceID1.trim().length() != 0) {
-            String subjectIds1 = i2b2HelperService.getSubjects(resultInstanceID1)
-            List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds1)
-            if (idList != null) snpDatasetNum_1 = idList.size()
-        }
-        if (resultInstanceID2 != null && resultInstanceID2.trim().length() != 0) {
-            String subjectIds2 = i2b2HelperService.getSubjects(resultInstanceID2)
-            List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds2)
-            if (idList != null) snpDatasetNum_2 = idList.size()
-        }
+	int snpDatasetNum2 = 0
+	if (result_instance_id2?.trim()) {
+	    String subjectIds2 = i2b2HelperService.getSubjects(result_instance_id2)
+	    List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds2)
+	    if (idList != null) {
+		snpDatasetNum2 = idList.size()
+	    }
+	}
 
-        String warningMsg = null
-        if (snpDatasetNum_1 + snpDatasetNum_2 > 10) {
-            warningMsg = 'Note: The performance may be slow with more than 10 SNP datasets. Please consider displaying individual chromosomes.'
-        }
-        def chroms = ['ALL', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
-        [chroms: chroms, snpDatasetNum_1: snpDatasetNum_1, snpDatasetNum_2: snpDatasetNum_2, warningMsg: warningMsg, chromDefault: 'ALL']
+	String warningMsg = null
+	if (snpDatasetNum1 + snpDatasetNum2 > 10) {
+	    warningMsg = 'Note: The performance may be slow with more than 10 SNP datasets. Please consider displaying individual chromosomes.'
+	}
+
+	[chroms: chroms, snpDatasetNum_1: snpDatasetNum1, snpDatasetNum_2: snpDatasetNum2, warningMsg: warningMsg, chromDefault: 'ALL']
     }
 
+    def showPlinkSelection(String result_instance_id1, String result_instance_id2) {
+	int snpDatasetNum1 = 0
+	int snpDatasetNum2 = 0
+	if (result_instance_id1?.trim()) {
+	    String subjectIds1 = i2b2HelperService.getSubjects(result_instance_id1)
+	    List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds1)
+	    if (idList != null) {
+		snpDatasetNum1 = idList.size()
+	    }
+	}
+	if (result_instance_id2?.trim()) {
+	    String subjectIds2 = i2b2HelperService.getSubjects(result_instance_id2)
+	    List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds2)
+	    if (idList != null) {
+		snpDatasetNum2 = idList.size()
+	    }
+	}
 
-    def showPlinkSelection = {
-        String resultInstanceID1 = request.getParameter('result_instance_id1')
-        String resultInstanceID2 = request.getParameter('result_instance_id2')
+	String warningMsg = null
+	if (snpDatasetNum1 + snpDatasetNum2 > 10) {
+	    warningMsg = 'Note: The performance may be slow with more than 10 SNP datasets. Please consider displaying individual chromosomes.'
+	}
 
-        def snpDatasetNum_1 = 0, snpDatasetNum_2 = 0
-        if (resultInstanceID1 != null && resultInstanceID1.trim().length() != 0) {
-            String subjectIds1 = i2b2HelperService.getSubjects(resultInstanceID1)
-            List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds1)
-            if (idList != null) snpDatasetNum_1 = idList.size()
-        }
-        if (resultInstanceID2 != null && resultInstanceID2.trim().length() != 0) {
-            String subjectIds2 = i2b2HelperService.getSubjects(resultInstanceID2)
-            List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds2)
-            if (idList != null) snpDatasetNum_2 = idList.size()
-        }
-
-        String warningMsg = null
-        if (snpDatasetNum_1 + snpDatasetNum_2 > 10) {
-            warningMsg = 'Note: The performance may be slow with more than 10 SNP datasets. Please consider displaying individual chromosomes.'
-        }
-        def chroms = ['ALL', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
-        [chroms: chroms, snpDatasetNum_1: snpDatasetNum_1, snpDatasetNum_2: snpDatasetNum_2, warningMsg: warningMsg, chromDefault: 'ALL']
+	[chroms         : chroms,
+	 snpDatasetNum_1: snpDatasetNum1,
+	 snpDatasetNum_2: snpDatasetNum2,
+	 warningMsg     : warningMsg,
+	 chromDefault   : 'ALL']
     }
 
-/**
- * Used to obtain the pathway for biomarker comparison when using the heatmap in dataset explorer
- */
-    def ajaxGetPathwaySearchBoxData = {
-        String searchText = request.getParameter('query')
-        logger.info('Obtaining pathways for ' + searchText)
+    //* Obtain the pathway for biomarker comparison when using the heatmap in dataset explorer.
+    def ajaxGetPathwaySearchBoxData(String query, String callback) {
+	logger.info 'Obtaining pathways for {}', query
 
-        def pathways = []
+	List<Map> pathways = []
 
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        String sqlt = 'SELECT * FROM (select * from de_pathway where upper(name) like upper(?)'
-        sqlt += ' ORDER BY LENGTH(name)) WHERE ROWNUM<=40'
+	Sql sql = new Sql(dataSource)
+	String sqlt = '''
+		SELECT * FROM (
+			select * from DEAPP.de_pathway
+			where upper(name) like upper(?) ORDER BY LENGTH(name)
+		)
+		WHERE ROWNUM<=40'''
 
-        sql.eachRow(sqlt, [searchText + '%'], { row ->
-            pathways.add([name: row.name, type: row.type, source: row.source, uid: row.pathway_uid])
-        })
+	sql.eachRow(sqlt, [query + '%'], { row ->
+	    pathways << [name: row.name, type: row.type, source: row.source, uid: row.pathway_uid]
+	})
 
-        def result = [rows: pathways]
-        render params.callback + '(' + (result as JSON) + ')'
+	render callback + '(' + ([rows: pathways] as JSON) + ')'
     }
 
-    def gplogin = {
-        def gpEnabled = grailsApplication.config.com.recomdata.datasetExplorer.enableGenePattern
-        if ('true' == gpEnabled) {
-            return [userName: springSecurityService.getPrincipal().username]
-        }
-        else {
-            render(view: 'nogp')
-
-        }
+    def gplogin() {
+	if (enableGenePattern) {
+	    [userName: securityService.currentUsername()]
+	}
+	else {
+	    render view: 'nogp'
+	}
     }
-
 
     protected String getGenePatternFileDirName() {
-        String fileDirName = grailsApplication.config.com.recomdata.analysis.genepattern.file.dir
-        String webRootName = servletContext.getRealPath('/')
-        if (webRootName.endsWith(File.separator) == false)
-            webRootName += File.separator
-        return webRootName + fileDirName
+	String webRootName = servletContext.getRealPath('/')
+	if (!webRootName.endsWith(File.separator)) {
+	    webRootName += File.separatorChar
+	}
+	webRootName + genePatternFileDir
+    }
+
+    private WorkflowStatus initWorkflowStatus(String job) {
+	WorkflowStatus wfstatus = new WorkflowStatus()
+	wfstatus.setCurrentJobStatus new JobStatus(name: 'Initializing Workflow', status: 'C')
+	wfstatus.setCurrentJobStatus new JobStatus(name: 'Retrieving Data', status: 'R')
+	wfstatus.addNewJob 'ConvertLineEndings'
+	wfstatus.addNewJob job
+	session.workflowstatus = wfstatus
+	wfstatus
+    }
+
+    private boolean hasValue(String s) {
+	s && s != 'undefined' && s != 'null'
     }
 }

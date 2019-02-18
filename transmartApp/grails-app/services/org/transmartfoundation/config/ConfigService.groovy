@@ -1,12 +1,13 @@
 package org.transmartfoundation.config
 
 import grails.util.Holders
+import org.codehaus.groovy.grails.commons.GrailsApplication
 
 import java.util.Date
 
 class ConfigService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     boolean transactional = true
 
@@ -14,601 +15,601 @@ class ConfigService {
 
         Map adminParams = [
             'com.recomdata.admin.paginate.max': [
-                desc:'Pages per screen in admin panels'],
+                desc: 'Pages per screen in admin panels'],
             'org.transmart.config.showUsernames': [
-                default:false,
-                desc:'Unless true, replace known username parameters with \'(hidden)\' in configuration panel'],
+                default: false,
+                desc: 'Unless true, replace known username parameters with \'(hidden)\' in configuration panel'],
             'org.transmart.config.showPasswords': [
-                default:false,
-                desc:'Unless true, replace known password parameters with \'(hidden)\' in configuration panel'],
+                default: false,
+                desc: 'Unless true, replace known password parameters with \'(hidden)\' in configuration panel'],
             'com.recomdata.plugins.pluginScriptDirectory': [
-                desc:'Script directory for plugins'],
+                desc: 'Script directory for plugins'],
         ]
         Map analysisParams = [
             'com.recomdata.datasetExplorer.genePatternEnabled': [
-                desc:'If \'true\' (quoted string), GenePattern is enabled'],
+                desc: 'If \'true\' (quoted string), GenePattern is enabled'],
             'com.recomdata.datasetExplorer.genePatternURL': [
-                desc:'GenePattern URL for gene pattern service, usually proxyed through Apache'],
+                desc: 'GenePattern URL for gene pattern service, usually proxyed through Apache'],
             'com.recomdata.datasetExplorer.genePatternRealURLBehindProxy': [
-                desc:'GenePattern URL with port number for analysis in gene pattern service'],
+                desc: 'GenePattern URL with port number for analysis in gene pattern service'],
             'com.recomdata.datasetExplorer.genePatternUser': [
-                desc:'GenePattern username'],
+                desc: 'GenePattern username'],
 
             'com.recomdata.analysis.data.file.dir': [
-                desc:'Analysis data directory for data export'],
+                desc: 'Analysis data directory for data export'],
             'com.recomdata.analysis.genepattern.file.dir': [
-                desc:'GenePattern file directory'],
+                desc: 'GenePattern file directory'],
             'com.recomdata.analysis.survival.censorFlagList': [
-                desc:'GenePattern survival analysis censor flags'],
+                desc: 'GenePattern survival analysis censor flags'],
             'com.recomdata.analysis.survival.survivalDataList': [
-                desc:'Genepattern survival analysis data concepts'],
+                desc: 'Genepattern survival analysis data concepts'],
             'com.recomdata.datasetExplorer.plinkExcutable': [
-                desc:'Full path to plink executable'],
+                desc: 'Full path to plink executable'],
         ]
         Map analyzeParams = [
             'com.recomdata.datasetExplorer.imageTempDir': [
-                desc:'Temporary image directories for analysis results'],
+                desc: 'Temporary image directories for analysis results'],
             'com.recomdata.plugins.tempFolderDirectory': [
-                desc:'Temporary directory for plugins to save files'],
+                desc: 'Temporary directory for plugins to save files'],
         ]
         Map authParams = [
             'grails.plugin.springsecurity.providerNames': [
-                desc:'List of loaded authentication providers'],
+                desc: 'List of loaded authentication providers'],
             'com.recomdata.guestAutoLogin': [
                 default:false,
-                desc:'If true, automatically login as guestUserName (logout to change to another user)'],
+                desc: 'If true, automatically login as guestUserName (logout to change to another user)'],
             'com.recomdata.guestUserName': [
-                desc:'Guest username for autologin'],
+                desc: 'Guest username for autologin'],
             'com.recomdata.passwordstrength.pattern': [
-                desc:'Regular expression to ensure password complexity. Good passwords must match. Usually includes test for upper case, lower case, number, and other character classes and a test for length'],
+                desc: 'Regular expression to ensure password complexity. Good passwords must match. Usually includes test for upper case, lower case, number, and other character classes and a test for length'],
             'com.recomdata.passwordstrength.description': [
-                desc:'Friendly readable description of the password complexity conditions'],
+                desc: 'Friendly readable description of the password complexity conditions'],
             'transmartproject.authUser.create.passwordRequired': [
-                desc:'Require a password when creating a new user'],
+                desc: 'Require a password when creating a new user'],
             'org.transmart.security.sniValidation': [
                 default:true,
-                desc:'Server name indication extension'],
+                desc: 'Server name indication extension'],
             'org.transmart.security.sslValidation': [
                 default:true,
-                desc:'SSL hostname and certification verification'],
+                desc: 'SSL hostname and certification verification'],
             'org.transmart.security.spnegoEnabled': [
-                desc:'Simple and Protected GSSAPI Negotiation enabled if true. Supports multiple security mechanisms'],
+                desc: 'Simple and Protected GSSAPI Negotiation enabled if true. Supports multiple security mechanisms'],
             'user.password.strength.regex': [
-                desc:'Password strength regex that is used to test passwords that are entered by users'],
+                desc: 'Password strength regex that is used to test passwords that are entered by users'],
         ]
         Map browseParams = [
             'com.recomdata.FmFolderJob.cronExpression': [
-                default:'0 0/5 * * * ?',
-                desc:'File upload cron interval'],
+                default: '0 0/5 * * * ?',
+                desc: 'File upload cron interval'],
             'com.recomdata.FmFolderJob.startDelayMs': [
                 default:60000,
-                desc:'File upload delay (msec)'],
+                desc: 'File upload delay (msec)'],
             'com.recomdata.FmFolderService.filestoreDirectory': [
-                desc:'Directory on server to store Browse tab files saved in folders, required for Browse file import'],
+                desc: 'Directory on server to store Browse tab files saved in folders, required for Browse file import'],
             'com.recomdata.FmFolderService.importDirectory': [
-                desc:'Directory on server to temporarily save uploaded files, required for Browse file import'],
+                desc: 'Directory on server to temporarily save uploaded files, required for Browse file import'],
             'com.recomdata.FmFolderService.fileTypes': [
-                default:'xml,json,csv,pdf,doc,docx,ppt,pptx,xls,xlsx,odt,odp,ods,ott,otp,ots,rtf,htm,html,txt,lo',
-                desc:'List of known file types for saving in Browse tab folders'],
+                default: 'xml,json,csv,pdf,doc,docx,ppt,pptx,xls,xlsx,odt,odp,ods,ott,otp,ots,rtf,htm,html,txt,lo',
+                desc: 'List of known file types for saving in Browse tab folders'],
             'com.recomdata.solr.baseURL': [
-                desc:'Browse URL for solR, required for Browse file import'],
+                desc: 'Browse URL for solR, required for Browse file import'],
             'com.rwg.solr.scheme': [
-                desc:'Browse/Faceted search solR protocol'],
+                desc: 'Browse/Faceted search solR protocol'],
             'com.rwg.solr.host': [
-                desc:'Browse/Faceted search solR host'],
+                desc: 'Browse/Faceted search solR host'],
             'com.rwg.solr.path': [
-                desc:'Browse/Faceted search solR path (remainder of URL)'],
+                desc: 'Browse/Faceted search solR path (remainder of URL)'],
             'com.rwg.solr.browse.path': [
-                desc:'Browse search path (remainder of URL)'],
+                desc: 'Browse search path (remainder of URL)'],
             'com.rwg.solr.update.path': [
-                desc:'Browse solR data import path (remainder of URL)'],
+                desc: 'Browse solR data import path (remainder of URL)'],
             'transmartproject.mongoFiles.enableMongo': [
                 default:false,
-                desc:'If true, store Browse tab files in MongoDB, else use server filesystem'],
+                desc: 'If true, store Browse tab files in MongoDB, else use server filesystem'],
             'transmartproject.mongoFiles.useDriver': [
-                desc:'if true, use local MongoDB local server'],
+                desc: 'if true, use local MongoDB local server'],
             'transmartproject.mongoFiles.dbServer': [
-                desc:'Local MongoDB server host'],
+                desc: 'Local MongoDB server host'],
             'transmartproject.mongoFiles.dbPort': [
-                desc:'Local MongoDB server port'],
+                desc: 'Local MongoDB server port'],
             'transmartproject.mongoFiles.dbName': [
-                desc:'Local MongoDB server dbname'],
+                desc: 'Local MongoDB server dbname'],
             'transmartproject.mongoFiles.apiURL': [
-                desc:'Remote MongoDB server URL'],
+                desc: 'Remote MongoDB server URL'],
             'transmartproject.mongoFiles.apiKey': [
-                desc:'Remote MongoDB server API key'],
+                desc: 'Remote MongoDB server API key'],
             'ui.browse.delete.allowprogram': [
                 default:false,
-                desc:'If true, display \'Delete Program\' in Browse tab for admin users'],
+                desc: 'If true, display \'Delete Program\' in Browse tab for admin users'],
             'ui.browse.delete.allowstudy': [
                 default:false,
-                desc:'If true, display \'Delete Study\' in Browse tab for admin users'],
+                desc: 'If true, display \'Delete Study\' in Browse tab for admin users'],
         ]
         Map buildInfoParams = [
             'buildinfo.properties.include': [
                 default:[],
-                desc:'Groovy list of properties to add to the buildInfo panel e.g. \'app.grails.version\' and \'build.groovy\''],
+                desc: 'Groovy list of properties to add to the buildInfo panel e.g. \'app.grails.version\' and \'build.groovy\''],
             'buildinfo.properties.exclude': [
                 default:[],
-                desc:'Groovy list of properties to exclude from the buildInfo panel e.g. \'env.proc.cores\''],
+                desc: 'Groovy list of properties to exclude from the buildInfo panel e.g. \'env.proc.cores\''],
         ]
         Map contactParams = [
             'com.recomdata.adminEmail': [
-                desc:'Email address to request administrator support, or to request a login username'],
+                desc: 'Email address to request administrator support, or to request a login username'],
             'com.recomdata.contactUs': [
-                desc:'contact email address'],
+                desc: 'contact email address'],
         ]
         Map dataSourceParams = [
             'dataSource.dialect' : [
-                desc:'Data source dialect' ],
+                desc: 'Data source dialect' ],
             'dataSource.driverClassName' : [
-                desc:'Data source driver' ],
+                desc: 'Data source driver' ],
             'dataSource.dbCreate' : [
-                desc:'Data source created if true' ],
+                desc: 'Data source created if true' ],
             'dataSource.url' : [
-                desc:'Data source URL' ],
+                desc: 'Data source URL' ],
             'dataSource.username' : [
-                desc:'Data source username' ],
+                desc: 'Data source username' ],
             'dataSource.password' : [
-                desc:'Data source password' ],
+                desc: 'Data source password' ],
             'dataSource.logSql' : [
-                desc:'Data source logSql setting' ],
+                desc: 'Data source logSql setting' ],
             'dataSource.formatSql' : [
-                desc:'Data source formatSql setting' ],
+                desc: 'Data source formatSql setting' ],
             'dataSource.properties.initialSize' : [
-                desc:'Data source initial size' ],
+                desc: 'Data source initial size' ],
             'dataSource.properties.minIdle' : [
-                desc:'Data source minimum idle' ],
+                desc: 'Data source minimum idle' ],
             'dataSource.properties.maxIdle' : [
-                desc:'Data source maximum idle' ],
+                desc: 'Data source maximum idle' ],
             'dataSource.properties.maxActive' : [
-                desc:'Data source maximum active' ],
+                desc: 'Data source maximum active' ],
             'dataSource.properties.maxWait' : [
-                desc:'Data source maximum wait' ],
+                desc: 'Data source maximum wait' ],
             'dataSource.properties.numTestsPerEvictionRun' : [
-                desc:'Data source number of tests per eviction run' ],
+                desc: 'Data source number of tests per eviction run' ],
             'dataSource.properties.minEvictableIdleTimeMillis' : [
-                desc:'Data source mininum evictable idle time (msec)' ],
+                desc: 'Data source mininum evictable idle time (msec)' ],
             'dataSource.properties.timeBetweenEvictionRunsMillis' : [
-                desc:'Data source tme between eviction runs (msec)' ],
+                desc: 'Data source tme between eviction runs (msec)' ],
             'dataSource.properties.validationQuery' : [
-                desc:'Data source simple validation query' ],
+                desc: 'Data source simple validation query' ],
             'dataSource.properties.testOnBorrow' : [
-                desc:'Data source test on borrow' ],
+                desc: 'Data source test on borrow' ],
             'dataSource.properties.testWhileIdle' : [
-                desc:'Data source test while idle' ],
+                desc: 'Data source test while idle' ],
             'dataSource.properties.testOnReturn' : [
-                desc:'Data source test on return' ],
+                desc: 'Data source test on return' ],
         ]
         Map exportParams = [
             'com.recomdata.export.jobs.sweep.startDelay': [
-                desc:'start delay for the sweep job (msec)'],
+                desc: 'start delay for the sweep job (msec)'],
             'com.recomdata.export.jobs.sweep.repeatInterval': [
-                desc:'Repeat interval for file sweep job (msec)'],
+                desc: 'Repeat interval for file sweep job (msec)'],
             'com.recomdata.export.jobs.sweep.fileAge': [
-                desc:'Delete files older than this (days)'],
+                desc: 'Delete files older than this (days)'],
             'com.recomdata.transmart.data.export.jobTmpDirectory': [
-                desc:'Server directory for data export jobs'],
+                desc: 'Server directory for data export jobs'],
             'com.recomdata.transmart.data.export.rScriptDirectory': [
-                desc:'Path to R scripts for data export'],
+                desc: 'Path to R scripts for data export'],
             'dataExport.bed.acgh.rgbColorScheme': [
-                desc:'Alternative color scheme for aCGH BED tracks. Current colors are based on cghCall R package'],
+                desc: 'Alternative color scheme for aCGH BED tracks. Current colors are based on cghCall R package'],
             'com.recomdata.search.gene.max': [
-                desc:'Maaximum number of genes in SNP data service'],
+                desc: 'Maaximum number of genes in SNP data service'],
             'com.recomdata.search.genepathway': [
-                desc:'Gene pathway in SNP data service'],
+                desc: 'Gene pathway in SNP data service'],
             'com.recomdata.plugins.resultSize': [
-                desc:'Result size used in SNP data service'],
+                desc: 'Result size used in SNP data service'],
             'com.recomdata.transmart.data.export.ftp.server': [
-                desc:'Data Export FTP server address'],
+                desc: 'Data Export FTP server address'],
             'com.recomdata.transmart.data.export.ftp.serverport': [
-                desc:'Data Export FTP server port'],
+                desc: 'Data Export FTP server port'],
             'com.recomdata.transmart.data.export.ftp.username': [
-                desc:'Data Export FTP username'],
+                desc: 'Data Export FTP username'],
             'com.recomdata.transmart.data.export.ftp.password': [
-                desc:'Data Export FTP password'],
+                desc: 'Data Export FTP password'],
             'com.recomdata.transmart.data.export.ftp.remote.path': [
-                desc:'Data Export FTP file path'],
+                desc: 'Data Export FTP file path'],
             'com.recomdata.transmart.data.export.max.export.jobs.loaded': [
-                desc:'Data Export maximum jobs loaded '],
+                desc: 'Data Export maximum jobs loaded '],
         ]
         Map galaxyParams = [
             'com.galaxy.export.galaxyEnabled': [
                 default: false,
-                desc:'Galaxy export plugin enabled if true'],
+                desc: 'Galaxy export plugin enabled if true'],
             'com.galaxy.export.galaxyEnabled': [
-                desc:'Galaxy server URL for Galaxy export tab'],
+                desc: 'Galaxy server URL for Galaxy export tab'],
         ]
         Map generalParams = [
             'com.recomdata.appTitle': [
-                desc:'Application title, usually including the release'],
+                desc: 'Application title, usually including the release'],
             'com.recomdata.largeLogo': [
-                desc:'application logo to be used in the login page (path appended to transmart URL)'],
+                desc: 'application logo to be used in the login page (path appended to transmart URL)'],
             'com.recomdata.smallLogo': [
-                desc:'application logo to be used in the search page (path appended to transmart URL)'],
+                desc: 'application logo to be used in the search page (path appended to transmart URL)'],
             'com.recomdata.projectName': [
-                desc:'Project name for welcome/login/query screens'],
+                desc: 'Project name for welcome/login/query screens'],
             'com.recomdata.projectLogo': [
-                desc:'Project logo for welcome/login/query screens'],
+                desc: 'Project logo for welcome/login/query screens'],
             'com.recomdata.projectURL': [
-                desc:'Project URL for link on welcome/login/query pages'],
+                desc: 'Project URL for link on welcome/login/query pages'],
             'com.recomdata.providerName': [
-                desc:'Provider name for welcome/login/query screens'],
+                desc: 'Provider name for welcome/login/query screens'],
             'com.recomdata.providerLogo': [
-                desc:'Provider logo for welcome/login/query screens'],
+                desc: 'Provider logo for welcome/login/query screens'],
             'com.recomdata.providerURL': [
-                desc:'Provider URL for link on welcome/login/query pages'],
+                desc: 'Provider URL for link on welcome/login/query pages'],
             'com.recomdata.skipdisclaimer': [
-                desc:'If true, do not show the disclaimer text on welcome screen'],
+                desc: 'If true, do not show the disclaimer text on welcome screen'],
             'com.recomdata.disclaimer': [
-                desc:'Disclaimer text for welcome screen'],
+                desc: 'Disclaimer text for welcome screen'],
             'com.recomdata.view.studyview': [
-                desc:'View to choose for study display'],
+                desc: 'View to choose for study display'],
             'org.transmart.configFine': [
-                desc:'Set to true on successful startup, last value in Config.groovy'],
+                desc: 'Set to true on successful startup, last value in Config.groovy'],
         ]
         Map gwasParams = [
             'com.recomdata.rwg.manhattanplots.cacheImages': [
-                desc:'If true, cache Manhattan plot mages for GWAS'],
+                desc: 'If true, cache Manhattan plot mages for GWAS'],
             'com.recomdata.rwg.qqplots.cacheImages': [
-                desc:'If true, cache QQ plot images for GWAS'],
+                desc: 'If true, cache QQ plot images for GWAS'],
             'com.recomdata.rwg.qqplots.temporaryImageFolder': [
-                desc:'Server folder to store cached images while rendering to the user'],
+                desc: 'Server folder to store cached images while rendering to the user'],
             'com.recomdata.rwg.qqplots.temporaryImageFolderFullPath': [
-                desc:'Server folder to store images while rendering to the user'],
+                desc: 'Server folder to store images while rendering to the user'],
             'com.recomdata.gwas.usehg19table': [ default: false,
-                desc:'If true, use only hg19 human reference unless another version is specified'],
+                desc: 'If true, use only hg19 human reference unless another version is specified'],
             'grails.plugin.transmartGwasPlink.plinkPath': [
-                desc:'Full path to the plink executable for GWAS-plink plugin'],
+                desc: 'Full path to the plink executable for GWAS-plink plugin'],
         ]
         Map gwavaParams = [
             'com.recomdata.rwg.webstart.codebase': [
-                desc:'GWAVA webstart parameters'],
+                desc: 'GWAVA webstart parameters'],
             'com.recomdata.rwg.webstart.gwavaInstance': [
-                desc:'GWAVA webstart parameters'],
+                desc: 'GWAVA webstart parameters'],
             'com.recomdata.rwg.webstart.href': [
-                desc:'GWAVA webstart parameters'],
+                desc: 'GWAVA webstart parameters'],
             'com.recomdata.rwg.webstart.jar': [
-                desc:'GWAVA webstart parameters'],
+                desc: 'GWAVA webstart parameters'],
             'com.recomdata.rwg.webstart.mainClass': [
-                desc:'GWAVA webstart parameters'],
+                desc: 'GWAVA webstart parameters'],
             'com.recomdata.rwg.webstart.transmart.url': [
-                desc:'GWAVA webstart parameters'],
+                desc: 'GWAVA webstart parameters'],
         ]
         Map helpParams = [
             'com.recomdata.adminHelpURL': [
-                desc:'Location of the help pages as an absolute URL. May be a remote copy.'],
+                desc: 'Location of the help pages as an absolute URL. May be a remote copy.'],
             'org.transmartproject.helpUrls.hiDomePopUp': [
-                desc:'URL of local help for HiDome usage to query high dimensional data'],
+                desc: 'URL of local help for HiDome usage to query high dimensional data'],
             'org.transmartproject.helpUrls.summaryStatistics': [
-                desc:'URL of local help for Summary Statistics in Analyze tab'],
+                desc: 'URL of local help for Summary Statistics in Analyze tab'],
             'org.transmartproject.helpUrls.geneSignatureList': [
-                desc:'URL of local help for Gene Signature List tab'],
+                desc: 'URL of local help for Gene Signature List tab'],
             'org.transmartproject.helpUrls.rsIdSignatureList': [
-                desc:'URL of local help for rsId Gene Signatures'],
+                desc: 'URL of local help for rsId Gene Signatures'],
             'org.transmartproject.helpUrls.boxPlot': [
-                desc:'URL of local help for boxPlot workflow'],
+                desc: 'URL of local help for boxPlot workflow'],
             'org.transmartproject.helpUrls.correlationAnalysis': [
-                desc:'URL of local help for Correlation workflow'],
+                desc: 'URL of local help for Correlation workflow'],
             'org.transmartproject.helpUrls.heatMap': [
-                desc:'URL of local help for Heatmap workflows'],
+                desc: 'URL of local help for Heatmap workflows'],
             'org.transmartproject.helpUrls.heatMapMaxRows': [
-                desc:'URL of local help for Heatmap workflow MaxRows parameter'],
+                desc: 'URL of local help for Heatmap workflow MaxRows parameter'],
             'org.transmartproject.helpUrls.hierarchicalClustering': [
-                desc:'URL of local help for HClust workflow'],
+                desc: 'URL of local help for HClust workflow'],
             'org.transmartproject.helpUrls.hierarchicalClusteringMaxRows': [
-                desc:'URL of local help for HClust workflow MaxRows parameter'],
+                desc: 'URL of local help for HClust workflow MaxRows parameter'],
             'org.transmartproject.helpUrls.kMeansClustering': [
-                desc:'URL of local help for kMeans workflow'],
+                desc: 'URL of local help for kMeans workflow'],
             'org.transmartproject.helpUrls.kMeansClusteringMaxRows': [
-                desc:'URL of local help for kMeans workflow MaxRows parameter'],
+                desc: 'URL of local help for kMeans workflow MaxRows parameter'],
             'org.transmartproject.helpUrls.lineGraph': [
-                desc:'URL of local help for Line Graph workflow'],
+                desc: 'URL of local help for Line Graph workflow'],
             'org.transmartproject.helpUrls.logisticRegression': [
-                desc:'URL of local help for Logistic Regression workflow'],
+                desc: 'URL of local help for Logistic Regression workflow'],
             'org.transmartproject.helpUrls.markerSelection': [
-                desc:'URL of local help for Marker Selection workflow'],
+                desc: 'URL of local help for Marker Selection workflow'],
             'org.transmartproject.helpUrls.pca': [
-                desc:'URL of local help for PCA workflow'],
+                desc: 'URL of local help for PCA workflow'],
             'org.transmartproject.helpUrls.scatterPlot': [
-                desc:'URL of local help for Scatter Plot workflow'],
+                desc: 'URL of local help for Scatter Plot workflow'],
             'org.transmartproject.helpUrls.search': [
-                desc:'URL of local help for Search'],
+                desc: 'URL of local help for Search'],
             'org.transmartproject.helpUrls.survivalAnalysis': [
-                desc:'URL of local help for Survival Analysis workflow'],
+                desc: 'URL of local help for Survival Analysis workflow'],
             'org.transmartproject.helpUrls.tableWithFisher': [
-                desc:'URL of local help for Table with Fisher workflow'],
+                desc: 'URL of local help for Table with Fisher workflow'],
         ]
         Map i2b2Params = [
-            'com.recomdata.i2b2.subject.domain': [ default:'(undefined)',
-                desc:'DatasetExplorer i2b2 server domain'],
-            'com.recomdata.i2b2.subject.projectid': [ default:'(undefined)',
-                desc:'DatasetExplorer i2b2 server projectID'],
-            'com.recomdata.i2b2.subject.username': [ default:'(undefined)',
-                desc:'DatasetExplorer i2b2 server username'],
-            'com.recomdata.i2b2.subject.password': [ default:'(undefined)',
-                desc:'DatasetExplorer i2b2 server password'],
-            'org.transmartproject.i2b2.instance': [ default:'(undefined)',
-                desc:'I2b2 plugin server instance'],
-            'org.transmartproject.i2b2.instance.port': [ default:'(undefined)',
-                desc:'I2b2 plugin server instance port'],
-            'org.transmartproject.i2b2.user_id': [ default:'(undefined)',
-                desc:'I2b2 server query userID'],
-            'org.transmartproject.i2b2.group_id': [ default:'(undefined)',
-                desc:'I2b2 server query groupID'],
-            'org.transmartproject.i2b2.pool': [ default:'(undefined)',
-                desc:'I2b2 plugin server pool'],
+            'com.recomdata.i2b2.subject.domain': [ default: '(undefined)',
+                desc: 'DatasetExplorer i2b2 server domain'],
+            'com.recomdata.i2b2.subject.projectid': [ default: '(undefined)',
+                desc: 'DatasetExplorer i2b2 server projectID'],
+            'com.recomdata.i2b2.subject.username': [ default: '(undefined)',
+                desc: 'DatasetExplorer i2b2 server username'],
+            'com.recomdata.i2b2.subject.password': [ default: '(undefined)',
+                desc: 'DatasetExplorer i2b2 server password'],
+            'org.transmartproject.i2b2.instance': [ default: '(undefined)',
+                desc: 'I2b2 plugin server instance'],
+            'org.transmartproject.i2b2.instance.port': [ default: '(undefined)',
+                desc: 'I2b2 plugin server instance port'],
+            'org.transmartproject.i2b2.user_id': [ default: '(undefined)',
+                desc: 'I2b2 server query userID'],
+            'org.transmartproject.i2b2.group_id': [ default: '(undefined)',
+                desc: 'I2b2 server query groupID'],
+            'org.transmartproject.i2b2.pool': [ default: '(undefined)',
+                desc: 'I2b2 plugin server pool'],
             'org.transmartproject.i2b2.waitTimeMilliseconds': [ default:600000,
-                desc:'I2b2 plugin server wait time (ms)'],
+                desc: 'I2b2 plugin server wait time (ms)'],
         ]
         Map kerberosParams = [
             'grails.plugin.springsecurity.kerberos.active': [
                 default:false,
-                desc:'If true, and Kerberos and LDAP (also required) providers are included in providwerNames, Kerberos authentication is used'],
+                desc: 'If true, and Kerberos and LDAP (also required) providers are included in providwerNames, Kerberos authentication is used'],
         ]
         Map ldapParams = [
             'grails.plugin.springsecurity.ldap.active': [
                 default:false,
-                desc:'If true, and LDAP provider is included in providerNames, LDAP authentication is used'],
+                desc: 'If true, and LDAP provider is included in providerNames, LDAP authentication is used'],
             'org.transmart.security.ldap.newUsernamePattern':[
-                desc:'pattern for newly created user, can include &lt;ID&gt; for record id or &lt;FEDERATED_ID&gt; for external user name'],
+                desc: 'pattern for newly created user, can include &lt;ID&gt; for record id or &lt;FEDERATED_ID&gt; for external user name'],
             'org.transmart.security.ldap.defaultAuthorities':[
-                desc:'comma separated list of new user authorities'],
+                desc: 'comma separated list of new user authorities'],
             'org.transmart.security.ldap.inheritPassword':[
-                desc:'if inheritPassword == false specified user will not be able to login without LDAP'],
+                desc: 'if inheritPassword == false specified user will not be able to login without LDAP'],
             'org.transmart.security.ldap.mappedUsernameProperty':[
-                desc:'can be \'username\' or \'federatedId\''],
+                desc: 'can be \'username\' or \'federatedId\''],
             'org.transmart.security.ldap.ad.domain':[
-                desc:'Active Directory extension'],
+                desc: 'Active Directory extension'],
             'org.transmart.security.ldap.context.server':[
-                desc:'Active directory server'],
+                desc: 'Active directory server'],
         ]
         Map logParams = [
             'log4j': [
-                desc:'Closure to configure server logging'],
+                desc: 'Closure to configure server logging'],
         ]
         Map loginParams = [
             'bruteForceLoginLock.allowedNumberOfAttempts': [
                 default:2,
-                desc:'Number of failed login attempts allowed'],
+                desc: 'Number of failed login attempts allowed'],
             'bruteForceLoginLock.lockTimeInMinutes': [
                 default:10,
-                desc:'Time to disable user login after too many failed attempts (min)'],
+                desc: 'Time to disable user login after too many failed attempts (min)'],
             'org.transmartproject.maxConcurrentUserSessions': [
-                desc:'Maximum concurrent sessions for one user (-1 for unlimited)'],
+                desc: 'Maximum concurrent sessions for one user (-1 for unlimited)'],
             'ui.loginScreen.disclaimer': [
-                desc:'Text displayed below login screen'],
+                desc: 'Text displayed below login screen'],
         ]
         Map metacoreParams = [
             'com.thomsonreuters.transmart.metacoreAnalyticsEnable': [
                 default: false,
-                desc:'Enable metacore analytics'],
+                desc: 'Enable metacore analytics'],
             'com.thomsonreuters.transmart.metacoreSettingsMode': [
-                desc:'Metacore analytics setting: \'demo\', \'system\' or \'user\''],
+                desc: 'Metacore analytics setting: \'demo\', \'system\' or \'user\''],
             'com.thomsonreuters.transmart.demoEnrichmentURL': [
-                desc:'Metacore analytics enrichment URL'],
+                desc: 'Metacore analytics enrichment URL'],
             'com.thomsonreuters.transmart.demoMapBaseURL': [
-                desc:'Metacore analytics mapbase URL for demo server'],
+                desc: 'Metacore analytics mapbase URL for demo server'],
             'com.thomsonreuters.transmart.metacoreDefaultLogin': [
-                desc:'Metacore analytics default (demo) username'],
+                desc: 'Metacore analytics default (demo) username'],
             'com.thomsonreuters.transmart.metacoreDefaultPassword': [
-                desc:'Metacore analytics default (demo) password'],
+                desc: 'Metacore analytics default (demo) password'],
             'com.thomsonreuters.transmart.metacoreURL': [
-                desc:'Metacore analytics URL, overrides demo settings'],
+                desc: 'Metacore analytics URL, overrides demo settings'],
             'com.thomsonreuters.transmart.metacoreLogin': [
-                desc:'Metacore analytics username'],
+                desc: 'Metacore analytics username'],
             'com.thomsonreuters.transmart.metacorePassword': [
-                desc:'Metacore analytics password'],
+                desc: 'Metacore analytics password'],
         ]
         Map oauthParams = [
             'dataSource_oauth2.dbCreate': [
-                desc:'If true, create new Oauth2 database' ],
+                desc: 'If true, create new Oauth2 database' ],
             'dataSource_oauth2.driverClassName' : [
-                desc:'Oauth2 database driver' ],
+                desc: 'Oauth2 database driver' ],
             'dataSource_oauth2.url': [
-                desc:'Oauth2 database URL' ],
+                desc: 'Oauth2 database URL' ],
             'dataSource_oauth2.username': [
-                desc:'Oauth2 database username' ],
+                desc: 'Oauth2 database username' ],
             'dataSource_oauth2.password': [
-                desc:'Oauth2 database password' ],
+                desc: 'Oauth2 database password' ],
             'dataSource_oauth2.logSql': [
-                desc:'Oauth2 database logSql setting' ],
+                desc: 'Oauth2 database logSql setting' ],
             'dataSource_oauth2.formatSql': [
-                desc:'Oauth2 database formatSql setting' ],
+                desc: 'Oauth2 database formatSql setting' ],
         ]
         Map rmodulesParams = [
             'RModules.host': [
-                desc:'Host address for Rserve server'],
+                desc: 'Host address for Rserve server'],
             'RModules.port': [
-                desc:'Port for Rserve server'],
+                desc: 'Port for Rserve server'],
             'RModules.pluginScriptDirectory': [
-                desc:'Path to R scripts'],
+                desc: 'Path to R scripts'],
             'RModules.tempFolderDirectory': [
-                desc:'working directory for R scripts, where the jobs are created and output files are generated'],
+                desc: 'working directory for R scripts, where the jobs are created and output files are generated'],
             'ui.tabs.datasetExplorer.analysisJobs.show': [
                 default:true,
-                desc:'If defined as true, display \'Analysis Jobs\' tab in the Analyze tab pages'],
+                desc: 'If defined as true, display \'Analysis Jobs\' tab in the Analyze tab pages'],
         ]
         Map samlParams = [
             'org.transmart.security.samlEnabled': [
                 default:false,
-                desc:'If true, use SAML authentication and login screen presents SAML federated login prompt'],
+                desc: 'If true, use SAML authentication and login screen presents SAML federated login prompt'],
             'org.transmart.security.saml.lb.scheme': [
-                desc:'SAML connection protocol'],
+                desc: 'SAML connection protocol'],
             'org.transmart.security.saml.lb.serverName': [
-                desc:'SAML server'],
+                desc: 'SAML server'],
             'org.transmart.security.saml.lb.serverPort': [
-                desc:'SAML server port'],
+                desc: 'SAML server port'],
             'org.transmart.security.saml.lb.includeServerPortInRequestURL': [
-                desc:'Whether to include the serverPort in the request'],
+                desc: 'Whether to include the serverPort in the request'],
             'org.transmart.security.saml.lb.contextPath': [
-                desc:'SAML server path (rest of URL)'],
+                desc: 'SAML server path (rest of URL)'],
             'org.transmart.security.saml.createInexistentUsers': [
-                desc:'If true, federated access can create federated users that exist on other servers'],
+                desc: 'If true, federated access can create federated users that exist on other servers'],
         ]
         Map sampleParams = [
             'sampleExplorer.idfield': [
-                desc:'Sample explorer solr ID field name'],
+                desc: 'Sample explorer solr ID field name'],
             'edu.harvard.transmart.sampleBreakdownMap.id': [
-                desc:'Identifier for sample breakdown'],
+                desc: 'Identifier for sample breakdown'],
             'sampleExplorer.resultsGridHeight': [
-                desc:'Sample explorer grid height'],
+                desc: 'Sample explorer grid height'],
             'sampleExplorer.resultsGridWidth': [
-                desc:'Sample explorer grid width'],
+                desc: 'Sample explorer grid width'],
             'com.recomdata.solr.maxNewsStories': [
-                desc:'Sample explorer maximum results per page'],
+                desc: 'Sample explorer maximum results per page'],
             'com.recomdata.solr.maxRows': [
-                desc:'Sample explorer maximum results'],
+                desc: 'Sample explorer maximum results'],
             'sampleExplorer.fieldMapping.columns': [
-                desc:'Names and pretty names of solR sample fields with optional width and other fields'],
+                desc: 'Names and pretty names of solR sample fields with optional width and other fields'],
        ]
         Map searchParams = [
             'com.recomdata.searchengine.index': [
-                desc:'Search tool Lucene index location'],
+                desc: 'Search tool Lucene index location'],
             'com.recomdata.search.paginate.max': [
                 default:10,
-                desc:'Maximum to display on page in search results'],
+                desc: 'Maximum to display on page in search results'],
             'com.recomdata.search.paginate.maxsteps': [
                 default:10,
-                desc:'Number to skip to start of next page of search results, shoulld be same as com.recomdata.search.paginate.max'],
+                desc: 'Number to skip to start of next page of search results, shoulld be same as com.recomdata.search.paginate.max'],
             'com.recomdata.solr.solrFieldList': [
-                desc:'Search (obsolete) field list to be indexed, separated by vertical bars'],
+                desc: 'Search (obsolete) field list to be indexed, separated by vertical bars'],
             'com.recomdata.solr.fieldExclusionList': [
-                desc:'Search (obsolete) fields not displayed, separated by vertical bars'],
+                desc: 'Search (obsolete) fields not displayed, separated by vertical bars'],
             'com.recomdata.solr.resultFields': [
-                desc:'Search (obsolete) result fields - in alphabetical order, separated by commas'],
+                desc: 'Search (obsolete) result fields - in alphabetical order, separated by commas'],
             'com.recomdata.solr.maxLinksDisplayed': [
-                desc:'Search (obsolete) number of results before displaying \'More[+]\''],
+                desc: 'Search (obsolete) number of results before displaying \'More[+]\''],
             'com.recomdata.solr.numberOfSuggestions': [
-                desc:'Search (obsolete) number of items in search suggestions box'],
+                desc: 'Search (obsolete) number of items in search suggestions box'],
         ]
         Map smartrParams = [
             'ipaConnector.username': [
-                desc:'IPA connector username'],
+                desc: 'IPA connector username'],
             'ipaConnector.password': [
-                desc:'IPA connector password'],
+                desc: 'IPA connector password'],
             'smartR.baseDir': [
-                desc:'Base directory for smartR'],
+                desc: 'Base directory for smartR'],
             'smartR.remoteScriptDirectory': [
-                desc:'Directory on R server to copy smartR scripts'],
+                desc: 'Directory on R server to copy smartR scripts'],
             'grails.plugin.transmartGwasPlink.enabled': [
-                desc:'GWAS plink enabled if true'],
+                desc: 'GWAS plink enabled if true'],
         ]
         Map solrParams = [
             :
         ]
         Map springParams = [
             'grails.plugin.springsecurity.userLookup.userDomainClassName': [
-                desc:'customized user GORM class (org.transmart.searchapp.AuthUser)'],
+                desc: 'customized user GORM class (org.transmart.searchapp.AuthUser)'],
             'grails.plugin.springsecurity.userLookup.passwordPropertyName': [
-                desc:'customized password field (passwd)'],
+                desc: 'customized password field (passwd)'],
             'grails.plugin.springsecurity.userLookup.authorityJoinClassName': [
-                desc:'customized user /role join GORM class (org.transmart.searchapp.AuthUser)'],
+                desc: 'customized user /role join GORM class (org.transmart.searchapp.AuthUser)'],
             'grails.plugin.springsecurity.authority.className': [
-                desc:'customized role GORM class (org.transmart.searchapp.Role)'],
+                desc: 'customized role GORM class (org.transmart.searchapp.Role)'],
             'grails.plugin.springsecurity.requestMap.className': [
-                desc:'(Obsolete) request map GORM class name - request map is stored in the db (org.transmart.searchapp.Requestmap)'],
+                desc: '(Obsolete) request map GORM class name - request map is stored in the db (org.transmart.searchapp.Requestmap)'],
             'grails.plugin.springsecurity.securityConfigType': [
-                desc:'requestmap in db (InterceptUrlMap to use oauth)'],
+                desc: 'requestmap in db (InterceptUrlMap to use oauth)'],
             'grails.plugin.springsecurity.successHandler.defaultTargetUrl': [
-                desc:'URL to redirect after login. Set to value of org.transmart.defaultLoginRedirect else /userLanding'],
+                desc: 'URL to redirect after login. Set to value of org.transmart.defaultLoginRedirect else /userLanding'],
             'grails.plugin.springsecurity.logout.afterLogoutUrl': [
-                desc:'URL after logout (/login/forceAuth)'],
+                desc: 'URL after logout (/login/forceAuth)'],
         ]
         Map uiParams = [
             'com.recomdata.sessionTimeout': [
-                desc:'Session timeout (inactivity in seconds)'],
+                desc: 'Session timeout (inactivity in seconds)'],
             'com.recomdata.heartbeatLaps': [
-                desc:'Session heartneat frequency to check for activity'],
+                desc: 'Session heartneat frequency to check for activity'],
             'com.recomdata.bugreportURL': [
-                desc:'Bug tracking system URL to enable Utilities menu \'Report a Bug\''],
+                desc: 'Bug tracking system URL to enable Utilities menu \'Report a Bug\''],
             'com.recomdata.debug.jsCallbacks': [
-                desc:'used to debug JavaScript callbacks in the dataset explorer in Chrome. Unfortunately, it also sometimes causes chrome to segfault'],
+                desc: 'used to debug JavaScript callbacks in the dataset explorer in Chrome. Unfortunately, it also sometimes causes chrome to segfault'],
             'com.recomdata.defaults.landing': [
-                desc:'Landing page after login. If undefined use Browse page or (if Browse is disabled) Analyze page'],
+                desc: 'Landing page after login. If undefined use Browse page or (if Browse is disabled) Analyze page'],
             'org.transmart.xnatImporterEnable': [
                 default:false,
-                desc:'If true, xnat importer is an option on the admin page'],
+                desc: 'If true, xnat importer is an option on the admin page'],
             'org.transmart.defaultLoginRedirect': [
-                desc:'default page displayed after login'],
+                desc: 'default page displayed after login'],
             'ui.jirareport.hide': [
                 default:false,
-                desc:'If true, remove \'Report a bug\' button on bottom left of every page'],
+                desc: 'If true, remove \'Report a bug\' button on bottom left of every page'],
             'ui.loginScreen.disclaimer': [
                 default:false,
-                desc:'If defined, a text to display below the initial login'],
+                desc: 'If defined, a text to display below the initial login'],
             'ui.tabs.browse.hide': [
                 default:false,
-                desc:'If true, disable the Browse tab page, remove Browse from the common header, use the Analyze page as the landing page after login'],
+                desc: 'If true, disable the Browse tab page, remove Browse from the common header, use the Analyze page as the landing page after login'],
             'ui.tabs.datasetExplorer.dataExport.hide': [
                 default:false,
-                desc:'If true, remove the Data Export tab from the Analyze tab pages'],
+                desc: 'If true, remove the Data Export tab from the Analyze tab pages'],
             'ui.tabs.datasetExplorer.dataExportJobs.hide': [
                 default:false,
-                desc:'If true, remove the Data Export Jobs tab from the Analyze tab pages'],
+                desc: 'If true, remove the Data Export Jobs tab from the Analyze tab pages'],
             'ui.tabs.datasetExplorer.gridView.hide': [
                 default:false,
-                desc:'If true, remove the Grid View tab from the Analyze tab pages'],
+                desc: 'If true, remove the Grid View tab from the Analyze tab pages'],
             'ui.tabs.datasetExplorer.workspace.hide': [
                 default:false,
-                desc:'If true, remove the Workspace tab from the Analyze tab pages'],
+                desc: 'If true, remove the Workspace tab from the Analyze tab pages'],
             'ui.tabs.geneSignature.hide': [
                 default:false,
-                desc:'If true, remove the Gene Signature tab from the common header'],
+                desc: 'If true, remove the Gene Signature tab from the common header'],
             'ui.tabs.gwas.hide': [
                 default:false,
-                desc:'If true, remove the GWAS tab from the common header'],
+                desc: 'If true, remove the GWAS tab from the common header'],
             'ui.tabs.sampleExplorer.hide': [
                 default:false,
-                desc:'If true, remove the Sample Explorer tab from the common header'],
+                desc: 'If true, remove the Sample Explorer tab from the common header'],
             'ui.tabs.search.show': [
                 default:false,
-                desc:'If true, restore the obsolete Search tab to the common header'],
+                desc: 'If true, restore the obsolete Search tab to the common header'],
             'ui.tabs.uploadData.hide': [
                 default:false,
-                desc:'If true, remove the Upload tab from the common header'],
+                desc: 'If true, remove the Upload tab from the common header'],
         ]
         Map uploadParams = [
             'com.recomdata.dataUpload.uploads.dir': [
-                desc:'GWAS data upload directory on server'],
+                desc: 'GWAS data upload directory on server'],
             'com.recomdata.dataUpload.templates.dir': [
-                desc:'GWAS data upload templates directory on server'],
+                desc: 'GWAS data upload templates directory on server'],
             'com.recomdata.dataUpload.etl.dir': [
-                desc:'GWAS data upload directory for analysis ETL'],
+                desc: 'GWAS data upload directory for analysis ETL'],
             'com.recomdata.dataUpload.adminEmail': [
-                desc:'Contact email for analysis ETL administrator'],
+                desc: 'Contact email for analysis ETL administrator'],
             'com.recomdata.dataUpload.appTitle': [
-                desc:'Title for data upload page'],
+                desc: 'Title for data upload page'],
             'com.recomdata.dataUpload.stageScript': [
-                desc:'GWAS analysis ETL script'],
+                desc: 'GWAS analysis ETL script'],
         ]
         Map x509Params = [
             :
         ]
         Map xnatImportParams = [
             'org.transmart.data.location': [
-                desc:'Local directory of transmart-data files for XNAT import scripts<br>Defaults to /transmart-data under /transmart'],
+                desc: 'Local directory of transmart-data files for XNAT import scripts<br>Defaults to /transmart-data under /transmart'],
             'org.transmart.importxnatplugin.etldir': [
-                desc:'Local directory to write imported XNAT clinical data<br>Defaults to end/data-integration/ under org.transmart.data.location'],
+                desc: 'Local directory to write imported XNAT clinical data<br>Defaults to end/data-integration/ under org.transmart.data.location'],
             'org.transmart.importxnatplugin.kettlehome': [
-                desc:'Local Kettle home directory for XNAT import<br>Defaults to samples/postgres/kettle-home under transmart-data'],
+                desc: 'Local Kettle home directory for XNAT import<br>Defaults to samples/postgres/kettle-home under transmart-data'],
             'org.transmart.importxnatplugin.location': [
-                desc:'Local directory for XNAT importer scripts<br>Defaults to /xnattotransmartlink under /transmart'],
+                desc: 'Local directory for XNAT importer scripts<br>Defaults to /xnattotransmartlink under /transmart'],
             'org.transmart.importxnatplugin.workingdir': [
-                desc:'Working directory for XNAT import<br>Defaults to value of RModules.tempFolderDirectory'],
+                desc: 'Working directory for XNAT import<br>Defaults to value of RModules.tempFolderDirectory'],
         ]
         Map xnatViewParams = [
-            'org.transmart.xnatViewerEnable': [
+            'ui.tabs.datasetExplorer.xnatEnabled.show': [
                 default:false,
-                desc:'If true, enable the XNAT viewer in the Analyze tab'],
+                desc: 'If true, enable the XNAT viewer in the Analyze tab'],
             'org.xnat.domain': [
-                desc:'XNAT server domain name for XNAT image viewer'],
+                desc: 'XNAT server domain name for XNAT image viewer'],
             'org.xnat.projectName': [
-                desc:'XNAT project name for XNAT image viewer'],
+                desc: 'XNAT project name for XNAT image viewer'],
             'org.xnat.username': [
-                desc:'XNAT username for XNAT image viewer'],
+                desc: 'XNAT username for XNAT image viewer'],
             'org.xnat.password': [
-                desc:'XNAT password (plain text) for XNAT image viewer'],
+                desc: 'XNAT password (plain text) for XNAT image viewer'],
         ]
 
         Map Params = [:]
@@ -1293,13 +1294,13 @@ class ConfigService {
 
     def getAuthProviders() {
         def result = [:]
-        def providers = ['ldapAuthenticationProvider':'LDAP',
-                         'samlAuthenticationProvider':'SAML',
-                         'rememberMeAuthenticationProvider':'Use a rememberMe cookie',
-                         'daoAuthenticationProvider':'User and Role database tables',
-                         'preAuthenticatedAuthenticationProvider':'Pre-authenticated',
-                         'kerberosServiceAuthenticationProvider':'Kerberos service',
-                         'anonymousAuthenticationProvider':'Anonymous authentication if no other method succeeds',
+        def providers = ['ldapAuthenticationProvider': 'LDAP',
+                         'samlAuthenticationProvider': 'SAML',
+                         'rememberMeAuthenticationProvider': 'Use a rememberMe cookie',
+                         'daoAuthenticationProvider': 'User and Role database tables',
+                         'preAuthenticatedAuthenticationProvider': 'Pre-authenticated',
+                         'kerberosServiceAuthenticationProvider': 'Kerberos service',
+                         'anonymousAuthenticationProvider': 'Anonymous authentication if no other method succeeds',
                          'clientCredentialsAuthenticationProvider': 'Client credentials',
                          'customAuthenticationProvider': 'Custom authentication']
 

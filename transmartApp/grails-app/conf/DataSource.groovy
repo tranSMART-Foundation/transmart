@@ -2,13 +2,13 @@
 
 
 dataSource_oauth2 {
-    driverClassName = 'org.h2.Driver'
-    url = 'jdbc:h2:~/.grails/oauth2db;MVCC=TRUE'
-    username = 'sa'
-    password = ''
     dbCreate = 'update'
-    logSql = true
+    driverClassName = 'org.h2.Driver'
     formatSql = true
+    logSql = true
+    password = ''
+    url = "jdbc:h2:~/.grails/oauth2db;MVCC=TRUE"
+    username = 'sa'
 }
 
 hibernate {
@@ -41,23 +41,23 @@ hibernate_oauth2 {
 environments {
 	test {
 		dataSource {
+			dbCreate = 'update'
 			driverClassName = 'org.h2.Driver'
+			formatSql = true
+			logSql = true
+			password = ''
 			url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;INIT=RUNSCRIPT FROM './h2_init.sql'"
 			username = 'sa'
-			password = ''
-			dbCreate = 'update'
-			logSql = true
-			formatSql = true
 		}
 
 		dataSource_oauth2 {
-			driverClassName = 'org.h2.Driver'
-			url = 'jdbc:h2:mem:oauth2;MVCC=TRUE'
-			username = 'sa'
-			password = ''
 			dbCreate = 'update'
-			logSql = true
+			driverClassName = 'org.h2.Driver'
 			formatSql = true
+			logSql = true
+			password = ''
+			url = "jdbc:h2:mem:oauth2;MVCC=TRUE"
+			username = 'sa'
 		}
 
 		hibernate {

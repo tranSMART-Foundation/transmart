@@ -1,4 +1,3 @@
-
 import groovy.util.logging.Slf4j
 
 @Slf4j('logger')
@@ -12,7 +11,7 @@ class LogTagLib {
      *
      */
     def logMsg = { attrs, body ->
-        def level = (attrs['level'] = attrs['level'] ?: 'info').toLowerCase()
+        def level = attrs.level?.toLowerCase() ?: 'info'
         logger."${level}"(body())
     }
 }

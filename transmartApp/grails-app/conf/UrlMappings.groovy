@@ -5,14 +5,12 @@
  */
 class UrlMappings {
     static mappings = {
-        "/$controller/$action?/$id?" {
-            constraints {
-                // apply constraints here
-            }
-        }
-        "/"(controller: 'userLanding', action: 'index')
+        "/$controller/$action?/$id?" {}
+	
+        "/transmart/dataExport/getJobs"(controller: 'dataExport', action: 'getJobs')
+
+        "/"(controller: 'userLanding')
+
         "500"(view: '/error')
-        "/transmart/dataExport/getJobs"(controller: "dataExport", action: "getJobs")
-        //"/transmart/exportData"(controller:"dataExport", action:"processExport")
     }
 }
