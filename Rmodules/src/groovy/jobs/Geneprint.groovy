@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component
 @Scope('job')
 class Geneprint extends HighDimensionalOnlyJob {
 
-
     @Override
     protected List<Step> prepareSteps() {
         List<Step> steps = []
@@ -20,12 +19,10 @@ class Geneprint extends HighDimensionalOnlyJob {
                 temporaryDirectory: temporaryDirectory,
                 params: params)
 
-        def openResultSetStep = new OpenHighDimensionalDataStep(
+        steps << new OpenHighDimensionalDataStep(
                 params: params,
                 dataTypeResource: highDimensionResource.getSubResourceForType(analysisConstraints['data_type']),
                 analysisConstraints: analysisConstraints)
-
-        steps << openResultSetStep
 
         steps
     }
@@ -44,8 +41,7 @@ class Geneprint extends HighDimensionalOnlyJob {
     }
 
     @Override
-    protected getForwardPath() {
-        '/Geneprint/geneprintOut?jobName=' + name
+    protected String getForwardPath() {
+        "/Geneprint/geneprintOut?jobName=${name}"
     }
-
 }

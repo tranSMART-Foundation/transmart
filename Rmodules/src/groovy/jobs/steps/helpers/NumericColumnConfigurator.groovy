@@ -12,16 +12,19 @@ import org.transmartproject.core.dataquery.clinical.ClinicalVariable
 @Scope('prototype')
 class NumericColumnConfigurator extends ColumnConfigurator {
 
+    private static final List<String> propertyNames = ['header', 'projection', 'keyForConceptPath',
+	                                               'keyForDataType', 'keyForSearchKeywordId', 'multiRow'].asImmutable()
+
     public static final String CLINICAL_DATA_TYPE_VALUE = 'CLINICAL'
 
-    String projection             /* only applicable for high dim data */
+    String projection             // only applicable for high dim data
 
-    String keyForConceptPath,
-           keyForDataType,        /* CLINICAL for clinical data */
-           keyForSearchKeywordId, /* only applicable for high dim data */
-           keyForLog10
+    String keyForConceptPath
+    String keyForDataType        // CLINICAL for clinical data
+    String keyForSearchKeywordId // only applicable for high dim data
+    String keyForLog10
 
-    boolean multiRow = false      /* only applicable for high dim data */
+    boolean multiRow = false      // only applicable for high dim data
 
     boolean alwaysClinical = false
 
@@ -36,14 +39,12 @@ class NumericColumnConfigurator extends ColumnConfigurator {
 
     @Override
     protected void doAddColumn(Closure<Column> columnDecorator) {
-        def resultColumnDecoretor = log10 ?
-                compose(columnDecorator, createLog10ColumnDecorator())
-                : columnDecorator
+        def resultColumnDecorator = log10 ? compose(columnDecorator, createLog10ColumnDecorator()) : columnDecorator
         if (isClinical()) {
-            addColumnClinical resultColumnDecoretor
+            addColumnClinical resultColumnDecorator
         }
         else {
-            addColumnHighDim resultColumnDecoretor
+            addColumnHighDim resultColumnDecorator
         }
     }
 
@@ -51,31 +52,27 @@ class NumericColumnConfigurator extends ColumnConfigurator {
         { Column originalColumn ->
             new TransformColumnDecorator(
                     inner: originalColumn,
-                    valueFunction: { value ->
-                        Math.log10(value)
-                    })
+                    valueFunction: { value -> Math.log10(value) })
         }
     }
 
     boolean isLog10() {
-        getStringParam(keyForLog10, false)?.toBoolean()
+        getStringParam keyForLog10, false
     }
 
     boolean isClinical() {
-        return alwaysClinical || getStringParam(keyForDataType) == CLINICAL_DATA_TYPE_VALUE
+        alwaysClinical || getStringParam(keyForDataType) == CLINICAL_DATA_TYPE_VALUE
     }
 
     private void addColumnHighDim(Closure<Column> decorateColumn) {
-        ['header', 'projection', 'keyForConceptPath', 'keyForDataType',
-                'keyForSearchKeywordId', 'multiRow'].each { prop ->
-            highDimensionColumnConfigurator."$prop" = this."$prop"
-        }
+        for (prop in propertyNames) {
+	    highDimensionColumnConfigurator[prop] = this[prop]
+	}
         highDimensionColumnConfigurator.addColumn decorateColumn
     }
 
     private void addColumnClinical(Closure<Column> decorateColumn) {
-        ClinicalVariable variable = clinicalDataRetriever.
-                createVariableFromConceptPath getStringParam(keyForConceptPath).trim()
+        ClinicalVariable variable = clinicalDataRetriever.createVariableFromConceptPath getStringParam(keyForConceptPath).trim()
         variable = clinicalDataRetriever << variable
 
         clinicalDataRetriever.attachToTable table
@@ -94,10 +91,11 @@ class NumericColumnConfigurator extends ColumnConfigurator {
      * @param keyPart
      */
     void setKeys(String keyPart = '') {
-        keyForConceptPath     = '' + keyPart + 'Variable'
-        keyForDataType        = 'div' + keyPart.capitalize() + 'VariableType'
-        keyForSearchKeywordId = 'div' + keyPart.capitalize() + 'VariablePathway'
-        keyForLog10           = 'div' + keyPart.capitalize() + 'VariableLog10'
+	String cap = keyPart.capitalize()
+        keyForConceptPath     = keyPart + 'Variable'
+        keyForDataType        = 'div' + cap + 'VariableType'
+        keyForSearchKeywordId = 'div' + cap + 'VariablePathway'
+        keyForLog10           = 'div' + cap + 'VariableLog10'
     }
 
 }

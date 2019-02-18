@@ -1,5 +1,7 @@
 package jobs.steps.helpers
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import jobs.UserParameters
 import jobs.table.Column
 import jobs.table.MissingValueAction
@@ -8,6 +10,7 @@ import jobs.table.columns.ColumnDecorator
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 
+@CompileStatic
 abstract class ColumnConfigurator {
 
     @Autowired
@@ -20,13 +23,15 @@ abstract class ColumnConfigurator {
 
     MissingValueAction missingValueAction
 
-    @Deprecated // use OptionalBinningColumnDecorator instead
+    @Deprecated
+    // use OptionalBinningColumnDecorator instead
     boolean required = true
 
     final void addColumn() {
         addColumn Closure.IDENTITY
     }
 
+    @CompileDynamic
     void addColumn(Closure<Column> decorateColumn) {
         if (!missingValueAction) {
             doAddColumn decorateColumn
@@ -53,13 +58,9 @@ abstract class ColumnConfigurator {
              * sufficient for the header value to be available only to the
              * outside via a decorator.
              */
-            doAddColumn(compose(
-                    { Column it ->
-                        new ReplaceMissingValueActionDecorator(
-                                inner:              it,
-                                missingValueAction: missingValueAction)
-                    },
-                    decorateColumn))
+            doAddColumn(compose({ Column it ->
+                        new ReplaceMissingValueActionDecorator(inner: it, missingValueAction: missingValueAction)
+                    }, decorateColumn))
         }
     }
 
@@ -69,46 +70,41 @@ abstract class ColumnConfigurator {
 
         private MissingValueAction missingValueAction
 
-        void setMissingValueAction(MissingValueAction missingValueAction) {
-            this.missingValueAction = missingValueAction
+        void setMissingValueAction(MissingValueAction action) {
+            missingValueAction = action
         }
 
         // @Delegate doesn't seem to work well with overriding properties
-        // when using the simple syntax 'MissingValueAction missingValueAction'
+        // when using the simple syntax "MissingValueAction missingValueAction"
         MissingValueAction getMissingValueAction() {
-            this.missingValueAction
+            missingValueAction
         }
     }
 
-    abstract protected void doAddColumn(Closure<Column> decorateColumn)
+    protected abstract void doAddColumn(Closure<Column> decorateColumn)
 
     protected final String getStringParam(String key, boolean required = true) {
         def v = params[key]
         if (!v && required) {
-            throw new InvalidArgumentsException("The parameter '$key' has not " +
-                    'been provided by the client')
+            throw new InvalidArgumentsException("The parameter '$key' has not been provided by the client")
         }
 
         if (v && !(v instanceof String)) {
-            throw new InvalidArgumentsException("Expected the parameter '$key' " +
-                    'to be a String, got a ' + v.getClass())
+            throw new InvalidArgumentsException("Expected the parameter '$key' to be a String, got a ${v.getClass().name}")
         }
 
         v
     }
 
-    protected  compose(Closure<Column> externalDecorate, Closure<Column> ourDecorate) {
-        { Column orig ->
-            externalDecorate.call(ourDecorate.call(orig))
-        }
-    }
+    protected Closure compose(Closure<Column> externalDecorate, Closure<Column> ourDecorate) {{ Column orig ->
+        externalDecorate.call(ourDecorate.call(orig))
+    }}
 
-    final protected getParams() {
+    protected final UserParameters getParams() {
         params
     }
 
-    final protected getTable() {
+    protected final Table getTable() {
         table
     }
-
 }

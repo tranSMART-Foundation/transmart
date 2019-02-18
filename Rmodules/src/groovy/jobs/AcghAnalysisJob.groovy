@@ -1,7 +1,13 @@
 package jobs
 
 import com.recomdata.transmart.util.ZipService
-import jobs.steps.*
+import jobs.steps.AcghRegionDumpDataStep
+import jobs.steps.BuildTableResultStep
+import jobs.steps.OpenHighDimensionalDataStep
+import jobs.steps.RCommandsStep
+import jobs.steps.SimpleDumpTableResultStep
+import jobs.steps.Step
+import jobs.steps.ZipResultsStep
 import jobs.steps.helpers.CategoricalColumnConfigurator
 import jobs.steps.helpers.HighDimensionColumnConfigurator
 import jobs.steps.helpers.SimpleAddColumnConfigurator
@@ -51,11 +57,10 @@ abstract class AcghAnalysisJob extends AbstractAnalysisJob {
     protected List<Step> prepareSteps() {
         List<Step> steps = []
 
-        if (groupByConfigurator.getConceptPaths()) {
+        if (groupByConfigurator.conceptPaths) {
             steps << new BuildTableResultStep(
                     table: table,
-                    configurators: [primaryKeyColumnConfigurator,
-                                    groupByConfigurator])
+                    configurators: [primaryKeyColumnConfigurator, groupByConfigurator])
 
             steps << new SimpleDumpTableResultStep(table: table,
                     temporaryDirectory: temporaryDirectory,
@@ -93,5 +98,4 @@ abstract class AcghAnalysisJob extends AbstractAnalysisJob {
                 resultsHolder: resultsHolder,
                 params: params)
     }
-
 }

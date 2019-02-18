@@ -25,7 +25,6 @@ class RCommandsStep implements Step {
      */
     Map<String, String> extraParams
 
-    @Override
     void execute() {
         runRCommandList rStatements
     }
@@ -38,8 +37,9 @@ class RCommandsStep implements Step {
         try {
             //Run the R command to set the working directory to our temp directory.
             String wd = RUtil.escapeRStringContent(temporaryDirectory.absolutePath)
-            logger.info "About to trigger R command: setwd('$wd')"
-            rConnection.eval "setwd('${wd}')"
+ 	    String command = "setwd('${wd}')"
+           logger.info 'About to trigger R command: {}', command
+            rConnection.eval command
 
             /**
              * Please make sure that any and all variables you add to the map here are placed _after_ the putAll
@@ -47,20 +47,18 @@ class RCommandsStep implements Step {
              */
             Map vars = [:]
 
-            params.each { k, v ->
-                vars[k] = v
-            }
+            params.each { k, v -> vars[k] = v }
 
             //lazy extra params are added after user params, to make sure there are no security breaches
             if (extraParams) {
-                vars.putAll(extraParams)
+                vars.putAll extraParams
             }
 
             vars.pluginDirectory = scriptsDirectory.absolutePath
             vars.temporaryDirectory = new File(temporaryDirectory, 'subset1_' + studyName).absolutePath
 
             //For each R step there is a list of commands.
-            stepList.each { String currentCommand ->
+            for (String currentCommand in stepList) {
                 runRCommand rConnection, currentCommand, vars
             }
         }
@@ -71,30 +69,30 @@ class RCommandsStep implements Step {
 
     private void runRCommand(RConnection connection, String command, Map vars) {
         String finalCommand = processTemplates command, vars
-        logger.info 'About to trigger R command: ' + finalCommand
+        logger.info 'About to trigger R command: {}', finalCommand
 
-        // TODO Set back silent mode REXP rObject = rConnection.parseAndEval('try(' + finalCommand + ', silent=TRUE)')
-        REXP rObject = connection.parseAndEval('try(' + finalCommand + ', silent=FALSE)')
+        // TODO Set back silent mode REXP rObject = rConnection.parseAndEval("try($finalCommand, silent=TRUE)")
+        REXP rObject = connection.parseAndEval("try($finalCommand, silent=FALSE)")
 
         if (rObject.inherits('try-error')) {
-            logger.error 'R command failure for:' + finalCommand
-            handleRError(rObject, connection)
+            logger.error 'R command failure for:{}', finalCommand
+            handleRError rObject, connection
         }
     }
 
-    static private void handleRError(REXP rObject, RConnection rConnection) throws RserveException {
+    private static void handleRError(REXP rObject, RConnection rConnection) throws RserveException {
         throw new RserveException(rConnection,
-                'There was an error running the R script for your job. ' +
-                        'Details: ' + rObject.asString())
+				  'There was an error running the R script for your job. Details: ' +
+				  rObject.asString())
     }
 
-    static private String processTemplates(String template, Map vars) {
+    private static String processTemplates(String template, Map vars) {
         Map escapedVars = [:].withDefault { k ->
             if (vars.containsKey(k)) {
                 RUtil.escapeRStringContent vars[k].toString()
             }
         }
-        SimpleTemplateEngine engine = new SimpleTemplateEngine()
-        engine.createTemplate(template).make(escapedVars)
+
+        new SimpleTemplateEngine().createTemplate(template).make escapedVars
     }
 }

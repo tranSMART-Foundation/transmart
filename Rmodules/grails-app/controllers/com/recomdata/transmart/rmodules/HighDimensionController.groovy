@@ -17,74 +17,60 @@ class HighDimensionController {
 
     HighDimensionResource highDimensionResourceService
 
-    @Lazy volatile JSON dataTypesMap = {
-        def output
-        output = highDimensionResourceService.knownTypes.collectEntries {
-            def subResource =
-                    highDimensionResourceService.getSubResourceForType(it)
-            [
-                    it,
-                    [
-                            assayConstraint: subResource.supportedAssayConstraints,
-                            dataConstraints: subResource.supportedDataConstraints,
-                            projections:     subResource.supportedProjections,
-                    ]
-            ]
-        }
-        output as JSON
+    @Lazy
+    volatile JSON dataTypesMap = {
+	def output = highDimensionResourceService.knownTypes.collectEntries {
+	    HighDimensionDataTypeResource subResource = highDimensionResourceService.getSubResourceForType(it)
+	    [it, [assayConstraint: subResource.supportedAssayConstraints,
+		  dataConstraints: subResource.supportedDataConstraints,
+		  projections:     subResource.supportedProjections]]
+	}
+	output as JSON
     }()
 
     def knownDataTypes() {
-        render dataTypesMap
+	render dataTypesMap
     }
 
     def nodeDetails() {
-        def constraints = []
+	List<AssayConstraint> constraints = []
 
-        constraints << highDimensionResourceService.createAssayConstraint(
-                AssayConstraint.DISJUNCTION_CONSTRAINT,
-                subconstraints: [
-                        (AssayConstraint.ONTOLOGY_TERM_CONSTRAINT):
-                                (params.conceptKeys instanceof String[] ?
-                                        params.conceptKeys :
-                                        [params.conceptKeys]).collect {[concept_key: it]} ])
+	constraints << highDimensionResourceService.createAssayConstraint(
+	    AssayConstraint.DISJUNCTION_CONSTRAINT,
+	    subconstraints: [
+		(AssayConstraint.ONTOLOGY_TERM_CONSTRAINT):
+		    (params.conceptKeys instanceof String[] ?
+		     params.conceptKeys :
+		     [params.conceptKeys]).collect {[concept_key: it]} ])
 
-        def assayMultiMap = highDimensionResourceService.
-                getSubResourcesAssayMultiMap(constraints)
+	Map<HighDimensionDataTypeResource, Collection<Assay>> assayMultiMap =
+	    highDimensionResourceService.getSubResourcesAssayMultiMap(constraints)
 
-        def result = assayMultiMap.collectEntries { HighDimensionDataTypeResource dataTypeResource,
-                                                    Collection<Assay> assays ->
-            def details = [
-                    platforms:   new HashSet<Platform>(),
-                    trialNames:  new HashSet<String>(),
-                    timepoints:  new HashSet<Timepoint>(),
-                    tissueTypes: new HashSet<TissueType>(),
-                    sampleTypes: new HashSet<SampleType>(),
-            ]
+	def result = assayMultiMap.collectEntries { HighDimensionDataTypeResource dataTypeResource,
+		                                   Collection<Assay> assays ->
+						   Map<String, Set> details = [
+		platforms:   [] as Set,
+		trialNames:  [] as Set,
+		timepoints:  [] as Set,
+		tissueTypes: [] as Set,
+		sampleTypes: [] as Set,
+	    ]
 
-            [
-                    dataTypeResource.dataTypeName,
-                    assays.inject(details, { accum, Assay assay ->
-                        accum.platforms   << platformToMap(assay.platform)
-                        accum.trialNames  << assay.trialName
-                        accum.timepoints  << assay.timepoint
-                        accum.tissueTypes << assay.tissueType
-                        accum.sampleTypes << assay.sampleType
-                        accum
-                    })
-            ]
-        }
+						   [dataTypeResource.dataTypeName,
+						    assays.inject(details, { Map<String, Set> accum, Assay assay ->
+		    accum.platforms   << platformToMap(assay.platform)
+		    accum.trialNames  << assay.trialName
+		    accum.timepoints  << assay.timepoint
+		    accum.tissueTypes << assay.tissueType
+		    accum.sampleTypes << assay.sampleType
+		    accum
+		})]
+	}
 
-        render result as JSON
+	render result as JSON
     }
 
-    private platformToMap(Platform p) {
-        Platform.metaClass.properties.
-                collect { it.name }.
-                minus(['class', 'template']).
-                collectEntries {
-                    [  it, p[it] ]
-                }
+    private Map platformToMap(Platform p) {
+	Platform.metaClass.properties.collect { it.name }.minus(['class', 'template']).collectEntries { [it, p[it] ] }
     }
-
 }

@@ -30,31 +30,27 @@ class BoxPlotVariableColumnConfigurator extends OptionalBinningColumnConfigurato
         binningConfigurator.additionalEnablingCheck = { UserParameters params ->
             getStringParam(keyForBinnedVariable) == valueForThisColumnBeingBinned
         }
-        forceNumericBinning             = false
+        forceNumericBinning = false
     }
 
     @Override
     void doAddColumn(Closure<Column> decorateColumn) {
         /* if we have only one variable, we don't necessary want maps as values
          * (namely, we don't want them if we have a clinical variable). */
-        numericColumnConfigurationClass =
-                isMultiVariable() ?
-                        ContextNumericVariableColumnConfigurator :
-                        NumericColumnConfigurator
+        numericColumnConfigurationClass = isMultiVariable() ?
+            ContextNumericVariableColumnConfigurator :
+            NumericColumnConfigurator
 
         super.doAddColumn decorateColumn
     }
 
     @Override
     void setHeader(String header) {
-        throw new UnsupportedOperationException(
-                'Column header is automatically assigned')
+        throw new UnsupportedOperationException('Column header is automatically assigned')
     }
 
     @Override
     String getHeader() {
-        categoricalOrBinned ?
-                categoricalColumnHeader :
-                numericColumnHeader
+        categoricalOrBinned ? categoricalColumnHeader : numericColumnHeader
     }
 }

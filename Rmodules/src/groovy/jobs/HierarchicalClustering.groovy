@@ -1,10 +1,12 @@
 package jobs
 
+import groovy.transform.CompileStatic
 import jobs.steps.Step
 import jobs.steps.ValueGroupDumpDataStep
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
+@CompileStatic
 @Component
 @Scope('job')
 class HierarchicalClustering extends HighDimensionalOnlyJob {
@@ -34,7 +36,7 @@ class HierarchicalClustering extends HighDimensionalOnlyJob {
     }
 
     @Override
-    protected getForwardPath() {
-        '/RHClust/heatmapOut?jobName=' + name
+    protected String getForwardPath() {
+        "/RHClust/heatmapOut?jobName=${name}"
     }
 }

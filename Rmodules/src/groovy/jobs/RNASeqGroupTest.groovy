@@ -1,7 +1,13 @@
 package jobs
 
 import com.recomdata.transmart.util.ZipService
-import jobs.steps.*
+import jobs.steps.BuildTableResultStep
+import jobs.steps.OpenHighDimensionalDataStep
+import jobs.steps.RCommandsStep
+import jobs.steps.RNASeqDumpDataStep
+import jobs.steps.SimpleDumpTableResultStep
+import jobs.steps.Step
+import jobs.steps.ZipResultsStep
 import jobs.steps.helpers.CategoricalColumnConfigurator
 import jobs.steps.helpers.HighDimensionColumnConfigurator
 import jobs.steps.helpers.SimpleAddColumnConfigurator
@@ -107,7 +113,7 @@ class RNASeqGroupTest extends AbstractAnalysisJob {
     }
 
     @Override
-    protected getForwardPath() {
-        return '/RNASeqgroupTest/RNASeqgroupTestOutput?jobName=' + name
+    protected String getForwardPath() {
+        "/RNASeqgroupTest/RNASeqgroupTestOutput?jobName=${name}"
     }
 }

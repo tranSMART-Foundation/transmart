@@ -12,13 +12,12 @@ class SimpleDumpTableResultStep extends AbstractDumpStep {
 
     final String statusName = 'Dumping Table Result'
 
-    @Override
     void execute() {
         try {
-            withDefaultCsvWriter { CSVWriter it ->
-                writeHeader it
+            withDefaultCsvWriter { CSVWriter writer ->
+                writeHeader writer
 
-                writeMeat it
+                writeMeat writer
             }
         }
         finally {
@@ -40,22 +39,21 @@ class SimpleDumpTableResultStep extends AbstractDumpStep {
 
 
     void writeMeat(CSVWriter writer) {
-        def rows = getMainRows()
+        Iterator rows = getMainRows()
         if (!rows.hasNext()) {
-            throw new EmptySetException('The result set is empty. ' +
-                    'Number of patients dropped owing to mismatched ' +
-                    'data: ' + table.droppedRows)
+            throw new EmptySetException(
+		'The result set is empty. Number of patients dropped owing to mismatched data: ' +
+		    table.droppedRows)
         }
+
         rows.each {
             writer.writeNext(it as String[])
         }
     }
 
     private void withDefaultCsvWriter(Closure constructFile) {
-        File output = new File(temporaryDirectory, outputFileName)
-        output.withWriter { writer ->
-            CSVWriter csvWriter = new CSVWriter(writer, '\t' as char)
-            constructFile.call(csvWriter)
+        new File(temporaryDirectory, outputFileName).withWriter { Writer writer ->
+			constructFile(new CSVWriter(writer, '\t' as char))
         }
     }
 }

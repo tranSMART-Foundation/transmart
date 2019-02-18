@@ -22,7 +22,6 @@ abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
         resultsHolder()
     }
 
-    @Override
     void execute() {
         try {
             writeDefaultCsv results, csvHeader
@@ -32,11 +31,7 @@ abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
         }
     }
 
-    abstract protected computeCsvRow(String subsetName,
-                                     String seriesName,
-                                     DataRow row,
-                                     AssayColumn column,
-                                     Object cell)
+    protected abstract computeCsvRow(String subsetName, String seriesName, DataRow row, AssayColumn column, cell)
 
     abstract List<String> getCsvHeader()
 
@@ -44,15 +39,16 @@ abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
         if (params.doGroupBySubject == 'true') {
             return [subsetName, patientId, seriesName].join('_')
         }
-        return [subsetName, seriesName, patientId].join('_')
+	else {
+            return [subsetName, seriesName, patientId].join('_')
+	}
     }
 
     private void withDefaultCsvWriter(Closure constructFile) {
         File output = new File(temporaryDirectory, outputFileName)
         output.createNewFile()
-        output.withWriter { writer ->
-            CSVWriter csvWriter = new CSVWriter(writer, '\t' as char)
-            constructFile.call(csvWriter)
+        output.withWriter { Writer writer ->
+            constructFile(new CSVWriter(writer, '\t' as char))
         }
     }
 
@@ -62,20 +58,18 @@ abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
     private void writeDefaultCsv(Map<List<String>, TabularResult<AssayColumn, DataRow<AssayColumn, Object>>> results,
                                  List<String> header) {
 
-
         withDefaultCsvWriter { CSVWriter csvWriter ->
+            csvWriter.writeNext(header as String[])
 
-            csvWriter.writeNext header as String[]
-
-            results.keySet().each { key ->
-                doSubset(key, csvWriter)
+            for (key in results.keySet()) {
+                doSubset key, csvWriter
             }
         }
     }
 
     private void doSubset(List<String> resultsKey, CSVWriter csvWriter) {
 
-        def tabularResult = results[resultsKey]
+        TabularResult tabularResult = results[resultsKey]
         if (!tabularResult) {
             return
         }
@@ -83,34 +77,19 @@ abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
         String subsetName = resultsKey[0]
         String seriesName = resultsKey[1]
 
-        def assayList = tabularResult.indicesList
+        List<AssayColumn> assayColumns = tabularResult.indicesList
 
-        tabularResult.each { DataRow row ->
+        for (DataRow row in tabularResult) {
             if (callPerColumn) {
-                assayList.each { AssayColumn assay ->
-                    if (row[assay] == null) {
-                        return
+                for(AssayColumn assay in assayColumns) {
+                    if (row[assay] != null) {
+			csvWriter.writeNext(computeCsvRow(subsetName, seriesName, row, assay, row[assay]) as String[])
                     }
-
-                    def csvRow = computeCsvRow(subsetName,
-                            seriesName,
-                            row,
-                            assay,
-                            row[assay])
-
-                    csvWriter.writeNext csvRow as String[]
-                }
-            }
-            else {
-                def csvRow = computeCsvRow(subsetName,
-                        seriesName,
-                        row,
-                        null,
-                        null)
-
-                csvWriter.writeNext csvRow as String[]
+		}
+	    }
+	    else {
+		csvWriter.writeNext(computeCsvRow(subsetName, seriesName, row, null, null) as String[])
             }
         }
     }
-
 }

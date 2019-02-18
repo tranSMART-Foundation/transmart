@@ -13,17 +13,20 @@ class ConceptUtils {
                 parts[revPos]
             }
         }
-        groups.each {
+        for (Map.Entry<String, List<List<String>>> entry in groups.entrySet()) {
             //Concepts that grouped under it.key == null do not have so many levels.
-            if (it.key && it.value.size() > 1) {
-                shortenToUniqueTails(it.value, step + 1)
-            } else if (it.key) {
-                def parts = it.value[0]
-                //remove all parts of the concept path from the root down to current element (excluding it).
-                //note that we are changing input list here
-                (parts.size() + revPos).times { parts.remove(0) }
+            if (entry.key) {
+		if (entry.value.size() > 1) {
+                    shortenToUniqueTails(entry.value, step + 1)
+		}
+		else {
+                    List<String> parts = entry.value[0]
+                    //remove all parts of the concept path from the root down to current element (excluding it).
+                    //note that we are changing input list here
+                    (parts.size() + revPos).times { parts.remove(0) }
+		}
             }
-        }
+	}
     }
 
     /**
@@ -33,13 +36,15 @@ class ConceptUtils {
      * Although it does not guarantee uniqueness if input list already contains repetitions.
      * e.g. Given input list ['\A\B\C\', '\A\2\C\', '\B\C\', '\B\C\']
      * function returns ['\A\B\C\', '\2\C\', '\B\C\', '\B\C\']
-     * @param conceptPathes concepts to shorten
+     * @param conceptPaths concepts to shorten
      * @return shortened and normalized concept paths
      */
-    static List<String> shortestUniqueTails(List<String> conceptPathes) {
-        List<List<String>> conceptsParts = conceptPathes.collect { it.split(Pattern.quote(SEP)).findAll() }
+    static List<String> shortestUniqueTails(List<String> conceptPaths) {
+        List<List<String>> conceptsParts = conceptPaths.collect { String path ->
+	    path.split(Pattern.quote(SEP)).findAll() as List
+	}
         shortenToUniqueTails(conceptsParts)
-        conceptsParts.collect { SEP + it.join(SEP) + SEP }
+        conceptsParts.collect { List<String> list -> SEP + list.join(SEP) + SEP }
     }
 
 }

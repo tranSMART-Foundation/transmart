@@ -19,10 +19,8 @@ class TableWithFisher extends CategoricalOrBinnedJob {
     @Qualifier('general')
     OptionalBinningColumnConfigurator dependentVariableConfigurator
 
-    @Override
-    void afterPropertiesSet() throws Exception {
-        primaryKeyColumnConfigurator.column =
-                new PrimaryKeyColumn(header: 'PATIENT_NUM')
+    void afterPropertiesSet() {
+        primaryKeyColumnConfigurator.column = new PrimaryKeyColumn(header: 'PATIENT_NUM')
 
         configureConfigurator independentVariableConfigurator,
                 'indep', 'independent', 'X'
@@ -33,16 +31,16 @@ class TableWithFisher extends CategoricalOrBinnedJob {
     @Override
     protected List<String> getRStatements() {
         [ '''source('$pluginDirectory/TableWithFisher/FisherTableLoader.R')''',
-                '''
+         '''
                 FisherTable.loader(
                 input.filename               = '$inputFileName',
                 aggregate.probes.independent = '$divIndependentVariableprobesAggregation' == 'true',
                 aggregate.probes.dependent   = '$divDependentVariableprobesAggregation'   == 'true'
-                )''' ]
+                )''']
     }
 
     @Override
-    protected getForwardPath() {
-        """/tableWithFisher/fisherTableOut?jobName=$name"""
+    protected String getForwardPath() {
+        "/tableWithFisher/fisherTableOut?jobName=$name"
     }
 }

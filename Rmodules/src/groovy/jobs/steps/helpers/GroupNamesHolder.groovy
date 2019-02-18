@@ -1,8 +1,11 @@
 package jobs.steps.helpers
 
+import groovy.transform.CompileStatic
+
 /**
- * Class for holding all the group names that are generated.
+ * Holds generated group names.
  */
+@CompileStatic
 class GroupNamesHolder {
     List<String> groupNames
 }

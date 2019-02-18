@@ -1,6 +1,6 @@
 eventCreatePluginArchiveStart = { stagingDir ->
     event('BuildInfoAddPropertiesStart', [stagingDir])
-    writeProperties(getEnvProperties(), '' + stagingDir + '/application.properties')
+    writeProperties(getEnvProperties(), "${stagingDir}/application.properties")
     event('BuildInfoAddPropertiesEnd', [stagingDir])
 }
 
@@ -52,7 +52,7 @@ def getRevision() {
     // maybe a local git?
     if (!scmVersion) {
         try {
-            def command = '''git rev-parse HEAD'''
+            def command = 'git rev-parse HEAD'
             def proc = command.execute()
             proc.waitFor()
             if (proc.exitValue() == 0) {
@@ -109,7 +109,7 @@ def getEstimateRevisionFromGitFolder() {
         if (headFile.exists()) {
             def headContents = headFile.text.trim()
             refsHeadPath = headContents.split(':')[1].trim()
-            def refsHeadFile = new File('.git/' + refsHeadPath)
+            def refsHeadFile = new File(".git/${refsHeadPath}")
             if (refsHeadFile.isFile()) {
                 return refsHeadFile.text.trim()
             }

@@ -42,8 +42,7 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
     /* if numeric variables must be binned */
     boolean forceNumericBinning = true
 
-    protected Class<? extends ColumnConfigurator> numericColumnConfigurationClass =
-            NumericColumnConfigurator
+    protected Class<? extends ColumnConfigurator> numericColumnConfigurationClass = NumericColumnConfigurator
 
     private ColumnConfigurator innerConfigurator
 
@@ -52,12 +51,10 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
 
     private void setupInnerConfigurator(String conceptPaths) {
 
-        boolean emptyConcept = (conceptPaths == '')
-
+        boolean emptyConcept = !conceptPaths
         if (emptyConcept) {
             //when required we will never reach here
-            logger.debug('Not required and no value for ' + keyForConceptPaths + ', ' +
-                    'assuming constant value column')
+            logger.debug 'Not required and no value for {}, assuming constant value column', keyForConceptPaths
 
             innerConfigurator = appCtx.getBean SimpleAddColumnConfigurator
             innerConfigurator.column = new ConstantValueColumn(
@@ -67,8 +64,7 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
 
         }
         else if (categorical) {
-            logger.debug('Found pipe character in ' + keyForConceptPaths + ', ' +
-                    'assuming categorical data')
+            logger.debug 'Found pipe character in {}, assuming categorical data', keyForConceptPaths
 
             innerConfigurator = appCtx.getBean CategoricalColumnConfigurator
 
@@ -76,8 +72,7 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
             innerConfigurator.keyForConceptPaths = keyForConceptPaths
         }
         else {
-            logger.debug('Did not find pipe character in ' + keyForConceptPaths + ', ' +
-                    'assuming continuous data')
+            logger.debug 'Did not find pipe character in {}, assuming continuous data', keyForConceptPaths
 
             innerConfigurator = appCtx.getBean numericColumnConfigurationClass
 
@@ -92,20 +87,18 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
         binningConfigurator.innerConfigurator = innerConfigurator
     }
 
-
     @Override
     protected void doAddColumn(Closure<Column> decorateColumn) {
 
-        def conceptPaths = getConceptPaths()
-        setupInnerConfigurator(conceptPaths)
+        String conceptPaths = getConceptPaths()
+        setupInnerConfigurator conceptPaths
 
-        if (conceptPaths != '') {
+        if (conceptPaths) {
 
             if (!binningConfigurator.binningEnabled &&
                     !(innerConfigurator instanceof CategoricalColumnConfigurator) &&
                     forceNumericBinning) {
-                throw new InvalidArgumentsException('Numeric variables must be ' +
-                        'binned for column ' + getHeader())
+                throw new InvalidArgumentsException('Numeric variables must be binned for column ' + header)
             }
             
             //configure binning only if has variable
@@ -114,12 +107,12 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
     }
 
     boolean isCategorical() {
-        keyForIsCategorical ? getStringParam(keyForIsCategorical).equalsIgnoreCase('true')
-                            : isMultiVariable()
+        keyForIsCategorical ?
+	    getStringParam(keyForIsCategorical).equalsIgnoreCase('true') : isMultiVariable()
     }
 
     protected boolean isMultiVariable() {
-        getStringParam(keyForConceptPaths).contains('|')
+        getStringParam(keyForConceptPaths).contains '|'
     }
 
     boolean isCategoricalOrBinned() {
@@ -127,16 +120,16 @@ class OptionalBinningColumnConfigurator extends ColumnConfigurator {
     }
     /**
      * Sets parameter keys based on optional base key part
-     * @param keyPart
      */
     void setKeys(String keyPart = '') {
-        keyForConceptPaths    = '' + keyPart + 'Variable'
-        keyForDataType        = 'div' + keyPart.capitalize() + 'VariableType'
-        keyForSearchKeywordId = 'div' + keyPart.capitalize() + 'VariablePathway'
+	String cap = keyPart.capitalize()
+        keyForConceptPaths    = keyPart + 'Variable'
+        keyForDataType        = 'div' + cap + 'VariableType'
+        keyForSearchKeywordId = 'div' + cap + 'VariablePathway'
     }
 
     String getConceptPaths() {
         //if required this will fail on empty conceptPaths
-        getStringParam(keyForConceptPaths, required)
+        getStringParam keyForConceptPaths, required
     }    
 }

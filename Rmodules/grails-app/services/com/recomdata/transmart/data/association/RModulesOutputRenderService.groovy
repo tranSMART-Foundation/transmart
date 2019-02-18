@@ -1,14 +1,14 @@
 /*************************************************************************   
 * Copyright 2008-2012 Janssen Research & Development, LLC.
 *
-* Licensed under the Apache License, Version 2.0 (the 'License')
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
 *     http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an 'AS IS' BASIS,
+* distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
@@ -16,38 +16,41 @@
 
 package com.recomdata.transmart.data.association
 
+import com.recomdata.transmart.util.ZipService
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.beans.factory.annotation.Value
+import org.transmartproject.core.users.User
+
+import java.util.regex.Matcher
 
 @Slf4j('logger')
-class RModulesOutputRenderService {
+class RModulesOutputRenderService implements InitializingBean {
 
-	static scope         = 'request'
+    static scope = 'request'
+    static transactional = false
 
-	def grailsApplication
-	def zipService
     def asyncJobService
-    def currentUserBean
-	def tempDirectory = ''
-	def jobName = ''
-	def jobTypeName = ''
-	def zipLink = ''
+    User currentUserBean
+    ZipService zipService
+
+    String tempDirectory = ''
+    private String  jobName = ''
+    private String  jobTypeName = ''
+    String zipLink = ''
 	
-    //<editor-fold desc='Configuration fetching'>
-		
+    @Value('${RModules.tempFolderDirectory:}')
+    private String tempFolderDirectory
+
     /**
-     * The directOry where the job data is stored and from where the R scripts
-     * run.
+     * The directory where the job data is stored and from where the R scripts run.
      *
      * The odd name ('folderDirectory') is an historical artifact.
      *
      * @return the jobs directory
      */
-    private String getTempFolderDirectory() {
-        String dir = grailsApplication.config.RModules.tempFolderDirectory
-        if (dir && !dir.endsWith(File.separator)) {
-            dir += File.separator
-        }
-        dir
+    String getTempFolderDirectory() {
+	tempFolderDirectory
     }
 
     /**
@@ -57,184 +60,143 @@ class RModulesOutputRenderService {
      *
      * @return URL path from which images will be served
      */
-    private String getImageURL() {
+    String getImageURL() {
         '/analysisFiles/'
     }
-    //</editor-fold>
 
     /**
      * The logical path from which the images will be served that is used in
      * array CGH related analyses.
      * @return URL path from which images will be served without backslash as prefix
      */
-    private String getRelativeImageURL() {
+    String getRelativeImageURL() {
         'analysisFiles/'
     }
 
-    def initializeAttributes(jobName, jobTypeName, linksArray) {
-        logger.debug "initializeAttributes for jobName '$jobName'; jobTypeName " +
-                "'$jobTypeName'"
-        logger.debug 'Settings are: jobs directory -> $tempFolderDirectory, ' +
-                'images URL -> $imageURL'
+    void initializeAttributes(String jobName, String jobTypeName, List<String>links) {
+        logger.debug 'initializeAttributes for jobName "{}"; jobTypeName "{}"', jobName, jobTypeName
+        logger.debug 'Settings are: jobs directory -> {}, images URL -> {}', tempFolderDirectory, imageURL
 
         this.jobName = jobName
         this.jobTypeName = jobTypeName
 
         String analysisDirectory = tempFolderDirectory + jobName + File.separator
-        this.tempDirectory = analysisDirectory + 'workingDirectory' + File.separator
+        tempDirectory = analysisDirectory + 'workingDirectory' + File.separator
 
-        File tempDirectoryFile = new File(this.tempDirectory)
+        File tempDirectoryFile = new File(tempDirectory)
 
         // Rename and copy images if required, build image link list
-        tempDirectoryFile.traverse(nameFilter: ~/(?i).*\.png/) { currentImageFile ->
+        tempDirectoryFile.traverse(nameFilter: ~/(?i).*\.png/) { File currentImageFile ->
             // Replace spaces with underscores, as Tomcat 6 is unable
             // to find files with spaces in their name
             String newFileName = currentImageFile.name.replaceAll(/[^.a-zA-Z0-9-_]/, '_')
             File oldImage = new File(currentImageFile.path)
             File renamedImage = new File(tempDirectoryFile, newFileName)
-            logger.debug('Rename $oldImage to $renamedImage')
-            oldImage.renameTo(renamedImage)
+            logger.debug 'Rename {} to {}', oldImage, renamedImage
+            oldImage.renameTo renamedImage
 
             // Build url to image
-            String currentLink = '' + imageURL + '$jobName/workingDirectory/' + newFileName + ''
-            logger.debug('New image link: ' + currentLink)
-            linksArray.add(currentLink)
+            String currentLink = imageURL + jobName + File.separator + 'workingDirectory' + File.separator + newFileName
+            logger.debug 'New image link: {}', currentLink
+            links << currentLink
         }
 
         try {
-            boolean isAllowedToExport = asyncJobService.isUserAllowedToExportResults(currentUserBean, jobName)
-            if (isAllowedToExport) {
-                // Zip the working directory
-                String zipLocation = '' + analysisDirectory + 'zippedData.zip'
+	    if (asyncJobService.isUserAllowedToExportResults(currentUserBean, jobName)) {
+                String zipLocation = analysisDirectory + 'zippedData.zip'
                 if (!new File(zipLocation).isFile()) {
-                    zipService.zipFolder(tempDirectory, zipLocation)
+                    zipService.zipFolder tempDirectory, zipLocation
                 }
-                this.zipLink = '' + imageURL + '' + jobName + '/zippedData.zip'
+                zipLink = imageURL + jobName + File.separator + 'zippedData.zip'
             }
         }
-        catch (Exception e) {
-            logger.error(e)
+        catch (e) {
+            logger.error e.message, e
         }
     }
 	
-	def String fileParseLoop(tempDirectoryFile, fileNamePattern,
-                             fileNameExtractionPattern, fileParseFunction) {
-		//This is the string we return.
-		String parseValueString = ''
-		
-		//Reinitialize the text files array list.
-		def ArrayList<String> txtFiles = new ArrayList<String>()
-		
-		//Loop through the directory create an array of txt files to be parsed.
-		tempDirectoryFile.traverse(nameFilter: ~fileNamePattern) {
-			currentTextFile ->
-			
-			txtFiles.add(currentTextFile.path)
-		}
+    String fileParseLoop(File tempDirectoryFile, String fileNamePattern, String fileNameExtractionPattern, Closure fileParseClosure) {
+	StringBuilder parseValue = new StringBuilder()
 
-		//Loop through the file path array and parse each of the files. We do this to make different tables if there are multiple files.
-		txtFiles.each {
-			//Parse out the name of the group from the name of the text file.
-			def matcher = (it =~ fileNameExtractionPattern)
-			
-			if (matcher.matches() && txtFiles.size > 1) {
-				//Add the HTML that will separate the different files.
-				parseValueString += "<br /><br /><span class='AnalysisHeader'>" +
-                        '' + matcher[0][1] + '</span><hr />'
-			}
-			
-			//Create objects for the output file.
-			File parsableFile = new File(it)
-			
-			//Parse the output files.
-			parseValueString += fileParseFunction.call(parsableFile.getText())
-		}
-		
-		parseValueString
+	List<String> txtFiles = []
+	tempDirectoryFile.traverse(nameFilter: ~fileNamePattern) { File currentTextFile ->
+	    txtFiles << currentTextFile.path
 	}
 
-    def parseVersionFile() {
-        def tempDirectoryFile = new File(tempDirectory)
-        String versionData = fileParseLoop(tempDirectoryFile,/.*sessionInfo.*\.txt/,/.*sessionInfo(.*)\.txt/, parseVersionFileClosure)
+	//Loop through the file path array and parse each of the files. We do this to make different tables if there are multiple files.
+	for (String path in txtFiles) {
+	    Matcher matcher = path =~ fileNameExtractionPattern
+	    if (matcher.matches() && txtFiles.size() > 1) {
+		//Add the HTML that will separate the different files.
+		parseValue << '<br/><br/><span class="AnalysisHeader">'<< matcher[0][1] << '</span><hr/>'
+	    }
 
-        return versionData
+	    parseValue << fileParseClosure(new File(path).text)
+	}
+
+	parseValue
     }
 
-    def parseVersionFileClosure = {
-        statsInStr ->
-
-            //Buffer that will hold the HTML we output.
-            StringBuffer buf = new StringBuffer()
-
-            buf.append("<br /><a href='#' onclick='\$(\"versionInfoDiv\").toggle()'><span class='AnalysisHeader'>R Version Information</span></a><br /><br />")
-
-            buf.append("<div id='versionInfoDiv' style='display: none;'>")
-
-            //This will tell us if we are printing the contents of the package or the session info. We will print the package contents in a table.
-            Boolean packageCommand = false
-            Boolean firstPackageLine = true
-
-            statsInStr.eachLine {
-                        if(it.contains('||PACKAGEINFO||')) {
-                            packageCommand = true
-                            return
-                        }
-
-                        if(!packageCommand) {
-                            buf.append(it)
-                            buf.append('<br />')
-                        }
-                        else {
-                            def currentLine = it.split('\t')
-
-                            if(firstPackageLine) {
-                                buf.append("<br /><br /><table class='AnalysisResults'>")
-                                buf.append('<tr>')
-                                currentLine.each() {
-                                            currentSegment ->
-
-                                                buf.append('<th>' + currentSegment + '</th>')
-
-                                        }
-                                buf.append('</tr>')
-
-                                firstPackageLine = false
-                            }
-                            else {
-                                buf.append('<tr>')
-                                currentLine.each() {
-                                            currentSegment ->
-
-                                                buf.append('<td>' + currentSegment + '</td>')
-
-                                        }
-                                buf.append('</tr>')
-                            }
-                        }
-                    }
-
-            buf.append('</table>')
-            buf.append('</div>')
-
-            buf.toString()
+    String parseVersionFile() {
+	fileParseLoop new File(tempDirectory), /.*sessionInfo.*\.txt/,
+	/.*sessionInfo(.*)\.txt/, parseVersionFileClosure
     }
-	
-    def createDirectory(File directory) {
-        def dirs = []
-        while (directory && !directory.exists()) {
-            dirs = [directory] + dirs
-            directory = directory.parentFile
-        }
-        dirs.each {
-            if (!it.mkdir()) {
-                logger.error 'Directory $it neither exists, ' +
-                        'nor could it be created'
-                return false
+
+    private Closure parseVersionFileClosure = { String statsInStr ->
+
+        StringBuilder sb = new StringBuilder()
+
+        sb << "<br/><a href='#' onclick='\$(\"versionInfoDiv\").toggle()'><span class='AnalysisHeader'>R Version Information</span></a><br/><br/>"
+
+        sb << '<div id="versionInfoDiv" style="display: none;">'
+
+        //This will tell us if we are printing the contents of the package or the session info. We will print the package contents in a table.
+        boolean packageCommand = false
+        boolean firstPackageLine = true
+
+        for (String line in statsInStr.readLines()) {
+
+            if(line.contains('||PACKAGEINFO||')) {
+                packageCommand = true
+                continue
+            }
+
+            if(!packageCommand) {
+                sb << line
+                sb << '<br/>'
             }
             else {
-                logger.debug 'Created directory $it'
+                String segments = line.split('\t')
+
+                if(firstPackageLine) {
+                    sb << '<br/><br/><table class="AnalysisResults">'
+                    sb << '<tr>'
+                    for (segment in segments) {
+                        sb << '<th>' << segment << '</th>'
+                    }
+                    sb << '</tr>'
+
+                    firstPackageLine = false
+                }
+                else {
+                    sb << '<tr>'
+                    for (segment in segments) {
+                        sb << '<td>' << segment << '</td>'
+                    }
+                    sb << '</tr>'
+                }
             }
         }
-        true
+
+        sb << '</table>'
+        sb << '</div>'
+
+        sb
+    }
+
+    void afterPropertiesSet() {
+	if (tempFolderDirectory && !tempFolderDirectory.endsWith(File.separator)) {
+	    tempFolderDirectory += File.separator
+	}
     }
 }

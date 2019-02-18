@@ -1,6 +1,10 @@
 package jobs
 
-import jobs.steps.*
+import groovy.transform.CompileStatic
+import jobs.steps.BuildTableResultStep
+import jobs.steps.MultiRowAsGroupDumpTableResultsStep
+import jobs.steps.RCommandsStep
+import jobs.steps.Step
 import jobs.steps.helpers.NumericColumnConfigurator
 import jobs.steps.helpers.SimpleAddColumnConfigurator
 import jobs.table.Table
@@ -15,6 +19,7 @@ import java.security.InvalidParameterException
 
 import static jobs.steps.AbstractDumpStep.DEFAULT_OUTPUT_FILE_NAME
 
+@CompileStatic
 @Component
 @Scope('job')
 class ScatterPlot extends AbstractAnalysisJob {
@@ -33,35 +38,30 @@ class ScatterPlot extends AbstractAnalysisJob {
 
     @PostConstruct
     void init() {
-        primaryKeyColumnConfigurator.column =
-                new PrimaryKeyColumn(header: 'PATIENT_NUM')
+        primaryKeyColumnConfigurator.column = new PrimaryKeyColumn(header: 'PATIENT_NUM')
 
         configureConfigurator independentVariableConfigurator, 'independent', 'X'
         configureConfigurator dependentVariableConfigurator,   'dependent',   'Y'
 
-        /* we also need these two extra variables (see R statements) */
+        // we also need these two extra variables (see R statements)
         extraParamValidation()
     }
 
     private void extraParamValidation() {
         if (params['divIndependentVariablePathway'] != null) {
             if (params['divIndependentPathwayName'] == null) {
-                throw new InvalidParameterException(
-                        'Missing user parameter "divIndependentPathwayName"')
+                throw new InvalidParameterException('Missing user parameter "divIndependentPathwayName"')
             }
         }
 
         if (params['divDependentVariablePathway'] != null) {
             if (params['divDependentPathwayName'] == null) {
-                throw new InvalidParameterException(
-                        'Missing user parameter "divDependentPathwayName"')
+                throw new InvalidParameterException('Missing user parameter "divDependentPathwayName"')
             }
         }
     }
 
-    private void configureConfigurator(NumericColumnConfigurator configurator,
-                                       String key,
-                                       String header) {
+    private void configureConfigurator(NumericColumnConfigurator configurator, String key, String header) {
         configurator.header     = header
         configurator.projection = Projection.LOG_INTENSITY_PROJECTION
         configurator.multiRow   = true
@@ -113,7 +113,7 @@ class ScatterPlot extends AbstractAnalysisJob {
     }
 
     @Override
-    protected getForwardPath() {
-        '/scatterPlot/scatterPlotOut?jobName=' + name
+    protected String getForwardPath() {
+        "/scatterPlot/scatterPlotOut?jobName=$name"
     }
 }

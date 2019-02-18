@@ -1,6 +1,10 @@
 package jobs
 
-import jobs.steps.*
+import groovy.transform.CompileStatic
+import jobs.steps.BuildTableResultStep
+import jobs.steps.MultiRowAsGroupDumpTableResultsStep
+import jobs.steps.RCommandsStep
+import jobs.steps.Step
 import jobs.steps.helpers.BinningColumnConfigurator
 import jobs.steps.helpers.ColumnConfigurator
 import jobs.steps.helpers.OptionalBinningColumnConfigurator
@@ -12,6 +16,7 @@ import org.transmartproject.core.dataquery.highdim.projections.Projection
 
 import static jobs.steps.AbstractDumpStep.DEFAULT_OUTPUT_FILE_NAME
 
+@CompileStatic
 abstract class CategoricalOrBinnedJob extends AbstractAnalysisJob implements InitializingBean {
 
     @Autowired
@@ -49,10 +54,8 @@ abstract class CategoricalOrBinnedJob extends AbstractAnalysisJob implements Ini
         steps
     }
 
-    protected void configureConfigurator(OptionalBinningColumnConfigurator configurator,
-                                         String keyBinPart,
-                                         String keyVariablePart,
-                                         String header = null) {
+    protected void configureConfigurator(OptionalBinningColumnConfigurator configurator, String keyBinPart,
+                                         String keyVariablePart, String header = null) {
         if (header != null) {
             configurator.header = header
         }
@@ -60,18 +63,18 @@ abstract class CategoricalOrBinnedJob extends AbstractAnalysisJob implements Ini
 
         configurator.multiRow              = true
 
-        configurator.keyForConceptPaths    = '' + keyVariablePart + 'Variable'
-        configurator.keyForDataType        = 'div' + keyVariablePart.capitalize() + 'VariableType'
-        configurator.keyForSearchKeywordId = 'div' + keyVariablePart.capitalize() + 'VariablePathway'
+	String cap = keyVariablePart.capitalize()
+        configurator.keyForConceptPaths    = keyVariablePart + 'Variable'
+        configurator.keyForDataType        = 'div' + cap + 'VariableType'
+        configurator.keyForSearchKeywordId = 'div' + cap + 'VariablePathway'
 
-        BinningColumnConfigurator binningColumnConfigurator =
-                configurator.binningConfigurator
-        binningColumnConfigurator.keyForDoBinning       = 'binning' + keyBinPart.capitalize()
-        binningColumnConfigurator.keyForManualBinning   = 'manualBinning' + keyBinPart.capitalize()
-        binningColumnConfigurator.keyForNumberOfBins    = 'numberOfBins' + keyBinPart.capitalize()
-        binningColumnConfigurator.keyForBinDistribution = 'binDistribution' + keyBinPart.capitalize()
-        binningColumnConfigurator.keyForBinRanges       = 'binRanges' + keyBinPart.capitalize()
-        binningColumnConfigurator.keyForVariableType    = 'variableType' + keyBinPart.capitalize()
+	cap = keyBinPart.capitalize()
+        BinningColumnConfigurator binningColumnConfigurator = configurator.binningConfigurator
+        binningColumnConfigurator.keyForDoBinning       = 'binning' + cap
+        binningColumnConfigurator.keyForManualBinning   = 'manualBinning' + cap
+        binningColumnConfigurator.keyForNumberOfBins    = 'numberOfBins' + cap
+        binningColumnConfigurator.keyForBinDistribution = 'binDistribution' + cap
+        binningColumnConfigurator.keyForBinRanges       = 'binRanges' + cap
+        binningColumnConfigurator.keyForVariableType    = 'variableType' + cap
     }
-
 }

@@ -1,6 +1,10 @@
 package jobs
 
-import jobs.steps.*
+import groovy.transform.CompileStatic
+import jobs.steps.BuildTableResultStep
+import jobs.steps.MultiRowAsGroupDumpTableResultsStep
+import jobs.steps.RCommandsStep
+import jobs.steps.Step
 import jobs.steps.helpers.NumericColumnConfigurator
 import jobs.steps.helpers.OptionalBinningColumnConfigurator
 import jobs.steps.helpers.SimpleAddColumnConfigurator
@@ -16,6 +20,7 @@ import javax.annotation.PostConstruct
 
 import static jobs.steps.AbstractDumpStep.DEFAULT_OUTPUT_FILE_NAME
 
+@CompileStatic
 @Component
 @Scope('job')
 class LogisticRegression extends AbstractAnalysisJob {
@@ -104,7 +109,7 @@ class LogisticRegression extends AbstractAnalysisJob {
     }
 
     @Override
-    protected getForwardPath() {
-        return '/logisticRegression/logisticRegressionOutput?jobName=' + name
+    protected String getForwardPath() {
+        "/logisticRegression/logisticRegressionOutput?jobName=$name"
     }
 }

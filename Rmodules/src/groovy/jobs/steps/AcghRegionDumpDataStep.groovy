@@ -16,25 +16,21 @@ class AcghRegionDumpDataStep extends AbstractDumpHighDimensionalDataStep {
     }
 
     @Override
-    protected computeCsvRow(String subsetName,
-                            String seriesName,
-                            DataRow genericRow,
-                            AssayColumn column /* null */,
-                            Object cell /* null */) {
+    protected computeCsvRow(String subsetName, String seriesName, DataRow genericRow, AssayColumn column /* null */, Object cell /* null */) {
         RegionRow<AcghValues> row = genericRow
         // +1 because the first column has no header
-        def line = Lists.newArrayListWithCapacity(csvHeader.size() + 1)
-        line[0] = rowNumber++ as String
-        line[1] = row.chromosome as String
-        line[2] = row.start as String
-        line[3] = row.end as String
-        line[4] = row.numberOfProbes as String
-        line[5] = row.cytoband
+        List<String> line = Lists.newArrayListWithCapacity(csvHeader.size() + 1)
+        line << rowNumber++ as String
+        line << row.chromosome
+        line << row.start as String
+        line << row.end as String
+        line << row.numberOfProbes as String
+        line << row.cytoband
 
         int j = 6
 
         PER_ASSAY_COLUMNS.each {k, Closure<AcghValues> value ->
-            assays.each { AssayColumn assay ->
+            for (AssayColumn assay in assays) {
                 line[j++] = value(row.getAt(assay)) as String
             }
         }
@@ -42,28 +38,23 @@ class AcghRegionDumpDataStep extends AbstractDumpHighDimensionalDataStep {
         line
     }
 
-    @Lazy List<String> csvHeader = {
-        List<String> r = [
-                'chromosome',
-                'start',
-                'end',
-                'num.probes',
-                'cytoband',
-        ]
+    @Lazy
+    List<String> csvHeader = {
+        List<String> r = ['chromosome', 'start', 'end', 'num.probes', 'cytoband']
 
-        PER_ASSAY_COLUMNS.keySet().each {String head ->
-            assays.each { AssayColumn assay ->
-                r << '' + head + '.' + assay.patientInTrialId.toString()
+        for (String head in PER_ASSAY_COLUMNS.keySet()) {
+			for (AssayColumn assay in assays) {
+                r << "${head}.${assay.patientInTrialId}".toString()
             }
         }
 
         r
     }()
 
-    @Lazy def assays = {
+    @Lazy
+    List<AssayColumn> assays = {
         results.values().iterator().next().indicesList
     }()
-
 
     private static final Map PER_ASSAY_COLUMNS = [
             chip:     { AcghValues v -> v.getChipCopyNumberValue() },
@@ -73,5 +64,4 @@ class AcghRegionDumpDataStep extends AbstractDumpHighDimensionalDataStep {
             probgain: { AcghValues v -> v.getProbabilityOfGain() },
             probamp:  { AcghValues v -> v.getProbabilityOfAmplification() },
     ]
-
 }

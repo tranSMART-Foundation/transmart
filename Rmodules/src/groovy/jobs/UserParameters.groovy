@@ -1,25 +1,22 @@
 package jobs
 
-import com.google.common.collect.Maps
+import groovy.transform.CompileStatic
 import groovy.json.JsonBuilder
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
+@CompileStatic
 @Component
 @Scope('job')
 class UserParameters {
 
-    Map<String, Object> map = Maps.newHashMap()
+    Map<String, Object> map = [:]
 
-    Object getAt(String key) {
+    def getAt(String key) {
         map.getAt(key)
     }
 
-    /*Object putAt(String key, Object value) {
-        map.putAt(key, value)
-    }*/
-
-    Object getProperty(String propertyName) {
+    def getProperty(String propertyName) {
         getAt propertyName
     }
 
@@ -29,8 +26,8 @@ class UserParameters {
 
     String toJSON() {
         JsonBuilder builder = new JsonBuilder()
-        builder(new TreeMap(map)) //sorting the map so its easier to compare visually
-        return builder.toString()
+        builder new TreeMap(map) //sorting the map so its easier to compare visually
+        builder
     }
 
     void each(Closure c) {

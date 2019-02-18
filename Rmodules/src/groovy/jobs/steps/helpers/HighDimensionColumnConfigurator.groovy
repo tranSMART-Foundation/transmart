@@ -31,9 +31,9 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
 
     String projection
 
-    String keyForConceptPath,
-           keyForDataType,
-           keyForSearchKeywordId
+    String keyForConceptPath
+    String keyForDataType
+    String keyForSearchKeywordId
 
     boolean multiRow = false
 
@@ -54,20 +54,24 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
     @Autowired
     private ResultInstanceIdsHolder resultInstanceIdsHolder
 
-    @Lazy private List<String> conceptPaths = {
+    @Lazy
+    private List<String> conceptPaths = {
         getStringParam(keyForConceptPath).split(/\|/) as List
     }()
 
-    @Lazy private HighDimensionDataTypeResource subResource = {
+    @Lazy
+    private HighDimensionDataTypeResource subResource = {
         String dataType = getStringParam(keyForDataType)
         highDimensionResource.getSubResourceForType dataType
     }()
 
-    @Lazy private Projection createdProjection = {
+    @Lazy
+    private Projection createdProjection = {
         subResource.createProjection [:], projection
     }()
 
-    @Lazy private AssayConstraint patientSetConstraint = {
+    @Lazy
+    private AssayConstraint patientSetConstraint = {
         subResource.createAssayConstraint(
                 AssayConstraint.DISJUNCTION_CONSTRAINT,
                 subconstraints: [
@@ -77,20 +81,19 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
                                 }])
     }()
 
-    @Lazy private List<DataConstraint> dataConstraints = {
-        def searchKeywordIds = getStringParam(keyForSearchKeywordId).split(',') as List
-        def illegalSearchKeywordIds = searchKeywordIds.findAll{ !it.isLong() }
+    @Lazy
+    private List<DataConstraint> dataConstraints = {
+        List<String> searchKeywordIds = getStringParam(keyForSearchKeywordId).split(',')
+        List<String> illegalSearchKeywordIds = searchKeywordIds.findAll{ !it.isLong() }
         if (illegalSearchKeywordIds) {
             throw new InvalidArgumentsException("Illegal search keyword ids: ${illegalSearchKeywordIds.join(',')}")
         }
 
-        [subResource.createDataConstraint(
-                DataConstraint.SEARCH_KEYWORD_IDS_CONSTRAINT,
-                keyword_ids: searchKeywordIds)]
+        [subResource.createDataConstraint(DataConstraint.SEARCH_KEYWORD_IDS_CONSTRAINT, keyword_ids: searchKeywordIds)]
     }()
 
     private TabularResult<AssayColumn, Number> openResultSet(String conceptPath) {
-        def assayConstraints = [patientSetConstraint]
+        List<AssayConstraint> assayConstraints = [patientSetConstraint]
         assayConstraints << subResource.createAssayConstraint(
                 AssayConstraint.ONTOLOGY_TERM_CONSTRAINT,
                 concept_key: createConceptKeyFrom(conceptPath))
@@ -101,22 +104,18 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
     private Map<String, TabularResult> openMultipleResultSets() {
         assert multiConcepts
 
-         conceptPaths.collectEntries {
-            [it, openResultSet(it)]
-        }
+         conceptPaths.collectEntries { [it, openResultSet(it)] }
     }
 
     private Set<String> findCommonPatients(Map<String, TabularResult> results) {
         Map<TabularResult, List<AssayColumn>> mapOfAssayLists =
-                results.collectEntries { String conceptPath,
-                                         TabularResult result ->
-                    [result, result.indicesList]
-                }
+            results.collectEntries { String conceptPath, TabularResult result ->
+            [result, result.indicesList]
+        }
 
-        List<Set<String>> patientsSets = mapOfAssayLists.values().
-                collect { List<AssayColumn> assays ->
-                    Sets.newHashSet assays*.patientInTrialId
-                }
+        List<Set<String>> patientsSets = mapOfAssayLists.values().collect { List<AssayColumn> assays ->
+            Sets.newHashSet assays*.patientInTrialId
+        }
 
         Set<String> commonPatients = patientsSets[0]
         if (patientsSets.size() > 1) {
@@ -127,10 +126,10 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
 
         if (commonPatients.empty) {
             throw new InvalidArgumentsException(
-                    'The intersection of the patients for the assays of the ' +
-                            '' + commonPatients.size() + ' result sets is empty. ' +
-                            'The patient sets for each result are, in order: ' +
-                            patientsSets
+                "The intersection of the patients for the assays of the " +
+		    "${commonPatients.size()} result sets is empty. " +
+		    "The patient sets for each result are, in order: " +
+		    patientsSets
             )
         }
 
@@ -139,9 +138,8 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
 
     @Override
     protected void doAddColumn(Closure<Column> decorateColumn) {
-        if (conceptPaths.size() == 0) {
-            throw new InvalidArgumentsException(
-                    'Found empty concept paths list (key ' + keyForConceptPath + ')')
+        if (!conceptPaths) {
+            throw new InvalidArgumentsException("Found empty concept paths list (key $keyForConceptPath)")
         }
 
         if (!header) {
@@ -151,38 +149,29 @@ class HighDimensionColumnConfigurator extends ColumnConfigurator {
         Map<String, TabularResult> tabularResults
         Set<String> commonPatients
         if (conceptPaths.size() == 1 && !multiConcepts) {
-            tabularResults = ImmutableMap.of(
-                    header + '_highdim',
-                    openResultSet(conceptPaths[0]))
+            tabularResults = ImmutableMap.of(header + '_highdim', openResultSet(conceptPaths[0]))
         }
         else {
             if (!multiConcepts) {
                 throw new InvalidArgumentsException(
-                        'Got multiple concept paths (key ' + keyForConceptPath + '), ' +
-                                'but multiConcepts is not on')
+                        "Got multiple concept paths (key $keyForConceptPath), but multiConcepts is not on")
             }
 
             tabularResults = openMultipleResultSets()
             commonPatients = findCommonPatients(tabularResults)
         }
 
-        tabularResults.each { String dataSourceName,
-                              TabularResult dataSource ->
+        tabularResults.each { String dataSourceName, TabularResult dataSource ->
             table.addDataSource dataSourceName, dataSource
         }
 
         def highDimColumn
         if (!multiRow) {
-            highDimColumn = new HighDimensionSingleRowResultColumn(
-                    header: header)
+            highDimColumn = new HighDimensionSingleRowResultColumn(header: header)
         }
         else {
-            highDimColumn = new HighDimensionMultipleRowsResultColumn(
-                    header:             header,
-                    patientsToConsider: commonPatients)
+            highDimColumn = new HighDimensionMultipleRowsResultColumn(header: header, patientsToConsider: commonPatients)
         }
-        table.addColumn(
-                decorateColumn.call(highDimColumn),
-                tabularResults.keySet())
+        table.addColumn decorateColumn(highDimColumn), tabularResults.keySet()
     }
 }

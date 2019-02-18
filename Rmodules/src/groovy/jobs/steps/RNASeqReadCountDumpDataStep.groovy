@@ -13,31 +13,24 @@ class RNASeqReadCountDumpDataStep extends AbstractDumpHighDimensionalDataStep {
     }
 
     @Override
-    protected computeCsvRow(String subsetName,
-                            String seriesName,
-                            DataRow genericRow,
-                            AssayColumn column /* null */,
-                            Object cell /* null */) {
+    protected computeCsvRow(String subsetName, String seriesName, DataRow genericRow, AssayColumn column /*null*/, cell /*null*/) {
 
         RegionRow<RnaSeqValues> row = genericRow
-        def line = Lists.newArrayListWithCapacity(csvHeader.size())
-        line[0] = row.bioMarker ?: row.name as String
+        List<String> line = Lists.newArrayListWithCapacity(csvHeader.size())
+        line <<  row.bioMarker ?: row.name as String
 
-        int j = 1
-
-        assays.each { AssayColumn assay ->
-            line[j++] = row.getAt(assay).readcount as String
+        for (AssayColumn assay in assays) {
+            line << row.getAt(assay).readcount as String
         }
 
         line
     }
 
-    @Lazy List<String> csvHeader = {
-        List<String> r = [
-                'regionname',
-        ]
+    @Lazy
+    List<String> csvHeader = {
+        List<String> r = ['regionname']
 
-        assays.each { AssayColumn assay ->
+        for (AssayColumn assay in assays) {
             r << assay.patientInTrialId
         }
 
@@ -47,5 +40,4 @@ class RNASeqReadCountDumpDataStep extends AbstractDumpHighDimensionalDataStep {
     @Lazy def assays = {
         results.values().iterator().next().indicesList
     }()
-
 }

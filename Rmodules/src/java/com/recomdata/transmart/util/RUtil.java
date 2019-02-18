@@ -25,8 +25,6 @@ public class RUtil {
      * double-quoted R string. The result will only contain ASCII
      * characters so the string can be serialized to any (reasonable) byte
      * stream.
-     * @param s
-     * @return
      */
     public static String escapeRStringContent(String s) {
         /* ok to overflow: will just give a NegativeArraySizeException */
@@ -46,17 +44,21 @@ public class RUtil {
             if (cp >= 0x80) { /* high characters */
                 if (cp <= 0xFFFF) {
                     sb.append(String.format("\\u%04X", cp));
-                } else {
+                }
+                else {
                     sb.append(String.format("\\U%08X", cp));
                 }
-            } else if (ESCAPE_SEQUENCES.containsKey(cp)) {
+            }
+            else if (ESCAPE_SEQUENCES.containsKey(cp)) {
                 sb.append(ESCAPE_SEQUENCES.get(cp));
-            } else if (cp < 0x20 || cp == 0x7F) {
+            }
+            else if (cp < 0x20 || cp == 0x7F) {
                 /* other control characters. This will force the string to
                  * be in UTF-8, which could otherwise not be necessary, but
                  * doing it this way keeps the code a little simpler */
                 sb.append(String.format("\\u%04X", cp));
-            } else {
+            }
+            else {
                 sb.appendCodePoint(cp);
             }
 
@@ -65,5 +67,4 @@ public class RUtil {
 
         return sb.toString();
     }
-
 }

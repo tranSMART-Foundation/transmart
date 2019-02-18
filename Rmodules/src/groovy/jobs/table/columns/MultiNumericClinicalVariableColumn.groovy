@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.clinical.ClinicalVariableColumn
 import org.transmartproject.core.dataquery.clinical.PatientRow
-import org.transmartproject.core.exceptions.InvalidArgumentsException
 
 /**
  * Column that supports an arbitrary number of numeric clinical variables
@@ -14,13 +13,13 @@ import org.transmartproject.core.exceptions.InvalidArgumentsException
 @CompileStatic
 class MultiNumericClinicalVariableColumn extends AbstractColumn {
 
-    /* clinical variable -> name of the group */
+    // clinical variable -> name of the group
     Map<ClinicalVariableColumn, String> clinicalVariables
 
     private PatientRow lastRow
 
     @Override
-    void onReadRow(String dataSourceName, Object row) {
+    void onReadRow(String dataSourceName, row) {
         assert lastRow == null
         assert row instanceof PatientRow
 
@@ -33,29 +32,18 @@ class MultiNumericClinicalVariableColumn extends AbstractColumn {
             return ImmutableMap.of()
         }
 
-        ImmutableMap.Builder<String, Object> builder =
-                ImmutableMap.builder()
+        ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder()
 
-        clinicalVariables.each { ClinicalVariableColumn col,
-                                 String groupName ->
+        clinicalVariables.each { ClinicalVariableColumn col, String groupName ->
             def value = lastRow.getAt col
             if (value != null) {
-                validateNumber col, value
+                value = validateNumber col, value
                 builder.put groupName, value
             }
         }
 
         PatientRow lastRowSaved = lastRow
         lastRow = null
-        ImmutableMap.of(
-                lastRowSaved.patient.inTrialId,
-                builder.build())
-    }
-
-    private void validateNumber(ClinicalVariableColumn col, Object value) {
-        if (!(value instanceof Number)) {
-            throw new InvalidArgumentsException(
-                    'Got non-numerical value for column ' + col + '; value was ' + value)
-        }
+        ImmutableMap.of(lastRowSaved.patient.inTrialId, builder.build()) as Map
     }
 }

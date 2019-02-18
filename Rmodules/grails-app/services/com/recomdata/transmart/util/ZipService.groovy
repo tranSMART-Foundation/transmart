@@ -17,38 +17,86 @@
  *
  ***************************************************************** */
 
-
 package com.recomdata.transmart.util
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.apache.commons.io.IOUtils
-import org.apache.commons.lang.StringUtils
 
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 @Slf4j('logger')
+@CompileStatic
 class ZipService {
 
-    boolean transactional = true
+    boolean transactional = false
 
     private static final int BUFFER_SIZE = 250 * 1024
 
     /**
-     * This method will bundle all the files into a zip file.
-     * If there are 2 files with the same name, only the first file is part of the zip.
-     *
-     * @param zipFileName
-     * @param files
-     *
-     * @return zipFile absolute path
-     *
+     * Zip a given folder.
      */
-    public static String bundleZipFile(String zipFileName, List<File> files) {
+    static String zipFolder(String srcFolder, String destZipFile) {
+
+        File zipFile = new File(destZipFile)
+	if (zipFile.exists() && zipFile.isFile() && zipFile.delete()) {
+	    zipFile = new File(destZipFile)
+	}
+
+        ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(zipFile))
+
+	addFolderToZip '', srcFolder, zip
+	zip.flush()
+	zip.close()
+
+	zipFile.name
+    }
+
+    private static void addFileToZip(String path, String srcFile, ZipOutputStream zip) {
+
+        File folder = new File(srcFile)
+        if (folder.isDirectory()) {
+            addFolderToZip path, srcFile, zip
+	    return
+        }
+
+        byte[] buf = new byte[BUFFER_SIZE]
+        int len
+        FileInputStream inStream = new FileInputStream(srcFile)
+        try {
+            zip.putNextEntry(new ZipEntry(path + '/' + folder.name))
+            while ((len = inStream.read(buf)) > 0) {
+                zip.write buf, 0, len
+            }
+        }
+        finally {
+            IOUtils.closeQuietly inStream
+        }
+    }
+
+    private static void addFolderToZip(String path, String srcFolder, ZipOutputStream zip) {
+        File folder = new File(srcFolder)
+
+        for (String fileName in folder.list()) {
+            if (!path) {
+                addFileToZip folder.name, srcFolder + '/' + fileName, zip
+            }
+            else {
+                addFileToZip path + '/' + folder.name, srcFolder + '/' + fileName, zip
+            }
+        }
+    }
+
+    /**
+     * Bundle all files into a zip file.
+     * If there are 2 files with the same name, only the first file is part of the zip.
+     */
+    static String bundleZipFile(String zipFileName, List<File> files) {
         File zipFile = null
         Map<String, File> filesMap = new HashMap<String, File>()
 
-        if (StringUtils.isEmpty(zipFileName)) return null
+        if (!zipFileName) return null
 
         try {
             zipFile = new File(zipFileName)
@@ -61,16 +109,16 @@ class ZipService {
             byte[] buffer = new byte[BUFFER_SIZE]
 
             for (File file : files) {
-                if (filesMap.containsKey(file.getName())) {
+                if (filesMap.containsKey(file.name)) {
                     continue
                 }
                 else if (file.exists() && file.canRead()) {
-                    filesMap.put(file.getName(), file)
-                    zipOut.putNextEntry(new ZipEntry(file.getName()))
+                    filesMap.put(file.name, file)
+                    zipOut.putNextEntry(new ZipEntry(file.name))
                     FileInputStream fis = new FileInputStream(file)
                     int bytesRead
                     while ((bytesRead = fis.read(buffer)) != -1) {
-                        zipOut.write(buffer, 0, bytesRead)
+                        zipOut.write buffer, 0, bytesRead
                     }
                     zipOut.flush()
                     zipOut.closeEntry()
@@ -83,70 +131,6 @@ class ZipService {
             //logger.error('Error while creating Zip file')
         }
 
-        return (null != zipFile) ? zipFile.getAbsolutePath() : null
-    }
-
-    /**
-     * This method will zip a given folder.
-     *
-     * @param srcFolder
-     * @param destZipFile
-     * @throws Exception
-     */
-    static public String zipFolder(String srcFolder, String destZipFile) throws Exception {
-        File zipFile = null
-        ZipOutputStream zip = null
-        FileOutputStream fileWriter = null
-
-        zipFile = new File(destZipFile)
-        if (zipFile.exists() && zipFile.isFile() && zipFile.delete()) {
-            zipFile = new File(destZipFile)
-        }
-
-        fileWriter = new FileOutputStream(zipFile)
-        zip = new ZipOutputStream(fileWriter)
-
-        addFolderToZip('', srcFolder, zip)
-        zip.flush()
-        zip.close()
-
-        return zipFile.getName()
-    }
-
-    static private void addFileToZip(String path, String srcFile, ZipOutputStream zip)
-            throws Exception {
-
-        File folder = new File(srcFile)
-        if (folder.isDirectory()) {
-            addFolderToZip(path, srcFile, zip)
-        }
-        else {
-            byte[] buf = new byte[BUFFER_SIZE]
-            int len
-            FileInputStream inStream = new FileInputStream(srcFile)
-            try {
-                zip.putNextEntry(new ZipEntry(path + '/' + folder.getName()))
-                while ((len = inStream.read(buf)) > 0) {
-                    zip.write(buf, 0, len)
-                }
-            }
-            finally {
-                IOUtils.closeQuietly(inStream)
-            }
-        }
-    }
-
-    static private void addFolderToZip(String path, String srcFolder, ZipOutputStream zip)
-            throws Exception {
-        File folder = new File(srcFolder)
-
-        for (String fileName : folder.list()) {
-            if (path.equals('')) {
-                addFileToZip(folder.getName(), srcFolder + '/' + fileName, zip)
-            }
-            else {
-                addFileToZip(path + '/' + folder.getName(), srcFolder + '/' + fileName, zip)
-            }
-        }
+        return (null != zipFile) ? zipFile.absolutePath : null
     }
 }

@@ -27,7 +27,8 @@ class OptionalColumnConfiguratorDecorator extends ColumnConfigurator {
 
         if (getStringParam(keyForEnabled, false)) {
             configuratorToUse = generalCase
-        } else {
+        }
+	else {
             configuratorToUse = fallback
         }
 
@@ -40,12 +41,11 @@ class OptionalColumnConfiguratorDecorator extends ColumnConfigurator {
 
     void setConstantColumnFallback(Object columnValue) {
         if (!header) {
-            throw new IllegalStateException(
-                    'Set this configurator\'s header before calling this method')
+            throw new IllegalStateException('Set this configurator\'s header before calling this method')
         }
+
         SimpleAddColumnConfigurator c = ctx.getBean(SimpleAddColumnConfigurator)
-        c.column = new ConstantValueColumn(header: header,
-                                           value:  columnValue)
+        c.column = new ConstantValueColumn(header: header, value:  columnValue)
         fallback = c
     }
 }

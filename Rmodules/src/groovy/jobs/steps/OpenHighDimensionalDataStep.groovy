@@ -1,7 +1,7 @@
 package jobs.steps
 
-import jobs.misc.AnalysisConstraints
 import jobs.UserParameters
+import jobs.misc.AnalysisConstraints
 import jobs.misc.Hacks
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
@@ -21,27 +21,28 @@ class OpenHighDimensionalDataStep implements Step {
     /* out */
     Map<List<String>, TabularResult> results = [:]
 
-    @Override
     void execute() {
         try {
             List<String> ontologyTerms = extractOntologyTerms()
-            extractPatientSets().eachWithIndex { resultInstanceId, index ->
-                ontologyTerms.each { ontologyTerm ->
+            extractPatientSets().eachWithIndex { int resultInstanceId, int index ->
+ 		for (ontologyTerm in ontologyTerms) {
                     String seriesLabel = ontologyTerm.split('\\\\')[-1]
                     List<String> keyList = ['S' + (index + 1), seriesLabel]
                     results[keyList] = fetchSubset(resultInstanceId, ontologyTerm)
                 }
             }
         }
-        catch(Throwable t) {
-            results.values().each { it.close() }
-            throw t
+        catch(e) {
+	    for (it in results.values()) {
+		it.close()
+	    }
+	    throw e
         }
     }
 
     private List<String> extractOntologyTerms() {
         analysisConstraints.assayConstraints.remove('ontology_term').collect {
-            Hacks.createConceptKeyFrom(it.term)
+            Hacks.createConceptKeyFrom it.term
         }
     }
 
@@ -49,7 +50,7 @@ class OpenHighDimensionalDataStep implements Step {
         analysisConstraints.assayConstraints.remove('patient_set').grep()
     }
 
-    private TabularResult fetchSubset(Integer patientSetId, String ontologyTerm) {
+    private TabularResult fetchSubset(int patientSetId, String ontologyTerm) {
 
         List<DataConstraint> dataConstraints = analysisConstraints['dataConstraints'].
                 collect { String constraintType, values ->
@@ -58,26 +59,22 @@ class OpenHighDimensionalDataStep implements Step {
                     }
                 }.grep()
 
-        List<AssayConstraint> assayConstraints = analysisConstraints['assayConstraints'].
-                collect { String constraintType, values ->
+        List<AssayConstraint> assayConstraints = analysisConstraints['assayConstraints'].collect { String constraintType, values ->
                     if (values) {
                         dataTypeResource.createAssayConstraint(values, constraintType)
                     }
                 }.grep()
 
-        assayConstraints.add(
-                dataTypeResource.createAssayConstraint(
-                        AssayConstraint.PATIENT_SET_CONSTRAINT,
-                        result_instance_id: patientSetId))
+        assayConstraints << dataTypeResource.createAssayConstraint(
+            AssayConstraint.PATIENT_SET_CONSTRAINT,
+            result_instance_id: patientSetId)
 
-        assayConstraints.add(
-                dataTypeResource.createAssayConstraint(
-                        AssayConstraint.ONTOLOGY_TERM_CONSTRAINT,
-                        concept_key: ontologyTerm))
+        assayConstraints << dataTypeResource.createAssayConstraint(
+            AssayConstraint.ONTOLOGY_TERM_CONSTRAINT,
+            concept_key: ontologyTerm)
 
-        Projection projection = dataTypeResource.createProjection([:],
-                analysisConstraints['projections'][0])
+        Projection projection = dataTypeResource.createProjection([:], analysisConstraints['projections'][0])
 
-        dataTypeResource.retrieveData(assayConstraints, dataConstraints, projection)
+        dataTypeResource.retrieveData assayConstraints, dataConstraints, projection
     }
 }

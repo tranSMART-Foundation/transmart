@@ -1,28 +1,28 @@
 package jobs.misc
 
-import com.google.common.collect.Maps
+import groovy.transform.CompileStatic
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
 /**
- * Created by carlos on 2/6/14.
+ * @author carlos
  */
+@CompileStatic
 @Component
 @Scope('job')
 class AnalysisConstraints {
 
-    Map<String, Object> map = Maps.newHashMap()
+    Map<String, Object> map = [:]
 
-    Object getAt(String key) {
-        map.getAt(key)
+    def getAt(String key) {
+        map[key]
     }
 
-    Object getProperty(String propertyName) {
+    def getProperty(String propertyName) {
         getAt propertyName
     }
 
     String toString() {
         'AnalysisConstraints' + map
     }
-
 }

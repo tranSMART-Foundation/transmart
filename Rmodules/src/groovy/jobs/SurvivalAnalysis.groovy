@@ -1,6 +1,10 @@
 package jobs
 
-import jobs.steps.*
+import groovy.transform.CompileStatic
+import jobs.steps.BuildTableResultStep
+import jobs.steps.MultiRowAsGroupDumpTableResultsStep
+import jobs.steps.RCommandsStep
+import jobs.steps.Step
 import jobs.steps.helpers.CensorColumnConfigurator
 import jobs.steps.helpers.NumericColumnConfigurator
 import jobs.steps.helpers.OptionalBinningColumnConfigurator
@@ -18,8 +22,9 @@ import org.transmartproject.core.dataquery.highdim.projections.Projection
 import static jobs.steps.AbstractDumpStep.DEFAULT_OUTPUT_FILE_NAME
 
 /**
- * Created by carlos on 1/20/14.
+ * @author carlos
  */
+@CompileStatic
 @Component
 @Scope('job')
 class SurvivalAnalysis extends AbstractAnalysisJob implements InitializingBean {
@@ -40,7 +45,6 @@ class SurvivalAnalysis extends AbstractAnalysisJob implements InitializingBean {
     @Autowired
     Table table
 
-    @Override
     void afterPropertiesSet() throws Exception {
         primaryKeyColumnConfigurator.column = new PrimaryKeyColumn(header: 'PATIENT_NUM')
 
@@ -65,7 +69,7 @@ class SurvivalAnalysis extends AbstractAnalysisJob implements InitializingBean {
         categoryVariableConfigurator.binningConfigurator.setKeys('')
         categoryVariableConfigurator.keyForConceptPaths = 'categoryVariable'
 
-        def missingValueAction = categoryVariableConfigurator.getConceptPaths() ?
+        def missingValueAction = categoryVariableConfigurator.conceptPaths ?
                 new MissingValueAction.DropRowMissingValueAction() :
                 new MissingValueAction.ConstantReplacementMissingValueAction(replacement: 'STUDY')
 
@@ -119,8 +123,8 @@ class SurvivalAnalysis extends AbstractAnalysisJob implements InitializingBean {
     }
 
     @Override
-    protected getForwardPath() {
-        '/survivalAnalysis/survivalAnalysisOutput?jobName=' + name
+    protected String getForwardPath() {
+        "/survivalAnalysis/survivalAnalysisOutput?jobName=$name"
     }
 
 }

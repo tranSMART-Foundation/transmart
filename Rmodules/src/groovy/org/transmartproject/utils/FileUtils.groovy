@@ -1,15 +1,15 @@
 package org.transmartproject.utils
 
 import au.com.bytecode.opencsv.CSVReader
+import groovy.transform.CompileStatic
 
 /**
- * Created with IntelliJ IDEA.
- * User: ruslan
- * Date: 20/06/2013
- * Time: 18:18
- * To change this template use File | Settings | File Templates.
+ * @author ruslan
  */
+@CompileStatic
 class FileUtils {
+
+    private static final int TO_END = -1
 
     /**
      * Parses character separated values file (csv, tsv,...) and return back table object.
@@ -37,50 +37,62 @@ class FileUtils {
      * ]
      * </pre></code>
      */
-    static def parseTable(args, File file) {
-        def resultRows = []
-        def buffReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), 'UTF-8'))
-        def csvReader = new CSVReader(buffReader, (args.separator ? args.separator : ',') as Character)
-        def rows = []
+    static Map parseTable(Map args, File file) {
+
+        Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), 'UTF-8'))
+	CSVReader csvReader = new CSVReader(reader, (args.separator ?: ',') as Character)
+
+	List<String[]> rows = []
         try {
             rows = csvReader.readAll()
-        } finally {
+        }
+	finally {
             csvReader.close()
         }
+
+	List<Map> resultRows = []
+
         if (rows) {
-            def headerRow = rows.remove(0) as List
-            def useFields = []
-            def usePositions = []
+	    Set<String> fields = (Set) args.fields
+	    Set<String> numberFields = (Set) args.numberFields
+
+	    List<String> headerRow = rows.remove(0) as List
+	    List<String> useFields = []
+	    List<Integer> usePositions = []
             headerRow.eachWithIndex {String entry, int i ->
-                if (!args.fields || args.fields.contains(entry)) {
+                if (!fields || fields.contains(entry)) {
                     useFields << entry
                     usePositions << i
                 }
             }
-            def sortByPosition = args.sort ? headerRow.indexOf(args.sort) : -1
+            int sortByPosition = args.sort ? headerRow.indexOf(args.sort) : -1
             if (sortByPosition >= 0) {
                 int dirMultiplier = args.dir ==~ /(?i)DESC/ ? -1 : 1
-                boolean isNumberSort = args.numberFields?.contains(args.sort) ?: false
-                rows.sort {row1, row2 ->
-                    def val1 = isNumberSort ? row1[sortByPosition].toDouble() : row1[sortByPosition]
-                    def val2 = isNumberSort ? row2[sortByPosition].toDouble() : row2[sortByPosition]
-                    val1.compareTo(val2) * dirMultiplier
+                boolean isNumberSort = numberFields?.contains(args.sort) ?: false
+		rows.sort { String[] row1, String[] row2 ->
+		    if (isNumberSort) {
+			row1[sortByPosition].toDouble().compareTo(row2[sortByPosition].toDouble()) * dirMultiplier
+		    }
+		    else {
+			row1[sortByPosition].compareTo(row2[sortByPosition]) * dirMultiplier
+		    }
                 }
             }
-            int start = args.start > 0 ? args.start : 0
-            final int TO_END = -1
-            int end = args.limit >= 0 ? args.limit + start - 1 : TO_END
+            int start = ((Integer) args.start) > 0 ? (int) args.start : 0
+            int end = ((Integer) args.limit) >= 0 ? (int) args.limit + start - 1 : TO_END
             if (end >= rows.size()) {
                 end = TO_END
             }
+
             if ((end == TO_END || start <= end) && start < rows.size()) {
-                rows[start..end].each {
-                    def rowMap = [:]
-                    List<String> useValues = it[usePositions]
+                for (String[] row in rows[start..end]) {
+                    Map rowMap = [:]
+                    List<String> useValues = row.getAt(usePositions)
                     useFields.eachWithIndex {String entry, int i ->
-                        rowMap[entry] = args.numberFields?.contains(entry) ? useValues[i].toDouble() : useValues[i]
+			String value = useValues[i]
+                        rowMap[entry] = numberFields?.contains(entry) ? value.toDouble() : value
                     }
-                    resultRows.add(rowMap)
+                    resultRows << rowMap
                 }
             }
         }

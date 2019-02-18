@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class that expects the context (map key) to be a concatenation to be in the
+ * Expects the context (map key) to be a concatenation to be in the
  * form &lt;concept path>|&lt;row label> and populates two columns after
  * the one with the original value -- the first with the concept path and the
  * second with the row label
@@ -29,7 +29,6 @@ public class TwoColumnExpandingMapIterator extends ExpandingMapIterator {
         Iterator<String> iterator = SPLITTER.split(entry.getKey()).iterator();
         getReturnArray()[index] = entry.getValue().toString();
         getReturnArray()[index + 1] = iterator.next();
-        getReturnArray()[index + 2] = iterator.hasNext() ?
-                iterator.next() : defaultRowLabel;
+        getReturnArray()[index + 2] = iterator.hasNext() ? iterator.next() : defaultRowLabel;
     }
 }

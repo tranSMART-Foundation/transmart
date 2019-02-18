@@ -27,24 +27,21 @@ class HighDimensionalDataRowMapAdapter extends ForwardingMap<String, Map<String,
          * In the future we may want to provide a MissingValueAction
          * to this class in order to customize this behavior */
         Map<String, AssayColumn> patientIdtoAssay =
-                Maps.uniqueIndex(assays,
-                        { AssayColumn assay ->
-                            assay.patientInTrialId
-                        } as Function)
+	    Maps.uniqueIndex(assays, { AssayColumn assay ->
+            assay.patientInTrialId
+        } as Function)
 
         Map<String, Map<String, Object> /* one entry */> patientIdToDataValue =
-                Maps.transformValues patientIdtoAssay,
-                        { AssayColumn assay ->
-                            def value = row.getAt(assay)
-                            if (value == null) {
-                                return null
-                            }
-                            ImmutableMap.of(contextPrepend + row.label, value)
-                        } as Function
+                Maps.transformValues patientIdtoAssay, { AssayColumn assay ->
+            def value = row.getAt(assay)
+            if (value == null) {
+                return null
+            }
+            ImmutableMap.of(contextPrepend + row.label, value)
+        } as Function
 
         // drop nulls
-        innerMap = Maps.filterValues patientIdToDataValue,
-                { Object value -> value != null } as Predicate
+        innerMap = Maps.filterValues patientIdToDataValue, { Object value -> value != null } as Predicate
     }
 
     @Override

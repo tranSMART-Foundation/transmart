@@ -5,50 +5,43 @@ import org.transmartproject.utils.FileUtils
 
 class aCGHgroupTestController {
 
-    def RModulesOutputRenderService
-    def grailsApplication
+    private static final Set<String> DEFAULT_FIELDS = ['chromosome', 'cytoband', 'start', 'end', 'pvalue', 'fdr'].asImmutable()
+    private static final Set<String>  DEFAULT_NUMBER_FIELDS = ['start', 'end', 'pvalue', 'fdr'].asImmutable()
 
-    final def DEFAULT_FIELDS = ['chromosome', 'cytoband', 'start', 'end', 'pvalue', 'fdr'] as Set
-    final Set DEFAULT_NUMBER_FIELDS = ['start', 'end', 'pvalue', 'fdr'] as Set
+    RModulesOutputRenderService RModulesOutputRenderService
 
-    def aCGHgroupTestOutput = {
-        def jobTypeName = 'aCGHgroupTest'
+    def aCGHgroupTestOutput(String jobName) {
+ 	List<String> imageLinks = []
+	RModulesOutputRenderService.initializeAttributes jobName, 'aCGHgroupTest', imageLinks
 
-        def imageLinks = new ArrayList<String>()
-
-        RModulesOutputRenderService.initializeAttributes(params.jobName, jobTypeName, imageLinks)
-
-        render(template: '/plugin/aCGHgroupTest_out', model: [zipLink: RModulesOutputRenderService.zipLink, imageLinks: imageLinks])
+        render template: '/plugin/aCGHgroupTest_out', model: [
+	    zipLink: RModulesOutputRenderService.zipLink,
+	    imageLinks: imageLinks]
     }
 
-    /**
-     * This function will return the image path
-     */
-    def imagePath = {
-        def imagePath = '' + RModulesOutputRenderService.relativeImageURL + params.jobName + '/workingDirectory/groups-test.png'
-        render imagePath
+    def imagePath(String jobName) {
+	render RModulesOutputRenderService.relativeImageURL + jobName + '/workingDirectory/groups-test.png'
     }
 
-    def resultTable = {
+    def resultTable(String jobName, String fields, String sort, Integer start, Integer limit, String dir) {
         response.contentType = 'text/json'
-        if (!(params?.jobName ==~ /(?i)[-a-z0-9]+/)) {
+        if (!(jobName ==~ /(?i)[-a-z0-9]+/)) {
             render new JSON([error: 'jobName parameter is required. It should contains just alphanumeric characters and dashes.'])
             return
         }
-        def file = new File('' + RModulesOutputRenderService.tempFolderDirectory, '' + params.jobName + '/workingDirectory/groups-test.txt')
+
+        File file = new File(RModulesOutputRenderService.tempFolderDirectory, jobName + '/workingDirectory/groups-test.txt')
         if (file.exists()) {
-            def fields = params.fields?.split('\\s*,\\s*') as Set ?: DEFAULT_FIELDS
+            Map obj = FileUtils.parseTable(file,
+					   start: start,
+					   limit: limit,
+					   fields: (fields?.split('\\s*,\\s*') as Set) ?: DEFAULT_FIELDS,
+					   sort: sort,
+					   dir: dir,
+					   numberFields: DEFAULT_NUMBER_FIELDS,
+					   separator: '\t')
 
-            def obj = FileUtils.parseTable(file,
-                    start: params.int('start'),
-                    limit: params.int('limit'),
-                    fields: fields,
-                    sort: params.sort,
-                    dir: params.dir,
-                    numberFields: DEFAULT_NUMBER_FIELDS,
-                    separator: '\t')
-
-            def json = new JSON(obj)
+            JSON json = new JSON(obj)
             json.prettyPrint = false
             render json
         }

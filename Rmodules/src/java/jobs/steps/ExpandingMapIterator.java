@@ -1,8 +1,16 @@
 package jobs.steps;
 
-import com.google.common.collect.*;
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.PeekingIterator;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 public class ExpandingMapIterator extends AbstractIterator<String[]> {
 
@@ -10,9 +18,7 @@ public class ExpandingMapIterator extends AbstractIterator<String[]> {
         this(preResults, mapIndexes, 1);
     }
 
-    protected ExpandingMapIterator(Iterator<List<Object>> preResults,
-                                   List<Integer> mapIndexes,
-                                   int numberOfNewRowsPerMapColumn) {
+    protected ExpandingMapIterator(Iterator<List<Object>> preResults, List<Integer> mapIndexes, int numberOfNewRowsPerMapColumn) {
         this.numberOfNewRowsPerMapColumn = numberOfNewRowsPerMapColumn;
         if (mapIndexes.isEmpty()) {
             throw new IllegalArgumentException("maxIndexes cannot be empty");
@@ -29,18 +35,18 @@ public class ExpandingMapIterator extends AbstractIterator<String[]> {
     protected int numberOfNewRowsPerMapColumn = 1;
 
     /* can be shared between calls to computeNext() */
-    private String[] _returnArray;
+    private String[] returnArray;
 
     protected String[] getReturnArray() {
         assert originalRow != null;
 
-        if (_returnArray == null) {
+        if (returnArray == null) {
             int outputSize = originalRow.size() +
                     transformedColumnsMap.size() * numberOfNewRowsPerMapColumn;
-            _returnArray = new String[outputSize];
+            returnArray = new String[outputSize];
         }
 
-        return _returnArray;
+        return returnArray;
     }
 
     private List<Object> originalRow;
@@ -57,8 +63,7 @@ public class ExpandingMapIterator extends AbstractIterator<String[]> {
     private void setTransformedColumnsIndexes(List<Integer> indexes) {
         int count = 0;
         for (Integer i: indexes) {
-            transformedColumnsMap.put(i,
-                    i + (count++ * numberOfNewRowsPerMapColumn));
+            transformedColumnsMap.put(i, i + (count++ * numberOfNewRowsPerMapColumn));
         }
     }
 
@@ -67,7 +72,7 @@ public class ExpandingMapIterator extends AbstractIterator<String[]> {
         if (originalRow == null) {
             // no row read yet or previous one already exhausted;
             if (!readOriginalRow()) {
-                return null; /* we got to the end, endOfData() was called */
+                return null; // we got to the end, endOfData() was called
             }
         }
 
@@ -81,7 +86,8 @@ public class ExpandingMapIterator extends AbstractIterator<String[]> {
             if (resetIterables()) {
                 prefillUnchangedColumns();
                 return true;
-            } else {
+            }
+            else {
                 // one or more iterables are empty; no rows will be generated
                 // for this original row
                 //continue
@@ -106,7 +112,8 @@ public class ExpandingMapIterator extends AbstractIterator<String[]> {
             if (index == nextTransformed) {
                 writingIndex += numberOfNewRowsPerMapColumn + 1;
                 nextTransformed = nextTransformedIterator.next();
-            } else {
+            }
+            else {
                 getReturnArray()[writingIndex++] = value.toString();
             }
         }
@@ -132,7 +139,8 @@ public class ExpandingMapIterator extends AbstractIterator<String[]> {
             for (IteratorWithCurrent<Map.Entry<String, Object>> iterator: mapIterators) {
                 iterator.next();
             }
-        } catch (NoSuchElementException nse) {
+        }
+        catch (NoSuchElementException nse) {
             return false; // one of the iterators is empty
         }
 
@@ -184,17 +192,14 @@ public class ExpandingMapIterator extends AbstractIterator<String[]> {
 
         T current;
 
-        @Override
         public boolean hasNext() {
             return inner.hasNext();
         }
 
-        @Override
         public T next() {
             return (current = inner.next());
         }
 
-        @Override
         public void remove() {
             inner.remove();
         }

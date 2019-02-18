@@ -1,9 +1,12 @@
 package jobs.steps.helpers
 
-import com.google.common.collect.Maps
 import jobs.table.Column
 import jobs.table.columns.ColumnDecorator
-import jobs.table.columns.binning.*
+import jobs.table.columns.binning.CategoricalBinningColumnDecorator
+import jobs.table.columns.binning.EvenDistributionBinningColumnDecorator
+import jobs.table.columns.binning.EvenSpacedBinningColumnDecorator
+import jobs.table.columns.binning.NumericBinRange
+import jobs.table.columns.binning.NumericManualBinningColumnDecorator
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import org.transmartproject.core.exceptions.InvalidArgumentsException
@@ -28,8 +31,7 @@ class BinningColumnConfigurator extends ColumnConfigurator {
 
     @Override
     protected void doAddColumn(Closure<Column> decorateColumn) {
-        innerConfigurator.addColumn(
-                compose(decorateColumn, createDecoratorClosure()))
+        innerConfigurator.addColumn compose(decorateColumn, createDecoratorClosure())
     }
 
     boolean isBinningEnabled() {
@@ -39,7 +41,7 @@ class BinningColumnConfigurator extends ColumnConfigurator {
 
     private Closure<Column> createDecoratorClosure() {
         if (binningEnabled) {
-            def decorator = createBinningDecorator()
+            ColumnDecorator decorator = createBinningDecorator()
             return { Column originalColumn ->
                 decorator.inner = originalColumn
                 decorator
@@ -53,28 +55,22 @@ class BinningColumnConfigurator extends ColumnConfigurator {
     private ColumnDecorator createBinningDecorator() {
         if (manualBinning) {
             if (variableContinuous) {
-                new NumericManualBinningColumnDecorator(
-                        binRanges: createBinRanges())
+                new NumericManualBinningColumnDecorator(binRanges: createBinRanges())
             }
             else {
-                new CategoricalBinningColumnDecorator(
-                        transformationMap: createConceptPathMap())
+                new CategoricalBinningColumnDecorator(transformationMap: createConceptPathMap())
             }
         }
         else {
             String distribution = getStringParam keyForBinDistribution
             if (distribution == 'EDP') {
-                new EvenDistributionBinningColumnDecorator(
-                        numberOfBins: getStringParam(keyForNumberOfBins) as int)
+                new EvenDistributionBinningColumnDecorator(numberOfBins: getStringParam(keyForNumberOfBins) as int)
             }
             else if (distribution == 'ESB') {
-                new EvenSpacedBinningColumnDecorator(
-                        numberOfBins: getStringParam(keyForNumberOfBins) as int)
+                new EvenSpacedBinningColumnDecorator(numberOfBins: getStringParam(keyForNumberOfBins) as int)
             }
             else {
-                throw new InvalidArgumentsException(
-                        'Invalid value for ' + keyForBinDistribution + ': ' +
-                        "expected 'EDP' or 'ESB', got $distribution")
+                throw new InvalidArgumentsException("Invalid value for $keyForBinDistribution: expected 'EDP' or 'ESB', got $distribution")
             }
         }
     }
@@ -85,19 +81,16 @@ class BinningColumnConfigurator extends ColumnConfigurator {
         binRangesString.split(/\|/).collect {
             String[] parts = it.split(',')
             if (parts.length != 3) {
-                throw new InvalidArgumentsException('Invalid bin range specification: ' + it + '. ' +
-                        'Complete value: ' + binRangesString)
+                throw new InvalidArgumentsException("Invalid bin range specification: ${it}. Complete value: $binRangesString")
             }
 
-            new NumericBinRange(
-                    from: parts[1] as BigDecimal,
-                    to:   parts[2] as BigDecimal)
-        }.sort { it.from }
+            new NumericBinRange(from: parts[1] as BigDecimal, to:   parts[2] as BigDecimal)
+        }.sort { NumericBinRange range -> range.from }
     }
 
     private Map<String, String> createConceptPathMap() {
         String binsString = getStringParam keyForBinRanges
-        Map result = Maps.newHashMap()
+        Map<String, String> result = [:]
 
         binsString.split(/\|/).each {
             String[] paths = it.split('<>')
@@ -119,15 +112,14 @@ class BinningColumnConfigurator extends ColumnConfigurator {
 
     /**
      * Sets parameter keys based on optional base key part
-     * @param keyPart
      */
     void setKeys(String keyPart = '') {
-        keyForDoBinning       = 'binning' + keyPart.capitalize()
-        keyForManualBinning   = 'manualBinning' + keyPart.capitalize()
-        keyForNumberOfBins    = 'numberOfBins' + keyPart.capitalize()
-        keyForBinDistribution = 'binDistribution' + keyPart.capitalize()
-        keyForBinRanges       = 'binRanges' + keyPart.capitalize()
-        keyForVariableType    = 'variableType' + keyPart.capitalize()
+		String cap = keyPart.capitalize()
+		keyForDoBinning = 'binning' + cap
+		keyForManualBinning = 'manualBinning' + cap
+		keyForNumberOfBins = 'numberOfBins' + cap
+		keyForBinDistribution = 'binDistribution' + cap
+		keyForBinRanges = 'binRanges' + cap
+		keyForVariableType = 'variableType' + cap
     }
-
 }

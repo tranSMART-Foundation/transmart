@@ -1,10 +1,12 @@
 package jobs
 
+import groovy.transform.CompileStatic
 import jobs.steps.PCADumpDataStep
 import jobs.steps.Step
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
+@CompileStatic
 @Component
 @Scope('job')
 class PCA extends HighDimensionalOnlyJob {
@@ -27,7 +29,7 @@ class PCA extends HighDimensionalOnlyJob {
                 )''' ]
 
     @Override
-    protected getForwardPath() {
-        '/PCA/pcaOut?jobName=' + name
+    protected String getForwardPath() {
+        "/PCA/pcaOut?jobName=$name"
     }
 }

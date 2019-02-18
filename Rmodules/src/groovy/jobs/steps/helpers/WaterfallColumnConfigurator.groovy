@@ -65,12 +65,12 @@ class WaterfallColumnConfigurator extends ColumnConfigurator {
         boolean found = false
 
         if (hasProperty(name)) {
-            def method = 'set' + name.capitalize()
+            def method = "set${name.capitalize()}"
             this."$method"(value)
             found = true
         }
         if (numericColumnConfigurator.hasProperty(name)) {
-            numericColumnConfigurator."$name" = value
+            numericColumnConfigurator[name] = value
             found = true
         }
 
@@ -80,20 +80,14 @@ class WaterfallColumnConfigurator extends ColumnConfigurator {
     }
 
     Closure<Boolean> createTester(String operator, String valueString) {
-        def value = valueString as BigDecimal
+        BigDecimal value = valueString as BigDecimal
         switch (operator) {
-            case '<':
-                return { it -> it < value }
-            case '<=':
-                return { it -> it <= value }
-            case '>':
-                return { it -> it > value }
-            case '>=':
-                return { it -> it >= value }
-            case '=':
-                return { it -> it == value }
-            default:
-                throw new InvalidArgumentsException('Bad value for operator: ' + operator)
+            case '<': return { it -> it < value }
+            case '<=': return { it -> it <= value }
+            case '>': return { it -> it > value }
+            case '>=': return { it -> it >= value }
+            case '=': return { it -> it == value }
+            default: throw new InvalidArgumentsException('Bad value for operator: ' + operator)
         }
     }
 

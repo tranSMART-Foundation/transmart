@@ -23,11 +23,11 @@ class HighDimensionSingleRowResultColumn extends AbstractColumn {
     }
 
     @Override
-    void onReadRow(String dataSourceName, Object row) {
+    void onReadRow(String dataSourceName, row) {
         assert row instanceof DataRow
 
         if (sawRow) {
-            logger.warn('Further rows from ' + dataSourceName + ' ignored')
+            logger.warn 'Further rows from {} ignored', dataSourceName
             return
         }
 
@@ -38,12 +38,14 @@ class HighDimensionSingleRowResultColumn extends AbstractColumn {
 
     @Override
     Map<String, Object> consumeResultingTableRows() {
-        if (!row) return ImmutableMap.of()
+        if (!row) {
+	    return ImmutableMap.of()
+	}
 
         ImmutableMap.Builder builder = ImmutableMap.builder()
         for (int i = 0; i < assays.size(); i++) {
             def value = row[i]
-            /* empty values are dropped */
+            // empty values are dropped
             if (value != null) {
                 builder.put assays[i].patientInTrialId,value
             }
@@ -52,5 +54,4 @@ class HighDimensionSingleRowResultColumn extends AbstractColumn {
         row = null
         builder.build()
     }
-
 }

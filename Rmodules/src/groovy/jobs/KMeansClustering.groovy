@@ -1,14 +1,15 @@
 package jobs
 
+import groovy.transform.CompileStatic
 import jobs.steps.Step
 import jobs.steps.ValueGroupDumpDataStep
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
+@CompileStatic
 @Component
 @Scope('job')
 class KMeansClustering extends HighDimensionalOnlyJob {
-
 
     @Override
     protected Step createDumpHighDimensionDataStep(Closure resultsHolder) {
@@ -35,7 +36,7 @@ class KMeansClustering extends HighDimensionalOnlyJob {
     }
 
     @Override
-    protected getForwardPath() {
-        '/RKMeans/heatmapOut?jobName=' + name
+    protected String getForwardPath() {
+        "/RKMeans/heatmapOut?jobName=$name"
     }
 }

@@ -57,13 +57,11 @@ class ContextNumericVariableColumnConfigurator extends ColumnConfigurator {
     @Override
     protected void doAddColumn(Closure<Column> decorateColumn) {
         if (clinicalData) {
-            logger.debug('' + keyForDataType + ' indicates clinical data; ' +
-                    'using the MultiNumericClinicalVariableColumnConfigurator')
+            logger.debug '{} indicates clinical data; using the MultiNumericClinicalVariableColumnConfigurator', keyForDataType
             multiClinicalConfigurator.doAddColumn decorateColumn
         }
         else {
-            logger.debug('' + keyForDataType + ' indicates high dim data; ' +
-                    'using the HighDimensionColumnConfigurator')
+            logger.debug '{} indicates high dim data; using the HighDimensionColumnConfigurator', keyForDataType
             multiHighDimConfigurator.doAddColumn decorateColumn
         }
     }
@@ -78,11 +76,10 @@ class ContextNumericVariableColumnConfigurator extends ColumnConfigurator {
     }
 
     boolean isClinicalData() {
-        getStringParam(keyForDataType) ==
-                NumericColumnConfigurator.CLINICAL_DATA_TYPE_VALUE
+        getStringParam(keyForDataType) == NumericColumnConfigurator.CLINICAL_DATA_TYPE_VALUE
     }
 
-    void setProperty(String name, Object value) {
+    void setProperty(String name, value) {
         if (name == 'keyForConceptPath' || name == 'keyForConceptPaths') {
             multiClinicalConfigurator.keyForConceptPaths = value
             multiHighDimConfigurator.keyForConceptPath   = value
@@ -94,10 +91,12 @@ class ContextNumericVariableColumnConfigurator extends ColumnConfigurator {
             multiClinicalConfigurator.setProperty name, value
             found = true
         }
+
         if (multiHighDimConfigurator.hasProperty(name)) {
             multiHighDimConfigurator.setProperty name, value
             found = true
         }
+
         if (!found) {
             throw new MissingPropertyException(name, getClass())
         }

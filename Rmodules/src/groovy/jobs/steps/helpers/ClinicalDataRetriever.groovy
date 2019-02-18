@@ -14,22 +14,18 @@ import org.transmartproject.core.dataquery.clinical.PatientRow
 @Scope('job')
 class ClinicalDataRetriever {
 
-    // work with only this case now
-    //boolean joinSubsets = true
-
     public static final String DATA_SOURCE_NAME = 'Clinical Data'
 
     private List<ClinicalVariable> variables = []
 
-    private boolean resultsGiven,
-                    attachedToTable
+    private boolean attachedToTable
+    private boolean resultsGiven
 
     @Autowired
     private ClinicalDataResource clinicalDataResource
 
     @Autowired
     private ResultInstanceIdsHolder resultInstanceIdsHolder
-
 
     /* this method sort of handles the case of the same variable being added
      * twice. In some variable was submitted earlier, it returns the original
@@ -40,14 +36,15 @@ class ClinicalDataRetriever {
      * concept path and then via concept code. */
     ClinicalVariable leftShift(ClinicalVariable var) {
         if (resultsGiven) {
-            throw new IllegalStateException(
-                    'Cannot add column, results already opened')
+            throw new IllegalStateException('Cannot add column, results already opened')
         }
+
         int i = variables.indexOf var
         if (i != -1) {
             variables[i]
-        } else {
-            variables.add(var)
+        }
+	else {
+            variables << var
             var
         }
     }
@@ -76,8 +73,7 @@ class ClinicalDataRetriever {
 
         resultsGiven = true
 
-        clinicalDataResource.retrieveData(
-                resultInstanceIdsHolder.queryResults, variables)
+        clinicalDataResource.retrieveData resultInstanceIdsHolder.queryResults, variables
     }
 
     void attachToTable(Table table) {
@@ -85,8 +81,7 @@ class ClinicalDataRetriever {
             return
         }
 
-        table.addDataSource(DATA_SOURCE_NAME,
-                new LazyDataSource(makeDataSource: this.&getResults))
+        table.addDataSource DATA_SOURCE_NAME, new LazyDataSource(makeDataSource: this.&getResults)
 
         attachedToTable = true
     }
@@ -97,15 +92,15 @@ class ClinicalDataRetriever {
 
         private Iterable storedDataSource
 
-        @Override
-        void close() throws Exception {
+        void close() {
             if (storedDataSource == null) {
                 return
             }
 
             if (dataSource instanceof Closeable) {
                 ((Closeable) dataSource).close()
-            } else if (dataSource instanceof AutoCloseable) {
+            }
+	    else if (dataSource instanceof AutoCloseable) {
                 ((AutoCloseable) dataSource).close()
             }
         }
@@ -118,14 +113,12 @@ class ClinicalDataRetriever {
             storedDataSource
         }
 
-        @Override
         Iterator iterator() {
             dataSource.iterator()
         }
 
-        @Override
         def invokeMethod(String name, args) {
-            dataSource.invokeMethod(name, args)
+            dataSource.invokeMethod name, args
         }
     }
 }

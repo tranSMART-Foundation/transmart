@@ -7,15 +7,16 @@ class LineGraphDumpTableResultsStep extends MultiRowAsGroupDumpTableResultsStep 
 
     private int callsToAddGroupColumnHeaders = 0
 
-    private int plotGroupColumnIndex,
-                plotSecondaryColumnIndex
+    private int plotGroupColumnIndex
+    private int plotSecondaryColumnIndex
 
     protected void addGroupColumnHeaders(List<String> headerList) {
         if (callsToAddGroupColumnHeaders == 0) {
             headerList << 'GROUP'        // concept path
             headerList << 'PLOT_GROUP'   // row label (e.g. probe)
             plotGroupColumnIndex = headerList.size() - 1
-        } else if (callsToAddGroupColumnHeaders == 1) {
+        }
+	else if (callsToAddGroupColumnHeaders == 1) {
             headerList << 'PLOT_GROUP_SECONDARY' // will be merged into PLOT_GROUP
             headerList << 'DUMMY' // we actually want to expand this second
                                   // map-value column into only one column, but
@@ -23,7 +24,8 @@ class LineGraphDumpTableResultsStep extends MultiRowAsGroupDumpTableResultsStep 
                                   // We don't have any iterator decorator that can
                                   // mix the two types of expansions
             plotSecondaryColumnIndex = headerList.size() - 2
-        } else {
+        }
+	else {
             // should not happen
             throw new IllegalStateException('Too many map values')
         }
@@ -33,17 +35,17 @@ class LineGraphDumpTableResultsStep extends MultiRowAsGroupDumpTableResultsStep 
 
     @Override
     protected List<String> getHeaders() {
-        def original = super.getHeaders()
+        List<String> original = super.getHeaders()
         if (original[-1] == 'DUMMY') {
             original[0..(plotSecondaryColumnIndex - 1)]
-        } else {
+        }
+	else {
             original
         }
     }
 
     protected createDecoratingIterator() {
-        def expandingIterator = new TwoColumnExpandingMapIterator(
-                preResults, transformedColumnsIndexes)
+        def expandingIterator = new TwoColumnExpandingMapIterator(preResults, transformedColumnsIndexes)
 
         if (super.getHeaders()[-1] == 'DUMMY') {
             // last column is a map
@@ -60,11 +62,11 @@ class LineGraphDumpTableResultsStep extends MultiRowAsGroupDumpTableResultsStep 
                 }
                 array[plotGroupColumnIndex] += array[plotSecondaryColumnIndex]
 
-                System.arraycopy(array, 0, transformedArray, 0,
-                        transformedArray.length)
+                System.arraycopy(array, 0, transformedArray, 0, transformedArray.length)
                 transformedArray
             } as Function)
-        } else {
+        }
+	else {
             expandingIterator
         }
     }

@@ -15,17 +15,16 @@ final class Hacks {
      * The assumption that the table code equals the first element of the full path breaks for across trial nodes
      * though, so we need special handling for that. The real solution, of course, is to have the front-end pass
      * concept keys instead.
-     * @param conceptPath
-     * @return String conceptKey
+     * @return conceptKey
      */
     static String createConceptKeyFrom(String conceptPath) {
         if (conceptPath =~ '^\\\\Across Trials\\\\') {
-            return '\\\\xtrials' + conceptPath
+            return "\\\\xtrials$conceptPath"
         }
 
         // This crazy dance with slashes is 'expected behaviour'
         // as per http://groovy.codehaus.org/Strings+and+GString (search for Slashy Strings)
-        def bs = '\\\\'
+        String bs = '\\\\'
         '\\\\' + (conceptPath =~ /$bs([^$bs]+)$bs/)[0][-1] + conceptPath
     }
 }

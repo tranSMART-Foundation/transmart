@@ -17,31 +17,27 @@
  *
  ******************************************************************/
 
-/**
- * $Id: JobResultsService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- */
 package com.recomdata.asynchronous
 
 import groovy.util.logging.Slf4j
 
 /**
- * JobResultsService handles the management of the asynchronous job results
+ * Handles the management of the asynchronous job results
  *
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
-
 @Slf4j('logger')
 class JobResultsService {
 
-    boolean transactional = false
+    static transactional = false
 
-    @Delegate Map jobResults = [:].asSynchronized()
+    @Delegate
+    Map jobResults = [:].asSynchronized()
 
     boolean isJobCancelled(String jobName) {
         boolean isJobCancelled = jobResults[jobName]['Status'] == 'Cancelled'
         if (isJobCancelled) {
-            logger.warn('' + jobName + ' has been cancelled')
+            logger.warn '{} has been cancelled', jobName
         }
         isJobCancelled
     }

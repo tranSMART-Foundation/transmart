@@ -13,8 +13,8 @@ class NumericManualBinningColumnDecorator implements ColumnDecorator {
 
     List<NumericBinRange> binRanges
 
-    private @Lazy List binNames = {
-        def ret = []
+    private @Lazy List<String> binNames = {
+        List<String> ret = []
         for (i in 0..(binRanges.size() - 1)) {
             def op1
             def lowerBound
@@ -31,11 +31,10 @@ class NumericManualBinningColumnDecorator implements ColumnDecorator {
                 lowerBound = binRanges[i].from
             }
             else {
-                throw new IllegalStateException('binRanges[' + i + '].from < ' +
-                        'binRanges[' + i - 1 + '].from. Bad column definition')
+                throw new IllegalStateException("binRanges[$i].from < binRanges[${i - 1}].from. Bad column definition")
             }
 
-            ret << '' + lowerBound + ' ' + op1 + ' ' + header + ' ≤ ' + binRanges[i].to.toString()
+            ret << "$lowerBound $op1 $header ≤ ${binRanges[i].to}".toString()
         }
         ret
     }()
@@ -52,12 +51,9 @@ class NumericManualBinningColumnDecorator implements ColumnDecorator {
     }
 
     private Object transformValue(Map originalValue) {
-        Map transformed = Maps.transformValues(
-                originalValue,
-                this.&transformValue as Function)
+        Map transformed = Maps.transformValues(originalValue, this.&transformValue as Function)
 
-        Maps.filterValues transformed,
-                { it != null } as Predicate
+        Maps.filterValues transformed, { it != null } as Predicate
     }
 
     private String transformValue(Number originalValue) {

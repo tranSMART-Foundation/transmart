@@ -1,43 +1,50 @@
 package jobs.table.columns
 
+import com.google.common.base.Objects
 import groovy.transform.CompileStatic
 import jobs.table.BackingMap
 import jobs.table.Column
 import jobs.table.MissingValueAction
+import org.transmartproject.core.dataquery.clinical.ClinicalVariableColumn
+import org.transmartproject.core.exceptions.InvalidArgumentsException
 
 @CompileStatic
 abstract class AbstractColumn implements Column {
 
     String header
 
-    MissingValueAction missingValueAction =
-            new MissingValueAction.DropRowMissingValueAction()
+    MissingValueAction missingValueAction = new MissingValueAction.DropRowMissingValueAction()
 
-    @Override
     void onDataSourceDepleted(String dataSourceName, Iterable dataSource) {
-        /* override to do something here */
+        // override to do something here
     }
 
-    @Override
     void beforeDataSourceIteration(String dataSourceName, Iterable dataSource) {
-        /* override to do something here */
+        // override to do something here
     }
 
-    @Override
     void onAllDataSourcesDepleted(int columnNumber, BackingMap backingMap) {
-        /* override to do something here */
+        // override to do something here
     }
 
-    @Override
-    Closure<Object> getValueTransformer() {
-        null
+    Closure getValueTransformer() {}
+
+    String toString() {
+        Objects.toStringHelper(this).add('header', header).toString()
     }
 
+    protected Number validateNumber(ClinicalVariableColumn col, value) {
+	if (value instanceof Number) {
+	    return (Number) value
+	}
 
-    @Override
-    public String toString() {
-        com.google.common.base.Objects.toStringHelper(this).
-                add('header', header).
-                toString()
+	if (value instanceof CharSequence) {
+	    String s = value.toString().trim()
+	    if (s.isNumber()) {
+		return s.toBigDecimal()
+	    }
+	}
+
+	throw new InvalidArgumentsException("Got non-numerical value for column $col; value was $value")
     }
 }

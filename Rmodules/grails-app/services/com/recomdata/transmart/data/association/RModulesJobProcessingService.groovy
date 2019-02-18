@@ -1,71 +1,57 @@
 package com.recomdata.transmart.data.association
 
-import grails.util.Holders
 import groovy.util.logging.Slf4j
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
 import org.rosuda.REngine.Rserve.RserveException
-import org.rosuda.Rserve.*
+import org.springframework.beans.factory.annotation.Value
 
 /**
- * This class contains methods for interacting with the R environment.
- *  
+ * Methods for interacting with the R environment.
 */
-
 @Slf4j('logger')
 class RModulesJobProcessingService {
-	static transactional = true
-	static scope = 'request'
-	
-	def grailsApplication
-	
-	def runRScript(workingDirectory, scriptName, commandToRun, rScriptDirectory) {
-		//Establish a connection to R Server.
-		RConnection c = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port)
-		c.stringEncoding = 'utf8'
-		
-		//Set the working directory to be our temporary location.
-		logger.debug("Attempting following R Command : ' + 'setwd('${workingDirectory}')".replace("\\","\\\\"))
-		println("Attempting following R Command : ' + 'setwd('${workingDirectory}')".replace("\\","\\\\"))
-		String workingDirectoryCommand = "setwd('${workingDirectory}')".replace("\\","\\\\")
-		
-		//Run the R command to set the working directory to our temp directory.
-		REXP x = c.eval(workingDirectoryCommand)
-		
-		//Run the R command to source in the script.
-		def sourceCommand = "source('${rScriptDirectory}/" + scriptName + "');".replace("\\","\\\\")
-		
-		logger.debug('Attempting following R Command : ' + sourceCommand)
-		println('Attempting following R Command : ' + sourceCommand)
-		
-		x = c.eval(sourceCommand)
-		
-		logger.debug('Attempting following R Command : ' + commandToRun)
-		println('Attempting following R Command : ' + commandToRun)
-		
-		REXP r = c.parseAndEval('try('+commandToRun+',silent=TRUE)')
-		
-		if (r.inherits('try-error')) {
-			//Grab the error R gave us.
-			String rError = r.asString()
-			
-			//This is the error we will eventually throw.
-			RserveException newError = null
-			
-			//If it is a friendly error, use that, otherwise throw the default message.
-			if(rError ==~ /(?ms).*\|\|FRIENDLY\|\|.*/) {
-				rError = rError.replaceFirst(/(?ms).*\|\|FRIENDLY\|\|/,'')
-				newError = new RserveException(c,rError)
-			}
-			else {
-				logger.error('RserveException thrown executing job: ' + rError)
-				logger.debug('RserveException thrown executing job: ' + rError)
-				newError = new RserveException(c,'There was an error running the R script for your job. Please contact an administrator.')
-			}
-			
-			throw newError
 
-		}
-	}
+    static scope = 'request'
+    static transactional = false
 	
+    @Value('${RModules.host:}')
+    private String host
+
+    @Value('${RModules.port:0}')
+    private int port
+
+    void runRScript(String workingDirectory, String scriptName, String commandToRun, String rScriptDirectory) {
+	RConnection c = new RConnection(host, port)
+	c.stringEncoding = 'utf8'
+
+	String workingDirectoryCommand = "setwd('${workingDirectory}')".replace('\\', '\\\\')
+	logger.debug 'Attempting following R Command : {}', workingDirectoryCommand
+	REXP x = c.eval(workingDirectoryCommand)
+
+	String sourceCommand = "source('${rScriptDirectory}/" + scriptName + "');".replace('\\','\\\\')
+	logger.debug 'Attempting following R Command : {}', sourceCommand
+	x = c.eval(sourceCommand)
+
+	logger.debug 'Attempting following R Command : {}', commandToRun
+	REXP r = c.parseAndEval('try('+commandToRun+',silent=TRUE)')
+
+	if (r.inherits('try-error')) {
+	    String rError = r.asString()
+
+	    RserveException newError
+
+	    //If it is a friendly error, use that, otherwise throw the default message.
+	    if(rError ==~ /(?ms).*\|\|FRIENDLY\|\|.*/) {
+		rError = rError.replaceFirst(/(?ms).*\|\|FRIENDLY\|\|/,'')
+		newError = new RserveException(c,rError)
+	    }
+	    else {
+	    logger.error 'RserveException thrown executing job: {}', rError
+		newError = new RserveException(c,'There was an error running the R script for your job. Please contact an administrator.')
+	    }
+
+	    throw newError
+	}
+    }
 }

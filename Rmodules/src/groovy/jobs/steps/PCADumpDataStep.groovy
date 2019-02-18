@@ -7,11 +7,7 @@ import org.transmartproject.core.dataquery.highdim.BioMarkerDataRow
 class PCADumpDataStep extends BioMarkerDumpDataStep {
 
     @Override
-    protected computeCsvRow(String subsetName,
-                            String seriesName,
-                            DataRow row,
-                            AssayColumn column,
-                            Object cell) {
+    protected computeCsvRow(String subsetName, String seriesName, DataRow row, AssayColumn column, cell) {
 
         assert row instanceof BioMarkerDataRow
 
@@ -27,13 +23,11 @@ class PCADumpDataStep extends BioMarkerDumpDataStep {
             probeValue = row.label
         }
 
-        [
-                rowKey,
-                row[column],
-                probeValue,
-                row.bioMarker,
-                subsetName
-        ]
+        [rowKey,
+         row[column],
+         probeValue,
+         row.bioMarker,
+         subsetName]
     }
 
 }

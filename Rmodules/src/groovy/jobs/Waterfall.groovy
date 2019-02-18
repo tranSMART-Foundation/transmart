@@ -1,6 +1,9 @@
 package jobs
 
-import jobs.steps.*
+import jobs.steps.BuildTableResultStep
+import jobs.steps.MultiRowAsGroupDumpTableResultsStep
+import jobs.steps.RCommandsStep
+import jobs.steps.Step
 import jobs.steps.helpers.SimpleAddColumnConfigurator
 import jobs.steps.helpers.WaterfallColumnConfigurator
 import jobs.table.Table
@@ -43,8 +46,7 @@ class Waterfall extends AbstractAnalysisJob {
 
         steps << new BuildTableResultStep(
                 table: table,
-                configurators: [primaryKeyColumnConfigurator,
-                        columnConfigurator])
+                configurators: [primaryKeyColumnConfigurator, columnConfigurator])
 
         steps << new MultiRowAsGroupDumpTableResultsStep(
                 table: table,
@@ -64,15 +66,12 @@ class Waterfall extends AbstractAnalysisJob {
 
     @Override
     protected List<String> getRStatements() {
-        [
-                '''source('$pluginDirectory/Waterfall/WaterfallPlotLoader.R')''',
-                '''WaterfallPlot.loader(input.filename='$inputFileName',
-                concept='$variablesConceptPaths')'''
-        ]
+        ['''source('$pluginDirectory/Waterfall/WaterfallPlotLoader.R')''',
+                '''WaterfallPlot.loader(input.filename='$inputFileName', concept='$variablesConceptPaths')''']
     }
 
     @Override
-    protected getForwardPath() {
-        '/waterfall/waterfallOut?jobName=' + name
+    protected String getForwardPath() {
+        "/waterfall/waterfallOut?jobName=$name"
     }
 }

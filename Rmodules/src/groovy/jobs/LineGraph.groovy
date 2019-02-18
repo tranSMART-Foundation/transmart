@@ -2,7 +2,11 @@ package jobs
 
 import com.google.common.base.Function
 import com.google.common.collect.Maps
-import jobs.steps.*
+import jobs.steps.BuildConceptTimeValuesStep
+import jobs.steps.BuildTableResultStep
+import jobs.steps.LineGraphDumpTableResultsStep
+import jobs.steps.RCommandsStep
+import jobs.steps.Step
 import jobs.steps.helpers.ContextNumericVariableColumnConfigurator
 import jobs.steps.helpers.OptionalBinningColumnConfigurator
 import jobs.steps.helpers.OptionalColumnConfiguratorDecorator
@@ -99,7 +103,7 @@ class LineGraph extends AbstractAnalysisJob {
         steps << new BuildConceptTimeValuesStep(
                 table: conceptTimeValues,
                 outputFile: new File(temporaryDirectory, SCALING_VALUES_FILENAME),
-                header: [ 'GROUP', 'VALUE' ]
+                header: ['GROUP', 'VALUE']
         )
 
         Map<String, Closure<String>> extraParams = [:]
@@ -133,7 +137,7 @@ class LineGraph extends AbstractAnalysisJob {
     }
 
     @Override
-    protected getForwardPath() {
-        '/lineGraph/lineGraphOutput?jobName=' + name
+    protected String getForwardPath() {
+        "/lineGraph/lineGraphOutput?jobName=$name"
     }
 }

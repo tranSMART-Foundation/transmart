@@ -1,11 +1,13 @@
 package jobs.steps
 
 import au.com.bytecode.opencsv.CSVWriter
+import groovy.transform.CompileStatic
 import jobs.table.ConceptTimeValuesTable
 
 /**
- * Created by carlos on 1/27/14.
+ * @author carlos
  */
+@CompileStatic
 class BuildConceptTimeValuesStep implements Step {
 
     ConceptTimeValuesTable table
@@ -14,12 +16,10 @@ class BuildConceptTimeValuesStep implements Step {
 
     File outputFile
 
-    @Override
     String getStatusName() {
-        return 'Creating concept time values table'
+        'Creating concept time values table'
     }
 
-    @Override
     void execute() {
 
         //makes sure the file is not there
@@ -27,21 +27,19 @@ class BuildConceptTimeValuesStep implements Step {
 
         Map<String,Map> map = table.resultMap
         if (map != null) {
-            writeToFile(map)
+            writeToFile map
         }
     }
 
     private void writeToFile(Map<String, Map> map) {
 
-        outputFile.withWriter { writer ->
+        outputFile.withWriter { Writer writer ->
             CSVWriter csvWriter = new CSVWriter(writer, '\t' as char)
-            csvWriter.writeNext(header)
+            csvWriter.writeNext header
 
-            map.each {
-                def line = [it.key, it.value.value] as String[]
-                csvWriter.writeNext(line)
+            for (Map.Entry<String, Map> entry in map.entrySet()) {
+		csvWriter.writeNext([entry.key, entry.value.value] as String[])
             }
         }
     }
-
 }

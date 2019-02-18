@@ -1,13 +1,15 @@
 package jobs.table.columns
 
 import com.google.common.collect.ImmutableMap
+import groovy.transform.CompileStatic
 import jobs.table.BackingMap
 
+@CompileStatic
 class PrimaryKeyColumn extends AbstractColumn {
 
     @Override
-    void onReadRow(String dataSourceName, Object row) {
-        /* don't care */
+    void onReadRow(String dataSourceName, row) {
+        // don't care
     }
 
     @Override
@@ -17,7 +19,7 @@ class PrimaryKeyColumn extends AbstractColumn {
 
     @Override
     void onAllDataSourcesDepleted(int columnNumber, BackingMap backingMap) {
-        backingMap.primaryKeys.each { pk ->
+        for (pk in backingMap.primaryKeys) {
             backingMap.putCell pk, columnNumber, pk
         }
     }

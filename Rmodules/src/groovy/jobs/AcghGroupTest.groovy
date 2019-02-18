@@ -1,8 +1,10 @@
 package jobs
 
+import groovy.transform.CompileStatic
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
+@CompileStatic
 @Component
 @Scope('job')
 class AcghGroupTest extends AcghAnalysisJob {
@@ -19,7 +21,7 @@ class AcghGroupTest extends AcghAnalysisJob {
     }
 
     @Override
-    protected getForwardPath() {
-        return '/aCGHgroupTest/aCGHgroupTestOutput?jobName=' + name
+    protected String getForwardPath() {
+        "/aCGHgroupTest/aCGHgroupTestOutput?jobName=${name}"
     }
 }

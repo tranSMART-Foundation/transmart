@@ -13,7 +13,8 @@ import org.transmartproject.core.users.ProtectedOperation
 import org.transmartproject.core.users.ProtectedResource
 import org.transmartproject.core.users.User
 
-@Slf4j('logger')
+import java.lang.reflect.Proxy
+
 class GMockFactoryBean implements FactoryBean {
 
     final boolean singleton = true
@@ -23,20 +24,21 @@ class GMockFactoryBean implements FactoryBean {
     @Autowired
     GMockController gMockController
 
-    private Object object
+    private object
 
     def getObject() {
-        if (clazz == null) {
-            /* refuse to give an object if not fully initialized yet */
-            throw new BeanCreationException('Asked to give mock without class being specified')
-        }
-        if (object == null) {
-            object = gMockController.mock(clazz)
-        }
-        object
+	if (clazz == null) {
+	    /* refuse to give an object if not fully initialized yet */
+	    throw new BeanCreationException('Asked to give mock without class being specified')
+	}
+
+	if (object == null) {
+	    object = gMockController.mock(clazz)
+	}
+
+	object
     }
 
-    @Override
     Class<?> getObjectType() { clazz }
 }
 
@@ -44,7 +46,6 @@ class GMockFactoryBean implements FactoryBean {
  * which checks whether the returned value matches the value declared
  * on the interface method.
  */
-@Slf4j('logger')
 class GroovyInterceptableProxyFactoryBean implements FactoryBean {
 
     Class<?> objectType
@@ -52,45 +53,37 @@ class GroovyInterceptableProxyFactoryBean implements FactoryBean {
 
     @Autowired
     ApplicationContext ctx
+
     final boolean singleton = true
 
-    @Lazy Object object = {
-        assert targetBeanName != null
-        assert objectType != null
+    @Lazy object = {
+        assert targetBeanName
+        assert objectType
 
-        java.lang.reflect.Proxy.newProxyInstance(
-                objectType.classLoader,
-                [objectType, GroovyInterceptable] as Class<?>[],
-                new ConvertedMap(invokeMethod: { String name, Object args ->
-                    InvokerHelper.invokeMethodSafe(
-                            ctx.getBean(targetBeanName),
-                            name,
-                            args)
-                }))
+        Proxy.newProxyInstance(objectType.classLoader,
+			       [objectType, GroovyInterceptable] as Class<?>[],
+			       new ConvertedMap(invokeMethod: { String name, args ->
+                InvokerHelper.invokeMethodSafe ctx.getBean(targetBeanName), name, args
+            }))
     }()
 }
 
-@Slf4j
+@Slf4j('logger')
 class CurrentUserBeanMockFactory implements FactoryBean<User> {
     final Class<?> objectType = User
 
     final boolean singleton = true
 
     void registerBeanToTry(String beanName) {
-        logger.debug('Mocked call to &currentUserBean.registerBeanToTry with ' +
-                'beanName=' + beanName)
+        logger.debug 'Mocked call to &currentUserBean.registerBeanToTry with beanName={}', beanName
     }
 
-    User getObject() throws Exception {
-        [
-            canPerform: { ProtectedOperation operation,
-                          ProtectedResource protectedResource ->
-                logger.debug('Mocked call to currentUserBean.canPerform with ' +
-                        'operation=' + operation + ', ' +
-                        'protectedResource=' + protectedResource)
-                true
-            }
-        ] as User
+    User getObject() {
+        [canPerform: { ProtectedOperation operation, ProtectedResource protectedResource ->
+	    logger.debug 'Mocked call to currentUserBean.canPerform with operation={}, protectedResource={}',
+		operation, protectedResource
+	    true
+        }] as User
     }
 
     /* the application is aware that currentUserBean is a BeanFactory that
@@ -105,16 +98,13 @@ class CurrentUserBeanMockFactory implements FactoryBean<User> {
 }
 
 beans = {
-    /*
-     *  Note that this file is only used for testing.
-     *  It is excluded from the final plugin artifact
-     */
+     //  Note that this file is only used for testing. It is excluded from the final plugin artifact
 
     gmockController GMockController, { bean ->
         bean.scope = 'job'
     }
 
-    /* Mock the core-db services */
+    // Mock the core-db services
 
     highDimensionResourceService GroovyInterceptableProxyFactoryBean, {
         targetBeanName = 'scopedHighDimensionResourceService'
@@ -146,6 +136,6 @@ beans = {
         bean.scope = 'job'
     }
 
-    /* Mock of transmartApp bean */
+    // Mock of transmartApp bean
     currentUserBean CurrentUserBeanMockFactory
 }

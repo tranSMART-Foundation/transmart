@@ -6,7 +6,7 @@ import org.mapdb.Fun
 /**
  * Decorator that transforms values, by using a provided function.
  *
- * Created by carlos on 1/22/14.
+ * @author carlos
  */
 class TransformColumnDecorator implements ColumnDecorator {
 
@@ -20,8 +20,8 @@ class TransformColumnDecorator implements ColumnDecorator {
 
     // NOTE: assumes there's no transformer in inner
     Closure<Object> getValueTransformer() {
-        { Fun.Tuple3<String, Integer, String> key, Object value ->
-            valueFunction(value)
+        { Fun.Tuple3<String, Integer, String> key, value ->
+            valueFunction value
         }
     }
 

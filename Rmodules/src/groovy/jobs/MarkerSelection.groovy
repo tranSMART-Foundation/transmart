@@ -1,10 +1,12 @@
 package jobs
 
+import groovy.transform.CompileStatic
 import jobs.steps.BioMarkerDumpDataStep
 import jobs.steps.Step
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
+@CompileStatic
 @Component
 @Scope('job')
 class MarkerSelection extends HighDimensionalOnlyJob {
@@ -41,6 +43,6 @@ class MarkerSelection extends HighDimensionalOnlyJob {
 
     @Override
     final String getForwardPath() {
-        '/markerSelection/markerSelectionOut?jobName=' + name
+        "/markerSelection/markerSelectionOut?jobName=${name}"
     }
 }

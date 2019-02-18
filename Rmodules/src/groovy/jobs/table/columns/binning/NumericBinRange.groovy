@@ -5,6 +5,6 @@ import groovy.transform.Immutable
 @Immutable
 class NumericBinRange {
 
-    BigDecimal from,
-               to
+    BigDecimal from
+    BigDecimal to
 }

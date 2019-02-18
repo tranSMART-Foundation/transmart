@@ -1,5 +1,6 @@
 package jobs.misc
 
+import com.recomdata.asynchronous.JobResultsService
 import grails.util.Holders
 import groovy.util.logging.Slf4j
 import jobs.AbstractAnalysisJob
@@ -28,12 +29,9 @@ class AnalysisQuartzJobAdapter implements Job {
     JobDataMap jobDataMap
 
     private static ThreadLocal<Map<String, Object>> BEANS_MAP =
-            new NamedThreadLocal<Map<String, Object>>('JobScope') {
-                @Override
-                protected Map<String, Object> initialValue() {
-                    new HashMap<String, Object>()
-                }
-            }
+        new NamedThreadLocal<Map<String, Object>>('JobScope') {
+        protected Map<String, Object> initialValue() { [:] }
+    };
 
     private static ThreadLocal<String> BOUND_JOB_NAME = new ThreadLocal()
 
@@ -45,11 +43,10 @@ class AnalysisQuartzJobAdapter implements Job {
         BOUND_JOB_NAME.get()
     }
 
-    @Override
     void execute(JobExecutionContext context) throws JobExecutionException {
-        this.jobDataMap = context.jobDetail.jobDataMap
+        jobDataMap = context.jobDetail.jobDataMap
 
-        def jobName = jobDataMap[PARAM_JOB_NAME]
+        String jobName = jobDataMap[PARAM_JOB_NAME]
         BOUND_JOB_NAME.set jobName
 
         setupDefaultScopeBeans()
@@ -63,7 +60,7 @@ class AnalysisQuartzJobAdapter implements Job {
             try {
                 job = createAnalysisJob()
             }
-            catch (Exception e) {
+            catch (e) {
                 logger.error 'Exception while creating the analysis job', e
                 jobResultsService[jobName]['Exception'] = e.message
                 asyncJobService.updateStatus jobName, 'Error'
@@ -73,7 +70,7 @@ class AnalysisQuartzJobAdapter implements Job {
             try {
                 job.run()
             }
-            catch (Exception e) {
+            catch (e) {
                 logger.error 'Some exception occurred in the processing pipe', e
                 jobResultsService[jobName]['Exception'] = e.message
                 job.updateStatus 'Error'
@@ -96,7 +93,6 @@ class AnalysisQuartzJobAdapter implements Job {
     static void cleanJobBeans() {
         //remove all the beans once the job has finished
         //Is this necessary? Does Quartz reuse threads across jobs?
-
         BEANS_STORAGE.clear()
     }
 
@@ -107,7 +103,7 @@ class AnalysisQuartzJobAdapter implements Job {
 
         /* wire things up */
         job.updateStatus = { String status, String viewerUrl = null ->
-            job.logger.info 'updateStatus called for status:' + status + ', viewerUrl:' + viewerUrl + ''
+            job.logger.info "updateStatus called for status:$status, viewerUrl:$viewerUrl"
             asyncJobService.updateStatus job.name, status, viewerUrl
         }
         job.setStatusList = { List<String> statusList ->
@@ -117,8 +113,7 @@ class AnalysisQuartzJobAdapter implements Job {
         job.topTemporaryDirectory = new File(Holders.config.RModules.tempFolderDirectory)
         job.scriptsDirectory = new File(Holders.config.RModules.pluginScriptDirectory)
 
-        job.studyName = i2b2ExportHelperService.
-                findStudyAccessions([jobDataMap.result_instance_id1])
+        job.studyName = i2b2ExportHelperService.findStudyAccessions([jobDataMap.result_instance_id1])
 
         job
     }
@@ -131,7 +126,7 @@ class AnalysisQuartzJobAdapter implements Job {
         mainContext.asyncJobService
     }
 
-    def getJobResultsService() {
+    JobResultsService getJobResultsService() {
         mainContext.jobResultsService
     }
 

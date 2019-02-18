@@ -1,73 +1,50 @@
 package com.recomdata.transmart.data.association
 
-import org.json.JSONArray
-import org.json.JSONObject
+import grails.converters.JSON
 
 class DataAssociationController {
     
+    private static final List<String> scripts = [
+	'FormValidator.js',
+	'HighDimensionalData.js',
+	'RmodulesView.js',
+	'dataAssociation.js',
+	'PDFGenerator.js',
+	'ext/tsmart-overrides.js',
+	'ext/tsmart-generic.js',
+	'plugin/IC50.js'].asImmutable()
+    
+    //TODO: requires images: servletContext.contextPath+pluginContextPath+'/css/jquery-ui-1.10.3.custom.css']
+    private static final List<String> styles = ['rmodules.css', 'jquery.qtip.min.css'].asImmutable()
+
     def pluginService
 
     /**
      * Load the initial DataAssociation page.
      */
-    def defaultPage = {
-        render(template: 'dataAssociation', model:[], contextPath:pluginContextPath)
+    def defaultPage() {
+        render template: 'dataAssociation', contextPath: pluginContextPath
     }
 
-    /**
-     *
-     */
-    def variableSelection = {
-        def module = pluginService.findPluginModuleByModuleName(params.analysis)
-        render(view:'../plugin/'+module.formPage)
+    def variableSelection(String analysis) {
+        render view: '../plugin/' + pluginService.findPluginModuleByModuleName(analysis).formPage
     }
 
     /**
      * Load required scripts for running analysis
      */
-    def loadScripts = {
+    def loadScripts() {
 
-        // list of required javascripts
-        def scripts = [
-                servletContext.contextPath + pluginContextPath + '/js/FormValidator.js',
-                servletContext.contextPath + pluginContextPath + '/js/HighDimensionalData.js',
-                servletContext.contextPath + pluginContextPath + '/js/RmodulesView.js',
-                servletContext.contextPath + pluginContextPath + '/js/dataAssociation.js',
-                servletContext.contextPath + pluginContextPath + '/js/PDFGenerator.js',
-                servletContext.contextPath + pluginContextPath + '/js/ext/tsmart-overrides.js',
-                servletContext.contextPath + pluginContextPath + '/js/ext/tsmart-generic.js',
-                servletContext.contextPath + pluginContextPath + '/js/plugin/IC50.js']
+	List<Map> rows = []
 
-        // list of required css
-        def styles = [
-                servletContext.contextPath+pluginContextPath+'/css/rmodules.css',
-                servletContext.contextPath+pluginContextPath+'/css/jquery.qtip.min.css']
-                //TODO: requires images: servletContext.contextPath+pluginContextPath+'/css/jquery-ui-1.10.3.custom.css']
+	for (script in scripts) {
+	    rows << [path: servletContext.contextPath + pluginContextPath + '/js/' + script, type: 'script']
+	}
 
-        JSONObject result = new JSONObject()
-        JSONArray rows = new JSONArray()
-                
-        // for all js files
-        for (file in scripts) {
-            def m = [:]
-            m['path'] = file.toString()
-            m['type'] = 'script'
-            rows.put(m)
-        }
+	for (style in styles) {
+	    rows << [path: servletContext.contextPath + pluginContextPath + '/css/' + style, type: 'css']
+	}
 
-        // for all css files
-        for (file in styles) {
-            def n = [:]
-            n['path'] = file.toString()
-            n['type'] = 'css'
-            rows.put(n)
-        }
-        
-        result.put('success', true)
-        result.put('totalCount', scripts.size())
-        result.put('files', rows)
-
-        response.setContentType('text/json')
-        response.outputStream << result.toString()
+	render([success: true, totalCount: scripts.size(), files: rows] as JSON)
     }
 }

@@ -1,10 +1,12 @@
 package jobs
 
+import groovy.transform.CompileStatic
 import jobs.steps.Step
 import jobs.steps.ValueGroupDumpDataStep
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
+@CompileStatic
 @Component
 @Scope('job')
 class Heatmap extends HighDimensionalOnlyJob {
@@ -32,8 +34,7 @@ class Heatmap extends HighDimensionalOnlyJob {
     }
 
     @Override
-    protected getForwardPath() {
-        '/RHeatmap/heatmapOut?jobName=' + name
+    protected String getForwardPath() {
+        "/RHeatmap/heatmapOut?jobName=${name}"
     }
-
 }

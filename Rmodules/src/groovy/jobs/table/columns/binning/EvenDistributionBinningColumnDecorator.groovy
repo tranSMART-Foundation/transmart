@@ -2,6 +2,7 @@ package jobs.table.columns.binning
 
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.GParsPool
@@ -25,26 +26,22 @@ class EvenDistributionBinningColumnDecorator implements ColumnDecorator {
     int numberOfBins
 
     /* context -> (upper bound -> bin name) */
-    private Map<String, NavigableMap<Number, String>> bins =
-            Maps.newConcurrentMap()
+    private Map<String, NavigableMap<Number, String>> bins = Maps.newConcurrentMap()
 
     static class GroovyNumberComparator implements Comparator<Number> {
-        public static GroovyNumberComparator INSTANCE =
-                new GroovyNumberComparator()
+        public static GroovyNumberComparator INSTANCE = new GroovyNumberComparator()
 
         int compare(Number o1, Number o2) {
             o1 <=> o2
         }
     }
 
-    private NavigableMap<Number, String> generateBinNames(List<Number> sortedValues,
-                                                          List<Integer> quantileRanks) {
-        NavigableMap<Number, String> res =
-                Maps.newTreeMap(GroovyNumberComparator.INSTANCE)
+    private NavigableMap<Number, String> generateBinNames(List<Number> sortedValues, List<Integer> quantileRanks) {
+        NavigableMap<Number, String> res = Maps.newTreeMap(GroovyNumberComparator.INSTANCE)
 
         int effectiveNumberOfBins = quantileRanks.size()
 
-        (0..(effectiveNumberOfBins - 1)).each { Integer it ->
+        (0..(effectiveNumberOfBins - 1)).each { int it ->
             Number lowerBound = it == 0 ?
                     sortedValues[0] :
                     sortedValues[quantileRanks[it - 1]]
@@ -52,21 +49,17 @@ class EvenDistributionBinningColumnDecorator implements ColumnDecorator {
                     sortedValues[-1] :
                     sortedValues[quantileRanks[it]]
 
-            def op1 = it == 0 ? '≤' : '<'
-            res[upperBound] = '' + lowerBound + ' ' + op1 + ' ' + header + ' ≤ ' + upperBound as String
+            String op1 = it == 0 ? '≤' : '<'
+            res[upperBound] = "$lowerBound $op1 $header ≤ $upperBound" as String
         }
 
         res
     }
 
-    private List<Number> collectAndSortValues(BackingMap backingMap,
-                                              Collection<String> pks,
-                                              Integer columnNumber,
-                                              String context) {
+    private List<Number> collectAndSortValues(BackingMap backingMap, Collection<String> pks, int columnNumber, String context) {
         List<Number> res = Lists.newArrayListWithCapacity pks.size()
-        pks.each { String primaryKey ->
-            Number n = (Number) backingMap.getCell(primaryKey, columnNumber, context)
-            res.add n
+        for (String primaryKey in pks) {
+            res << (Number) backingMap.getCell(primaryKey, columnNumber, context)
         }
 
         Collections.sort res, GroovyNumberComparator.INSTANCE
@@ -82,8 +75,7 @@ class EvenDistributionBinningColumnDecorator implements ColumnDecorator {
         for (i in 1..effectiveNumberOfBins) {
             /* maybe use nearest rank instead? */
             int rank = (((sortedValues.size() * i) / effectiveNumberOfBins) as int) - 1 //rounds down
-            while (rank > 0 &&
-                    sortedValues[rank] == sortedValues[rank - 1]) {
+            while (rank > 0 && sortedValues[rank] == sortedValues[rank - 1]) {
                 rank--
             }
             // rank will be first element with this value
@@ -108,28 +100,23 @@ class EvenDistributionBinningColumnDecorator implements ColumnDecorator {
     }
 
 
-    @CompileStatic(TypeCheckingMode.SKIP)
-    void onAllDataSourcesDepleted(int columnNumber,
-                                  BackingMap backingMap) {
-        Map<String, Set<String>> contextPkMap =
-                backingMap.getContextPrimaryKeysMap(columnNumber)
+    @CompileDynamic
+    void onAllDataSourcesDepleted(int columnNumber, BackingMap backingMap) {
+        Map<String, Set<String>> contextPkMap = backingMap.getContextPrimaryKeysMap(columnNumber)
 
         // XXX: create a reusable pool for this sort of thing
         GParsPool.withPool {
             contextPkMap.eachParallel { String ctx, Set<String> pks ->
-                List<Number> sortedValues =
-                        collectAndSortValues backingMap, pks, columnNumber, ctx
-                List<Integer> quantileRanks =
-                        calculateQuantileRanks sortedValues
-
+                List<Number> sortedValues = collectAndSortValues backingMap, pks, columnNumber, ctx
+                List<Integer> quantileRanks = calculateQuantileRanks sortedValues
                 bins[ctx] = generateBinNames sortedValues, quantileRanks
             }
         }
     }
 
     // NOTE: assumes there's no transformer in inner
-    Closure<Object> getValueTransformer() {
-        { Fun.Tuple3<String, Integer, String> key, Object value ->
+    Closure getValueTransformer() {
+        { Fun.Tuple3<String, Integer, String> key, value ->
             Number numberValue = (Number) value
 
             String ctx = key.c
@@ -138,12 +125,12 @@ class EvenDistributionBinningColumnDecorator implements ColumnDecorator {
             Map.Entry<Number, String> entry = binsForCtx.ceilingEntry(numberValue)
             if (entry == null) {
                 // should not happen
-                throw new IllegalStateException('Could not determine bin for ' +
-                        'value ' + numberValue + '. Bins available, with key as upper ' +
-                        'bound: ' + binsForCtx)
+                throw new IllegalStateException("Could not determine bin for " +
+						"value $numberValue. Bins available, with key as upper " +
+						"bound: $binsForCtx")
             }
 
-            (Object) entry.value /* the name of the bin */
+            entry.value /* the name of the bin */
         }
     }
 

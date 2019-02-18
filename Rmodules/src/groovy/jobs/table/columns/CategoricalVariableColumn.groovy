@@ -20,25 +20,26 @@ class CategoricalVariableColumn extends AbstractColumn {
     PatientRow lastRow
 
     @Override
-    void onReadRow(String dataSourceName, Object row) {
+    void onReadRow(String dataSourceName, row) {
         lastRow = (PatientRow) row
     }
 
     @Override
     Map<String, Object> consumeResultingTableRows() {
-        if (!lastRow) return ImmutableMap.of()
+        if (!lastRow) {
+	    return ImmutableMap.of()
+	}
 
         for (clinicalVariable in leafNodes) {
             if (lastRow.getAt(clinicalVariable)) {
-                return ImmutableMap.of(getPrimaryKey(lastRow),
-                                       lastRow.getAt(clinicalVariable))
+                return ImmutableMap.of(getPrimaryKey(lastRow), lastRow.getAt(clinicalVariable))
             }
         }
 
         ImmutableMap.of()
     }
 
-    protected String getPrimaryKey(PatientRow row) {
+    protected String getPrimaryKey(PatientRow ignored) {
         lastRow.patient.inTrialId
     }
 }

@@ -148,9 +148,9 @@ class BackingMap implements AutoCloseable {
 
                     def previous = result.set columnNumber, value
                     if (previous != null) {
-                        throw new IllegalStateException('For ' + pk + ', ' +
-                                'replaced ' + previous + ' with ' + entry.value + ' ' +
-                                '(mixed empty and non-empty contexts?)')
+                        throw new IllegalStateException("For $pk, " +
+							"replaced $previous with $entry.value " +
+							"(mixed empty and non-empty contexts?)")
                     }
                 }
             }

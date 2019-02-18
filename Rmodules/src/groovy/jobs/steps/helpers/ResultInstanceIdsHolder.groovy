@@ -29,7 +29,8 @@ class ResultInstanceIdsHolder {
 
     def keysForResultInstanceIds = ['result_instance_id1', 'result_instance_id2']
 
-    @Lazy List<Long> resultInstanceIds = {
+    @Lazy
+    List<Long> resultInstanceIds = {
         def r = keysForResultInstanceIds.collect { key ->
             def v = params[key]
             if (v && !v.isLong()) {
@@ -40,19 +41,18 @@ class ResultInstanceIdsHolder {
         }.findAll()
 
         if (!r) {
-            throw new InvalidArgumentsException('No result instance ids provided. ' +
-                    'Check the parameters ' + keysForResultInstanceIds)
+            throw new InvalidArgumentsException("No result instance ids provided. Check the parameters $keysForResultInstanceIds")
         }
 
         r
     }()
 
-    @Lazy List<QueryResult> queryResults = {
+    @Lazy
+    List<QueryResult> queryResults = {
         resultInstanceIds.collect { id ->
             def queryResult = queriesResource.getQueryResultFromId id
             if (!currentUserBean.canPerform(READ, queryResult)) {
-                throw new AccessDeniedException("Current user doesn't have " +
-                        'access to result instance with id ' + id)
+                throw new AccessDeniedException("Current user doesn't have access to result instance with id $id")
             }
 
             queryResult

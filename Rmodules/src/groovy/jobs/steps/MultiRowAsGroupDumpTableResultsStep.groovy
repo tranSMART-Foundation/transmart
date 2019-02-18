@@ -65,15 +65,13 @@ class MultiRowAsGroupDumpTableResultsStep extends SimpleDumpTableResultStep {
 
         preResults = Iterators.peekingIterator(table.result.iterator())
         if (!preResults.hasNext()) {
-            throw new EmptySetException('The result set is empty. ' +
-                    'Number of patients dropped owing to mismatched ' +
-                    'data: ' + table.droppedRows)
+            throw new EmptySetException(
+		'The result set is empty. Number of patients dropped owing to mismatched data: ' +
+		    table.droppedRows)
         }
 
-        def originalHeaders = table.headers
-        def firstLine = preResults.peek()
-
-        firstLine.eachWithIndex { it, index ->
+        List<String> originalHeaders = table.headers
+	preResults.peek().eachWithIndex { it, int index ->
             _headers << originalHeaders[index]
 
             if (it instanceof Map) {
@@ -88,7 +86,7 @@ class MultiRowAsGroupDumpTableResultsStep extends SimpleDumpTableResultStep {
             headerList << 'GROUP'
         }
         else {
-            headerList << 'GROUP.' + transformedColumnsIndexes.size() - 1.toString()
+            headerList << 'GROUP.' + (transformedColumnsIndexes.size() - 1)
         }
     }
 

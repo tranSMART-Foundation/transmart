@@ -1,6 +1,9 @@
 package jobs
 
-import jobs.steps.*
+import jobs.steps.BuildTableResultStep
+import jobs.steps.CorrelationAnalysisDumpDataStep
+import jobs.steps.RCommandsStep
+import jobs.steps.Step
 import jobs.steps.helpers.GroupNamesHolder
 import jobs.steps.helpers.MultiNumericClinicalVariableColumnConfigurator
 import jobs.steps.helpers.SimpleAddColumnConfigurator
@@ -16,6 +19,7 @@ import static jobs.steps.AbstractDumpStep.DEFAULT_OUTPUT_FILE_NAME
 @Component
 @Scope('job')
 class CorrelationAnalysis extends AbstractAnalysisJob {
+
     @Autowired
     SimpleAddColumnConfigurator primaryKeyColumnConfigurator
 
@@ -29,11 +33,9 @@ class CorrelationAnalysis extends AbstractAnalysisJob {
 
     @PostConstruct
     void init() {
-
         columnConfigurator.header = 'VALUE'
         columnConfigurator.keyForConceptPaths = 'variablesConceptPaths'
         columnConfigurator.groupNamesHolder = holder
-
     }
 
     @Override
@@ -64,17 +66,15 @@ class CorrelationAnalysis extends AbstractAnalysisJob {
 
     @Override
     protected List<String> getRStatements() {
-        [
-            '''source('$pluginDirectory/Correlation/CorrelationLoader.r')''',
+        ['''source('$pluginDirectory/Correlation/CorrelationLoader.r')''',
             '''Correlation.loader(input.filename='$inputFileName',
                     correlation.by='$correlationBy',
                     correlation.method='$correlationType')'''
-        ]
+	]
     }
 
     @Override
-    protected getForwardPath() {
-        '/correlationAnalysis/correlationAnalysisOutput?jobName=' + name
+    protected String getForwardPath() {
+        "/correlationAnalysis/correlationAnalysisOutput?jobName=$name"
     }
-
 }

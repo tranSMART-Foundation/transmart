@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import org.transmartproject.core.dataquery.clinical.ClinicalVariableColumn
-import org.transmartproject.utils.ConceptUtils
 
 @Component
 @Scope('prototype')
@@ -30,9 +29,7 @@ class MultiNumericClinicalVariableColumnConfigurator extends ColumnConfigurator 
             clinicalDataRetriever.createVariableFromConceptPath it
         }
 
-        variables = variables.collect {
-            clinicalDataRetriever << it
-        }
+        variables = variables.collect { clinicalDataRetriever << it }
 
         clinicalDataRetriever.attachToTable table
 
@@ -54,8 +51,7 @@ class MultiNumericClinicalVariableColumnConfigurator extends ColumnConfigurator 
                 [ClinicalDataRetriever.DATA_SOURCE_NAME] as Set)
     }
 
-    public List<String> getConceptPaths() {
-        getStringParam(keyForConceptPaths).split(/\|/) as List
+    List<String> getConceptPaths() {
+        getStringParam(keyForConceptPaths).split(/\|/)
     }
-
 }
