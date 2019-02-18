@@ -1,7 +1,7 @@
 include ../makefile.inc
 
-R_MIRROR ?= http://cran-mirror.cs.uu.nl
-R_VERSION = 3.2.1
+R_MIRROR ?= http://cran.ma.imperial.ac.uk
+R_VERSION = 3.5.1
 R_SOURCE = R-$(R_VERSION)
 R_PREFIX ?= $(realpath .)/root
 R_EXEC = $(R_PREFIX)/bin/R
@@ -37,10 +37,13 @@ $(R_EXEC): build/Makefile
 cran_packages: cran_pkg.R $(R_EXEC)
 	CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f $<
 
-other_packages: other_pkg.R cran_packages $(R_EXEC)
+rforge_packages: rforge_pkg.R other_packages $(R_EXEC)
 	CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f $<
 
-install_packages: cran_packages other_packages
+other_packages: other_pkg.R rforge_packages cran_packages $(R_EXEC)
+	CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f $<
+
+install_packages: cran_packages rforge_packages other_packages
 
 start_Rserve start_Rserve.dbg:
 	$(R_EXEC) CMD $(patsubst start_%,%,$@)
