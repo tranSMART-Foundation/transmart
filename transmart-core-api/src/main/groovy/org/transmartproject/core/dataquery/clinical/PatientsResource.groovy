@@ -1,7 +1,6 @@
 package org.transmartproject.core.dataquery.clinical
 
 import org.transmartproject.core.dataquery.Patient
-import org.transmartproject.core.doc.Experimental
 import org.transmartproject.core.exceptions.NoSuchResourceException
 
 interface PatientsResource {
@@ -14,5 +13,4 @@ interface PatientsResource {
      * @throws NoSuchResourceException if there's no user with such id
      */
     Patient getPatientById(Long id) throws NoSuchResourceException
-
 }

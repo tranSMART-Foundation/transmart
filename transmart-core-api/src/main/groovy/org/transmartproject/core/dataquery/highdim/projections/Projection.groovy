@@ -1,13 +1,12 @@
 package org.transmartproject.core.dataquery.highdim.projections
 
 /**
- * A projection determines that which data will show up in the result set's
- * cells.
+ * A projection determines that which data will show up in the result set's cells.
  *
  * @param < CELL > The type of the cells in the
  * {@link org.transmartproject.core.dataquery.TabularResult}.
  */
-public interface Projection<CELL> {
+interface Projection<CELL> {
 
     /**
      * The data type default projection for getting real data series from the
@@ -17,13 +16,13 @@ public interface Projection<CELL> {
      * Data type implementations are strongly encouraged to support this
      * projection, if possible.
      */
-    public static final DEFAULT_REAL_PROJECTION = 'default_real_projection'
+    String DEFAULT_REAL_PROJECTION = 'default_real_projection'
 
     /**
      * Projection for getting the log transformation of original data points.
      *
      */
-    public static final LOG_INTENSITY_PROJECTION = 'log_intensity'
+    String LOG_INTENSITY_PROJECTION = 'log_intensity'
 
     /**
      * Projection for getting transformed data points representing the standard
@@ -33,7 +32,7 @@ public interface Projection<CELL> {
      * filtered data set (with rows or assays excluded) or on the complete
      * data set.
      */
-    public static final ZSCORE_PROJECTION = 'zscore'
+    String ZSCORE_PROJECTION = 'zscore'
 
     /**
      * This generic projection returns a map with the values of all fields of
@@ -44,27 +43,26 @@ public interface Projection<CELL> {
      * properties available on the rows and the dataProperties likewise
      * for the cell map values.
      */
-    public static final ALL_DATA_PROJECTION = 'all_data'
+    String ALL_DATA_PROJECTION = 'all_data'
 
-
-    public static final NORMALIZED_READ_COUNT_PROJECTION = 'normalized_readcount'
-    public static final LOG_NORMALIZED_READ_COUNT_PROJECTION = 'log_normalized_readcount'
+    String NORMALIZED_READ_COUNT_PROJECTION = 'normalized_readcount'
+    String LOG_NORMALIZED_READ_COUNT_PROJECTION = 'log_normalized_readcount'
 
     // ACGH types
-    public static final CHIP_COPYNUMBER_VALUE = 'chip_copy_number_value'
-    public static final FLAG = 'flag'
-    public static final PROB_AMP = 'probability_of_amplification'
-    public static final PROB_LOSS = 'probability_of_loss'
-    public static final PROB_GAIN = 'probability_of_gain'
-    public static final PROB_NORM = 'probability_of_normal'
-    public static final SEGMENT_COPY_NUMBER_VALUE = 'segment_copy_number_value'
+    String CHIP_COPYNUMBER_VALUE = 'chip_copy_number_value'
+    String FLAG = 'flag'
+    String PROB_AMP = 'probability_of_amplification'
+    String PROB_LOSS = 'probability_of_loss'
+    String PROB_GAIN = 'probability_of_gain'
+    String PROB_NORM = 'probability_of_normal'
+    String SEGMENT_COPY_NUMBER_VALUE = 'segment_copy_number_value'
 
     // VCF Projections
-    public static final VAR_CLASS = 'variant'
-    public static final REF_ALT = 'reference'
-    public static final VAR_TYPE = 'variant_type'
+    String VAR_CLASS = 'variant'
+    String REF_ALT = 'reference'
+    String VAR_TYPE = 'variant_type'
 
-    public static final Map<String, String> prettyNames = [
+    Map<String, String> prettyNames = [
             (LOG_INTENSITY_PROJECTION): 'Log Intensity',
             (DEFAULT_REAL_PROJECTION) : 'Raw Intensity',
             (ZSCORE_PROJECTION)       : 'Z-Score',
@@ -84,11 +82,9 @@ public interface Projection<CELL> {
     ]
 
     /**
-     * This method takes an implementation-defined object and returns the final
-     * cell value.
+     * Takes an implementation-defined object and returns the final cell value.
      * @param object an implementation-defined object
      * @return the final cell value
      */
-    CELL doWithResult(Object object)
-
+    CELL doWithResult(object)
 }

@@ -2,7 +2,6 @@ package org.transmartproject.core.dataquery.clinical
 
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.dataquery.TabularResult
-import org.transmartproject.core.doc.Experimental
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.ontology.Study
 import org.transmartproject.core.querytool.QueryResult
@@ -10,7 +9,7 @@ import org.transmartproject.core.querytool.QueryResult
 /**
  * Entry point for retrieving clinical data.
  */
-public interface ClinicalDataResource {
+interface ClinicalDataResource {
 
     /**
      * Equivalent to {@link #retrieveData(java.util.List, java.util.List)}
@@ -70,8 +69,7 @@ public interface ClinicalDataResource {
                                                                    List<ClinicalVariable> ontologyTerms)
 
     /**
-     * Retrieves the data for passed variables for the patients included in the passed
-     * study.
+     * Retrieves the data for passed variables for the patients included in the passed study.
      *
      * @param study name of a study that returns patients for
      * @param variables the list of variables to include in the result (columns)
@@ -82,8 +80,7 @@ public interface ClinicalDataResource {
                                                                    List<ClinicalVariable> ontologyTerms)
 
     /**
-     * Creates a clinical variable to pass to the <code>retrieveData</code>
-     * methods.
+     * Creates a clinical variable to pass to the <code>retrieveData</code>  methods.
      *
      * @see #retrieveData(java.util.List, java.util.List)
      * @param parameters variable type specific string -> object map
@@ -96,5 +93,4 @@ public interface ClinicalDataResource {
      */
     ClinicalVariable createClinicalVariable(Map<String, Object> parameters,
                                             String type) throws InvalidArgumentsException
-
 }

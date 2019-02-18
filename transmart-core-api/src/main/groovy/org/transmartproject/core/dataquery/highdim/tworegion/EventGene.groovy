@@ -1,7 +1,7 @@
 package org.transmartproject.core.dataquery.highdim.tworegion
 
 /**
- * Created by j.hudecek on 21-1-2015.
+ * @author j.hudecek
  */
 interface EventGene {
     /**

@@ -30,5 +30,4 @@ interface AccessLogEntryResource {
      * @return list of all events that meet data range constraint
      */
     List<AccessLogEntry> listEvents(Map<String, Object> paginationParams, Date startDate, Date endDate)
-
 }

@@ -9,7 +9,7 @@ import org.transmartproject.core.dataquery.highdim.chromoregion.Region
  * Array based platforms will have an associated array template (data about
  * its probes); region platforms will have an associated set of regions.
  */
-public interface Platform {
+interface Platform {
 
     /**
      * A string that uniquely identifies the platform.
@@ -66,5 +66,4 @@ public interface Platform {
      * @return the template entries for this platform or null
      */
     Iterable<?> getTemplate()
-
 }

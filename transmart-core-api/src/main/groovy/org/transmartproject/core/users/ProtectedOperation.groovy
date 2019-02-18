@@ -1,7 +1,10 @@
 package org.transmartproject.core.users
 
+import groovy.transform.CompileStatic
+
 interface ProtectedOperation {
 
+    @CompileStatic
     enum WellKnownOperations implements ProtectedOperation {
         /**
          * Make use of the read of operations of the REST API.
@@ -44,6 +47,6 @@ interface ProtectedOperation {
          * Read the protected resource.
          * Applicable to query results.
          */
-        READ,
+        READ
     }
 }

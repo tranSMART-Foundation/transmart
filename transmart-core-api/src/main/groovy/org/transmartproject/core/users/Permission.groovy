@@ -17,7 +17,7 @@ package org.transmartproject.core.users
  * this resource.
  *
  */
-public interface Permission {
+interface Permission {
 
     /**
      * The name of the permission. Typically, client code is not interested in
@@ -42,5 +42,4 @@ public interface Permission {
      * @return true iif this permission includes the passed operation
      */
     boolean isCase(ProtectedOperation operation)
-
 }

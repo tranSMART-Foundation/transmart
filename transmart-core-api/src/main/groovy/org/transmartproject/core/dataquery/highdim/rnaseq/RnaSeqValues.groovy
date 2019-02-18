@@ -1,10 +1,11 @@
 package org.transmartproject.core.dataquery.highdim.rnaseq
+
 /**
  * Aggregates certain values, both measured and calculated,
  * for a certain (assay, probe, gene or region) pair
  * in the context of a RNA sequencing high dimensional observation.
   */
-public interface RnaSeqValues {
+interface RnaSeqValues {
 
     Integer getReadcount()
 

@@ -1,5 +1,6 @@
 package org.transmartproject.core.querytool
 
+import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import org.transmartproject.core.users.ProtectedResource
 
@@ -7,6 +8,7 @@ import org.transmartproject.core.users.ProtectedResource
  * A query definition is a set of panels. The data it represents is the
  * intersection of all the panels.
  */
+@CompileStatic
 @EqualsAndHashCode
 final class QueryDefinition implements ProtectedResource {
 
@@ -23,13 +25,11 @@ final class QueryDefinition implements ProtectedResource {
     final List<Panel> panels
 
     QueryDefinition(List<Panel> panels) {
-        this.name = "tranSMART's Query at " +
-                "${new Date().format('E MMM d yyyy HH:mm:ss \'GMT\'Z')}"
-        this.panels = panels.asImmutable()
+	this('''tranSMART's Query at ''' + new Date().format('E MMM d yyyy HH:mm:ss \'GMT\'Z'), panels)
     }
 
     QueryDefinition(String name, List<Panel> panels) {
-        this.name = name
-        this.panels = panels.asImmutable()
+	this.name = name
+	this.panels = panels.asImmutable()
     }
 }

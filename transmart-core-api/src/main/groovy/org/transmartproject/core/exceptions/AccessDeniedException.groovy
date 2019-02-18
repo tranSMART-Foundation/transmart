@@ -1,9 +1,11 @@
 package org.transmartproject.core.exceptions
 
+import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 
 /**
- * Exception to be thrown whenever the user is denied access to some resource.
+ * Thrown whenever the user is denied access to some resource.
  */
+@CompileStatic
 @InheritConstructors
 class AccessDeniedException extends RuntimeException { }

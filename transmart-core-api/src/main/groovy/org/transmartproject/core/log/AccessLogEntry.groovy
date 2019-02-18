@@ -34,5 +34,4 @@ interface AccessLogEntry {
      * @return time when event has happened
      */
     Date getAccessTime()
-
 }

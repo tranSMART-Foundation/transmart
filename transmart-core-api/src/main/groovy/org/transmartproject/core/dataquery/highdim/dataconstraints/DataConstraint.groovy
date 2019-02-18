@@ -10,7 +10,7 @@ package org.transmartproject.core.dataquery.highdim.dataconstraints
  * This interface should only include constants for constraints that are
  * expected to be supported in a significant number of different analyses.
  */
-public interface DataConstraint {
+interface DataConstraint {
 
     /**
      * A well-known constraint for filtering rows related to a certain
@@ -26,7 +26,7 @@ public interface DataConstraint {
      *
      * Parameters: 'keyword_ids' => <List of keyword ids (PK of search_keyword)>
      */
-    public final static String SEARCH_KEYWORD_IDS_CONSTRAINT = 'search_keyword_ids'
+    String SEARCH_KEYWORD_IDS_CONSTRAINT = 'search_keyword_ids'
 
     /**
      * A well-known constraint for filtering rows relevant to a certain
@@ -36,7 +36,7 @@ public interface DataConstraint {
      *             'start'      => <integer with start position (inclusive)>
      *             'end'        => <integer with end position (inclusive)>
      */
-    public final static String CHROMOSOME_SEGMENT_CONSTRAINT = 'chromosome_segment'
+    String CHROMOSOME_SEGMENT_CONSTRAINT = 'chromosome_segment'
 
     /**
      * A well-known constraint for building a disjunction of several
@@ -48,7 +48,7 @@ public interface DataConstraint {
      *                                  value (for several constraints of the
      *                                  same type)>
      */
-    public final static String DISJUNCTION_CONSTRAINT = 'disjunction'
+    String DISJUNCTION_CONSTRAINT = 'disjunction'
 
     /**
      * Filter rows relevant to some genes. Prefer this to
@@ -58,7 +58,7 @@ public interface DataConstraint {
      *             XOR
      *             'ids' => <list of public gene ids (NCBI Gene accession)>
      */
-    public final static String GENES_CONSTRAINT = 'genes'
+    String GENES_CONSTRAINT = 'genes'
 
     /**
      * Filter rows relevant to some proteins. Prefer this to
@@ -68,7 +68,7 @@ public interface DataConstraint {
      *             XOR
      *             'ids'  => <list of UniProt ids>
      */
-    public final static String PROTEINS_CONSTRAINT = 'proteins'
+    String PROTEINS_CONSTRAINT = 'proteins'
 
     /**
      * Filter rows relevant to some pathways. Prefer this to
@@ -79,7 +79,7 @@ public interface DataConstraint {
      *             'ids' => <list of names in the form
      *                       <database>:<db specific id>>
      */
-    public final static String PATHWAYS_CONSTRAINT = 'pathways'
+    String PATHWAYS_CONSTRAINT = 'pathways'
 
     /**
      * Filter rows relevant to some gene signatures. Prefer this to
@@ -89,7 +89,7 @@ public interface DataConstraint {
      *             XOR
      *             'ids' => <list of gene signature ids>
      */
-    public final static String GENE_SIGNATURES_CONSTRAINT = 'gene_signatures'
+    String GENE_SIGNATURES_CONSTRAINT = 'gene_signatures'
 
     /**
      * Filter rows based on a property
@@ -98,7 +98,7 @@ public interface DataConstraint {
      *             'property' => property of the row to check
      *             'operand'  => the object to compare the property to (e.g. a collection if operator == 'in', a string if operator == 'ilike', ...)
      */
-    public final static String PROPERTY_CONSTRAINT = 'property'
+    String PROPERTY_CONSTRAINT = 'property'
 
     /**
      * Filter rows based on the annotation/platform associated with the high dimensional data
@@ -111,5 +111,5 @@ public interface DataConstraint {
      *             'concept_code' => concept code of the high dimensional concept
      *            )
      */
-    public final static String ANNOTATION_CONSTRAINT = 'annotation'
+    String ANNOTATION_CONSTRAINT = 'annotation'
 }

@@ -5,8 +5,7 @@ import org.transmartproject.core.exceptions.NoSuchResourceException
 /**
  * Resource related with users.
  */
-public interface UsersResource {
+interface UsersResource {
 
     User getUserFromUsername(String username) throws NoSuchResourceException
-
 }

@@ -1,7 +1,9 @@
 package org.transmartproject.core.querytool
 
+import groovy.transform.CompileStatic
 import groovy.transform.Immutable
 
+@CompileStatic
 @Immutable
 class Item {
 

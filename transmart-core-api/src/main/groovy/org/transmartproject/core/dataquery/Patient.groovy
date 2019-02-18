@@ -6,7 +6,7 @@ import org.transmartproject.core.dataquery.assay.Assay
  * A patient (or subject) is a individual for which we have clinical
  * observations or other data.
  */
-public interface Patient {
+interface Patient {
 
     /**
      * A unique identifier for the patient. Cannot be null.
@@ -88,5 +88,4 @@ public interface Patient {
      * @return the assays associated with this patient; an empty list if none
      */
     Set<Assay> getAssays()
-
 }

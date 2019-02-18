@@ -14,7 +14,6 @@ import org.transmartproject.core.querytool.HighDimensionFilterType
 import org.transmartproject.core.querytool.QueryResult
 
 /**
- *
  * @param < R >
  */
 interface HighDimensionDataTypeResource<R extends DataRow<AssayColumn, ? /* depends on projection */>> {
@@ -73,7 +72,6 @@ interface HighDimensionDataTypeResource<R extends DataRow<AssayColumn, ? /* depe
      * identified by their name.
      * Only constraints of this type can by passed to this resource's
      * {@link #retrieveData(List, List, Projection)}.
-     *
      *
      * @return set of supported assay constraints
      */
@@ -152,17 +150,17 @@ interface HighDimensionDataTypeResource<R extends DataRow<AssayColumn, ? /* depe
     boolean matchesPlatform(Platform platform)
 
     /**
-     * Looks for annotations starting with search_term in assays belonging to the given concept_code
-     * @param concept_code the concept code
-     * @param search_term the search term
-     * @param search_property the type of annotation to search in (e.g. geneSymbol)
-     * @return a list of strings: the annotations starting with search_term in assays belonging
+     * Looks for annotations starting with searchTerm in assays belonging to the given conceptCode
+     * @param conceptCode the concept code
+     * @param searchTerm the search term
+     * @param searchProperty the type of annotation to search in (e.g. geneSymbol)
+     * @return a list of strings: the annotations starting with searchTerm in assays belonging
      * to the given concept code, ordered alphabetically
      */
-    List<String> searchAnnotation(String concept_code, String search_term, String search_property)
+    List<String> searchAnnotation(String conceptCode, String searchTerm, String searchProperty)
 
     /**
-     * A map of properties that can be used as search_property in {@link #searchAnnotation(String, String, String)}.
+     * A map of properties that can be used as searchProperty in {@link #searchAnnotation(String, String, String)}.
      * The keys are the actual property names to be used in {@link #searchAnnotation(String, String, String)}, the
      * values are the pretty printed forms to be used for display to the user
      * @return The map of searchable properties for this
@@ -185,11 +183,11 @@ interface HighDimensionDataTypeResource<R extends DataRow<AssayColumn, ? /* depe
      * The projectionType should correspond to a member of the list {@link #getSearchableProjections()}, e.g. 'log_intensity'
      * The property should be a valid property of this high-dimensional data, i.e. it should be a member of the list {@link #getSearchableAnnotationProperties()}, e.g. 'geneSymbol'
      * The selector is used to match a property against, e.g. 'KRAS'
-     * @param concept_key The concept key associated with the high dimensional data
-     * @param result_instance_id If this is null it will be ignored. Otherwise only the values for patients that are members
+     * @param conceptKey The concept key associated with the high dimensional data
+     * @param resultInstanceId If this is null it will be ignored. Otherwise only the values for patients that are members
      * of the given result instance will be returned.
      *
      * @return A map where the keys are patient ids, and the values are the data for that patient.
      */
-    def getDistribution(ConstraintByOmicsValue constraint, String concept_key, Long result_instance_id)
+    Map<Long, List> getDistribution(ConstraintByOmicsValue constraint, String conceptKey, Long resultInstanceId)
 }

@@ -12,5 +12,4 @@ interface OntologyTermTagsResource {
      * @return Multi-map of tags. The order of the tags is fixed.
      */
     Map<OntologyTerm, List<OntologyTermTag>> getTags(Set<OntologyTerm> ontologyTerms, boolean includeDescendantsTags)
-
 }

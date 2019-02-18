@@ -1,6 +1,9 @@
 package org.transmartproject.core.dataquery.highdim
 
-public enum GenomeBuildNumber {
+import groovy.transform.CompileStatic
+
+@CompileStatic
+enum GenomeBuildNumber {
 
     GRCh36('GRCH36'),
     GRCh37('GRCH37'),
@@ -8,25 +11,23 @@ public enum GenomeBuildNumber {
 
     UNKNOWN('UNKNOWN')
 
-    static gBuildNumberMap = [ 'HG18'  :'GRCH36',
-                               'HG19'  :'GRCH37',
-                               'HG38'  :'GRCH38'
-                             ]
+    private static final Map<String, String> gBuildNumberMap =
+	[HG18: 'GRCH36', HG19: 'GRCH37', HG38: 'GRCH38'].asImmutable() as Map
+
     /**
      * The value of this object for storage purposes.
      */
     final String id  
 
-    protected GenomeBuildNumber(id) {
+    private GenomeBuildNumber(id) {
         this.id = id
     }
 
     static GenomeBuildNumber forId(String id) {
         String ucid = id ? id.toUpperCase() : id
         ucid = gBuildNumberMap[ucid] ?: ucid
-        values().find { it.id == ucid } ?: UNKNOWN
+        values().find { GenomeBuildNumber it -> it.id == ucid } ?: UNKNOWN
     }
-
 }
 
 /*

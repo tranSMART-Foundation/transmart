@@ -10,5 +10,4 @@ interface ComposedVariable extends ClinicalVariable {
      * @return the list of inner clinical variables
      */
     List<ClinicalVariable> getInnerClinicalVariables()
-
 }

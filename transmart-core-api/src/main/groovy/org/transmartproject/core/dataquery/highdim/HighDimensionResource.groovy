@@ -9,14 +9,14 @@ import org.transmartproject.core.exceptions.NoSuchResourceException
  * A resource that serves an entry point to obtain sub-resources allowing access
  * to certain types of high-dimensional data.
  */
-public interface HighDimensionResource {
+interface HighDimensionResource {
 
     /**
      * Returns the set of data type names that can be used to obtain
      * {@link HighDimensionDataTypeResource} objects with
      * {@link #getSubResourceForType(java.lang.String)}.
      *
-     * @return set of known data type names
+     * @return known data type names
      */
     Set<String> getKnownTypes()
 

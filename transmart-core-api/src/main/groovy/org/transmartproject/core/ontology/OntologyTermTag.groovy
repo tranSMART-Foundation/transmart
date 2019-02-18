@@ -15,5 +15,4 @@ interface OntologyTermTag {
      * @return Free text value.
      */
     String getDescription()
-
 }

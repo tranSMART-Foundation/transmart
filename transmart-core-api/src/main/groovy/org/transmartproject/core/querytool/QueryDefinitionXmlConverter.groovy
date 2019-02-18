@@ -3,8 +3,7 @@ package org.transmartproject.core.querytool
 import org.transmartproject.core.exceptions.InvalidRequestException
 
 /**
- * Defines an interface to for serializing and unserializing QueryDefinition
- * objects to and from XML.
+ * For serializing and deserializing QueryDefinition objects to and from XML.
  *
  * The reason this interface exists, instead of being an implementation detail
  * of {@link QueriesResource} or a the control backed by it is that it is

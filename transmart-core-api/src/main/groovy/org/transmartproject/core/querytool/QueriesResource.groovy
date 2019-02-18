@@ -3,9 +3,6 @@ package org.transmartproject.core.querytool
 import org.transmartproject.core.exceptions.InvalidRequestException
 import org.transmartproject.core.exceptions.NoSuchResourceException
 
-/**
- *
- */
 interface QueriesResource {
 
     /**

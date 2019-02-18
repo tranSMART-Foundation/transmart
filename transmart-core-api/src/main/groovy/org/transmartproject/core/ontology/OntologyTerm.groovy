@@ -1,11 +1,12 @@
 package org.transmartproject.core.ontology
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.dataquery.Patient
 
 /**
  * An i2b2 ontology metadata entry.
  */
-public interface OntologyTerm {
+interface OntologyTerm {
 
     /**
      * The hierarchical level of the term. The term at the highest level of a`
@@ -77,7 +78,6 @@ public interface OntologyTerm {
      */
     Object getMetadata()
 
-
     /**
      * Returns the terms one level below that have this term as a parent.
      * Synonyms and hidden terms are not shown.
@@ -120,17 +120,18 @@ public interface OntologyTerm {
      */
     List<Patient> getPatients()
 
+    @CompileStatic
     enum VisualAttributes {
 
         /**
          * Non-terminal term that can be used as a query item.
          */
-        FOLDER              (0, 'F' as Character),
+        FOLDER(0, 'F' as char),
 
         /**
          * Non-terminal term that cannot be used as a query item.
          */
-        CONTAINER           (0, 'C' as Character),
+            CONTAINER(0, 'C' as char),
 
         /**
          * The term represents several terms, which are collapsed on it. An
@@ -139,72 +140,73 @@ public interface OntologyTerm {
          * two terms that are considered to be 'Unknown Gender' and both are
          * mapped to that one.
          */
-        MULTIPLE            (0, 'M' as Character),
+            MULTIPLE(0, 'M' as char),
 
         /**
          * A terminal term.
          */
-        LEAF                (0, 'L' as Character),
-        MODIFIER_CONTAINER  (0, 'O' as Character),
-        MODIFIER_FOLDER     (0, 'D' as Character),
-        MODIFIER_LEAF       (0, 'R' as Character),
+            LEAF(0, 'L' as char),
+            MODIFIER_CONTAINER(0, 'O' as char),
+            MODIFIER_FOLDER(0, 'D' as char),
+            MODIFIER_LEAF(0, 'R' as char),
 
 
         /**
          * A term to be displayed normally.
          */
-        ACTIVE              (1, 'A' as Character),
+            ACTIVE              (1, 'A' as char),
 
         /**
          * A term that cannot be used.
          */
-        INACTIVE            (1, 'I' as Character),
+            INACTIVE            (1, 'I' as char),
 
         /**
          * The term is hidden from the user.
          */
-        HIDDEN              (1, 'H' as Character),
+            HIDDEN              (1, 'H' as char),
 
 
         /**
          * If present, the term can have children added to it and it can also
          * be deleted.
          */
-        EDITABLE            (2, 'E' as Character),
+            EDITABLE            (2, 'E' as char),
 
         /**
          * !! tranSMART extension !!
          * Indicates high-dimensional data.
          */
-        HIGH_DIMENSIONAL    (2, 'H' as Character),
+            HIGH_DIMENSIONAL    (2, 'H' as char),
 
         /**
          * To indicate the term as study
          */
-        STUDY               (2, 'S' as Character),
+            STUDY               (2, 'S' as char),
 
         /**
          * To indicate the term as program
          */
-        PROGRAM             (2, 'P' as Character)
+            PROGRAM             (2, 'P' as char)
 
-        int position
-        char keyChar
+        final int position
+        final char keyChar
 
-        protected VisualAttributes(int position, char keyChar) {
+        private VisualAttributes(int position, char keyChar) {
             this.position = position
             this.keyChar = keyChar
         }
 
         static EnumSet<VisualAttributes> forSequence(String sequence) {
-            def ret = EnumSet.noneOf(VisualAttributes)
-            def allValues = values()
-            sequence.eachWithIndex{ String c, int i ->
-                def v = allValues.find { it.position == i && it.keyChar == c }
-                if (v != null)
-                    ret.add(v)
-            }
-            ret
+	    EnumSet<VisualAttributes> set = EnumSet.noneOf(VisualAttributes)
+	    VisualAttributes[] allValues = values()
+	    sequence.eachWithIndex { String c, int i ->
+		VisualAttributes v = allValues.find { VisualAttributes it -> it.position == i && it.keyChar == c }
+		if (v) {
+                    set << v
+		}
+	    }
+	    set
         }
     }
 }

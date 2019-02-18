@@ -1,10 +1,11 @@
 package org.transmartproject.core.exceptions
 
+import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 
 /**
- * Exception to be thrown whenever some query that should return a non-empty set
- * does return an empty set.
+ * Thrown whenever some query that should return a non-empty set returns an empty set.
  */
+@CompileStatic
 @InheritConstructors
 class EmptySetException extends RuntimeException { }

@@ -1,5 +1,6 @@
 package org.transmartproject.core.dataquery.highdim.acgh
 
+import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
@@ -7,13 +8,13 @@ import groovy.transform.ToString
  * Specifies segment on chromosome.
  * It's supposed to be wider than region and be used to query acgh data
  */
+@CompileStatic
 @EqualsAndHashCode
 @ToString
-public class ChromosomalSegment {
+class ChromosomalSegment {
 
     /**
      * An identifier for the chromosome
-     * @return
      */
     String chromosome
 
@@ -31,5 +32,4 @@ public class ChromosomalSegment {
      * @return the end of the interval in the chromosome
      */
     Long end
-
 }

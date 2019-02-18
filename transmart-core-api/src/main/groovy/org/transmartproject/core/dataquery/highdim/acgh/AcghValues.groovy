@@ -1,10 +1,11 @@
 package org.transmartproject.core.dataquery.highdim.acgh
+
 /**
  * Aggregates certain values, both measured and calculated,
  * for a certain (assay, probe or region) pair in the context of a certain
  * array comparative genomic hybridization trial.
  */
-public interface AcghValues {
+interface AcghValues {
 
     /**
      * The log2 ratio value for the (assay, probe/region) pair represented in
@@ -40,7 +41,7 @@ public interface AcghValues {
     CopyNumberState getCopyNumberState()
 
     /**
-     * The probability ('soft call') of this region or segment having
+     * The probability ("soft call") of this region or segment having
      * suffered a copy number loss.
      *
      * @return probability of loss event
@@ -48,7 +49,7 @@ public interface AcghValues {
     Double getProbabilityOfLoss()
 
     /**
-     * The probability ('soft call') of this region or segment not
+     * The probability ("soft call") of this region or segment not
      * having suffered any kind of copy number alteration.
      *
      * @return probability of normal event
@@ -56,7 +57,7 @@ public interface AcghValues {
     Double getProbabilityOfNormal()
 
     /**
-     * The probability ('soft call') that this region or segment has
+     * The probability ("soft call") that this region or segment has
      * suffered a single copy-number gain.
      *
      * @return probability of gain event
@@ -64,7 +65,7 @@ public interface AcghValues {
     Double getProbabilityOfGain()
 
     /**
-     * The probability ('soft call') of that this region or segment having
+     * The probability ("soft call") of that this region or segment having
      * suffered multiple copy-number gains.
      *
      * @return probability of amplification event

@@ -2,9 +2,9 @@ package org.transmartproject.core.dataquery.clinical
 
 import org.transmartproject.core.concept.ConceptKey
 
-public interface ClinicalVariable {
+interface ClinicalVariable {
 
-    /**`
+    /**
      * Data associated with a specific concept. The concept must be terminal,
      * i.e., it must have data associated directly to it, as opposed to
      * through children.
@@ -20,7 +20,7 @@ public interface ClinicalVariable {
      *
      * Type of data: {@link String} or {@link BigDecimal}.
      */
-    public final static String TERMINAL_CONCEPT_VARIABLE = 'terminal_concept_variable'
+    String TERMINAL_CONCEPT_VARIABLE = 'terminal_concept_variable'
 
     /**
      * TranSMART stores categorical variables as a container concept with as many
@@ -36,15 +36,15 @@ public interface ClinicalVariable {
      * </pre>
      *
      * The reason for this is not completely clear. Maybe it's because it allows
-     * showing the concept code next to each possible value (in this case 'male'
-     * and 'female'). It also allows slightly easier selection of patients with
+     * showing the concept code next to each possible value (in this case "male"
+     * and "female"). It also allows slightly easier selection of patients with
      * a given value (one can just drag the concept instead of having to constrain
      * it to a specific value).
      *
-     * This type of clinical variable represents a collapsed view the terminal
-     * concepts responsible for implementing a tranSMART 'categorical variable'.
-     * In the example above, it would return 'female' for 'Patient1' and 'male'
-     * for 'Patient2' and 'Patient3'.
+     * This type of clinical variable represents a collapsed view of the terminal
+     * concepts responsible for implementing a tranSMART "categorical variable".
+     * In the example above, it would return "female" for "Patient1" and "male"
+     * for "Patient2" and "Patient3".
      *
      * Parameters: concept_code => <string representing the concept code of
      *                              the container concept related to the
@@ -63,13 +63,13 @@ public interface ClinicalVariable {
      * Variables of this type implement {@link ComposedVariable}.
      * Type of data: {@link String}.
      */
-    public final static String CATEGORICAL_VARIABLE = 'categorical_variable'
+    String CATEGORICAL_VARIABLE = 'categorical_variable'
 
     /**
      * Creates a variable that aggregates all the descendant 1) numerical leaf
      * variable terms and 2) categorical variables (see
      * {@link #CATEGORICAL_VARIABLE}) of the configured ontology term.
-     * 'Descendant', as used here, includes also the passed ontology term.
+     * "Descendant", as used here, includes also the passed ontology term.
      *
      * Parameters: concept_code => <string representing the concept code of
      *                              any concept>
@@ -83,11 +83,10 @@ public interface ClinicalVariable {
      * Type of data: {@link Map} from {@link ClinicalVariable} to {@link String}
      * or {@link BigDecimal}.
      */
-    public final static String NORMALIZED_LEAFS_VARIABLE = 'normalized_leafs_variable'
+    String NORMALIZED_LEAFS_VARIABLE = 'normalized_leafs_variable'
 
     /**
      * @return the concept key. See {@link org.transmartproject.core.ontology.OntologyTerm#getKey()}
      */
-    public ConceptKey getKey()
-
+    ConceptKey getKey()
 }

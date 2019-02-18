@@ -6,7 +6,7 @@ import org.transmartproject.core.users.ProtectedResource
 /**
  * A study (or trial) represents a unit of patients and data for these patients.
  */
-public interface Study extends ProtectedResource {
+interface Study extends ProtectedResource {
 
     /**
      * The (hopefully unique) name of the study.
@@ -23,7 +23,7 @@ public interface Study extends ProtectedResource {
 
     /**
      * All the patients belonging to this study.
-     * @return the patients for this study
+     * @return the patients
      */
     Set<Patient> getPatients()
 }

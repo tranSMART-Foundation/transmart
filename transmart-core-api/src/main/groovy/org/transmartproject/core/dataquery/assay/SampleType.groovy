@@ -6,8 +6,7 @@ import groovy.transform.Canonical
 class SampleType {
 
     /**
-     * The sample code used for querying purposes. Typically a numerical
-     * value.
+     * The sample code used for querying purposes. Typically a numerical value.
      */
     String code
 
@@ -15,5 +14,4 @@ class SampleType {
      * A label used for displaying purposes.
      */
     String label
-
 }

@@ -4,8 +4,7 @@ import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.users.ProtectedResource
 
 /**
- * A query result instance contains information about a specific run of a
- * query.
+ * Contains information about a specific run of a query.
  *
  * All query results are assumed to be of PATIENTSET type.
  */
@@ -16,21 +15,21 @@ interface QueryResult extends ProtectedResource {
      *
      * @return the numerical identifier for this result
      */
-    public Long getId()
+    Long getId()
 
     /**
      * The size of the set, or -1 if there was an error.
      *
      * @return the size of the set
      */
-    public Long getSetSize()
+    Long getSetSize()
 
     /**
      * The status of this query result instance.
      *
      * @return the status or null if unknown
      */
-    public QueryStatus getStatus() //FINISHED (3), ERROR (4)
+    QueryStatus getStatus() //FINISHED (3), ERROR (4)
 
     /**
      * The error message associated with this query result. May be an
@@ -38,14 +37,14 @@ interface QueryResult extends ProtectedResource {
      *
      * @return the error message or null if none
      */
-    public String getErrorMessage()
+    String getErrorMessage()
 
     /**
      * The set of patients included in this result.
      *
      * @return the set of patients
      */
-    public Set<Patient> getPatients()
+    Set<Patient> getPatients()
 
     /**
      * The username of the user associated with this query. There may not
@@ -54,6 +53,5 @@ interface QueryResult extends ProtectedResource {
      * @return the username associated with the query definition used to issue
      * this query
      */
-    public String getUsername()
-
+    String getUsername()
 }

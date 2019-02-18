@@ -1,8 +1,9 @@
 package org.transmartproject.core.users
+
 /**
  * Represents a tranSMART user.
  */
-public interface User {
+interface User {
 
     /**
      * An numerical identifier for the user.
@@ -30,10 +31,7 @@ public interface User {
      * Returns true iif this user is authorized to perform the given operation
      * on the given object.
      *
-     * @param operation
-     * @param protectedResource
      * @return true iif access is granted
      */
     boolean canPerform(ProtectedOperation operation, ProtectedResource protectedResource)
-
 }

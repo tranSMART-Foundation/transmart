@@ -1,6 +1,6 @@
 package org.transmartproject.core.dataquery
 
-public interface DataRow<COL, CELL> extends Iterable<CELL> {
+interface DataRow<COL, CELL> extends Iterable<CELL> {
 
     String getLabel()
 

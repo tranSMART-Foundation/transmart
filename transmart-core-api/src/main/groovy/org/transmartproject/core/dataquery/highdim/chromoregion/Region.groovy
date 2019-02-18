@@ -3,14 +3,13 @@ package org.transmartproject.core.dataquery.highdim.chromoregion
 import org.transmartproject.core.dataquery.highdim.Platform
 
 /**
- * A region is a platform- (and therefore data type-) bound portion of a
- * chromosome.
+ * A platform- (and therefore data type-) bound portion of a chromosome.
  *
  * For aCGH, is the result of the aggregation of several probes, but, in
  * general, it's another platform element, that, when combined with an
  * assay, identifies a data point in high dimensional data.
  */
-public interface Region {
+interface Region {
 
     /**
      * A unique numeric identifier for the region.
@@ -69,5 +68,4 @@ public interface Region {
      * @return number of probes aggregated in this region or null if inapplicable
      */
     Integer getNumberOfProbes()
-
 }

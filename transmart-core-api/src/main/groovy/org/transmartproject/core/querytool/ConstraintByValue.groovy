@@ -1,7 +1,9 @@
 package org.transmartproject.core.querytool
 
+import groovy.transform.CompileStatic
 import groovy.transform.Immutable
 
+@CompileStatic
 @Immutable
 class ConstraintByValue {
 
@@ -21,31 +23,36 @@ class ConstraintByValue {
      */
     ValueType valueType
 
-
-    enum Operator {
+    @CompileStatic
+    static enum Operator {
 
         LOWER_THAN          ('LT'),
-        LOWER_OR_EQUAL_TO   ('LE'),
-        EQUAL_TO            ('EQ'),
-        BETWEEN             ('BETWEEN'),
-        GREATER_THAN        ('GT'),
-        GREATER_OR_EQUAL_TO ('GE')
+            LOWER_OR_EQUAL_TO   ('LE'),
+            EQUAL_TO            ('EQ'),
+            BETWEEN             ('BETWEEN'),
+            GREATER_THAN        ('GT'),
+            GREATER_OR_EQUAL_TO ('GE');
 
         final String value
 
-        protected Operator(String value) {
+        private Operator(String value) {
             this.value = value
         }
 
-        static Operator forValue(String value) {
-            values().find { value == it.value } ?:
-                { throw new IllegalArgumentException('No operator for value ' + value) }()
-        }
+	static Operator forValue(String value) {
+	    Operator operator = values().find { Operator it -> value == it.value }
+	    if (operator) {
+		operator
+	    }
+	    else {
+		throw new IllegalArgumentException('No operator for value ' + value)
+	    }
+	}
     }
 
-    enum ValueType {
+    @CompileStatic
+    static enum ValueType {
         NUMBER,
         FLAG
     }
-
 }

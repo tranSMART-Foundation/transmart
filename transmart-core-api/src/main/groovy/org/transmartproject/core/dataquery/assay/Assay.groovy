@@ -4,7 +4,7 @@ import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.dataquery.highdim.Platform
 
 /**
- * An assay (used somewhat interchangeably with the term 'sample' for tranSMART
+ * An assay (used somewhat interchangeably with the term "sample" for tranSMART
  * purposes) is any biological tissue used in an analysis for generating
  * high-dimensional data. An assay is linked to a specific patient and to a
  * specific platform.
@@ -75,5 +75,4 @@ interface Assay {
      * @return the platform for this assay; never null
      */
     Platform getPlatform()
-
 }
