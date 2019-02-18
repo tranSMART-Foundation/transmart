@@ -12,7 +12,7 @@
         <g:each var="term" in="${termsMap}">
             <tr>
                 <td style="vertical-align:top;">
-                    <g:render template="categoryListWithCheckBoxes"
+                    <g:render template='categoryListWithCheckBoxes'
                               model="[termName: term.key, termDisplayName: term.value.displayName, termList: term.value.counts, JSONData: JSONData]"/>
                 </td>
             </tr>

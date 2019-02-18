@@ -4,7 +4,7 @@
 <div onclick="jQuery('[name=\'regionFilter\'][value=\'gene\']').attr('checked', true);">
     <g:radio name="regionFilter" value="gene"/>
     Gene: <tmpl:extSearchField width="200" fieldName="filterGeneId" searchAction="searchAutoComplete"
-                                    searchController="RWG"/>
+                               searchController="RWG"/>
     <a style="color: blue; cursor: pointer" id="filterGeneIdChangeButton"
        onclick="changeField('filterGeneId-combobox', 'filterGeneId')">Change</a>
     <br/>

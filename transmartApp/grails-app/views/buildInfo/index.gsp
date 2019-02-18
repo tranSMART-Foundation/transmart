@@ -1,15 +1,14 @@
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="admin"/>
-    <title>AccessLog List</title>
-</head>
+    <head>
+	<meta name="layout" content="admin"/>
+	<title>Build Info</title>
+    </head>
 
-<body>
-<div class="body">
-    <g:render template="/buildInfo/buildInfo"/><br/>
-    <g:render template="/buildInfo/runtimeStatus"/><br/>
-    <g:render template="/buildInfo/installedPlugins"/><br/>
-</div>
-</body>
+    <body>
+	<div class="body">
+	    <g:render template='/buildInfo/buildInfo' model="[warDeployed: warDeployed]"/><br/>
+	    <g:render template='/buildInfo/runtimeStatus' model="[envName: envName, javaVersion: javaVersion]"/><br/>
+	    <g:render template='/buildInfo/installedPlugins' model="[plugins: plugins]"/><br/>
+	</div>
+    </body>
 </html>

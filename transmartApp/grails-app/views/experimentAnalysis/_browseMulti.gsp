@@ -1,6 +1,4 @@
-<%--<script type="text/javascript" src="${resource(dir:'js', file:'jquery/ui.multiselect.js')}"></script>--%>
-
-<script type="text/javascript">
+<script>
     jQuery(function () {
         // choose either the full version
         jQuery(".multiselect").multiselect();
@@ -14,5 +12,3 @@
         <option value="${analysis[0]}">${analysis[1]}</option>
     </g:each>
 </select>
-
-

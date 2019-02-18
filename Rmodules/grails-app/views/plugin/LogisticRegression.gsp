@@ -1,7 +1,6 @@
 %{--include js lib for box plot dynamically--}%
-<r:require modules="logistic_regression"/>
-<r:layoutResources disposition="defer"/>
-
+<r:require modules='logistic_regression'/>
+<r:layoutResources disposition='defer'/>
 
 <div id="analysisWidget">
 
@@ -22,15 +21,15 @@
                         <h3>Independent Variable</h3>
                         <span class="hd-notes">
                             Drag a <b>numerical</b> or <b>high dimensional</b> concept from the Data Set Explorer Tree into the box below.
-                            <br><br><br><br><br><br><br><br>
+                            <br/><br/><br/><br/><br/><br/><br/><br/>
                         </span>
                         <div id='divIndependentVariable' class="queryGroupIncludeSmall highDimBox"></div>
                         <div class="highDimBtns">
                             <button type="button" onclick="highDimensionalData.gather_high_dimensional_data('divIndependentVariable', true)">High Dimensional Data</button>
                             <button type="button" onclick="logisticRegressionView.clear_high_dimensional_input('divIndependentVariable')">Clear</button>
                         </div>
-                        <input type="hidden" id="independentVarDataType">
-                        <input type="hidden" id="independentPathway">
+                        <input type="hidden" id="independentVarDataType"/>
+                        <input type="hidden" id="independentPathway"/>
                     </div>
 
                     %{--Display independent variable--}%
@@ -52,16 +51,16 @@
                             from the tree into the box below (for example, Subjects with Malignant Vs. Subjects with
                             Benign Tumors). A folder may be dragged in to include the two leaf nodes under that folder,
                             or a continuous or high dimensional variable may be selected and categorized using the binning option below.
-                            <br> <i>NOTE: The top concept or the first bin will always be designated a value of 1 (success) and
-                            the other a value of 0 (failure).</i>
+                            <br/> <i>NOTE: The top concept or the first bin will always be designated a value of 1 (success) and
+				the other a value of 0 (failure).</i>
                         </span>
                         <div id='divGroupByVariable' class="queryGroupIncludeSmall highDimBox"></div>
                         <div class="highDimBtns">
                             <button type="button" onclick="highDimensionalData.gather_high_dimensional_data('divGroupByVariable', true)">High Dimensional Data</button>
                             <button type="button" onclick="logisticRegressionView.clear_high_dimensional_input('divGroupByVariable')">Clear</button>
                         </div>
-                        <input type="hidden" id="groupByVarDataType">
-                        <input type="hidden" id="groupByPathway">
+                        <input type="hidden" id="groupByVarDataType"/>
+                        <input type="hidden" id="groupByPathway"/>
                     </div>
 
                     %{--Display group variable--}%
@@ -76,7 +75,7 @@
                         </select>
 
                         <label for="txtNumberOfBins">Number of Bins:</label>
-                        <input type="text" id="txtNumberOfBins" onChange="logisticRegressionView.manage_bins(this.value);" value="2" disabled />
+                        <input type="text" id="txtNumberOfBins" onChange="logisticRegressionView.manage_bins(this.value);" value="2" disabled/>
 
                         <label for="selBinDistribution">Bin Assignments</label>
                         <select id="selBinDistribution">
@@ -85,7 +84,7 @@
                         </select>
 
                         <div class="chkpair">
-                            <input type="checkbox" id="chkManualBin" onClick="logisticRegressionView.manage_bins(document.getElementById('txtNumberOfBins').value);"> Manual Binning
+                            <input type="checkbox" id="chkManualBin" onClick="logisticRegressionView.manage_bins(document.getElementById('txtNumberOfBins').value);"/> Manual Binning
                         </div>
 
                         %{-- Manual binning continuous variable --}%
@@ -105,11 +104,10 @@
                                     <td style="vertical-align: top;">Categories
                                         <div id='divCategoricalItems' class="manualBinningCategories"></div>
                                     </td>
-                                    <td style="vertical-align: top;"><br />
-                                        <br><span class="minifont">&laquo;Drag To Bin&raquo</span></td>
+                                    <td style="vertical-align: top;"><br/>
+                                        <br/><span class="minifont">&laquo;Drag To Bin&raquo</span></td>
                                     <td>
                                         <table id="tblBinCategorical">
-
                                         </table>
                                     </td>
                                 </tr>
@@ -120,7 +118,6 @@
                 </fieldset>
             </div>
 
-
         </div>  %{--end container--}%
 
         %{-- ************************************************************************************************* --}%
@@ -130,10 +127,10 @@
         <fieldset class="toolFields">
 
             <div class="chkpair">
-                <g:checkBox name="isBinning" onclick="logisticRegressionView.toggle_binning();"/> Enable binning
+                <g:checkBox name='isBinning' onclick='logisticRegressionView.toggle_binning();'/> Enable binning
             </div>
 
-            <input type="button" value="Run" onClick="logisticRegressionView.submit_job(this.form);" class="runAnalysisBtn">
+            <input type="button" value="Run" onClick="logisticRegressionView.submit_job(this.form);" class="runAnalysisBtn"/>
         </fieldset>
     </form>
 </div>

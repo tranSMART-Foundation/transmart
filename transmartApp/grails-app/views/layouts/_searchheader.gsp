@@ -1,4 +1,4 @@
-<g:if test="${webRequest.getActionName() == null || webRequest.getActionName() == 'index' || source == 'index'}">
+<g:if test="${webRequest.actionName == null || webRequest.actionName == 'index' || source == 'index'}">
     <div class="body" style="clear:both; width:99%;margin-left:5px;margin-top:20px">
         <table style="border:0px; align:left">
             <tr>
@@ -53,7 +53,7 @@
                                                        style="text-decoration:underline;color:blue;font-size:11px;"
                                                        href=""
                                                        onclick="popupWindow('${createLink(controller:'searchHelp', action:'list')}', 'searchhelpwindow');
-                                                       return false;">
+								return false;">
                                                         browse
                                                     </a>
                                                     <br/>
@@ -132,7 +132,7 @@
                     <a id="browse-link" class="tiny" style="text-decoration:underline;color:blue;font-size:11px;"
                        href=""
                        onclick="popupWindow('${createLink(controller:'searchHelp', action:'list')}', 'searchhelpwindow');
-                       return false;">
+				return false;">
                         browse
                     </a>
                     <br/>

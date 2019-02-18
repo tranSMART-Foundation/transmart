@@ -23,7 +23,7 @@
 		<table style="width: auto; border: 0; text-align: center; margin: auto;" align="center">
 			<tr>
 				<td style="text-align: center; vertical-align: middle; margin-left: -40px;">
-					<img src="${uiHeroImageUrl}" alt="Transmart" />
+					<img src="${cms.link(name: 'transmartlogoHMS.jpg')}" alt="Transmart" />
 				</td>
 			</tr>
 			<tr id="bannerRow">

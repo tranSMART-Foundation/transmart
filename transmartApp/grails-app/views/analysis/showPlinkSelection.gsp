@@ -1,5 +1,5 @@
 </table>
 
-<script type="text/javascript">
+<script>
     showPathwaySearchBox('selectedGenesPlink', 'selectedGenesAndIdPlink', 'searchPathwayPlink', 'divPathwayPlink');
 </script>

@@ -1,13 +1,13 @@
 %{--include js lib for scatter plot dynamically--}%
-<r:require modules="scatter_plot"/>
-<r:layoutResources disposition="defer"/>
+<r:require modules='scatter_plot'/>
+<r:layoutResources disposition='defer'/>
 
 <div id="analysisWidget">
 
     <h2>
         Variable Selection
         <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.scatterPlot ?: "JavaScript:D2H_ShowHelp(1512,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+            <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
 
@@ -29,8 +29,8 @@
                             <button type="button" onclick="highDimensionalData.gather_high_dimensional_data('divIndependentVariable', true)">High Dimensional Data</button>
                             <button type="button" onclick="scatterPlotView.clear_high_dimensional_input('divIndependentVariable')">Clear</button>
                         </div>
-                        <input type="hidden" id="independentVarDataType">
-                        <input type="hidden" id="independentPathway">
+                        <input type="hidden" id="independentVarDataType"/>
+                        <input type="hidden" id="independentPathway"/>
                     </div>
 
                     %{--Display independent variable--}%
@@ -53,8 +53,8 @@
                             <button type="button" onclick="highDimensionalData.gather_high_dimensional_data('divDependentVariable', true)">High Dimensional Data</button>
                             <button type="button" onclick="scatterPlotView.clear_high_dimensional_input('divDependentVariable')">Clear</button>
                         </div>
-                        <input type="hidden" id="dependentVarDataType">
-                        <input type="hidden" id="dependentPathway">
+                        <input type="hidden" id="dependentVarDataType"/>
+                        <input type="hidden" id="dependentPathway"/>
                     </div>
 
                     %{--Display dependent variable--}%
@@ -70,12 +70,10 @@
 
         <fieldset class="toolFields">
             <div>
-                <g:checkBox name="divIndependentVariableLog10"/> Perform log<sub>10</sub> transformation on independent variable.
+                <g:checkBox name='divIndependentVariableLog10'/> Perform log<sub>10</sub> transformation on independent variable.
                 (Do not apply to high dimensional data. Negative values will be ignored.)
             </div>
-            <input type="button" value="Run" onClick="scatterPlotView.submit_job(this.form);" class="runAnalysisBtn">
+            <input type="button" value="Run" onClick="scatterPlotView.submit_job(this.form);" class="runAnalysisBtn"/>
         </fieldset>
-
     </form>
-
 </div>

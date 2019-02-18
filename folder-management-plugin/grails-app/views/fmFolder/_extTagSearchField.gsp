@@ -1,12 +1,11 @@
 <g:javascript>
-
 jQuery(document).ready(function() {	
 	
 	var escapedFieldName = '${fieldName}'.replace(".", "\\.");
 	jQuery("#" + escapedFieldName + "-input").autocomplete({
 		source: function( request, response ) {
 			jQuery.ajax({
-				url: '${createLink([action:searchAction,controller:searchController])}',
+				url: '${createLink(action: searchAction, controller: searchController)}',
 				data: {
 					term: request.term,
 					codeTypeName: '${codeTypeName}'
@@ -73,31 +72,33 @@ jQuery(document).ready(function() {
 		return returnElement;
 	};
 });
+
 function removeTag(fieldName, tag) {
         var escapedFieldName = fieldName.replace(".", "\\.");
         //Attribute selector here gets around spaces in ID, which shouldn't be allowed... but is
         jQuery('[id=\'' + escapedFieldName + '-tag-' + tag + "\']").remove();
         jQuery('#' + escapedFieldName + ' option[value="' + tag + '"]').remove();
 }
+
 //For all tags - when clicked, call the remove tag function (remove them from the DOM and underlying select list)
 jQuery('.tag').live('click', function(e) { removeTag(jQuery(this).parent().attr('name'), jQuery(this).attr('name')); });
 </g:javascript>
 <%-- Tag box (visual display of tags) --%>
 <div id="${fieldName}-tags" class="tagBox" name="${fieldName}">
-	<g:each in="${values}" var="value">
-		<span class="tag" id="${fieldName}-tag-${value.uniqueId}" name="${value.uniqueId}">${value.codeName}</span>
-	</g:each>
+    <g:each in="${values}" var='value'>
+	<span class="tag" id="${fieldName}-tag-${value.uniqueId}" name="${value.uniqueId}">${value.codeName}</span>
+    </g:each>
 </div>
 
 <%-- Hidden select field, keeps actual selected values --%>
 <select id="${fieldName}" name="${fieldName}" multiple="multiple" style="display: none;">
-	<g:each in="${values}" var="value">
-		<option selected="selected" value="${value.uniqueId}">${value.codeName}</option>
-	</g:each>
+    <g:each in="${values}" var='value'>
+	<option selected="selected" value="${value.uniqueId}">${value.codeName}</option>
+    </g:each>
 </select>
 
 <%-- Visible input --%>
 <div style="background-color: #E4E4E4; float:left; padding: 8px; border-radius: 8px;">
-	<div style="float: left; line-height: 24px; font-style: italic; margin-right: 8px;">Add new: </div>
-	<input id="${fieldName}-input" style="float: left; width: 600px;"/>
+    <div style="float: left; line-height: 24px; font-style: italic; margin-right: 8px;">Add new: </div>
+    <input id="${fieldName}-input" style="float: left; width: 600px;"/>
 </div>

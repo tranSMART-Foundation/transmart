@@ -1,13 +1,13 @@
 %{--include js lib for heatmap dynamically--}%
-<r:require modules="pca"/>
-<r:layoutResources disposition="defer"/>
+<r:require modules='pca'/>
+<r:layoutResources disposition='defer'/>
 
 <div id="analysisWidget">
 
     <h2>
         Variable Selection
         <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.pca ?: "JavaScript:D2H_ShowHelp(1511,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+            <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
 
@@ -31,17 +31,14 @@
 
         <fieldset class="toolFields">
             <div>
-                <input type="checkbox" id="chkUseExperimentAsVariable" name="doUseExperimentAsVariable">
+                <input type="checkbox" id="chkUseExperimentAsVariable" name="doUseExperimentAsVariable"/>
                 <span>Use experiment/node as variable instead of probe (multiple nodes only)</span>
             </div>
             <div>
-                <input type="checkbox" id="chkCalculateZscore" name="calculateZscore">
+                <input type="checkbox" id="chkCalculateZscore" name="calculateZscore"/>
                 <span>Calculate z-score on the fly</span>
             </div>
-            <input type="button" value="Run" onClick="pcaView.submit_job(this.form);" class="runAnalysisBtn">
+            <input type="button" value="Run" onClick="pcaView.submit_job(this.form);" class="runAnalysisBtn"/>
         </fieldset>
-
-
     </form>
-
 </div>

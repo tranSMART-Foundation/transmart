@@ -6,10 +6,9 @@
     <h2>
         Variable Selection
         <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.correlationAnalysis ?: "JavaScript:D2H_ShowHelp(1290,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+            <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
-
 
     <form id="analysisForm">
         <fieldset class="inputFields">
@@ -31,7 +30,6 @@
                 </select>
             </fieldset>
          </fieldset>
-
 
         <fieldset class="toolFields">
             <input type="button" value="Run" onClick="correlationAnalysisView.submit_job(this.form);" class="runAnalysisBtn">

@@ -1,6 +1,6 @@
 %{--include js lib for box plot dynamically--}%
-<r:require modules="survival_analysis"/>
-<r:layoutResources disposition="defer"/>
+<r:require modules='survival_analysis'/>
+<r:layoutResources disposition='defer'/>
 
 <div id="analysisWidget">
 
@@ -8,13 +8,12 @@
     <h2>
         Variable Selection
         <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.survivalAnalysis ?: "JavaScript:D2H_ShowHelp(1088,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+            <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
 
     <form id="analysisForm">
         <div class="three-layout-container ">
-
 
             %{-- ************************************************************************************************* --}%
             %{-- Left inputs --}%
@@ -23,8 +22,8 @@
                 <fieldset class="inputFields">
                     <h3>Time</h3>
                     <div class="divInputLabel">Select time variable from the Data Set Explorer Tree and drag it into
-                    the box.  For example, "Survival Time".
-                    This variable is required.</div>
+			the box.  For example, "Survival Time".
+			This variable is required.</div>
                     <div id='divTimeVariable' class="queryGroupIncludeLong divInputBox"></div>
                     <div class="highDimBtns">
                         <button type="button" onclick="survivalAnalysisView.clear_high_dimensional_input('divTimeVariable')">Clear</button>
@@ -40,16 +39,16 @@
                     <div class="highDimContainer">
                         <h3>Category</h3>
                         <div class="divInputLabel">Select a variable on which you would like to sort the cohort and
-                        drag it into the box. For example, "Cancer Stage".  If this variable is continuous (e.g. Age),
-                        then it should be "binned" using the option below.
-                        This variable is not required.</div>
+                            drag it into the box. For example, "Cancer Stage".  If this variable is continuous (e.g. Age),
+                            then it should be "binned" using the option below.
+                            This variable is not required.</div>
                         <div id='divCategoryVariable' class="queryGroupIncludeLong divInputBox"></div>
                         <div class="highDimBtns">
                             <button type="button" onclick="highDimensionalData.gather_high_dimensional_data('divCategoryVariable', true)">High Dimensional Data</button>
                             <button type="button" onclick="survivalAnalysisView.clear_high_dimensional_input('divCategoryVariable')">Clear</button>
                         </div>
-                        <input type="hidden" id="dependentVarDataType">
-                        <input type="hidden" id="dependentPathway">
+                        <input type="hidden" id="dependentVarDataType"/>
+                        <input type="hidden" id="dependentPathway"/>
                     </div>
 
                     %{--Display independent variable--}%
@@ -65,7 +64,7 @@
                         </select>
 
                         <label for="txtNumberOfBins">Number of Bins:</label>
-                        <input type="text" id="txtNumberOfBins" onChange="survivalAnalysisView.manage_bins(this.value);" value="4" />
+                        <input type="text" id="txtNumberOfBins" onChange="survivalAnalysisView.manage_bins(this.value);" value="4"/>
 
                         <label for="selBinDistribution">Bin Assignments</label>
                         <select id="selBinDistribution">
@@ -74,7 +73,7 @@
                         </select>
 
                         <div class="chkpair">
-                            <input type="checkbox" id="chkManualBin" onClick="survivalAnalysisView.manage_bins(document.getElementById('txtNumberOfBins').value);"> Manual Binning
+                            <input type="checkbox" id="chkManualBin" onClick="survivalAnalysisView.manage_bins(document.getElementById('txtNumberOfBins').value);"/> Manual Binning
                         </div>
 
                         %{-- Manual binning continuous variable --}%
@@ -98,7 +97,6 @@
                                         <br><span class="minifont">&laquo;Drag To Bin&raquo</span></td>
                                     <td>
                                         <table id="tblBinCategorical">
-
                                         </table>
                                     </td>
                                 </tr>
@@ -134,9 +132,9 @@
         %{-- ************************************************************************************************* --}%
         <fieldset class="toolFields">
             <div class="chkpair">
-                <g:checkBox name="isBinning" onclick="survivalAnalysisView.toggle_binning();"/> Enable binning
+                <g:checkBox name='isBinning' onclick='survivalAnalysisView.toggle_binning();'/> Enable binning
             </div>
-            <input type="button" value="Run" onClick="survivalAnalysisView.submit_job(this.form);" class="runAnalysisBtn">
+            <input type="button" value="Run" onClick="survivalAnalysisView.submit_job(this.form);" class="runAnalysisBtn"/>
         </fieldset>
     </form>
 </div>

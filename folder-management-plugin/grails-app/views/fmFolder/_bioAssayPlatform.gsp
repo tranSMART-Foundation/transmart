@@ -1,5 +1,3 @@
-<%@ page import="org.transmart.biomart.*" %>
-
 <g:javascript>
 function addToPlatformField() {
 	var platformId = jQuery('#platform').val();
@@ -42,50 +40,46 @@ jQuery('.tag').live('click', function(e) { removeTag(jQuery(this).parent().attr(
 
 <%-- Tag box (visual display of tags) --%>
 <div id="${fieldName}-tags" class="tagBox" name="${fieldName}">
-	<g:each in="${values}" var="value">
+    <g:each in="${values}" var='value'>
 	<span class="tag" id="${fieldName}-tag-${value.uniqueId}" name="${value.uniqueId}">${value.displayValue}</span>
-		</g:each>
+    </g:each>
 </div>
 
 <%-- Hidden select field, keeps actual selected values --%>
 <select id="${fieldName}" name="${fieldName}" multiple="multiple" style="display: none;">
-	<g:each in="${values}" var="value">
-		<option selected="selected" value="${value.uniqueId}">${value.displayValue}</option>
-	</g:each>
+    <g:each in="${values}" var='value'>
+	<option selected="selected" value="${value.uniqueId}">${value.displayValue}</option>
+    </g:each>
 </select>
 
 <%-- Visible input --%>
 
 <div style="background-color: #E4E4E4; float:left; padding: 8px; border-radius: 8px;">
-	<div style="margin-right: 8px">
+    <div style="margin-right: 8px">
 	<div style="fixed: left; line-height: 24px; font-style: italic; margin-right: 8px;">Filter on: </div>
 	<div style="margin-right: 8px">
-	
-	
-	<div class="textsmaller">Measurement</div>
-	<div id="measurementwrapper">
-		<g:render template="selectMeasurements" plugin="folderManagement" model="${[measurements:measurements]}"/>
-	</div>
-	</div>
-	
-	<div style="margin-right: 8px">
-	<div class="textsmaller">Technology</div>
-	<div id="technologywrapper">
-		<g:render template="selectTechnologies" plugin="folderManagement" model="${[technologies:technologies]}"/>
-	</div>
-	</div>
-	
-	<div style="margin-right: 8px">
-	<div class="textsmaller">Vendor</div>
-	<div id="vendorwrapper">
-		<g:render template="selectVendors" plugin="folderManagement" model="${[vendors:vendors]}"/>
-	</div>
-	</div>
+	    <div class="textsmaller">Measurement</div>
+	    <div id="measurementwrapper">
+		<g:render template='selectMeasurements' model="[measurements:measurements]"/>
+	    </div>
 	</div>
 	<div style="margin-right: 8px">
+	    <div class="textsmaller">Technology</div>
+	    <div id="technologywrapper">
+		<g:render template='selectTechnologies' model="[technologies:technologies]"/>
+	    </div>
+	</div>
+	<div style="margin-right: 8px">
+	    <div class="textsmaller">Vendor</div>
+	    <div id="vendorwrapper">
+		<g:render template='selectVendors' model="[vendors:vendors]"/>
+	    </div>
+	</div>
+    </div>
+    <div style="margin-right: 8px">
 	<div style="fixed: left; line-height: 24px; font-style: italic; margin-right: 8px;">Add new platform: </div>
 	<div id="platformwrapper">
-		<g:render template="selectPlatforms" plugin="folderManagement"/>
+	    <g:render template='selectPlatforms'/>
 	</div>
-	</div>
+    </div>
 </div>

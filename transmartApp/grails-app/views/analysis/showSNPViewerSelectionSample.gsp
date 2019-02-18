@@ -1,5 +1,5 @@
 <p><span style="color: red; ">
-    ${warningMsg}
+	${warningMsg}
 </span></p>
 <table class="searchform">
 
@@ -7,9 +7,7 @@
         <tr>
             <td style='white-space: nowrap'>SNP Datasets in Subset ${snpSubset.key}:</td>
             <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-            <td>
-                ${snpSubset.value}
-            </td>
+            <td>${snpSubset.value}</td>
         </tr>
     </g:each>
 
@@ -21,22 +19,18 @@
     <tr>
         <td valign='top' style='white-space: nowrap'>Select Chromosomes:</td>
         <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-        <td><g:select name="snpViewChroms" id="snpViewChroms"
-                      from="${chroms}" value="${chromDefault}" multiple="multiple" size="5"></g:select>
-        </td>
+        <td><g:select name="snpViewChroms" from="${chroms}" value="${chromDefault}" multiple="multiple" size="5"/></td>
     </tr>
     <tr>
         <td valign='top' style='white-space: nowrap'>Selected Genes:</td>
         <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-        <td><input type="text" size="35" id="selectedGenesSNPViewer"
-                   autocomplete="off"/>
-
-            <div id="divPathwaySNPViewer"
-                 style="width: 100%; font: 11px tahoma, arial, helvetica, sans-serif"><br>
-                Add a Gene:<br>
-                <input type="text" size="35" id="searchPathwaySNPViewer"
-                       autocomplete="off"/> <input type="hidden"
-                                                   id="selectedGenesAndIdSNPViewer"/></div>
+        <td>
+	    <input type="text" size="35" id="selectedGenesSNPViewer" autocomplete="off"/>
+            <div id="divPathwaySNPViewer" style="width: 100%; font: 11px tahoma, arial, helvetica, sans-serif">
+                <br>Add a Gene:<br>
+                <input type="text" size="35" id="searchPathwaySNPViewer" autocomplete="off"/>
+		<input type="hidden" id="selectedGenesAndIdSNPViewer"/>
+	    </div>
         </td>
     </tr>
     <tr>
@@ -47,11 +41,10 @@
     <tr>
         <td valign='top' style='white-space: nowrap'>Selected SNPs:</td>
         <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-        <td><input type="text" size="35" id="selectedSNPs"
-                   autocomplete="off"/></td>
+        <td><input type="text" size="35" id="selectedSNPs" autocomplete="off"/></td>
     </tr>
 </table>
 
-<script type="text/javascript">
+<script>
     showPathwaySearchBox('selectedGenesSNPViewer', 'selectedGenesAndIdSNPViewer', 'searchPathwaySNPViewer', 'divPathwaySNPViewer');
 </script>

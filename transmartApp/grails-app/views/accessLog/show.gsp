@@ -1,74 +1,55 @@
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="admin"/>
-    <title>Show AccessLog</title>
-</head>
+    <head>
+	<meta name="layout" content="admin"/>
+	<title>Show AccessLogEntry</title>
+    </head>
 
-<body>
-<div class="body">
-    <h1>Show AccessLog</h1>
-    <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
-    </g:if>
-    <div class="dialog">
-        <table>
-            <tbody>
+    <body>
+	<div class="body">
+	    <h1>Show AccessLogEntry</h1>
+	    <g:if test="${flash.message}">
+		<div class="message">${flash.message}</div>
+	    </g:if>
+	    <div class="dialog">
+		<table>
+		    <tbody>
 
-            <tr class="prop">
-                <td valign="top" class="name"><g:message code="accessLogInstance.id" default="Id"/>:</td>
+			<tr class="prop">
+			    <td valign="top" class="name">Id:</td>
+			    <td valign="top" class="value">${fieldValue(bean: accessLog, field: 'id')}</td>
+			</tr>
 
-                <td valign="top" class="value">${fieldValue(bean: accessLogInstance, field: 'id')}</td>
+			<tr class="prop">
+			    <td valign="top" class="name">User:</td>
+			    <td valign="top" class="value">${fieldValue(bean: accessLog, field: 'username')}</td>
+			</tr>
 
-            </tr>
+			<tr class="prop">
+			    <td valign="top" class="name">Event:</td>
+			    <td valign="top" class="value">${fieldValue(bean: accessLog, field: 'event')}</td>
+			</tr>
 
+			<tr class="prop">
+			    <td valign="top" class="name">Event Message:</td>
+			    <td valign="top" class="value">${fieldValue(bean: accessLog, field: 'eventMessage')}</td>
+			</tr>
 
-            <tr class="prop">
-                <td valign="top" class="name"><g:message code="accessLogInstance.username" default="User"/>:</td>
+			<tr class="prop">
+			    <td valign="top" class="name">Access Time:</td>
+			    <td valign="top" class="value">${fieldValue(bean: accessLog, field: 'accessTime')}</td>
+			</tr>
 
-                <td valign="top" class="value">${fieldValue(bean: accessLogInstance, field: 'username')}</td>
+		    </tbody>
+		</table>
+	    </div>
 
-            </tr>
-
-
-            <tr class="prop">
-                <td valign="top" class="name"><g:message code="accessLogInstance.event" default="Event"/>:</td>
-
-                <td valign="top" class="value">${fieldValue(bean: accessLogInstance, field: 'event')}</td>
-
-            </tr>
-
-
-            <tr class="prop">
-                <td valign="top" class="name"><g:message code="accessLogInstance.eventmessage"
-                                                         default="Event Message"/>:</td>
-
-                <td valign="top" class="value">${fieldValue(bean: accessLogInstance, field: 'eventmessage')}</td>
-
-            </tr>
-
-
-
-            <tr class="prop">
-                <td valign="top" class="name"><g:message code="accessLogInstance.accesstime"
-                                                         default="Access Time"/>:</td>
-
-                <td valign="top" class="value">${fieldValue(bean: accessLogInstance, field: 'accesstime')}</td>
-
-            </tr>
-
-            </tbody>
-        </table>
-    </div>
-
-    <div class="buttons">
-        <g:form>
-            <input type="hidden" name="id" value="${accessLogInstance?.id}"/>
-            <span class="button"><g:actionSubmit class="edit" value="Edit"/></span>
-            <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');"
-                                                 value="Delete"/></span>
-        </g:form>
-    </div>
-</div>
-</body>
+	    <div class="buttons">
+		<g:form>
+		    <input type="hidden" name="id" value="${accessLog?.id}"/>
+		    <span class="button"><g:actionSubmit class="edit" value="Edit"/></span>
+		    <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete"/></span>
+		</g:form>
+	    </div>
+	</div>
+    </body>
 </html>

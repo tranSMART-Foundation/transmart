@@ -10,10 +10,10 @@
     <g:else>No files have been added to the export cart.</g:else>
 
     <table style="width: 100%;" class="exporttable" id="exporttable">
-        <g:each in="${files}" var="file">
+        <g:each in="${files}" var='file'>
             <tr name="${file.id}">
                 <td>${file.folder}</td>
-                <td><g:checkBox name="${(file.id).toString()}" onclick="updateExportCount();" value="true"/></td>
+                <td><g:checkBox name="${file.id}" onclick="updateExportCount();" value='true'/></td>
                 <td><span class="fileicon ${file.fileType}"></span>&nbsp;${file.displayName}</td>
                 <td width="1"><span class="exporttableremove foldericon removecart">&nbsp;</span></td>
             </tr>

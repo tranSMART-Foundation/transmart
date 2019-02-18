@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <!-- Force Internet Explorer 8 to override compatibility mode -->
+        %{-- Force Internet Explorer 8 to override compatibility mode --}%
         <meta http-equiv="X-UA-Compatible" content="IE=edge" >        
         
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
         <title>${grailsApplication.config.com.recomdata.appTitle}</title>
         
-        <!-- jQuery CSS for cupertino theme -->
+        %{-- jQuery CSS for cupertino theme --}%
         <link rel="stylesheet" href="${resource(dir:'css/jquery/ui', file:'jquery-ui-1.9.1.custom.css')}">
         <link rel="stylesheet" href="${resource(dir:'css/jquery/skin', file:'ui.dynatree.css')}">
         
-        <!-- Our CSS -->
+        %{-- Our CSS --}%
         <link rel="stylesheet" href="${resource(dir:'css', file:'jquery.loadmask.css')}">
         <link rel="stylesheet" href="${resource(dir:'css', file:'main.css')}">
         <link rel="stylesheet" href="${resource(dir:'css', file:'rwg.css')}">
@@ -22,7 +22,7 @@
         <link rel="stylesheet" href="${resource(dir:'css', file:'jquery/multiselect/common.css')}">
         <link rel="stylesheet" href="${resource(dir:'css', file:'jquery/jqueryDatatable.css')}">
                                 
-        <!-- jQuery JS libraries -->
+        %{-- jQuery JS libraries --}%
         <script type="text/javascript" src="${resource(dir:'js', file:'jQuery/jquery.min.js')}"></script>   
         <script>jQuery.noConflict();</script> 
         
@@ -39,33 +39,32 @@
         <script type="text/javascript" src="${resource(dir:'js', file:'jQuery/jquery.dataTables.js')}"></script>
         <script type="text/javascript" src="${resource(dir:'js', file:'facetedSearch/facetedSearchBrowse.js')}"></script>
         <script type="text/javascript" src="${resource(dir:'js', file:'jQuery/ui.multiselect.js')}"></script>  
-          
-                
-        <!--Datatable styling and scripts-->
+
+        %{--Datatable styling and scripts--}%
         <script type="text/javascript" src="${resource(dir:'js/', file:'jquery.dataTables.min.js')}"></script>
         <script type="text/javascript" src="${resource(dir:'js', file:'ColVis.min.js')}"></script> 
-                
-        <!--  SVG Export -->
+
+        %{--  SVG Export --}%
         <%--<script type="text/javascript" src="${resource(dir:'js', file:'svgExport/rgbcolor.js')}"></script>  --%>
-          
-    
-        <g:javascript library="prototype" /> 
-        <script type="text/javascript">
+
+        <g:javascript library='prototype'/> 
+        <script>
             var $j = jQuery.noConflict();
         </script>
-        
-        <!-- Our JS -->        
+
+        %{-- Our JS --}%
         <script type="text/javascript" src="${resource(dir:'js', file:'rwg.js')}"></script>
         <script type="text/javascript" src="${resource(dir:'js', file:'maintabpanel.js')}"></script>
         <script type="text/javascript" src="${resource(dir:'js', file:'datasetExplorer.js')}"></script>
-        
-        <!-- Protovis Visualization library and IE plugin (for lack of SVG support in IE8 -->
+
+        %{-- Protovis Visualization library and IE plugin (for lack of SVG support in IE8 --}%
         <%-- <script type="text/javascript" src="${resource(dir:'js/protovis', file:'protovis-r3.2.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'js/protovis', file:'protovis-msie.min.js')}"></script> --%>
-</head>
-<body>
-<div style="width:800px">
-<g:render template="editMetaData" plugin="folderManagement" model="[folder:folder, measurements:measurements, technologies:technologies, vendors:vendors, platforms:platforms, layout:layout]" />
-</div>
-</body>
+             <script type="text/javascript" src="${resource(dir:'js/protovis', file:'protovis-msie.min.js')}"></script> --%>
+    </head>
+
+    <body>
+	<div style="width:800px">
+	    <g:render template='editMetaData' model="[folder:folder, measurements:measurements, technologies:technologies, vendors:vendors, platforms:platforms, layout:layout]" />
+	</div>
+    </body>
 </html>

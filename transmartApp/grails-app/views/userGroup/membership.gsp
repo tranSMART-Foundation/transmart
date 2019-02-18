@@ -1,10 +1,8 @@
-<%@ page import="org.transmart.searchapp.AuthUser" %>
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="admin"/>
-    <title>Group Membership</title>
-    <style>
+    <head>
+	<meta name="layout" content="admin"/>
+	<title>Group Membership</title>
+	<style>
     p {
         width: 440px;
     }
@@ -12,26 +10,23 @@
     .ext-ie .x-form-text {
         position: static !important;
     }
-    </style>
-    <g:setProvider library="jquery"/>
-</head>
+	</style>
+	<g:setProvider library='jquery'/>
+    </head>
 
-<body>
-<div class="body">
-    <h1>Manage Group Membership</h1>
-    <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
-    </g:if>
-    <div id="divuser"
-         style="width:100%; font:11px tahoma, arial, helvetica, sans-serif">
-        <br> please select a user then select groups</br>
-        <br><b>Search User<b></b><br>
-        <input type="text" size="80" id="searchUsers" autocomplete="off"/></div>
-    <r:script>
-
-        var pageInfo = {
-            basePath: "${request.getContextPath()}"
-        }
+    <body>
+	<div class="body">
+	    <h1>Manage Group Membership</h1>
+	    <g:if test="${flash.message}">
+		<div class="message">${flash.message}</div>
+	    </g:if>
+	    <div id="divuser" style="width:100%; font:11px tahoma, arial, helvetica, sans-serif">
+		please select a user then select groups<br/>
+		<b>Search User</b><br/>
+		    <input type="text" size="80" id="searchUsers" autocomplete="off"/>
+	    </div>
+	    <r:script>
+        var pageInfo = { basePath: "${request.getContextPath()}" };
   
         createUserSearchBox2('${request.getContextPath()}/userGroup/ajaxGetUserSearchBoxData', 440);
 
@@ -42,26 +37,31 @@
                 return false;
             }
 
-        ${remoteFunction(action: 'searchGroupsWithoutUser', update: [success: 'groups', failure: ''], params: 'jQuery(\'#searchtext\').serialize()+\'&id=\'+pid')};
+        ${remoteFunction(action: 'searchGroupsWithoutUser',
+	                 update: [success: 'groups', failure: ''],
+	                 params: 'jQuery(\'#searchtext\').serialize()+\'&id=\'+pid')};
             return false;
         }
-    </r:script>
-    <table>
-        <tr><td></td><td></td><td>
-            <input name="searchtext" id="searchtext"/>
-            <button class="" onclick="searchgroup();">Search Groups</button>
-        </td>
-        <tr><td><b>Member of these groups</b>
-        </td><td></td><td><b>Available groups</b></td></tr>
-        <tr id="groups">
-            <g:render template="addremoveg"
-                      model="['groupswithoutuser': groupswithoutuser]"/>
-        </tr>
-    </table>
-</div>
-</td>
-</tr>
-</tbody>
-<input type="hidden" id="currentprincipalid">
-</body>
+	    </r:script>
+	    <table>
+		<tr>
+		    <td>&nbsp;</td>
+		    <td>&nbsp;</td>
+		    <td>
+			<input name="searchtext" id="searchtext"/>
+			<button class="" onclick="searchgroup();">Search Groups</button>
+		    </td>
+		</tr>
+		<tr>
+		    <td><b>Member of these groups</b></td>
+		    <td>&nbsp;</td>
+		    <td><b>Available groups</b></td>
+		</tr>
+		<tr id="groups">
+		    <g:render template='addremoveg' model="[groupswithoutuser: groupswithoutuser]"/>
+		</tr>
+	    </table>
+	</div>
+	<input type="hidden" id="currentprincipalid"/>
+    </body>
 </html>

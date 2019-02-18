@@ -55,16 +55,16 @@
 
         <span class="fjs-tm-headline">Set chart size:</span>
         <div class="fjs-tm-chart-size">
-            <button class="fjs-tm-button" value="10" onclick="fjsService.setChartSize(this.value)">10%</button>
-            <button class="fjs-tm-button" value="20" onclick="fjsService.setChartSize(this.value)">20%</button>
-            <button class="fjs-tm-button" value="30" onclick="fjsService.setChartSize(this.value)">30%</button>
-            <button class="fjs-tm-button" value="40" onclick="fjsService.setChartSize(this.value)">40%</button>
-            <button class="fjs-tm-button" value="50" onclick="fjsService.setChartSize(this.value)">50%</button>
-            <button class="fjs-tm-button" value="60" onclick="fjsService.setChartSize(this.value)">60%</button>
-            <button class="fjs-tm-button" value="70" onclick="fjsService.setChartSize(this.value)">70%</button>
-            <button class="fjs-tm-button" value="80" onclick="fjsService.setChartSize(this.value)">80%</button>
-            <button class="fjs-tm-button" value="90" onclick="fjsService.setChartSize(this.value)">70%</button>
-            <button class="fjs-tm-button" value="100" onclick="fjsService.setChartSize(this.value)">100%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="10" onclick="fjsService.setChartSize(this.value)">10%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="20" onclick="fjsService.setChartSize(this.value)">20%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="30" onclick="fjsService.setChartSize(this.value)">30%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="40" onclick="fjsService.setChartSize(this.value)">40%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="50" onclick="fjsService.setChartSize(this.value)">50%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="60" onclick="fjsService.setChartSize(this.value)">60%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="70" onclick="fjsService.setChartSize(this.value)">70%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="80" onclick="fjsService.setChartSize(this.value)">80%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="90" onclick="fjsService.setChartSize(this.value)">90%</button>
+            <button class="fjs-tm-button fjs-chart-size-btn" value="100" onclick="fjsService.setChartSize(this.value)">100%</button>
         </div>
 
         <span class="fjs-tm-headline">Drop variables of interest:</span>

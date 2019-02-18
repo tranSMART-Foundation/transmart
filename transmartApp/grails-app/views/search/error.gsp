@@ -1,7 +1,7 @@
 <html>
-  <head>
-    <title>${grailsApplication.config.com.recomdata.appTitle} - ${title}</title>
-    <style type="text/css">
+    <head>
+	<title>${grailsApplication.config.com.recomdata.appTitle} - ${title}</title>
+	<style type="text/css">
       .message {
       border: 1px solid black;
       padding: 5px;
@@ -22,16 +22,16 @@
       margin: 3px;
       font-family: courier;
       }
-    </style>
-  </head>
+	</style>
+    </head>
 
-  <body>
-    <h1>${title}</h1>
+    <body>
+	<h1>${title}</h1>
 
-    <h2>Error Details</h2>
+	<h2>Error Details</h2>
 
-    <div class="message">
-      <strong>Message:</strong> ${message}
-    </div>
-  </body>
+	<div class="message">
+	    <strong>Message:</strong> ${message}
+	</div>
+    </body>
 </html>

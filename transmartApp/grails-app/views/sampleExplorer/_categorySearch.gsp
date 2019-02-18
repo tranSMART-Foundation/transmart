@@ -8,12 +8,10 @@
 
     <g:if test="${newsUpdates != null && !newsUpdates.isEmpty()}">
         <g:each var="newsUpdate" in="${newsUpdates}" status="iterator">
-
             <a href="#" onClick="showNewsUpdateDetail('${newsUpdate.id}')">
-                Data Set <i>${newsUpdate.dataSetName}</i> modified on <i><g:formatDate format="yyyy-MM-dd"
-                                                                                       date="${newsUpdate.updateDate}"></g:formatDate></i>
+                Data Set <i>${newsUpdate.dataSetName}</i> modified on <i>
+		    <g:formatDate format="yyyy-MM-dd" date="${newsUpdate.updateDate}"/></i>
             </a>
-
             <br/>
             <br/>
         </g:each>
@@ -24,5 +22,4 @@
 
     <br/>
     <br/>
-
 </div>

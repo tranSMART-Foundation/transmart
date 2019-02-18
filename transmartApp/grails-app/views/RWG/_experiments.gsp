@@ -42,7 +42,7 @@
             <span class="result-analysis-label">
                 <g:set var="ts" value="${Calendar.instance.time.time}"/>
                 <a id="toggleDetail_${experimentresult.key.id}" href="#"
-                   onclick="javascript:toggleDetailDiv('${experimentresult.key.id}', '${createLink(controller:'RWG',action:'getTrialAnalysis',params:[id:experimentresult.key.id,trialNumber:experimentresult.key.id,unqKey:ts])}');">
+                   onclick="toggleDetailDiv('${experimentresult.key.id}', '${createLink(controller:'RWG',action:'getTrialAnalysis',params:[id:experimentresult.key.id,trialNumber:experimentresult.key.id,unqKey:ts])}');">
                     <img alt="expand/collapse" id="imgExpand_${experimentresult.key.id}"
                          src="${resource(dir: 'images', file: 'down_arrow_small2.png')}" style="display: inline;"/>
                     ${experimentresult.value}

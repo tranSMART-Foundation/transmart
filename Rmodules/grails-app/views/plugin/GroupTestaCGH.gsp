@@ -1,6 +1,6 @@
 %{--include js lib for heatmap dynamically--}%
-<r:require modules="acgh_group_test"/>
-<r:layoutResources disposition="defer"/>
+<r:require modules='acgh_group_test'/>
+<r:layoutResources disposition='defer'/>
 
 %{--Input Container--}%
 <div id="gtContainer"></div>
@@ -15,7 +15,7 @@
 <div id="template-group-test-plot" class="x-hidden">
 	<div id="plotResultContainer" class="plotResultContainer">
 		%{--Image--}%
-		<g:img file="{filename}" class="freq-plot"></g:img>
+		<g:img file="{filename}" class='freq-plot'/>
 		<hr class="separator"/>
 		%{--Download button --}%
 		<div class="resultToolBar">

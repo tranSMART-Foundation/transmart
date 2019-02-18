@@ -24,7 +24,7 @@
                     <td valign="top" class="value">${tissues.join(', ')}</td>
                 </tr>
             </g:if>
-
+	    
             <g:set var="samples" value="${assays*.sampleType*.label.unique().findAll()}"/>
             <g:if test="${samples}">
                 <tr class="prop">
@@ -41,8 +41,8 @@
         <g:set var="platforms" value="${assays*.platform.unique()}"/>
         <br/>
         <h2><g:message code="highDim.summary.platformInfo" default="Platform Information"/>:</h2>
-        <g:each in="${platforms}" var="platform">
-            <g:render template="showPlatform" model="${[platform: platform]}"/>
+        <g:each in="${platforms}" var='platform'>
+            <g:render template='showPlatform' model="[platform: platform]"/>
         </g:each>
     </g:if>
 </g:each>

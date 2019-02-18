@@ -1,4 +1,4 @@
-<g:form controller="experimentAnalysis" action="filterResult">
+<g:form controller='experimentAnalysis' action='filterResult'>
     <g:set var="expAnalysisFilter" value="${session.searchFilter.expAnalysisFilter}"/>
 
     <table class="jubfilter" style="width: 650px">

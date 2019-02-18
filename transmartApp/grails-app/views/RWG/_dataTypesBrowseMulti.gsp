@@ -1,5 +1,3 @@
-<%--<script type="text/javascript" src="${resource(dir:'js', file:'jquery/ui.multiselect.js')}"></script>--%>
-
 <script type="text/javascript">
     jQuery(function () {
         jQuery(".multiselect").multiselect();
@@ -11,5 +9,3 @@
         <option value="${dataType.key}">${dataType.value}</option>
     </g:each>
 </select>
-
-

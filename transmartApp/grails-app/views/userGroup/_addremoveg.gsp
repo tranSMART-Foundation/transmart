@@ -7,11 +7,11 @@
     <button class="ltarrowbutton"
             onclick="${remoteFunction(action:'addUserToGroups', update:[success:'groups', failure:''],
                      params: 'addremove_buildAddUser()')};
-            return false;">&LT;&LT;Add</button><br>
-    <button class="ltarrowbutton"
-            onclick="${remoteFunction(action:'removeUserFromGroups', update:[success:'groups', failure:''],
-                     params: 'addremove_buildRemoveUser()')};
-            return false;">Remove&GT;&GT;</button>
+		     return false;">&LT;&LT;Add</button><br>
+	<button class="ltarrowbutton"
+		onclick="${remoteFunction(action:'removeUserFromGroups', update:[success:'groups', failure:''],
+			 params: 'addremove_buildRemoveUser()')};
+			 return false;">Remove&GT;&GT;</button>
 </td>
 <td>
     <div id="addfrombox">

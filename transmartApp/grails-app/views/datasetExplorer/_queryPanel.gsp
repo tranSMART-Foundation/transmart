@@ -4,11 +4,11 @@
         <td>Subset 2</td>
     </tr>
     <!-- TODO This must be reactivated when support for encounter is proposed
-    <tr>
-        <td><div class="queryEncounter"><label for="queryEncounter_1"><input id="queryEncounter_1" type="checkbox"/>Only groups occurring within the same encounter</label></div></td>
-        <td><div class="queryEncounter"><label for="queryEncounter_2"><input id="queryEncounter_2" type="checkbox"/>Only groups occurring within the same encounter</label></div></td>
-    </tr>
-    -->
+	 <tr>
+             <td><div class="queryEncounter"><label for="queryEncounter_1"><input id="queryEncounter_1" type="checkbox"/>Only groups occurring within the same encounter</label></div></td>
+             <td><div class="queryEncounter"><label for="queryEncounter_2"><input id="queryEncounter_2" type="checkbox"/>Only groups occurring within the same encounter</label></div></td>
+	 </tr>
+	 -->
     <tr>
         <td><!-- That's where our panels go --></td>
         <td><!-- That's where our panels go --></td>
@@ -31,20 +31,25 @@
         <div class="panelBoxListPlaceholder">
             <div class="wrap"><span class="holder">Drag your concepts here</span></div>
         </div>
+
         <div class="panelBoxList" id="panelBoxList_$n"></div>
+
         <div class="panelBoxDateSelector">
             <input type="text" id="panelBoxDateFrom_$n" placeholder="From">
             <input type="text" id="panelBoxDateTo_$n" placeholder="To">
         </div>
+
         <div class="panelBoxBar">
             <span class="panelRadio">
-                <input type="radio" id="panelInclude_$n" name="panelRadio_$n" value="0" checked="checked"><label for="panelInclude_$n">Include</label>
-                <input type="radio" id="panelExclude_$n" name="panelRadio_$n" value="1"><label for="panelExclude_$n">Exclude</label>
+                <input type="radio" id="panelInclude_$n" name="panelRadio_$n" value="0" checked="checked">
+		<label for="panelInclude_$n">Include</label>
+                <input type="radio" id="panelExclude_$n" name="panelRadio_$n" value="1">
+		<label for="panelExclude_$n">Exclude</label>
             </span>
             <span class="panelButtons">
                 <!-- TODO This must be reactivated when support for dated query is proposed
-                <input type="checkbox" id="panelDate_$n" class="panelDate" /><label for="panelDate_$n" class="flatbutton">By Dates</label>
-                -->
+                     <input type="checkbox" id="panelDate_$n" class="panelDate" /><label for="panelDate_$n" class="flatbutton">By Dates</label>
+                     -->
                 <button id="panelClear_$n" class="flatbutton clearbutton">Clear Panel</button>
             </span>
         </div>
@@ -64,7 +69,8 @@
                 <img src="${projectLogo}" alt="${projectName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
             </g:if>
 	    <g:else>
-                <img src="${resource(dir: 'images', file: 'project_logo.png')}" alt="${projectName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+                <img src="${resource(dir: 'images', file: 'project_logo.png')}" alt="${projectName}"
+		     style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
             </g:else>
 	</a>
     </g:if>
@@ -78,7 +84,8 @@
                 <img src="${providerLogo}" alt="${providerName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
         </g:if>
 	<g:else>
-                <img src="${resource(dir: 'images', file: 'provider_logo.png')}" alt="${providerName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+            <img src="${resource(dir: 'images', file: 'provider_logo.png')}" alt="${providerName}"
+		 style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
         </g:else>
         </a>
     </g:if>
@@ -86,7 +93,7 @@
 
 <div id="hiddenDragDiv" style="display:none"></div>
 
-<script type="text/javascript">
+<script>
     prepareQueryPanels();
     setupDragAndDrop();
     if (GLOBAL.restoreSubsetId) {

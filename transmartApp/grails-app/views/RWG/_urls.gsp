@@ -1,5 +1,5 @@
 <%-- Set up URLs for AJAX --%>
-<script type="text/javascript" charset="utf-8">
+<script>
     var searchResultsURL = "${createLink([controller:'RWG', action:'loadSearchResults'])}";
     var facetResultsURL = "${createLink([controller:'RWG', action:'getFacetResults'])}";
     var clearSearchFilterURL = "${createLink([controller:'RWG', action:'clearSearchFilter'])}";
@@ -82,5 +82,4 @@
 
     var uploadFilesURL = "${createLink([controller:'uploadFiles',action:'displayUpload'])}";
     var uploadActionURL = "${createLink([controller:'uploadFiles',action:'upload'])}"; 
-
 </script>

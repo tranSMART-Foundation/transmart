@@ -1,4 +1,4 @@
-<script type="text/javascript" charset="utf-8">
+<script>
     var exportAddURL = "${createLink([controller:'fileExport', action:'add'])}";
     var exportRemoveURL = "${createLink([controller:'fileExport', action:'remove'])}";
     var exportViewURL = "${createLink([controller:'fileExport', action:'view'])}";

@@ -1,7 +1,7 @@
 <%@ page import="org.codehaus.groovy.grails.validation.routines.UrlValidator" %>
 <br/>
 <h2><g:message code="show.tags.header" default="Tags"/>:</h2>
-<g:if test="${tags.isEmpty()}">
+<g:if test="${!tags}">
     <table class="detail">
         <tr><td><g:message code="show.tags.notFound"/></td></tr>
     </table>

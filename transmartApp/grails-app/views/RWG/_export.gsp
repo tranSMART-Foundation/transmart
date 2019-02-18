@@ -21,6 +21,7 @@
         </g:each>
     </table>
     <br/>
-    <g:if test="${files}"><span id="exportbutton"
-                                class="greybutton export">Export selected files (${files.size()})</span></g:if>
+    <g:if test="${files}">
+	<span id="exportbutton" class="greybutton export"> Export selected files (${files.size()})</span>
+    </g:if>
 </div>

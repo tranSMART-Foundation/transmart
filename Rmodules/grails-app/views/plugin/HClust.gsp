@@ -1,13 +1,13 @@
 %{--include js lib for heatmap dynamically--}%
-<r:require modules="hclust"/>
-<r:layoutResources disposition="defer"/>
+<r:require modules='hclust'/>
+<r:layoutResources disposition='defer'/>
 
 <div id="analysisWidget">
 
     <h2>
         Variable Selection
         <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.hierarchicalClustering ?: "JavaScript:D2H_ShowHelp(1506,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+            <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
 

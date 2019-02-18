@@ -1,4 +1,4 @@
-<g:form method="post" controller="igv">
+<g:form controller='igv'>
     <input type="hidden" name="sessionFile" value="${sessionFile}"/>
 
     <table class="subsettable" style="margin: 10px;width:530px; border: 0px none; border-collapse: collapse;">

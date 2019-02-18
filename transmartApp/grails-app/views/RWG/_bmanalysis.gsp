@@ -3,7 +3,6 @@
 <g:set var="shortDescription" value="${analysis.shortDescription}"/>
 <g:set var="isTimeCourse" value="${analysis.isTimeCourse}"/>
 
-
 <div id="TrialDetail_${analysisId}_anchor" class="result-analysis">
     <div class="analysis-name">
         <table class="analysis-table">
@@ -45,9 +44,9 @@
 
             <div id="results_${analysisId}">
                 <div class='vis-toolBar'>
-                    <div id="btnResultsExport_${analysisId}" class='vis-toolbar-item'><a
-                            href="${createLink([controller: 'search', action: 'getAnalysisResults', params: [export: true, analysisId: analysisId]])}"><img
-                                alt="" src="${resource(dir: 'images', file: 'internal-link.gif')}"/> Export as CSV</a>
+                    <div id="btnResultsExport_${analysisId}" class='vis-toolbar-item'>
+			<a href="${createLink([controller: 'search', action: 'getAnalysisResults', params: [export: true, analysisId: analysisId]])}">
+			    <img alt="" src="${resource(dir: 'images', file: 'internal-link.gif')}"/> Export as CSV</a>
                     </div>
 
                     <div id="resultsExportOpts_${analysisId}" class='menuOptList' style="display:none;">
@@ -74,12 +73,9 @@
                             <img alt="" src="${resource(dir: 'images', file: 'internal-link.gif')}"/> Export as PNG
                         </a>
                     </div>
-
                     <div id="qqplot_results_${analysisId}" class="heatmap_analysis"></div>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
-

@@ -3,8 +3,8 @@
 <p>
     <p>${correlationData}</p>
 
-    <g:each var="location" in="${imageLocations}">
-        <g:img file="${location}"></g:img>
+    <g:each var='location' in="${imageLocations}">
+        <g:img file="${location}"/>
     </g:each>
 
     <g:if test="${zipLink}">

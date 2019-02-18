@@ -1,6 +1,6 @@
 %{--include js lib for table fisher dynamically--}%
-<r:require modules="table_fisher"/>
-<r:layoutResources disposition="defer"/>
+<r:require modules='table_fisher'/>
+<r:layoutResources disposition='defer'/>
 
 <div id="analysisWidget">
 
@@ -8,10 +8,9 @@
     <h2>
         Variable Selection
         <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.tableWithFisher ?: "JavaScript:D2H_ShowHelp(1272,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+            <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
-
 
     <form id="analysisForm">
         <div class="container">
@@ -27,15 +26,15 @@
                     <div class="highDimContainer">
                         <h3>Independent Variable</h3>
                         <span class="hd-notes">Select two or more variables from the Data Set Explorer Tree and drag
-                        them into the box. A continuous variable may be selected and categorized by enabling the
-                        "Binning" below.</span>
+                            them into the box. A continuous variable may be selected and categorized by enabling the
+                            "Binning" below.</span>
                         <div id='divIndependentVariable' class="queryGroupIncludeSmall highDimBox"></div>
                         <div class="highDimBtns">
                             <button type="button" onclick="highDimensionalData.gather_high_dimensional_data('divIndependentVariable', true)">High Dimensional Data</button>
                             <button type="button" onclick="tableWithFisherView.clear_high_dimensional_input('divIndependentVariable')">Clear</button>
                         </div>
-                        <input type="hidden" id="independentVarDataType">
-                        <input type="hidden" id="independentPathway">
+                        <input type="hidden" id="independentVarDataType"/>
+                        <input type="hidden" id="independentPathway"/>
                     </div>
 
                     %{--Display independent variable--}%
@@ -45,7 +44,7 @@
                     <fieldset class="binningDiv">
 
                         <div class="chkpair">
-                            <input type="checkbox" id="EnableBinningIndep">
+                            <input type="checkbox" id="EnableBinningIndep"/>
                             Bin the Independent Variable
                         </div>
 
@@ -65,7 +64,7 @@
                         </select>
 
                         <div class="chkpair">
-                            <input type="checkbox" id="chkManualBinIndep" onClick="tableWithFisherView.manage_bins_fisher(document.getElementById('txtNumberOfBinsIndep').value,'Indep');"> Manual Binning
+                            <input type="checkbox" id="chkManualBinIndep" onClick="tableWithFisherView.manage_bins_fisher(document.getElementById('txtNumberOfBinsIndep').value,'Indep');"/> Manual Binning
                         </div>
 
                         %{-- Manual binning for independent variable --}%
@@ -88,7 +87,6 @@
                                         <br><span class="minifont">&laquo;Drag To Bin&raquo</span></td>
                                     <td>
                                         <table id="tblBinCategoricalIndep">
-
                                         </table>
                                     </td>
                                 </tr>
@@ -110,14 +108,14 @@
                     <div class="highDimContainer">
                         <h3>Dependent Variable</h3>
                         <span class="hd-notes">Select two or more variables from the Data Set Explorer Tree and drag them into the box.
-                        A continuous variable may be selected and categorized by enabling the "Binning" below.</span>
+                            A continuous variable may be selected and categorized by enabling the "Binning" below.</span>
                         <div id='divDependentVariable' class="queryGroupIncludeSmall highDimBox"></div>
                         <div class="highDimBtns">
                             <button type="button" onclick="highDimensionalData.gather_high_dimensional_data('divDependentVariable', true)">High Dimensional Data</button>
                             <button type="button" onclick="tableWithFisherView.clear_high_dimensional_input('divDependentVariable')">Clear</button>
                         </div>
-                        <input type="hidden" id="dependentVarDataType">
-                        <input type="hidden" id="dependentPathway">
+                        <input type="hidden" id="dependentVarDataType"/>
+                        <input type="hidden" id="dependentPathway"/>
                     </div>
 
                     %{--Display dependent variable--}%
@@ -127,7 +125,7 @@
                     <fieldset class="binningDiv">
 
                         <div class="chkpair">
-                            <input type="checkbox" id="EnableBinningDep">
+                            <input type="checkbox" id="EnableBinningDep"/>
                             Bin the Dependent Variable
                         </div>
 
@@ -138,7 +136,7 @@
                         </select>
 
                         <label for="txtNumberOfBinsDep">Number of Bins:</label>
-                        <input type="text" id="txtNumberOfBinsDep" onChange="tableWithFisherView.manage_bins_fisher(this.value,'Dep');" value="2" />
+                        <input type="text" id="txtNumberOfBinsDep" onChange="tableWithFisherView.manage_bins_fisher(this.value,'Dep');" value="2"/>
 
                         <label for="selBinDistributionDep">Bin Assignments</label>
                         <select id="selBinDistributionDep">
@@ -147,7 +145,7 @@
                         </select>
 
                         <div class="chkpair">
-                            <input type="checkbox" id="chkManualBinDep" onClick="tableWithFisherView.manage_bins_fisher(document.getElementById('txtNumberOfBinsDep').value,'Dep');"> Manual Binning
+                            <input type="checkbox" id="chkManualBinDep" onClick="tableWithFisherView.manage_bins_fisher(document.getElementById('txtNumberOfBinsDep').value,'Dep');"/> Manual Binning
                         </div>
 
                         %{-- Manual binning for Dependent variable --}%
@@ -170,7 +168,6 @@
                                         <br /><span class="minifont">&laquo;Drag To Bin&raquo;</span></td>
                                     <td>
                                         <table id="tblBinCategoricalDep">
-
                                         </table>
                                     </td>
                                 </tr>
@@ -183,17 +180,14 @@
 
         </div> %{--end container--}%
 
-
-
         %{-- ************************************************************************************************* --}%
         %{-- Tool Bar --}%
         %{-- ************************************************************************************************* --}%
         <fieldset class="toolFields">
             <div class="chkpair">
-                <g:checkBox name="isBinning" onclick="tableWithFisherView.toggle_binning_fisher();"/> Enable binning
+                <g:checkBox name='isBinning' onclick='tableWithFisherView.toggle_binning_fisher();'/> Enable binning
             </div>
-            <input type="button" value="Run" onClick="tableWithFisherView.submit_job(this.form);" class="runAnalysisBtn">
+            <input type="button" value="Run" onClick="tableWithFisherView.submit_job(this.form);" class="runAnalysisBtn"/>
         </fieldset>
-
     </form>
 </div>

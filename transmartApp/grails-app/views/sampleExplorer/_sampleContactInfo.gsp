@@ -7,9 +7,8 @@
             Contact Information unavailable for these samples.
         </g:if>
         <g:else>
-            Contact E-Mail : <a
-                href="mailto:${contact.key}?Subject=Sample Information&body=Sample%20IDs%20${contactSampleIdMap[contact.key].join(',')}"
-                target="_top">${contact.key}</a>
+            Contact E-Mail : <a href="mailto:${contact.key}?Subject=Sample Information&body=Sample%20IDs%20${contactSampleIdMap[contact.key].join(',')}"
+				target="_top">${contact.key}</a>
         </g:else>
     </div>
 
@@ -46,5 +45,4 @@
     </div>
 
     <g:set var="sectionCounter" value="${sectionCounter + 1}"/>
-
 </g:each>

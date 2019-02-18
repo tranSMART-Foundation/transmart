@@ -1,5 +1,4 @@
 <g:javascript>
-
 jQuery(document).ready(function() {	
 	
 	var escapedFieldName = '${fieldName}'.replace(".", "\\.");

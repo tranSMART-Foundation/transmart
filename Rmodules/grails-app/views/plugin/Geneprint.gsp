@@ -1,6 +1,6 @@
 %{--include js lib for geneprint dynamically--}%
-<r:require modules="geneprint"/>
-<r:layoutResources disposition="defer"/>
+<r:require modules='geneprint'/>
+<r:layoutResources disposition='defer'/>
 
 <div id="analysisWidget">
 

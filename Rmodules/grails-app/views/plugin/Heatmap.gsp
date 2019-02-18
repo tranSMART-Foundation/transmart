@@ -1,13 +1,13 @@
 %{--include js lib for heatmap dynamically--}%
-<r:require modules="heatmap"/>
-<r:layoutResources disposition="defer"/>
+<r:require modules='heatmap'/>
+<r:layoutResources disposition='defer'/>
 
 <div id="analysisWidget">
 
     <h2>
         Variable Selection
         <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatMap ?: "JavaScript:D2H_ShowHelp(1505,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+            <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
 
@@ -31,7 +31,7 @@
                 Max rows to display:
                 <g:if test="${grailsApplication.config.org.transmartproject.helpUrls.heatMapMaxRows}">
                     <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatMapMaxRows}">
-                        <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+                        <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
                     </a>
                 </g:if>
             </label>
@@ -41,14 +41,14 @@
 
         <fieldset class="toolFields">
             <div>
-                <input type="checkbox" id="chkGroupBySubject" name="doGroupBySubject">
+                <input type="checkbox" id="chkGroupBySubject" name="doGroupBySubject"/>
                 <span>Group by subject (instead of node) for multiple nodes</span>
             </div>
             <div>
-                <input type="checkbox" id="chkCalculateZscore" name="calculateZscore">
+                <input type="checkbox" id="chkCalculateZscore" name="calculateZscore"/>
                 <span>Calculate z-score on the fly</span>
             </div>
-            <input type="button" value="Run" onClick="heatMapView.submit_job(this.form);" class="runAnalysisBtn">
+            <input type="button" value="Run" onClick="heatMapView.submit_job(this.form);" class="runAnalysisBtn"/>
         </fieldset>
     </div>
 

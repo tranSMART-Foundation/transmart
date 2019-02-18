@@ -26,7 +26,6 @@ function changeField(field, valueField) {
 	jQuery('#' + escapedFieldName).val('');
 	jQuery('#' + escapedFieldName + "-input").val('').removeAttr('disabled').focus();
 }
-
 </g:javascript>
 <g:textField name="${fieldName}" style="display: none" value="${value}"/>
 <g:if test="${label}">

@@ -1,55 +1,53 @@
 <html>
-<head>
-    <title>Transmart Administration</title>
+    <head>
+	<title>Transmart Administration</title>
 
-    <g:javascript library="jquery" />
-    <r:require module="adminTab" />
+	<g:javascript library='jquery' />
+	<r:require module='adminTab' />
 
-    <r:script>
-			Ext.BLANK_IMAGE_URL = "${resource(dir: 'js', file: 'ext/resources/images/default/s.gif')}";
+	<r:script>
+	    Ext.BLANK_IMAGE_URL = "${resource(dir: 'js', file: 'ext/resources/images/default/s.gif')}";
 
-			// set ajax to 180*1000 milliseconds
-			Ext.Ajax.timeout = 180000;
-			var pageInfo;
+	    // set ajax to 180*1000 milliseconds
+	    Ext.Ajax.timeout = 180000;
+	    var pageInfo;
 
-			Ext.onReady(function()
-		    {
-			    Ext.QuickTips.init();
+	    Ext.onReady(function() {
+	        Ext.QuickTips.init();
 
-	            var helpURL = '${grailsApplication.config.com.recomdata.adminHelpURL}';
-	            var contact = '${grailsApplication.config.com.recomdata.contactUs}';
-	            var appTitle = '${grailsApplication.config.com.recomdata.appTitle}';
-	            var buildVer = 'Build Version: <g:meta name="environment.BUILD_NUMBER"/> - <g:meta
-            name="environment.BUILD_ID"/>';
+	        var helpURL = '${grailsApplication.config.com.recomdata.adminHelpURL}';
+	        var contact = '${grailsApplication.config.com.recomdata.contactUs}';
+	        var appTitle = '${grailsApplication.config.com.recomdata.appTitle}';
+	        var buildVer = 'Build Version: <g:meta name="environment.BUILD_NUMBER"/> - <g:meta name="environment.BUILD_ID"/>';
 				   
-	            var viewport = new Ext.Viewport({
-	                layout: "border",
-	                items:[new Ext.Panel({                          
-                       region: "center",  
-                       //tbar: createUtilitiesMenu(helpURL, contact, appTitle,'${request.getContextPath()}', buildVer, 'admin-utilities-div'),
-                       autoScroll:true,                     
-                       contentEl: "page"
+	        var viewport = new Ext.Viewport({
+	            layout: "border",
+	            items:[new Ext.Panel({                          
+                        region: "center",  
+                        autoScroll:true,                     
+                        contentEl: "page"
                     })]
-	            });
-	            viewport.doLayout();
-
-	            pageInfo = {
-					basePath :"${request.getContextPath()}"
-				}
 	        });
-    </r:script>
-    %{--<g:layoutHead/>--}%
-    <r:layoutResources/>
-</head>
+	        viewport.doLayout();
 
-<body>
-<div id="page">
-    <div id="header-div" class="header-div"><g:render template="/layouts/commonheader" model="['app': 'accesslog']"/></div>
+	        pageInfo = {
+	            basePath :"${request.contextPath}"
+	        }
+	    });
+	</r:script>
+	<r:layoutResources/>
+    </head>
 
-    <div id='navbar'><g:render template="/layouts/adminnavbar"/></div>
+    <body>
+	<div id="page">
+	    <div id="header-div" class="header-div">
+		<g:render template='/layouts/commonheader' model="[app: 'accesslog']"/>
+	    </div>
 
-    <div id="content"><g:layoutBody/></div>
-    <r:layoutResources/>
-</div>
-</body>
+	    <div id='navbar'><g:render template='/layouts/adminnavbar'/></div>
+
+	    <div id="content"><g:layoutBody/></div>
+	    <r:layoutResources/>
+	</div>
+    </body>
 </html>

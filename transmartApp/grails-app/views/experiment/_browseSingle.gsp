@@ -18,8 +18,8 @@ table.studyBrowseTable > tbody > tr > td {
     font-size: 10px;
 }
 </style>
-<script type="text/javascript" src="${resource(dir: 'js', file: 'jquery/ui.multiselect.js')}"></script>
-<script type="text/javascript">
+<script src="${resource(dir: 'js', file: 'jquery/ui.multiselect.js')}"></script>
+<script>
     $j(document).ready(function () {
         $j(".studyBrowseRow").click(function () {
             $j('.studyBrowseRow').removeClass('selected');
@@ -28,11 +28,14 @@ table.studyBrowseTable > tbody > tr > td {
     });
 
 </script>
+
 <table class="studyBrowseTable"><thead><tr><th>Accession</th><th>Name</th></tr></thead>
     <tbody>
-    <g:each in="${experiments}" var="experiment">
-        <tr class="studyBrowseRow" id="${experiment.accession}"><td>${experiment.accession}</td><td
-                id="studyBrowseName${experiment.accession}">${experiment.title}</td></tr>
-    </g:each>
+	<g:each in="${experiments}" var="experiment">
+            <tr class="studyBrowseRow" id="${experiment.accession}">
+		<td>${experiment.accession}</td>
+		<td>id="studyBrowseName${experiment.accession}">${experiment.title}</td>
+	    </tr>
+	</g:each>
     </tbody>
 </table>

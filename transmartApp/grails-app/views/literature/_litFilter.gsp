@@ -1,4 +1,4 @@
-<div style="border:0px;overflow:auto;width:100%;height:100%">
+<div style="border:0;overflow:auto;width:100%;height:100%">
     <g:form controller="literature">
         <table border="0" cellspacing="0" cellpadding="0" class="jubfilter">
             <tr>
@@ -58,7 +58,7 @@
                     <g:each in="${session.searchFilter.litFilter.alterationTypes.keySet()}" status="i"
                             var="alterationType">
                         <g:checkBox name="alterationtype_${alterationType.toLowerCase().replace(' ', '_')}"
-                                    value="${session.searchFilter.litFilter.alterationTypes.get(alterationType)}"/>
+                                    value="${session.searchFilter.litFilter.alterationTypes[alterationType]}"/>
                         ${alterationType}<br/>
                     </g:each>
                 </td>

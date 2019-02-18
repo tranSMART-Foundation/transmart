@@ -1,5 +1,4 @@
 <g:each var="sample" in="${samples}">
-
     <table class="biobankResults">
         <g:each var="sampleAttribute" in="${sample}">
             <g:if test="${sampleAttribute.key != 'count'}">
@@ -14,8 +13,6 @@
             </g:if>
         </g:each>
     </table>
-
     <br/>
     <br/>
-
 </g:each>

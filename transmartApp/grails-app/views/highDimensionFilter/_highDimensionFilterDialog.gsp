@@ -7,41 +7,63 @@
     <g:else>
         <table style="-webkit-border-horizontal-spacing: 10px; vertical-align: middle; width: 100%;">
             <tbody>
-            <tr><td>Platform</td><td>${gpl_id}</td></tr>
-            <tr><td>Search in</td>
-                <td>
-                <select id="highdimension-search-property" style="width: 100%">
-                <g:each in="${searchable_properties.keySet().sort {a, b -> searchable_properties.get(a) <=> searchable_properties.get(b)}}" var="prop_key">
-                    <option value="${prop_key}">${searchable_properties.get(prop_key)}</option>
-                </g:each>
-                </select>
-            </td></tr>
-            <tr><td><label for="highdimension-filter-selector">Search term</label></td><td><input type="text" id="highdimension-filter-selector" style="width: 100%"/></td></tr>
-            <tr><td>Query on</td>
-                <td>
-                    <select id="highdimension-filter-projection" style="width: 100%" onchange="omicsProjectionChanged()">
-                        <g:each in="${projections.keySet().sort {a, b -> projections.get(a) <=> projections.get(b)}}" var="projection">
-                            <option value="${projection}">${projections.get(projection)}</option>
-                        </g:each>
-                    </select>
-                </td></tr>
-
+		<tr>
+		    <td>Platform</td>
+		    <td>${gpl_id}</td>
+		</tr>
+		<tr>
+		    <td>Search in</td>
+                    <td>
+			<select id="highdimension-search-property" style="width: 100%">
+			    <g:each var='prop_key'
+				    in="${searchable_properties.keySet().sort {a, b -> searchable_properties.get(a) <=> searchable_properties.get(b)}}">
+				<option value="${prop_key}">${searchable_properties.get(prop_key)}</option>
+			    </g:each>
+			</select>
+		    </td>
+		</tr>
+		<tr>
+		    <td><label for="highdimension-filter-selector">Search term</label></td>
+		    <td><input type="text" id="highdimension-filter-selector" style="width: 100%"/></td>
+		</tr>
+		<tr>
+		    <td>Query on</td>
+                    <td>
+			<select id="highdimension-filter-projection" style="width: 100%" onchange="omicsProjectionChanged()">
+                            <g:each var='projection' in="${projections.keySet().sort {a, b -> projections.get(a) <=> projections.get(b)}}">
+				<option value="${projection}">${projections.get(projection)}</option>
+                            </g:each>
+			</select>
+                    </td>
+		</tr>
             </tbody>
         </table>
 
         <g:if test="${filter_type==org.transmartproject.core.querytool.HighDimensionFilterType.SINGLE_NUMERIC || filter_type==org.transmartproject.core.querytool.HighDimensionFilterType.ACGH}">
             <table width="100%">
                 <tbody>
-                <tr id="highdimension-slider-row1"><td colspan="3">Number of subjects selected: <span id="highdimension-filter-subjectcount">0</span></td></tr>
-                <tr id="highdimension-slider-row2"><td colspan="3">Select the range for expression values:</td></tr>
-                <tr id="highdimension-slider-row3" style="display: none;">
-                    <td><input type="text" size="6" id="highdimension-amount-min" style="color:#548cff; font-weight:bold;"></td>
-                    <td align="center"><div id="highdimension-range"></div></td>
-                    <td><input type="text" size="6" id="highdimension-amount-max" style="color:#548cff; font-weight:bold;"></td>
-                </tr>
-                <tr id="highdimension-slider-row4"><td colspan="3">Histogram:</td></tr>
-                <tr><td colspan="3"><div id="highdimension-filter-histogram" style="text-align: center;"></div></td></tr>
-                <tr id="highdimension-slider-row6"><td>Bins:</td><td align="center"><div id="highdimension-bins"></div></td><td><input type="text" size="2" id="highdimension-amount-bins" readonly style="color:#548cff; font-weight:bold;"/></td></tr>
+                    <tr id="highdimension-slider-row1">
+			<td colspan="3">Number of subjects selected: <span id="highdimension-filter-subjectcount">0</span></td>
+		    </tr>
+                    <tr id="highdimension-slider-row2">
+			<td colspan="3">Select the range for expression values:</td>
+		    </tr>
+                    <tr id="highdimension-slider-row3" style="display: none;">
+			<td><input type="text" size="6" id="highdimension-amount-min" style="color:#548cff; font-weight:bold;"></td>
+			<td align="center"><div id="highdimension-range"></div></td>
+			<td><input type="text" size="6" id="highdimension-amount-max" style="color:#548cff; font-weight:bold;"></td>
+                    </tr>
+                    <tr id="highdimension-slider-row4">
+			<td colspan="3">Histogram:</td>
+		    </tr>
+                    <tr>
+			<td colspan="3"><div id="highdimension-filter-histogram" style="text-align: center;"></div></td>
+		    </tr>
+		    <tr id="highdimension-slider-row6">
+			<td>Bins:</td>
+			<td align="center"><div id="highdimension-bins"></div></td>
+			<td><input type="text" size="2" id="highdimension-amount-bins" readonly style="color:#548cff; font-weight:bold;"/></td>
+		    </tr>
                 </tbody>
             </table>
         </g:if>

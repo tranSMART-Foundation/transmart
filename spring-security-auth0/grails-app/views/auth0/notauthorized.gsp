@@ -11,15 +11,12 @@
 				<div class="row well" style="opacity: .85; color: black;">
 					<div class="col-sm-12">
 						<div class="description">
-							<g:if test="${notAuthorizedTemplate}">${notAuthorizedTemplate}</g:if>
-							<g:else>
-							<h3>Sorry. You are not yet authorized to access i2b2/tranSMART.</h3>
-							<br />
-							<p>Contact the administrator to request the access to the system.</p>
-							<p>Please wait until you receive an e-mail, stating that you are registered and appropriate access level has been granted.</p>
-							<br />
-							Thank you!
-							</g:else>
+						    <h3>Sorry. You are not yet authorized to access i2b2/tranSMART.</h3>
+						    <br />
+						    <p>Contact the administrator to request the access to the system.</p>
+						    <p>Please wait until you receive an e-mail, stating that you are registered and appropriate access level has been granted.</p>
+						    <br />
+						    Thank you!
 						</div>
 					</div>
 				</div>

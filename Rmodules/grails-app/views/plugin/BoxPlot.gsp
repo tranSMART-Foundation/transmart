@@ -8,7 +8,7 @@
     <h2>
         Variable Selection
         <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.boxPlot ?: "JavaScript:D2H_ShowHelp(1310,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+            <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
 
@@ -138,10 +138,9 @@
          %{-- ************************************************************************************************* --}%
             <fieldset class="toolFields">
                 <div class="chkpair">
-                    <g:checkBox name="isBinning" onclick="boxPlotView.toggle_binning();"/> Enable binning
+                    <g:checkBox name='isBinning' onclick='boxPlotView.toggle_binning();'/> Enable binning
                 </div>
                 <input type="button" value="Run" onClick="boxPlotView.submit_job(this.form);" class="runAnalysisBtn">
             </fieldset>
     </form>
-
 </div>

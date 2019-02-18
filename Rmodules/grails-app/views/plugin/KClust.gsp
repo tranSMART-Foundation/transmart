@@ -1,13 +1,13 @@
 %{--include js lib for heatmap dynamically--}%
-<r:require modules="kclust"/>
-<r:layoutResources disposition="defer"/>
+<r:require modules='kclust'/>
+<r:layoutResources disposition='defer'/>
 
 <div id="analysisWidget">
 
     <h2>
         Variable Selection
         <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClustering ?: "JavaScript:D2H_ShowHelp(1507,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+            <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
         </a>
     </h2>
 
@@ -45,11 +45,11 @@
         <fieldset class="toolFields">
             <div>
                 <input type="checkbox" id="chkCalculateZscore" name="calculateZscore">
-                <span>Calculate z-score on the fly</span>
+                    <span>Calculate z-score on the fly</span>
             </div>
             <input type="button" value="Run" onClick="kmeansClustering.submit_job(this.form);" class="runAnalysisBtn">
         </fieldset>
 
-</form>
+    </form>
 
 </div>

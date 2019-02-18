@@ -5,8 +5,9 @@
         </h1>
         <ul class="navlist">
             <li>
-                <span class="adminMenuButton"><g:link class="list" controller="accessLog"
-                                                      action="list">View Access Log</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='accessLog'>View Access Log</g:link>
+		</span>
             </li>
         </ul>
     </div>
@@ -19,17 +20,20 @@
         </h1>
         <ul class="navlist">
             <li>
-                <span class="adminMenuButton"><g:link class="list" controller="userGroup"
-                                                      action="list">Group List</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='userGroup'>Group List</g:link>
+		</span>
             </li>
             <li>
-                <span class="adminMenuButton"><g:link class="create" controller="userGroup"
-                                                      action="create">Create Group</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='create' controller='userGroup' action='create'>Create Group</g:link>
+		</span>
             </li>
 
             <li>
-                <span class="adminMenuButton"><g:link class="create" controller="userGroup"
-                                                      action="membership">Group Membership</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='create' controller='userGroup' action='membership'>Group Membership</g:link>
+		</span>
             </li>
         </ul>
     </div>
@@ -42,12 +46,14 @@
         </h1>
         <ul class="navlist">
             <li>
-                <span class="adminMenuButton"><g:link class="list" controller="authUser"
-                                                      action="list">User List</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='authUser' action='list'>User List</g:link>
+		</span>
             </li>
             <li>
-                <span class="adminMenuButton"><g:link class="create" controller="authUser"
-                                                      action="create">Create User</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='create' controller='authUser' action='create'>Create User</g:link>
+		</span>
             </li>
         </ul>
     </div>
@@ -62,12 +68,14 @@
                 </h1>
                 <ul class="navlist">
                     <li>
-                        <span class="adminMenuButton"><g:link class="list" controller="GalaxyUserDetails"
-                                                              action="list">User List</g:link></span>
+                        <span class="adminMenuButton">
+			    <g:link class='list' controller='galaxyUserDetails'>User List</g:link>
+			</span>
                     </li>
                     <li>
-                        <span class="adminMenuButton"><g:link class="create" controller="GalaxyUserDetails"
-                                                              action="create">Create User</g:link></span>
+                        <span class="adminMenuButton">
+			    <g:link class='create' controller='galaxyUserDetails' action='create'>Create User</g:link>
+			</span>
                     </li>
                 </ul>
             </div>
@@ -82,12 +90,14 @@
         </h1>
         <ul class="navlist">
             <li>
-                <span class="adminMenuButton"><g:link class="create" controller="secureObjectAccess"
-                                                      action="manageAccess">Access Control by Group</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='create' controller='secureObjectAccess' action='manageAccess'>Access Control by Group</g:link>
+		</span>
             </li>
             <li>
-                <span class="adminMenuButton"><g:link class="create" controller="secureObjectAccess"
-                                                      action="manageAccessBySecObj">Access Control by Study</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='create' controller='secureObjectAccess' action='manageAccessBySecObj'>Access Control by Study</g:link>
+		</span>
             </li>
         </ul>
     </div>
@@ -100,12 +110,14 @@
         </h1>
         <ul class="navlist">
             <li>
-                <span class="adminMenuButton"><g:link class="list" controller="secureObject"
-                                                      action="list">Study List</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='secureObject'>Study List</g:link>
+		</span>
             </li>
             <li>
-                <span class="adminMenuButton"><g:link class="create" controller="secureObject"
-                                                      action="create">Add Study</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='create' controller='secureObject' action='create'>Add Study</g:link>
+		</span>
             </li>
         </ul>
     </div>
@@ -118,12 +130,14 @@
         </h1>
         <ul class="navlist">
             <li>
-                <span class="adminMenuButton"><g:link class="list" controller="secureObjectPath"
-                                                      action="list">SecureObjectPath List</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='secureObjectPath'>SecureObjectPath List</g:link>
+		</span>
             </li>
             <li>
-                <span class="adminMenuButton"><g:link class="create" controller="secureObjectPath"
-                                                      action="create">Add SecureObjectPath</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='create' controller='secureObjectPath' action='create'>Add SecureObjectPath</g:link>
+		</span>
             </li>
         </ul>
     </div>
@@ -136,12 +150,14 @@
         </h1>
         <ul class="navlist">
             <li>
-                <span class="adminMenuButton"><g:link class="list" controller="role"
-                                                      action="list">Role List</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='role'>Role List</g:link>
+		</span>
             </li>
             <li>
-                <span class="adminMenuButton"><g:link class="create" controller="role"
-                                                      action="create">Create Role</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='create' controller='role' action='create'>Create Role</g:link>
+		</span>
             </li>
         </ul>
     </div>
@@ -154,19 +170,21 @@
         </h1>
         <ul class="navlist">
             <li>
-                <span class="adminMenuButton"><g:link class="list" controller="requestmap"
-                                                      action="list">Requestmap List</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='requestmap'>Requestmap List</g:link>
+		</span>
             </li>
             <li>
-                <span class="adminMenuButton"><g:link class="create" controller="requestmap"
-                                                      action="create">Requestmap Create</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='create' controller='requestmap' action='create'>Requestmap Create</g:link>
+		</span>
             </li>
         </ul>
     </div>
 </div>
 
 <g:if test="${!!grailsApplication.getControllerClass('ImportXnatController')}">
-    <g:if test="${grailsApplication.config.org.transmart.xnatImporterEnable}">
+    <g:if test="${grailsApplication.config.org.transmart.xnatImporterEnabled}">
         <div class='navbarBox'>
             <div class="navcontainer1">
                 <h1 class="panelHeader">
@@ -174,17 +192,20 @@
                 </h1>
                 <ul class="navlist">
                     <li>
-                        <span class="adminMenuButton"><g:link class="list" controller="importXnat" action="list">Configuration List</g:link></span>
+                        <span class="adminMenuButton">
+			    <g:link class='list' controller='importXnat'>Configuration List</g:link>
+			</span>
                     </li>
                     <li>
-                        <span class="adminMenuButton"><g:link class="create" controller="importXnat" action="create">Create Configuration</g:link></span>
+                        <span class="adminMenuButton">
+			    <g:link class='create' controller='importXnat' action='create'>Create Configuration</g:link>
+			</span>
                     </li>
                 </ul>
             </div>
         </div>
     </g:if>
 </g:if>
-
 
 <div class='navbarBox'>
     <div class="navcontainer1">
@@ -193,12 +214,15 @@
         </h1>
         <ul class="navlist">
             <li>
-                <span class="adminMenuButton"><g:link class="list" controller="configInfo"
-                                                      action="index">Configuration Detail</g:link></span>
-                <span class="adminMenuButton"><g:link class="list" controller="buildInfo"
-                                                      action="index">Build Information</g:link></span>
-                <span class="adminMenuButton"><g:link class="list" controller="statusInfo"
-                                                      action="index">Status of Support Connections</g:link></span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='configInfo'>Configuration Detail</g:link>
+		</span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='buildInfo'>Build Information</g:link>
+		</span>
+                <span class="adminMenuButton">
+		    <g:link class='list' controller='statusInfo'>Status of Support Connections</g:link>
+		</span>
             </li>
         </ul>
     </div>

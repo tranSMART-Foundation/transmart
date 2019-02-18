@@ -1,6 +1,4 @@
-<%--<script type="text/javascript" src="${resource(dir:'js', file:'jquery/ui.multiselect.js')}"></script>--%>
-
-<script type="text/javascript">
+<script>
     jQuery(function () {
         // choose either the full version
         jQuery(".multiselect").multiselect();
@@ -10,9 +8,7 @@
 </script>
 
 <select id="multiselectbox" class="multiselect" multiple="multiple" name="experiments[]">
-    <g:each in="${experiments}" var="experiment">
+    <g:each in="${experiments}" var='experiment'>
         <option value="${experiment.id}">${experiment.title}</option>
     </g:each>
 </select>
-
-

@@ -8,12 +8,12 @@
     }
     </style>
     <g:if test="${subResourcesAssayMultiMap}">
-        <g:render template="highDimSummary" model="subResourcesAssayMultiMap"/>
+        <g:render template='highDimSummary' model="[subResourcesAssayMultiMap: subResourcesAssayMultiMap]"/>
     </g:if>
     <g:if test="${tags}">
-        <g:render template="showTags" model="tags"/>
+        <g:render template='showTags' model="[tags: tags]"/>
     </g:if>
     <g:if test="${browseStudyInfo}">
-        <g:render template="showBrowseStudyInfo" model="browseStudyInfo"/>
+        <g:render template='showBrowseStudyInfo' model="[browseStudyInfo: browseStudyInfo]"/>
     </g:if>
 </g:else>
