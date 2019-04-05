@@ -15,8 +15,8 @@ or evaluation purposes, it is sufficient to download a pre-built WAR file, for
 instance a snapshot from the [i2b2-tranSMART Foundation's][2]
 CI/build servers, for snapshots of the i2b2-tranSMART Foundation's GitHub
 repository. In order to run the WAR, an application server is
-required. The only supported one is [Tomcat][3], from the 7.x
-line, though it will most likely work on others.
+required. The only supported one is [Tomcat][3], from the 7.x and 8.x
+lines, though it will most likely work on others.
 
 In addition, an Oracle 12 or PostgreSQL database installed with the
 proper schema and data is required. This can be prepared with the
@@ -32,5 +32,5 @@ For details on how to install the i2b2-tranSMART Foundation's releases, refer to
   [1]: http://grails.org/
   [2]: https://ci.transmartfoundation.org/
   [3]: http://tomcat.apache.org/
-  [4]: https://github.com/tranSMART-Foundation/transmart/transmart-data
+  [4]: https://github.com/tranSMART-Foundation/transmart/tree/master/transmart-data
   [5]: https://wiki.transmartfoundation.org/
