@@ -1,5 +1,5 @@
 KETTLE_VERSION=4.4.0
-TRANSMART_RELEASE_BRANCH=release-16.3
+TRANSMART_RELEASE_BRANCH=release-16.4
 
 UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
 				tar gfortran g++ unzip libreadline-dev \
@@ -8,6 +8,7 @@ UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
 
 UBUNTU14_PACKAGES=php5-cli php5-json openjdk-7-jdk
 UBUNTU16_PACKAGES=php7.0-cli php7.0-json
+UBUNTU18_PACKAGES=php7.2-cli php7.2-json
 
 GROOVY_VERSION=2.1.9
 
@@ -90,7 +91,7 @@ php: $(PHP_BIN)
 
 install_ubuntu_packages14:
 	. /etc/lsb-release; \
-		test $$DISTRIB_RELEASE != '16.04' || \
+		test $$DISTRIB_RELEASE == '14.04' || \
 	    grep ondrej/php5 /etc/apt/sources.list || ( \
 				gpg --recv-keys --keyserver keyserver.ubuntu.com $(ONDREJ_KEY) && \
 				(gpg -a --export $(ONDREJ_KEY) | apt-key add -) && \
@@ -101,6 +102,10 @@ install_ubuntu_packages14:
 install_ubuntu_packages16:
 	apt-get update
 	apt-get install -y $(UBUNTU16_PACKAGES)
+
+install_ubuntu_packages18:
+	apt-get update
+	apt-get install -y $(UBUNTU18_PACKAGES)
 
 install_ubuntu_packages:
 	apt-get update
@@ -141,16 +146,24 @@ data-integration/.keep: $(KETTLE_ARCHIVE)
 ../vars: vars-ubuntu.php
 	php -d variables_order=E $< > $@
 
-ubuntu_deps_root: install_ubuntu_packages /var/lib/postgresql/tablespaces
+ubuntu_deps_root: install_ubuntu_packages install_ubuntu_packages /var/lib/postgresql/tablespaces
 
-ubuntu_deps_root16: install_ubuntu_packages16 /var/lib/postgresql/tablespaces
+ubuntu_deps_root14: install_ubuntu_packages install_ubuntu_packages14 /var/lib/postgresql/tablespaces
+
+ubuntu_deps_root16: install_ubuntu_packages install_ubuntu_packages16 /var/lib/postgresql/tablespaces
+
+ubuntu_deps_root18: install_ubuntu_packages install_ubuntu_packages18 /var/lib/postgresql/tablespaces
 
 # Note: in the release case - we are making a strong assumption that tranSMART-ETL
 #   already exists, is NOT a git archive, and can not be updated
 # ubuntu_deps_regular: update_etl data-integration ../vars groovy
 ubuntu_deps_regular: data-integration ../vars groovy
 
+ubuntu_deps_regular14: data-integration ../vars groovy
+
 ubuntu_deps_regular16: data-integration ../vars groovy
+
+ubuntu_deps_regular18: data-integration ../vars groovy
 
 .DELETE_ON_ERROR:
 
