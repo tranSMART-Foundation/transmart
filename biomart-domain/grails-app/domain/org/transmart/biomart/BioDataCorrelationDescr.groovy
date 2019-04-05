@@ -16,31 +16,28 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioDataCorrelationDescr {
-    Long id
     String correlation
     String description
-    String typeName
-    String status
     String source
     String sourceCode
+    String status
+    String typeName
+
     static mapping = {
-        table 'BIO_DATA_CORREL_DESCR'
+	table 'BIOMART.BIO_DATA_CORREL_DESCR'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_DATA_CORREL_DESCR_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_DATA_CORREL_DESCR_ID'
-            correlation column: 'CORRELATION'
-            description column: 'DESCRIPTION'
-            typeName column: 'TYPE_NAME'
-            status column: 'STATUS'
-            source column: 'SOURCE'
-            sourceCode column: 'SOURCE_CODE'
-        }
     }
 
+    static constraints = {
+	correlation nullable: true
+	description nullable: true
+	source nullable: true
+	sourceCode nullable: true
+	status nullable: true
+	typeName nullable: true
+    }
 }

@@ -1,333 +1,321 @@
 import com.recomdata.search.query.AssayAnalysisDataQuery
 import com.recomdata.search.query.Query
-import groovy.util.logging.Slf4j
-import org.transmart.*
+import com.recomdata.tea.TEABaseResult
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import groovy.util.slurpersupport.GPathResult
+import org.transmart.AnalysisResult
+import org.transmart.AssayAnalysisValue
+import org.transmart.ExpAnalysisResultSet
+import org.transmart.GlobalFilter
+import org.transmart.SearchFilter
+import org.transmart.TrialAnalysisResult
+import org.transmart.TrialFilter
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.BioAssayAnalysisData
+import org.transmart.biomart.BioMarker
 import org.transmart.biomart.ClinicalTrial
 
 /**
- * $Id: TrialQueryService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
-
-@Slf4j('logger')
+@CompileStatic
 class TrialQueryService {
+
+    static transactional = false
 
     /**
      * count Analysis with criteria
      */
-    def countTrial(SearchFilter filter) {
-
+	int countTrial(SearchFilter filter) {
         if (filter == null || filter.globalFilter.isTextOnly()) {
-            return 0
+	    0
+	}
+	else {
+	    BioAssayAnalysisData.executeQuery(createQuery('COUNT_EXP', filter))[0] as int
         }
-
-        return BioAssayAnalysisData.executeQuery(createQuery('COUNT_EXP', filter))[0]
     }
 
-    def countAnalysis(SearchFilter filter) {
-
+    int countAnalysis(SearchFilter filter) {
         if (filter == null || filter.globalFilter.isTextOnly()) {
-            return 0
+	    0
+	}
+	else {
+	    BioAssayAnalysisData.executeQuery(createQuery('COUNT_ANALYSIS', filter))[0] as int
         }
-
-        return BioAssayAnalysisData.executeQuery(createQuery('COUNT_ANALYSIS', filter))[0]
     }
 
     /**
      * retrieve trials with criteria
      */
-    def queryTrial(boolean count, SearchFilter filter, paramMap) {
+    ExpAnalysisResultSet queryTrial(boolean count, SearchFilter filter, Map paramMap) {
 
         if (filter == null || filter.globalFilter.isTextOnly()) {
-            return []
+	    return null
         }
-        def result = BioAssayAnalysisData.executeQuery(createQuery('DATA', filter), paramMap == null ? [:] : paramMap)
 
-        List trialResult = []
-        //def analysisCount = 0
-        //def expCount = 0
-        for (row in result) {
-            //	analysisCount +=row[1]
-            //	expCount++
-            trialResult.add(new TrialAnalysisResult(trial: ClinicalTrial.get(row[0]), analysisCount: row[1], groupByExp: true))
+	List<Object[]> result = BioAssayAnalysisData.executeQuery(
+	    createQuery('DATA', filter),
+	    paramMap ?: [:]) as List<Object[]>
+
+	    List<TEABaseResult> trialResult = []
+	for (Object[] row in result) {
+	    trialResult << new TrialAnalysisResult(trial: ClinicalTrial.get((long) row[0]), analysisCount: (long) row[1], groupByExp: true)
         }
-        return new ExpAnalysisResultSet(expAnalysisResults: trialResult, groupByExp: true)
+
+	new ExpAnalysisResultSet(expAnalysisResults: trialResult, groupByExp: true)
     }
 
-    /**
-     *
-     */
-    def createQuery(countType, SearchFilter filter) {
+    String createQuery(String countType, SearchFilter filter) {
         if (filter == null || filter.globalFilter.isTextOnly()) {
             return ' WHERE 1=0'
         }
-        def gfilter = filter.globalFilter
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad')
-        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad ')
-        query.addTable('org.transmart.biomart.ClinicalTrial ct ')
-        query.addCondition('baad.experiment.id = ct.id ')
+	GlobalFilter gfilter = filter.globalFilter
 
-        query.createGlobalFilterCriteria(gfilter)
-        createTrialFilterCriteria(filter.trialFilter, query)
+	Query query = new AssayAnalysisDataQuery(mainTableAlias: 'baad')
+	query.addTable 'org.transmart.biomart.BioAssayAnalysisData baad '
+	query.addTable 'org.transmart.biomart.ClinicalTrial ct '
+	query.addCondition 'baad.experiment.id = ct.id '
+
+	query.createGlobalFilterCriteria gfilter
+	createTrialFilterCriteria filter.trialFilter, query
 
         // handle switch scenarios
-        if ('COUNT_EXP'.equals(countType)) {
-            query.addSelect('COUNT(DISTINCT baad.experiment.id) ')
+	if ('COUNT_EXP' == countType) {
+	    query.addSelect 'COUNT(DISTINCT baad.experiment.id) '
         }
-        else if ('COUNT_ANALYSIS'.equals(countType)) {
-            //	query.addTable('JOIN baad.markers baad_bm')
-            query.addSelect('COUNT(DISTINCT baad.analysis.id) ')
-        }
-        else if ('DATA'.equals(countType)) {
-            query.addTable('JOIN baad.featureGroup.markers baad_bm')
-            query.addSelect('DISTINCT baad.experiment.id, COUNT(distinct baad.analysis.id)  ')
-            query.addGroupBy(' baad.experiment.id ')
-            query.addOrderBy(' COUNT(distinct baad.analysis.id) DESC ')
+	else if ('COUNT_ANALYSIS' == countType) {
+	    query.addSelect 'COUNT(DISTINCT baad.analysis.id) '
+	}
+	else if ('DATA' == countType) {
+	    query.addTable 'JOIN baad.featureGroup.markers baad_bm'
+	    query.addSelect 'DISTINCT baad.experiment.id, COUNT(distinct baad.analysis.id)  '
+	    query.addGroupBy ' baad.experiment.id '
+	    query.addOrderBy ' COUNT(distinct baad.analysis.id) DESC '
         }
         else {
-            query.addSelect('DISTINCT baad.experiment.id, COUNT(distinct baad.analysis.id)  ')
-            query.addGroupBy(' baad.experiment.id ')
-            query.addOrderBy(' COUNT(distinct baad.analysis.id) DESC ')
+	    query.addSelect 'DISTINCT baad.experiment.id, COUNT(distinct baad.analysis.id)  '
+	    query.addGroupBy ' baad.experiment.id '
+	    query.addOrderBy ' COUNT(distinct baad.analysis.id) DESC '
         }
 
-        def q = query.generateSQL()
-        //println(q)
-        return q
+	query.generateSQL()
     }
 
     /**
      * find distinct trial analyses with current filters
      */
-    def createAnalysisIDSelectQuery(SearchFilter filter) {
+    String createAnalysisIDSelectQuery(SearchFilter filter) {
         if (filter == null || filter.globalFilter.isTextOnly()) {
             return ' SELECT -1 FROM org.transmart.biomart.BioAssayAnalysisData baad WHERE 1 = 1 '
         }
-        def gfilter = filter.globalFilter
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
-        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad ')
-        query.addTable('org.transmart.biomart.ClinicalTrial ct ')
-        query.addCondition('baad.experiment.id = ct.id ')
+	GlobalFilter gfilter = filter.globalFilter
 
-        query.createGlobalFilterCriteria(gfilter)
-        createTrialFilterCriteria(filter.trialFilter, query)
+	Query query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+	query.addTable 'org.transmart.biomart.BioAssayAnalysisData baad '
+	query.addTable 'org.transmart.biomart.ClinicalTrial ct '
+	query.addCondition 'baad.experiment.id = ct.id '
 
-        query.addSelect('baad.analysis.id')
+	query.createGlobalFilterCriteria gfilter
+	createTrialFilterCriteria filter.trialFilter, query
 
-        return query.generateSQL()
+	query.addSelect 'baad.analysis.id'
+
+	query.generateSQL()
     }
 
-    /**
-     *
-     */
-    def queryTrialAnalysis(clinicalTrialId, SearchFilter filter) {
+    TrialAnalysisResult queryTrialAnalysis(long clinicalTrialId, SearchFilter filter) {
 
-        def gfilter = filter.globalFilter
+	GlobalFilter gfilter = filter.globalFilter
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
-        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad')
-        query.addTable('JOIN baad.featureGroup.markers baad_bm')
-        query.addSelect('baad')
-        query.addSelect('baad_bm')
-        query.addCondition('baad.experiment.id = ' + clinicalTrialId)
+	Query query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+	query.addTable 'org.transmart.biomart.BioAssayAnalysisData baad'
+	query.addTable 'JOIN baad.featureGroup.markers baad_bm'
+	query.addSelect 'baad'
+	query.addSelect 'baad_bm'
+	query.addCondition 'baad.experiment.id = ' + clinicalTrialId
         // expand biomarkers
         query.createGlobalFilterCriteria(gfilter, true)
 
-        createTrialFilterCriteria(filter.trialFilter, query)
-        def sql = query.generateSQL()
-        //logger.info('>> TrialAnalysis query:\n'+sql)
+	createTrialFilterCriteria filter.trialFilter, query
 
-        def result = null
-        def tResult = new TrialAnalysisResult(trial: ClinicalTrial.get(clinicalTrialId))
-        // println('exe sql:'+sql)
-        if (!gfilter.getBioMarkerFilters().isEmpty()) {
-            result = BioAssayAnalysisData.executeQuery(sql)
-            processAnalysisResult(result, tResult)
+	TrialAnalysisResult tResult = new TrialAnalysisResult(trial: ClinicalTrial.get(clinicalTrialId))
+	if (gfilter.bioMarkerFilters) {
+	    List<Object[]> result = BioAssayAnalysisData.executeQuery(query.generateSQL()) as List<Object[]>
+		processAnalysisResult result, tResult
         }
         else {
-            def allAnalysis = getAnalysesForExpriment(clinicalTrialId, filter)
-            result = []
-            for (row in allAnalysis) {
-                def analysisId = row[0]
-                def countGene = row[1]
-                //result = getTopAnalysisDataForAnalysis(analysisId, 5)
-                result = BioAssayAnalysis.getTopAnalysisDataForAnalysis(analysisId, 50)
-                def analysisResult = new AnalysisResult(analysis: BioAssayAnalysis.get(analysisId), bioMarkerCount: countGene)
-                tResult.analysisResultList.add(analysisResult)
-                processAnalysisResultNoSort(result, analysisResult)
+	    List<Object[]> allAnalysis = getAnalysesForExpriment(clinicalTrialId, filter)
+	    for (Object[] row in allAnalysis) {
+		long analysisId = (long) row[0]
+		long countGene = (long) row[1]
+		List<Object[]> result = BioAssayAnalysis.getTopAnalysisDataForAnalysis(analysisId, 50)
+		AnalysisResult analysisResult = new AnalysisResult(analysis: BioAssayAnalysis.get(analysisId), bioMarkerCount: countGene)
+		tResult.analysisResultList << analysisResult
+		processAnalysisResultNoSort result, analysisResult
             }
         }
 
-        return tResult
+	tResult
     }
 
-    def createBaseQuery(SearchFilter filter, trialFilter) {
-        def gfilter = filter.globalFilter
+    private AssayAnalysisDataQuery createBaseQuery(SearchFilter filter, TrialFilter trialFilter) {
+	GlobalFilter gfilter = filter.globalFilter
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
-        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad')
-        if (filter != null)
-            query.createGlobalFilterCriteria(gfilter, true)
-        if (trialFilter != null)
-            createTrialFilterCriteria(trialFilter, query)
-        return query
+	AssayAnalysisDataQuery query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+	query.addTable 'org.transmart.biomart.BioAssayAnalysisData baad'
+	if (filter) {
+	    query.createGlobalFilterCriteria gfilter, true
+	}
+	if (trialFilter) {
+	    createTrialFilterCriteria trialFilter, query
+	}
+	query
     }
 
     /**
      *  get ananlysis only
      */
-    def getAnalysesForExpriment(clinicalTrialId, SearchFilter filter) {
+    List<Object[]> getAnalysesForExpriment(clinicalTrialId, SearchFilter filter) {
         // need both filters here
-        def query = createBaseQuery(filter, filter.trialFilter)
-        query.addSelect('baad.analysis.id')
-        query.addTable('JOIN baad.featureGroup.markers baad_bm')
-        query.addSelect('COUNT(DISTINCT baad_bm.id)')
-        query.addCondition('baad.experiment.id =' + clinicalTrialId)
-        query.addGroupBy('baad.analysis')
-        query.addOrderBy('COUNT(DISTINCT baad_bm.id) DESC')
-        return BioAssayAnalysisData.executeQuery(query.generateSQL())
+	Query query = createBaseQuery(filter, filter.trialFilter)
+	query.addSelect 'baad.analysis.id'
+	query.addTable 'JOIN baad.featureGroup.markers baad_bm'
+	query.addSelect 'COUNT(DISTINCT baad_bm.id)'
+	query.addCondition 'baad.experiment.id =' + clinicalTrialId
+	query.addGroupBy 'baad.analysis'
+	query.addOrderBy 'COUNT(DISTINCT baad_bm.id) DESC'
+
+	BioAssayAnalysisData.executeQuery query.generateSQL()
     }
 
     /**
      * process analysis result
      */
-    def processAnalysisResultNoSort(List result, AnalysisResult aresult) {
-
-        //def aresult = new AnalysisResult(analysis)
-        for (row in result) {
-            def analysisData = row[0]
-            def biomarker = row[1]
-            aresult.assayAnalysisValueList.add(new AssayAnalysisValue(analysisData: analysisData, bioMarker: biomarker))
-
+    private void processAnalysisResultNoSort(List<Object[]> result, AnalysisResult aresult) {
+	for (Object[] row in result) {
+	    BioAssayAnalysisData analysisData = (BioAssayAnalysisData) row[0]
+	    BioMarker biomarker = (BioMarker) row[1]
+	    aresult.assayAnalysisValueList << new AssayAnalysisValue(analysisData: analysisData, bioMarker: biomarker)
         }
-
     }
 
-    /**
-     *
-     */
-    def processAnalysisResult(List result, TrialAnalysisResult tar) {
-        LinkedHashMap analysisResultMap = new LinkedHashMap()
+    @CompileDynamic
+    private void processAnalysisResult(List<Object[]> result, TrialAnalysisResult tar) {
+	Map<Long, AnalysisResult> analysisResultMap = [:]
 
-        for (row in result) {
-            def analysisData = row[0]
-            def biomarker = row[1]; //org.transmart.biomart.BioMarker.get(row[1])
-            //println(biomarker)
-            def aresult = analysisResultMap.get(analysisData.analysis.id)
+	for (Object[] row in result) {
+	    BioAssayAnalysisData analysisData = (BioAssayAnalysisData) row[0]
+	    BioMarker biomarker = (BioMarker) row[1]
+	    AnalysisResult aresult = analysisResultMap[analysisData.analysisId]
             if (aresult == null) {
                 aresult = new AnalysisResult(analysis: analysisData.analysis)
-                analysisResultMap.put(analysisData.analysis.id, aresult)
-
+		analysisResultMap[analysisData.analysis.id] = aresult
             }
-            aresult.assayAnalysisValueList.add(new AssayAnalysisValue(analysisData: analysisData, bioMarker: biomarker))
+	    aresult.assayAnalysisValueList << new AssayAnalysisValue(analysisData: analysisData, bioMarker: biomarker)
         }
 
-        def mc = [
-                compare: { a, b -> a.equals(b) ? 0 : (((double) a.size()) / ((double) a.analysis.dataCount)) > (((double) b.size()) / ((double) b.analysis.dataCount)) ? -1 : 1 }
-        ] as Comparator
-
-
-        Collection allanalysis = analysisResultMap.values().sort(mc)
-        tar.analysisResultList.addAll(allanalysis)
+	tar.analysisResultList.addAll analysisResultMap.values().sort { AnalysisResult a, AnalysisResult b ->
+	    a == b ? 0 :
+		(((double) a.size()) / ((double) a.analysis.dataCount)) > (((double) b.size()) / ((double) b.analysis.dataCount)) ?
+		-1 : 1
+	}
     }
 
     /**
      * trial filter criteria
      */
-    def createTrialFilterCriteria(trialfilter, Query query) {
+    void createTrialFilterCriteria(TrialFilter trialfilter, Query query) {
 
         // disease
         if (trialfilter.hasDisease()) {
-            def alias = query.mainTableAlias + '_dis'
-            query.addTable('JOIN ' + query.mainTableAlias + '.experiment.diseases ' + alias)
-            query.addCondition(alias + '.id = ' + trialfilter.bioDiseaseId)
+	    String alias = query.mainTableAlias + '_dis'
+	    query.addTable 'JOIN ' + query.mainTableAlias + '.experiment.diseases ' + alias
+	    query.addCondition alias + '.id = ' + trialfilter.bioDiseaseId
         }
 
         // compound
         if (trialfilter.hasCompound()) {
-            def alias = query.mainTableAlias + '_cpd'
-            query.addTable('JOIN ' + query.mainTableAlias + '.experiment.compounds ' + alias)
-            query.addCondition(alias + '.id = ' + trialfilter.bioCompoundId)
+	    String alias = query.mainTableAlias + '_cpd'
+	    query.addTable 'JOIN ' + query.mainTableAlias + '.experiment.compounds ' + alias
+	    query.addCondition alias + '.id = ' + trialfilter.bioCompoundId
         }
 
         // design
         if (trialfilter.hasStudyDesign()) {
-            query.addTable('org.transmart.biomart.ClinicalTrial ct ')
-            query.addCondition('baad.experiment.id = ct.id ')
-            query.addCondition("ct.design = '" + trialfilter.studyDesign + "'")
+	    query.addTable 'org.transmart.biomart.ClinicalTrial ct '
+	    query.addCondition 'baad.experiment.id = ct.id '
+	    query.addCondition "ct.design = '" + trialfilter.studyDesign + "'"
         }
 
         // type
         if (trialfilter.hasStudyType()) {
-            query.addTable('org.transmart.biomart.ClinicalTrial ct ')
-            query.addCondition('baad.experiment.id = ct.id ')
-            query.addCondition("ct.studyType = '" + trialfilter.studyType + "'")
+	    query.addTable 'org.transmart.biomart.ClinicalTrial ct '
+	    query.addCondition 'baad.experiment.id = ct.id '
+	    query.addCondition "ct.studyType = '" + trialfilter.studyType + "'"
         }
 
         // study phase
         if (trialfilter.hasPhase()) {
-            query.addTable('org.transmart.biomart.ClinicalTrial ct ')
-            query.addCondition('baad.experiment.id = ct.id ')
-            query.addCondition("ct.studyPhase = '" + trialfilter.phase + "'")
+	    query.addTable 'org.transmart.biomart.ClinicalTrial ct '
+	    query.addCondition 'baad.experiment.id = ct.id '
+	    query.addCondition "ct.studyPhase = '" + trialfilter.phase + "'"
         }
 
-        def bFirstWhereItem = true
+	boolean firstWhereItem = true
         StringBuilder s = new StringBuilder()
 
         // fold change on BioAssayAnalysisData
         if (trialfilter.hasFoldChange()) {
-            //s.append('(baad.foldChangeRatio >=')
-            //	.append(trialfilter.foldChange)
-            //  .append(' OR baad.foldChangeRatio <= ')
-            //	.append(-trialfilter.foldChange).append(')')
-            //	.append(' OR baad.foldChangeRatio IS NULL)')
-            bFirstWhereItem = false
-            s.append('( abs(baad.foldChangeRatio) >= ').append(trialfilter.foldChange).append(' OR baad.foldChangeRatio IS NULL)')
+	    firstWhereItem = false
+	    s << '( abs(baad.foldChangeRatio) >= ' << trialfilter.foldChange << ' OR baad.foldChangeRatio IS NULL)'
         }
 
         // preferred p value on BioAssayAnalysisData
         if (trialfilter.hasPValue()) {
-            if (bFirstWhereItem) {
-                s.append(' (baad.preferredPvalue <= ').append(trialfilter.pvalue).append(' )')
+	    if (firstWhereItem) {
+		s << ' (baad.preferredPvalue <= ' << trialfilter.pvalue << ' )'
             }
             else {
-                s.append(' AND (baad.preferredPvalue <= ').append(trialfilter.pvalue).append(' )')
+		s << ' AND (baad.preferredPvalue <= ' << trialfilter.pvalue << ' )'
             }
-            //.append(' OR baad.preferredPvalue IS NULL)')
         }
         //		 rvalue on BioAssayAnalysisData
         if (trialfilter.hasRValue()) {
-            if (bFirstWhereItem) {
-                s.append(' ((baad.rvalue >= abs(').append(trialfilter.rvalue).append(')) OR (baad.rhoValue>=abs(').append(trialfilter.rvalue).append(')) OR baad.rhoValue IS NULL)')
+	    if (firstWhereItem) {
+		s << ' ((baad.rvalue >= abs(' << trialfilter.rvalue <<
+		    ')) OR (baad.rhoValue>=abs(' << trialfilter.rvalue <<
+		    ')) OR baad.rhoValue IS NULL)'
             }
             else {
-                s.append(' AND (baad.rvalue >= abs(').append(trialfilter.rvalue).append(')) OR (baad.rhoValue>=abs(').append(trialfilter.rvalue).append(')) OR baad.rhoValue IS NULL)')
+		s << ' AND (baad.rvalue >= abs(' << trialfilter.rvalue <<
+		    ')) OR (baad.rhoValue>=abs(' << trialfilter.rvalue <<
+		    ')) OR baad.rhoValue IS NULL)'
             }
-
         }
+
         // platform filter
         if (trialfilter.hasPlatform()) {
-            if (bFirstWhereItem) {
-                s.append(" (baad.analysis.assayDataType = '").append(trialfilter.platform).append("')")
+	    if (firstWhereItem) {
+		s << " (baad.analysis.assayDataType = '" << trialfilter.platform << "')"
             }
             else {
-                s.append(" AND (baad.analysis.assayDataType = '").append(trialfilter.platform).append("')")
+		s << " AND (baad.analysis.assayDataType = '" << trialfilter.platform << "')"
             }
         }
 
         // add filter criteria
-        if (s.size() > 0) query.addCondition(s.toString())
+	if (s) {
+	    query.addCondition s.toString()
+	}
 
         // clinical trials
         if (trialfilter.hasSelectedTrials()) {
-            query.addTable('org.transmart.biomart.ClinicalTrial ct ')
-            query.addCondition('baad.experiment.id = ct.id ')
-            query.addCondition('ct.id in (' + trialfilter.createTrialInclause() + ')')
-
+	    query.addTable 'org.transmart.biomart.ClinicalTrial ct '
+	    query.addCondition 'baad.experiment.id = ct.id '
+	    query.addCondition 'ct.id in (' + trialfilter.createTrialInclause() + ')'
         }
     }
 
@@ -335,106 +323,73 @@ class TrialQueryService {
      * Execute the SOLR query to get the analyses for the trial that match the given search criteria
      * @param solrRequestUrl - the base URL for the SOLR request
      * @param solrQueryParams - the query string for the search, to be passed into the data for the POST request
-     * @return List containing the analysis Ids
+     * @return the analysis Ids
      */
-    def executeSOLRTrialAnalysisQuery = { solrRequestUrl, solrQueryParams ->
+    @CompileDynamic
+    private List<Long> executeSOLRTrialAnalysisQuery(String solrRequestUrl, String solrQueryParams) {
 
-        List analysisIds = []
-
-        def slurper = new XmlSlurper()
+	List<Long> analysisIds = []
 
         // submit request
-        def solrConnection = new URL(solrRequestUrl).openConnection()
+	URLConnection solrConnection = new URL(solrRequestUrl).openConnection()
         solrConnection.requestMethod = 'POST'
         solrConnection.doOutput = true
 
         // add params to request
-        def dataWriter = new OutputStreamWriter(solrConnection.outputStream)
+	Writer dataWriter = new OutputStreamWriter(solrConnection.outputStream)
         dataWriter.write(solrQueryParams)
         dataWriter.flush()
         dataWriter.close()
 
-        def docs   // will store the document nodes from the xml response in here
-
-        // process response
-        if (solrConnection.responseCode == solrConnection.HTTP_OK) {
-            def xml
-
-            solrConnection.inputStream.withStream {
-                xml = slurper.parse(it)
-            }
-
-            // retrieve all the document nodes from the xml
-            docs = xml.result.find { it.@name == 'response' }.doc
-        }
-        else {
-            throw new Exception('SOLR Request failed! Request url:' + solrRequestUrl + '  Response code:' + solrConnection.responseCode + '  Response message:' + solrConnection.responseMessage)
+	if (solrConnection.responseCode != solrConnection.HTTP_OK) {
+	    throw new Exception('SOLR Request failed! Request url:' + solrRequestUrl + '  Response code:' +
+				solrConnection.responseCode + '  Response message:' + solrConnection.responseMessage)
         }
 
+	GPathResult xml = solrConnection.inputStream.withStream { new XmlSlurper().parse(it) }
+	def docs = xml.result.find { it.@name == 'response' }.doc
         solrConnection.disconnect()
 
         // put analysis id for each document into a list to pass back
         for (docNode in docs) {
             def analysisIdNode = docNode.str.find { it.@name == 'ANALYSIS_ID' }
-            def analysisId = analysisIdNode.text()
-
-            analysisIds.add(analysisId)
+	    analysisIds << analysisIdNode.text() as Long
         }
 
-        return analysisIds
+	analysisIds
     }
 
     /**
      *   Execute a SOLR query to retrieve all the analyses for a certain trial that match the given criteria
      */
-    def querySOLRTrialAnalysis(params, List sessionFilter) {
-        RWGController rwgController = new RWGController()
-
-        def trialNumber = params['trialNumber']
+    @CompileDynamic
+    List<Map> querySOLRTrialAnalysis(String trialNumber, List<String> sessionFilter) {
+	RWGController rwgController = new RWGController() // TODO WTF?
 
         // create a copy of the original list (we don't want to mess with original filter params)
-        // (the list is an object, so it is not 'passed by val', it's a reference)
-        def filter = []
-        sessionFilter.each {
-            filter.add(it)
-        }
+	List<String> filter = [] + sessionFilter
 
-        filter.add('STUDY_ID:' + trialNumber)
-        def nonfacetedQueryString = rwgController.createSOLRNonfacetedQueryString(filter)
+	filter << 'STUDY_ID:' + trialNumber
+	String nonfacetedQueryString = rwgController.createSOLRNonfacetedQueryString(filter)
 
         String solrRequestUrl = rwgController.createSOLRQueryPath()
 
         // TODO create a conf setting for max rows
         String solrQueryString = rwgController.createSOLRQueryString(nonfacetedQueryString, '', '', 10000, false)
-        def analysisIds = executeSOLRTrialAnalysisQuery(solrRequestUrl, solrQueryString)
+	List<Long> analysisIds = executeSOLRTrialAnalysisQuery(solrRequestUrl, solrQueryString)
 
-        def analysisList = []
+	List<Object[]> results = BioAssayAnalysis.executeQuery('''
+				select b.id, b.shortDescription, b.longDescription, b.name
+				from org.transmart.biomart.BioAssayAnalysis b
+				where b.id in (:analysisIds)
+				ORDER BY b.longDescription''',
+				[analysisIds: analysisIds])
 
-        // retrieve the descriptions for each analysis
-        def results = BioAssayAnalysis.executeQuery('select b.id, b.shortDescription, b.longDescription, b.name ' +
-                ' from org.transmart.biomart.BioAssayAnalysis b' +
-                ' where b.id in (' + analysisIds.join(',') + ") ORDER BY b.longDescription")
-
-        // retrieve the analyses that are of type Time Course by checking the taxonomy
-//		def timeCourseAnalyses = bio.BioAnalysisAttributeLineage.executeQuery('select b1.bioAnalysisAttribute.bioAssayAnalysisID from bio.BioAnalysisAttributeLineage b1' +
-//			' where b1.bioAnalysisAttribute.bioAssayAnalysisID in (' + analysisIds.join(',') +  ") " +
-//			" and lower(b1.ancestorTerm.termName) = lower('Time Course')" )
-// 
-        for (r in results) {
-
-            // if current analysis is in time course list then set flag to true
-            def isTimeCourse = false
-            //if (timeCourseAnalyses.contains(r[0]))  {
-            //	isTimeCourse = true
-            //}
-
-            // create a map for each record
-            def aMap = ['id': r[0], 'shortDescription': r[1], 'longDescription': r[2], 'name': r[3], 'isTimeCourse': isTimeCourse]
-
-            analysisList.add aMap
+	List<Map> analysisList = []
+	for (Object[] row in results) {
+	    analysisList << [id: row[0], shortDescription: row[1], longDescription: row[2], name: row[3], isTimeCourse: false]
         }
 
-        return analysisList
+	analysisList
     }
-
 }

@@ -16,30 +16,23 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioAssayAnalysisPlatform {
-    Long id
+    String platformDescription
     String platformName
     String platformVersion
-    String platformDescription
+
     static mapping = {
-        table 'BIO_ASY_ANALYSIS_PLTFM'
+	table 'BIOMART.BIO_ASY_ANALYSIS_PLTFM'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASY_ANALYSIS_PLTFM_ID'
         version false
         cache usage: 'read-only'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_ASY_ANALYSIS_PLTFM_ID'
-            platformName column: 'PLATFORM_NAME'
-            platformVersion column: 'PLATFORM_VERSION'
-            platformDescription column: 'PLATFORM_DESCRIPTION'
-        }
     }
+
     static constraints = {
-        platformName(nullable: true, maxSize: 400)
-        platformVersion(nullable: true, maxSize: 400)
-        platformDescription(nullable: true, maxSize: 2000)
+	platformDescription nullable: true, maxSize: 2000
+	platformName nullable: true, maxSize: 400
+	platformVersion nullable: true, maxSize: 400
     }
 }

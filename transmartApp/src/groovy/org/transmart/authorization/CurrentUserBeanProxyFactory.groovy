@@ -1,5 +1,6 @@
 package org.transmart.authorization
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.aop.TargetSource
 import org.springframework.aop.framework.AopInfrastructureBean
@@ -13,7 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.transmartproject.core.users.User
 
 /**
- * Creates a proxy bean that provides the 'current user' appropriate for context
+ * Creates a proxy bean that provides the "current user" appropriate for context
  * of the caller.
  *
  * The current user has to be available to transmart services in several
@@ -32,7 +33,7 @@ import org.transmartproject.core.users.User
  * quartz bean, and then to whatever other beans happen to be registered with
  * {@link CurrentUserBeanProxyFactory#registerBeanToTry(java.lang.String)}.
  */
-@Slf4j('logger')
+@CompileStatic
 class CurrentUserBeanProxyFactory implements FactoryBean<User>, BeanFactoryAware {
 
     // Don't change this bean name. Rmodules depends on this bean name
@@ -48,24 +49,27 @@ class CurrentUserBeanProxyFactory implements FactoryBean<User>, BeanFactoryAware
         extraBeansToTry << beanName
     }
 
-    @Override
-    User getObject() throws Exception {
+    User getObject() {
         object
     }
 
-    @Override
-    Class<?> getObjectType() {
+    Class<User> getObjectType() {
         User
     }
 
-    @Override
     boolean isSingleton() {
         true
     }
 
+    @CompileStatic
+    @Slf4j('logger')
     class CurrentUserBeanTargetSource implements TargetSource {
 
         ConfigurableBeanFactory cbf
+
+	CurrentUserBeanTargetSource(ConfigurableBeanFactory cbf) {
+	    this.cbf = cbf
+	}
 
         final Class<?> targetClass = User
 
@@ -73,8 +77,7 @@ class CurrentUserBeanProxyFactory implements FactoryBean<User>, BeanFactoryAware
             false
         }
 
-        @Override
-        Object getTarget() throws Exception {
+	def getTarget() {
             if (RequestContextHolder.requestAttributes) {
                 // request context is active
                 cbf.getBean SUB_BEAN_REQUEST
@@ -84,33 +87,29 @@ class CurrentUserBeanProxyFactory implements FactoryBean<User>, BeanFactoryAware
                     try {
                         return cbf.getBean(beanName)
                     }
-                    catch (BeansException e) {
-                        logger.debug('BeansException for bean ' + beanName)
+		    catch (BeansException ignored) {
+			logger.debug 'BeansException for bean {}', beanName
                     }
                 }
 
-                throw new IllegalStateException('Tried to fetch ' +
-                        "current user, but it's not available")
+		throw new IllegalStateException("Tried to fetch current user, but it's not available")
             }
         }
 
-        @Override
-        void releaseTarget(Object target) throws Exception {
+	void releaseTarget(target) {
             // not really anything to do
         }
     }
 
-    @Override
     void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         ConfigurableBeanFactory cbf = (ConfigurableBeanFactory) beanFactory
 
         ProxyFactory pf = new ProxyFactory([User] as Class[])
-        pf.targetSource = new CurrentUserBeanTargetSource(cbf: cbf)
-
+	pf.targetSource = new CurrentUserBeanTargetSource(cbf)
         // also expose the thing as a ScopedObject
         //pf.addAdvice(new DelegatingIntroductionInterceptor(scopedObject))
-        pf.addInterface(AopInfrastructureBean)
+	pf.addInterface AopInfrastructureBean
 
-        object = pf.getProxy(cbf.getBeanClassLoader())
+	object = (User) pf.getProxy(cbf.getBeanClassLoader())
     }
 }

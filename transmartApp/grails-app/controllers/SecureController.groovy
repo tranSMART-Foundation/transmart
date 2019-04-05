@@ -1,12 +1,11 @@
-import org.transmart.searchapp.AccessLog
+import org.transmartproject.db.log.AccessLogService
 
 class SecureController {
 
-    def springSecurityService
+    AccessLogService accessLogService
 
-    def index = {
-        def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'Access Dataset Explorer', accesstime: new Date())
-        al.save()
-        redirect(controller: 'datasetExplorer', action: 'index')
+    def index() {
+	accessLogService.report 'Access Dataset Explorer', null
+	redirect controller: 'datasetExplorer'
     }
 }

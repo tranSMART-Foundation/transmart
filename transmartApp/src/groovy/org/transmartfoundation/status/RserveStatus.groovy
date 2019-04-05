@@ -1,7 +1,8 @@
 package org.transmartfoundation.status
 
-import java.util.Date;
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class RserveStatus {
 
     String url
@@ -12,7 +13,6 @@ class RserveStatus {
     Date lastProbe
 
     String toString () {
-        return "RserveStatus (" + url + ") - probe at: " + lastProbe
+	'RserveStatus (' + url + ') - probe at: ' + lastProbe
     }
-
 }

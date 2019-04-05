@@ -2,6 +2,9 @@ package com.recomdata.transmart.data.export
 
 import grails.converters.JSON
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
+import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.UtilService
 import org.transmartproject.core.exceptions.AccessDeniedException
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.users.User
@@ -12,32 +15,31 @@ import java.util.regex.Pattern
 @Slf4j('logger')
 class DataExportController {
 
-    def exportService
-    def exportMetadataService
-    def springSecurityService
     User currentUserBean
-    def dataExportService
+    @Autowired private DataExportService dataExportService
+    @Autowired private ExportService exportService
+    @Autowired private ExportMetadataService exportMetadataService
+    @Autowired private SecurityService securityService
+    @Autowired private UtilService utilService
 
-    private static final String ROLE_ADMIN = 'ROLE_ADMIN'
-
-    def index = {}
+    def index() {}
 
     //We need to gather a JSON Object to represent the different data types.
     def getMetaData() {
         List<Long> resultInstanceIds = parseResultInstanceIds()
-        checkRightsToExport(resultInstanceIds)
+	checkRightsToExport resultInstanceIds
 
         render exportMetadataService.getMetaData(
-                resultInstanceIds[0],
-                resultInstanceIds[1]) as JSON
+            resultInstanceIds[0],
+            resultInstanceIds[1]) as JSON
     }
 
-    def downloadFileExists() {
-        checkJobAccess params.jobname
+    def downloadFileExists(String jobName) {
+	checkJobAccess jobname
 
-        def InputStream inputStream = exportService.downloadFile(params)
-        def result = [:]
+	Map result = [:]
 
+	InputStream inputStream = exportService.downloadFile(jobName)
         if (inputStream) {
             result.fileStatus = true
             inputStream.close()
@@ -47,49 +49,37 @@ class DataExportController {
             result.message = 'Download failed as file could not be found on the server'
         }
 
-        render result as JSON
+	render(result as JSON)
     }
 
-    def downloadFile() {
-        checkJobAccess params.jobname
+    def downloadFile(String jobname) {
+	checkJobAccess jobname
 
-        def InputStream inputStream = exportService.downloadFile(params)
-
-        def fileName = params.jobname + '.zip'
-        response.setContentType 'application/zip'
-        response.setHeader 'Content-disposition', 'attachment;filename=' + fileName
-        response.outputStream << inputStream
-        response.outputStream.flush()
-        inputStream.close()
-        return true
+	utilService.sendDownload response, 'application/zip', jobname + '.zip',
+	    exportService.downloadFile(params)
     }
 
     /**
-     * Method that will create the new asynchronous job name
+     * Creates the new asynchronous job name.
      * Current methodology is username-jobtype-ID from sequence generator
      */
     def createnewjob() {
-        def result = exportService.createExportDataAsyncJob(params, springSecurityService.getPrincipal().username)
-
-        response.setContentType('text/json')
-        response.outputStream << result.toString()
+	response.contentType = 'text/json'
+	response.outputStream << exportService.createExportDataAsyncJob(params).toString()
     }
 
     /**
-     * Method that will run a data export and is called asynchronously from the datasetexplorer -> Data Export tab
+     * Runs a data export and is called asynchronously from the datasetexplorer -> Data Export tab.
      */
     def runDataExport() {
-        checkRightsToExport(parseResultInstanceIds())
+	checkRightsToExport parseResultInstanceIds()
 
-        def jsonResult = exportService.exportData(params, currentUserBean.username)
-
-        response.setContentType('text/json')
-        response.outputStream << jsonResult.toString()
+	response.contentType = 'text/json'
+	response.outputStream << exportService.exportData(params).toString()
     }
 
     def isCurrentUserAllowedToExport() {
-        boolean isAllowed = dataExportService
-                .isUserAllowedToExport(currentUserBean, parseResultInstanceIds())
+	boolean isAllowed = dataExportService.isUserAllowedToExport(currentUserBean, parseResultInstanceIds())
         render([result: isAllowed] as JSON)
     }
 
@@ -108,9 +98,10 @@ class DataExportController {
         assert !params.containsKey('result_instance_id3')
         List<Long> result = []
         for (subsetNumber in 1..2) {
-            if (params.containsKey('result_instance_id'+subsetNumber)) 
+	    if (params.containsKey('result_instance_id' + subsetNumber)) {
                 result[subsetNumber-1] = params.long('result_instance_id'+subsetNumber)
-        }
+            }
+	}
         result
     }
 
@@ -119,40 +110,27 @@ class DataExportController {
             throw new InvalidArgumentsException('No result instance id provided')
         }
 
-        if (!dataExportService
-                .isUserAllowedToExport(currentUserBean,
-                    resultInstanceIds)) {
-            throw new AccessDeniedException('User ' + currentUserBean.username + ' has no EXPORT permission' +
-                    ' on one of the result sets: ' + resultInstanceIds)
+	if (!dataExportService.isUserAllowedToExport(currentUserBean, resultInstanceIds)) {
+	    throw new AccessDeniedException('User ' + currentUserBean.username +
+					    ' has no EXPORT permission on one of the result sets: ' + resultInstanceIds)
         }
     }
 
-    private checkJobAccess(String jobName) {
-        if (isAdmin()) {
+    private void checkJobAccess(String jobName) {
+	if (securityService.principal().isAdmin()) {
             return
         }
 
-        String loggedInUsername = springSecurityService.principal.username
         String jobUsername = extractUserFromJobName(jobName)
 
-        if (jobUsername != loggedInUsername) {
-            logger.warn('Denying access to job ' + jobName + ' because the ' +
-                    'corresponding username (' + jobUsername + ') does not match ' +
-                    'that of the current user')
-            throw new AccessDeniedException('Job ' + jobName + ' was not started by ' +
-                    'this user')
+	if (jobUsername != securityService.currentUsername()) {
+	    logger.warn 'Denying access to job {} because the corresponding username' +
+		' ({}) does not match that of the current user', jobName, jobUsername
+	    throw new AccessDeniedException("Job $jobName was not started by this user")
         }
     }
 
-    // copied from Rmodules' AnalysisFilesController
-    // Job control and file download access ought to be unified
-    private boolean isAdmin() {
-        springSecurityService.principal.authorities.any {
-            it.authority == ROLE_ADMIN
-        }
-    }
-
-    static private String extractUserFromJobName(String jobName) {
+    private static String extractUserFromJobName(String jobName) {
         Pattern pattern = ~/(.+)-[a-zA-Z]+-\d+/
         Matcher matcher = pattern.matcher(jobName)
 
@@ -163,5 +141,3 @@ class DataExportController {
         matcher.group(1)
     }
 }
-
-

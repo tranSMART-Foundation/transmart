@@ -1,36 +1,28 @@
 package com.recomdata.search.query
 
+import groovy.transform.CompileStatic
 import org.transmart.GlobalFilter
-
+import org.transmart.KeywordSet
 
 /**
- * @author $Author: mmcduffie $
- * $Id $
- * $Revision: 9178 $
- *
+ * @author mmcduffie
  */
-public class AssayStatsExpMarkerQuery extends AssayAnalysisDataQuery {
+@CompileStatic
+class AssayStatsExpMarkerQuery extends AssayAnalysisDataQuery {
 
     /**
      * default criteria builder for biomarkers
      */
-
-    def buildGlobalFilterBioMarkerCriteria(GlobalFilter gfilter,
-                                           boolean expandBioMarkers) {
-        def biomarkerFilters = gfilter.getBioMarkerFilters()
-
-        if (!biomarkerFilters.isEmpty()) {
-            def markerAlias = mainTableAlias + '.marker'
+    void buildGlobalFilterBioMarkerCriteria(GlobalFilter gfilter, boolean expandBioMarkers) {
+	KeywordSet biomarkerFilters = gfilter.bioMarkerFilters
+	if (biomarkerFilters) {
+	    String markerAlias = mainTableAlias + '.marker'
             if (expandBioMarkers) {
-                addCondition(createExpandBioMarkerCondition(markerAlias, gfilter))
-                //	addCondition(markerAlias+'.id IN ('+createExpandBioMarkerSubQuery(biomarkerFilters.getKeywordDataIdString())+') ')
-
+		addCondition createExpandBioMarkerCondition(markerAlias, gfilter)
             }
             else {
-                addCondition(markerAlias + '.id IN (' + biomarkerFilters.getKeywordDataIdString() + ') ')
+		addCondition markerAlias + '.id IN (' + biomarkerFilters.keywordDataIdString + ') '
             }
         }
     }
-
-
 }

@@ -16,26 +16,21 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioData {
-    Long id
-    String uniqueId
     String type
+    String uniqueId
+
     static hasMany = [externalCodes: BioDataExternalCode]
+
     static mapping = {
-        table 'BIO_DATA_UID'
-        version false
+	table 'BIOMART.BIO_DATA_UID'
         tablePerHierarchy false
-        columns {
-            id column: 'BIO_DATA_ID'
-            uniqueId column: 'UNIQUE_ID'
-            type column: 'BIO_DATA_TYPE'
-            externalCodes joinTable: [name: 'BIO_DATA_EXT_CODE', key: 'BIO_DATA_ID', column: 'BIO_DATA_EXT_CODE_ID']
+        id column: 'BIO_DATA_ID'
+	version false
 
-        }
+	externalCodes joinTable: [name: 'BIOMART.BIO_DATA_EXT_CODE', key: 'BIO_DATA_ID', column: 'BIO_DATA_EXT_CODE_ID']
+	type column: 'BIO_DATA_TYPE'
     }
-
 }

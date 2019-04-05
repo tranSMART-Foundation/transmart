@@ -1,51 +1,28 @@
 import grails.converters.JSON
-import groovy.util.logging.Slf4j
+import i2b2.Comparison
+import org.springframework.beans.factory.annotation.Autowired
 
-@Slf4j('logger')
 class ComparisonController {
 
-    def index = {}
+    @Autowired private I2b2HelperService i2b2HelperService
 
-    def i2b2HelperService
+    def index() {}
 
-    def getQueryDefinition = {
-        String qid = request.getParameter('qid')
-        String q = i2b2HelperService.getQueryDefinitionXMLFromQID(qid)
-        logger.debug(q)
-        PrintWriter pw = new PrintWriter(response.getOutputStream())
-        pw.write(q)
-        pw.flush()
+    def getQueryDefinition(String qid) {
+	render i2b2HelperService.getQueryDefinitionXMLFromQID(qid)
     }
 
-    def save = {
-        def qid1 = request.getParameter('result_instance_id1')
-        def qid2 = request.getParameter('result_instance_id2')
-        def s = new i2b2.Comparison()
-
-        try {
-            s.queryResultId1 = Integer.parseInt(qid1)
-        }
-        catch (NumberFormatException nfe) {
-            s.queryResultId1 = -1
-        }
-
-        try {
-            s.queryResultId2 = Integer.parseInt(qid2)
-        }
-        catch (NumberFormatException nfe) {
-            s.queryResultId2 = -1
-        }
-
+    def save() {
+	Comparison s = new Comparison(
+	    queryResultId1: params.int('result_instance_id1', -1),
+	    queryResultId2: params.int('result_instance_id2', -1))
         boolean success = s.save()
 
-        def link = new StringBuilder()
-        link.append('<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="mailto:?subject=Link to ')
-        link.append('Saved comparison ID=' + s.id)
-        link.append('&body=The following is a link to the saved comparison in tranSMART.  Please, note that you need to be logged into tranSMART prior to using this link.%0A%0A')
-        link.append(createLink(controller: 'datasetExplorer', action: 'index', id: s.id, absolute: true))
-        link.append('" target="_blank" class="tiny" style="text-decoration:underline;color:blue;font-size:11px;">Email this comparison</a><br /><br />')
-        def result = [success: success, id: s.id, link: link]
-        logger.trace(result as JSON)
-        render result as JSON
+	String link = '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="mailto:?subject=Link to Saved comparison ID=' + s.id +
+	    '&body=The following is a link to the saved comparison in tranSMART.  ' +
+	    'Please, note that you need to be logged into tranSMART prior to using this link.%0A%0A' +
+	    createLink(controller: 'datasetExplorer', id: s.id, absolute: true) +
+	    '" target="_blank" class="tiny" style="text-decoration:underline;color:blue;font-size:11px;">Email this comparison</a><br /><br />'
+	render([success: success, id: s.id, link: link] as JSON)
     }
 }

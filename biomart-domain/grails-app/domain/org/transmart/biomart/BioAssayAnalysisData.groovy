@@ -16,70 +16,51 @@
  *
  *
  ******************************************************************/
-
-/**
- * $Id: BioAssayAnalysisData.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
-
 package org.transmart.biomart
 
 import com.recomdata.util.IExcelProfile
 
 class BioAssayAnalysisData implements IExcelProfile {
-    String featureGroupName
-    Experiment experiment
-    BioAssayPlatform assayPlatform
-    Double foldChangeRatio
-    Double rawPvalue
     Double adjustedPvalue
-    Double preferredPvalue
-    Double rValue
-    Double rhoValue
-    BioAssayAnalysis analysis
-    Double cutValue
-    String resultsValue
-    Long id
     String adjustedPValueCode
+    BioAssayAnalysis analysis
+    BioAssayPlatform assayPlatform
+    Double cutValue
+    Experiment experiment
+    BioAssayFeatureGroup featureGroup
+    String featureGroupName
+    Double foldChangeRatio
     Double numericValue
     String numericValueCode
+    Double preferredPvalue
+    Double rawPvalue
+    String resultsValue
+    Double rhoValue
+    Double rValue
     Double teaNormalizedPValue
-    BioAssayFeatureGroup featureGroup
+
+    static transients = ['values']
+
     static hasMany = [markers: BioMarker]
+
     static belongsTo = [BioMarker]
 
     static mapping = {
-        table 'BIO_ASSAY_ANALYSIS_DATA'
+	table 'BIOMART.BIO_ASSAY_ANALYSIS_DATA'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASY_ANALYSIS_DATA_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            featureGroupName column: 'FEATURE_GROUP_NAME'
-            experiment column: 'BIO_EXPERIMENT_ID'
-            assayPlatform column: 'BIO_ASSAY_PLATFORM_ID'
-            foldChangeRatio column: 'FOLD_CHANGE_RATIO'
-            rawPvalue column: 'RAW_PVALUE'
-            adjustedPvalue column: 'ADJUSTED_PVALUE'
-            preferredPvalue column: 'PREFERRED_PVALUE'
-            rValue column: 'R_VALUE'
-            rhoValue column: 'RHO_VALUE'
-            featureGroup column: 'BIO_ASSAY_FEATURE_GROUP_ID'
-            analysis column: 'BIO_ASSAY_ANALYSIS_ID'
-            cutValue column: 'CUT_VALUE'
-            resultsValue column: 'RESULTS_VALUE'
-            id column: 'BIO_ASY_ANALYSIS_DATA_ID'
-            adjustedPValueCode column: 'ADJUSTED_P_VALUE_CODE'
-            numericValue column: 'NUMERIC_VALUE'
-            numericValueCode column: 'NUMERIC_VALUE_CODE'
-            teaNormalizedPValue column: 'TEA_NORMALIZED_PVALUE'
-            markers joinTable: [name: 'BIO_DATA_OMIC_MARKER', key: 'BIO_DATA_ID']
-        }
+
+	adjustedPValueCode column: 'ADJUSTED_P_VALUE_CODE'
+	analysis column: 'BIO_ASSAY_ANALYSIS_ID'
+        assayPlatform column: 'BIO_ASSAY_PLATFORM_ID'
+	experiment column: 'BIO_EXPERIMENT_ID'
+        featureGroup column: 'BIO_ASSAY_FEATURE_GROUP_ID'
+	markers joinTable: [name: 'BIOMART.BIO_DATA_OMIC_MARKER', key: 'BIO_DATA_ID']
+        teaNormalizedPValue column: 'TEA_NORMALIZED_PVALUE'
     }
 
-    /**
-     * Get values to Export to Excel
-     */
-    public List getValues() {
-        return [featureGroupName, foldChangeRatio, rValue, rawPvalue, teaNormalizedPValue, adjustedPvalue, rhoValue, cutValue, resultsValue, numericValueCode, numericValue]
+    List getValues() {
+	[featureGroupName, foldChangeRatio, rValue, rawPvalue, teaNormalizedPValue,
+	 adjustedPvalue, rhoValue, cutValue, resultsValue, numericValueCode, numericValue]
     }
 }

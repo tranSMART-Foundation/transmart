@@ -1,4 +1,3 @@
-package com.recomdata.grails.plugin.gwas
 /*************************************************************************
  * tranSMART - translational medicine data mart
  * 
@@ -18,48 +17,33 @@ package com.recomdata.grails.plugin.gwas
  *
  ******************************************************************/
   
-
-/**
- * $Id: BioAssayAnalysisData.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
-
-
+package com.recomdata.grails.plugin.gwas
 
 import com.recomdata.util.IExcelProfile
 import org.transmart.biomart.BioAssayAnalysisPlatform
 
+/**
+ * @author mmcduffie
+ */
 class BioAssayAnalysisEqtl implements IExcelProfile {
 
-	BioAssayAnalysisPlatform analysis
-	String rsId
-	Double pValue
-	Double logPValue
-	Long etlId
-	Long id
-	String ext_data
+    BioAssayAnalysisPlatform analysis
+    Long etlId
+    String ext_data
+    Double logPValue
+    Double pValue
+    String rsId
 	
-	static mapping = {
-	 table name:'BIO_ASSAY_ANALYSIS_EQTL', schema:'BIOMART'
-	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
-	 columns {
-		 id column:'BIO_ASY_ANALYSIS_EQTL_ID'
-		 analysis column:'BIO_ASSAY_ANALYSIS_ID'
-		 rsId column:'RS_ID'
-		 pValue column:'P_VALUE'
-		 logPValue column:'LOG_P_VALUE'
-		 etlId column:'ETL_ID'
-		 ext_data column:'EXT_DATA'
-		}
-	 	
-	}
+    static mapping = {
+	table 'BIOMART.BIO_ASSAY_ANALYSIS_EQTL'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASY_ANALYSIS_EQTL_ID'
+	version false
 
-	/**
-	 * Get values to Export to Excel
-	 */
-	public List getValues() {
-		return [rsId, pValue, logPValue]
-	}
+	analysis column:'BIO_ASSAY_ANALYSIS_ID'
+	logPValue column:'LOG_P_VALUE'
+    }
+
+    List getValues() {
+	[rsId, pValue, logPValue]
+    }
 }

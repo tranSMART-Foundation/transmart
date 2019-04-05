@@ -1,49 +1,53 @@
 import com.recomdata.search.query.AssayAnalysisDataQuery
 import com.recomdata.search.query.Query
+import groovy.transform.CompileStatic
+import org.springframework.beans.factory.annotation.Autowired
+import org.transmart.GlobalFilter
 import org.transmart.SearchFilter
 import org.transmart.TrialAnalysisResult
 
 /**
- * $Id: ClinicalTrialAnalysisTEAService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
+@CompileStatic
 class ClinicalTrialAnalysisTEAService extends AnalysisTEABaseService {
 
-    def trialQueryService
+    static transactional = false
 
-    def getExpType() {
-        return 'Clinical Trial'
+    @Autowired private TrialQueryService trialQueryService
+
+    String getExpType() {
+	'Clinical Trial'
     }
 
-    def createResultObject() {
-        return new TrialAnalysisResult()
+    TrialAnalysisResult createResultObject() {
+	new TrialAnalysisResult()
     }
 
-    def createSubFilterCriteria(SearchFilter filter, Query query) {
-        return trialQueryService.createTrialFilterCriteria(filter.trialFilter, query)
+    void createSubFilterCriteria(SearchFilter filter, Query query) {
+	trialQueryService.createTrialFilterCriteria filter.trialFilter, query
     }
 
     /**
      * find distinct trial analyses with current filters
      */
-    def createAnalysisIDSelectQuery(SearchFilter filter) {
+    String createAnalysisIDSelectQuery(SearchFilter filter) {
         if (filter == null || filter.globalFilter.isTextOnly()) {
             return ' SELECT -1 FROM org.transmart.biomart.BioAssayAnalysisData baad WHERE 1 = 1 '
         }
-        def gfilter = filter.globalFilter
 
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
-        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad ')
-        query.addTable('org.transmart.biomart.ClinicalTrial ct ')
-        query.addCondition('baad.experiment.id = ct.id ')
+	GlobalFilter gfilter = filter.globalFilter
 
-        query.createGlobalFilterCriteria(gfilter)
-        createSubFilterCriteria(filter, query)
+	Query query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+	query.addTable 'org.transmart.biomart.BioAssayAnalysisData baad '
+	query.addTable 'org.transmart.biomart.ClinicalTrial ct '
+	query.addCondition 'baad.experiment.id = ct.id '
 
-        query.addSelect('baad.analysis.id')
+	query.createGlobalFilterCriteria gfilter
+	createSubFilterCriteria filter, query
 
-        return query.generateSQL()
+	query.addSelect 'baad.analysis.id'
+
+	query.generateSQL()
     }
-
 }

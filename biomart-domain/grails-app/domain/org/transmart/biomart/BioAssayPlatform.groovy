@@ -1,92 +1,78 @@
-
 package org.transmart.biomart
 
 class BioAssayPlatform {
-    Long id
-    String name
-    String platformVersion
-    String description
-    String organism
     String accession
     String array
-    String vendor
-    String platformType
+    String description
+    String name
+    String organism
     String platformTechnology
+    String platformType
+    String platformVersion
+    String vendor
 
     String uniqueId
 
-    static transients = ['uniqueId', 'fullName']
+    static transients = ['fullName', 'uniqueId']
+
     static hasMany = [analyses:BioAssayAnalysis]
 
     static mapping = {
-        table 'BIO_ASSAY_PLATFORM'
+	table 'BIOMART.BIO_ASSAY_PLATFORM'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASSAY_PLATFORM_ID'
         version false
         cache true
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_ASSAY_PLATFORM_ID'
-            name column: 'PLATFORM_NAME'
-            platformVersion column: 'PLATFORM_VERSION'
-            description column: 'PLATFORM_DESCRIPTION'
-            organism column: 'PLATFORM_ORGANISM'
-            accession column: 'PLATFORM_ACCESSION'
-            array column: 'PLATFORM_ARRAY'
-            vendor column: 'PLATFORM_VENDOR'
-            platformType column: 'PLATFORM_TYPE'
-            platformTechnology column: 'PLATFORM_TECHNOLOGY'
-            analyses joinTable:[name:'BIO_DATA_PLATFORM', key:'BIO_ASSAY_PLATFORM_ID']
-        }
+
+        accession column: 'PLATFORM_ACCESSION'
+	analyses joinTable: [name: 'BIOMART.BIO_DATA_PLATFORM', key: 'BIO_ASSAY_PLATFORM_ID']
+        array column: 'PLATFORM_ARRAY'
+	description column: 'PLATFORM_DESCRIPTION'
+	name column: 'PLATFORM_NAME'
+	organism column: 'PLATFORM_ORGANISM'
+        vendor column: 'PLATFORM_VENDOR'
     }
 
     static constraints = {
-        name(nullable: true, maxSize: 400)
-        platformVersion(nullable: true, maxSize: 400)
-        description(nullable: true, maxSize: 2000)
-        platformType(nullable: true)
-        platformTechnology(nullable: true)
+	description nullable: true, maxSize: 2000
+	name nullable: true, maxSize: 400
+	platformTechnology nullable: true
+	platformType nullable: true
+	platformVersion nullable: true, maxSize: 400
     }
+
+    /**
+     * Find concept code by its uniqueId
+     * @return BioAssayPlatform with matching uniqueId or null, if match not found.
+     */
+    static BioAssayPlatform findByUniqueId(String uniqueId) {
+	executeQuery('from BioAssayPlatform where id=(select id from BioData where uniqueId=:uniqueId)',
+		     [uniqueId: uniqueId])[0]
+    }
+
     /**
      * Use transient property to support unique ID for tagValue.
      * @return tagValue's uniqueId
      */
-
     String getUniqueId() {
-        if (uniqueId == null) {
-            if (id) {
-                BioData data = BioData.get(id)
-                if (data != null) {
-                    uniqueId = data.uniqueId
-                    return data.uniqueId
-                }
-                return 'BAP:'+accession
-            }
-            else {
-                return null
-            }
+	if (uniqueId) {
+	    return uniqueId
+        }
+
+	if (!id) {
+	    return
+        }
+
+	String bioDataUid = BioData.where { id == this.id }.uniqueId.get()
+	if (bioDataUid) {
+	    uniqueId = bioDataUid
+	    uniqueId
         }
         else {
-            return uniqueId
+	    'BAP:' + accession
         }
     }
-
 
     String getFullName() {
-        return (platformType + '/' + platformTechnology + '/' + vendor + '/' + name)
-
-    }
-
-/**
- * Find concept code by its uniqueId
- * @param uniqueId
- * @return BioAssayPlatform with matching uniqueId or null, if match not found.
- */
-
-    static BioAssayPlatform findByUniqueId(String uniqueId) {
-        BioAssayPlatform cc
-        BioData bd = BioData.findByUniqueId(uniqueId)
-        if (bd != null) {
-            cc = BioAssayPlatform.get(bd.id)
-        }
-        return cc
+	platformType + '/' + platformTechnology + '/' + vendor + '/' + name
     }
 }

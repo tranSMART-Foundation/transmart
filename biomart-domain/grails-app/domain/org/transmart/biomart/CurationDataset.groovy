@@ -16,32 +16,26 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class CurationDataset {
-    String curationType
+    Long bioAnalysisPlatformId
     Date createDate
     Long creator
-    Long id
-    Long bioAnalysisPlatformId
-    static mapping = {
-        table 'BIO_CURATION_DATASET'
-        version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            curationType column: 'BIO_CURATION_TYPE'
-            createDate column: 'CREATE_DATE'
-            creator column: 'CREATOR'
-            id column: 'BIO_CURATION_DATASET_ID'
-            bioAnalysisPlatformId column: 'BIO_ASY_ANALYSIS_PLATFORM_ID'
-        }
-    }
-    static constraints = {
-        curationType(maxSize: 400)
-        createDate(nullable: true)
-        creator(nullable: true)
+    String curationType
 
+    static mapping = {
+	table 'BIOMART.BIO_CURATION_DATASET'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_CURATION_DATASET_ID'
+        version false
+
+        bioAnalysisPlatformId column: 'BIO_ASY_ANALYSIS_PLATFORM_ID'
+	curationType column: 'BIO_CURATION_TYPE'
+    }
+
+    static constraints = {
+	createDate nullable: true
+	creator nullable: true
+	curationType maxSize: 400
     }
 }

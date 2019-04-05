@@ -1,13 +1,14 @@
 package org.transmart
 
+import groovy.transform.CompileStatic
+
 /**
- * $Id: SearchResult.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
+@CompileStatic
 class SearchResult {
 
-    def countmap = [:]
+    Map countmap = [:]
 
     // trial tab
     int analysisCount = 0
@@ -32,20 +33,19 @@ class SearchResult {
     def result
     String resultType
 
-    def totalCount = {
-        return experimentCount + literatureCount() + trialCount + documentCount + profileCount
+    int totalCount() {
+	experimentCount + literatureCount() + trialCount + documentCount + profileCount
     }
 
-    def litJubOncCount = {
-        return litJubOncAltCount + litJubOncInhCount + litJubOncIntCount
+    int litJubOncCount() {
+	litJubOncAltCount + litJubOncInhCount + litJubOncIntCount
     }
 
-    def litJubAsthmaCount = {
-        return litJubAsthmaAltCount + litJubAsthmaInhCount + litJubAsthmaIntCount + litJubAsthmaPECount
+    int litJubAsthmaCount() {
+	litJubAsthmaAltCount + litJubAsthmaInhCount + litJubAsthmaIntCount + litJubAsthmaPECount
     }
 
-    def literatureCount = {
-        return litJubOncCount() + litJubAsthmaCount()
+    int literatureCount() {
+	litJubOncCount() + litJubAsthmaCount()
     }
-
 }

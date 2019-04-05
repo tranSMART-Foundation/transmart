@@ -1,32 +1,25 @@
 package org.transmart.searchapp
 
 class SearchTaxonomy {
+    Date importDate
+    Long searchKeywordId
+    String sourceCd
+    String termName
 
-	static transients = ["children", "parents"]
-	Long id
-	String termName
-	String sourceCd
-	Date importDate
-	Long searchKeywordId
-	List children = []
-	List parents = []
+    List children = []
+    List parents = []
 
-	static mapping = {
-		table 'SEARCH_TAXONOMY'
-		version false
-		id generator:'sequence', params:[sequence:'SEQ_SEARCH_TAXONOMY_TERM_ID']
-		columns {
-			id column:'TERM_ID'
-			searchKeywordId column: 'SEARCH_KEYWORD_ID'
-			termName column:'TERM_NAME'
-			sourceCd column:'SOURCE_CD'
-			importDate column:'IMPORT_DATE'
-		}
-	}
+    static transients = ['children', 'parents']
 
-	static constraints = {
-		termName(nullable:false,maxSize:900)
-		sourceCd(nullable:true,maxSize:900)
-		importDate(nullable:true)
-	}
+    static mapping = {
+	table 'SEARCHAPP.SEARCH_TAXONOMY'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_TAXONOMY_TERM_ID'], column: 'TERM_ID'
+	version false
+    }
+
+    static constraints = {
+	importDate nullable: true
+	sourceCd nullable: true, maxSize: 900
+	termName maxSize: 900
+    }
 }

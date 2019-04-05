@@ -10,27 +10,25 @@ interface HighDimExporter {
     /**
      * Determines whether a datatype is supported
      * @param dataType Name of the datatype
-     * @return true if the datatype is supported by this exporter, false otherwise
+     * @return true if the datatype is supported by this exporter
      */
-    public boolean isDataTypeSupported(String dataType)
+    boolean isDataTypeSupported(String dataType)
 
     /**
-     * Returns the projection name to be used for retrieving
-     * data from the database
+     * The projection name to be used for retrieving data from the database.
      * @return Projection name
      */
-    public String getProjection()
+    String getProjection()
 
     /**
-     * @return A short string describing the format that is 
-     *         produced by this exporter
+     * @return A short string describing the format that is produced by this exporter
      */
-    public String getFormat()
+    String getFormat()
 
     /**
      * @return a longer human readable description for this exporter
      */
-    public String getDescription()
+    String getDescription()
 
     /**
      * Exports the data in the TabularResult to the outputStream given
@@ -38,7 +36,8 @@ interface HighDimExporter {
      * @param projection Projection that was used to retrieve the data
      * @param outputStream Stream to write the data to
      */
-    public void export(TabularResult data, Projection projection, Closure<OutputStream> newOutputStream)
+    void export(TabularResult data, Projection projection,
+	        Closure<OutputStream> newOutputStream)
 
     /**
      * Exports the data in the TabularResult to the outputStream given, 
@@ -49,6 +48,7 @@ interface HighDimExporter {
      * @param outputStream Stream to write the data to
      * @param isCancelled Closure that returns true iff the export is cancelled
      */
-    public void export(TabularResult data, Projection projection, Closure<OutputStream> newOutputStream, Closure<Boolean> isCancelled)
+    void export(TabularResult data, Projection projection,
+	        Closure<OutputStream> newOutputStream, Closure<Boolean> isCancelled)
 
 }

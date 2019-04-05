@@ -1,125 +1,196 @@
+import com.recomdata.tea.TEABaseResult
 import com.recomdata.util.ExcelGenerator
 import com.recomdata.util.ExcelSheet
+import de.DeMrnaAnnotation
 import groovy.util.logging.Slf4j
+import org.transmart.AnalysisResult
+import org.transmart.AssayAnalysisValue
+import org.transmart.ExperimentAnalysisResult
 import org.transmart.SearchResult
+import org.transmart.TrialAnalysisResult
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.BioAssayAnalysisData
+import org.transmart.biomart.ClinicalTrial
 import org.transmart.biomart.Experiment
 
 /**
- * $Id: AnalysisDataExportService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
+ * @author mmcduffie */
 
 @Slf4j('logger')
 class AnalysisDataExportService {
 
-    def renderAnalysisInExcel(BioAssayAnalysis analysis) {
-        def ExcelSheet sheet = null
-        def method = analysis.analysisMethodCode
-        if ('correlation'.equalsIgnoreCase(method)) {
-            sheet = renderCorrelationAnalysisExcel(analysis)
-        }
-        else if ('spearman correlation'.equalsIgnoreCase(method)) {
-            sheet = renderSpearmanAnalysisExcel(analysis)
-        }
-        else {
-            // todo -- need to handle more methods....
-            sheet = renderComparisonAnalysisExcel(analysis)
-        }
+    static transactional = false
 
-        def gen = new ExcelGenerator()
-        return gen.generateExcel([sheet])
+    private static final List<String> headers1 = ['Analysis', 'ProbeSet', 'Fold Change Ratio', 'p-Value',
+	                                          'adjusted p-value', 'TEA p-Value', 'Gene'].asImmutable()
+    private static final List<String> headers2 = ['Analysis', 'Antigen', 'Fold Change Ratio', 'p-Value',
+	                                          'adjusted p-Value', 'TEA p-Value', 'Gene'].asImmutable()
+    private static final List<String> headers3 = ['Analysis', 'ProbeSet', 'r-Value', 'Gene'].asImmutable()
+    private static final List<String> headers4 = ['Analysis', 'Antigen', 'r-Value', 'Gene'].asImmutable()
+    private static final List<String> headers5 = ['Analysis', 'ProbeSet', 'rho-value', 'Gene'].asImmutable()
+    private static final List<String> headers6 = ['Analysis', 'Antigen', 'rho-value'].asImmutable()
+    private static final List<String> headers7 = ['Accession Number', 'Type', 'Title', 'Description', 'Design',
+	                                          'Status', 'Overall Design', 'Start Date', 'Completion Date',
+	                                          'Primary Investigator', 'Compounds', 'Diseases',
+	                                          'Organisms'].asImmutable()
+    private static final List<String> headers8 = ['Accession Number', 'TEA Score', 'Analysis Title',
+	                                          'Analysis Description', 'p-Value Cut Off', 'Fold Change Cut Off',
+	                                          'QA Criteria', 'Analysis Platform', 'Method', 'Data type',
+	                                          'Compounds', 'Diseases', 'Bio Marker', 'Description',
+	                                          'Organism', 'ProbeSet', 'Fold Change', 'RValue', 'p-Value',
+	                                          'TEA p-Value', 'FDR p-Value', 'Rho-Value', 'Cut Value',
+	                                          'Results Value', 'Numeric Value Code', 'Numeric Value'].asImmutable()
+    private static final List<String> headers9 = ['Title', 'Trial Number', 'Owner', 'Description',
+	                                          'Study Phase', 'Study Type', 'Study Design',
+	                                          'Blinding procedure', 'Duration of study (weeks)',
+	                                          'Completion date', 'Inclusion Criteria', 'Exclusion Criteria',
+	                                          'Dosing Regimen', 'Type of Control', 'Gender restriction mfb',
+	                                          'Group assignment', 'Primary endpoints', 'Secondary endpoints',
+	                                          'Route of administration', 'Secondary ids', 'Subjects',
+	                                          'Max age', 'Min age', 'Number of patients', 'Number of sites',
+	                                          'Compounds', 'Diseases', 'Organisms'].asImmutable()
+    private static final List<String> headers10 = ['Trial Number', 'TEA Score', 'Analysis Title',
+	                                           'Analysis Description', 'p-Value Cut Off', 'Fold Change Cut Off',
+	                                           'QA Criteria', 'Analysis Platform', 'Method', 'Data type',
+	                                           'Compounds', 'Diseases', 'Bio Marker', 'Description',
+	                                           'Organism', 'ProbeSet', 'Fold Change', 'RValue', 'p-Value',
+	                                           'TEA p-Value', 'FDR p-Value', 'Rho-Value', 'Cut Value',
+	                                           'Results Value', 'Numeric Value Code', 'Numeric Value'].asImmutable()
+    private static final List<String> blank1 = ['']
+    private static final List<String> blank9 = [''] * 9
+    private static final List<String> blank12 = [''] * 12
+    private static final List<String> blank14 = [''] * 14
+
+    byte[] renderAnalysisInExcel(BioAssayAnalysis analysis) {
+	ExcelSheet sheet
+	switch (analysis.analysisMethodCode.toLowerCase()) {
+	    case 'correlation': sheet = renderCorrelationAnalysisExcel(analysis); break
+	    case 'spearman correlation': sheet = renderSpearmanAnalysisExcel(analysis); break
+	    default: sheet = renderComparisonAnalysisExcel(analysis) // todo -- need to handle more methods....
+	}
+
+	new ExcelGenerator().generateExcel([sheet])
     }
 
-    def renderComparisonAnalysisExcel(BioAssayAnalysis analysis) {
+    ExcelSheet renderComparisonAnalysisExcel(BioAssayAnalysis analysis) {
 
-        def allprobesameexpr = BioAssayAnalysisData.executeQuery('SELECT distinct g FROM BioAssayAnalysisData g WHERE g.analysis.id =' + analysis.id)
-        def headers = []
-        def values = []
-        def dataType = analysis.assayDataType
+	List<BioAssayAnalysisData> allprobesameexpr = BioAssayAnalysisData.executeQuery('''
+				SELECT distinct g
+				FROM BioAssayAnalysisData g
+				WHERE g.analysis =:analysis''',
+		[analysis: analysis])
+	List<String> headers
+	String dataType = analysis.assayDataType
         if (isGeneExpression(dataType)) {
-            headers = ['Analysis', 'ProbeSet', 'Fold Change Ratio', 'p-Value', 'adjusted p-value', 'TEA p-Value', 'Gene']
+	    headers = headers1
         }
         else if (isRBM(dataType)) {
-            headers = ['Analysis', 'Antigen', 'Fold Change Ratio', 'p-Value', 'adjusted p-Value', 'TEA p-Value', 'Gene']
+	    headers = headers2
+	}
+	else {
+	    headers = []
         }
 
-        for (data in allprobesameexpr) {
-            def rowGenes = (de.DeMrnaAnnotation.findAll('from DeMrnaAnnotation as a where a.probesetId=? and geneSymbol is not null', [data.probesetId]))*.geneSymbol
+	List<Map> values = []
+	for (BioAssayAnalysisData data in allprobesameexpr) {
+	    List<String> rowGenes = DeMrnaAnnotation.executeQuery('''
+					select a.geneSymbol
+					from DeMrnaAnnotation as a
+					where a.probesetId=?
+					  and geneSymbol is not null''',
+		[data.probesetId])
 
-            for (marker in rowGenes) {
-                values.add([data.analysis.name, data.probeset, data.foldChangeRatio, data.rawPvalue, data.adjustedPvalue, data.teaNormalizedPValue, marker])
+	    for (String marker in rowGenes) {
+		values << [data.analysis.name, data.probeset, data.foldChangeRatio, data.rawPvalue,
+			   data.adjustedPvalue, data.teaNormalizedPValue, marker]
             }
-        }
-        return new ExcelSheet('sheet1', headers, values)
+	}
+
+	new ExcelSheet('sheet1', headers, values)
     }
 
-    def renderCorrelationAnalysisExcel(BioAssayAnalysis analysis) {
+    ExcelSheet renderCorrelationAnalysisExcel(BioAssayAnalysis analysis) {
 
-        def allprobesameexpr = BioAssayAnalysisData.executeQuery("SELECT distinct g FROM BioAssayAnalysisData g JOIN g.featureGroup.markers markers WHERE markers.bioMarkerType='GENE' AND g.analysis.id =" + analysis.id)
-        def headers = []
-        def values = []
-        def dataType = analysis.assayDataType
-
+	List<BioAssayAnalysisData> allprobesameexpr = BioAssayAnalysisData.executeQuery('''
+				SELECT distinct g
+				FROM BioAssayAnalysisData g
+				JOIN g.featureGroup.markers markers
+				WHERE markers.bioMarkerType='GENE'
+				  AND g.analysis=:analysis''')
+	String dataType = analysis.assayDataType
+	List<String> headers
         if (isGeneExpression(dataType)) {
-            headers = ['Analysis', 'ProbeSet', 'r-Value', 'Gene']
+	    headers = headers3
         }
         else if (isRBM(dataType)) {
-            headers = ['Analysis', 'Antigen', 'r-Value', 'Gene']
+	    headers = headers4
+	}
+	else {
+	    headers = []
         }
 
-        for (data in allprobesameexpr) {
-            def rowGenes = (de.DeMrnaAnnotation.findAll('from DeMrnaAnnotation as a where a.probesetId=? and geneSymbol is not null', [data.probesetId]))*.geneSymbol
+	List<Map> values = []
+	for (BioAssayAnalysisData data in allprobesameexpr) {
+	    List<String> rowGenes = (DeMrnaAnnotation.executeQuery('''
+					select a.geneSymbol
+					from DeMrnaAnnotation as a
+					where a.probesetId=?
+					and geneSymbol is not null''',
+		[data.probesetId]))
 
-            for (marker in rowGenes) {
-                values.add([data.analysis.name, data.probeset, , data.rvalue, marker])
+	    for (String marker in rowGenes) {
+		values << [data.analysis.name, data.probeset, data.rvalue, marker]
             }
         }
-        return new ExcelSheet('sheet1', headers, values)
+
+	new ExcelSheet('sheet1', headers, values)
     }
 
-    def renderSpearmanAnalysisExcel(BioAssayAnalysis analysis) {
+    ExcelSheet renderSpearmanAnalysisExcel(BioAssayAnalysis analysis) {
 
-        println('>> Spearman analysis query:')
-        //def allprobesameexpr = BioAssayAnalysisData.executeQuery("SELECT distinct g FROM BioAssayAnalysisData g JOIN FETCH g.markers markers WHERE markers.bioMarkerType='GENE' AND g.analysis.id ="+analysis.id)
-        def allprobesameexpr = BioAssayAnalysisData.executeQuery('SELECT distinct g FROM BioAssayAnalysisData g WHERE g.analysis.id =' + analysis.id + ' order by g.probesetId')
-        def headers = []
-        def values = []
-        def dataType = analysis.assayDataType
-
-        // build excel sheet based on data type
+	List<BioAssayAnalysisData> allprobesameexpr = BioAssayAnalysisData.executeQuery('''
+				SELECT distinct g
+				FROM BioAssayAnalysisData g
+				WHERE g.analysis=:analysis
+				order by g.probesetId''',
+		[analysis: analysis])
+	List<String> headers = []
+	String dataType = analysis.assayDataType
+	List<List> values = []
         if (isGeneExpression(dataType)) {
-            headers = ['Analysis', 'ProbeSet', 'rho-value', 'Gene']
+	    headers = headers5
 
             // build excel data
-            for (data in allprobesameexpr) {
-                def rowGenes = (de.DeMrnaAnnotation.findAll('from DeMrnaAnnotation as a where a.probesetId=? and geneSymbol is not null', [data.probesetId]))*.geneSymbol
+	    for (BioAssayAnalysisData data in allprobesameexpr) {
+		List<String> rowGenes = DeMrnaAnnotation.executeQuery('''
+						select a.geneSymbol
+						from DeMrnaAnnotation as a
+						where a.probesetId=?
+						and geneSymbol is not null''',
+			[data.probesetId])
 
-                for (marker in rowGenes) {
-                    //println(">>For antigen '" + data.featureGroupName + "' adding marker: id: " + marker + ", name: " + marker.name)
-                    values.add([data.analysis.name, data.probeset, data.rhoValue, marker])
+		for (String marker in rowGenes) {
+		    values << [data.analysis.name, data.probeset, data.rhoValue, marker]
                 }
             }
         }
         else if (isRBM(dataType)) {
             // don't grab associated markers due to data annotation
-            headers = ['Analysis', 'Antigen', 'rho-value']
-            for (data in allprobesameexpr) values.add([data.analysis.name, data.probeset, data.rhoValue])
+	    headers = headers6
+	    for (BioAssayAnalysisData data in allprobesameexpr) {
+		values << [data.analysis.name, data.probeset, data.rhoValue]
+            }
+	}
 
-            //def mc = [ compare: {a,b-> a.equals(b)? 0: a.size()>b.size()? -1: 1 } ] as Comparator
-            //values.sort{it}
-        }
-        return new ExcelSheet('sheet1', headers, values)
+	new ExcelSheet('sheet1', headers, values)
     }
 
-    def isGeneExpression(String dataType) {
-        return 'Gene Expression'.equalsIgnoreCase(dataType)
+    boolean isGeneExpression(String dataType) {
+	'Gene Expression'.equalsIgnoreCase dataType
     }
 
-    def isRBM(String dataType) {
-        return 'RBM'.equalsIgnoreCase(dataType)
+    boolean isRBM(String dataType) {
+	'RBM'.equalsIgnoreCase dataType
     }
 
     /**
@@ -129,60 +200,44 @@ class AnalysisDataExportService {
      * @param sResult the search result
      * @param expAnalysisMap map with experiment accession as key and analysis as value
      *
-     * @return a byte array containing the Excel workbook
+     * @return the Excel workbook
      */
-    def createExcelEAStudyView(SearchResult sResult, Map expAnalysisMap) {
-        def ExcelSheet sheet1 = null
-        def ExcelSheet sheet2 = null
+    byte[] createExcelEAStudyView(SearchResult sResult, Map<Experiment, List<AnalysisResult>> expAnalysisMap) {
 
-        def headers1 = ['Accession Number', 'Type', 'Title', 'Description', 'Design', 'Status', 'Overall Design', 'Start Date', 'Completion Date', 'Primary Investigator', 'Compounds', 'Diseases', 'Organisms']
-        def headers2 = ['Accession Number', 'TEA Score', 'Analysis Title', 'Analysis Description', 'p-Value Cut Off', 'Fold Change Cut Off', 'QA Criteria', 'Analysis Platform', 'Method', 'Data type', 'Compounds', 'Diseases', 'Bio Marker', 'Description', 'Organism', 'ProbeSet', 'Fold Change', 'RValue', 'p-Value', 'TEA p-Value', 'FDR p-Value', 'Rho-Value', 'Cut Value', 'Results Value', 'Numeric Value Code', 'Numeric Value']
-
-        def values1 = []
-        def values2 = []
-        def placeh2 = ['', '', '', '', '', '', '', '', '', '', '', '']
-        // Empty placeholder for analysis metadata
-        def placebm2 = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
-        // Empty placeholder for biomarkers
-
-        def experimentOrganisms = [:]
+	Map<String, String> experimentOrganisms = [:]
         String orgString = ''
         String organism = ''
-        int orgIndex = -1
 
-        logger.info('Number of Experiments: ' + sResult.result.expAnalysisResults.size())
+	logger.info 'Number of Experiments: {}', sResult.result.expAnalysisResults.size()
 
-        expAnalysisMap.each { k, v ->
-            values2.add([k.accession] + ['', '', '', '', '', '', '', '', ''] + [k.getCompoundNames()] + [k.getDiseaseNames()])
+	List values2 = []
+	expAnalysisMap.each { Experiment k, List<AnalysisResult> v ->
+	    values2 << [k.accession] + blank9 + [k.compoundNames] + [k.diseaseNames]
             orgString = ''
-            v.each {
-                values2.add([''] + [it.calcDisplayTEAScore()] + it.analysis.getValues() + placebm2)
+	    for (AnalysisResult ar in v) {
+		values2 << [] + blank1 + [ar.calcDisplayTEAScore()] + ar.analysis.values + blank14
                 // First column is for accession number
-                it.assayAnalysisValueList.each {
-                    values2.add(placeh2 + it.bioMarker.getValues() + it.analysisData.getValues())
-                    organism = it.bioMarker.organism
-                    orgIndex = orgString.indexOf(it.bioMarker.organism)
-                    if (orgIndex < 0) {
-                        if (orgString.length() > 0) {
+		for (AssayAnalysisValue aav in ar.assayAnalysisValueList) {
+		    values2 << [] + blank12 + aav.bioMarker.values + aav.analysisData.values
+		    organism = aav.bioMarker.organism
+		    if (!orgString.contains(aav.bioMarker.organism)) {
+			if (orgString) {
                             orgString += ', '
                         }
-                        orgString += it.bioMarker.organism
+			orgString += aav.bioMarker.organism
                     }
                 }
             }
-            experimentOrganisms.put(k.accession, orgString)
+	    experimentOrganisms[k.accession] = orgString
         }
 
-        sResult.result.expAnalysisResults.each() {
-            values1.add(it.experiment.getExpValues() + [experimentOrganisms.get(it.experiment.accession)])
+	List values1 = []
+	for (ExperimentAnalysisResult ear in sResult.result.expAnalysisResults) {
+	    values1 << ear.experiment.expValues + [experimentOrganisms[ear.experiment.accession]]
         }
 
-        sheet1 = new ExcelSheet('Experiments', headers1, values1)
-        sheet2 = new ExcelSheet('Analysis', headers2, values2)
-
-        def gen = new ExcelGenerator()
-
-        return gen.generateExcel([sheet1, sheet2])
+	new ExcelGenerator().generateExcel([new ExcelSheet('Experiments', headers7, values1),
+		                            new ExcelSheet('Analysis', headers8, values2)])
     }
 
     /**
@@ -193,55 +248,38 @@ class AnalysisDataExportService {
      *
      * @return a byte array containing the Excel workbook
      */
-    def createExcelEATEAView(SearchResult sResult) {
-        def ExcelSheet sheet1 = null
-        def ExcelSheet sheet2 = null
+    byte[] createExcelEATEAView(SearchResult sResult) {
 
-        def headers1 = ['Accession Number', 'Type', 'Title', 'Description', 'Design', 'Status', 'Overall Design', 'Start Date', 'Completion Date', 'Primary Investigator', 'Compounds', 'Diseases', 'Organisms']
-        def headers2 = ['Accession Number', 'TEA Score', 'Analysis Title', 'Analysis Description', 'p-Value Cut Off', 'Fold Change Cut Off', 'QA Criteria', 'Analysis Platform', 'Method', 'Data type', 'Compounds', 'Diseases', 'Bio Marker', 'Description', 'Organism', 'ProbeSet', 'Fold Change', 'RValue', 'p-Value', 'TEA p-Value', 'FDR p-Value', 'Rho-Value', 'Cut Value', 'Results Value', 'Numeric Value Code', 'Numeric Value']
+	List values1 = []
+	List values2 = []
 
-        def values1 = []
-        def values2 = []
-        def placeh2 = ['', '', '', '', '', '', '', '', '', '', '', '']
-        // Empty placeholder for analysis metadata
-        def placebm2 = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
-        // Empty placeholder for biomarkers
+	Set<Long> expIds = []
 
-        def expIDs = [] as Set
-        String orgString = ''
-        String organism = ''
-        int orgIndex = -1
+	TEABaseResult tbr = sResult.result.expAnalysisResults[0]
+	logger.info 'Number of Experiments: {}', tbr.expCount
 
-        def ear = sResult.result.expAnalysisResults[0]
-        logger.info('Number of Experiments: ' + ear.expCount)
-
-        ear.analysisResultList.each {
-            def experiment = Experiment.get(it.experimentId)
-            values2.add([experiment.accession] + [it.calcDisplayTEAScore()] + it.analysis.getValues() + [experiment.getCompoundNames()] + [experiment.getDiseaseNames()] + placebm2)
-            orgString = ''
-            it.assayAnalysisValueList.each {
-                values2.add(placeh2 + it.bioMarker.getValues() + it.analysisData.getValues())
-                organism = it.bioMarker.organism
-                orgIndex = orgString.indexOf(it.bioMarker.organism)
-                if (orgIndex < 0) {
-                    if (orgString.length() > 0) {
+	for (AnalysisResult ar in tbr.analysisResultList) {
+	    Experiment experiment = Experiment.get(ar.experimentId)
+	    values2 << [experiment.accession] + [ar.calcDisplayTEAScore()] + ar.analysis.values +
+		[experiment.compoundNames] + [experiment.diseaseNames] + blank14
+	    String orgString = ''
+	    for (AssayAnalysisValue aav in ar.assayAnalysisValueList) {
+		values2 << [] + [] + blank12 + aav.bioMarker.values + aav.analysisData.values
+		if (!orgString.contains(aav.bioMarker.organism)) {
+		    if (orgString) {
                         orgString += ', '
                     }
-                    orgString += it.bioMarker.organism
+		    orgString += aav.bioMarker.organism
                 }
             }
 
-            if (!expIDs.contains(experiment.id)) {
-                values1.add(experiment.getExpValues() + [orgString])
-                expIDs.add(experiment.id)
+	    if (!expIds.contains(experiment.id)) {
+		values1 << experiment.expValues + [orgString]
+		expIds << experiment.id
             }
         }
-        sheet1 = new ExcelSheet('Experiments', headers1, values1)
-        sheet2 = new ExcelSheet('Analysis', headers2, values2)
-
-        def gen = new ExcelGenerator()
-
-        return gen.generateExcel([sheet1, sheet2])
+	new ExcelGenerator().generateExcel([new ExcelSheet('Experiments', headers7, values1),
+		                            new ExcelSheet('Analysis', headers8, values2)])
     }
 
     /**
@@ -252,126 +290,85 @@ class AnalysisDataExportService {
      *
      * @return a byte array containing the Excel workbook
      */
-    def createExcelTrialStudyView(SearchResult sResult, Map trialMap) {
-        def ExcelSheet sheet1 = null
-        def ExcelSheet sheet2 = null
+    byte[] createExcelTrialStudyView(SearchResult sResult, Map<ClinicalTrial, List<AnalysisResult>> trialMap) {
 
-        def headers1 = ['Title', 'Trial Number', 'Owner', 'Description', 'Study Phase', 'Study Type', 'Study Design', 'Blinding procedure',
-                        'Duration of study (weeks)', 'Completion date', 'Inclusion Criteria', 'Exclusion Criteria', 'Dosing Regimen',
-                        'Type of Control', 'Gender restriction mfb', 'Group assignment', 'Primary endpoints', 'Secondary endpoints',
-                        'Route of administration', 'Secondary ids', 'Subjects', 'Max age', 'Min age', 'Number of patients', 'Number of sites', 'Compounds', 'Diseases', 'Organisms']
-        def headers2 = ['Trial Number', 'TEA Score', 'Analysis Title', 'Analysis Description', 'p-Value Cut Off', 'Fold Change Cut Off', 'QA Criteria', 'Analysis Platform', 'Method', 'Data type', 'Compounds', 'Diseases', 'Bio Marker', 'Description', 'Organism', 'ProbeSet', 'Fold Change', 'RValue', 'p-Value', 'TEA p-Value', 'FDR p-Value', 'Rho-Value', 'Cut Value', 'Results Value', 'Numeric Value Code', 'Numeric Value']
+	List values1 = []
+	List values2 = []
 
-        def values1 = []
-        def values2 = []
-        def placeh2 = ['', '', '', '', '', '', '', '', '', '', '', '']
-        // Empty placeholder for analysis metadata
-        def placebm2 = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']   // Empty placeholder for biomarkers
-
-        def trialOrganisms = [:]
-        String orgString = ''
+	Map<String, String> trialOrganisms = [:]
         String organism = ''
-        int orgIndex = -1
 
-        logger.info('Number of Trials: ' + sResult.result.expAnalysisResults.size())
+	logger.info 'Number of Trials: {}', sResult.result.expAnalysisResults.size()
 
-        trialMap.each { k, v ->
-            values2.add([k.trialNumber] + ['', '', '', '', '', '', '', '', ''] + [k.getCompoundNames()] + [k.getDiseaseNames()])
-            orgString = ''
-            logger.info('Trial Number: ' + k.trialNumber)
-            v.each {
-                values2.add([''] + [it.calcDisplayTEAScore()] + it.analysis.getValues() + placebm2)
+	trialMap.each { ClinicalTrial k, List<AnalysisResult> v ->
+	    values2 << [k.trialNumber] + blank9 + [k.compoundNames] + [k.diseaseNames]
+	    String orgString = ''
+	    logger.info 'Trial Number: {}', k.trialNumber
+	    for (AnalysisResult ar in v) {
+		values2 << [] + blank1 + [ar.calcDisplayTEAScore()] + ar.analysis.values + blank14
                 // First column is for accession number
-                it.assayAnalysisValueList.each {
-                    values2.add(placeh2 + it.bioMarker.getValues() + it.analysisData.getValues())
-                    organism = it.bioMarker.organism
-                    orgIndex = orgString.indexOf(it.bioMarker.organism)
-                    if (orgIndex < 0) {
-                        if (orgString.length() > 0) {
+		for (AssayAnalysisValue aav in ar.assayAnalysisValueList) {
+		    values2 << [] + blank12 + aav.bioMarker.values + aav.analysisData.values
+		    organism = aav.bioMarker.organism
+		    if (!orgString.contains(aav.bioMarker.organism)) {
+			if (orgString) {
                             orgString += ', '
                         }
-                        orgString += it.bioMarker.organism
+			orgString += aav.bioMarker.organism
                     }
                 }
             }
-            trialOrganisms.put(k.trialNumber, orgString)
+	    trialOrganisms[k.trialNumber] = orgString
         }
 
-        sResult.result.expAnalysisResults.each {
-            values1.add(it.trial.getValues() + [trialOrganisms.get(it.trial.trialNumber)])
+	for (TrialAnalysisResult tar in sResult.result.expAnalysisResults) {
+	    values1 << tar.trial.values + [trialOrganisms[tar.trial.trialNumber]]
         }
 
-        sheet1 = new ExcelSheet('Trials', headers1, values1)
-        sheet2 = new ExcelSheet('Analysis', headers2, values2)
-
-        def gen = new ExcelGenerator()
-
-        return gen.generateExcel([sheet1, sheet2])
+	new ExcelGenerator().generateExcel([new ExcelSheet('Trials', headers9, values1),
+		                            new ExcelSheet('Analysis', headers10, values2)])
     }
 
     /**
      * Create the Excel objects and pass the resulting byte array back to be fed to the
      * response output stream
      *
-     * @param sResult the search result
-     *
-     * @return a byte array containing the Excel workbook
+     * @return the Excel workbook
      */
-    def createExcelTrialTEAView(SearchResult sResult) {
-        def ExcelSheet sheet1 = null
-        def ExcelSheet sheet2 = null
+    byte[] createExcelTrialTEAView(SearchResult sResult) {
 
-        def headers1 = ['Title', 'Trial Number', 'Owner', 'Description', 'Study Phase', 'Study Type', 'Study Design', 'Blinding procedure',
-                        'Duration of study (weeks)', 'Completion date', 'Inclusion Criteria', 'Exclusion Criteria', 'Dosing Regimen',
-                        'Type of Control', 'Gender restriction mfb', 'Group assignment', 'Primary endpoints', 'Secondary endpoints',
-                        'Route of administration', 'Secondary ids', 'Subjects', 'Max age', 'Min age', 'Number of patients', 'Number of sites', 'Compounds', 'Diseases', 'Organisms']
-        def headers2 = ['Accession Number', 'TEA Score', 'Analysis Title', 'Analysis Description', 'p-Value Cut Off', 'Fold Change Cut Off', 'QA Criteria', 'Analysis Platform', 'Method', 'Data type', 'Compounds', 'Diseases', 'Bio Marker', 'Description', 'Organism', 'ProbeSet', 'Fold Change', 'RValue', 'p-Value', 'TEA p-Value', 'FDR p-Value', 'Rho-Value', 'Cut Value', 'Results Value', 'Numeric Value Code', 'Numeric Value']
+	List values1 = []
+	List values2 = []
 
-        def values1 = []
-        def values2 = []
-        def placeh2 = ['', '', '', '', '', '', '', '', '', '', '', '']
-        // Empty placeholder for analysis metadata
-        def placebm2 = ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
-        // Empty placeholder for biomarkers
+	Set<Long> trialIds = []
+	logger.info 'Number of Trials: {}', sResult.result.expCount
 
-        def trialIDs = [] as Set
-        String orgString = ''
-        String organism = ''
-        int orgIndex = -1
-        logger.info('Number of Trials: ' + sResult.result.expCount)
+	TEABaseResult tbr = sResult.result.expAnalysisResults[0]
 
-        def ear = sResult.result.expAnalysisResults[0]
-        def trialValues = []
-
-        ear.analysisResultList.each {
-            def experiment = Experiment.get(it.experimentId)
-            trialValues = it.experiment.getValues()
-            logger.info('Trial Number: ' + trialValues[1])
-            values2.add([trialValues[1]] + [it.calcDisplayTEAScore()] + it.analysis.getValues() + [experiment.getCompoundNames()] + [experiment.getDiseaseNames()] + placebm2)
-            orgString = ''
-            it.assayAnalysisValueList.each {
-                values2.add(placeh2 + it.bioMarker.getValues() + it.analysisData.getValues())
-                organism = it.bioMarker.organism
-                orgIndex = orgString.indexOf(it.bioMarker.organism)
-                if (orgIndex < 0) {
-                    if (orgString.length() > 0) {
+	for (AnalysisResult ar in tbr.analysisResultList) {
+	    Experiment experiment = Experiment.get(ar.experimentId)
+	    def trialValues = ar.experiment.values
+	    logger.info 'Trial Number: {}', trialValues[1]
+	    values2 << [trialValues[1]] + [ar.calcDisplayTEAScore()] + ar.analysis.values +
+		[experiment.compoundNames] + [experiment.diseaseNames] + blank14
+	    String orgString = ''
+	    for (AssayAnalysisValue aav in ar.assayAnalysisValueList) {
+		values2 << [] + blank12 + aav.bioMarker.values + aav.analysisData.values
+		if (!orgString.contains(aav.bioMarker.organism)) {
+		    if (orgString) {
                         orgString += ', '
                     }
-                    orgString += it.bioMarker.organism
+		    orgString += aav.bioMarker.organism
                 }
             }
 
-            if (!trialIDs.contains(experiment.expId)) {
-                values1.add(trialValues + [orgString])
-                trialIDs.add(experiment.expId)
+	    if (!trialIds.contains(experiment.expId)) {
+		values1 << trialValues + [orgString]
+		trialIds << experiment.expId
             }
         }
 
-        sheet1 = new ExcelSheet('Trials', headers1, values1)
-        sheet2 = new ExcelSheet('Analysis', headers2, values2)
-
-        def gen = new ExcelGenerator()
-
-        return gen.generateExcel([sheet1, sheet2])
+	new ExcelGenerator().generateExcel([new ExcelSheet('Trials', headers9, values1),
+		                            new ExcelSheet('Analysis', headers8, values2)])
     }
 }

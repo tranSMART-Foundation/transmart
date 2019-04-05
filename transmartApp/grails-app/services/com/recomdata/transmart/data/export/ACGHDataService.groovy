@@ -9,10 +9,13 @@ import org.transmartproject.core.dataquery.highdim.HighDimensionResource
 import org.transmartproject.core.dataquery.highdim.acgh.AcghValues
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
+import org.transmartproject.core.dataquery.highdim.projections.Projection
 
 import javax.annotation.PostConstruct
 
 class ACGHDataService {
+
+    static transactional = false
 
     HighDimensionResource highDimensionResourceService
     HighDimensionDataTypeResource<RegionRow> acghResource
@@ -25,30 +28,27 @@ class ACGHDataService {
         acghResource = highDimensionResourceService.getSubResourceForType 'acgh'
     }
 
-    def writeRegions(String study,
-                     File studyDir,
-                     String fileName,
-                     String jobName,
-                     resultInstanceId) {
-        def assayConstraints = [
-                acghResource.createAssayConstraint(
-                        AssayConstraint.TRIAL_NAME_CONSTRAINT,
-                        name: study),
-                acghResource.createAssayConstraint(
-                        AssayConstraint.PATIENT_SET_CONSTRAINT,
-                        result_instance_id: resultInstanceId as Long),
+    void writeRegions(String study, File studyDir, String fileName, String jobName, resultInstanceId) {
+	List<AssayConstraint> assayConstraints = [
+            acghResource.createAssayConstraint(
+                AssayConstraint.TRIAL_NAME_CONSTRAINT,
+                name: study),
+            acghResource.createAssayConstraint(
+                AssayConstraint.PATIENT_SET_CONSTRAINT,
+		result_instance_id: resultInstanceId as Long)
         ]
-        def projection = acghResource.createProjection([:], 'acgh_values')
 
-        def result,
-            writerUtil
+	Projection projection = acghResource.createProjection([:], 'acgh_values')
+
+	TabularResult result
+	FileWriterUtil writerUtil
 
         try {
             /* dataType == 'aCGH' => file created in a subdir w/ that name */
             writerUtil = new FileWriterUtil(studyDir, fileName, jobName, 'aCGH',
-                    null, '\t' as char)
-            result = acghResource.retrieveData assayConstraints, [], projection
-            doWithResult(result, writerUtil)
+					    null, '\t' as char)
+	    result = acghResource.retrieveData(assayConstraints, [], projection)
+	    doWithResult result, writerUtil
         }
         finally {
             writerUtil?.finishWriting()
@@ -57,18 +57,17 @@ class ACGHDataService {
     }
 
     @CompileStatic
-    private doWithResult(TabularResult<AssayColumn, RegionRow> regionResult,
-                         FileWriterUtil writerUtil) {
+    private doWithResult(TabularResult<AssayColumn, RegionRow> regionResult, FileWriterUtil writerUtil) {
 
         List<AssayColumn> assays = regionResult.indicesList
         String[] header = createHeader(assays)
         writerUtil.writeLine(header as String[])
 
-        def templateArray = new String[header.size() + 1]
+	String[] templateArray = new String[header.size() + 1]
         //+1 b/c 1st row has no header
-        Long i = 1; //for the first row
+	int i = 1 //for the first row
         for (Iterator<RegionRow> iterator = regionResult.rows; iterator.hasNext();) {
-            RegionRow row = (RegionRow) iterator.next()
+	    RegionRow row = iterator.next()
 
             String[] line = (String[]) templateArray.clone()
 
@@ -86,27 +85,27 @@ class ACGHDataService {
                 }
             }
 
-            writerUtil.writeLine(line)
+	    writerUtil.writeLine line
         }
     }
 
     private static final List<String> HEADER = ['chromosome', 'start', 'end', 'num.probes', 'cytoband'].asImmutable()
 
     private static final Map<String, Closure<AcghValues>> PER_ASSAY_COLUMNS = [
-			chip    : { AcghValues v -> v.getChipCopyNumberValue() },
-			flag    : { AcghValues v -> v.getCopyNumberState().getIntValue() },
-			probloss: { AcghValues v -> v.getProbabilityOfLoss() },
-			probnorm: { AcghValues v -> v.getProbabilityOfNormal() },
-			probgain: { AcghValues v -> v.getProbabilityOfGain() },
-			probamp : { AcghValues v -> v.getProbabilityOfAmplification() },
+	chip    : { AcghValues v -> v.getChipCopyNumberValue() },
+	flag    : { AcghValues v -> v.getCopyNumberState().getIntValue() },
+	probloss: { AcghValues v -> v.getProbabilityOfLoss() },
+	probnorm: { AcghValues v -> v.getProbabilityOfNormal() },
+	probgain: { AcghValues v -> v.getProbabilityOfGain() },
+	probamp : { AcghValues v -> v.getProbabilityOfAmplification() },
     ]
 
     private String[] createHeader(List<AssayColumn> assays) {
 	List<String> header = [] + HEADER
 	for (String head in PER_ASSAY_COLUMNS.keySet()) {
-		for (AssayColumn assay in assays) {
-			header << head + '.' + assay.patientInTrialId
-		}
+	    for (AssayColumn assay in assays) {
+		header << head + '.' + assay.patientInTrialId
+	    }
 	}
 
 	header as String[]

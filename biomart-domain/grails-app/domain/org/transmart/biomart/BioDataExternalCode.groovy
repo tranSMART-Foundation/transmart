@@ -16,34 +16,25 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioDataExternalCode {
-    Long id
     Long bioDataId
+    String bioDataType
     String code
     String codeSource
     String codeType
-    String bioDataType
+
     static mapping = {
-        table 'BIO_DATA_EXT_CODE'
+	table 'BIOMART.BIO_DATA_EXT_CODE'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_DATA_EXT_CODE_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_DATA_EXT_CODE_ID'
-            bioDataId column: 'BIO_DATA_ID'
-            code column: 'CODE'
-            codeSource column: 'CODE_SOURCE'
-            codeType column: 'CODE_TYPE'
-            bioDataType column: 'BIO_DATA_TYPE'
-        }
     }
+
     static constraints = {
-        code(maxSize: 500)
-        codeSource(nullable: true, maxSize: 400)
-        codeType(nullable: true, maxSize: 400)
-        bioDataType(nullable: true, maxSize: 100)
+	bioDataType nullable: true, maxSize: 100
+	code maxSize: 500
+	codeSource nullable: true, maxSize: 400
+	codeType nullable: true, maxSize: 400
     }
 }

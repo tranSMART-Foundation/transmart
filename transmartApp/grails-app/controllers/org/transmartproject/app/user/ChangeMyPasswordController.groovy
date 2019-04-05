@@ -1,77 +1,81 @@
 package org.transmartproject.app.user
 
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.validation.Validateable
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.MessageSource
 import org.springframework.web.servlet.support.RequestContextUtils
+import org.transmart.plugin.shared.SecurityService
 import org.transmart.searchapp.AuthUser
+import org.springframework.security.authentication.encoding.PasswordEncoder
 
 class ChangeMyPasswordController {
 
-    static Map allowedMethods = [save: 'POST']
+    static allowedMethods = [save: 'POST']
     static defaultAction = 'show'
 
-    def messageSource
-    def springSecurityService
+    @Autowired private MessageSource messageSource
+    @Autowired private SecurityService securityService
+    @Autowired private SpringSecurityService springSecurityService
 
-    def show = {}
+    def show() {}
 
     def save(ChangePasswordCommand command) {
         if (command.hasErrors()) {
             render(view: 'show', model: [command: command])
         }
         else {
-            AuthUser currentUser = springSecurityService.currentUser
+	    AuthUser currentUser = AuthUser.get(securityService.currentUserId())
             currentUser.passwd = springSecurityService.encodePassword(command.newPassword)
             currentUser.changePassword = false
             currentUser.save(flush: true)
 
             if (currentUser.hasErrors()) {
-                command.errors.reject('ChangePassword.couldNotSave')
-                render(view: 'show', model: [command: command])
+		command.errors.reject 'ChangePassword.couldNotSave'
+		render view: 'show', model: [command: command]
             }
             else {
                 flash.message = messageSource.getMessage('ChangePassword.savedSuccessfully',
-                        new Objects[0], RequestContextUtils.getLocale(request))
-                redirect(action: 'show')
+							 null, RequestContextUtils.getLocale(request))
+		redirect action: 'show'
             }
         }
     }
-
 }
 
 @Validateable
 class ChangePasswordCommand {
 
-    def grailsApplication
-    def springSecurityService
+    GrailsApplication grailsApplication
+    PasswordEncoder passwordEncoder
+    SpringSecurityService springSecurityService
 
     String oldPassword
     String newPassword
     String newPasswordRepeated
 
     static constraints = {
-
-        oldPassword(blank: false, validator: { oldPsw, thisCmd ->
-            if (!thisCmd.springSecurityService.passwordEncoder
-                    .isPasswordValid(thisCmd.springSecurityService.currentUser.getPersistentValue('passwd'), oldPsw, null)) {
+	oldPassword blank: false, validator: { String oldPassword, ChangePasswordCommand command ->
+	    if (!command.passwordEncoder.isPasswordValid(
+		command.springSecurityService.currentUser.getPersistentValue('passwd'), oldPassword, null)) {
                 'doesNotMatch'
             }
-        })
+	}
 
-        newPassword(blank: false,
-                validator: { newPsw, thisCmd ->
-            if (newPsw == thisCmd.oldPassword) {
+	newPassword blank: false, validator: { String newPassword, ChangePasswordCommand command ->
+	    if (newPassword == command.oldPassword) {
                 'hasToBeChanged'
-            } else if (thisCmd.grailsApplication.config.user.password.strength.regex.with { it && !(newPsw ==~ it)}) {
+	    }
+	    else if (command.grailsApplication.config.user.password.strength.regex.with { it && !(newPassword ==~ it) }) {
                 'lowPasswordStrength'
             }
-        })
+	}
 
-        newPasswordRepeated(blank: false, validator: { newPsw2, thisCmd ->
-            if (newPsw2 != thisCmd.newPassword) {
+	newPasswordRepeated blank: false, validator: { String newPassword2, ChangePasswordCommand command ->
+	    if (newPassword2 != command.newPassword) {
                 'doesNotEqual'
             }
-        })
-
+	}
     }
-
 }

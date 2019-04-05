@@ -108,7 +108,7 @@ class RScriptsSynchronizer {
         }
     }
 
-    /* the passed in OutputStrem will be closed */
+    /* the passed in OutputStream will be closed */
     private void createZip(OutputStream destinationStream) {
         ZipOutputStream zs = new ZipOutputStream(destinationStream, Charsets.UTF_8)
         try {

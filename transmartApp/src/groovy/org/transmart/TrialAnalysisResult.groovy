@@ -1,38 +1,36 @@
 package org.transmart
 
 import com.recomdata.tea.TEABaseResult
+import groovy.transform.CompileStatic
+import org.transmart.biomart.ClinicalTrial
+import org.transmart.biomart.ContentReference
 
 /**
- * $Id: TrialAnalysisResult.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
-public class TrialAnalysisResult extends TEABaseResult {
-    def trial
-    Long expCount
+@CompileStatic
+class TrialAnalysisResult extends TEABaseResult {
+    ClinicalTrial trial
 
-    def getProtocol() {
-        def file = null
-        for (cr in trial.files) {
+    ContentReference getProtocol() {
+	for (ContentReference cr in trial.files) {
             if (cr.type == 'Protocol') {
-                file = cr
+		return cr
             }
         }
-        return file
     }
 
-    def getFiles() {
-        def files = []
-        for (cr in trial.files) {
+    List<ContentReference> getFiles() {
+	List<ContentReference> files = []
+	for (ContentReference cr in trial.files) {
             if (cr.type != 'Protocol') {
-                files.add(cr)
+		files << cr
             }
         }
-        return files
+	files
     }
 
-    def hasResult() {
-        return analysisCount > 0
+    boolean hasResult() {
+	analysisCount
     }
-
 }

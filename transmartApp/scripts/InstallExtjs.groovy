@@ -11,7 +11,7 @@ jsDir = "${basedir}/web-app/js"
 extDir = "${jsDir}/ext"
 props = null
 
-includeTargets << new File('' + grailsHome + '/scripts/Init.groovy')
+includeTargets << new File("${grailsHome}/scripts/Init.groovy")
 
 target('default': "The description of the script goes here!") {
     depends(setup)
@@ -24,14 +24,14 @@ target(setup: "Sets up access to the Grails Config properties script") {
     props = Ant.antProject.properties
 }
 
-target(clean: 'Removes any previous versions') {
+target(clean: "Removes any previous versions") {
     Ant.delete(dir: "${extDir}")
 }
 
 target(install: "Installs the latest version of extjs into the scripts folder") {
     Ant.unzip(src: "${extjsFile}", dest: "$jsDir")
-    Ant.move(file: "${jsDir/ext-2.2", tofile: "${extDir}")
-    Ant.delete(dir: "${extDir/docs")
-    Ant.delete(dir: "${extDir/examples")
-    Ant.delete(dir: "${extDir/source")
+    Ant.move(file: "${jsDir}/ext-2.2", tofile: "${extDir}")
+    Ant.delete(dir: "${extDir}/docs")
+    Ant.delete(dir: "${extDir}/examples")
+    Ant.delete(dir: "${extDir}/source")
 }

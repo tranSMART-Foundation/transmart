@@ -1,14 +1,17 @@
 package org.transmartfoundation.status
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class GwavaStatus {
 
-    def url
-    def connected
-    def lastProbe
-    def enabled
-    def errorMessage
+    String url
+    boolean connected
+    Date lastProbe
+    boolean enabled
+    String errorMessage
 
     String toString() {
-        return "GwavaStatus (" + url + ") - probe at: " + lastProbe
+	'GwavaStatus (' + url + ') - probe at: ' + lastProbe
     }
 }

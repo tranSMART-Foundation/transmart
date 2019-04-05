@@ -16,36 +16,23 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.searchapp
 
-/**
- * domain class for gene signature file schemas
- */
 class GeneSignatureFileSchema {
-    Long id
-    String name
     String description
+    String name
     Long numberColumns
     boolean supported
 
     static mapping = {
-        table 'SEARCH_GENE_SIG_FILE_SCHEMA'
+	table 'SEARCHAPP.SEARCH_GENE_SIG_FILE_SCHEMA'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID'], column: 'SEARCH_GENE_SIG_FILE_SCHEMA_ID'
         version false
         cache usage: 'read-only'
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            id column: 'SEARCH_GENE_SIG_FILE_SCHEMA_ID'
-            name column: 'NAME'
-            description column: 'DESCRIPTION'
-            numberColumns column: 'NUMBER_COLUMNS'
-            supported column: 'SUPPORTED'
-        }
     }
 
     static constraints = {
-        name(maxSize: 100)
-        description(nullable: true, maxSize: 255)
+	description nullable: true
+	name maxSize: 100
     }
 }

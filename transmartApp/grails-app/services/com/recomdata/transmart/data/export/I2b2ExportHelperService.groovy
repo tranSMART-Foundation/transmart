@@ -1,34 +1,36 @@
 package com.recomdata.transmart.data.export
 
+import groovy.sql.Sql
+
+import javax.sql.DataSource
+
 import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
 
 class I2b2ExportHelperService {
 
     static transactional = false
-    def dataSource
 
+    DataSource dataSource
 
-    def findStudyAccessions(result_instance_ids) {
+    List<String> findStudyAccessions(result_instance_ids) {
         checkQueryResultAccess(*(result_instance_ids as List))
 
         def rids = []
         for (r in result_instance_ids) {
-            if (r?.trim()?.length() > 0) {
-                rids.add('CAST(' + r + ' AS numeric)')
+	    if (r?.trim()) {
+		rids << 'CAST(' + r + ' AS numeric)'
             }
         }
 
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        StringBuilder sqltb = new StringBuilder('select DISTINCT b.TRIAL FROM i2b2demodata.QT_PATIENT_SET_COLLECTION a ').
-                append('INNER JOIN i2b2demodata.PATIENT_TRIAL b').
-                append(' ON a.PATIENT_NUM=b.PATIENT_NUM WHERE RESULT_INSTANCE_ID IN(').
-                append(rids.join(', ')).append(')')
-        def trials = []
-        sql.eachRow(sqltb.toString(),
-                { row ->
-                    trials.add(row.TRIAL)
-                }
-        )
-        return trials
+	String sql = '''
+			select DISTINCT b.TRIAL
+			FROM i2b2demodata.QT_PATIENT_SET_COLLECTION a
+			INNER JOIN i2b2demodata.PATIENT_TRIAL b ON a.PATIENT_NUM=b.PATIENT_NUM
+			WHERE RESULT_INSTANCE_ID IN(''' + rids.join(", ") + ')'
+	List<String> trials = []
+	new Sql(dataSource).eachRow sql, { row ->
+	    trials << row.TRIAL
+        }
+	trials
     }
 }

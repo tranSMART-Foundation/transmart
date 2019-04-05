@@ -16,24 +16,16 @@
 *
 *
 ******************************************************************/
- 
-
 package com.recomdata.transmart.domain.searchapp
 
-
 class ReportItem {
-	   Long id
-	   String code
+    String code
 	   
-	   static belongsTo = [report: Report]
+    static belongsTo = [report: Report]
 	   
-static mapping = {
+    static mapping = {
 	table 'SEARCHAPP.REPORT_ITEM'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'REPORT_ITEM_ID'
 	version false
-	id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
-	columns {
-	      id column:'REPORT_ITEM_ID'
-		  code column:'CODE'
-	   }
-   }
+    }
 }

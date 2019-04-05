@@ -16,27 +16,17 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioDataAttribute {
-    Long id
-    String propertyCode
-    String propertyValue
-    String propertyUnit
     Long bioDataId
-    static mapping = {
-        table 'BIO_DATA_ATTRIBUTE'
-        version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_DATA_ATTRIBUTE_ID'
-            propertyCode column: 'PROPERTY_CODE'
-            propertyValue column: 'PROPERTY_VALUE'
-            propertyUnit column: 'PROPERTY_UNIT'
-            bioDataId column: 'BIO_DATA_ID'
-        }
-    }
+    String propertyCode
+    String propertyUnit
+    String propertyValue
 
+    static mapping = {
+	table 'BIOMART.BIO_DATA_ATTRIBUTE'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_DATA_ATTRIBUTE_ID'
+        version false
+    }
 }

@@ -1,116 +1,116 @@
 package xnat.plugin
-import groovy.json.*
 
-class ScanController {
+import grails.util.Metadata
+import groovy.json.JsonSlurper
+import org.springframework.beans.factory.InitializingBean
 
-    def ScanService
-    def SubjectService
+class ScanController implements InitializingBean {
 
-    def index = {
-    }
+    private String appName
 
-    def getAPIListData = {
-            Subject subject = new Subject()
-            subject.tranSMART_subjectID = params.subjectID
-            subject.xnat_subjectID = SubjectService.getXnatID(subject.tranSMART_subjectID)
-            subject.xnat_project = SubjectService.getXnatProject(subject.tranSMART_subjectID)
-//            println(subject.xnat_subjectID)
+    ScanService scanService
+    SubjectService subjectService
 
-            String sessionString = 'https://'+ ScanService.getDomain() + '/data/projects/' + subject.xnat_project + '/subjects/'+subject.xnat_subjectID+'/experiments?format=json'
-            def sessionURL = sessionString.toURL().text
-            def sessionJSON = new JsonSlurper().parseText(sessionURL)
+    def index() {}
 
-            int numSessions = sessionJSON.ResultSet.totalRecords.toInteger()
+    def getAPIListData(String subjectID) {
+	Subject subject = new Subject(
+	    transmartSubjectId: subjectID,
+	    xnatSubjectId: subjectService.getXnatID(subjectID),
+	    xnatProject: subjectService.getXnatProject(subjectID))
 
-            for (int i = 0; i < numSessions; i++) {
-                Session s = new Session()
-                s.sessionID = sessionJSON.ResultSet.Result[i].ID
+	String sessionString = 'https://' + scanService.domain + '/data/projects/' + subject.xnatProject +
+	    '/subjects/' + subject.xnatSubjectId + '/experiments?format=json'
+	String sessionUrl = sessionString.toURL().text
+	def sessionJSON = new JsonSlurper().parseText(sessionUrl)
 
-                String scanString = 'https://'+ ScanService.getDomain() + '/data/experiments/'+s.sessionID+'/scans?format=json'
-                def scanURL = scanString.toURL().text
-                def scanJSON = new JsonSlurper().parseText(scanURL)
+        int numSessions = sessionJSON.ResultSet.totalRecords.toInteger()
 
-                int numScans = scanJSON.ResultSet.totalRecords.toInteger()
+        for (int i = 0; i < numSessions; i++) {
+	    Session s = new Session(sessionID: sessionJSON.ResultSet.Result[i].ID)
 
-                for (int j = 0; j < numScans; j++) {
-                    Scan aScan = new Scan()
-                    aScan.sessionID = s.sessionID
-                    aScan.scanID = scanJSON.ResultSet.Result[j].ID
-                    aScan.seriesDesc = scanJSON.ResultSet.Result[j].series_description
+	    String scanString = 'https://' + scanService.domain + '/data/experiments/' + s.sessionID + '/scans?format=json'
+	    def scanJSON = new JsonSlurper().parseText(scanString.toURL().text)
 
-                    String resourceString = 'https://'+ ScanService.getDomain() + scanJSON.ResultSet.Result[j].URI+'/resources?format=json'
-                    def resourceURL = resourceString.toURL().text
-                    def resourceJSON = new JsonSlurper().parseText(resourceURL)
-                    //println(resourceJSON)
-                    int numResources = resourceJSON.ResultSet.totalRecords.toInteger()
+            int numScans = scanJSON.ResultSet.totalRecords.toInteger()
 
-                    for (int k = 0; k < numResources; k++) {
-                        if (resourceJSON.ResultSet.Result[k].format == 'GIF') {
-                            //println(resourceJSON.ResultSet.Result[k].xnat_abstractresource_id)
-                            Snapshot newSnap = new Snapshot()
-                            newSnap.resourceID = resourceJSON.ResultSet.Result[k].xnat_abstractresource_id
-                            //println(scanJSON.ResultSet.Result[j].URI)
-                            String thumbnailString = 'https://'+ ScanService.getDomain() + scanJSON.ResultSet.Result[j].URI+'/resources/'+newSnap.resourceID+'/files?format=json'
-                            def thumbnailURL = thumbnailString.toURL().text
-                            def thumbnailJSON = new JsonSlurper().parseText(thumbnailURL)
-//                            println('thumbnail:'+thumbnailURL)
+            for (int j = 0; j < numScans; j++) {
+		Scan scan = new Scan(
+		    sessionID: s.sessionID,
+		    scanID: scanJSON.ResultSet.Result[j].ID,
+		    seriesDesc: scanJSON.ResultSet.Result[j].series_description)
 
-                            if (thumbnailJSON.ResultSet != null) {
-                                def numThumbnails = thumbnailJSON.ResultSet.Result[0].URI
-                                if (numThumbnails!=null) {
-                                    newSnap.fileName = thumbnailJSON.ResultSet.Result[0].URI
-                                    //println(thumbnailJSON.ResultSet.Result[0].URI)
-//                                    println('Nap:'+newSnap.fileName)
-                                    aScan.snapshots.add(newSnap)
-                                }
+		String resourceString = 'https://' + scanService.domain + scanJSON.ResultSet.Result[j].URI + '/resources?format=json'
+		def resourceJSON = new JsonSlurper().parseText(resourceString.toURL().text)
+                int numResources = resourceJSON.ResultSet.totalRecords.toInteger()
+
+                for (int k = 0; k < numResources; k++) {
+                    if (resourceJSON.ResultSet.Result[k].format == 'GIF') {
+			Snapshot newSnap = new Snapshot(resourceID: resourceJSON.ResultSet.Result[k].xnat_abstractresource_id)
+			String thumbnailString = 'https://' + scanService.domain + scanJSON.ResultSet.Result[j].URI +
+			    '/resources/' + newSnap.resourceID + '/files?format=json'
+			def thumbnailJSON = new JsonSlurper().parseText(thumbnailString.toURL().text)
+
+                        if (thumbnailJSON.ResultSet != null) {
+                            def numThumbnails = thumbnailJSON.ResultSet.Result[0].URI
+                            if (numThumbnails!=null) {
+                                newSnap.fileName = thumbnailJSON.ResultSet.Result[0].URI
+				scan.snapshots << newSnap
                             }
                         }
                     }
-
-                    s.scans.add(aScan)
-
                 }
-                s.subjectID = params.subjectID
-                s.sessionName = sessionJSON.ResultSet.Result[i].label
-                subject.sessions.add(s)
+
+		s.scans << scan
             }
-
-            String jsonFile = '['
-            Iterator newSessionIter = subject.sessions.iterator()
-
-            while (newSessionIter.hasNext()) {
-                Session aSession = newSessionIter.next()
-                jsonFile += '{"name":"'+aSession.sessionName+'",'
-                Iterator newScanIter = aSession.scans.iterator().iterator()
-                jsonFile += '"scans":['
-                while (newScanIter.hasNext()) {
-                    Scan aScan = newScanIter.next()
-
-                    jsonFile += '{"id":"'+aScan.scanID+'",'
-                    jsonFile += '"series":"'+aScan.seriesDesc+'",'
-                    Iterator snapIter = aScan.snapshots.iterator()
-                    while (snapIter.hasNext()) {
-                        Snapshot aSnapshot = snapIter.next()
-                        jsonFile += '"info":"'+ '/'+ grails.util.Metadata.current.'app.name' + '/xnat/info?url=' +  ScanService.generateInfoURL(aSession.sessionID, aScan.scanID) +'",'
-                        jsonFile += '"thumbnail":"'+'/'+ grails.util.Metadata.current.'app.name' + '/xnat/image?url='+ ScanService.generateThumbnailURL(aSession.sessionID, aScan.scanID, aSnapshot.resourceID, aSnapshot.fileName) +'",'
-                    }
-                    jsonFile += '"download":"'+'/'+ grails.util.Metadata.current.'app.name' + '/xnat/download?url=' + ScanService.generateDownloadURL(aSession.sessionID, aScan.scanID)
-                    jsonFile +='"}'
-                    if (newScanIter.hasNext()) {
-                        jsonFile +=','
-                    }
-
-                }
-                jsonFile +=']}'
-                if (newSessionIter.hasNext()){
-                    jsonFile +=','
-                }
-            }
-            jsonFile +=']'
-
-//            System.out.print(jsonFile)
-            response.setContentType('application/json')
-            render jsonFile
+	    s.subjectID = subjectID
+            s.sessionName = sessionJSON.ResultSet.Result[i].label
+	    subject.sessions << s
         }
 
+	StringBuilder jsonFile = new StringBuilder('[')
+        Iterator newSessionIter = subject.sessions.iterator()
+
+        while (newSessionIter.hasNext()) {
+	    Session session = newSessionIter.next()
+	    jsonFile << '{"name":"' << session.sessionName << '",'
+	    jsonFile << '"scans":['
+
+	    Iterator newScanIter = session.scans.iterator().iterator()
+            while (newScanIter.hasNext()) {
+		Scan scan = newScanIter.next()
+
+		jsonFile << '{"id":"' << scan.scanID << '",'
+		jsonFile << '"series":"' << scan.seriesDesc << '",'
+
+		Iterator snapIter = scan.snapshots.iterator()
+                while (snapIter.hasNext()) {
+		    Snapshot snapshot = snapIter.next()
+		    jsonFile << '"info":"' << "/" << appName << "/xnat/info?url=" <<
+			scanService.generateInfoUrl(session.sessionID, scan.scanID) << '",'
+		    jsonFile << '"thumbnail":"' << "/" << appName << "/xnat/image?url=" <<
+			scanService.generateThumbnailUrl(snapshot.fileName) << '",'
+		}
+		jsonFile << '"download":"' << "/" << appName << "/xnat/download?url=" <<
+		    scanService.generateDownloadUrl(session.sessionID, scan.scanID)
+		jsonFile << '"}'
+                if (newScanIter.hasNext()) {
+		    jsonFile << ','
+                }
+            }
+
+	    jsonFile << ']}'
+            if (newSessionIter.hasNext()){
+		jsonFile << ','
+            }
+        }
+	jsonFile << ']'
+
+	response.contentType = 'application/json'
+	render jsonFile.toString()
+    }
+
+    void afterPropertiesSet() {
+	appName = Metadata.current.'app.name'
+    }
 }

@@ -1,17 +1,16 @@
 package org.transmartfoundation.status
 
+import org.springframework.beans.factory.annotation.Autowired
+
 class StatusInfoController {
 
-    SolrStatusService solrStatusService
-    RserveStatusService rserveStatusService
-    GwavaStatusService gwavaStatusService
+    @Autowired private SolrStatusService solrStatusService
+    @Autowired private RserveStatusService rserveStatusService
+    @Autowired private GwavaStatusService gwavaStatusService
 
     def index() {
-
-        SolrStatus solrStatus = solrStatusService.getStatus()
-        RserveStatus rserveStatus = rserveStatusService.getStatus()
-        GwavaStatus gwavaStatus = gwavaStatusService.getStatus()
-
-        [solrStatus: solrStatus, rserveStatus: rserveStatus, gwavaStatus: gwavaStatus]
+	[solrStatus: solrStatusService.status,
+	 rserveStatus: rserveStatusService.status,
+	 gwavaStatus: gwavaStatusService.status]
     }
 }

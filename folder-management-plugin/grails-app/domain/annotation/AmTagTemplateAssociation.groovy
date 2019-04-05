@@ -2,21 +2,18 @@ package annotation
 
 class AmTagTemplateAssociation {
 
-    Long id
-    Long tagTemplateId
     String objectUid
+    Long tagTemplateId
 
     static mapping = {
-        table 'am_tag_template_association'
+	table 'AMAPP.am_tag_template_association'
+	id generator: 'sequence', params: [sequence: 'AMAPP.SEQ_AMAPP_DATA_ID']
         version false
         cache true
         sort 'value'
-        id generator: 'sequence', params: [sequence: 'AMAPP.SEQ_AMAPP_DATA_ID']
-//		columns { id column:'tag_value_id' }
     }
 
     static constraints = {
-        objectUid(maxSize: 200)
+	objectUid maxSize: 200
     }
-
 }

@@ -2,457 +2,278 @@ package com.recomdata.transmart.data.export
 
 import de.DeVariantDataSet
 import de.DeVariantSubjectDetail
+import groovy.sql.Sql
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
+import javax.sql.DataSource
 
 import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
 
+@CompileStatic
 @Slf4j('logger')
 class VcfDataService {
-    boolean transactional = false
 
-    def snpRefDataService
-    def dataSource
-    def VCF_V4_1_HEADER_LINE = '#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT'
+    private static final String VCF_V4_1_HEADER_LINE = '#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT'
 
-    def boolean getDataAsFile(
-            String outputDir,
-            String jobName,
-            List studyList,
-            String resultInstanceId1,
-            //String resultInstanceId2,
-            String selectedSNPs,
-            String selectedGenes,
-            String selectedChromosomes,
-            String subjectPrefix) {
+    static transactional = false
 
-        def rsList = []
-        def chrList = []
-        def geneNameList = []
-        // create query to find gene to snps
-        if (selectedGenes != null && selectedGenes.trim().length() > 0) {
-            // ToDo- parse gene list
-            //def geneList = parseGeneList(selectedGenes)
-            //	def geneList = parseGeneList(['BRCA1'])
-            List<Long> geneSearchIdList = new ArrayList<Long>()
+    SnpRefDataService snpRefDataService
+    DataSource dataSource
 
-            if (selectedGenes != null && selectedGenes.length() != 0) {
+    boolean getDataAsFile(String outputDir, String jobName, List studyList, String resultInstanceId1,
+	                  String selectedSNPs, String selectedGenes, String selectedChromosomes, String subjectPrefix) {
 
-                geneNameList = parseGeneList(selectedGenes, null, geneSearchIdList)
-                //println(selectedGenes)
-                //println(geneNameList)
-
-                rsList.addAll(snpRefDataService.findRsIdByGeneNames(geneNameList))
-            }
-
+	List<String> rsList = []
+	List<String> chrList = []
+	List<String> geneNameList = []
+	if (selectedGenes?.trim()) {
+	    // ToDo- parse gene list
+	    //def geneList = parseGeneList(selectedGenes)
+	    //	def geneList = parseGeneList(['BRCA1'])
+	    List<Long> geneSearchIdList = []
+	    geneNameList = parseGeneList(selectedGenes, geneSearchIdList)
+	    rsList.addAll snpRefDataService.findRsIdByGeneNames(geneNameList)
         }
 
         // create query to find snps
-        if (selectedSNPs != null && selectedSNPs.trim().length() > 0) {
-            rsList.addAll(parseRsList(selectedSNPs))
+	if (selectedSNPs?.trim()) {
+	    rsList.addAll parseRsList(selectedSNPs)
         }
 
-        if (selectedChromosomes != null && 'ALL' != selectedChromosomes) {
-            chrList.addAll(parseChrList(selectedChromosomes))
+	if (selectedChromosomes && 'ALL' != selectedChromosomes) {
+	    chrList.addAll parseChrList(selectedChromosomes)
         }
 
-        // locate dataset
-
-        def datasets = findDataset(resultInstanceId1, null)
+	List<String> datasets = findDataset(resultInstanceId1)
 
         // locate and retrieve variant
 
-        def variants = retrieveVariantDetail(rsList, chrList, datasets)
+	List<DeVariantSubjectDetail> variants = retrieveVariantDetail(rsList, chrList, datasets)
 
-        def dsSubjectIdxMap = [:]
-        def dsSubHeaderColMap = [:]
+	Map<String, List<Integer>> dsSubjectIdxMap = [:]
+	Map<String, List<String>> dsSubHeaderColMap = [:]
         // create subset 1 subject id query
 
-        def s1 = [:]
-        if (resultInstanceId1 != null)
+	Map<String, Map<String, Integer>> s1 = [:]
+	if (resultInstanceId1 != null) {
             s1 = findSubjectIdx(resultInstanceId1)
-
-        // create subset 2 subject id query
-
-        def s2 = [:]
-        //	if(resultInstanceId2!=null) {
-        //		s2= findSubjectIdx(resultInstanceId2)
-        //	}
-        // create vcf sample and header list by dataset id
-        // each dataset has a vcf file
-        s1.each { k, v ->
-            if (dsSubjectIdxMap.get(k) == null) {
-                dsSubjectIdxMap.put(k, [])
-                dsSubHeaderColMap.put(k, [])
-            }
-            v.each { key, value ->
-                dsSubjectIdxMap.get(k).add(value)
-                // construct key
-                dsSubHeaderColMap.get(k).add(subjectPrefix + '_' + key)
-            }
         }
-        // s2
-        s2.each { k, v ->
-            if (dsSubjectIdxMap.get(k) == null) {
-                dsSubjectIdxMap.put(k, [])
-                dsSubHeaderColMap.put(k, [])
+
+	// create vcf sample and header list by dataset id; each dataset has a vcf file
+	s1.each { String k, Map<String, Integer> v ->
+	    if (dsSubjectIdxMap[k] == null) {
+		dsSubjectIdxMap[k] = []
+		dsSubHeaderColMap[k] = []
             }
-            v.each { key, value ->
-                dsSubjectIdxMap.get(k).add(value)
+	    v.each { String key, int value ->
+		dsSubjectIdxMap[k] << value
                 // construct key
-                dsSubHeaderColMap.get(k).add(subjectPrefix + key)
+		dsSubHeaderColMap[k] << subjectPrefix + '_' + key
             }
         }
 
         // construct VCFdata file
-        def vsnpset = constructVCFfile(variants, datasets, dsSubjectIdxMap, dsSubHeaderColMap, outputDir, jobName, subjectPrefix)
-        println(vsnpset)
-        constructVCFParamFile(outputDir, geneNameList, new ArrayList(vsnpset), chrList, jobName)
+	constructVCFfile variants, datasets, dsSubjectIdxMap, dsSubHeaderColMap, outputDir, jobName, subjectPrefix
+	constructVCFParamFile outputDir, geneNameList, chrList, jobName
 
-
-        return true
+	true
     }
 
-    def constructVCFParamFile(
-            outputDir,
-            geneNameList,
-            rsList,
-            chrList,
-            jobName) {
+    private void constructVCFParamFile(String outputDir, List<String> geneNameList, List<String> chrList, String jobName) {
         // create a filter file so that we can get the right params
-        def pfile = null
-        def pfilewriter = null
+	Writer writer
         try {
-            pfile = new File(outputDir + File.separator + jobName + '_vcf.params')
-            //println('writing file:'+pfile.getAbsolutePath())
-
-            pfilewriter = pfile.newWriter()
+	    writer = new File(outputDir, jobName + '_vcf.params').newWriter()
             // if there is a gene use the first gene
-            if (geneNameList != null && !geneNameList.isEmpty()) {
-                pfilewriter.writeLine('Gene=' + geneNameList[0])
-
+	    if (geneNameList) {
+		writer.writeLine 'Gene=' + geneNameList[0]
             }
-            if (chrList != null && !chrList.isEmpty()) {
-                pfilewriter.writeLine('Chr=' + 'chr' + chrList[0])
+	    if (chrList) {
+		writer.writeLine 'Chr=' + 'chr' + chrList[0]
             }
-
-            if (rsList != null && !rsList.isEmpty()) {
-
-                //println(rsList)
-                def nrsid = rsList[0].trim().toLowerCase()
-                if (!nrsid.startsWith('rs')) {
-                    nrsid = 'rs' + nrsid
-                }
-                //	println('rsid:'+nrsid)
-                def result = DeVariantSubjectDetail.executeQuery('SELECT d.chromosome, d.position FROM DeVariantSubjectDetail d WHERE d.rsID =?', nrsid)
-                def chr = null
-                def pos = null
-                if (result != null) {
-                    chr = result[0][0]
-                    pos = result[0][1]
-
-                    def spos = pos - 50
-                    def epos = pos + 50
-
-                    pfilewriter.writeLine('SNP=' + 'chr' + chr + ':' + spos + '-' + epos)
-                }
-            }
-
-
         }
-        catch (Exception e) {
-            logger.error(e.getMessage(), e)
-
+	catch (e) {
+	    logger.error e.message, e
         }
         finally {
-            if (pfilewriter != null) {
-                pfilewriter.flush()
-                pfilewriter.close()
-            }
+	    writer?.flush()
+	    writer?.close()
         }
     }
 
     /**
      * construct multiple VCF files - each dataset has a file
-     * @param variants
-     * @param datasetIds
-     * @param dsSubjectIdxMap
-     * @param dsSubHeaderColMap
-     * @param outputDir
-     * @param jobName
-     * @return
      */
-    def constructVCFfile(variants,
-                         datasetIds,
-                         dsSubjectIdxMap,
-                         dsSubHeaderColMap,
-                         outputDir,
-                         jobName,
-                         subjectPrefix) {
+    private void constructVCFfile(List<DeVariantSubjectDetail> variants, List<String> datasetIds, Map<String, List<Integer>> dsSubjectIdxMap, Map<String, List<String>> dsSubHeaderColMap, String outputDir, String jobName, String subjectPrefix) {
 
-        Set vsnpSet = new HashSet()
         // create writers, each dataset get a writer
-        def dsWriterMap = [:]
+	Map<String, BufferedWriter> dsWriterMap = [:]
         // each dataset has a new files
-        datasetIds.each {
-            def nfile = new File(outputDir + File.separator + jobName + '_' + it + '_' + subjectPrefix + '.vcf')
-            logger.debug('writing data file for dataset:' + it + ' at :' + nfile.getAbsolutePath())
+	for (String id in datasetIds) {
+	    File file = new File(outputDir, jobName + '_' + id + '_' + subjectPrefix + '.vcf')
+	    logger.debug 'writing data file for dataset:{} at :{}', id, file.absolutePath
 
-            def nwriter = nfile.newWriter()
-            dsWriterMap.put(it, nwriter)
+	    BufferedWriter writer = file.newWriter()
+	    dsWriterMap[id] = writer
             // write metadata and header
-            def dsMetadata = DeVariantDataSet.get(it)
-            // metadata
-
-            nwriter.write(dsMetadata.metadata)
+	    writer.write DeVariantDataSet.get(id).metadata
             // header
 
-            StringBuilder s = new StringBuilder(VCF_V4_1_HEADER_LINE)
-            //		println('header:'+dsSubHeaderColMap.get(it))
-            def dheader = dsSubHeaderColMap.get(it)
-            dheader.each {
-                s.append('\t')
-                s.append(it)
+	    StringBuilder sb = new StringBuilder(VCF_V4_1_HEADER_LINE)
+	    for (String s in dsSubHeaderColMap[id]) {
+		sb << '\t' << s
             }
-            nwriter.writeLine(s.toString())
-            nwriter.flush()
-
-
+	    writer.writeLine sb.toString()
+	    writer.flush()
         }
-        // loop through variant data and use the dataset writer to output data
 
-        println('variant length:' + variants.size())
-        variants.each {
+	// loop through variant data and use the dataset writer to output data
 
+	for (DeVariantSubjectDetail v in variants) {
             StringBuilder variant = new StringBuilder()
 
-            variant.append(it.chromosome).append('\t')
-            variant.append(it.position).append('\t')
-            variant.append(it.rsID).append('\t')
-            variant.append(it.ref).append('\t')
-            variant.append(it.alt).append('\t')
-            variant.append(it.quality).append('\t')
-            variant.append(it.filter).append('\t')
-            variant.append(it.info).append('\t')
-            variant.append(it.format)
-
-            vsnpSet.add(it.rsID)
-
-            String value = it.variant
+	    variant << v.chromosome << '\t'
+	    variant << v.position << '\t'
+	    variant << v.rsID << '\t'
+	    variant << v.ref << '\t'
+	    variant << v.alt << '\t'
+	    variant << v.quality << '\t'
+	    variant << v.filter << '\t'
+	    variant << v.info << '\t'
+	    variant << v.format
 
             // using a split to get the value in array by tab
-            String[] valueArray = value.split('\\t')
-            def total = valueArray.length
-            //println('totalvalue:'+total)
-            //	println(valueArray)
-            def indexList = dsSubjectIdxMap.get(it.dataset)
+	    String[] valueArray = v.variant.split('\\t')
+	    int total = valueArray.length
+	    List<Integer> indexList = dsSubjectIdxMap[v.dataset]
             // 1 based index list
 
-
-            indexList.each {
-                int idx = it - 1
+	    for (int i in indexList) {
+		int idx = i - 1
                 if (idx <= total) {
-                    //println(it)
-                    variant.append('\t').append(valueArray[idx])
-                    //	println(valueArray[idx])
+		    variant << '\t' << valueArray[idx]
                 }
                 else {
-                    throw new Exception('variant size :' + total + ' do not match variant index:' + it)
+		    throw new Exception('variant size :' + total + ' do not match variant index:' + i)
                 }
             }
-            //variant.append(value)
-            dsWriterMap.get(it.dataset).writeLine(variant.toString())
-
-
+	    dsWriterMap[v.dataset].writeLine variant.toString()
         }
-        dsWriterMap.values().each {
+
+	for (Writer w in dsWriterMap.values()) {
             try {
-                it.flush()
-                it.close()
+		w.flush()
+		w.close()
             }
-            catch (Exception e) {
-                logger.error(e.getMessage(), e)
-            }
-
+	    catch (e) {
+		logger.error e.message, e
+	    }
         }
-        return vsnpSet
-
     }
 
     /**
      * retrieve variant by rsid, chr and dataset. dataset is required
-     * @param rsList
-     * @param chrList
-     * @param dataset
-     * @return
      */
-    def retrieveVariantDetail(rsList, chrList, datasetList) {
-        String query = 'FROM DeVariantSubjectDetail dvd WHERE dvd.dataset IN (:ds) '
-        def vmap = [:]
-        vmap.put('ds', datasetList)
+    private List<DeVariantSubjectDetail> retrieveVariantDetail(List<String> rsList, List<String> chrList, List<String> datasetList) {
+	String hql = 'FROM DeVariantSubjectDetail dvd WHERE dvd.dataset IN (:ds) '
+	Map params = [ds: datasetList]
 
-        //	println('Rs:'+rsList)
-        //	println('CHR:'+chrList)
-
-        if (!rsList.isEmpty()) {
-            query += ' AND dvd.rsID IN (:rsids) ' // this could be an issue for more than 1000 rs ids
-            vmap.put('rsids', rsList)
+	if (rsList) {
+	    hql += ' AND dvd.rsID IN (:rsids) ' // this could be an issue for more than 1000 rs ids
+	    params.rsids = rsList
         }
 
-        if (!chrList.isEmpty()) {
-
-            query += ' AND dvd.chromosome IN (:chrNums) '
-            vmap.put('chrNums', chrList)
+	if (chrList) {
+	    hql += ' AND dvd.chromosome IN (:chrNums) '
+	    params.chrNums = chrList
         }
-        query += ' ORDER BY dvd.chromosome, dvd.position'
+	hql += ' ORDER BY dvd.chromosome, dvd.position'
 
-        return DeVariantSubjectDetail.findAll(query, vmap)
-
+	DeVariantSubjectDetail.findAll hql, params
     }
 
-    /**
-     * parse rsids
-     * @param rsIds
-     * @return
-     */
-    def parseRsList(String rsIds) {
-        //def rsList = []
-        String[] rsidArray = rsIds.split(',')
-        def rsList = []
-        for (int i = 0; i < rsidArray.length; i++) {
-            rsList.add(rsidArray[i].trim())
-        }
-
-        return rsList
+    private List<String> parseRsList(String rsIds) {
+	rsIds.split(',')*.trim()
     }
 
-    /**
-     * parse chromosome
-     */
-    def parseChrList(String chrs) {
-        def chrList = []
-        chrList.add(chrs)
-        return chrList
+    private List<String> parseChrList(String chrs) {
+	[chrs]
     }
 
-    /**
-     * find dataset
-     * @param resultInstanceId1
-     * @param resultInstanceId2
-     * @return
-     */
+    @CompileDynamic
+    private List<String> findDataset(String resultInstanceId1) {
+	checkQueryResultAccess resultInstanceId1
 
-    def findDataset(resultInstanceId1, resultInstanceId2) {
-        checkQueryResultAccess resultInstanceId1, resultInstanceId2
-
-
-        def q = '''
-		SELECT DISTINCT a.dataset_id from DE_VARIANT_SUBJECT_IDX a
-		INNER JOIN de_subject_sample_mapping b on a.SUBJECT_ID = b.SUBJECT_ID 
-		INNER JOIN qt_patient_set_collection sc ON sc.result_instance_id in (?) AND b.patient_id = sc.patient_num
+	String sql = '''
+		SELECT DISTINCT a.dataset_id
+		from DEAPP.DE_VARIANT_SUBJECT_IDX a
+		INNER JOIN DEAPP.de_subject_sample_mapping b on a.SUBJECT_ID = b.SUBJECT_ID 
+		INNER JOIN I2B2DEMODATA.qt_patient_set_collection sc ON sc.result_instance_id in (?) AND b.patient_id = sc.patient_num
 '''
-        def param = []
-        if (resultInstanceId1 != null) {
-            param.add(resultInstanceId1)
-        }
-        if (resultInstanceId2 != null) {
-            param.add(resultInstanceId2)
+
+	List params = []
+	if (resultInstanceId1) {
+	    params << resultInstanceId1
         }
 
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        def datasetList = []
+	List<String> datasetList = []
 
-        sql.eachRow(q, param, { row ->
+	new Sql(dataSource).eachRow(sql, params, { row ->
             if (row.dataset_id != null) {
-                datasetList.add(row.dataset_id)
+		datasetList << row.dataset_id
             }
         })
-        return datasetList
+
+	datasetList
     }
 
-    /**
-     * find subject idx map
-     * @param resultInstanceId
-     * @param prefix
-     * @return
-     */
-    def findSubjectIdx(resultInstanceId) {
+    @CompileDynamic
+    private Map<String, Map<String, Integer>> findSubjectIdx(String resultInstanceId) {
 
-        def q =
-                '''				SELECT distinct a.DATASET_ID, a.SUBJECT_ID, a.POSITION from DE_VARIANT_SUBJECT_IDX a
-		INNER JOIN de_subject_sample_mapping b on a.SUBJECT_ID = b.SUBJECT_ID 
-		INNER JOIN qt_patient_set_collection sc ON sc.result_instance_id in (?) AND b.patient_id = sc.patient_num
- ORDER BY a.POSITION'''
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        def datasetIdxMap = [:]
+	String sql = '''
+			SELECT distinct a.DATASET_ID, a.SUBJECT_ID, a.POSITION
+			from DEAPP.DE_VARIANT_SUBJECT_IDX a
+			INNER JOIN DEAPP.de_subject_sample_mapping b on a.SUBJECT_ID = b.SUBJECT_ID
+			INNER JOIN I2B2DEMODATA.qt_patient_set_collection sc ON sc.result_instance_id in (?) AND b.patient_id = sc.patient_num
+			ORDER BY a.POSITION
+		'''
 
-        sql.eachRow(q, [resultInstanceId], { row ->
-            def sIdx = datasetIdxMap.get(row.DATASET_ID)
+	Map<String, Map<String, Integer>> datasetIdxMap = [:]
+
+	new Sql(dataSource).eachRow(sql, [resultInstanceId], { row ->
+	    Map<String, Integer> sIdx = datasetIdxMap[row.DATASET_ID]
             if (sIdx == null) {
-                sIdx = new LinkedHashMap()
-                datasetIdxMap.put(row.DATASET_ID, sIdx)
+		sIdx = [:]
+		datasetIdxMap[row.DATASET_ID] = sIdx
             }
-            sIdx.put(row.SUBJECT_ID, row.POSITION)
-            //logger.debug('sub:'+row.SUBJECT_ID+' pos:'+row.POSITION)
-
+	    sIdx[row.SUBJECT_ID] = row.POSITION
         })
 
-        return datasetIdxMap
-
+	datasetIdxMap
     }
 
     /**
-     * This function parse the ','-separated gene string like 'Gene>MET', and return a list of gene search ID and a list of matching gene names.
+     * Parse the ','-separated gene string like 'Gene>MET', and return a list of gene search ID and a list of matching gene names.
      */
-
-
-    def parseGeneList(String genes, String geneAndIdListStr, List<Long> geneSearchIdList) {
-        def geneNameList = []
-        if (genes == null || genes.length() == 0)
+    private List<String> parseGeneList(String genes, List<Long> geneSearchIdList) {
+	if (!genes) {
             return null
-        Map<String, Long> geneIdMap = new HashMap<String, Long>()
+	}
 
-        /*   String[] geneAndIdList = geneAndIdListStr.split('\\|\\|\\|')
-           for (String geneAndIdStr : geneAndIdList) {
-               String[] geneIdPair = geneAndIdStr.split('\\|\\|')
-               geneIdMap.put(geneIdPair[0].trim(), new Long(geneIdPair[1].trim()))
-           }*/
-        String[] geneValues = genes.split(',')
+	List<String> geneNameList = []
+	Map<String, Long> geneIdMap = [:]
 
-        //  println('parse:'+geneValues)
-        for (String geneStr : geneValues) {
+	for (String geneStr in genes.split(',')) {
             geneStr = geneStr.trim()
-            Long geneId = geneIdMap.get(geneStr.trim())
-            geneSearchIdList.add(geneId)
-            if (geneStr.startsWith('Gene>'))
+	    geneSearchIdList << geneIdMap[geneStr.trim()]
+	    if (geneStr.startsWith('Gene>')) {
                 geneStr = geneStr.substring('Gene>'.length())
-            geneNameList.add(geneStr.trim())
-        }
-        return geneNameList
-    }
-
-    def listToIN(List<String> list) {
-        StringBuilder sb = new StringBuilder()
-        // need to make it less than 1000! -- temp solution
-        int i = 0
-        for (c in list) {
-            //If the only thing submitted was 'ALL' we return an empty string just like there was nothinbg in the box.
-            if (c.toString() == 'ALL' && list.size() == 1) {
-                break
             }
+	    geneNameList << geneStr.trim()
+        }
 
-            sb.append("'")
-            sb.append(c.toString().replace("'", "''"))
-            sb.append("'")
-            sb.append(',')
-            i++
-            if (i >= 1000) {
-                break
-            }
-        }
-        if (sb.length() > 0) {
-            sb.deleteCharAt(sb.length() - 1);//remove last comma
-        }
-        return sb.toString()
+	geneNameList
     }
-
 }

@@ -1,36 +1,37 @@
 package com.recomdata.genesignature
 
 import com.recomdata.util.BinomialDistribution
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.transmart.AnalysisResult
+import org.transmart.AssayAnalysisValue
+import org.transmart.biomart.BioAssayAnalysisData
+import org.transmart.biomart.BioMarker
 
 /**
- * manager class for TEA scoring logic
- * $Id: TEAScoreManager.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- * */
+ * manager class for TEA scoring logic.
+ * @author mmcduffie
+ */
+@CompileStatic
 @Slf4j('logger')
-public class TEAScoreManager {
+class TEAScoreManager {
 
     // this is a cutoff for UI display
-    static double TEA_SIGNIFICANCE_CUTOFF = 0.05
+    static final double TEA_SIGNIFICANCE_CUTOFF = 0.05
 
     // number of genes used in entire search analysis
-    def geneCount = 0
+    int geneCount = 0
 
     /**
      * applies the TEA scoring algorithm for the specified AnalysisResult based on its value object list
      * The algorithm populates the AnalysisResult with the various TEA metrics
      */
-    def assignTEAMetrics(analysisResult) {
+    void assignTEAMetrics(AnalysisResult analysisResult) {
 
         // list of bio markers to score
-        def valueList = analysisResult.assayAnalysisValueList
-        Map mapMarkers = new HashMap()
-        def currMarker
-
-        if (valueList.size() == 0) {
-            analysisResult.TEAScore = null
+	List<AssayAnalysisValue> valueList = analysisResult.assayAnalysisValueList
+	if (!valueList) {
+	    // analysisResult.TEAScore = null   TODO missing property
             return
         }
 
@@ -42,55 +43,51 @@ public class TEAScoreManager {
         double pValSumUp = 0
         double pValSumDown = 0
 
-        //tmp vars
-        def baad
-        def compFoldChg
-        def gsFoldChg
-        def NPV
-        def bm
+	Double compFoldChg
+	Double gsFoldChg
+	Double npv
 
-        // iterate items
-        for (value in valueList) {
-            baad = value.analysisData
-            bm = value.bioMarker
+	Map<Long, BioMarker> mapMarkers = [:]
+	for (AssayAnalysisValue value in valueList) {
+	    BioAssayAnalysisData baad = value.analysisData
+	    BioMarker bm = value.bioMarker
 
             // track each biomarker that has been evaluated
-            currMarker = mapMarkers.get(bm.id)
-            if (currMarker != null) {
-                logger.warn('skipping duplicate bioMarker (' + bm.name + '): 1) Comp fold chg:' + compFoldChg + '; 2) NPV: ' + NPV + '; 3) Regulation fold chg: ' + gsFoldChg)
+	    BioMarker currMarker = mapMarkers[bm.id]
+	    if (currMarker) {
+		logger.warn 'skipping duplicate bioMarker ({}): 1) Comp fold chg:{}; 2) NPV: {}; 3) Regulation fold chg: {}',
+		    bm.name, compFoldChg, npv, gsFoldChg
                 continue
             }
 
             // track evaluated marker
-            mapMarkers.put(bm.id, bm)
+	    mapMarkers[bm.id] = bm
 
             // data used in calc
             compFoldChg = baad.foldChangeRatio
-            NPV = baad.teaNormalizedPValue
+	    npv = baad.teaNormalizedPValue
             gsFoldChg = value.valueMetric
-
-            //	logger.info('evaluating bioMarker ('+bm.name+'): 1) Comp fold chg:'+compFoldChg+'; 2) NPV: '+NPV+'; 3) Regulation fold chg: '+gsFoldChg)
 
             if (gsFoldChg == null || gsFoldChg == 0) {
                 // a) genes and pathways
                 if (compFoldChg > 0) {
                     pValCtUp++
-                    pValSumUp += -Math.log(NPV)
+		    pValSumUp += -Math.log(npv)
                 }
                 else {
                     pValCtDown++
-                    pValSumDown += -Math.log(NPV)
+		    pValSumDown += -Math.log(npv)
                 }
             }
             else {
                 // b) gene lists and signatures
                 if ((gsFoldChg > 0 && compFoldChg > 0) || (gsFoldChg < 0 && compFoldChg < 0)) {
                     pValCtUp++
-                    pValSumUp += -Math.log(NPV)
+		    pValSumUp += -Math.log(npv)
                 }
                 else {
                     pValCtDown++
-                    pValSumDown += -Math.log(NPV)
+		    pValSumDown += -Math.log(npv)
                 }
             }
         }
@@ -99,40 +96,42 @@ public class TEAScoreManager {
         double TEAScoreUp = 1.1
         double TEAScoreDown = 1.1
 
-        //logger.info('>> TEA Summary <<')
-
-        logger.info('1) up count: ' + pValCtUp + '; down count: ' + pValCtDown)
+	logger.info '1) up count: {}; down count: {}', pValCtUp, pValCtDown
 
         // up score
-        if (pValCtUp > 0) TEAScoreUp = calcTEAScore(pValCtUp, pValSumUp, 'up')
+	if (pValCtUp > 0) {
+	    TEAScoreUp = calcTEAScore(pValCtUp, pValSumUp, 'up')
+	}
 
         // down score
-        if (pValCtDown > 0) TEAScoreDown = calcTEAScore(pValCtDown, pValSumDown, 'down')
+	if (pValCtDown > 0) {
+	    TEAScoreDown = calcTEAScore(pValCtDown, pValSumDown, 'down')
+	}
 
-        // assign TEA metrics (retain lower of the two)
-        def teaScore = Math.min(TEAScoreUp, TEAScoreDown)
-        analysisResult.teaScore = new Double(teaScore)
+	analysisResult.teaScore = Math.min(TEAScoreUp, TEAScoreDown)
 
         // enrichment status
-        if (pValCtDown == 0 && pValCtUp > 0) analysisResult.bTeaScoreCoRegulated = true
+	if (pValCtDown == 0 && pValCtUp > 0) {
+	    analysisResult.bTeaScoreCoRegulated = true
+	}
 
-        if (pValCtDown > 0 && pValCtUp == 0) analysisResult.bTeaScoreCoRegulated = false
+	if (pValCtDown > 0 && pValCtUp == 0) {
+	    analysisResult.bTeaScoreCoRegulated = false
+	}
 
-        if (pValCtDown > 0 && pValCtUp > 0) analysisResult.bTeaScoreCoRegulated = (TEAScoreUp <= TEAScoreDown)
+	if (pValCtDown > 0 && pValCtUp > 0) {
+	    analysisResult.bTeaScoreCoRegulated = TEAScoreUp <= TEAScoreDown
+	}
 
         // significant TEA score?
         analysisResult.bSignificantTEA = analysisResult.teaScore.doubleValue() <= TEA_SIGNIFICANCE_CUTOFF
-        //logger.info('3) TEA Result [ score: '+analysisResult.teaScore+'; co-regulated? '+analysisResult.bTeaScoreCoRegulated+'; significant? '+analysisResult.bSignificantTEA+' ]')
     }
 
     /**
      * calc TEA score for indicated side
      */
     double calcTEAScore(int sideCt, double sideSum, String side) {
-        def pValAvg = Math.exp(-sideSum / sideCt)
-        BinomialDistribution bd = new BinomialDistribution(geneCount, pValAvg)
-        def tea = 1 - bd.getCDF(sideCt)
-        //logger.info('2?) ('+side+') TEA Score: '+tea+'; pv_ave p-value: '+pValAvg)
-        return tea
+	double pValAvg = Math.exp(-sideSum / sideCt)
+	1 - new BinomialDistribution(geneCount, pValAvg).getCDF(sideCt)
     }
 }

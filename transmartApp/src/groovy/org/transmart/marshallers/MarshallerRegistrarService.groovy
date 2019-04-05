@@ -13,48 +13,45 @@ import org.springframework.core.type.classreading.MetadataReaderFactory
 import org.springframework.core.type.filter.TypeFilter
 
 @Slf4j('logger')
-public class MarshallerRegistrarService implements FactoryBean {
+class MarshallerRegistrarService implements FactoryBean {
 
-    private final static PACKAGE = 'org.transmart.marshallers'
-    private final static RESOURCE_PATTERN = '**/*Marshaller.class'
+    private static final String PACKAGE = 'org.transmart.marshallers'
+    private static final String RESOURCE_PATTERN = '**/*Marshaller.class'
 
-    final Class objectType = null
+    final Class objectType
     final boolean singleton = true
 
-    @Autowired
-    ApplicationContext ctx
+    @Autowired ApplicationContext ctx
 
     void start() {
         logger.info 'Registering marshallers'
 
-        ClassPathBeanDefinitionScanner scanner = new
-                ClassPathBeanDefinitionScanner((BeanDefinitionRegistry) ctx, false) {
+	ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(
+	    (BeanDefinitionRegistry) ctx, false) {
+            protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
+                Set<BeanDefinitionHolder> superValue = super.doScan(basePackages)
+		logger.debug 'Found marshallers: {}', superValue
 
-                    @Override
-                    protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
-                        Set<BeanDefinitionHolder> superValue = super.doScan(basePackages)
-                        logger.debug 'Found marshallers: ' + superValue
-
-                        superValue.each { holder ->
-                            def bean = ctx.getBean(holder.beanName)
-                            JSON.registerObjectMarshaller(bean.targetType,
-                                    bean.&convert)
-                        }
-
-                        superValue
-                    }
+		for (holder in superValue) {
+                    def bean = ctx.getBean(holder.beanName)
+		    JSON.registerObjectMarshaller(bean.targetType, bean.&convert)
                 }
-        scanner.setResourcePattern(RESOURCE_PATTERN)
-        scanner.addIncludeFilter({
-            MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory ->
-                metadataReader.classMetadata.className.matches('.+Marshaller')
-        } as TypeFilter)
 
-        scanner.scan(PACKAGE)
+                superValue
+            }
+        }
+
+	scanner.resourcePattern = RESOURCE_PATTERN
+	scanner.addIncludeFilter new TypeFilter() {
+	    boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) {
+		metadataReader.classMetadata.className.matches '.+Marshaller'
+	    }
+	}
+
+	scanner.scan PACKAGE
     }
 
-    @Override
-    Object getObject() throws Exception {
+    def getObject() {
         start()
         null
     }

@@ -5,39 +5,33 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class AmTagTemplateService {
 
-    boolean transactional = true
+    static transactional = false
 
-    def serviceMethod() {
+    AmTagTemplate getTemplate(String key) {
 
-    }
+	logger.info 'Searching amTagTemplateAssociation for {}', key
 
-    def getTemplate(String key) {
-
-        logger.info 'Searching amTagTemplateAssociation for ' + key
-
-        def amTagTemplateAssociation
-        def amTagTemplate
+	AmTagTemplateAssociation amTagTemplateAssociation
 
         if (key) {
             amTagTemplateAssociation = AmTagTemplateAssociation.findByObjectUid(key)
-            logger.info 'amTagTemplateAssociation = ' + amTagTemplateAssociation + ' for key = ' + key
+	    logger.debug 'amTagTemplateAssociation = {} for key = {}', amTagTemplateAssociation, key
         }
         else {
             logger.error 'Unable to retrieve an AmTagTemplateAssociation with a null key value'
         }
 
+	AmTagTemplate amTagTemplate
         if (amTagTemplateAssociation) {
-            logger.info 'Searching amTagTemplate'
+	    logger.debug 'Searching amTagTemplate'
             amTagTemplate = AmTagTemplate.get(amTagTemplateAssociation.tagTemplateId)
-            logger.info 'amTagTemplate = ' + amTagTemplate.toString()
-            logger.info 'amTagTemplate.tagItems = ' + amTagTemplate.amTagItems
-
+	    logger.debug 'amTagTemplate = {}', amTagTemplate
+	    logger.debug 'amTagTemplate.tagItems = {}', amTagTemplate.amTagItems
         }
         else {
-            logger.error 'AmTagTemplate is null for tag template association = ' + key
+	    logger.debug 'AmTagTemplate is null for tag template association = {}', key
         }
 
-        return amTagTemplate
+	amTagTemplate
     }
-
 }

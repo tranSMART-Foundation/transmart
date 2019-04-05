@@ -1,36 +1,42 @@
 package com.thomsonreuters.lsps.transmart
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import groovyx.net.http.HTTPBuilder
-import static groovyx.net.http.ContentType.*
-import static groovyx.net.http.Method.*
 import org.apache.http.auth.AuthScope
 import org.apache.http.auth.NTCredentials
 
+@CompileStatic
 @Slf4j('logger')
 class HttpBuilderService {
-	boolean transactional = true
 	
-	def getInstance(uri) {
-		HTTPBuilder site = new HTTPBuilder(uri)
+    static transactional = false
+
+    private static final String proxyHost = System.getProperty('proxyHost')
+    private static final String proxyPassword = System.getProperty('proxyPassword')
+    private static final String proxyPort = System.getProperty('proxyPort')
+    private static final String proxyUser = System.getProperty('proxyUser')
+    private static final String proxyNTLMDomain = System.getProperty('proxyNTLMDomain')
+
+    HTTPBuilder getInstance(String uri) {
+	HTTPBuilder site = new HTTPBuilder(uri)
 			
-		if (System.properties.proxyHost && System.properties.proxyPort) {
-			logger.info 'Using proxy -> ' + System.properties.proxyHost + ':' + System.properties.proxyPort
-			if (System.properties.proxyUser) {
-				logger.info 'Authenticating with proxy as ' + System.properties.proxyUser
-				if (System.properties.proxyNTLMDomain) logger.info 'NTLM domain: ' + System.properties.proxyNTLMDomain
-				site.client.getCredentialsProvider().setCredentials(
-				    new AuthScope(System.properties.proxyHost, System.properties.proxyPort.toInteger()),
-				    new NTCredentials(System.properties.proxyUser, System.properties.proxyPassword, 
-						InetAddress.getLocalHost().getHostName(), System.properties.proxyNTLMDomain)
-				)
-			}
-				
-			site.setProxy(System.properties.proxyHost, System.properties.proxyPort.toInteger(), null)
+	if (proxyHost && proxyPort) {
+	    logger.info 'Using proxy -> {}:{}', proxyHost, proxyPort
+	    if (proxyUser) {
+		logger.info 'Authenticating with proxy as {}', proxyUser
+		if (proxyNTLMDomain) {
+		    logger.info 'NTLM domain: {}', proxyNTLMDomain
 		}
-		
-		site
-		
+		site.client.credentialsProvider.setCredentials(
+		    new AuthScope(proxyHost, proxyPort.toInteger()),
+		    new NTCredentials(proxyUser, proxyPassword,
+				      InetAddress.localHost.hostName, proxyNTLMDomain)
+		)
+	    }
+				
+	    site.setProxy proxyHost, proxyPort.toInteger(), null
 	}
-	
+	site
+    }
 }

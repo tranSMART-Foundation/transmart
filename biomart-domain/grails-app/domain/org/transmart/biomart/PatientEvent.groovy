@@ -16,36 +16,26 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class PatientEvent {
-    Long id
+    Long bioClinicTrialTimepointId
     Long bioPatientId
     String eventCode
-    String eventTypeCode
     Date eventDate
+    String eventTypeCode
     String site
-    Long bioClinicTrialTimepointId
+
     static mapping = {
-        table 'BIO_PATIENT_EVENT'
+	table 'BIOMART.BIO_PATIENT_EVENT'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_PATIENT_EVENT_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_PATIENT_EVENT_ID'
-            bioPatientId column: 'BIO_PATIENT_ID'
-            eventCode column: 'EVENT_CODE'
-            eventTypeCode column: 'EVENT_TYPE_CODE'
-            eventDate column: 'EVENT_DATE'
-            site column: 'SITE'
-            bioClinicTrialTimepointId column: 'BIO_CLINIC_TRIAL_TIMEPOINT_ID'
-        }
     }
+
     static constraints = {
-        eventCode(nullable: true, maxSize: 400)
-        eventTypeCode(nullable: true, maxSize: 400)
-        eventDate(nullable: true)
-        site(nullable: true, maxSize: 800)
+	eventCode nullable: true, maxSize: 400
+	eventDate nullable: true
+	eventTypeCode nullable: true, maxSize: 400
+	site nullable: true, maxSize: 800
     }
 }

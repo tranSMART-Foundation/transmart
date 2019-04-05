@@ -16,73 +16,59 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.searchapp
 
 import org.transmart.biomart.BioMarker
 
-/**
- * domain class for a gene signature item
- */
 class GeneSignatureItem {
-
-    Long id
-    GeneSignature geneSignature
-    BioMarker bioMarker
+    Long bioAssayFeatureGroupId
     String bioDataUniqueId
+    BioMarker bioMarker
     Double foldChgMetric
     Long probesetId
-    static transients = ['probeset', 'geneSymbol']
-    def probeset
-    def geneSymbol
+
+    static transients = ['geneSymbol', 'probeset']
 
     static belongsTo = [geneSignature: GeneSignature]
 
     static mapping = {
-        table 'SEARCH_GENE_SIGNATURE_ITEM'
+	table 'SEARCHAPP.SEARCH_GENE_SIGNATURE_ITEM'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID']
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            id column: 'ID'
-            geneSignature column: 'SEARCH_GENE_SIGNATURE_ID'
-            bioMarker column: 'BIO_MARKER_ID'
-            foldChgMetric column: 'FOLD_CHG_METRIC'
-            bioDataUniqueId column: 'BIO_DATA_UNIQUE_ID'
-            probesetId column: 'PROBESET_ID'
-        }
+
+        bioDataUniqueId column: 'BIO_DATA_UNIQUE_ID'
+	bioMarker column: 'BIO_MARKER_ID'
+	foldChgMetric column: "FOLD_CHG_METRIC"
+	geneSignature column: 'SEARCH_GENE_SIGNATURE_ID'
+        probesetId column: 'PROBESET_ID'
     }
 
     static constraints = {
-        foldChgMetric(nullable: true)
-        bioDataUniqueId(nullable: true)
-        probesetId(nullable: true)
-        bioMarker(nullable: true)
-        bioDataUniqueId(nullable: true)
+	bioAssayFeatureGroupId nullable: true
+	bioDataUniqueId nullable: true
+	bioMarker nullable: true
+	foldChgMetric nullable: true
+	probesetId nullable: true
     }
 
-    def getProbeset() {
-        def probename = ''
+    String getProbeset() {
+	String probename = ''
         if (probesetId != null) {
-            def annot = de.DeMrnaAnnotation.find('from DeMrnaAnnotation as a where a.probesetId=?', [probesetId])
-            if (annot != null) probename = annot.probeId
+	    // TODO BB DeMrnaAnnotation is in folder-management but it's not a dependency
+	    def annot = de.DeMrnaAnnotation.findByProbesetId(probesetId)
+	    if (annot) {
+		probename = annot.probeId
+	    }
         }
         return probename
     }
 
-    def getGeneSymbol() {
-        def symbol = []
+    List<String> getGeneSymbol() {
         if (bioMarker != null) {
-            symbol.add(bioMarker.name)
+	    [bioMarker.name]
         }
         else if (probesetId != null) {
-            def annot = de.DeMrnaAnnotation.findAll('from DeMrnaAnnotation as a where a.probesetId=?', [probesetId])
-            if (annot != null) {
-                for (g in annot*.geneSymbol) {
-                    symbol.add(g)
-                }
-            }
+	    de.DeMrnaAnnotation.findAllByProbesetId(probesetId)*.geneSymbol
         }
-        return symbol
     }
 }

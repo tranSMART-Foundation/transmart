@@ -2,6 +2,8 @@ package org.transmart.authorization
 
 import com.google.common.collect.Sets
 import grails.util.Holders
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
@@ -18,9 +20,9 @@ import javax.annotation.Resource
 import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.BUILD_COHORT
 import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.READ
 
+@CompileStatic
 @Slf4j('logger')
-class QueriesResourceAuthorizationDecorator
-        implements QueriesResource, AuthorizationDecorator<QueriesResource> {
+class QueriesResourceAuthorizationDecorator implements QueriesResource, AuthorizationDecorator<QueriesResource> {
 
     @Resource(name = CurrentUserBeanProxyFactory.BEAN_BAME)
     User user
@@ -28,42 +30,40 @@ class QueriesResourceAuthorizationDecorator
     @Autowired
     QueriesResource delegate
 
-    @Override
     QueryResult runQuery(QueryDefinition definition) throws InvalidRequestException {
         if (!user.canPerform(BUILD_COHORT, definition)) {
-            throw new AccessDeniedException('Denied ' + user.username + ' access ' +
-                    'for building cohort based on ' + definition)
+	    throw new AccessDeniedException('Denied ' + user.username +
+					    ' access for building cohort based on ' + definition)
         }
 
         delegate.runQuery definition
     }
 
-    @Override
     QueryResult runQuery(QueryDefinition definition, String username) throws InvalidRequestException {
         if (!user.canPerform(BUILD_COHORT, definition)) {
-            throw new AccessDeniedException('Denied ' + user.username + ' access ' +
-                    'for building cohort based on ' + definition)
+	    throw new AccessDeniedException('Denied ' + user.username +
+					    ' access for building cohort based on ' + definition)
         }
         if (username != user.username) {
-            throw new AccessDeniedException('Denied ' + user.username + ' access ' +
-                    'to building a cohort in name of ' + username)
+	    throw new AccessDeniedException('Denied ' + user.username +
+					    ' access to building a cohort in name of ' + username)
         }
 
         delegate.runQuery definition, username
     }
 
-    @Override
     QueryResult getQueryResultFromId(Long id) throws NoSuchResourceException {
-        def res = delegate.getQueryResultFromId id
+	QueryResult res = delegate.getQueryResultFromId(id)
 
         if (!user.canPerform(READ, res)) {
-            throw new AccessDeniedException('Denied ' + user.username + ' access ' +
-                    'to query result with id ' + id)
+	    throw new AccessDeniedException('Denied ' + user.username +
+					    ' access to query result with id ' + id)
         }
 
         res
     }
 
+    @CompileStatic
     static class LegacyQueryResultAccessCheckRequestCache {
         // should be request-scope bean
         Set<Long> resultInstanceIdsAllowed = Sets.newHashSet()
@@ -85,12 +85,13 @@ class QueriesResourceAuthorizationDecorator
      * @throws AccessDeniedException if access is denied
      * @param arguments zero or more result instance ids to check
      */
+    @CompileDynamic
     @Deprecated
     static void checkQueryResultAccess(Object... arguments) {
-        def ids = arguments.findAll().collect { it as long }
+	List<Long> ids = arguments.findAll().collect { it as long }
 
         QueriesResourceAuthorizationDecorator thiz =
-                Holders.applicationContext.queriesResourceAuthorizationDecorator
+            Holders.applicationContext.queriesResourceAuthorizationDecorator
 
         LegacyQueryResultAccessCheckRequestCache cache
 
@@ -98,31 +99,27 @@ class QueriesResourceAuthorizationDecorator
          * job), we can take advantage of a cache (we're guaranteed it's the
          * same user across the whole request */
         if (RequestContextHolder.requestAttributes) {
-            cache = Holders.applicationContext.
-                    legacyQueryResultAccessCheckRequestCache
+	    cache = Holders.applicationContext.legacyQueryResultAccessCheckRequestCache
         }
 
-        ids.each { long it ->
-            if (cache && cache.resultInstanceIdsAllowed.contains(it)) {
-                logger.debug('Request cache for legacy access to result ' +
-                        'instance ids includes entry for rid ' + it)
+	for (long id in ids) {
+	    if (cache?.resultInstanceIdsAllowed?.contains(id)) {
+		logger.debug 'Request cache for legacy access to result instance ids includes entry for rid {}', id
                 return
             }
 
-            thiz.getQueryResultFromId it //may throw
-            logger.debug('Request access to rid ' + it + ' from legacy ' +
-                    'checkQueryResultAccess')
+	    thiz.getQueryResultFromId id //may throw
+	    logger.debug 'Request access to rid {} from legacy checkQueryResultAccess', id
 
             if (cache) {
-                cache.resultInstanceIdsAllowed << it
+		cache.resultInstanceIdsAllowed << id
             }
         }
     }
 
-    @Override
     QueryDefinition getQueryDefinitionForResult(QueryResult result) throws NoSuchResourceException {
         /* the gatekeeping is done when fetching the query result only.
          * Odd that this method is not in QueryResult anyway */
-        delegate.getQueryDefinitionForResult(result)
+	delegate.getQueryDefinitionForResult result
     }
 }

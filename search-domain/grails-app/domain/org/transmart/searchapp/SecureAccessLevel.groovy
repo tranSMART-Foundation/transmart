@@ -1,4 +1,3 @@
-package org.transmart.searchapp
 /*************************************************************************
  * tranSMART - translational medicine data mart
  *
@@ -17,24 +16,21 @@ package org.transmart.searchapp
  *
  *
  ******************************************************************/
+package org.transmart.searchapp
+
 class SecureAccessLevel {
-    static def OWN = 'OWN'
-    Long accessLevelValue
-    Long id
+    public static final String OWN = 'OWN'
+
     String accessLevelName
+    Long accessLevelValue
 
     static mapping = {
-        table 'SEARCH_SEC_ACCESS_LEVEL'
+	table 'SEARCHAPP.SEARCH_SEC_ACCESS_LEVEL'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID'], column: 'SEARCH_SEC_ACCESS_LEVEL_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            accessLevelValue column: 'ACCESS_LEVEL_VALUE'
-            id column: 'SEARCH_SEC_ACCESS_LEVEL_ID'
-            accessLevelName column: 'ACCESS_LEVEL_NAME'
-        }
     }
 
     static constraints = {
-        accessLevelName(nullable: true, maxSize: 400)
+	accessLevelName nullable: true, maxSize: 400
     }
 }

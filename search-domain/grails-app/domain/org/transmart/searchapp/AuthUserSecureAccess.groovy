@@ -1,39 +1,33 @@
 package org.transmart.searchapp
 
 class AuthUserSecureAccess {
-    static transients = ['objectAccessName', 'principalAccessName']
-
-    Long id
-    AuthUser authUser
-    SecureObject secureObject
     SecureAccessLevel accessLevel
+    AuthUser authUser
     String objectAccessName
     String principalAccessName
+    SecureObject secureObject
+
+    static transients = ['objectAccessName', 'principalAccessName']
 
     static mapping = {
-        table 'SEARCH_AUTH_USER_SEC_ACCESS_V'
-        version false
-        columns {
-            id column: 'SEARCH_AUTH_USER_SEC_ACCESS_ID'
-            authUser column: 'SEARCH_AUTH_USER_ID'
-            secureObject column: 'SEARCH_SECURE_OBJECT_ID'
-            accessLevel column: 'SEARCH_SEC_ACCESS_LEVEL_ID'
-        }
+	table 'SEARCHAPP.SEARCH_AUTH_USER_SEC_ACCESS_V'
+        id column: 'SEARCH_AUTH_USER_SEC_ACCESS_ID'
+	version false
+
+	accessLevel column: 'SEARCH_SEC_ACCESS_LEVEL_ID'
+        authUser column: 'SEARCH_AUTH_USER_ID'
+        secureObject column: 'SEARCH_SECURE_OBJECT_ID'
     }
 
     static constraints = {
-        authUser(nullable: true)
+	authUser nullable: true
     }
 
-    public String getObjectAccessName() {
-        return secureObject.displayName + ' (' + accessLevel.accessLevelName + ')'
+    String getObjectAccessName() {
+	secureObject.displayName + ' (' + accessLevel.accessLevelName + ')'
     }
 
-    public void setObjectAccessName(String s) {}
-
-    public String getPrincipalAccessName() {
-        return authUser.name + ' (' + accessLevel.accessLevelName + ')'
+    String getPrincipalAccessName() {
+	authUser.name + ' (' + accessLevel.accessLevelName + ')'
     }
-
-    public void setPrincipalAccessName(String s) {}
 }

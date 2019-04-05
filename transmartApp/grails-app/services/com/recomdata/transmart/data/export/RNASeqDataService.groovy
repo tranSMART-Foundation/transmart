@@ -9,14 +9,18 @@ import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.dataquery.highdim.HighDimensionResource
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
+import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.dataquery.highdim.rnaseq.RnaSeqValues
 
 import javax.annotation.PostConstruct
 
+@CompileStatic
 class RNASeqDataService {
 
+    static transactional = false
+
     private static final List<String> HEADER_NAMES = ['regionname', 'chromosome', 'start',
-	                                                  'end', 'num.probes', 'cytoband'].asImmutable()
+	                                              'end', 'num.probes', 'cytoband'].asImmutable()
     private static final Closure<Integer> getReadcount = { RnaSeqValues v -> v.getReadcount() }
     private static final String readcount = 'readcount'
 
@@ -31,31 +35,18 @@ class RNASeqDataService {
         rnaSeqResource = highDimensionResourceService.getSubResourceForType 'rnaseq'
     }
 
-    def writeRegions(String study,
-                     File studyDir,
-                     String fileName,
-                     String jobName,
-                     resultInstanceId) {
-        def assayConstraints = [
-                rnaSeqResource.createAssayConstraint(
-                        AssayConstraint.TRIAL_NAME_CONSTRAINT,
-                        name: study),
-                rnaSeqResource.createAssayConstraint(
-                        AssayConstraint.PATIENT_SET_CONSTRAINT,
-                        result_instance_id: resultInstanceId as Long),
-        ]
+    void writeRegions(String study, File studyDir, String fileName, String jobName, resultInstanceId) {
+	List<AssayConstraint> assayConstraints = createAssayConstraints(study, resultInstanceId as Long)
+	Projection projection = rnaSeqResource.createProjection([:], 'rnaseq_values')
 
-        def projection = rnaSeqResource.createProjection([:], 'rnaseq_values')
-
-        def result,
-            writerUtil
-
+	FileWriterUtil writerUtil = null
+	TabularResult<AssayColumn, RegionRow> result = null
         try {
-            /* dataType == 'RNASeq' => file created in a subdir w/ that name */
+	    // dataType == 'RNASeq' => file created in a subdir w/ that name
             writerUtil = new FileWriterUtil(studyDir, fileName, jobName, 'RNASeq',
-                    null, '\t' as char)
+					    null, "\t" as char)
             result = rnaSeqResource.retrieveData assayConstraints, [], projection
-            doWithResult(result, writerUtil)
+	    doWithResult result, writerUtil
         }
         finally {
             writerUtil?.finishWriting()
@@ -63,20 +54,19 @@ class RNASeqDataService {
         }
     }
 
-    @CompileStatic
-    private doWithResult(TabularResult<AssayColumn, RegionRow> rnaseqRegionResult,
-                         FileWriterUtil writerUtil) {
+    private void doWithResult(TabularResult<AssayColumn, RegionRow> rnaseqRegionResult,
+                              FileWriterUtil writerUtil) {
 
         List<AssayColumn> assays = rnaseqRegionResult.indicesList
         String[] header = createHeader(assays)
         writerUtil.writeLine(header as String[])
 
-        def templateArray = new String[header.size() + 1]
+	String[] templateArray = new String[header.size() + 1]
         //+1 b/c 1st row has no header
-        Long i = 1; //for the first row
+	long i = 1 //for the first row
 
         for (Iterator<RegionRow> iterator = rnaseqRegionResult.rows; iterator.hasNext();) {
-            RegionRow row = (RegionRow) iterator.next()
+	    RegionRow row = iterator.next()
 
             String[] line = (String[]) templateArray.clone()
 
@@ -93,19 +83,15 @@ class RNASeqDataService {
 		line[j++] = getReadcount(row.getAt(assay)) as String
 	    }
 
-            writerUtil.writeLine(line)
+	    writerUtil.writeLine line
         }
     }
-
-    private static final Map PER_ASSAY_COLUMNS = [
-            readcount: { RnaSeqValues v -> v.getReadCount() },
-    ]
 
     private String[] createHeader(List<AssayColumn> assays) {
 	List<String> r = ([] + HEADER_NAMES) as List
 
 	for (AssayColumn assay in assays) {
-		r << readcount + '.' + assay.patientInTrialId
+	    r << readcount + "." + assay.patientInTrialId
 	}
 
 	r as String[]
@@ -114,12 +100,12 @@ class RNASeqDataService {
     @CompileDynamic
     private List<AssayConstraint> createAssayConstraints(String study, long resultInstanceId) {
 	List<AssayConstraint> assayConstraints = [
-			rnaSeqResource.createAssayConstraint(
-					AssayConstraint.TRIAL_NAME_CONSTRAINT,
-					name: study),
-			rnaSeqResource.createAssayConstraint(
-					AssayConstraint.PATIENT_SET_CONSTRAINT,
-					result_instance_id: resultInstanceId),
+	    rnaSeqResource.createAssayConstraint(
+		AssayConstraint.TRIAL_NAME_CONSTRAINT,
+		name: study),
+	    rnaSeqResource.createAssayConstraint(
+		AssayConstraint.PATIENT_SET_CONSTRAINT,
+		result_instance_id: resultInstanceId),
 	]
 
     }

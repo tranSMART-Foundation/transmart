@@ -1,47 +1,46 @@
 package com.recomdata.genepattern
 
-class JobStatus {
-    def name = ''
-    def status = ''; // C -completed, R- Running, I - initializing, Q -queued, T - terminated
-    def message = ''
-    def gpJobId
-    def totalRecord = 0
+import groovy.transform.CompileStatic
 
-    def isRunning() {
-        return status == 'R'
+@CompileStatic
+class JobStatus {
+
+    String name = ''
+    String status = '' // C -completed, R- Running, I - initializing, Q -queued, T - terminated
+    String message = ''
+    def gpJobId
+    int totalRecord = 0
+
+    boolean isRunning() {
+	status == 'R'
     }
 
-    def setComplete() {
+    void setComplete() {
         status = 'C'
     }
 
-    def isCompleted() {
-        return status == 'C'
+    boolean isCompleted() {
+	status == 'C'
     }
 
-    @Override
-    public int hashCode() {
+    int hashCode() {
         final int prime = 31
         int result = 1
-        result = prime * result + ((name == null) ? 0 : name.hashCode())
-        return result
+	result = prime * result + (name == null ? 0 : name.hashCode())
+	result
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        //if (this == obj)
-        //	return true
-        if (obj == null)
+    boolean equals(obj) {
+	if (is(obj)) {
+	    return true
+	}
+	if (obj == null) {
             return false
-        if (getClass() != obj.getClass())
+	}
+	if (getClass() != obj.getClass()) {
             return false
-        JobStatus other = (JobStatus) obj
-        if (name == null) {
-            if (other.name != null)
-                return false
-        } else if (!name.equals(other.name))
-            return false
-        return true
-    }
+	}
 
+	name == ((JobStatus) obj).name
+    }
 }

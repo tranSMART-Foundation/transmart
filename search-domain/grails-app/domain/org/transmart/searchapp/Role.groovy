@@ -1,5 +1,3 @@
-package org.transmart.searchapp
-
 /*************************************************************************
  * tranSMART - translational medicine data mart
  *
@@ -18,27 +16,21 @@ package org.transmart.searchapp
  *
  *
  ******************************************************************/
+package org.transmart.searchapp
+
 class Role {
-    // role types
-    static def ADMIN_ROLE = 'ROLE_ADMIN'
-    static def STUDY_OWNER_ROLE = 'ROLE_STUDY_OWNER'
-    static def SPECTATOR_ROLE = 'ROLE_SPECTATOR'
-    static def DS_EXPLORER_ROLE = 'ROLE_DATASET_EXPLORER_ADMIN'
-    static def PUBLIC_USER_ROLE = 'ROLE_PUBLIC_USER'
-    static def TRAINING_USER_ROLE = 'ROLE_TRAINING_USER'
+    String authority
+    String description
 
     static hasMany = [people: AuthUser]
 
-    String description
-    String authority
-
     static mapping = {
-        table 'SEARCH_ROLE'
-        people joinTable: [name: 'SEARCH_ROLE_AUTH_USER', key: 'PEOPLE_ID', column: 'AUTHORITIES_ID']
+	table 'SEARCHAPP.SEARCH_ROLE'
+
+	people joinTable: [name: 'SEARCHAPP.SEARCH_ROLE_AUTH_USER', key: 'PEOPLE_ID', column: 'AUTHORITIES_ID']
     }
 
     static constraints = {
-        authority(blank: false, unique: true)
-        description()
+	authority blank: false, unique: true
     }
 }

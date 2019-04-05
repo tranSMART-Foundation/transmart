@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.export;
 
@@ -24,63 +23,102 @@ import org.codehaus.groovy.grails.web.json.JSONException;
 import org.codehaus.groovy.grails.web.json.JSONObject;
 
 /**
- * 
  * @author Chris Uhrich
- * @version 1.0
- * 
- * Copyright 2008 Recombinant Data Corp.
  */
 public class ExportColumn {
-	private String id;
-	private String label;
-	private String pattern;
-	private String type;
+    private String id;
+    private String label;
+    private String pattern;
+    private String type;
+    private String tooltip;
 	
-	public ExportColumn(String id, String label, String pattern, String type) {
-		this.id = id;
-		this.label = label;
-		this.pattern = pattern;
-		this.type = type;
-	}
+    public ExportColumn(String id, String label, String pattern, String type) {
+        this.id = id;
+        this.label = label;
+        this.pattern = pattern;
+        this.type = type;
+        this.tooltip = label;
+    }
+
+    public ExportColumn(String id, String label, String pattern, String type, String tooltip) {
+        this.id = id;
+        this.label = label;
+        this.pattern = pattern;
+        this.type = type;
+        this.tooltip = tooltip;
+    }
 	
-	public JSONObject toJSONObject() throws JSONException {
-		JSONObject json = new JSONObject();
-		json.put("name", id);
-		json.put("header", label);
-		json.put("sortable", true);
-		json.put("width", 50);
-		return json;
-	}
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("name", id);
+        json.put("header", label);
+        json.put("tooltip", tooltip);
+        if (type != null && type.toLowerCase().equals("number")) {
+            json.put("type", "float");
+        }
+        else {
+            json.put("type", "string");
+        }
+        json.put("sortable", true);
+        return json;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public JSONObject toJSON_DataTables() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("sTitle", label);
 
-	public void setId(String id) {
-		this.id = id;
-	}
+        String typeOut;
+        if (type != null) {
+            if (type == "Number") {
+                typeOut = "numeric";
+            }
+            else {
+                typeOut = "string";
+            }
 
-	public String getLabel() {
-		return label;
-	}
+            json.put("sType", typeOut);
+        }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+        return json;
+    }
 
-	public String getPattern() {
-		return pattern;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setPattern(String pattern) {
-		this.pattern = pattern;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTooltip() {
+        return tooltip;
+    }
+
+    public void setTooltip(String tooltip) {
+        this.tooltip = tooltip;
+    }
 }

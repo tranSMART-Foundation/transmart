@@ -1,16 +1,20 @@
 package org.transmart
 
 import com.recomdata.security.AuthUserDetailsService
-import org.apache.commons.logging.Log
+import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.apache.commons.logging.LogFactory
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import org.opensaml.xml.XMLObject
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.saml.SAMLCredential
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService
-import org.springframework.transaction.TransactionStatus
+import org.transmart.plugin.shared.UtilService
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Role
 import org.transmartproject.core.exceptions.UnexpectedResultException
@@ -19,41 +23,62 @@ import javax.annotation.Resource
 
 // not in grails-app/services to avoid being automatically instantiated
 // we want to instantiate it only if SAML is on
+@CompileStatic
 @Slf4j('logger')
-public class FederatedUserDetailsService implements SAMLUserDetailsService {
+class FederatedUserDetailsService implements SAMLUserDetailsService, InitializingBean {
 
     @Resource
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     @Autowired
     SessionFactory sessionFactory
 
-    static Log log = LogFactory.getLog(FederatedUserDetailsService.class)
-
     @Autowired
     AuthUserDetailsService userDetailsService
 
-    @Override
-    public Object loadUserBySAML(SAMLCredential credential)
-            throws UsernameNotFoundException {
+    @Autowired
+    UtilService utilService
+
+    @Value('${org.transmart.security.saml.createInexistentUsers:false}')
+    private boolean createInexistentUsers
+
+    @Value('${org.transmart.security.saml.attribute.username:}')
+    private String usernameAttribute
+
+    @Value('${org.transmart.security.saml.attribute.federatedId:}')
+    private String federatedIdAttribute
+
+    @Value('${org.transmart.security.saml.attribute.firstName:}')
+    private String firstNameAttribute
+
+    @Value('${org.transmart.security.saml.attribute.lastName:}')
+    private String lastNameAttribute
+
+    @Value('${org.transmart.security.saml.attribute.email:}')
+    private String emailAttribute
+
+    private List<String> defaultRoleNames
+
+    @Transactional
+    def loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
 
         String federatedId = fetchFederatedId(credential)
         try {
-            logger.debug("Searching for user with federated id '$federatedId'")
-            return userDetailsService.loadUserByProperty('federatedId', federatedId, true)
+	    logger.debug 'Searching for user with federated id "{}"', federatedId
+	    userDetailsService.loadUserByProperty 'federatedId', federatedId, true
         }
         catch (UsernameNotFoundException nf) {
-            logger.info("No user found with federated id '$federatedId")
-            tryCreateUser(credential, federatedId, nf)
-            logger.info("Trying to load user with federated id '$federatedId' again")
+	    logger.info 'No user found with federated id "{}"', federatedId
+	    tryCreateUser credential, federatedId, nf
+	    logger.info 'Trying to load user with federated id "{}" again', federatedId
 
-            return userDetailsService.loadUserByProperty('federatedId', federatedId, true)
+	    userDetailsService.loadUserByProperty 'federatedId', federatedId, true
         }
     }
 
     String fetchFederatedId(SAMLCredential credential) {
-        if (attributeConfig.federatedId) {
-            getAttr(credential, attributeConfig.federatedId)
+	if (federatedIdAttribute) {
+	    getAttr credential, federatedIdAttribute
         }
         else {
             credential.nameID.value //better be persistent
@@ -63,83 +88,78 @@ public class FederatedUserDetailsService implements SAMLUserDetailsService {
     static String getAttr(SAMLCredential credential, String it) {
         def values = credential.getAttribute(it)?.attributeValues
         if (!values) {
-            throw new UnexpectedResultException('Could not find values ' +
-                    'for attribute ' + it + ' in SAML credential')
+	    throw new UnexpectedResultException(
+		'Could not find values for attribute ' + it + ' in SAML credential')
         }
         if (values.size() > 1) {
-            throw new UnexpectedResultException('Found more than one ' +
-                    'value for attribute ' + it + ': ' + values)
+	    throw new UnexpectedResultException(
+		'Found more than one value for attribute ' + it + ': ' + values)
         }
 
         XMLObject attrValue = values.getAt(0)
         if (attrValue.hasProperty('value')) {
-            attrValue.value
+	    attrValue['value']
         }
         else if (values.hasProperty('textContent')) {
-            attrValue.textContent
+	    attrValue['textContent']
         }
         else {
-            throw new UnexpectedResultException('Unexpected value for ' +
-                    'attribute ' + it + ': ' + attrValue)
+	    throw new UnexpectedResultException(
+		'Unexpected value for attribute ' + it + ': ' + attrValue)
         }
     }
 
-    private def getSamlConfig() {
-        grailsApplication.config.org.transmart.security.saml
-    }
+    private void tryCreateUser(SAMLCredential credential, String federatedId, UsernameNotFoundException nf) {
+	if (!createInexistentUsers) {
+	    logger.warn 'Will not try to create user with federated id "{}", such option is deactivated',
+		federatedId
+	    throw nf
+	}
 
-    private def getAttributeConfig() {
-        samlConfig.attribute
-    }
+	String username = null
+	if (usernameAttribute) {
+	    username = getAttr(credential, usernameAttribute)
+	}
 
-    private void tryCreateUser(SAMLCredential credential, federatedId, nf) {
-        if (grailsApplication.config.org.transmart.security.saml.createInexistentUsers != 'true') {
-            logger.warn('Will not try to create user with federated id ' +
-                    "'$federatedId', such option is deactivated")
-            throw nf
+	String realName = null
+	if (firstNameAttribute && lastNameAttribute) {
+	    String firstName = getAttr(credential, firstNameAttribute) ?: ''
+	    String lastName = getAttr(credential, lastNameAttribute) ?: ''
+	    realName = firstName && lastName ? firstName + ' ' + lastName : firstName + lastName
         }
 
-        AuthUser.withTransaction { TransactionStatus status ->
-            String username = null,
-                   realName = null,
-                   email = null
+	String email = null
+	if (emailAttribute) {
+	    email = getAttr(credential, emailAttribute)
+        }
 
-            if (attributeConfig.username) {
-                username = getAttr(credential, attributeConfig.username)
-            }
-            if (attributeConfig.firstName && attributeConfig.lastName) {
-                realName = getAttr(credential, attributeConfig.firstName) ?: ''
-                if (realName) {
-                    realName += ' '
-                }
-                if (getAttr(credential, attributeConfig.lastName)) {
-                    realName += getAttr(credential, attributeConfig.lastName)
-                }
-            }
-            if (attributeConfig.email) {
-                email = getAttr(credential, attributeConfig.email)
-            }
+	AuthUser newUser = AuthUser.createFederatedUser(federatedId, username, realName, email)
+	updateRoles newUser
 
-            AuthUser newUser = AuthUser.createFederatedUser(federatedId,
-                    username, realName, email, sessionFactory.currentSession)
+	if (newUser.save(flush: true)) {
+	    logger.info 'Created new user. {federatedId={}, username={}, realName={}, email={}}',
+		federatedId, username, realName, email
+        }
+	else {
+	    logger.error 'Failed creating new user with federatedId {}, errors: {}',
+		federatedId, utilService.errorStrings(newUser)
+	    throw nf
+        }
+    }
 
-            if (samlConfig.defaultRoles) {
-                // if new user authorities specified then replace default authorities
-                newUser.authorities.clear()
-                Role.findAllByAuthorityInList(samlConfig.defaultRoles).each { newUser.addToAuthorities(it) }
-            }
-
-            def outcome = newUser.save(flush: true)
-            if (outcome) {
-                logger.info('Created new user. {federatedId=' + federatedId + ', ' +
-                        'username=' + username + ', realName=' + realName + ', email=' +
-                        '' + email + '}')
-            }
-            else {
-                logger.error('Failed creating new user with federatedId ' +
-                        '' + federatedId + ', errors: ' + newUser.errors)
-                throw nf
+    @CompileDynamic
+    private void updateRoles(AuthUser user) {
+	if (defaultRoleNames) {
+            // if new user authorities specified then replace default authorities
+	    user.authorities.clear()
+	    for (Role role in Role.findAllByAuthorityInList(defaultRoleNames)) {
+		user.addToAuthorities role
             }
         }
+    }
+
+    @CompileDynamic
+    void afterPropertiesSet() {
+	defaultRoleNames = grailsApplication.config.org.transmart.security.saml.defaultRoles as List<String>
     }
 }

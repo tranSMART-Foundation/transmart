@@ -1,5 +1,6 @@
 package org.transmartfoundation.status
 
-class RestInterfaceStatus {
+import groovy.transform.CompileStatic
 
-}
+@CompileStatic
+class RestInterfaceStatus {}

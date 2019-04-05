@@ -1,26 +1,21 @@
 package annotation
 
-
 class AmTagItem implements Comparable<AmTagItem> {
-
-    Long id
+    Boolean activeInd
+    String codeTypeName
     String displayName
     Integer displayOrder
-//	String tagItemUid
-    Integer maxValues
+    Boolean editable
     String guiHandler
-    String codeTypeName
-    String tagItemType
-    String tagItemSubtype
+    Integer maxValues
+    Boolean required
     String tagItemAttr
-    Boolean editable = Boolean.TRUE
-    Boolean required = Boolean.TRUE
-    Boolean activeInd = Boolean.TRUE
-    Boolean viewInGrid = Boolean.TRUE
-    Boolean viewInChildGrid = Boolean.TRUE
-    static belongsTo = [amTagTemplate: AmTagTemplate]
+    String tagItemSubtype
+    String tagItemType
+    Boolean viewInChildGrid
+    Boolean viewInGrid
 
-//	AmTagAssociation amTagAssociation
+    static belongsTo = [amTagTemplate: AmTagTemplate]
 
     static mapping = {
         table 'AMAPP.am_tag_item'
@@ -28,43 +23,27 @@ class AmTagItem implements Comparable<AmTagItem> {
         version false
         cache true
         sort 'displayOrder'
-        amTagTemplate joinTable: [name: 'am_tag_template', key: 'tag_template_id', column: 'tag_item_id'], lazy: false
-        id column: 'tag_item_id', generator: 'sequence', params: [sequence: 'AMAPP.SEQ_AMAPP_DATA_ID']
-        amTagTemplate column: 'tag_template_id'
-//		amTagAssociation joinTable: [name: 'am_tag_association',  key:'tag_item_id', column: 'tag_item_id'], lazy: false
 
-    }
-
-    @Override
-    public int compareTo(AmTagItem itemIn) {
-
-        if (itemIn.displayOrder != null && displayOrder != null) {
-            return displayOrder?.compareTo(itemIn.displayOrder)
-        }
-        else {
-            return displayName?.compareTo(itemIn.displayName)
-        }
-        return 0
+	amTagTemplate joinTable: [name: 'AMAPP.am_tag_template', key: 'tag_template_id', column: 'tag_item_id'],
+	    lazy: false, column: 'tag_template_id'
     }
 
     static constraints = {
-        tagItemType(maxSize: 200)
-        tagItemAttr(maxSize: 200)
-        displayName(maxSize: 200)
-        codeTypeName(maxSize: 200)
-        guiHandler(maxSize: 200)
-        tagItemSubtype(nullable: true)
-//		tagItemUid(maxSize:300)
+	codeTypeName maxSize: 200
+	displayName maxSize: 200
+	guiHandler maxSize: 200
+	tagItemAttr maxSize: 200
+	tagItemSubtype nullable: true
+	tagItemType maxSize: 200
     }
 
-    /**
-     * override display
-     */
-    public String toString() {
-        StringBuffer sb = new StringBuffer()
-        sb.append('ID: ').append(this.id).append(', Display Name: ').append(this.displayName)
-        sb.append(', Display Order: ').append(this.displayOrder)
-        return sb.toString()
+    int compareTo(AmTagItem itemIn) {
+	itemIn.displayOrder != null && displayOrder != null ?
+	    displayOrder.compareTo(itemIn.displayOrder) :
+	    displayName?.compareTo(itemIn.displayName);
     }
 
+    String toString() {
+	'ID: ' + id + ', Display Name: ' + displayName + ', Display Order: ' + displayOrder
+    }
 }

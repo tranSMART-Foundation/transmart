@@ -4,64 +4,61 @@ import groovy.transform.ToString
 
 @ToString(includes = ['id', 'displayName', 'originalName', 'fileSize', 'filestoreLocation', 'filestoreName', 'createDate'])
 class FmFile {
-
-    Long id
+    Boolean activeInd = true
+    Date createDate = new Date()
     String displayName
-    String originalName
-    Long fileVersion = 1l
-    String fileType
     Long fileSize
     String filestoreLocation
     String filestoreName
+    String fileType
+    Long fileVersion = 1
     String linkUrl
-    Boolean activeInd = Boolean.TRUE
-    Date createDate = new Date()
-    Date updateDate = new Date()
+    String originalName
     String uniqueId
-
-    static hasMany = [folders: FmFolder]
-    //Should probably only have one, but Grails doesn't allow join table on one-many
-
-    static belongsTo = FmFolder
+    Date updateDate = new Date()
 
     static transients = ['folder', 'uniqueId']
 
+    //Should probably only have one, but Grails doesn't allow join table on one-many
+    static hasMany = [folders: FmFolder]
+
+    static belongsTo = FmFolder
+
     static mapping = {
-        table 'fm_file'
+	table 'FMAPP.fm_file'
+	id column: 'file_id', generator: 'sequence', params: [sequence: 'FMAPP.seq_fm_id']
         version false
         cache true
         sort 'displayName'
-        id column: 'file_id', generator: 'sequence', params: [sequence: 'seq_fm_id']
-        folders joinTable: [name: 'fm_folder_file_association', key: 'file_id', column: 'folder_id']
+
+	folders joinTable: [name: 'FMAPP.fm_folder_file_association', key: 'file_id', column: 'folder_id']
     }
 
     static constraints = {
-        displayName(maxSize: 1000)
-        originalName(maxSize: 1000)
-        fileType(nullable: true, maxSize: 100)
-        fileSize(nullable: true)
-        filestoreLocation(nullable: true, maxSize: 1000)
-        filestoreName(nullable: true, maxSize: 1000)
-        linkUrl(nullable: true, maxSize: 1000)
+	displayName maxSize: 1000
+	fileSize nullable: true
+	filestoreLocation nullable: true, maxSize: 1000
+	filestoreName nullable: true, maxSize: 1000
+	fileType nullable: true, maxSize: 100
+	linkUrl nullable: true, maxSize: 1000
+	originalName maxSize: 1000
     }
 
     /**
-     * Gets file's associated folder.
-     * @return
+     * Find file by its uniqueId
+     * @return file with matching uniqueId or null, if match not found.
      */
+    static FmFile findByUniqueId(String uniqueId) {
+	// TODO BB
+	get FmData.findByUniqueId(uniqueId)?.id
+    }
+
     FmFolder getFolder() {
-        if (folders != null && !folders.isEmpty()) {
-            return folders.iterator().next()
-        }
-        return null
+	folders?.iterator()?.next()
     }
 
-    /**
-     * Sets file's associated folder.
-     * @param folder
-     */
-    def setFolder(FmFolder folder) {
-        this.addToFolders(folder)
+    void setFolder(FmFolder folder) {
+	addToFolders folder
     }
 
     /**
@@ -69,29 +66,14 @@ class FmFile {
      * @return folder's uniqueId
      */
     String getUniqueId() {
-        if (uniqueId == null) {
-            FmData data = FmData.get(id)
-            if (data != null) {
-                uniqueId = data.uniqueId
-                return data.uniqueId
-            }
-            return null
-        }
-        return uniqueId
-    }
+	if (uniqueId) {
+            return uniqueId
+	}
 
-    /**
-     * Find file by its uniqueId
-     * @param uniqueId
-     * @return file with matching uniqueId or null, if match not found.
-     */
-    static FmFile findByUniqueId(String uniqueId) {
-        FmFile file
-        FmData data = FmData.findByUniqueId(uniqueId)
-        if (data != null) {
-            file = FmFile.get(data.id)
+	FmData data = FmData.get(id)
+	if (data) {
+	    uniqueId = data.uniqueId
+	    return uniqueId
         }
-        return file
     }
-
 }

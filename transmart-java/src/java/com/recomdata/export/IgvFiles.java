@@ -18,75 +18,84 @@
  ******************************************************************/
   
 
-/**
- * $Id: IgvFiles.java 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- *
- */
 package com.recomdata.export;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author mmcduffie
+ */
 public class IgvFiles {
-	protected File tmpDir;
-	protected String fileAccessUrl;
+    protected File tmpDir;
+    protected String fileAccessUrl;
+    protected File sampleFile;
+    protected List<File> files = new ArrayList<>();
+    protected File sessionFile;
 	
-	protected File sampleFile;
-	protected List<File> copyNumberFileList;
-	protected File sessionFile;
+    public IgvFiles(String gpFileDirName, String gpFileAccessUrl) {
+        fileAccessUrl = gpFileAccessUrl;
+        // put files in a directory 
+        tmpDir = new File(gpFileDirName);
+        if (! tmpDir.exists()) {
+            tmpDir.mkdir();
+        }
+    }
 	
-	public IgvFiles(String gpFileDirName, String gpFileAccessUrl) throws java.io.IOException {
-		fileAccessUrl = gpFileAccessUrl;
-		// put files in a directory 
-		tmpDir = new File(gpFileDirName);
+    public File getSampleFile() throws IOException {
+        if (sampleFile == null) {
+            sampleFile = File.createTempFile("igv_df_", ".sample.txt", tmpDir);
+        }
+        return sampleFile;
+    }
+	
+    public File createCopyNumberFile() throws IOException {
+        return File.createTempFile("igv_df_", ".cn", tmpDir);
+    }
 		
-		if (! tmpDir.exists()) {
-			tmpDir.mkdir();
-		}
-		
-		copyNumberFileList = new ArrayList<File>();
-	}
+    public void addFile(File file) {
+        files.add(file);
+    }
 	
-	public File getSampleFile() throws java.io.IOException {	
-		if (sampleFile == null)
-			sampleFile = File.createTempFile("gp_df_", ".sample.txt", tmpDir);
-		return this.sampleFile;
-	}
+    public File getSessionFile() throws IOException {
+        if (sessionFile == null) {
+            sessionFile = File.createTempFile("igv_df_", ".xml", tmpDir);
+        }
+        return sessionFile;
+    }
 	
-	public File createCopyNumberFile() throws java.io.IOException {
-		
-		return File.createTempFile("gp_df_", ".cn", tmpDir);
-	}
+    public static String getFileSecurityHash(File file, String userName) throws NoSuchAlgorithmException {
+        String hashWord = userName + Long.toString(file.length());
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        md5.reset();
+        md5.update(hashWord.getBytes());
+        //return md5.digest().toString();
+        return hashWord;
+    }
 	
-	public File getSessionFile() throws java.io.IOException {
-		if (sessionFile == null)
-			sessionFile = File.createTempFile("gp_df_", ".xml", tmpDir);
-		return this.sessionFile;
-	}
+    public String getFileUrlWithSecurityToken(File file, String userName) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        String hashStr = getFileSecurityHash(file, userName);
+        // The URL in the XML document need to have & escaped by &amp;
+        // IGV openSession routine uses the extension of a file or a URL to determine the file type. Put the file name at the end of URL.
+        return fileAccessUrl  + "?user=" + userName + 
+            "&amp;hash=" + URLEncoder.encode(hashStr, "UTF-8")+ "&amp;file=" + URLEncoder.encode(file.getName(), "UTF-8");
+    }
 	
-	public static String getFileSecurityHash(File file, String userName) throws Exception {
-		String hashWord = userName + Long.toString(file.length());
-		MessageDigest md5 = MessageDigest.getInstance("MD5");
-		md5.reset();
-		md5.update(hashWord.getBytes());
-		//return md5.digest().toString();
-		return hashWord;
-	}
-	
-	public String getFileUrlWithSecurityToken(File file, String userName) throws Exception {
-		String hashStr = getFileSecurityHash(file, userName);
-		// The URL in the XML document need to have & escaped by &amp;
-		// IGV openSession routine uses the extension of a file or a URL to determine the file type. Put the file name at the end of URL.
-		return fileAccessUrl  + "?user=" + userName + 
-			"&amp;hash=" + URLEncoder.encode(hashStr, "UTF-8")+ "&amp;file=" + URLEncoder.encode(file.getName(), "UTF-8");
-	}
-	
-	List<File> getCopyNumberFileList() {
-		return copyNumberFileList;
-	}
+    public String getFileUrl(File file) throws Exception {
+        return fileAccessUrl + "/" + URLEncoder.encode(file.getName(), "UTF-8");
+    }
+
+    public List<File> getCopyNumberFileList() {
+        return files;
+    }
+
+    public List<File> getDataFileList() {
+        return files;
+    }
 }

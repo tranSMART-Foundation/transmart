@@ -1,19 +1,17 @@
 package org.transmart
 
-
 import com.recomdata.tea.TEABaseResult
+import groovy.transform.CompileStatic
+import org.transmart.biomart.Experiment
 
 /**
- * @author $Author: mmcduffie $
- * $Id: ExperimentAnalysisResult.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @version $Reversion$
- *
+ * @author mmcduffie
  */
-public class ExperimentAnalysisResult extends TEABaseResult {
+@CompileStatic
+class ExperimentAnalysisResult extends TEABaseResult {
 
-    def experiment
-    Long expCount
+    Experiment experiment
 
     // current page rendering in session
-    def pagedAnalysisList
+    List<AnalysisResult> pagedAnalysisList
 }

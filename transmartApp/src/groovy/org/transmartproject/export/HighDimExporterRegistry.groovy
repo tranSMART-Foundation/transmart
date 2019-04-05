@@ -2,9 +2,11 @@ package org.transmartproject.export
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Component
 
+@CompileStatic
 @Component
 @Slf4j('logger')
 class HighDimExporterRegistry {
@@ -13,29 +15,22 @@ class HighDimExporterRegistry {
 
     /**
      * Register a new high dimensional data exporter.
-     * @param exporterFormat
-     * @param exporterClass
      */
-    void registerHighDimensionExporter(String exporterFormat,
-                                       HighDimExporter exporter) {
-        this.exporterRegistry.put(exporterFormat, exporter)
-        logger.debug "Registered high dimensional exporter '$exporterFormat'"
+    void registerHighDimensionExporter(String exporterFormat, HighDimExporter exporter) {
+	exporterRegistry.put exporterFormat, exporter
+	logger.debug 'Registered high dimensional exporter "{}"', exporterFormat
     }
 
     /**
-     * @param criteriaMap.dataType Name of the datatype to export
-     * @param criteriaMap.fileFormat Format to export
-     * @return Returns a set of exporters that are able to export
-     * a certain datatype or certain file format.
+     * @param dataType Name of the datatype to export
+     * @param fileFormat Format to export
+     * @return exporters that are able to export a certain datatype or certain file format
      */
-    Set<HighDimExporter> findExporters(Map criteriaMap = [:]) {
-        String fileFormat = criteriaMap.fileFormat
-        String dataType = criteriaMap.dataType
-
-        final Set<HighDimExporter> exporters
+    Set<HighDimExporter> findExporters(String fileFormat, String dataType) {
+	Set<HighDimExporter> exporters
         if (fileFormat) {
             if (!exporterRegistry.containsKey(fileFormat)) {
-                throw new NoSuchExporterException('Unknown format: ' + fileFormat)
+		throw new NoSuchExporterException("Unknown format: ${fileFormat}")
             }
             exporters = exporterRegistry.get(fileFormat) as Set
         }
@@ -44,13 +39,12 @@ class HighDimExporterRegistry {
         }
 
         if (dataType) {
-            exporters.findAll { exporter ->
-                exporter.isDataTypeSupported(dataType)
-            }
+	    exporters.findAll { HighDimExporter exporter ->
+		exporter.isDataTypeSupported dataType
+	    } as Set<HighDimExporter>
         }
         else {
             exporters
         }
     }
-
 }

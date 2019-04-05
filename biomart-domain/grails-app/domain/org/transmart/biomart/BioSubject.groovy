@@ -16,38 +16,30 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioSubject {
-    Long id
+    String organism
     Long siteSubjectId
     String source
     String sourceCode
     String status
-    String organism
     String type
+
     static mapping = {
-        table 'BIO_SUBJECT'
+	table 'BIOMART.BIO_SUBJECT'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_SUBJECT_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_SUBJECT_ID'
-            siteSubjectId column: 'SITE_SUBJECT_ID'
-            source column: 'SOURCE'
-            sourceCode column: 'SOURCE_CODE'
-            status column: 'STATUS'
-            organism column: 'ORGANISM'
-            type column: 'BIO_SUBJECT_TYPE'
-        }
+
+        type column: 'BIO_SUBJECT_TYPE'
     }
+
     static constraints = {
-        siteSubjectId(nullable: true)
-        source(nullable: true, maxSize: 400)
-        sourceCode(nullable: true, maxSize: 400)
-        status(nullable: true, maxSize: 400)
-        organism(nullable: true, maxSize: 400)
-        type(maxSize: 400)
+	organism nullable: true, maxSize: 400
+	siteSubjectId nullable: true
+	source nullable: true, maxSize: 400
+	sourceCode nullable: true, maxSize: 400
+	status nullable: true, maxSize: 400
+	type maxSize: 400
     }
 }

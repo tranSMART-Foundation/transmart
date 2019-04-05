@@ -16,38 +16,27 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.searchapp
 
 class SearchKeywordTerm {
-    Long ownerAuthUserId
     String keywordTerm
-    SearchKeyword searchKeyword
+    Long ownerAuthUserId
     Long rank
-    Long id
+    SearchKeyword searchKeyword
     Long termLength
 
     static belongsTo = [searchKeyword: SearchKeyword]
 
     static mapping = {
-        table 'SEARCH_KEYWORD_TERM'
+	table 'SEARCHAPP.SEARCH_KEYWORD_TERM'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            ownerAuthUserId column: 'OWNER_AUTH_USER_ID'
-            keywordTerm column: 'KEYWORD_TERM'
-            searchKeyword column: 'SEARCH_KEYWORD_ID'
-            rank column: 'RANK'
-            id column: 'SEARCH_KEYWORD_TERM_ID'
-            termLength column: 'TERM_LENGTH'
-        }
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID'], column: 'SEARCH_KEYWORD_TERM_ID'
     }
 
     static constraints = {
-        ownerAuthUserId(nullable: true)
-        keywordTerm(maxSize: 200)
-        rank(nullable: true)
-        termLength(nullable: true)
+	keywordTerm maxSize: 200
+	ownerAuthUserId nullable: true
+	rank nullable: true
+	termLength nullable: true
     }
 }

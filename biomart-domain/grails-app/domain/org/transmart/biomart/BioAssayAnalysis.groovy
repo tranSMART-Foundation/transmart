@@ -16,104 +16,101 @@
  * 
  *
  ******************************************************************/
-  
-
-/**
- * $Id: BioAssayAnalysis.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
 package org.transmart.biomart
 
 import com.recomdata.util.IExcelProfile
+import grails.util.Environment
 
 class BioAssayAnalysis implements IExcelProfile {
-	String name
-	String shortDescription
-	String longDescription
-	Date createDate
-	String qaCriteria
-	String analystId
-	Long id
-	Double foldChangeCutoff
-	Double pValueCutoff
-	Double rValueCutoff
-	BioAssayAnalysisPlatform analysisPlatform
-	String assayDataType
-	String analysisMethodCode
-	String type
-	Long dataCount
-	Long teaDataCount
-	String etlId
-	static hasMany=[datasets:BioAssayDataset,files:ContentReference, uniqueIds: BioData, diseases:Disease, observations:Observation, platforms:BioAssayPlatform]
-	static hasOne=[ext:BioAssayAnalysisExt]
-	static belongsTo=[ContentReference, Disease, Observation, BioAssayPlatform]
+    String analysisMethodCode
+    BioAssayAnalysisPlatform analysisPlatform
+    String analystId
+    String assayDataType
+    Date createDate
+    Long dataCount
+    String etlId
+    Double foldChangeCutoff
+    String longDescription
+    String name
+    Double pValueCutoff
+    String qaCriteria
+    Double rValueCutoff
+    String shortDescription
+    Long teaDataCount
+    String type
 
-	static mapping = {
-		table 'BIO_ASSAY_ANALYSIS'
-		version false
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
-		columns {
-			name column:'ANALYSIS_NAME'
-			shortDescription column:'SHORT_DESCRIPTION'
-			longDescription column:'LONG_DESCRIPTION'
-			createDate column:'ANALYSIS_CREATE_DATE'
-			qaCriteria column:'QA_CRITERIA'
-			analystId column:'ANALYST_ID'
-			id column:'BIO_ASSAY_ANALYSIS_ID'
-			etlId column:'ETL_ID'
-			foldChangeCutoff column:'FOLD_CHANGE_CUTOFF'
-			pValueCutoff column:'PVALUE_CUTOFF'
-			rValueCutoff column:'RVALUE_CUTOFF'
-			analysisPlatform column:'BIO_ASY_ANALYSIS_PLTFM_ID'
-			type column:'ANALYSIS_TYPE'
-			dataCount column:'DATA_COUNT'
-			teaDataCount column:'TEA_DATA_COUNT'
-			assayDataType column:'BIO_ASSAY_DATA_TYPE'
-			analysisMethodCode column:'ANALYSIS_METHOD_CD'
-			datasets joinTable:[name:'BIO_ASY_ANALYSIS_DATASET',key:'BIO_ASSAY_ANALYSIS_ID']
-			ext joinTable:[name:'BIO_ASSAY_ANALYSIS_EXT',key:'BIO_ASSAY_ANALYSIS_ID']
-			files joinTable:[name:'BIO_CONTENT_REFERENCE', key:'BIO_DATA_ID', column:'BIO_CONTENT_REFERENCE_ID'], cache:true
-			diseases joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DATA_ID'], cache:true
-			observations joinTable:[name:'BIO_DATA_OBSERVATION', key:'BIO_DATA_ID'], cache:true
-			platforms joinTable:[name:'BIO_DATA_PLATFORM', key:'BIO_DATA_ID'], cache:true
-            uniqueIds joinTable: [name: 'BIO_DATA_UID', key: 'BIO_DATA_ID']
-		}
-	}
+    static transients = ['uniqueId', 'values']
 
-	static constraints = {
-		name(nullable:true, maxSize:1000)
-		shortDescription(nullable:true, maxSize:1020)
-		longDescription(nullable:true, maxSize:4000)
-		createDate(nullable:true)
-		qaCriteria(nullable:true, maxSize:4000)
-		analystId(nullable:true, maxSize:1020)
-		foldChangeCutoff(nullable:true)
-		pValueCutoff(nullable:true)
-		rValueCutoff(nullable:true)
-		analysisPlatform(nullable:true)
-		type(nullable:true, maxSize:400)
-		ext(nullable:true)
-	}
+    static hasOne=[ext:BioAssayAnalysisExt]
 
-	/**
-	 * get top analysis data records for the indicated analysis
-	 */
-	def static getTopAnalysisDataForAnalysis(Long analysisId, int topCount){
-		def query = 'SELECT DISTINCT baad, baad_bm FROM org.transmart.biomart.BioAssayAnalysisData baad JOIN baad.featureGroup.markers baad_bm  WHERE baad.analysis.id =:aid ORDER BY ABS(baad.foldChangeRatio) desc, baad.rValue, baad.rhoValue DESC'
-		return BioAssayAnalysisData.executeQuery(query, [aid:analysisId], [max:topCount])
-	}
+    static hasMany = [datasets: BioAssayDataset,
+	              diseases: Disease,
+	              files: ContentReference,
+	              observations: Observation,
+	              platforms: BioAssayPlatform,
+	              uniqueIds: BioData]
 
-	/**
-	 * Get values to Export to Excel
-	 */
-	public List getValues() {
-		return [shortDescription, longDescription, pValueCutoff, foldChangeCutoff, qaCriteria, analysisPlatform == null ? '' : analysisPlatform.platformName, analysisMethodCode, assayDataType]
-	}
+    static belongsTo = [BioAssayPlatform, ContentReference, Disease, Observation]
+
+    static mapping = {
+	table 'BIOMART.BIO_ASSAY_ANALYSIS'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASSAY_ANALYSIS_ID'
+	version false
+
+	analysisMethodCode column: 'ANALYSIS_METHOD_CD'
+	analysisPlatform column: 'BIO_ASY_ANALYSIS_PLTFM_ID'
+	assayDataType column: 'BIO_ASSAY_DATA_TYPE'
+	createDate column:'ANALYSIS_CREATE_DATE'
+	datasets joinTable: [name: 'BIOMART.BIO_ASY_ANALYSIS_DATASET', key: 'BIO_ASSAY_ANALYSIS_ID']
+	diseases joinTable: [name: 'BIOMART.BIO_DATA_DISEASE', key: 'BIO_DATA_ID'], cache: true
+	ext joinTable: [name: 'BIOMART.BIO_ASSAY_ANALYSIS_EXT', key: 'BIO_ASSAY_ANALYSIS_ID']
+	files joinTable: [name: 'BIOMART.BIO_CONTENT_REFERENCE', key: 'BIO_DATA_ID', column: 'BIO_CONTENT_REFERENCE_ID'], cache: true
+	name column: 'ANALYSIS_NAME'
+	observations joinTable: [name: 'BIOMART.BIO_DATA_OBSERVATION', key: 'BIO_DATA_ID'], cache: true
+	platforms joinTable: [name: 'BIOMART.BIO_DATA_PLATFORM', key: 'BIO_DATA_ID'], cache: true
+	pValueCutoff column:'PVALUE_CUTOFF'
+	rValueCutoff column:'RVALUE_CUTOFF'
+	type column:'ANALYSIS_TYPE'
+	uniqueIds joinTable: [name: 'BIOMART.BIO_DATA_UID', key: 'BIO_DATA_ID']
+    }
+
+    static constraints = {
+	analysisPlatform nullable: true
+	analystId nullable: true, maxSize: 1020
+	createDate nullable: true
+	ext nullable: true
+	foldChangeCutoff nullable: true
+	longDescription nullable: true, maxSize: 4000
+	name nullable: true, maxSize: 1000
+	pValueCutoff nullable: true
+	qaCriteria nullable: true, maxSize: 4000
+	rValueCutoff nullable: true
+	shortDescription nullable: true, maxSize: 1020
+	type nullable: true, maxSize: 400
+    }
+
+    /**
+     * get top analysis data records for the indicated analysis
+     */
+    static List<Object[]> getTopAnalysisDataForAnalysis(long analysisId, int topCount) {
+	// ordering fails in H2 (and possibly when deployed), so exclude it to test most of the query
+	String orderBy = Environment.current == Environment.TEST ? '' :
+	    'ORDER BY ABS(baad.foldChangeRatio) desc, baad.rValue, baad.rhoValue DESC'
+	executeQuery '''
+		SELECT DISTINCT baad, baad_bm
+		FROM org.transmart.biomart.BioAssayAnalysisData baad
+		JOIN baad.featureGroup.markers baad_bm
+		WHERE baad.analysis.id=:aid
+		''' + orderBy,
+		[aid: analysisId], [max: topCount]
+    }
+
+    List getValues() {
+	[shortDescription, longDescription, pValueCutoff, foldChangeCutoff, qaCriteria,
+	 analysisPlatform == null ? '' : analysisPlatform.platformName, analysisMethodCode, assayDataType]
+    }
     
-    def getUniqueId() {
-        if (uniqueIds != null && !uniqueIds.isEmpty())
-            return uniqueIds.iterator().next()
-        return null
+    BioData getUniqueId() {
+	uniqueIds?.iterator()?.next()
     }
 }

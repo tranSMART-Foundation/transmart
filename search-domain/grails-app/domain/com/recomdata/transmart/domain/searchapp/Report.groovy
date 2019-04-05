@@ -16,47 +16,38 @@
 *
 *
 ******************************************************************/
- 
-
 package com.recomdata.transmart.domain.searchapp
 
 import java.text.SimpleDateFormat
 
 class Report {
-	   Long id
-	   String name
-	   Date timestamp = new Date()
-	   String description
-	   String creatingUser
-	   String publicFlag
-	   String study
+    String creatingUser
+    String description
+    String name
+    String publicFlag
+    String study
+    Date timestamp = new Date()
+
+    static transients = ['displayDate']
 	   
-	   static hasMany = [reportItems: ReportItem]
+    static hasMany = [reportItems: ReportItem]
 	   
-static mapping = {
+    static mapping = {
 	table 'SEARCHAPP.REPORT'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'REPORT_ID'
 	version false
-	id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
-	columns {
-	   id column:'REPORT_ID'
-	   name column:'NAME'
-	   timestamp column:'CREATE_DATE'
-	   description column:'DESCRIPTION'
-	   creatingUser column:'CREATINGUSER'
-	   publicFlag column:'PUBLIC_FLAG'
-	   study column:'STUDY'
-	   }
-   }
 
-static constraints = {
-	timestamp(nullable:true)
-	description(nullable:true)
-	name(nullable:true)
-	   }
+	creatingUser column:'CREATINGUSER'
+	timestamp column: 'CREATE_DATE'
+    }
 
-def getDisplayDate(){
-	def dateFormat = new SimpleDateFormat('MM-dd-yyyy')
-	return dateFormat.format(timestamp)
-}
+    static constraints = {
+	description nullable: true
+	name nullable: true
+	timestamp nullable: true
+    }
 
+    String getDisplayDate() {
+	new SimpleDateFormat("MM-dd-yyyy").format timestamp
+    }
 }

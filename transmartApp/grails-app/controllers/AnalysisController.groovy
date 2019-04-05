@@ -99,20 +99,21 @@ class AnalysisController {
 	    i2b2HelperService.fillDefaultRbmpanelInHeatMapValidator(hv2, ci2, concepts2)
         }
 
-	Map result = [defaultPlatforms      : [hv1.getFirstPlatform(), hv2.getFirstPlatform()],
-		      defaultPlatformLabels : [hv1.getFirstPlatformLabel(), hv2.getFirstPlatformLabel()],
-		      trials                : [ci1.getAllTrials(), ci2.getAllTrials()],
-		      defaultTimepoints     : [hv1.getAllTimepoints(), hv2.getAllTimepoints()],
-		      defaultTimepointLabels: [hv1.getAllTimepointLabels(), hv2.getAllTimepointLabels()],
-		      defaultSamples        : [hv1.getAllSamples(), hv2.getAllSamples()],
-		      defaultSampleLabels   : [hv1.getAllSampleLabels(), hv2.getAllSampleLabels()],
-		      defaultGpls           : [hv1.getAll('gpls'), hv2.getAll('gpls')],
-		      defaultGplLabels      : [hv1.getAll('gplLabels'), hv2.getAll('gplLabels')],
-		      defaultTissues        : [hv1.getAll('tissues'), hv2.getAll('tissues')],
-		      defaultTissueLabels   : [hv1.getAll('tissueLabels'), hv2.getAll('tissueLabels')],
-		      defaultRbmpanels      : [hv1.getAll('rbmpanels'), hv2.getAll('rbmpanels')],
-		      defaultRbmpanelLabels : [hv1.getAll('rbmpanelsLabels'), hv2.getAll('rbmpanelsLabels')],
-		      markerType            : markerType]
+	Map result = [
+	    defaultPlatforms      : [hv1.getFirstPlatform(), hv2.getFirstPlatform()],
+	    defaultPlatformLabels : [hv1.getFirstPlatformLabel(), hv2.getFirstPlatformLabel()],
+	    trials                : [ci1.getAllTrials(), ci2.getAllTrials()],
+	    defaultTimepoints     : [hv1.getAllTimepoints(), hv2.getAllTimepoints()],
+	    defaultTimepointLabels: [hv1.getAllTimepointLabels(), hv2.getAllTimepointLabels()],
+	    defaultSamples        : [hv1.getAllSamples(), hv2.getAllSamples()],
+	    defaultSampleLabels   : [hv1.getAllSampleLabels(), hv2.getAllSampleLabels()],
+	    defaultGpls           : [hv1.getAll('gpls'), hv2.getAll('gpls')],
+	    defaultGplLabels      : [hv1.getAll('gplLabels'), hv2.getAll('gplLabels')],
+	    defaultTissues        : [hv1.getAll('tissues'), hv2.getAll('tissues')],
+	    defaultTissueLabels   : [hv1.getAll('tissueLabels'), hv2.getAll('tissueLabels')],
+	    defaultRbmpanels      : [hv1.getAll('rbmpanels'), hv2.getAll('rbmpanels')],
+	    defaultRbmpanelLabels : [hv1.getAll('rbmpanelsLabels'), hv2.getAll('rbmpanelsLabels')],
+	    markerType            : markerType]
 	render result as JSON
     }
 
@@ -174,7 +175,7 @@ class AnalysisController {
 
 	try {
 	    logger.debug 'Received SNPViewer rendering request: {}', request
-
+	    
 	    logger.debug '\tresult_instance_id1: {}', result_instance_id1
 	    logger.debug '\tresult_instance_id2: {}', result_instance_id2
 
@@ -246,7 +247,7 @@ class AnalysisController {
 		logger.debug 'URL for viewer: {}', viewerURL
 		result.put('viewerURL', viewerURL)
 		result.put('snpGeneAnnotationPage', geneSnpPageBuf.toString())
-
+		
 		logger.debug 'result: {}', result
 	    }
 	    catch (JSONException e) {
@@ -520,8 +521,8 @@ class AnalysisController {
 
 	    chroms = chroms ?: 'ALL'
 
-//			accessLogService.report 'DatasetExplorer-ShowIgv',
-//					'RID1:' + resultInstanceID1 + ' RID2:' + resultInstanceID2
+//	    accessLogService.report 'DatasetExplorer-ShowIgv',
+//		'RID1:' + resultInstanceID1 + ' RID2:' + resultInstanceID2
 
 	    //Gather subjects from Sample IDs.
 	    //Form a list of lists of longs. We will convert the outside list to an array in a later method.
@@ -704,7 +705,6 @@ class AnalysisController {
 	}
     }
 
-    //This function parses the ','-separated gene strings like 'Gene>MET', and returns a list of gene search IDs and a list of matching gene names.
     void getGeneSearchIdListFromRequest(String genes, String geneAndIdListStr, List<Long> geneSearchIdList, List<String> geneNameList) {
 	if (!genes || !geneAndIdListStr || !geneSearchIdList || !geneNameList) {
 	    return
@@ -892,7 +892,9 @@ class AnalysisController {
 	 chromDefault   : 'ALL']
     }
 
-    //* Obtain the pathway for biomarker comparison when using the heatmap in dataset explorer.
+    /**
+     * Obtain the pathway for biomarker comparison when using the heatmap in dataset explorer.
+     */
     def ajaxGetPathwaySearchBoxData(String query, String callback) {
 	logger.info 'Obtaining pathways for {}', query
 

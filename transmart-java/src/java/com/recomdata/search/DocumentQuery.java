@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.search;
 
@@ -26,201 +25,207 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PhraseQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocCollector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DocumentQuery {
 
-	public final static int MAX_HITS = 51200;
-	public final static int MAX_CLAUSE_COUNT = 8192;
-	private String[] fields = { "contents", "summary", "path", "title", "repository" };
-	private File index = null;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	public DocumentQuery(String index) {
+    public final static int MAX_HITS = 51200;
+    public final static int MAX_CLAUSE_COUNT = 8192;
+    private File index;
+    public DocumentQuery(String index) {
 
-		this.index = new File(index);
-		BooleanQuery.setMaxClauseCount(MAX_CLAUSE_COUNT);
+        this.index = new File(index);		BooleanQuery.setMaxClauseCount(MAX_CLAUSE_COUNT);
 
-	}
+    }
 
-	public int searchCount(LinkedHashMap<String, ArrayList<String> > searchTerms, LinkedHashMap<String, ArrayList<String> > filterTerms) {
+    public int searchCount(Map<String, List<String>> searchTerms, Map<String, List<String>> filterTerms) {
 
-		Query query = buildQuery(searchTerms);
-		Filter filter = buildFilter(filterTerms);
-		IndexReader reader = null;
-		Searcher searcher = null;
+        Query query = buildQuery(searchTerms);
+        Filter filter = buildFilter(filterTerms);
+        IndexReader reader = null;
+        Searcher searcher = null;
+
+        try {
+            reader = IndexReader.open(index);
+            searcher = new IndexSearcher(reader);
+            TopDocCollector collector = new TopDocCollector(MAX_HITS);
+            if (filter != null) {
+                searcher.search(query, filter, collector);
+            }
+            else {
+                searcher.search(query, collector);
+            }
+            return collector.topDocs().scoreDocs.length;
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return 0;
+        }
+        finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (searcher != null) {
+                    searcher.close();
+                }
+            }
+            catch (Exception e2) {
+                logger.error(e2.getMessage(), e2);
+                return 0;
+            }
+        }
+    }
+
+    public DocumentHit[] search(Map<String, List<String>> searchTerms, Map<String, List<String>> filterTerms, int max, int offset) {
+
+        Query query = buildQuery(searchTerms);
+        Filter filter = buildFilter(filterTerms);
+
+        DocumentHit[] documents = null;
+        try {
+            IndexReader reader = IndexReader.open(index);
+            Searcher searcher = new IndexSearcher(reader);
+            Analyzer analyzer = new StandardAnalyzer();
+            TopDocCollector collector = new TopDocCollector(offset + max);
+            if (filter != null) {
+                searcher.search(query, filter, collector);
+            }
+            else {
+                searcher.search(query, collector);
+            }
+            ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            int size = hits.length - offset < max ? hits.length - offset : max;
+            documents = new DocumentHit[size];
+            for (int i = offset; i < offset + max && i < hits.length; i++) {
+                query.rewrite(reader);
+                documents[i - offset] = new DocumentHit(searcher.doc(hits[i].doc), hits[i].doc, hits[i].score, query, analyzer);
+            }
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return documents;
+
+    }
+
+    private Query buildQuery(Map<String, List<String>> searchTerms) {
+
+        BooleanQuery andQuery = new BooleanQuery();
+
+        for (String key : searchTerms.keySet()) {
+            List<String> list = searchTerms.get(key);
+            List<Query> queries = new ArrayList<>();
+            for (String value : list) {
+                if (!value.contains(" ")) {
+                    queries.add(new TermQuery(new Term("contents", value.toLowerCase())));
+                }
+                else {
+                    String[] values = value.split(" ");
+                    PhraseQuery phraseQuery = new PhraseQuery();
+                    for (String v : values) {
+                        phraseQuery.add(new Term("contents", v.toLowerCase()));
+                    }
+                    queries.add(phraseQuery);
+                }
+            }
+            addQueries(andQuery, queries);
+        }
+        return andQuery;
+
+    }
+
+    private Filter buildFilter(Map<String, List<String>> filterTerms) {
+
+        BooleanQuery andQuery = new BooleanQuery();
 		
-		try {
-		    reader = IndexReader.open(index);
-		    searcher = new IndexSearcher(reader);
-		    TopDocCollector collector = new TopDocCollector(MAX_HITS);
-		    if (filter != null) {
-		    	searcher.search(query, filter, collector);
-		    } else {
-		    	searcher.search(query, collector);
-		    }
-		    ScoreDoc[] hits = collector.topDocs().scoreDocs;
-			return hits.length;
-		} catch (Exception e) {
-			System.out.println("exception: " + e.getMessage());
-			return 0;
-		} finally {
-			try {
-				if (reader != null) {
-					reader.close();
-				}
-				if (searcher != null) {
-					searcher.close();
-				}
-			} catch (Exception e2) {
-				System.out.println("exception: " + e2.getMessage());
-				return 0;
-			}
-		}
+        if (filterTerms.containsKey("REPOSITORY")) {
+            // The repository field is stored as non-analyzed, so matches need to be exact.
+            List<String> list = filterTerms.get("REPOSITORY");
+            List<Query> queries = new ArrayList<>();
+            for (String value : list) {
+                queries.add(new TermQuery(new Term("repository", value)));
+            }
+            addQueries(andQuery, queries);
+        }
 
-	}
+        if (filterTerms.containsKey("PATH")) {
+            // The path field is stored as analyzed, so the search terms also need to be analyzed in order to get a match.
+            try {
+                List<String> list = filterTerms.get("PATH");
+                if (list.size() > 0) {
+                    StringReader reader = new StringReader(list.get(0));
+                    StandardAnalyzer analyzer = new StandardAnalyzer();
+                    TokenStream tokenizer = analyzer.tokenStream("path", reader);
+                    PhraseQuery phraseQuery = new PhraseQuery();
+                    Token token = new Token();
+                    for (token = tokenizer.next(token); token != null; token = tokenizer.next(token)) {
+                        phraseQuery.add(new Term("path", token.term()));
+                    }
+                    andQuery.add(phraseQuery, BooleanClause.Occur.MUST);
+                }
+            }
+            catch (IOException ignored) {
+                // do nothing
+            }
+        }
 
-	public DocumentHit[] search(LinkedHashMap<String, ArrayList<String> > searchTerms, LinkedHashMap<String, ArrayList<String> > filterTerms, int max, int offset) {
+        if (filterTerms.containsKey("EXTENSION")) {
+            List<String> list = filterTerms.get("EXTENSION");
+            List<Query> queries = new ArrayList<>();
+            for (String value : list) {
+                queries.add(new TermQuery(new Term("extension", value.toLowerCase())));
+            }
+            addQueries(andQuery, queries);
+        }
 
-		Query query = buildQuery(searchTerms);
-		Filter filter = buildFilter(filterTerms);
+        if (filterTerms.containsKey("NOTEXTENSION")) {
+            List<String> list = filterTerms.get("NOTEXTENSION");
+            for (String value : list) {
+                andQuery.add(
+                    new TermQuery(new Term("extension", value.toLowerCase())),
+                    BooleanClause.Occur.MUST_NOT);
+            }
+        }
 
-		DocumentHit[] documents = null;
-		try {
-		    IndexReader reader = IndexReader.open(index);
-		    Searcher searcher = new IndexSearcher(reader);
-		    Analyzer analyzer = new StandardAnalyzer();
-		    TopDocCollector collector = new TopDocCollector(offset + max);
-		    if (filter != null) {
-		    	searcher.search(query, filter, collector);
-		    } else {
-		    	searcher.search(query, collector);
-		    }
-		    ScoreDoc[] hits = collector.topDocs().scoreDocs;
-		    int size = hits.length - offset < max ? hits.length - offset : max;
-			documents = new DocumentHit[size];
-			for (int i = offset; i < offset + max && i < hits.length; i++) {
-				query.rewrite(reader);
-				documents[i - offset] = new DocumentHit(searcher.doc(hits[i].doc), hits[i].doc, hits[i].score, query, analyzer);
-			}
-		} catch (Exception e) {
-			System.out.println("exception: " + e.getMessage());
-		}
-
-		return documents;
-
-	}
-
-	private Query buildQuery(LinkedHashMap<String, ArrayList<String> > searchTerms) {
-
-		BooleanQuery andQuery = new BooleanQuery();
-
-		for (String key : searchTerms.keySet()) {
-			ArrayList<String> list = searchTerms.get(key);
-			ArrayList<Query> queries = new ArrayList<Query>();
-			for (String value : list) {
-				if (value.indexOf(" ") == -1) {
-					Term term = new Term("contents", value.toLowerCase());
-					TermQuery termQuery = new TermQuery(term);
-					queries.add(termQuery);
-				} else {
-					String[] values = value.split(" ");
-					PhraseQuery phraseQuery = new PhraseQuery();
-					for (String v : values) {
-						Term term = new Term("contents", v.toLowerCase());
-						phraseQuery.add(term);
-					}
-					queries.add(phraseQuery);
-				}
-			}
-			addQueries(andQuery, queries);
-		}
-		
-		return andQuery;
-
-	}
-
-	private Filter buildFilter(LinkedHashMap<String, ArrayList<String> > filterTerms) {
-
-		BooleanQuery andQuery = new BooleanQuery();
-		
-		if (filterTerms.containsKey("REPOSITORY")) {
-			// The repository field is stored as non-analyzed, so matches need to be exact.
-			ArrayList<String> list = filterTerms.get("REPOSITORY");
-			ArrayList<Query> queries = new ArrayList<Query>();
-			for (String value : list) {
-					Term term = new Term("repository", value);
-					TermQuery termQuery = new TermQuery(term);
-					queries.add(termQuery);
-			}
-			addQueries(andQuery, queries);
-		}
-
-		if (filterTerms.containsKey("PATH")) {
-			// The path field is stored as analyzed, so the search terms also need to be analyzed in order to get a match.
-			try {
-				ArrayList<String> list = filterTerms.get("PATH");
-				if (list.size() > 0) {
-					StringReader reader = new StringReader(list.get(0));
-					StandardAnalyzer analyzer = new StandardAnalyzer();
-					TokenStream tokenizer = analyzer.tokenStream("path", reader);
-					PhraseQuery phraseQuery = new PhraseQuery();
-					Token token = new Token();
-					for (token = tokenizer.next(token); token != null; token = tokenizer.next(token)) {
-						Term term = new Term("path", token.term());
-						phraseQuery.add(term);
-					}
-					andQuery.add(phraseQuery, BooleanClause.Occur.MUST);
-				}
-			} catch (IOException ex) {
-				// do nothing
-			}
-		}
-		
-		if (filterTerms.containsKey("EXTENSION")) {
-			ArrayList<String> list = filterTerms.get("EXTENSION");
-			ArrayList<Query> queries = new ArrayList<Query>();
-			for (String value : list) {
-				Term term = new Term("extension", value.toLowerCase());
-				TermQuery termQuery = new TermQuery(term);
-				queries.add(termQuery);
-			}
-			addQueries(andQuery, queries);
-		}
-
-		if (filterTerms.containsKey("NOTEXTENSION")) {
-			ArrayList<String> list = filterTerms.get("NOTEXTENSION");
-			for (String value : list) {
-				Term term = new Term("extension", value.toLowerCase());
-				TermQuery termQuery = new TermQuery(term);
-				andQuery.add(termQuery, BooleanClause.Occur.MUST_NOT);
-			}
-		}
-
-		if (andQuery.clauses().size() > 0) {
-			return new QueryWrapperFilter(andQuery);
-		}
-		return null;
-
-	}
+        if (andQuery.clauses().size() > 0) {
+            return new QueryWrapperFilter(andQuery);
+        }
+        
+        return null;
+    }
 	
-	private void addQueries(BooleanQuery andQuery, ArrayList<Query> queries) {
-		
-		if (queries.size() == 1) {
-			andQuery.add(queries.get(0), BooleanClause.Occur.MUST);
-		} else if (queries.size() > 1) {
-			BooleanQuery orQuery = new BooleanQuery();
-			for (Query query : queries) {
-				orQuery.add(query, BooleanClause.Occur.SHOULD);
-			}
-			andQuery.add(orQuery, BooleanClause.Occur.MUST);
-		}
-		
-	}
-
+    private void addQueries(BooleanQuery andQuery, List<Query> queries) {
+        if (queries.size() == 1) {
+            andQuery.add(queries.get(0), BooleanClause.Occur.MUST);
+        }
+        else if (queries.size() > 1) {
+            BooleanQuery orQuery = new BooleanQuery();
+            for (Query query : queries) {
+                orQuery.add(query, BooleanClause.Occur.SHOULD);
+            }
+            andQuery.add(orQuery, BooleanClause.Occur.MUST);
+        }
+    }
 }

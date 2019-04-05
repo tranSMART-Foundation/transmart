@@ -1,10 +1,3 @@
-package org.transmart.searchapp
-
-import groovy.util.logging.Slf4j
-import org.hibernate.SQLQuery
-import org.hibernate.classic.Session
-import org.hibernate.type.StandardBasicTypes
-
 /*************************************************************************
  * tranSMART - translational medicine data mart
  *
@@ -23,120 +16,85 @@ import org.hibernate.type.StandardBasicTypes
  *
  *
  ******************************************************************/
+package org.transmart.searchapp
 
-@Slf4j('logger')
+import org.transmart.plugin.shared.security.Roles
+
+import static org.transmart.searchapp.Principal.PrincipalType.USER
+
 class AuthUser extends Principal {
-    static transients = ['pass']
-    static hasMany = [authorities: Role, groups: UserGroup]
-    static belongsTo = [Role, UserGroup]
-
+    Boolean changePassword
+    String email
+    boolean emailShow
+    String federatedId
+    Integer loginAttempts = 0
+    String pass = '[secret]' // plain password to create a hashed password
+    String passwd
     String username
     String userRealName
-    String passwd
-    String email
-    String federatedId
-    boolean emailShow
-    Boolean changePassword
 
-    /** plain password to create a MD5 password */
-    String pass = '[secret]'
+    static transients = ['pass']
+
+    static hasMany = [authorities: Role, groups: UserGroup]
+
+    static belongsTo = [Role, UserGroup]
 
     static mapping = {
-        table 'SEARCH_AUTH_USER'
+	table 'SEARCHAPP.SEARCH_AUTH_USER'
         version false
-        columns {
-            id column: 'ID'
-            username column: 'USERNAME'
-            userRealName column: 'USER_REAL_NAME'
-            passwd column: 'PASSWD'
-            email column: 'EMAIL'
-            String federatedId
-            emailShow column: 'EMAIL_SHOW'
-            authorities joinTable: [name: 'SEARCH_ROLE_AUTH_USER', key: 'AUTHORITIES_ID', column: 'PEOPLE_ID']
-            groups joinTable: [name: 'SEARCH_AUTH_GROUP_MEMBER', column: 'AUTH_GROUP_ID', key: 'AUTH_USER_ID']
-            changePassword column: 'CHANGE_PASSWD'
-        }
+
+	authorities joinTable: [name: 'SEARCHAPP.SEARCH_ROLE_AUTH_USER', key: 'AUTHORITIES_ID', column: 'PEOPLE_ID']
+        changePassword column: 'CHANGE_PASSWD'
+	groups joinTable: [name: 'SEARCHAPP.SEARCH_AUTH_GROUP_MEMBER', column: 'AUTH_GROUP_ID', key: 'AUTH_USER_ID']
+	loginAttempts column: 'LOGIN_ATTEMPT_COUNT'
     }
 
     static constraints = {
-        username(blank: false, unique: true)
-        userRealName(blank: false)
-        passwd(blank: false)
-        email(nullable: true, maxSize: 255)
-        changePassword(nullable: true)
-        federatedId(nullable: true)
-    }
-
-    def String toString() {
-        return userRealName + ' - ' + username
-    }
-
-    public AuthUser() {
-        this.type = 'USER'
-    }
-
-    def beforeInsert = {
-        if (name == null)
-            name = userRealName
-    }
-
-    def beforeUpdate = {
-        name = userRealName
-    }
-    
-        /**
-	 * is this user an Admin
-	 */
-    def isAdmin() {
-		def bAdmin = false
-		authorities.each { if(it.authority==Role.ADMIN_ROLE) bAdmin = true; }
-		return bAdmin
-	}
-
-    /**
-     * is this user an Data Set Explorer Admin
-     */
-    def isDseAdmin() {
-        authorities.any { it.authority == Role.DS_EXPLORER_ROLE }
+	changePassword nullable: true
+	email nullable: true
+	federatedId nullable: true
+	passwd blank: false
+	username blank: false, unique: true
+	userRealName blank: false
     }
 
     /*
      * Should be called with an open session and active transaction
      */
-    static AuthUser createFederatedUser(String federatedId,
-                                        String username,
-                                        String realName,
-                                        String email,
-                                        Session session) {
-//G
-        //Long id = query.uniqueResult()
-        //logger.debug("New user will have id '$id'")
-
-        def ret = AuthUser.create()
-        //ret.id = id
-
-        ret.federatedId = federatedId
-        ret.username = username ?: federatedId
-        ret.userRealName = realName ?: '<NONE PROVIDED>'
-        ret.name = realName
-        ret.email = email
-        ret.passwd = 'NO_PASSWORD'
-        ret.enabled = true
-
-        ret.addToAuthorities(Role.findByAuthority(Role.SPECTATOR_ROLE))
-
-        ret
+    static AuthUser createFederatedUser(String federatedId, String username, String realName, String email) {
+	new AuthUser(federatedId: federatedId, username: username ?: federatedId,
+		     userRealName: realName ?: '<NONE PROVIDED>', name: realName,
+		     email: email, passwd: 'NO_PASSWORD', enabled: true).addToAuthorities(
+	    Role.findByAuthority(Roles.SPECTATOR.authority))
     }
 
+    // TODO BB move to tx service
     static void removeAll(Role role) {
-        def usersWithRole = AuthUser.withCriteria {
-            authorities {
-                eq('id', role.id)
-            }
-        }
-        usersWithRole.each { AuthUser user ->
-            user.removeFromAuthorities(role)
+	List<AuthUser> usersWithRole = withCriteria {
+	    authorities {
+		eq('id', role.id)
+	    }
+	}
+	for (AuthUser user in usersWithRole) {
+	    user.removeFromAuthorities role
+	}
+    }
+
+    AuthUser() {
+	type = USER
+    }
+
+    String toString() {
+	userRealName + ' - ' + username
+    }
+
+    def beforeInsert() {
+	if (!name) {
+	    name = userRealName
         }
     }
 
+    def beforeUpdate() {
+	name = userRealName
+    }
 }

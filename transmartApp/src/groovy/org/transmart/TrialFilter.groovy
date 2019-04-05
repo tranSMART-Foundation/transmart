@@ -1,18 +1,17 @@
 package org.transmart
 
+import groovy.transform.CompileStatic
+
 /**
- * $Id: TrialFilter.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- * */
+ * @author mmcduffie
+ */
+@CompileStatic
 class TrialFilter {
 
-    def selectedtrials = []
+    List<String> selectedtrials = []
     boolean newFilter = true
 
     String platform
-    //Double foldChange = 1.2
-    //Double pValue = 0.05
     Double foldChange
     Double pvalue
     Double rvalue
@@ -23,90 +22,60 @@ class TrialFilter {
     String studyDesign
     String status
 
-    def hasSelectedTrials() {
-        return selectedtrials.size() > 0
+    boolean hasSelectedTrials() {
+	selectedtrials
     }
 
-    def createTrialInclause() {
-        def s = new StringBuilder()
+    String createTrialInclause() {
+	StringBuilder s = new StringBuilder()
         for (n in selectedtrials) {
-            if (s.length() > 0) {
-                s.append(',')
+	    if (s) {
+		s << ','
             }
-            s.append("'").append(n).append("'")
+	    s << "'" << n << "'"
         }
-        return s.toString()
+	s
     }
 
-    def hasPlatform() {
-        return (platform != null && platform.length() > 0)
+    boolean hasPlatform() {
+	platform
     }
 
-    def hasFoldChange() {
-        return (foldChange != null && foldChange > 0)
+    boolean hasFoldChange() {
+	foldChange
     }
 
-    def hasPValue() {
-        return (pvalue != null && pvalue > 0)
+    boolean hasPValue() {
+	pvalue
     }
 
-    def hasRValue() {
-        return (rvalue != null)
-
+    boolean hasRValue() {
+	rvalue != null
     }
 
-    def hasDisease() {
-        return (bioDiseaseId != null && bioDiseaseId > 0)
+    boolean hasDisease() {
+	bioDiseaseId
     }
 
-    def hasCompound() {
-        return (bioCompoundId != null && bioCompoundId > 0)
+    boolean hasCompound() {
+	bioCompoundId > 0
     }
 
-    def hasPhase() {
-        return (phase != null && phase.length() > 0)
+    boolean hasPhase() {
+	phase
     }
 
-    def hasStudyType() {
-        return (studyType != null && studyType.length() > 0)
+    boolean hasStudyType() {
+	studyType
     }
 
-    def hasStudyDesign() {
-        return (studyDesign != null && studyDesign.length() > 0)
+    boolean hasStudyDesign() {
+	studyDesign
     }
 
-//	def createStudyTypeInValues(){
-//		return createMultipleStringInValues(studyTypes)
-//	}
-//
-//	def createStudyDesignInValues(){
-//		return createMultipleStringInValues(studyDesigns)
-//	}
-//
-//	def createMultipleStringInValues(stringList){
-//		def s = new StringBuilder()
-//		int i = 0
-//		for(n in stringList){
-//			if(i>0)
-//				s.append(',')
-//			s.append("'")
-//			s.append(n.toString())
-//			s.append("'")
-//			i++
-//		}
-//		return s.toString()
-//	}
-
-    def createListTrialInclause() {
-        def s = []
-        // int i = 0
-        for (n in selectedtrials) {
-            s.add(n.toString())
-        }
-        return s
+    String createListTrialInclause() {
+	selectedtrials*.toString()
     }
 
-    def marshal() {
-
-    }
+    def marshal() {}
 }

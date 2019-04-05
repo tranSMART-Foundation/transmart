@@ -16,60 +16,45 @@
  * 
  *
  ******************************************************************/
-  
 package org.transmart.biomart
 
 class BioAssayAnalysisExt {
-	String vendor
-	String vendorType
-	String genomeVersion
-	String tissue
-	String cellType
-	String population
-	String researchUnit
-	String sampleSize
-	String modelName
-	String modelDescription
-	String sensitiveFlag
-	String sensitiveDesc
+    String cellType
+    String genomeVersion
+    String modelDescription
+    String modelName
+    String population
+    String researchUnit
+    String sampleSize
+    String sensitiveDesc
+    String sensitiveFlag
+    String tissue
+    String vendor
+    String vendorType
 	
-	static belongsTo=[bioAssayAnalysis: BioAssayAnalysis]
+    static belongsTo=[bioAssayAnalysis: BioAssayAnalysis]
 
-	static mapping = {
-		table 'BIO_ASSAY_ANALYSIS_EXT'
-		version false
-		cache usage:'read-only'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
-		columns {
-			id column: 'BIO_ASSAY_ANALYSIS_EXT_ID'
-			bioAssayAnalysis: 'BIO_ASSAY_ANALYSIS_ID'
-			vendor column:'VENDOR'
-			vendorType column:'VENDOR_TYPE'
-			genomeVersion column:'GENOME_VERSION'
-			tissue column:'TISSUE'
-			cellType column:'CELL_TYPE'
-			population column:'POPULATION'
-			researchUnit column:'RESEARCH_UNIT'
-			sampleSize column:'SAMPLE_SIZE'
-			modelName column:'MODEL_NAME'
-			modelDescription column:'MODEL_DESC'
-			sensitiveFlag column:'SENSITIVE_FLAG'
-			sensitiveDesc column:'SENSITIVE_DESC'
-		}
-	}
+    static mapping = {
+	table 'BIOMART.BIO_ASSAY_ANALYSIS_EXT'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASSAY_ANALYSIS_EXT_ID'
+	version false
+	cache usage:'read-only'
 
-	static constraints = {
-		vendor(nullable: true)
-		vendorType(nullable: true)
-		genomeVersion(nullable: true)
-		tissue(nullable: true)
-		cellType(nullable: true)
-		population(nullable: true)
-		researchUnit(nullable: true)
-		sampleSize(nullable: true)
-		modelName(nullable: true)
-		modelDescription(nullable: true)
-		sensitiveFlag(nullable: true)
-		sensitiveDesc(nullable: true)
-	}
+	modelDescription column:'MODEL_DESC'
+    }
+
+    static constraints = {
+	cellType nullable: true
+	genomeVersion nullable: true
+	modelDescription nullable: true
+	modelName nullable: true
+	population nullable: true
+	researchUnit nullable: true
+	sampleSize nullable: true
+	sensitiveDesc nullable: true
+	sensitiveFlag nullable: true
+	tissue nullable: true
+	vendor nullable: true
+	vendorType nullable: true
+    }
 }

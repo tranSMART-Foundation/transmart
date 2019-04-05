@@ -1,4 +1,3 @@
-package org.transmart.searchapp
 /*************************************************************************
  * tranSMART - translational medicine data mart
  *
@@ -17,53 +16,52 @@ package org.transmart.searchapp
  *
  *
  ******************************************************************/
+package org.transmart.searchapp
+
 class Principal {
+
+    static enum PrincipalType {
+	ROOT('ROOT'),
+	    USER('USER'),
+	    PUBLIC('PUBLIC'),
+	    GROUP('GROUP')
+
+	final String type
+
+	PrincipalType(String type) {
+	    this.type = type
+	}
+    }
+
+    Date dateCreated
+    String description = ''
+    Boolean enabled
+    Date lastUpdated
+    String name
+    PrincipalType type
+    String uniqueId = ''
+
     static transients = ['principalNameWithType']
 
-    Long id
-    boolean enabled
-    String type
-    String name
-    String uniqueId = ''
-    Date dateCreated
-    Date lastUpdated
-    String description = ''
-    String principalNameWithType
-
     static mapping = {
-        table 'SEARCH_AUTH_PRINCIPAL'
+	table 'SEARCHAPP.SEARCH_AUTH_PRINCIPAL'
         tablePerHierarchy false
+	id generator: 'sequence', params: [sequence: 'searchapp.hibernate_sequence']
         version false
-        id generator: 'sequence',
-                params: [sequence: 'hibernate_sequence', schema: 'searchapp']
-        columns {
-                    id column: 'ID'
-                    uniqueId column: 'UNIQUE_ID'
-                    name column: 'NAME'
-                    description column: 'DESCRIPTION'
-                    enabled column: 'ENABLED'
-                    type column: 'PRINCIPAL_TYPE'
-                    dateCreated column: 'DATE_CREATED'
-                    lastUpdated column: 'LAST_UPDATED'
-                }
 
+        type column: 'PRINCIPAL_TYPE'
     }
+
     static constraints = {
-        //enabled()
-        type(nullable: false)
-        description(nullable: true, maxSize: 255)
-        uniqueId(nullable: true)
+	description nullable: true, maxSize: 4000
+	uniqueId nullable: true
     }
 
-    def beforeInsert = {
-        uniqueId = type + ' ' + id
+    def beforeInsert() {
+	uniqueId = type.toString() + ' ' + id
     }
 
-    public String getPrincipalNameWithType() {
-        return type + ' - ' + name
-    }
-
-    public void setPrincipalNameWithType(String n) {
-
+    String getPrincipalNameWithType() {
+	type + ' - ' + name
     }
 }

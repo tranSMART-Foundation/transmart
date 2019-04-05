@@ -16,35 +16,27 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class ClinicalTrialPatientGroup {
     ClinicalTrial clinicalTrial
-    Long id
-    String name
     String description
+    String name
     Long numberOfPatients
     String patientGroupTypeCode
+
     static mapping = {
-        table 'BIO_CLINC_TRIAL_PT_GROUP'
+	table 'BIOMART.BIO_CLINC_TRIAL_PT_GROUP'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_CLINICAL_TRIAL_P_GROUP_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            clinicalTrial column: 'BIO_EXPERIMENT_ID'
-            id column: 'BIO_CLINICAL_TRIAL_P_GROUP_ID'
-            name column: 'NAME'
-            description column: 'DESCRIPTION'
-            numberOfPatients column: 'NUMBER_OF_PATIENTS'
-            patientGroupTypeCode column: 'PATIENT_GROUP_TYPE_CODE'
-        }
+
+        clinicalTrial column: 'BIO_EXPERIMENT_ID'
     }
 
     static constraints = {
-        name(nullable: true, maxSize: 1020)
-        description(nullable: true, maxSize: 2000)
-        numberOfPatients(nullable: true)
-        patientGroupTypeCode(nullable: true, maxSize: 400)
+	description nullable: true, maxSize: 2000
+	name nullable: true, maxSize: 1020
+	numberOfPatients nullable: true
+	patientGroupTypeCode nullable: true, maxSize: 400
     }
 }

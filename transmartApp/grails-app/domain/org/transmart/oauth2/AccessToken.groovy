@@ -2,37 +2,34 @@ package org.transmart.oauth2
 
 class AccessToken {
 
-    String authenticationKey
     byte[] authentication
-
-    String username
+    String authenticationKey
     String clientId
-
-    String value
-    String tokenType
-
     Date expiration
+    String tokenType
+    String username
+    String value
+
     Map<String, Object> additionalInformation
 
     static hasOne = [refreshToken: String]
+
     static hasMany = [scope: String]
 
     static constraints = {
-        username nullable: true
-        clientId nullable: false, blank: false
-        value nullable: false, blank: false, unique: true
-        tokenType nullable: false, blank: false
-        expiration nullable: false
-        scope nullable: false
-        refreshToken nullable: true
-        authenticationKey nullable: false, blank: false, unique: true
-        authentication nullable: false, minSize: 1, maxSize: 1024 * 32
         additionalInformation nullable: true
+	authentication minSize: 1, maxSize: 1024 * 4
+	authenticationKey blank: false, unique: true
+	clientId blank: false
+	refreshToken nullable: true
+	tokenType blank: false
+	username nullable: true
+	value blank: false, unique: true
     }
 
     static mapping = {
-        datasource 'oauth2'
         version false
         scope lazy: false
+	datasource 'oauth2'
     }
 }

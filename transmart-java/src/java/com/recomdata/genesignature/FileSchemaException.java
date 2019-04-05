@@ -15,50 +15,38 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.genesignature;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
- * Special exception class for invalid gene signature upload files
- * $Id: FileSchemaException.java 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * Special exception class for invalid gene signature upload files.
+ *
+ * @author mmcduffie
  */
 public class FileSchemaException extends RuntimeException {
-
-	/**
-	 * required for serialization
-	 */
-	private static final long serialVersionUID = 7745871701505432136L;
+    private static final long serialVersionUID = 7745871701505432136L;
 	
-	public FileSchemaException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public FileSchemaException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public FileSchemaException(String message) {
-		super(message);
-	}	
+    public FileSchemaException(String message) {
+        super(message);
+    }	
 
-	/**
-	 * helper function for constructing an error messages for invalid gene symbols that could not be 
-	 * mapped to the warehouse schema
-	 * @param invalidGenes
-	 * @return
-	 */
-	public static void ThrowInvalidGenesFileSchemaException(Collection<String> invalidGenes) throws FileSchemaException {				
-		StringBuffer msg = new StringBuffer("The following gene symbols could not be mapped, please fix or remove:<br><br>");
-		msg.append("<ul style='list-style-type: disc; list-style-position: inside;'>");
-		Iterator<String> it = (Iterator<String>) invalidGenes.iterator();
-		while(it.hasNext()) {
-			msg.append("<li>" + it.next().toString() + "</li>");
-		}
-		msg.append("<ul>");
-		throw new FileSchemaException(msg.toString());
-	}
-
+    /**
+     * Constructs an error message for invalid gene symbols that could not be mapped to the warehouse schema.
+     */
+    public static void ThrowInvalidGenesFileSchemaException(Collection<String> invalidGenes) throws FileSchemaException {				
+        StringBuilder msg = new StringBuilder("The following gene symbols could not be mapped, please fix or remove:<br><br>");
+        msg.append("<ul style='list-style-type: disc; list-style-position: inside;'>");
+        for (String invalidGene : invalidGenes) {
+            msg.append("<li>").append(invalidGene).append("</li>");
+        }
+        msg.append("<ul>");
+        throw new FileSchemaException(msg.toString());
+    }
 }

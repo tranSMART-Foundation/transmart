@@ -1,10 +1,11 @@
 package com.recomdata.dataexport.util
 
+import com.recomdata.transmart.data.export.SnpDataObject
+
 /**
- * This interface provides a method to write a data object to a file.
+ * Provides a method to write a data object to a file.
  * @author MMcDuffie
- *
  */
 interface BiomarkerDataRowProcessor {
-    void processDataRow(row, resultingObject)
+    void processDataRow(SnpDataObject row, Writer resultingObject)
 }

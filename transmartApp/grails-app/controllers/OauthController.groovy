@@ -5,11 +5,11 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.provider.OAuth2Authentication
 import org.springframework.security.oauth2.provider.token.TokenStore
+import org.springframework.util.Assert
 
 class OauthController {
 
-    @Autowired
-    private TokenStore tokenStore
+    @Autowired private TokenStore tokenStore
 
     // This is just poorly named. There's nothing about "verification" here
     /** as per request of R client just return the code */
@@ -26,26 +26,24 @@ class OauthController {
         header 'Pragma', 'no-cache'
 
         Authentication auth = SecurityContextHolder.context.authentication
-        if (!(auth instanceof OAuth2Authentication)) {
-            throw new IllegalStateException(
-                    'Method called without oauth2 authentication present')
-        }
+	Assert.state(auth instanceof OAuth2Authentication,
+                     'Method called without oauth2 authentication present')
+
         OAuth2Authentication oauthAuth = auth
 
-        Map res = [:]
-        res['clientId'] = oauthAuth.storedRequest.clientId
-        res['redirectUri'] = oauthAuth.storedRequest.redirectUri
-        res['token'] = tokenStore.readAccessToken(oauthAuth.details.tokenValue)
+	Map res = [
+	    clientId: oauthAuth.storedRequest.clientId,
+	    redirectUri: oauthAuth.storedRequest.redirectUri,
+	    token: tokenStore.readAccessToken(oauthAuth.details.tokenValue)]
         oauthAuth.principal.with {
-            res['principal'] = [
-                    id: id,
-                    username: username,
-                    userRealName: userRealName,
-                    authorities: authorities*.toString(),
+	    res.principal = [
+                id: id,
+                username: username,
+                userRealName: userRealName,
+                authorities: authorities*.toString(),
             ]
         }
 
-        render res as JSON
+	render(res as JSON)
     }
-
 }

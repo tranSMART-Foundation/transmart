@@ -2,59 +2,87 @@ package fm
 
 import annotation.AmTagDisplayValue
 import annotation.AmTagItem
+import annotation.AmTagItemService
 import annotation.AmTagTemplate
-import annotation.AmTagTemplateAssociation
+import annotation.AmTagTemplateService
+import com.mongodb.MongoClient
+import com.mongodb.gridfs.GridFS
+import com.mongodb.gridfs.GridFSDBFile
 import com.recomdata.export.ExportColumn
 import com.recomdata.export.ExportRowNew
 import com.recomdata.export.ExportTableNew
 import com.recomdata.util.FolderType
 import de.DeMrnaAnnotation
-import org.transmart.mongo.MongoUtils
 import grails.converters.JSON
 import grails.converters.XML
 import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
-import groovy.xml.StreamingMarkupBuilder
+import groovyx.net.http.ContentType
+import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.Method
 import org.apache.commons.lang.StringUtils
-import org.slf4j.LoggerFactory
-import org.transmart.biomart.*
-import org.transmart.searchapp.AuthUser
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.dao.DataIntegrityViolationException
+import org.transmart.biomart.BioAssayAnalysis
+import org.transmart.biomart.BioAssayAnalysisData
+import org.transmart.biomart.BioAssayPlatform
+import org.transmart.biomart.BioDataExternalCode
+import org.transmart.biomart.ConceptCode
+import org.transmart.biomart.Experiment
+import org.transmart.mongo.MongoUtils
+import org.transmart.plugin.shared.SecurityService
 import org.transmart.searchapp.SearchKeyword
-
-import javax.activation.MimetypesFileTypeMap
 
 import javax.activation.MimetypesFileTypeMap
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpServletResponseWrapper
-import com.mongodb.Mongo
-import com.mongodb.DB
-import com.mongodb.MongoClient
-import com.mongodb.gridfs.GridFS
-import com.mongodb.gridfs.GridFSDBFile
-import groovyx.net.http.ContentType
-import groovyx.net.http.HTTPBuilder
-import groovyx.net.http.Method
 
 @Slf4j('logger')
 class FmFolderController {
 
-    def formLayoutService
-    def amTagTemplateService
-    def amTagItemService
-    def fmFolderService
-    def ontologyService
-    def solrFacetService
-    def springSecurityService
+    //FIXME Quick hack to make title properties act as hyperlinks.
+    //These name properties should be indicated in the database, and the sort value should be specified
+    //(needs a rewrite of our ExportTable)
+    private static final List<String> nameProperties = ['assay name', 'analysis name', 'study title', 'program title', 'folder name']
 
     static allowedMethods = [save: 'POST', update: 'POST', delete: 'POST']
+    static defaultAction = 'list'
+
+    AmTagItemService amTagItemService
+    AmTagTemplateService amTagTemplateService
+    FmFolderService fmFolderService
+    def ontologyService
+    def solrFacetService
+    @Autowired private SecurityService securityService
+
+    @Value('${transmartproject.mongoFiles.enableMongo:false}')
+    private boolean enableMongo
+
+    @Value('${transmartproject.mongoFiles.apiKey:}')
+    private String mongoApiKey
+
+    @Value('${transmartproject.mongoFiles.apiURL:}')
+    private String mongoApiUrl
+
+    @Value('${transmartproject.mongoFiles.dbName:}')
+    private String mongoDbName
+
+    @Value('${transmartproject.mongoFiles.dbPort:0}')
+    private int mongoPort
+
+    @Value('${transmartproject.mongoFiles.dbServer:}')
+    private String mongoServer
+
+    @Value('${transmartproject.mongoFiles.useDriver:false}')
+    private boolean useDriver
 
     @Lazy
     static MimetypesFileTypeMap MIME_TYPES_FILES_MAP = {
-        def log = LoggerFactory.getLogger(this)
         File mimeTypesFile = [
-                new File(System.getenv('HOME'), '.mime.types'),
-                new File(System.getenv('JAVA_HOME'), 'lib/mime.types'),
-                new File('/etc/mime.types')
+            new File(System.getenv('HOME'), '.mime.types'),
+            new File(System.getenv('JAVA_HOME'), 'lib/mime.types'),
+            new File('/etc/mime.types')
         ].findResult null, { File file ->
             if (file.exists()) {
                 return file
@@ -62,503 +90,345 @@ class FmFolderController {
         }
 
         if (!mimeTypesFile) {
-            logger.warn 'Could not find a mime.types file'
+	    FmFolderController.logger.warn 'Could not find a mime.types file'
             return new MimetypesFileTypeMap()
         }
 
-        logger.info 'Loading mime.types file on $mimeTypesFile'
+	FmFolderController.logger.debug 'Loading mime.types file on {}', mimeTypesFile
         mimeTypesFile.withInputStream {
             new MimetypesFileTypeMap(it)
         }
     }()
 
-    def index = {
-        redirect(action: 'list', params: params)
-    }
-
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
         [fmFolderInstanceList: FmFolder.list(params), fmFolderInstanceTotal: FmFolder.count()]
     }
 
-
-    public String serializeFoldersToXMLFile() {
-        def writer = new FileWriter('c:\\temp\\SerializedAsXML.xml')
-
-//      List<FmFolder> folderList = FmFolder.list()
-        def fmFolderInstance = FmFolder.get(8)
-
-
-        def builder = new StreamingMarkupBuilder().bind {
-//          mkp.xmlDeclaration()
-            unescaped << '<fmFolders>'
-//          folderList.each {folder ->
-            out << fmFolderInstance
-//          }
-            unescaped << '</fmFolders>'
-        }
-        writer << builder
-
-        return builder.toString()
+    def create() {
+	[fmFolderInstance: new FmFolder(params)]
     }
 
-
-    def create = {
-        logger.info 'Creating == ' + params
-
-        def fmFolderInstance = new FmFolder()
-        fmFolderInstance.properties = params
-
-        return [fmFolderInstance: fmFolderInstance]
-    }
-
-    def createAnalysis = {
+    def createAnalysis() {
         logger.info 'createAnalysis called'
-        logger.info 'params = ' + params
 
-        //logger.info '** action: expDetail called!'
+	FmFolder parentFolder = FmFolder.get(params.folderId)
+	FmFolder folder = new FmFolder(folderType: FolderType.ANALYSIS.name(), parent: parentFolder)
 
-        def folder = new FmFolder()
-        folder.folderType = FolderType.ANALYSIS.name()
-        def parentFolder = FmFolder.get(params.folderId)
-        folder.parent = parentFolder
+	AmTagTemplate amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.ANALYSIS.name())
+	List<String> measurements = BioAssayPlatform.executeQuery('SELECT DISTINCT platformType FROM BioAssayPlatform as p ORDER BY p.platformType')
+	List<String> vendors = BioAssayPlatform.executeQuery('SELECT DISTINCT vendor FROM BioAssayPlatform as p ORDER BY p.vendor')
+	List<String> technologies = BioAssayPlatform.executeQuery('SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p ORDER BY p.platformTechnology')
+	List<BioAssayPlatform> platforms = BioAssayPlatform.executeQuery('FROM BioAssayPlatform as p ORDER BY p.name')
 
-        def bioDataObject = new BioAssayAnalysis()
-        def amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.ANALYSIS.name())
-        def metaDataTagItems = amTagItemService.getDisplayItems(amTagTemplate.id)
-        def title = 'Create Analysis'
-        def templateType = 'createAnalysisForm'
-        def measurements = BioAssayPlatform.executeQuery('SELECT DISTINCT platformType FROM BioAssayPlatform as p ORDER BY p.platformType')
-        def vendors = BioAssayPlatform.executeQuery('SELECT DISTINCT vendor FROM BioAssayPlatform as p ORDER BY p.vendor')
-        def technologies = BioAssayPlatform.executeQuery('SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p ORDER BY p.platformTechnology')
-        def platforms = BioAssayPlatform.executeQuery('FROM BioAssayPlatform as p ORDER BY p.name')
-
-        logger.info measurements
-        logger.info technologies
-        logger.info vendors
-        logger.info platforms
-
-        render(template: 'createAnalysis', plugin: 'folderManagement', model: [bioDataObject: bioDataObject, measurements: measurements, technologies: technologies, vendors: vendors, platforms: platforms, folder: folder, amTagTemplate: amTagTemplate, metaDataTagItems: metaDataTagItems])
+	render template: 'createAnalysis', model: [
+	    bioDataObject   : new BioAssayAnalysis(),
+	    measurements    : measurements,
+	    technologies    : technologies,
+	    vendors         : vendors,
+	    platforms       : platforms,
+	    folder          : folder,
+	    amTagTemplate   : amTagTemplate,
+	    metaDataTagItems: amTagItemService.getDisplayItems(amTagTemplate.id)]
     }
 
-    def createAssay = {
-        logger.info 'createAssay called'
-        logger.info 'params = ' + params
+    def createAssay() {
+	FmFolder parentFolder = FmFolder.get(params.folderId)
+	FmFolder folder = new FmFolder(folderType: FolderType.ASSAY.name(), parent: parentFolder)
+	AmTagTemplate amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.ASSAY.name())
+	List<String> measurements = BioAssayPlatform.executeQuery('SELECT DISTINCT platformType FROM BioAssayPlatform as p ORDER BY p.platformType')
+	List<String> vendors = BioAssayPlatform.executeQuery('SELECT DISTINCT vendor FROM BioAssayPlatform as p ORDER BY p.vendor')
+	List<String> technologies = BioAssayPlatform.executeQuery('SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p ORDER BY p.platformTechnology')
+	List<BioAssayPlatform> platforms = BioAssayPlatform.executeQuery('FROM BioAssayPlatform as p ORDER BY p.name')
 
-        //logger.info '** action: expDetail called!'
-
-        def folder = new FmFolder()
-        folder.folderType = FolderType.ASSAY.name()
-        def parentFolder = FmFolder.get(params.folderId)
-        folder.parent = parentFolder
-        def bioDataObject = folder
-        def amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.ASSAY.name())
-        def metaDataTagItems = amTagItemService.getDisplayItems(amTagTemplate.id)
-        def title = 'Create Assay'
-        def templateType = 'createAssayForm'
-        def measurements = BioAssayPlatform.executeQuery('SELECT DISTINCT platformType FROM BioAssayPlatform as p ORDER BY p.platformType')
-        def vendors = BioAssayPlatform.executeQuery('SELECT DISTINCT vendor FROM BioAssayPlatform as p ORDER BY p.vendor')
-        def technologies = BioAssayPlatform.executeQuery('SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p ORDER BY p.platformTechnology')
-        def platforms = BioAssayPlatform.executeQuery('FROM BioAssayPlatform as p ORDER BY p.name')
-
-        logger.info measurements
-        logger.info technologies
-        logger.info vendors
-        logger.info 'platforms total: ' + platforms.size() + ''
-
-        render(template: 'createAssay', plugin: 'folderManagement', model: [bioDataObject: bioDataObject, measurements: measurements, technologies: technologies, vendors: vendors, platforms: platforms, folder: folder, amTagTemplate: amTagTemplate, metaDataTagItems: metaDataTagItems])
+	render template: 'createAssay', model: [
+	    bioDataObject   : folder,
+	    measurements    : measurements,
+	    technologies    : technologies,
+	    vendors         : vendors,
+	    platforms       : platforms,
+	    folder          : folder,
+	    amTagTemplate   : amTagTemplate,
+	    metaDataTagItems: amTagItemService.getDisplayItems(amTagTemplate.id)]
     }
 
-    def createFolder = {
-        logger.info 'createFolder called'
-        logger.info 'params = ' + params
-        //logger.info '** action: expDetail called!'
+    def createFolder() {
+	FmFolder parentFolder = FmFolder.get(params.folderId)
+	FmFolder folder = new FmFolder(folderType: FolderType.FOLDER.name(), parent: parentFolder)
 
-        def folder = new FmFolder()
-        folder.folderType = FolderType.FOLDER.name()
-        def parentFolder = FmFolder.get(params.folderId)
-        folder.parent = parentFolder
+	AmTagTemplate amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.FOLDER.name())
+	render template: 'createFolder', model: [
+	    bioDataObject   : folder,
+	    folder          : folder,
+	    amTagTemplate   : amTagTemplate,
+	    metaDataTagItems: amTagItemService.getDisplayItems(amTagTemplate.id)]
+    }
 
-        def bioDataObject = folder
-        def amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.FOLDER.name())
-        if (!amTagTemplate) {
-            logger.error('Unable to find tag template for folder type = ')
+    def createStudy() {
+	FmFolder parentFolder = FmFolder.get(params.folderId)
+	FmFolder folder = new FmFolder(folderType: FolderType.STUDY.name(), parent: parentFolder)
+	AmTagTemplate amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.STUDY.name())
+	render template: 'createStudy', model: [
+	    bioDataObject   : new Experiment(),
+	    folder          : folder,
+	    amTagTemplate   : amTagTemplate,
+	    metaDataTagItems: amTagItemService.getDisplayItems(amTagTemplate.id)]
         }
 
-        def metaDataTagItems = amTagItemService.getDisplayItems(amTagTemplate.id)
-        def title = 'Create Folder'
-        def templateType = 'createFolderForm'
-        render(template: 'createFolder', plugin: 'folderManagement', model: [bioDataObject: bioDataObject, folder: folder, amTagTemplate: amTagTemplate, metaDataTagItems: metaDataTagItems])
+    def createProgram() {
+	FmFolder folder = new FmFolder(folderType: FolderType.PROGRAM.name())
+	AmTagTemplate amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.PROGRAM.name())
+	render template: 'createProgram', model: [
+	    bioDataObject   : folder,
+	    folder          : folder,
+	    amTagTemplate   : amTagTemplate,
+	    metaDataTagItems: amTagItemService.getDisplayItems(amTagTemplate.id)]
     }
 
-    def createStudy = {
-        logger.info 'createStudy called'
-        logger.info 'params = ' + params
-        //logger.info '** action: expDetail called!'
-
-        def folder = new FmFolder()
-        folder.folderType = FolderType.STUDY.name()
-        def parentFolder = FmFolder.get(params.folderId)
-        folder.parent = parentFolder
-        def bioDataObject = new Experiment()
-        def amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.STUDY.name())
-        def metaDataTagItems = amTagItemService.getDisplayItems(amTagTemplate.id)
-        render(template: 'createStudy', plugin: 'folderManagement', model: [bioDataObject: bioDataObject, folder: folder, amTagTemplate: amTagTemplate, metaDataTagItems: metaDataTagItems])
-    }
-
-    def createProgram = {
-        logger.info 'createProgram called'
-        logger.info 'params = ' + params
-        //logger.info '** action: expDetail called!'
-
-        def folder = new FmFolder()
-        folder.folderType = FolderType.PROGRAM.name()
-        def bioDataObject = folder
-        def amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.PROGRAM.name())
-        def metaDataTagItems = amTagItemService.getDisplayItems(amTagTemplate.id)
-        render(template: 'createProgram', plugin: 'folderManagement', model: [bioDataObject: bioDataObject, folder: folder, amTagTemplate: amTagTemplate, metaDataTagItems: metaDataTagItems])
-    }
-
-    private createAmTagTemplateAssociation(folderType, folder) {
-        def amTagTemplate = AmTagTemplate.findByTagTemplateType(folderType)
-        AmTagTemplateAssociation atta = new AmTagTemplateAssociation(tagTemplateId: amTagTemplate.id, objectUid: folder.getUniqueId())
-
-        if (!atta.save(flush: true)) {
-            atta.errors.each {
-                logger.error it
-            }
-        }
-    }
-
-    def save = {
-        logger.info params
-        def fmFolderInstance = new FmFolder(params)
-        if (fmFolderInstance.save(flush: true)) {
-            redirect(action: 'show', id: fmFolderInstance.id)
+    def save() {
+	FmFolder fmFolder = new FmFolder(params)
+	if (fmFolder.save(flush: true)) {
+	    redirect action: 'show', id: fmFolder.id
         }
         else {
-            render(view: 'create', model: [fmFolderInstance: fmFolderInstance])
+	    render view: 'create', model: [fmFolderInstance: fmFolder]
         }
     }
 
-    def saveProgram = {
-        logger.info 'saveProgram called'
-        logger.info params
-
-        def folder = new FmFolder(params)
+    def saveProgram() {
+	FmFolder folder = new FmFolder(params)
         folder.folderLevel = 0
         folder.folderType = FolderType.PROGRAM.name()
 
         try {
-            fmFolderService.saveFolder(folder, folder, params)
-            def result = [id: folder.id]
-            render result as JSON
-            solrFacetService.reindexFolder(folder.getUniqueId())
+	    fmFolderService.saveFolder folder, folder, params
+	    render([id: folder.id] as JSON)
+	    solrFacetService.reindexFolder folder.uniqueId
         }
-        catch (ValidationException ex) {
-            logger.error 'Unable to save program'
-            def errors = g.renderErrors(bean: ex.errors)
-            logger.error errors
-            def result = [errors: errors]
-            render result as JSON
+	catch (ValidationException e) {
+	    String errors = renderErrors(bean: e.errors)
+	    logger.error 'Unable to save program: {}', errors
+	    render([errors: errors] as JSON)
         }
-        catch (Exception ex) {
-            logger.error 'Exception in FmFolderController.saveProgram', ex
-            def result = [errors: '<ul><li>An unexpected error has occurred. If this error persits, please click \'Close\' or \'Cancel\' to close this dialog box.<br><br>Error details: ' + ex.getMessage() + '</li></ul>']
-            render result as JSON
+	catch (e) {
+	    renderUnexpectedError e
         }
-
     }
 
-    def saveStudy = {
-        logger.info 'saveStudy called'
-        logger.info params
-
-        def parentFolder = FmFolder.get(params.parentId)
+    def saveStudy() {
+	FmFolder parentFolder = FmFolder.get(params.parentId)
         if (!parentFolder) {
             logger.error 'Parent folder is null'
-            def result = [errors: '<ul><li>Unexpected error: the parent folder ID is missing.</li></ul>']
-            render result
+	    render([errors: '<ul><li>Unexpected error: the parent folder ID is missing.</li></ul>'])
             return
         }
 
-        def folder = new FmFolder(params)
+	FmFolder folder = new FmFolder(params)
         folder.folderLevel = parentFolder.folderLevel + 1
         folder.folderType = FolderType.STUDY.name()
         folder.parent = parentFolder
         params.accession = params.accession.toUpperCase()
 
-        def experiment = Experiment.findOrCreateByAccession(params.accession)
-
+	Experiment experiment = Experiment.findOrCreateByAccession(params.accession)
         experiment.title = folder.folderName
         experiment.description = folder.description
         experiment.type = 'Experiment'
 
         try {
-            fmFolderService.saveFolder(folder, experiment, params)
-            def result = [id: folder.id, parentId: folder.parentId]
-            render result as JSON
-            solrFacetService.reindexFolder(folder.getUniqueId())
+	    fmFolderService.saveFolder folder, experiment, params
+	    render([id: folder.id, parentId: folder.parentId] as JSON)
+	    solrFacetService.reindexFolder folder.uniqueId
         }
-        catch (ValidationException ex) {
-            logger.error 'Unable to save study'
-            def errors = g.renderErrors(bean: ex.errors)
-            logger.error errors
-            def result = [errors: errors]
-            render result as JSON
+	catch (ValidationException e) {
+	    String errors = renderErrors(bean: e.errors)
+	    logger.error 'Unable to save study: {}', errors
+	    render([errors: errors] as JSON)
         }
-        catch (Exception ex) {
-            logger.error 'Exception in FmFolderController.saveStudy', ex
-            def result = [errors: '<ul><li>An unexpected error has occurred. If this error persits, please click \'Close\' or \'Cancel\' to close this dialog box.<br><br>Error details: ' + ex.getMessage() + '</li></ul>']
-            render result as JSON
+	catch (e) {
+	    logger.error 'Exception in FmFolderController.saveStudy', e
+	    renderUnexpectedError e
         }
-
     }
 
-    def saveAssay = {
-        logger.info 'saveAssay called'
-        logger.info params
-
-        def parentFolder = FmFolder.get(params.parentId)
+    def saveAssay() {
+	FmFolder parentFolder = FmFolder.get(params.parentId)
         if (!parentFolder) {
             logger.error 'Parent folder is null'
-            def result = [errors: '<ul><li>Unexpected error: the parent folder ID is missing.</li></ul>']
-            render result
+	    render([errors: '<ul><li>Unexpected error: the parent folder ID is missing.</li></ul>'])
             return
         }
 
-        def folder = new FmFolder(params)
+	FmFolder folder = new FmFolder(params)
         folder.folderLevel = parentFolder.folderLevel + 1
         folder.folderType = FolderType.ASSAY.name()
         folder.parent = parentFolder
 
         try {
-            fmFolderService.saveFolder(folder, folder, params)
-            def result = [id: folder.id, parentId: folder.parentId]
-            render result as JSON
-            solrFacetService.reindexFolder(folder.getUniqueId())
+	    fmFolderService.saveFolder folder, folder, params
+	    render([id: folder.id, parentId: folder.parentId] as JSON)
+	    solrFacetService.reindexFolder folder.uniqueId
         }
-        catch (ValidationException ex) {
-            logger.error 'Unable to save assay'
-            def errors = g.renderErrors(bean: ex.errors)
-            logger.error errors
-            def result = [errors: errors]
-            render result as JSON
+	catch (ValidationException e) {
+	    String errors = renderErrors(bean: e.errors)
+	    logger.error 'Unable to save assay: {}', errors
+	    render([errors: errors] as JSON)
         }
-        catch (Exception ex) {
-            logger.error 'Exception in FmFolderController.saveAssay', ex
-            def result = [errors: '<ul><li>An unexpected error has occurred. If this error persits, please click \'Close\' or \'Cancel\' to close this dialog box.<br><br>Error details: ' + ex.getMessage() + '</li></ul>']
-            render result as JSON
+	catch (e) {
+	    logger.error 'Exception in FmFolderController.saveAssay', e
+	    renderUnexpectedError e
         }
-
     }
 
-    def saveAnalysis = {
-        logger.info 'saveAnalysis called'
-        logger.info params
-
-        def parentFolder = FmFolder.get(params.parentId)
+    def saveAnalysis() {
+	FmFolder parentFolder = FmFolder.get(params.parentId)
         if (!parentFolder) {
             logger.error 'Parent folder is null'
-            def result = [errors: '<ul><li>Unexpected error: the parent folder ID is missing.</li></ul>']
-            render result
+	    render([errors: '<ul><li>Unexpected error: the parent folder ID is missing.</li></ul>'])
             return
         }
 
-        def folder = new FmFolder(params)
+	FmFolder folder = new FmFolder(params)
         folder.folderLevel = parentFolder.folderLevel + 1
         folder.folderType = FolderType.ANALYSIS.name()
         folder.parent = parentFolder
 
-        def parentFolderStudy = folder.findParentStudyFolder()
+	FmFolder parentFolderStudy = folder.findParentStudyFolder()
 
-        def analysis = new BioAssayAnalysis()
-        analysis.name = folder.folderName
-        analysis.shortDescription = folder.description
-        analysis.longDescription = folder.description
-        analysis.analysisMethodCode = 'TBD'
-        analysis.assayDataType = 'Browse analysis'
-        analysis.dataCount = -1
-        analysis.teaDataCount = -1
-        def assocStudy = FmFolderAssociation.findByFmFolder(parentFolderStudy)
-        if (assocStudy != null) {
-            def study = assocStudy.getBioObject()
+	BioAssayAnalysis analysis = new BioAssayAnalysis(name: folder.folderName, shortDescription: folder.description,
+		longDescription: folder.description, analysisMethodCode: 'TBD', assayDataType: 'Browse analysis',
+		dataCount: -1, teaDataCount: -1)
+	FmFolderAssociation assocStudy = FmFolderAssociation.findByFmFolder(parentFolderStudy)
+	if (assocStudy) {
+	    def study = assocStudy.bioObject
             if (study instanceof Experiment) {
-                analysis.etlId = ((Experiment) study).accession
+		analysis.etlId = study.accession
             }
         }
 
         try {
-            fmFolderService.saveFolder(folder, analysis, params)
-            def result = [id: folder.id, parentId: folder.parentId]
-            render result as JSON
-            solrFacetService.reindexFolder(folder.getUniqueId())
+	    fmFolderService.saveFolder folder, analysis, params
+	    render([id: folder.id, parentId: folder.parentId] as JSON)
+	    solrFacetService.reindexFolder folder.uniqueId
         }
-        catch (ValidationException ex) {
-            logger.error 'Unable to save study'
-            def errors = g.renderErrors(bean: ex.errors)
-            logger.error errors
-            def result = [errors: errors]
-            render result as JSON
+	catch (ValidationException e) {
+	    String errors = renderErrors(bean: e.errors)
+	    logger.error 'Unable to save study: {}', errors
+	    render([errors: errors] as JSON)
         }
-        catch (Exception ex) {
-            logger.error 'Exception in FmFolderController.saveAnalysis', ex
-            def result = [errors: '<ul><li>An unexpected error has occurred. If this error persits, please click \'Close\' or \'Cancel\' to close this dialog box.<br><br>Error details: ' + ex.getMessage() + '</li></ul>']
-            render result as JSON
+	catch (e) {
+	    logger.error 'Exception in FmFolderController.saveAnalysis', e
+	    renderUnexpectedError e
         }
-
     }
 
-    def saveFolder = {
-        logger.info 'saveFolder called'
-        logger.info params
-
-        def parentFolder = FmFolder.get(params.parentId)
+    def saveFolder() {
+	FmFolder parentFolder = FmFolder.get(params.parentId)
         if (!parentFolder) {
             logger.error 'Parent folder is null'
-            def result = [errors: '<ul><li>Unexpected error: the parent folder ID is missing.</li></ul>']
-            render result
+	    render([errors: '<ul><li>Unexpected error: the parent folder ID is missing.</li></ul>'])
             return
         }
 
-        def folder = new FmFolder(params)
+	FmFolder folder = new FmFolder(params)
         folder.folderLevel = parentFolder.folderLevel + 1
         folder.folderType = FolderType.FOLDER.name()
         folder.parent = parentFolder
 
         try {
-            fmFolderService.saveFolder(folder, folder, params)
-            def result = [id: folder.id, parentId: folder.parentId]
-            render result as JSON
-            solrFacetService.reindexFolder(folder.getUniqueId())
+	    fmFolderService.saveFolder folder, folder, params
+	    render([id: folder.id, parentId: folder.parentId] as JSON)
+	    solrFacetService.reindexFolder folder.uniqueId
+	}
+	catch (ValidationException e) {
+	    String errors = renderErrors(bean: e.errors)
+	    logger.error 'Unable to save folder: {}', errors
+	    render([errors: errors] as JSON)
         }
-        catch (ValidationException ex) {
-            logger.error 'Unable to save folder'
-            def errors = g.renderErrors(bean: ex.errors)
-            logger.error errors
-            def result = [errors: errors]
-            render result as JSON
+	catch (e) {
+	    logger.error 'Exception in FmFolderController.saveFolder', e
+	    renderUnexpectedError e
         }
-        catch (Exception ex) {
-            logger.error 'Exception in FmFolderController.saveFolder', ex
-            def result = [errors: '<ul><li>An unexpected error has occurred. If this error persits, please click \'Close\' or \'Cancel\' to close this dialog box.<br><br>Error details: ' + ex.getMessage() + '</li></ul>']
-            render result as JSON
-        }
-
-
     }
 
-
-    def showStudy = {
-        def fmFolderInstance = FmFolder.get(params.id)
-
-        // test the class
-        // def json = new JSONSerializer(target: fmFolderInstance).getJSON()
-        // logger.info json
-
-        def data = serializeFoldersToXMLFile()
-        logger.info data
-
-        if (!fmFolderInstance) {
-            redirect(action: 'list')
+    def edit(FmFolder fmFolder) {
+	if (!fmFolder) {
+	    redirect action: 'list'
         }
         else {
-            [fmFolderInstance: fmFolderInstance, data: data]
+	    [fmFolderInstance: fmFolder]
         }
     }
 
-    def edit = {
-        def fmFolderInstance = FmFolder.get(params.id)
-        if (!fmFolderInstance) {
-            redirect(action: 'list')
-        }
-        else {
-            return [fmFolderInstance: fmFolderInstance]
-        }
-    }
+    def update(FmFolder fmFolder) {
+	if (fmFolder) {
+	    fmFolder.properties = params
 
-    def update = {
-
-        logger.info 'UPDATING == ' + params
-        def fmFolderInstance = FmFolder.get(params.id)
-
-        if (fmFolderInstance) {
-            fmFolderInstance.properties = params
-
-            if (!fmFolderInstance.hasErrors() && fmFolderInstance.save(flush: true)) {
-                redirect(action: 'show', id: fmFolderInstance.id)
+	    if (!fmFolder.hasErrors() && fmFolder.save(flush: true)) {
+		redirect action: 'show', id: fmFolder.id
             }
             else {
-                render(view: 'edit', model: [fmFolderInstance: fmFolderInstance])
+		render view: 'edit', model: [fmFolderInstance: fmFolder]
             }
         }
         else {
-            redirect(action: 'list')
+	    redirect action: 'list'
         }
     }
 
-    def delete = {
-        def fmFolderInstance = FmFolder.get(params.id)
-        if (fmFolderInstance) {
+    def delete(FmFolder fmFolder) {
+	if (fmFolder) {
             try {
-                fmFolderInstance.delete(flush: true)
-                redirect(action: 'list')
+		fmFolder.delete(flush: true)
+		redirect action: 'list'
             }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                redirect(action: 'show', id: params.id)
+	    catch (DataIntegrityViolationException e) {
+		redirect action: 'show', id: params.id
             }
         }
         else {
-            redirect(action: 'list')
+	    redirect action: 'list'
         }
     }
 
-    def getPrograms = {
-        List<FmFolder> folders = getFolder(FolderType.PROGRAM.name(), null)
-        render folders as XML
+    def getPrograms() {
+	render(getFolder(FolderType.PROGRAM.name(), null) as XML)
     }
 
-    def getStudies = {
-        List<FmFolder> folders = getFolder(FolderType.STUDY.name(), params.parentPath)
-        render folders as XML
+    def getStudies() {
+	render(getFolder(FolderType.STUDY.name(), params.parentPath) as XML)
     }
 
-    def getFolders = {
-        List<FmFolderController> folders = getFolder(FolderType.FOLDER.name(), params.parentPath)
-        render folders as XML
+    def getFolders() {
+	render(getFolder(FolderType.FOLDER.name(), params.parentPath) as XML)
     }
 
-    def getAnalysises = {
-        List<FmFolder> folders = getFolder(FolderType.ANALYSIS.name(), params.parentPath)
-        render folders as XML
+    def getAnalysises() {
+	render(getFolder(FolderType.ANALYSIS.name(), params.parentPath) as XML)
     }
 
-    def getAssayes = {
-        List<FmFolder> folders = getFolder(FolderType.ASSAY.name(), params.parentPath)
-        render folders as XML
+    def getAssayes() {
+	render(getFolder(FolderType.ASSAY.name(), params.parentPath) as XML)
     }
 
     //service to call to get all the children of a folder, regardless their type
     //need a parameter parentId corresponding to the parent identifier
-    def getAllChildren = {
-        List<FmFolder> children = fmFolderService.getChildrenFolder(params.parentId)
-        render children as XML
+    def getAllChildren() {
+	render(fmFolderService.getChildrenFolder(params.parentId) as XML)
     }
 
     //service to call to get all experiments objects that are associated with a folder in fm_folder_association table
-    def getExperiments = {
-        def assocs = FmFolderAssociation.findAll("from FmFolderAssociation as fd where fd.objectType='org.transmart.biomart.Experiment'")
+    def getExperiments() {
         render(contentType: 'text/xml') {
             experiments {
-                for (assoc in assocs) {
-                    def exp = assoc.getBioObject()
-                    if (exp != null) {
+		for (assoc in FmFolderAssociation.findAllByObjectType('org.transmart.biomart.Experiment')) {
+		    def exp = assoc.bioObject
+		    if (exp) {
                         experiment(id: exp.id) {
-                            accession(exp.accession)
-                            title(exp.title?.encodeAsHTML())
-                            folderId(assoc.fmFolder.id)
-                            folderUid(assoc.fmFolder.uniqueId)
+			    accession exp.accession
+			    title exp.title?.encodeAsHTML()
+			    folderId assoc.fmFolder.id
+			    folderUid assoc.fmFolder.uniqueId
                         }
                     }
                 }
@@ -567,17 +437,16 @@ class FmFolderController {
     }
 
     //service to get analyses details, mainly analysis unique id and title
-    def getAnalysesDetails = {
-        def assocs = FmFolderAssociation.findAll("from FmFolderAssociation as fd where fd.objectType='org.transmart.biomart.BioAssayAnalysis'")
+    def getAnalysesDetails() {
         render(contentType: 'text/xml') {
             analyses {
-                for (assoc in assocs) {
-                    def folder = assoc.fmFolder
-                    if (folder != null) {
+		for (assoc in FmFolderAssociation.findAllByObjectType('org.transmart.biomart.BioAssayAnalysis')) {
+		    FmFolder folder = assoc.fmFolder
+		    if (folder) {
                         analysis(id: assoc.objectUid) {
-                            title(assoc.fmFolder.folderName)
-                            folderId(assoc.fmFolder.id)
-                            parentId(assoc.fmFolder.parent.id)
+			    title assoc.fmFolder.folderName
+			    folderId assoc.fmFolder.id
+			    parentId assoc.fmFolder.parent.id
                         }
                     }
                 }
@@ -585,72 +454,65 @@ class FmFolderController {
         }
     }
 
-    def addProgram = {
-        def p = new FmFolder(params['fmFolder'])
-        doAddFolder(FolderType.PROGRAM.name(), p, null)
+    def addProgram() {
+	doAddFolder FolderType.PROGRAM.name(), new FmFolder(params.fmFolder), null
     }
 
-    def addStudy = {
-        def p = new FmFolder(params['fmFolder'])
-        doAddFolder(FolderType.STUDY.name(), p, params['parentId'])
+    def addStudy() {
+	doAddFolder FolderType.STUDY.name(), new FmFolder(params.fmFolder), params.parentId
     }
 
-    def addFolder = {
-        def p = new FmFolder(params['fmFolder'])
-        doAddFolder(FolderType.STUDY.name(), p, params['parentId'])
+    def addFolder() {
+	doAddFolder FolderType.STUDY.name(), new FmFolder(params.fmFolder), params.parentId
     }
 
-    def addAnalysis = {
-        def p = new FmFolder(params['fmFolder'])
-        doAddFolder(FolderType.ANALYSIS.name(), p, params['parentId'])
+    def addAnalysis() {
+	doAddFolder FolderType.ANALYSIS.name(), new FmFolder(params.fmFolder), params.parentId
     }
 
-    def addFile = {
-        FmFolder p = FmFolder.get(params['folderId'])
-        FmFile f = new FmFile()
-        f.properties = params
+    def addFile() {
+	FmFolder p = FmFolder.get(params.folderId)
+	FmFile f = new FmFile(params)
         if (f.save(flush: true)) {
-            p.addToFmFiles(f)
+	    p.addToFmFiles f
             if (p.save(flush: true)) {
-                render p as XML
+		render(p as XML)
             }
             else {
                 render p.errors
             }
-
         }
         else {
             render f.errors
         }
 
-
-        doAddFolder(FolderType.STUDY.name(), p, params['parentId'])
+	doAddFolder FolderType.STUDY.name(), p, params.parentId
     }
 
-    def getFolderContents = {
+    def getFolderContents() {
         def id = params.id
         if (!id) {
             id = FmFolder.findByUniqueId(params.uid).id
         }
-        def auto = params.boolean('auto')
+
+	Boolean auto = params.boolean('auto')
         //Flag for whether folder was automatically opened - if not, then it shouldn't respect the folder mask
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-        def folderContentsAccessLevelMap = fmFolderService.getFolderContentsWithAccessLevelInfo(user, id)
-        def folderContents = new ArrayList(folderContentsAccessLevelMap.keySet())
-        def folderSearchLists = session['folderSearchList']
+	Map<FmFolder, String> folderContentsAccessLevelMap = fmFolderService.getFolderContentsWithAccessLevelInfo(id)
+	List<FmFolder> folderContents = folderContentsAccessLevelMap.keySet() as List
+	def folderSearchLists = session.folderSearchList
         if (!folderSearchLists) {
             folderSearchLists = [[], []]
         }
-        def folderSearchString = folderSearchLists[0] ? folderSearchLists[0].join(',') + ',' : ''
+	String folderSearchString = folderSearchLists[0] ? folderSearchLists[0].join(',') + ',' : ''
         //Extra , - used to identify leaves
-        def uniqueLeavesString = folderSearchLists[1] ? folderSearchLists[1].join(',') + ',' : ''
-        def nodesToExpand = session['rwgOpenedNodes']
+	String uniqueLeavesString = folderSearchLists[1] ? folderSearchLists[1].join(',') + ',' : ''
+	def nodesToExpand = session.rwgOpenedNodes
         //check that all folders from folderContents are in the search path, or children of nodes in the search path
-        if (folderSearchLists[0].size() > 0) {
-            for (def folder : folderContents) {
+	if (folderSearchLists[0]) {
+	    for (folder in folderContents) {
                 boolean found = false
-                for (String path : folderSearchLists[0]) {
-                    if (path.indexOf(folder.folderFullName) > -1 || folder.folderFullName.indexOf(path) > -1) {
+		for (String path in folderSearchLists[0]) {
+		    if (path.contains(folder.folderFullName) || folder.folderFullName.contains(path)) {
                         found = true
                         break
                     }
@@ -660,42 +522,31 @@ class FmFolderController {
                 }
             }
         }
-        def displayMetadata = ''
+
+	String displayMetadata = ''
         //if there is an accession in filters, add the study node (there is just one) in the array for nodes to expand
-        if (session['rwgSearchFilter'] != null) {
-            def filters = session['rwgSearchFilter']
-            for (def filter in filters) {
-                if (filter != null && filter.indexOf('|ACCESSION;') > -1) {
-                    for (def folder : folderContents) {
-                        if (folder.folderType == 'STUDY') {
-                            if (!nodesToExpand.grep(folder.uniqueId)) {
-                                nodesToExpand += folder.uniqueId
-                                displayMetadata = folder.uniqueId
-                            }
+	def filters = session.rwgSearchFilter
+	for (filter in filters) {
+	    if (filter?.contains('|ACCESSION;')) {
+		for (folder in folderContents) {
+                    if (folder.folderType == 'STUDY') {
+                        if (!nodesToExpand.grep(folder.uniqueId)) {
+			    nodesToExpand << folder.uniqueId
+                            displayMetadata = folder.uniqueId
                         }
                     }
                 }
             }
         }
-        render(template: 'folders', plugin: "folderManagement", model: [folders: folderContents, folderContentsAccessLevelMap: folderContentsAccessLevelMap, folderSearchString: folderSearchString, uniqueLeavesString: uniqueLeavesString, auto: auto, nodesToExpand: nodesToExpand, displayMetadata: displayMetadata])
-    }
 
-    /**
-     * Update incorrect or missing tag values for folders.
-     */
-    def fixFolderTags = {
-
-        def folders = FmFolder.findAll()
-        logger.info('fixFolderTags found ' + folders?.size())
-        for (folder in folders) {
-            logger.info('checking tag for folder ' + folder.id)
-            if (folder.folderTag == null || folder.folderTag != Long.toString(folder.id, 36).toUpperCase()) {
-                folder.folderTag = Long.toString(folder.id, 36).toUpperCase()
-                logger.info('updating tag to ' + folder.folderTag)
-                folder.save()
-            }
-        }
-
+	render template: 'folders', model: [
+	    folders                     : folderContents,
+	    folderContentsAccessLevelMap: folderContentsAccessLevelMap,
+	    folderSearchString          : folderSearchString,
+	    uniqueLeavesString          : uniqueLeavesString,
+	    auto                        : auto,
+	    nodesToExpand               : nodesToExpand,
+	    displayMetadata             : displayMetadata]
     }
 
     private void doAddFolder(String folderType, FmFolder folder, long parentId) {
@@ -705,7 +556,7 @@ class FmFolderController {
             folder.folderLevel = 0
         }
         else {
-            def parentFolder = FmFolder.getAt(parentId)
+	    FmFolder parentFolder = FmFolder.get(parentId)
             folder.folderLevel = parentFolder.folderLevel + 1
             folder.parent = parentFolder
         }
@@ -714,22 +565,9 @@ class FmFolderController {
             // Set folder's tag value based on a radix-36 conversion of its ID.
             folder.tag = Long.toString(folder.id, 36).toUpperCase()
             folder.save(flush: true)
-            solrFacetService.reindexFolder(folder.getUniqueId())
+	    solrFacetService.reindexFolder folder.uniqueId
 
-            render folder as XML
-        }
-        else {
-            render folder.errors
-        }
-    }
-
-    private void updateFolder() {
-        def folder = FmFolder.getAt(params.folderId)
-        folder.properties = params
-
-        if (folder.save()) {
-            solrFacetService.reindexFolder(folder.getUniqueId())
-            render folder as XML
+	    render(folder as XML)
         }
         else {
             render folder.errors
@@ -737,28 +575,20 @@ class FmFolderController {
     }
 
     private void moveFolder(long folderId, String newFolderFullName, String newFolderLevel) {
-        def folder = FmFolder.getAt(folderId)
-        def oldFullName = folder.folderFullName
-        def oldLevel = folder.folderLevel
+	FmFolder folder = FmFolder.get(folderId)
+	long oldLevel = folder.folderLevel
         folder.folderFullName = newFolderFullName
-        folder.folderLevel = newFolderLevel
+	folder.folderLevel = newFolderLevel as long
 
         if (folder.save()) {
-            List<FmFolder> subFolderList = FmFolder.findAll("from FmFolder as fd where fd.folderFullName like :fn escape '*'",
-                    [fn: oldFullName + '%'])
+	    List<FmFolder> subFolderList = FmFolder.executeQuery("from FmFolder as fd where fd.folderFullName like :fn escape '*'",
+			[fn: folder.folderFullName + '%'])
 
-            subFolderList.each {
-
-                println it
-                def folderLevelDifferential = it.folderLevel - oldLevel
-                // it.folderLevel =
-                // it.folderFullName =
-                moveFolder(it.id, newFolderFullName + it.folderName + '\\', newFolderLevel + folderLevelDifferential)
-
+	    for (FmFolder fmFolder in subFolderList) {
+		moveFolder(fmFolder.id, newFolderFullName + fmFolder.folderName + '\\', newFolderLevel + (fmFolder.folderLevel - oldLevel))
             }
 
-            render folder as XML
-
+	    render(folder as XML)
         }
         else {
             render folder.errors
@@ -766,19 +596,21 @@ class FmFolderController {
     }
 
     private void removeFolder(long folderId) {
-        def folder = FmFolder.getAt(folderId)
+	FmFolder folder = FmFolder.get(folderId)
         folder.activeInd = false
 
         if (folder.save()) {
-            List<FmFolder> subFolderList = FmFolder.findAll("from FmFolder as fd where fd.folderFullName like :fn escape '*' and fd.folderLevel = :fl",
-                    [fn: folder.folderFullName + '%', fl: (folder.folderLevel + 1)])
+	    List<FmFolder> subFolderList = FmFolder.executeQuery('''
+			from FmFolder as fd
+			where fd.folderFullName like :fn escape '*'
+			and fd.folderLevel = :fl''',
+			[fn: folder.folderFullName + '%', fl: (folder.folderLevel + 1)])
 
-            subFolderList.each {
-                println it
-                removeFolder(it.id)
+	    for (FmFolder fmFolder in subFolderList) {
+		removeFolder fmFolder.id
             }
 
-            render folder as XML
+	    render(folder as XML)
 
         }
         else {
@@ -787,35 +619,23 @@ class FmFolderController {
     }
 
     private List<FmFolder> getFolder(String folderType, String parentPath) {
-        logger.info('getFolder(' + folderType + ', ' + parentPath + ')')
-        if (parentPath == null) {
-            return FmFolder.executeQuery('from FmFolder as fd where fd.activeInd = true and upper(fd.folderType) = upper(:fl) ', [fl: folderType])
+	logger.debug 'getFolder({}, {})', folderType, parentPath
+	if (!parentPath) {
+	    FmFolder.executeQuery('''
+			from FmFolder as fd
+			where fd.activeInd = true
+			  and upper(fd.folderType) = upper(:fl)''',
+			[fl: folderType])
         }
         else {
-            return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and upper(fd.folderType) = upper(:fl) and fd.folderFullName like :fn escape '*' ",
+	    FmFolder.executeQuery('''
+			from FmFolder as fd
+			where fd.activeInd = true
+			and upper(fd.folderType) = upper(:fl)
+			and fd.folderFullName like :fn escape '*' ''',
                     [fl: folderType, fn: parentPath + '%'])
         }
-
     }
-
-    //method which returns a list of folders which are the children of the folder of which the identifier is passed as parameter
-    private List<FmFolder> getChildrenFolder(String parentId) {
-        def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
-    }
-
-    //method which returns a list of folders which are the children of the folder of which the identifier is passed as parameter by folder types
-    private List<FmFolder> getChildrenFolderByType(Long parentId, String folderType) {
-        def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl and upper(fd.folderType) = upper(:ft)", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%", ft: folderType])
-    }
-
-    //method which returns a list of folders which are the children of the folder of which the identifier is passed as parameter
-    private List getChildrenFolderTypes(Long parentId) {
-        def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("select distinct(fd.folderType) from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
-    }
-
     private String createDataTable(Map<FmFolder, String> subFoldersAccessLevelMap, String folderType) {
 
         if (!subFoldersAccessLevelMap) {
@@ -828,7 +648,7 @@ class FmFolderController {
         def dataObject
         def childMetaDataTagItems
 
-        for (folder in folders) {
+	for (FmFolder folder in folders) {
             dataObject = getBioDataObject(folder)
             childMetaDataTagItems = getChildMetaDataItems(folder)
             if (dataObject && childMetaDataTagItems) {
@@ -836,56 +656,45 @@ class FmFolderController {
             }
         }
 
-        childMetaDataTagItems.eachWithIndex()
-                { obj, i ->
-                    //
-                    AmTagItem amTagItem = obj
-                    if (amTagItem.viewInChildGrid) {
-                        if (amTagItem.tagItemType == 'FIXED') {
-                            logger.info('CREATEDATATABLE::FIXED TYPE == ' + amTagItem.tagItemType + ' ID = ' + amTagItem.id + ' ' + amTagItem.displayName)
-
-                            if (dataObject.hasProperty(amTagItem.tagItemAttr)) {
-                                //logger.info ('CREATEDATATABLE::FIXED COLUMNS == ' + amTagItem.tagItemAttr + ' ' + amTagItem.displayName)
-                                table.putColumn(amTagItem.id.toString(),
+	childMetaDataTagItems.eachWithIndex { obj, i ->
+            AmTagItem amTagItem = obj
+            if (amTagItem.viewInChildGrid) {
+                if (amTagItem.tagItemType == 'FIXED') {
+                    if (dataObject.hasProperty(amTagItem.tagItemAttr)) {
+                        table.putColumn(amTagItem.id.toString(),
                                         new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, '', 'String'))
-                            }
-                            else {
-                                logger.error('CREATEDATATABLE::TAG ITEM ID = ' + amTagItem.id + ' COLUMN ' + amTagItem.tagItemAttr + ' is not a propery of ' + dataObject)
-                            }
-
-                        }
-                        else if (amTagItem.tagItemType == 'CUSTOM') {
-                            logger.info('CREATEDATATABLE::CUSTOM == ' + amTagItem.tagItemType + ' ID = ' + amTagItem.id + ' ' + amTagItem.displayName)
-                            table.putColumn(amTagItem.id.toString(),
-                                    new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, '', 'String'))
-
-                        }
-                        else {
-                            logger.info('CREATEDATATABLE::BUSINESS OBJECT == ' + amTagItem.tagItemType + ' ID = ' + amTagItem.id + ' ' + amTagItem.displayName)
-                            table.putColumn(amTagItem.id.toString(),
-                                    new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, '', 'String'))
-                        }
                     }
                     else {
-                        logger.info('COLUMN ' + amTagItem.displayName + ' is not to display in grid')
-                    }
+			logger.error 'CREATEDATATABLE::TAG ITEM ID = {} COLUMN {} is not a propery of {}',
+			    amTagItem.id, amTagItem.tagItemAttr, dataObject                            }
 
                 }
+                else if (amTagItem.tagItemType == 'CUSTOM') {
+                    table.putColumn(amTagItem.id.toString(),
+                                    new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, '', 'String'))
+                }
+                else {
+                    table.putColumn(amTagItem.id.toString(),
+                                    new ExportColumn(amTagItem.id.toString(), amTagItem.displayName, '', 'String'))
+                }
+            }
+            else {
+		logger.debug 'COLUMN {} is not to display in grid', amTagItem.displayName                    }
 
-        folders.each { folderObject ->
-            logger.info 'FOLDER::$folderObject'
+        }
 
+	for (folderObject in folders) {
             def bioDataObject = getBioDataObject(folderObject)
             ExportRowNew newrow = new ExportRowNew()
             childMetaDataTagItems.eachWithIndex() { obj, i ->
                 AmTagItem amTagItem = obj
                 if (amTagItem.viewInChildGrid) {
                     if (amTagItem.tagItemType == 'FIXED' && bioDataObject.hasProperty(amTagItem.tagItemAttr)) {
-                        def bioDataDisplayValue = null
+			String bioDataDisplayValue = null
                         def bioDataPropertyValue = bioDataObject[amTagItem.tagItemAttr]
                         if (amTagItem.tagItemSubtype == 'PICKLIST' || amTagItem.tagItemSubtype == 'MULTIPICKLIST') {
                             if (bioDataPropertyValue) {
-                                def cc = ConceptCode.findByUniqueId(bioDataPropertyValue)
+				ConceptCode cc = ConceptCode.findByUniqueId(bioDataPropertyValue)
                                 if (cc) {
                                     bioDataDisplayValue = cc.codeName
                                 }
@@ -896,10 +705,10 @@ class FmFolderController {
                             else {
                                 bioDataDisplayValue = ''
                             }
-
                         }
                         else if (amTagItem.tagItemSubtype == 'FREETEXT') {
-                            bioDataDisplayValue = createTitleString(amTagItem, bioDataPropertyValue, folderObject, subFoldersAccessLevelMap[folderObject] != 'LOCKED')
+			    bioDataDisplayValue = createTitleString(amTagItem, bioDataPropertyValue, folderObject,
+				subFoldersAccessLevelMap[folderObject] != 'LOCKED')
                         }
                         else if (amTagItem.tagItemSubtype == 'FREETEXTAREA') {
                             bioDataDisplayValue = amTagItem.displayName
@@ -908,13 +717,10 @@ class FmFolderController {
                             logger.error 'FIXED ATTRIBUTE ERROR::Unknown tagItemSubType'
                         }
 
-                        logger.info('ROWS == ' + amTagItem.tagItemAttr + ' ' + bioDataObject[amTagItem.tagItemAttr])
-                        newrow.put(amTagItem.id.toString(), bioDataDisplayValue ? bioDataDisplayValue : '')
+			newrow.put(amTagItem.id.toString(), bioDataDisplayValue ?: '')
                     }
                     else if (amTagItem.tagItemType == 'CUSTOM') {
-
-                        def tagValues = AmTagDisplayValue.findAllDisplayValue(folderObject.uniqueId, amTagItem.id)
-                        logger.info('CUSTOM PARAMETERS :: FolderUID:' + folderObject.uniqueId + ' bioDataObject:' + bioDataObject.getUniqueId() + ' amTagItem_id:' + amTagItem.id)
+			Collection<AmTagDisplayValue> tagValues = AmTagDisplayValue.findAllDisplayValue(folderObject.uniqueId, amTagItem.id)
                         newrow.put(amTagItem.id.toString(), createDisplayString(tagValues))
                     }
                     else {
@@ -928,81 +734,70 @@ class FmFolderController {
                             newrow.put(amTagItem.id.toString(), createTitleString(amTagItem, folderObject.folderName, folderObject, true))
                         }
                         else {
-                            def tagValues = AmTagDisplayValue.findAllDisplayValue(folderObject.uniqueId, amTagItem.id)
-                            logger.info('BIOOBJECT PARAMETERS ' + folderObject.uniqueId + ' ' + amTagItem.id + ' tagValues ' + tagValues)
-
+			    Collection<AmTagDisplayValue> tagValues = AmTagDisplayValue.findAllDisplayValue(folderObject.uniqueId, amTagItem.id)
                             newrow.put(amTagItem.id.toString(), createDisplayString(tagValues))
                         }
-
                     }
                 }
 
                 table.putRow(folderObject.uniqueId, newrow)
             }
+	}
 
-        }
-        return table.toJSON_DataTables('', folderType).toString(5)
+	table.toJSON_DataTables('', folderType).toString(5)
     }
 
-    //FIXME Quick hack to make title properties act as hyperlinks.
-    //These name properties should be indicated in the database, and the sort value should be specified
-    //(needs a rewrite of our ExportTable)
-    def nameProperties = ['assay name', 'analysis name', 'study title', 'program title', 'folder name']
-
-    private createTitleString(AmTagItem amTagItem, String name, FmFolder folderObject, boolean isLink = true) {
-        def tagName = amTagItem.displayName
+    private String createTitleString(AmTagItem amTagItem, String name, FmFolder folderObject, boolean isLink = true) {
+	String tagName = amTagItem.displayName
         if (nameProperties.contains(tagName.toLowerCase())) {
-            def titleHtml = isLink ? "<a href='#' onclick='openFolderAndShowChild(${folderObject.parent?.id}, ${folderObject.id})'>$name</a>" : name
-            //Comment with name at the start to preserve the sort order - precaution against '--' being included in a name
-            return "<!-- ${name.replace('--', '_')} -->$titleHtml"
+	    String titleHtml = isLink ?
+		"<a href='#' onclick='openFolderAndShowChild(${folderObject.parent?.id}, ${folderObject.id})'>$name</a>" :
+		name
+	    //Comment with name at the start to preserve the sort order - precaution against "--" being included in a name
+	    "<!-- ${name.replace('--', '_')} -->$titleHtml"
+	}
+	else {
+	    name
         }
-        return name
     }
 
-    private createDisplayString(tagValues) {
-        // logger.info ('createDisplayString::TAGVALUES == ' + tagValues)
-
-        def displayValue = ''
+    private String createDisplayString(tagValues) {
         if (tagValues) {
-            displayValue = tagValues*.displayValue.join(', ')
+	    tagValues*.displayValue.join(', ')
+	}
+	else {
+	    ''
         }
-        return displayValue
     }
 
     def folderDetail() {
-        logger.info '** action: folderDetail called!'
         def folderId = params.id
-        logger.info 'PARAMS = $params'
 
-        def folder
-        def subFolders
+	FmFolder folder
         def bioDataObject
-        def amTagTemplate
-        def metaDataTagItems
-        def jSONForGrids = []
-        def subjectLevelDataAvailable = false
-        def measurements
-        def technologies
-        def vendors
-        def platforms
+	List<AmTagItem> metaDataTagItems
+	List<String> jsonForGrids = []
+	boolean subjectLevelDataAvailable = false
+	List<String> measurements
+	List<String> technologies
+	List<String> vendors
+	List<BioAssayPlatform> platforms
         Map searchHighlight
 
         if (folderId) {
             folder = FmFolder.get(folderId)
 
-            logger.info 'FolderId ' + folderId + ' folder ' + folder + ''
             if (folder) {
                 if (!folder.activeInd) {
-                    render(template: 'deletedFolder', plugin: "folderManagement")
+		    render template: 'deletedFolder'
                     return
                 }
 
                 bioDataObject = getBioDataObject(folder)
                 metaDataTagItems = getMetaDataItems(folder, false)
-                logger.info 'metaDataTagItems  = ' + metaDataTagItems
 
                 //If the folder is a study, check for subject-level data being available
-                if (folder.folderType.equalsIgnoreCase(FolderType.STUDY.name()) && bioDataObject != null && bioDataObject.hasProperty('accession')) {
+		if (folder.folderType.equalsIgnoreCase(FolderType.STUDY.name()) && bioDataObject?.hasProperty('accession')) {
                     subjectLevelDataAvailable = ontologyService.checkSubjectLevelData(bioDataObject.accession)
                 }
 
@@ -1013,91 +808,66 @@ class FmFolderController {
                     platforms = BioAssayPlatform.executeQuery('FROM BioAssayPlatform as p ORDER BY p.name')
                 }
 
-                def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-                def subFolderTypes = fmFolderService.getChildrenFolderTypes(folder.id)
-                subFolderTypes.each {
-                    logger.info 'check subFolderType it = ' + it + ' for folder ' + folder.id + ''
-                    subFolders = fmFolderService.getChildrenFolderByType(folder.id, it)
-                    if (subFolders != null && subFolders.size() > 0) {
-                        logger.info 'found ' + subFolders.size() + ' subFolders == $subFolders'
-                        def subFoldersAccessLevelMap = fmFolderService.getAccessLevelInfoForFolders(user, subFolders)
+		for (String type in fmFolderService.getChildrenFolderTypes(folder.id)) {
+		    List<FmFolder> subFolders = fmFolderService.getChildrenFolderByType(folder.id, type)
+		    if (subFolders) {
+			Map<FmFolder, String> subFoldersAccessLevelMap = fmFolderService.getAccessLevelInfoForFolders(subFolders)
                         String gridTitle = 'Associated ' + StringUtils.capitalize(subFolders[0].pluralFolderTypeName.toLowerCase())
-                        String gridData = createDataTable(subFoldersAccessLevelMap, gridTitle)
-                        //         logger.info gridData
-                        jSONForGrids.add(gridData)
-                        logger.debug 'ADDING JSON GRID'
+			jsonForGrids << createDataTable(subFoldersAccessLevelMap, gridTitle)
                     }
                 }
 
                 // Highlight search terms (if specified by RWGController)
-                def categoryList = session['rwgCategorizedSearchTerms']
-                searchHighlight = solrFacetService.getSearchHighlight(folder, categoryList)
+		searchHighlight = solrFacetService.getSearchHighlight(folder, session.rwgCategorizedSearchTerms)
             }
         }
 
-        logger.debug 'FolderInstance = ' + bioDataObject + ''
-        def useMongo = grailsApplication.config.transmartproject.mongoFiles.enableMongo
-        render template: '/fmFolder/folderDetail', plugin: "folderManagement",
-                model: [
-                        folder                   : folder,
-                        bioDataObject            : bioDataObject,
-                        measurements             : measurements,
-                        technologies             : technologies,
-                        vendors                  : vendors,
-                        platforms                : platforms,
-                        amTagTemplate            : amTagTemplate,
-                        metaDataTagItems         : metaDataTagItems,
-                        jSONForGrids             : jSONForGrids,
-                        subjectLevelDataAvailable: subjectLevelDataAvailable,
-                        searchHighlight          : searchHighlight,
-                        useMongo                 : useMongo
-                ]
+	render template: '/fmFolder/folderDetail', model: [
+            folder                   : folder,
+            bioDataObject            : bioDataObject,
+            measurements             : measurements,
+            technologies             : technologies,
+            vendors                  : vendors,
+            platforms                : platforms,
+            metaDataTagItems         : metaDataTagItems,
+	    jSONForGrids             : jsonForGrids,
+            subjectLevelDataAvailable: subjectLevelDataAvailable,
+            searchHighlight          : searchHighlight,
+	    useMongo                 : enableMongo]
     }
 
-    def analysisTable = {
+    def analysisTable() {
         try {
             def analysisId = params.id
-            def genes = []
-            def geneFilter = session['geneFilter']
+	    List<String> genes = []
+	    def geneFilter = session.geneFilter
             //Convert gene filter to a straight list
             if (geneFilter) {
                 geneFilter = geneFilter.substring(5).split('::')[0].replace('|', '/').split('/')
             }
 
-            logger.info "analysisTable id ${analysisId} geneFilter '${geneFilter}'"
-
             //For each gene (ignore pathways), add the gene name and any synonyms to the list to match against
-            for (item in geneFilter) {
+	    for (String item in geneFilter) {
                 if (item.startsWith('GENE')) {
-                    def sk = SearchKeyword.findByUniqueId(item)
-                    def synonyms = BioDataExternalCode.findAllWhere(bioDataId: sk.bioDataId, codeType: 'SYNONYM')
-                    genes.push(sk.keyword)
-                    for (s in synonyms) {
-                        genes.push(s.code)
+		    SearchKeyword sk = SearchKeyword.findByUniqueId(item)
+		    genes << sk.keyword
+		    for (s in BioDataExternalCode.findAllByBioDataIdAndCodeType(k.bioDataId, 'SYNONYM')) {
+			genes << s.code
                     }
                 }
             }
 
-            logger.info 'geneCount ' + genes.size() + ''
-
-            def criteriaParams = [:]
+	    Map criteriaParams = [:]
             if (!params.boolean('full')) {
-                criteriaParams.put('max', 1000)
-                logger.info 'not full... limit to 1000 rows'
+		criteriaParams.max = 1000
             }
 
-            logger.info "criteriaParams '${criteriaParams}'"
-            logger.info 'fetch BioAssayAnalysisData for analysisId ' + analysisId + ''
-
-            FmFolderAssociation fmm = FmFolderAssociation.findByFmFolder(FmFolder.findById(analysisId))
+	    FmFolderAssociation fmm = FmFolderAssociation.findByFmFolder(FmFolder.load(analysisId as Long))
             String ouid = fmm.objectUid
-            int AssaysNb = ouid.substring(ouid.indexOf(':') + 1).toInteger()
-            def rows = BioAssayAnalysisData.createCriteria().list(criteriaParams) {
-                eq('analysis', BioAssayAnalysis.findById(AssaysNb))
-                order('rawPvalue', 'asc')
+	    List<BioAssayAnalysisData> rows = BioAssayAnalysisData.createCriteria().list(criteriaParams) {
+		eq 'analysis', BioAssayAnalysis.load(ouid.substring(ouid.indexOf(':') + 1) as Long)
+		order 'rawPvalue', 'asc'
             }
-
-            logger.info 'rowCount ' + rows.getTotalCount() + ''
 
             ExportTableNew table = new ExportTableNew()
             table.putColumn('probe', new ExportColumn('probe', 'Probe', '', 'String'))
@@ -1107,17 +877,19 @@ class FmFolderController {
             table.putColumn('teapvalue', new ExportColumn('teapvalue', 'TEA-adjusted p-value', '', 'Number'))
             table.putColumn('foldchangeratio', new ExportColumn('foldchangeratio', 'Fold Change Ratio', '', 'Number'))
 
-            rows.each {
-                def rowGenes = (DeMrnaAnnotation.findAll('from DeMrnaAnnotation as a where a.probesetId=? and geneSymbol is not null', [it.probesetId]))*.geneSymbol
-                def foundGene = false
-
-                logger.info "row probesetId ${it.probesetId} rowGenes '${rowGenes}'"
+	    for (BioAssayAnalysisData baad in rows) {
+		List<String> rowGenes = DeMrnaAnnotation.executeQuery('''
+				select a.geneSymbol
+				from DeMrnaAnnotation as a
+				where a.probesetId=?
+				and geneSymbol is not null''',
+				[baad.probesetId])
+		boolean foundGene = false
 
                 if (genes) {
-
-                    def lowerGenes = []
+		    List<String> lowerGenes = []
                     for (gene in rowGenes) {
-                        lowerGenes.push(gene.toLowerCase())
+			lowerGenes << gene.toLowerCase()
                     }
                     for (gene in genes) {
                         if (gene.toLowerCase() in lowerGenes) {
@@ -1129,13 +901,13 @@ class FmFolderController {
 
                 if (foundGene || !genes) {
                     ExportRowNew newrow = new ExportRowNew()
-                    newrow.put('probe', it.featureGroupName)
+		    newrow.put('probe', baad.featureGroupName)
                     newrow.put('gene', rowGenes.join(', '))
-                    newrow.put('pvalue', it.rawPvalue.toString())
-                    newrow.put('apvalue', it.adjustedPvalue.toString())
-                    newrow.put('teapvalue', it.teaNormalizedPValue.toString())
-                    newrow.put('foldchangeratio', it.foldChangeRatio.toString())
-                    table.putRow(it.id.toString(), newrow)
+		    newrow.put('pvalue', baad.rawPvalue.toString())
+		    newrow.put('apvalue', baad.adjustedPvalue.toString())
+		    newrow.put('teapvalue', baad.teaNormalizedPValue.toString())
+		    newrow.put('foldchangeratio', baad.foldChangeRatio.toString())
+		    table.putRow(baad.id.toString(), newrow)
                 }
             }
 
@@ -1143,66 +915,54 @@ class FmFolderController {
             analysisData.put('rowCount', rows.getTotalCount())
             analysisData.put('filteredByGenes', genes.size() > 0)
 
-            render(contentType: 'text/json', text: analysisData.toString(5))
+	    render contentType: 'text/json', text: analysisData.toString(5)
         }
-        catch (Exception e) {
-            logger.error('Error while building analysis table', e)
+	catch (e) {
+	    logger.error 'Error while building analysis table', e
         }
     }
 
-
-    private List<AmTagItem> getChildMetaDataItems(folder) {
-        def amTagTemplate = amTagTemplateService.getTemplate(folder.getUniqueId())
-        List<AmTagItem> metaDataTagItems
+    private List<AmTagItem> getChildMetaDataItems(FmFolder folder) {
+	AmTagTemplate amTagTemplate = amTagTemplateService.getTemplate(folder.uniqueId)
         if (amTagTemplate) {
-            metaDataTagItems = amTagItemService.getChildDisplayItems(amTagTemplate.id)
+	    amTagItemService.getChildDisplayItems amTagTemplate.id
         }
         else {
-            logger.error 'Unable to find child amTagTemplate for object Id = ' + folder.getUniqueId()
+	    logger.error 'Unable to find child amTagTemplate for object Id = {}', folder.uniqueId
         }
-
-        return metaDataTagItems
     }
 
     private List<AmTagItem> getMetaDataItems(folder, editable) {
-        def amTagTemplate = amTagTemplateService.getTemplate(folder.getUniqueId())
-        List<AmTagItem> metaDataTagItems
+	AmTagTemplate amTagTemplate = amTagTemplateService.getTemplate(folder.uniqueId)
         if (amTagTemplate) {
             if (editable) {
-                metaDataTagItems = amTagItemService.getEditableItems(amTagTemplate.id)
+		amTagItemService.getEditableItems amTagTemplate.id
             }
             else {
-                metaDataTagItems = amTagItemService.getDisplayItems(amTagTemplate.id)
+		amTagItemService.getDisplayItems amTagTemplate.id
             }
         }
         else {
-            logger.error 'Unable to find amTagTemplate for object Id = ' + folder.getUniqueId()
+	    logger.error 'Unable to find amTagTemplate for object Id = {}', folder.uniqueId
         }
-
-        return metaDataTagItems
     }
 
-    private Object getBioDataObject(folder) {
+    private getBioDataObject(FmFolder folder) {
         def bioDataObject
-        def folderAssociation
-
-        logger.info 'getBioDataObject::folder = ' + folder
 
         if (folder.folderType == 'PROGRAM') {
-            bioDataObject = folder
-            return bioDataObject
+	    return folder
         }
 
-        folderAssociation = FmFolderAssociation.findByFmFolder(folder)
+	FmFolderAssociation folderAssociation = FmFolderAssociation.findByFmFolder(folder)
         //for PROGRAM this would be
         //folderAssociation = FmFolderAssociation.findByFmFolder(folder)
 
         if (folderAssociation) {
-            logger.info 'getBioDataObject::folderAssociation = ' + folderAssociation
-            bioDataObject = folderAssociation.getBioObject()
+	    bioDataObject = folderAssociation.bioObject
         }
         else {
-            logger.info 'Unable to find folderAssociation for folder Id = ' + folder.id
+	    logger.info 'Unable to find folderAssociation for folder Id = {}', folder.id
         }
 
         if (!bioDataObject) {
@@ -1210,14 +970,10 @@ class FmFolderController {
             bioDataObject = folder
         }
 
-        return bioDataObject
+	bioDataObject
     }
 
-    def editMetaData = {
-        logger.info 'editMetaData called'
-        logger.info 'params = ' + params
-
-
+    def editMetaData() {
         if (!isAdmin()) {
             logger.info 'Not an admin: ignore'
             return
@@ -1225,10 +981,9 @@ class FmFolderController {
 
         def folderId = params.folderId
 
-        def folder
+	FmFolder folder
         def bioDataObject
-        def amTagTemplate
-        def metaDataTagItems
+	List<AmTagItem> metaDataTagItems
         if (folderId) {
             folder = FmFolder.get(folderId)
             if (folder) {
@@ -1236,44 +991,39 @@ class FmFolderController {
                 metaDataTagItems = getMetaDataItems(folder, true)
             }
             else {
-                logger.error 'Unable to find folder for folder Id = ' + folderId
+		logger.error 'Unable to find folder for folder Id = {}', folderId
             }
-
         }
 
-        def title = 'Edit Meta Data'
-        def templateType = 'editMetadataForm'
+	List<String> measurements = BioAssayPlatform.executeQuery('SELECT DISTINCT platformType FROM BioAssayPlatform as p ORDER BY p.platformType')
+	List<String> vendors = BioAssayPlatform.executeQuery('SELECT DISTINCT vendor FROM BioAssayPlatform as p ORDER BY p.vendor')
+	List<String> technologies = BioAssayPlatform.executeQuery('SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p ORDER BY p.platformTechnology')
+	List<BioAssayPlatform> platforms = BioAssayPlatform.executeQuery('FROM BioAssayPlatform as p ORDER BY p.name')
 
-        def measurements = BioAssayPlatform.executeQuery('SELECT DISTINCT platformType FROM BioAssayPlatform as p ORDER BY p.platformType')
-        def vendors = BioAssayPlatform.executeQuery('SELECT DISTINCT vendor FROM BioAssayPlatform as p ORDER BY p.vendor')
-        def technologies = BioAssayPlatform.executeQuery('SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p ORDER BY p.platformTechnology')
-        def platforms = BioAssayPlatform.executeQuery('FROM BioAssayPlatform as p ORDER BY p.name')
-
-        render(template: 'editMetaData', plugin: 'folderManagement',
-                model: [bioDataObject: bioDataObject, measurements: measurements, technologies: technologies, vendors: vendors, platforms: platforms,
-                        folder       : folder, amTagTemplate: amTagTemplate, metaDataTagItems: metaDataTagItems])
+	render template: 'editMetaData',
+	    model: [bioDataObject   : bioDataObject,
+		    measurements    : measurements,
+		    technologies    : technologies,
+		    vendors         : vendors,
+		    platforms       : platforms,
+		    folder          : folder,
+		    metaDataTagItems: metaDataTagItems]
     }
 
-    def updateMetaData = {
-        logger.info 'updateMetaData called'
-        logger.info params
-
+    def updateMetaData(FmFolder folder) {
         if (!isAdmin()) {
             return
         }
 
         try {
-            FmFolder folder = FmFolder.get(params.id)
-
             // Get associated business object and deal with any special folderName/description inconsistencies.
-            Object object
-            FmFolderAssociation assoc = FmFolderAssociation.findByFmFolder(folder)
+	    def object
             folder.folderName = params.folderName
             folder.description = params.description
-            if (assoc != null) {
-                object = assoc.getBioObject()
+	    FmFolderAssociation assoc = FmFolderAssociation.findByFmFolder(folder)
+	    if (assoc) {
+		object = assoc.bioObject
                 if (object instanceof Experiment) {
-                    object = (Experiment) object
                     folder.folderName = params.title
                 }
                 else if (object instanceof BioAssayAnalysis) {
@@ -1285,36 +1035,24 @@ class FmFolderController {
                 object = folder
             }
 
-            fmFolderService.saveFolder(folder, object, params)
-            def result = [id: folder.id, folderName: folder.folderName]
-            render result as JSON
+	    fmFolderService.saveFolder folder, object, params
+	    render([id: folder.id, folderName: folder.folderName] as JSON)
 
-            solrFacetService.reindexFolder(folder.getUniqueId())
+	    solrFacetService.reindexFolder folder.uniqueId
         }
-        catch (ValidationException ex) {
-            logger.error 'Unable to update metadata'
-            def errors = g.renderErrors(bean: ex.errors)
-            logger.error errors
-            def result = [errors: errors]
-            render result as JSON
+	catch (ValidationException e) {
+	    String errors = renderErrors(bean: e.errors)
+	    logger.error 'Unable to update metadata: {}', errors
+	    render([errors: errors] as JSON)
         }
-        catch (Exception ex) {
-            logger.error 'Exception in FmFolderController.updateMetaData', ex
-            def result = [errors: '<ul><li>An unexpected error has occurred. If this error persits, please click \'Close\' or \'Cancel\' to close this dialog box.<br><br>Error details: ' + ex.getMessage() + '</li></ul>']
-            render result as JSON
+	catch (e) {
+	    logger.error 'Exception in FmFolderController.updateMetaData', e
+	    renderUnexpectedError e
         }
-
     }
 
-    def subFolders = {
-        ExportTableNew table
-
-        //Keep this if you want to cache the grid data
-        //ExportTableNew table=(ExportTableNew)request.getSession().getAttribute('gridtable')
-
-        if (table == null) {
-            table = new ExportTableNew()
-        }
+    def subFolders() {
+	ExportTableNew table = new ExportTableNew()
 
         table.putColumn('ident', new ExportColumn('ident', 'ID', '', 'String', 50))
         table.putColumn('name', new ExportColumn('name', 'Name', '', 'String', 50))
@@ -1326,10 +1064,9 @@ class FmFolderController {
         newrow.put('description', 'foo.description')
         table.putRow('somerow', newrow)
 
-        def jSONToReturn = table.toJSON_DataTables('').toString(5)
+	String jSONToReturn = table.toJSON_DataTables('').toString(5)
 
-        request.getSession().setAttribute('gridtable', table)
-
+	session.gridtable = table
         [jSONForGrid: jSONToReturn]
 
     }
@@ -1337,96 +1074,79 @@ class FmFolderController {
     /**
      * Calls service to import files into tranSMART filestore and index them with SOLR
      */
-    def importFiles = {
-
-        fmFolderService.importFiles()
-
+    def importFiles() {
+        fmFolderService.importFiles()	       
     }
 
     /**
      * Calls service to re-index existing files with SOLR
      */
-    def reindexFiles = {
-        render(contentType: 'text/plain', text: 'Reindexing...')
+    def reindexFiles() {
+	render 'Reindexing...'
         fmFolderService.reindexFiles()
-        render(contentType: 'text/plain', text: '...complete!')
+	render '...complete!'
     }
 
-    def reindexFolder = {
-        solrFacetService.reindexFolder(params.uid)
+    def reindexFolder() {
+	solrFacetService.reindexFolder params.uid
     }
 
-    def removeEntry = {
+    def removeEntry() {
         fmFolderService.removeSolrEntry(params.uid)
     }
 
-    def deleteStudy() {
-        def studyFolderId = params.id
-        def studyFolder = FmFolder.findById(studyFolderId)
-        fmFolderService.deleteStudy(studyFolder)
+    def deleteStudy(FmFolder studyFolder) {
+	fmFolderService.deleteStudy studyFolder
         render 'ok'
     }
 
-    def deleteProgram() {
-        def programFolderId = params.id
-        def programFolder = FmFolder.findById(programFolderId)
-        fmFolderService.deleteProgram(programFolder)
+    def deleteProgram(FmFolder programFolder) {
+	fmFolderService.deleteProgram programFolder
         render 'ok'
     }
 
-    def hasChildren() {
-        def parentId = params.id
-        def fmFolder = FmFolder.findById(parentId)
-        def result = [result: (fmFolder.getChildren().findAll { it.activeInd }.size() != 0)]
-        render result as JSON
+    def hasChildren(FmFolder fmFolder) {
+	render([result: fmFolder.children.findAll { it.activeInd }.size() != 0] as JSON)
     }
 
-    def deleteFolder = {
-
+    def deleteFolder(FmFolder folder) {
         if (!isAdmin()) {
             return
         }
 
-        def id = params.id
-        def folder = FmFolder.get(id)
         if (folder) {
-            fmFolderService.deleteFolder(folder)
-            render(template: 'deletedFolder', plugin: "folderManagement")
+	    fmFolderService.deleteFolder folder
+	    render template: 'deletedFolder'
         }
         else {
-            render(status: 500, text: 'FmFolder not found')
+	    render status: 500, text: 'FmFolder not found'
         }
     }
 
-    def deleteFile = {
-
+    def deleteFile(FmFile file) {
         if (!isAdmin()) {
             return
         }
 
-        def id = params.id
-        def file = FmFile.get(id)
-        def folder = file.getFolder()
+	FmFolder folder = file.folder
         if (file) {
-            logger.info('deleting file ' + file + ' in folder ' + folder + '')
-            fmFolderService.deleteFile(file)
-            render(template: '/fmFolder/filesTable', plugin: "folderManagement", model: [folder: folder, hlFileIds: []])
+	    logger.debug 'deleting file {} in folder {}', file, folder
+	    fmFolderService.deleteFile file
+	    render template: '/fmFolder/filesTable', model: [folder: folder, hlFileIds: []]
         }
         else {
-            render(status: 404, text: 'FmFile not found')
+	    render status: 404, text: 'FmFile not found'
         }
-
     }
 
-    def downloadFile() {
-        FmFile fmFile = FmFile.get params.id
+    def downloadFile(FmFile fmFile) {
         if (!fmFile) {
             render status: 404, text: 'FmFile not found'
             return
         }
 
-        String mimeType = MIME_TYPES_FILES_MAP.getContentType fmFile.originalName
-        logger.debug 'Downloading file $fmFile, mime type $mimeType'
+	String mimeType = MIME_TYPES_FILES_MAP.getContentType(fmFile.originalName)
+	logger.debug 'Downloading file {}, mime type {}', fmFile, mimeType
 
         HttpServletResponse fileResponse=new HttpServletResponseWrapper(response)
         response.setContentType mimeType
@@ -1435,174 +1155,153 @@ class FmFolderController {
          * with all major browsers, except for IE8. See:
          * http://greenbytes.de/tech/tc2231/#attwithfn2231utf8comp
          */
-        response.addHeader 'Content-Disposition',
-                "attachment; filename*=UTF-8''" +
-                        fmFile.originalName.getBytes('UTF-8').collect {
-                            '%' + String.format('%02x', it)
-                        }.join('')
-        response.addHeader 'Content-length', fmFile.fileSize.toString()
+	header 'Content-Disposition', "attachment; filename*=UTF-8''" +
+            fmFile.originalName.getBytes('UTF-8').collect {
+            '%' + String.format('%02x', it)
+        }.join('')
+	header 'Content-length', fmFile.fileSize.toString()
 
-        def useMongo = grailsApplication.config.transmartproject.mongoFiles.enableMongo
-        if (!useMongo) {
-            def file = fmFolderService.getFile fmFile
-            file.newInputStream().withStream {
-                fileResponse.outputStream << it
+	if (!enableMongo) {
+	    fmFolderService.getFile(fmFile).newInputStream().withStream { InputStream stream ->
+		fileResponse.outputStream << stream
             }
         }
         else {
-            if (grailsApplication.config.transmartproject.mongoFiles.useDriver) {
-                MongoClient mongo = new MongoClient(grailsApplication.config.transmartproject.mongoFiles.dbServer,
-                        grailsApplication.config.transmartproject.mongoFiles.dbPort)
-                DB db = mongo.getDB(grailsApplication.config.transmartproject.mongoFiles.dbName)
-                GridFS gfs = new GridFS(db)
-                GridFSDBFile gfsFile = gfs.findOne(fmFile.filestoreName)
-                fileResponse.outputStream << gfsFile.getInputStream()
+	    if (useDriver) {
+		MongoClient mongo = new MongoClient(mongoServer, mongoPort)
+		GridFSDBFile gfsFile = new GridFS(mongo.getDB(mongoDbName)).findOne(fmFile.filestoreName)
+		fileResponse.outputStream << gfsFile.inputStream
                 mongo.close()
             }
             else {
-                def apiURL = grailsApplication.config.transmartproject.mongoFiles.apiURL
-                def apiKey = grailsApplication.config.transmartproject.mongoFiles.apiKey
-                def http = new HTTPBuilder(apiURL + fmFile.filestoreName + '/fsfile')
-                http.request(Method.GET, ContentType.BINARY) { req ->
-                    headers.'apikey' = MongoUtils.hash(apiKey)
+		new HTTPBuilder(mongoApiUrl + fmFile.filestoreName + '/fsfile').request(Method.GET, ContentType.BINARY) { req ->
+		    headers.'apikey' = MongoUtils.hash(mongoApiKey)
                     response.success = { resp, binary ->
                         assert resp.statusLine.statusCode == 200
                         fileResponse.outputStream << binary
                     }
                     response.failure = { resp ->
-                        logger.error('Problem during connection to API: ' + resp.status)
-                        render(contentType: 'text/plain', text: 'Error writing ZIP: File not found')
+			logger.error 'Problem during connection to API: {}', resp.status
+			render 'Error writing ZIP: File not found'
                     }
                 }
             }
         }
     }
 
-    def ajaxTechnologies = {
-        def queryString = ' where 1=1'
-        if (params.measurementName != null && params.measurementName != 'null' && params.measurementName != 'undefined') {
-            queryString += " and platformType = '" + params.measurementName + "'"
-            logger.info("ajaxTechnologies with measurement = '" + params.measurementName + "'")
+    def ajaxTechnologies(String measurementName, String vendorName) {
+	String queryString = ' where 1=1'
+	if (measurementName && measurementName != 'null') {
+	    queryString += " and platformType = '" + measurementName + "'"
         }
-        if (params.vendorName != null && params.vendorName != 'null' && params.vendorName != 'undefined') {
-            queryString += " and vendor = '" + params.vendorName + "'"
-            logger.info("ajaxTechnologies with vendor = '" + params.vendorName + "'")
+	if (vendorName && vendorName != 'null') {
+	    queryString += " and vendor = '" + vendorName + "'"
         }
 
-        queryString = 'SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p ' + queryString + '  ORDER BY p.platformTechnology'
-        def technologies = BioAssayPlatform.executeQuery(queryString)
-        logger.info('ajaxTechnologies technologies from: ' + queryString + ' ' + technologies)
-        render(template: 'selectTechnologies', plugin: 'folderManagement', model: [technologies: technologies, technology: params.technologyName])
+	List<BioAssayPlatform> technologies = BioAssayPlatform.executeQuery(
+	    'SELECT DISTINCT platformTechnology FROM BioAssayPlatform as p ' + queryString + '  ORDER BY p.platformTechnology')
+	render template: 'selectTechnologies', model: [technologies: technologies, technology: params.technologyName]
     }
 
-    def ajaxVendors = {
-        logger.info params
-        def queryString = ' where 1=1'
+    def ajaxVendors(String technologyName, String measurementName) {
+	String queryString = ' where 1=1'
 
-        if (params.technologyName != null && params.technologyName != 'null' && params.technologyName != 'undefined') {
-            queryString += " and platformTechnology = '" + params.technologyName + "'"
-            logger.info("ajaxVendors with technology = '" + params.technologyName + "'")
+	if (technologyName && technologyName != 'null') {
+	    queryString += " and platformTechnology = '" + technologyName + "'"
         }
 
-        if (params.measurementName != null && params.measurementName != 'null' && params.measurementName != 'undefined') {
-            queryString += " and platformType = '" + params.measurementName + "'"
-            logger.info("ajaxVendors with measurement = '" + params.measurementName + "'")
+	if (measurementName && measurementName != 'null') {
+	    queryString += " and platformType = '" + measurementName + "'"
         }
 
-        queryString = 'SELECT DISTINCT vendor FROM BioAssayPlatform as p ' + queryString + '  ORDER BY p.vendor'
-        def vendors = BioAssayPlatform.executeQuery(queryString)
-        logger.info('ajaxVendors vendors from: ' + queryString + ' ' + vendors)
-        render(template: 'selectVendors', plugin: 'folderManagement', model: [vendors: vendors, vendor: params.vendorName])
+	List<String> vendors = BioAssayPlatform.executeQuery(
+	    'SELECT DISTINCT vendor FROM BioAssayPlatform as p ' + queryString + '  ORDER BY p.vendor')
+	render template: 'selectVendors', model: [vendors: vendors, vendor: params.vendorName]
     }
 
-    def ajaxMeasurements = {
-        logger.info params
-        def queryString = ' where 1=1'
+    def ajaxMeasurements(String technologyName, String vendorName, String measurementName) {
+	String queryString = ' where 1=1'
 
-        if (params.technologyName != null && params.technologyName != 'null' && params.technologyName != 'undefined') {
-            queryString += " and platformTechnology = '" + params.technologyName + "'"
-            logger.info("ajaxMeasurements with technology = '" + params.technologyName + "'")
+	if (technologyName && technologyName != 'null') {
+	    queryString += " and platformTechnology = '" + technologyName + "'"
         }
 
-        if (params.vendorName != null && params.vendorName != 'null' && params.vendorName != 'undefined') {
-            queryString += " and vendor = '" + params.vendorName + "'"
-            logger.info("ajaxMeasurements with vendor = '" + params.vendorName + "'")
+	if (vendorName && vendorName != 'null') {
+	    queryString += " and vendor = '" + vendorName + "'"
         }
 
-        queryString = 'SELECT DISTINCT platformType FROM BioAssayPlatform as p ' + queryString + '  ORDER BY p.platformType'
-        def measurements = BioAssayPlatform.executeQuery(queryString)
-        logger.info queryString + ' ' + measurements
-        render(template: 'selectMeasurements', plugin: 'folderManagement', model: [measurements: measurements, measurement: params.measurementName])
+	List<String> measurements = BioAssayPlatform.executeQuery(
+	    'SELECT DISTINCT platformType FROM BioAssayPlatform as p ' + queryString + '  ORDER BY p.platformType')
+	render template: 'selectMeasurements', model: [measurements: measurements, measurement: measurementName]
     }
 
-    def ajaxPlatforms = {
-        logger.info params
-        def queryString = ' where 1=1'
+    def ajaxPlatforms(String measurementName, String technologyName, String vendorName) {
+	String queryString = ' where 1=1'
 
-        if (params.measurementName != null && params.measurementName != 'null' && params.measurementName != 'undefined') {
-            queryString += " and platformType = '" + params.measurementName + "'"
+	if (measurementName && measurementName != 'null') {
+	    queryString += " and platformType = '" + measurementName + "'"
         }
 
-        if (params.technologyName != null && params.technologyName != 'null' && params.technologyName != 'undefined') {
-            queryString += " and platformTechnology = '" + params.technologyName + "'"
+	if (technologyName && technologyName != 'null') {
+	    queryString += " and platformTechnology = '" + technologyName + "'"
         }
 
-        if (params.vendorName != null && params.vendorName != 'null' && params.vendorName != 'undefined') {
-            queryString += " and vendor = '" + params.vendorName + "'"
+	if (vendorName && vendorName != 'null') {
+	    queryString += " and vendor = '" + vendorName + "'"
         }
 
-        queryString = 'FROM BioAssayPlatform as p ' + queryString + '  ORDER BY p.platformType'
-        def platforms = BioAssayPlatform.executeQuery(queryString)
-        render(template: 'selectPlatforms', plugin: 'folderManagement', model: [platforms: platforms])
+	List<BioAssayPlatform> platforms = BioAssayPlatform.executeQuery(
+	    'FROM BioAssayPlatform as p ' + queryString + '  ORDER BY p.platformType')
+	render template: 'selectPlatforms', model: [platforms: platforms]
     }
 
     private boolean isAdmin() {
-        if ('anonymousUser' != springSecurityService.getPrincipal()) {
-            def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-            if (!user.isAdmin()) {
-                render(status: 200, text: "You do not have permission to edit this object's metadata.")
-                return false
-            }
+	if (securityService.principal().isAdmin()) {
+	    true
         }
         else {
-            render(status: 200, text: "You do not have permission to edit this object's metadata.")
-            return false
+	    render '''You do not have permission to edit this object's metadata.'''
+	    false
         }
-        return true
     }
 
+    def getFolderFiles(String id, String accession, String folderId) {
+	logger.info 'getFolderFiles id {} accession {} returnJSON {}', id, accession, params.returnJSON
 
-    def getFolderFiles = {
-        //Get the folder ID for the study selected
-        def paramMap = params
-        def experiment = null
-        logger.info('getFolderFiles id ' + params.id + ' accession ' + params.accession + ' returnJSON ' + params.returnJSON + '')
-        if (params.id) {
-            experiment = Experiment.get(params.id)
+	Experiment experiment
+	if (id) {
+	    experiment = Experiment.get(id)
         }
-        else if (params.accession) {
-            experiment = Experiment.findByAccession(params.accession)
-        }
-        else if (params.folderId) {
-            def accession = FmFolderAssociation.findByFmFolder(FmFolder.findById(params.folderId)).objectUid.replace('EXP:', '')
+	else if (accession) {
             experiment = Experiment.findByAccession(accession)
         }
-        def folder = fmFolderService.getFolderByBioDataObject(experiment)
+	else if (folderId) {
+	    String acc = FmFolderAssociation.findByFmFolder(FmFolder.load(folderId as Long)).objectUid.replace('EXP:', '')
+	    experiment = Experiment.findByAccession(acc)
+	}
+
+	FmFolder folder = fmFolderService.getFolderByBioDataObject(experiment)
         if (folder) {
             if (params.returnJSON) {
-                def fileList = folder.getFmFiles()
-                def infoList = [:]
-                for (file in fileList) {
+		Map<Long, Map> infoList = [:]
+		for (FmFile file in folder.fmFiles) {
                     if (file.activeInd) {
-                        infoList.put(file.id, [displayName: file.displayName, fileType: file.fileType])
+			infoList[file.id] = [displayName: file.displayName, fileType: file.fileType]
                     }
                 }
-                render infoList as JSON
+		render(infoList as JSON)
             }
             else {
-                logger.info('rendering filesTable folder ' + folder + '')
-                render(template: '/fmFolder/filesTable', plugin: "folderManagement", model: [folder: folder])
+		logger.debug 'rendering filesTable folder {}', folder
+		render template: '/fmFolder/filesTable', model: [folder: folder]
             }
         }
+    }
+
+    private renderUnexpectedError(Exception e) {
+	String error = '<ul><li>An unexpected error has occurred. If this error persits, ' +
+	    'please click "Close" or "Cancel" to close this dialog box.<br><br>Error details: ' + e.message + '</li></ul>'
+	render([errors: error] as JSON)
+
     }
 }

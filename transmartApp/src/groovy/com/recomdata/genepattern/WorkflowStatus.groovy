@@ -1,11 +1,14 @@
 package com.recomdata.genepattern
 
+import groovy.transform.CompileStatic
 import org.json.JSONObject
 
+@CompileStatic
 class WorkflowStatus {
-    def jobStatusList = new ArrayList()
-    def currentStatus = 'Starting'; /* Starting, Running, Cancelled, Completed*/
-    JSONObject result = null
+
+    List<JobStatus> jobStatusList = []
+    String currentStatus = 'Starting' // Starting, Running, Cancelled, Completed
+    JSONObject result
     int currentStatusIndex = 1
 
     // repeat count to help manage dup javascript firings
@@ -14,30 +17,29 @@ class WorkflowStatus {
     /**
      * update object if it's in set, add if not exists
      */
-    def addJobStatus(status) {
-        int sindex = jobStatusList.indexOf(status)
-        if (sindex > -1) {
-            def s = jobStatusList.get(sindex)
+    void addJobStatus(JobStatus status) {
+	int index = jobStatusList.indexOf(status)
+	if (index > -1) {
+	    JobStatus s = jobStatusList[index]
             s.status = status.status
             s.message = status.message
             s.gpJobId = status.gpJobId
             s.totalRecord = status.totalRecord
         }
         else {
-            jobStatusList.add(status)
+	    jobStatusList << status
         }
     }
 
-    def addNewJob(String sname) {
-        jobStatusList.add(new JobStatus(name: sname, status: 'Q'))
+    void addNewJob(String sname) {
+	jobStatusList << new JobStatus(name: sname, status: 'Q')
     }
 
-
-    def setCurrentJobStatus(status) {
+    void setCurrentJobStatus(JobStatus status) {
         // set previous job to be completed..
-        int sindex = jobStatusList.indexOf(status)
-        if (sindex > -1) {
-            for (int i = 0; i < sindex; i++) {
+	int index = jobStatusList.indexOf(status)
+	if (index > -1) {
+	    for (int i = 0; i < index; i++) {
                 jobStatusList[i].setComplete()
             }
         }
@@ -52,23 +54,21 @@ class WorkflowStatus {
             }
         }
         currentStatus = 'Running'
-
     }
 
-    def setCancelled() {
-        this.currentStatus = 'Cancelled'
+    void setCancelled() {
+	currentStatus = 'Cancelled'
     }
 
-    def isCancelled() {
-        return currentStatus == 'Cancelled'
+    boolean isCancelled() {
+	currentStatus == 'Cancelled'
     }
 
-    def isCompleted() {
-        return currentStatus == 'Completed'
+    boolean isCompleted() {
+	currentStatus == 'Completed'
     }
 
-    def setCompleted() {
+    void setCompleted() {
         currentStatus = 'Completed'
     }
-
 }

@@ -15,60 +15,48 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.export;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * 
  * @author Chris Uhrich
- * @version 1.0
- * 
- * Copyright 2008 Recombinant Data Corp.
  */
 public class HeatMapRow {
-	//private LinkedHashMap<String, HeatMapValue> values;
-	private TreeMap<String, HeatMapValue> values;
-	
-	public HeatMapRow(String gene, Set<String> columns) {
-		// values = new LinkedHashMap<String, HeatMapValue>();
-		values = new TreeMap<String, HeatMapValue>();
-		for (Iterator<String> i = columns.iterator(); i.hasNext(); ) {
-			String columnName = i.next();
-			if (columnName.equals("Gene")) {
-				values.put(columnName, new HeatMapValue(gene));
-			} else {
-				values.put(columnName, new HeatMapValue(""));
-			}
-		}
-	}
-	
-	public void put(String columnName, String value) {
-		//System.out.println(columnName+" "+value);
-		HeatMapValue hmv = values.get(columnName); 
-		hmv.setValue(value);
-	}
 
-	public String get(String columnName) {
-		//System.out.println(columnName+" "+value);
-		HeatMapValue hmv = values.get(columnName); 
-		return(hmv.getValue());
-	}
-
+    private Map<String, HeatMapValue> values = new TreeMap<String, HeatMapValue>();
 	
-	public JSONArray toJSONArray() throws JSONException {
-		JSONArray json = new JSONArray();
-		for (Iterator<HeatMapValue> i = values.values().iterator(); i.hasNext(); ) {
-			json.put(i.next().toJSONObject());
-		}
-		return json;
-	}
+    public HeatMapRow(String gene, Set<String> columns) {
+        for (String columnName : columns) {
+            if (columnName.equals("Gene")) {
+                values.put(columnName, new HeatMapValue(gene));
+            }
+            else {
+                values.put(columnName, new HeatMapValue(""));
+            }
+        }
+    }
+	
+    public void put(String columnName, String value) {
+        values.get(columnName).setValue(value);
+    }
+
+    public String get(String columnName) {
+        return values.get(columnName).getValue();
+    }
+
+    public JSONArray toJSONArray() throws JSONException {
+        JSONArray json = new JSONArray();
+        for (HeatMapValue heatMapValue : values.values()) {
+            json.put(heatMapValue.toJSONObject());
+        }
+        return json;
+    }
 }

@@ -1,28 +1,23 @@
 package de
 
 class DeMrnaAnnotation implements Serializable {
-    String gplId
-    String probeId
-    String geneSymbol
-    Long probesetId
+    private static final long serialVersionUID = 1
+
     Long geneId
+    String geneSymbol
+    String gplId
     String organism
+    String probeId
+    Long probesetId
 
     static mapping = {
-        table 'DE_MRNA_ANNOTATION'
-        version false
+	table 'DEAPP.DE_MRNA_ANNOTATION'
         id column: 'DE_MRNA_ANNOTATION_ID'
-        columns {
-            gplId column: 'GPL_ID'
-            probeId column: 'PROBE_ID'
-            geneSymbol column: 'GENE_SYMBOL'
-            probesetId column: 'PROBESET_ID'
-            geneId column: 'GENE_ID'
-            organism column: 'ORGANISM'
-        }
+	version false
     }
+
     static constraints = {
-        geneSymbol(nullable: true)
-        geneId(nullable: true)
+	geneId nullable: true
+	geneSymbol nullable: true
     }
 }

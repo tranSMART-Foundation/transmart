@@ -20,41 +20,25 @@
 package org.transmart.searchapp
 
 class SavedFacetedSearch {
-	  
-  	 Long id
-	 Long userId   // would like to reference the AuthUser class, but can't because it is in default package -- for now just reference the id 
-	 String name
-	 String keywords
-	 String analysisIds
-	 String searchType
-	 Date createDt
-	 Date modifiedDt
+    String analysisIds
+    Date createDt
+    String keywords
+    Date modifiedDt
+    String name
+    String searchType
+    Long userId	// would like to reference the AuthUser class, but can't because it is in default package -- for now just reference the id
 	 
-	 static mapping = {
-		 table 'SAVED_FACETED_SEARCH'
-		 version false
-		 id generator:'sequence', params:[sequence:'SEQ_SAVED_FACETED_SEARCH_ID']
-		 columns {
-			id column:'SAVED_FACETED_SEARCH_ID'
-			userId column: 'USER_ID'
-			name column: 'NAME'
-			keywords column:'KEYWORDS'
-			analysisIds column:'ANALYSIS_IDS'
-			searchType column:'SEARCH_TYPE'
-			createDt column:'CREATE_DT'
-			modifiedDt column:'MODIFIED_DT'
-		 }
-	 }
+    static mapping = {
+	table 'SEARCHAPP.SAVED_FACETED_SEARCH'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SAVED_FACETED_SEARCH_ID'], column: 'SAVED_FACETED_SEARCH_ID'
+	version false
+    }
 	 
-	 static constraints = {
-		 userId(nullable:false)
-		 name(nullable:false,blank: false,maxSize:100)
-		 keywords(nullable:false,blank: false,maxSize:4000)
-		 analysisIds(nullable:true,maxSize:4000)
-		 name (unique:'userId')
-		 searchType(nullable:false)
-		 createDt(nullable:true)
-		 modifiedDt(nullable:true)
-	 }
-		
+    static constraints = {
+	analysisIds nullable: true, maxSize: 4000
+	createDt nullable: true
+	keywords blank: false, maxSize: 4000
+	modifiedDt nullable: true
+	name blank: false, maxSize: 100, unique: 'userId'
+    }
  }

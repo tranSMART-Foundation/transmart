@@ -16,31 +16,29 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioAssayFeatureGroup {
-    Long id
     String name
     String type
+
     static hasMany = [markers: BioMarker]
+
     static belongsTo = [BioMarker]
 
-
     static mapping = {
-        table 'BIO_ASSAY_FEATURE_GROUP'
+	table 'BIOMART.BIO_ASSAY_FEATURE_GROUP'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASSAY_FEATURE_GROUP_ID'
         version false
         cache usage: 'read-only'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_ASSAY_FEATURE_GROUP_ID'
-            name column: 'FEATURE_GROUP_NAME'
-            type column: 'FEATURE_GROUP_TYPE'
-            markers joinTable: [name: 'BIO_ASSAY_DATA_ANNOTATION', key: 'BIO_ASSAY_FEATURE_GROUP_ID']
-        }
+
+	markers joinTable: [name: 'BIOMART.BIO_ASSAY_DATA_ANNOTATION', key: 'BIO_ASSAY_FEATURE_GROUP_ID'] // BioAssayDataAnnotation
+        name column: 'FEATURE_GROUP_NAME'
+        type column: 'FEATURE_GROUP_TYPE'
     }
 
     static constraints = {
+	name maxSize: 100
+	type maxSize: 50
     }
 }

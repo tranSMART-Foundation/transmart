@@ -1,168 +1,85 @@
 package org.transmart
 
-/**
- *
- */
+import groovy.transform.CompileStatic
 
 /**
  * @author JIsikoff
- *
  */
-public class HeatmapValidator {
+@CompileStatic
+class HeatmapValidator {
 
-    def platforms = new LinkedHashSet()
-    def timepoints = new LinkedHashSet()
-    def timepointLabels = new LinkedHashSet()
-    def samples = new LinkedHashSet()
-    def sampleLabels = new LinkedHashSet()
-    def gpls = new LinkedHashSet()
-    def gplLabels = new LinkedHashSet()
-    def tissues = new LinkedHashSet()
-    def tissueLabels = new LinkedHashSet()
-    def rbmpanels = new LinkedHashSet()
-    def rbmpanelsLabels = new LinkedHashSet()
-    def msg = ''
-    def valid = false
+    LinkedHashSet<String> platforms = []
+    LinkedHashSet timepoints = []
+    LinkedHashSet timepointLabels = []
+    LinkedHashSet samples = []
+    LinkedHashSet sampleLabels = []
+    LinkedHashSet gpls = []
+    LinkedHashSet gplLabels = []
+    LinkedHashSet tissues = []
+    LinkedHashSet tissueLabels = []
+    LinkedHashSet rbmpanels = []
+    LinkedHashSet rbmpanelsLabels = []
+    String msg = ''
+    boolean valid = false
 
-    def validate = {
-                msg = ''
-                def p = platforms.size()
-                def t = timepoints.size()
-                def s = samples.size()
+    private Map<String, LinkedHashSet> setsByField = [
+	gplLabels: gplLabels,
+	gpls: gpls,
+	tissueLabels: tissueLabels,
+	tissues: tissues,
+	rbmpanels: rbmpanels,
+	rbmpanelsLabels: rbmpanelsLabels]
 
-                //Check platforms
-                if (p > 1) {
-                    msg += 'Too many platforms found. '
-                    valid = false
-                }
-                else if (p < 1) {
-                    msg += 'No platforms found. '
-                    valid = false
-                }
+    boolean validate() {
+	int p = platforms.size()
+        if (p > 1) {
+	    msg = 'Too many platforms found. '
+            valid = false
+        }
+        else if (p < 1) {
+	    msg = 'No platforms found. '
+            valid=false
+        }
+	else { // p == 1
+	    msg = ''
+	    valid = true
+        }
 
-                /*
-                //check timepoints
-                if(t>1) {
-                    msg+='Too many timepoints found. '
-                    valid=false
-                }
-                else if(t<1) {
-                    msg+='No timepoints found. '
-                    valid=false
-                }
-                */
+	valid
+    }
 
-                if (p == 1 /* && t==1 */) {
-                    valid = true; //found one timepoint and one platform
-                }
-                return valid
+    String getFirstPlatform() {
+	platforms[0]
+    }
 
-
-            }
-    def getFirstPlatform = {
-                Iterator itr = platforms.iterator()
-                if (itr.hasNext()) {
-                    return itr.next()
-                }
-            }
-
-    def getFirstPlatformLabel = {
-        Iterator itr = platforms.iterator()
-        if (itr.hasNext()) {
-            String platform = (String) itr.next()
-            return ('MRNA_AFFYMETRIX'.equals(platform) ? 'MRNA' : platform)
+    String getFirstPlatformLabel() {
+	String platform = firstPlatform
+	if (platform) {
+	    'MRNA_AFFYMETRIX' == platform ? 'MRNA' : platform
         }
     }
 
-    def getFirstTimepoint = {
-                Iterator itr = timepoints.iterator()
-                if (itr.hasNext()) {
-                    return itr.next()
-                }
-            }
-    def getAllTimepoints = {
-                StringBuilder strng = new StringBuilder()
-                Iterator itr = timepoints.iterator()
-                if (itr.hasNext()) {
-                    strng.append(itr.next())
-                }
-                while (itr.hasNext()) {
-                    strng.append(',').append(itr.next())
-                }
+    def getFirstTimepoint() {
+	timepoints[0]
+    }
 
-                return strng.toString()
-            }
+    String getAllTimepoints() {
+	timepoints.join ','
+    }
 
-    def getAllTimepointLabels = {
-                StringBuilder strng = new StringBuilder()
-                Iterator itr = timepointLabels.iterator()
-                if (itr.hasNext()) {
-                    strng.append(itr.next())
-                }
-                while (itr.hasNext()) {
-                    strng.append(',').append(itr.next())
-                }
+    String getAllTimepointLabels() {
+	timepointLabels.join ','
+    }
 
-                return strng.toString()
-            }
+    String getAllSamples() {
+	samples.join ','
+    }
 
-    def getAllSamples = {
-                StringBuilder strng = new StringBuilder()
-                Iterator itr = samples.iterator()
-                if (itr.hasNext()) {
-                    strng.append(itr.next())
-                }
-                while (itr.hasNext()) {
-                    strng.append(',').append(itr.next())
-                }
+    String getAllSampleLabels() {
+	sampleLabels.join ','
+    }
 
-                return strng.toString()
-            }
-
-    def getAllSampleLabels = {
-                StringBuilder strng = new StringBuilder()
-                Iterator itr = sampleLabels.iterator()
-                if (itr.hasNext()) {
-                    strng.append(itr.next())
-                }
-                while (itr.hasNext()) {
-                    strng.append(',').append(itr.next())
-                }
-
-                return strng.toString()
-            }
-
-    def getAll(field) {
-        Iterator itr
-        if (field == 'gplLabels') {
-            itr = gplLabels.iterator()
-        }
-        else if (field == 'gpls') {
-            itr = gpls.iterator()
-        }
-        else if (field == 'tissueLabels') {
-            itr = tissueLabels.iterator()
-        }
-        else if (field == 'tissues') {
-            itr = tissues.iterator()
-        }
-        else if (field == 'rbmpanels') {
-            itr = rbmpanels.iterator()
-        }
-        else if (field == 'rbmpanelsLabels') {
-            itr = rbmpanelsLabels.iterator()
-        }
-
-        StringBuilder strng = new StringBuilder()
-
-        if (itr.hasNext()) {
-            strng.append(itr.next())
-        }
-        while (itr.hasNext()) {
-            strng.append(',').append(itr.next())
-        }
-
-        return strng.toString()
+    String getAll(String field) {
+	(setsByField[field] ?: []).join ','
     }
 }
-

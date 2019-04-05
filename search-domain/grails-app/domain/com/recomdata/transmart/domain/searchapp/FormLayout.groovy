@@ -1,4 +1,3 @@
-package com.recomdata.transmart.domain.searchapp
 /*************************************************************************
  * tranSMART - translational medicine data mart
  * 
@@ -17,41 +16,33 @@ package com.recomdata.transmart.domain.searchapp
  * 
  *
  ******************************************************************/
-  
+package com.recomdata.transmart.domain.searchapp
 
  /**
-  * $Id: AccessLog.groovy 10098 2011-10-19 18:39:32Z mmcduffie $
-  * @author $Author: mmcduffie $
-  * @version $Revision: 10098 $
+ * @author mmcduffie
   */
+class FormLayout {
+    String column
+    String dataType
+    String displayName
+    String key
+    Integer sequence
 
-public class FormLayout {
+    static mapping = {
+	table 'CZ_FORM_LAYOUT'
+	id generator: 'sequence', params: [sequence: 'SEQ_CZ_FORM_LAYOUT_ID'], column: 'FORM_LAYOUT_ID'
+	version false
 
-	Long id
-	String key
-	String column
-	String displayName
-	String dataType
-	Integer sequence
+	column column:'FORM_COLUMN'
+	dataType column:'DATA_TYPE'
+	displayName column: 'DISPLAY_NAME'
+	key column: 'FORM_KEY'
+	sequence column:'SEQUENCE'
+    }
 
-	static mapping = {
-		table 'CZ_FORM_LAYOUT'
-	 id generator:'sequence', params:[sequence:'SEQ_CZ_FORM_LAYOUT_ID']
-		version false
-		id column:'FORM_LAYOUT_ID'
-		key column:'FORM_KEY'
-		column column:'FORM_COLUMN'
-		displayName column:'DISPLAY_NAME'
-		dataType column:'DATA_TYPE'
-		sequence column:'SEQUENCE'
-	}
-
-	static constraints = {
-		key(nullable:false)
-		column(nullable:false)
-		displayName(nullable:true)
-		dataType(nullable: true)
-		sequence(nullable:true)
-	}
-
+    static constraints = {
+	dataType nullable: true
+	displayName nullable: true
+	sequence nullable: true
+    }
 }

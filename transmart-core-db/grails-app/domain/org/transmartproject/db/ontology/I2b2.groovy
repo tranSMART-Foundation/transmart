@@ -95,9 +95,9 @@ class I2b2 extends AbstractI2b2Metadata implements Serializable {
         if (res.size() == 1) {
             new StudyImpl(ontologyTerm: res[0], id: trial)
         }
-        else {
+/*        else {
             null
         }
+*/
     }
-
 }

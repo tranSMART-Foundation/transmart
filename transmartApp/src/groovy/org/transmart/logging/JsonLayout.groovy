@@ -33,15 +33,20 @@ class JsonLayout extends EnhancedPatternLayout {
     String dateFormat = 'yyyy-MM-dd HH:mm:ss.SSSX'
     boolean printNulls = true
 
-    @Lazy volatile Gson gson = {
+    @Lazy
+    volatile Gson gson = {
         GsonBuilder builder = new GsonBuilder().setDateFormat(dateFormat)
-        if (!singleLine) builder.setPrettyPrinting()
-        if (printNulls) builder.serializeNulls()
+	if (!singleLine) {
+	    builder.setPrettyPrinting()
+	}
+	if (printNulls) {
+	    builder.serializeNulls()
+	}
         builder.create()
     }()
 
     /*
-     * We need to serialize the json structure to a string and then call the parent layout methods on that.
+     * TODO We need to serialize the json structure to a string and then call the parent layout methods on that.
      * Unfortunately LoggingEvent.message is not accessible without reflection/CompileDynamic magic.
      *
      * Some alternatives are: trying to create a modified event, but LoggingEvent is not cloneable and also not easily
@@ -54,11 +59,11 @@ class JsonLayout extends EnhancedPatternLayout {
     @CompileDynamic
     @Override
     String format(LoggingEvent event) {
-        Object originalMessage = event.@message
+	def originalMessage = event.@message
         String origRenderedMessage = event.@renderedMessage
         try {
             event.@message = gson.toJson(originalMessage)
-            return super.format(event)
+	    super.format event
         }
         finally {
             event.@message = originalMessage

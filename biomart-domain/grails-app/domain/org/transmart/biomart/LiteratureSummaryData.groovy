@@ -16,40 +16,22 @@
  *
  *
  ******************************************************************/
-
-/**
- * $Id: LiteratureSummaryData.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
 package org.transmart.biomart
 
 class LiteratureSummaryData {
-    Long id
-    String etlId
-    String diseaseSite
-    String target
-    String variant
-    String dataType
     String alterationType
-    String totalFrequency
-    String totalAffectedCases
+    String dataType
+    String diseaseSite
+    String etlId
     String summary
+    String target
+    String totalAffectedCases
+    String totalFrequency
+    String variant
+
     static mapping = {
-        table 'BIO_LIT_SUM_DATA'
+	table 'BIOMART.BIO_LIT_SUM_DATA'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_LIT_SUM_DATA_ID'
         version false
-        id column: 'BIO_LIT_SUM_DATA_ID'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            etlId column: 'ETL_ID'
-            diseaseSite column: 'DISEASE_SITE'
-            target column: 'TARGET'
-            variant column: 'VARIANT'
-            dataType column: 'DATA_TYPE'
-            alterationType column: 'ALTERATION_TYPE'
-            totalFrequency column: 'TOTAL_FREQUENCY'
-            totalAffectedCases column: 'TOTAL_AFFECTED_CASES'
-            summary column: 'SUMMARY'
-        }
     }
 }

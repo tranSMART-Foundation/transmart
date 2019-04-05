@@ -9,6 +9,16 @@ else {
 	console = [info: { println "[INFO] $it" }, warn: { println "[WARN] $it" }]
 }
 
+grails.assets.minifyJs = true
+
+grails.assets.minifyOptions = [
+    languageMode: 'ES5', // tried ECMASCRIPT6
+    targetLanguage: 'ES5', //Can go from ES5 to ES6 for those bleeding edgers
+    optimizationLevel: 'SIMPLE', //Or ADVANCED or WHITESPACE_ONLY
+    excludes: ["**/fractalis.js","**/fractalis.unminified.js"]
+]
+grails.asset.minify.js.excludes = ["**/fractalis.js","**/fractalis.unminified.js"]
+
 /**
  * Running externalized configuration
  * Assuming the following configuration files

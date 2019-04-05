@@ -1,26 +1,27 @@
 package com.recomdata.transmart.util
 
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
 
 import java.nio.channels.Channels
-import java.nio.channels.ReadableByteChannel
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
 
+@CompileStatic
 class FileDownloadService {
 
-    boolean transactional = true
+    static transactional = false
 
-    def getFilename(String fileURIStr) {
+    String getFilename(String fileURIStr) {
         URI fileURI = new URI(fileURIStr)
         String filename = null
-        if (StringUtils.equalsIgnoreCase('file', fileURI.getScheme())) {
-            filename = (new File(fileURI.toString())).getName()
+	if (StringUtils.equalsIgnoreCase('file', fileURI.scheme)) {
+	    filename = new File(fileURI.toString()).name
         }
         else {
-            if (null != fileURI) {
-                if (StringUtils.isNotEmpty(fileURIStr)) {
+	    if (fileURI) {
+		if (fileURIStr) {
                     int loc = fileURIStr.lastIndexOf('/')
                     if (loc == fileURIStr.length() - 1) {
                         loc = (fileURIStr.substring(0, loc - 1)).lastIndexOf('/')
@@ -30,88 +31,61 @@ class FileDownloadService {
             }
         }
 
-        println 'Filename retrieved from URL :: ' + filename
-        return filename
+	filename
     }
 
-    // How many threads to kick off
-    def nThreads = 0
-    def ThreadPoolExecutor pool = null
+    void getFiles(List<String> fileURLs, String dirToDownloadTo) {
+	int nThreads = fileURLs?.size()
+	if (!nThreads) {
+	    return
+	}
 
-    /**
-     *
-     * @return
-     */
-    def getFiles(List<String> fileURLs, String dirToDownloadTo) {
-        nThreads = fileURLs?.size()
-        println 'number of files :: ' + nThreads
-        println 'Dir to download to :: ' + dirToDownloadTo
-        if (nThreads > 0) pool = Executors.newFixedThreadPool(nThreads)
-        // Construct a list of the URL objects we're running, submitted to the pool
-        def results = fileURLs.inject([]) { list, url ->
-            println 'Creating thread to download File :: ' + url
-            def u = new FileDownload(url, getFilename(url), dirToDownloadTo)
-            pool?.submit u
-            list << u
-        }
+	ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(nThreads)
 
-        // Always a good idea to set a timeout for the pool if we don't want the threads to go on for ever.
-        def timeout = 0
-        if (timeout > 0) pool.awaitTermination(timeout, TimeUnit.SECONDS)
-        println 'Waiting for Threads to finish executing'
+	for (url in fileURLs) {
+	    pool.submit new FileDownload(url, getFilename(url), dirToDownloadTo)
+	}
+
         // Wait for the poolclose when all threads are completed
-        while (pool?.activeCount > 0)
-        println 'Threads finished execution'
-        pool?.shutdown()
-        println 'Thread-Pool shutdown initiated'
+	while (pool.activeCount > 0)
+	    pool.shutdown()
     }
 }
 
+@CompileStatic
+@Slf4j('logger')
 class FileDownload extends Thread {
     private String fileURI
     private String filename
     private String fileContainerDir
 
-    public FileDownload(String fileURI, String filename, String dirToDownloadTo) {
-        this.fileURI = fileURI
-        this.filename = filename
-        this.fileContainerDir = dirToDownloadTo
+    FileDownload(String uri, String name, String dir) {
+	fileURI = uri
+	filename = name
+	fileContainerDir = dir
     }
 
-    public void run() {
-        URL fileURL = null
-
-        File file = new File(fileContainerDir + File.separator + filename)
-        ReadableByteChannel rbc = null
+    void run() {
+	if (!fileURI) {
+	    return
+	}
         FileOutputStream fos = null
         try {
-            println 'File URI :: ' + fileURI
-            if (StringUtils.isEmpty(fileURI))
-                return
-
-            fileURL = new URL(fileURI)
-            rbc = Channels.newChannel(fileURL.openStream())
-            fos = new FileOutputStream(file)
-            fos.getChannel().transferFrom(rbc, 0, 1 << 24)
+	    URL fileURL = new URL(fileURI)
+	    fos = new FileOutputStream(new File(fileContainerDir, filename))
+	    fos.channel.transferFrom Channels.newChannel(fileURL.openStream()), 0, 1 << 24
         }
         catch (MalformedURLException e) {
-            e.printStackTrace()
-            println 'Invalid File URL'
+	    logger.error 'Invalid File URL', e
         }
         catch (IOException e) {
-            e.printStackTrace()
-            println 'IO failure during file download'
+	    logger.error 'IO failure during file download', e
         }
         finally {
-            if (null != fos) {
-                try {
-                    fos.close()
-                }
-                catch (IOException e) {
-                    e.printStackTrace()
-                }
+            try {
+		fos?.close()
             }
-            println 'Download of File finalized :: ' + fileURI
+	    catch (ignored) {}
         }
     }
 }

@@ -25,6 +25,8 @@
 package com.recomdata.datasetexplorer.proxy;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,101 +35,76 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Security;
-import java.util.logging.Logger;
-
-//import javax.net.ssl.*;
 
 /**
  * @author Yutaka Yoshida, Greg Murray
- *
+ * <p>
  * Minimum set of HTTPclient supporting both http and https.
  * It's aslo capable of POST, but it doesn't provide doGet because
  * the caller can just read the inputstream.
  */
 public class HttpClient {
 
-    private static Logger logger;
-    private String proxyHost = null;
+    private static final Logger logger = LoggerFactory.getLogger("jmaki.xhp.Log");
+
+    private String proxyHost;
     private int proxyPort = -1;
     private boolean isHttps = false;
     private boolean isProxy = false;
-    private URLConnection urlConnection = null;
+    private URLConnection urlConnection;
     
     /**
      * @param url URL string
      */
-    public HttpClient(String url) 
-        throws MalformedURLException {
-        this.urlConnection = getURLConnection(url);
+    public HttpClient(String url) throws MalformedURLException {
+        urlConnection = getURLConnection(url);
     }
+
     /**
      * @param phost PROXY host name
      * @param pport PROXY port string
      * @param url URL string
      */
-    public HttpClient(String phost, int pport, String url)
-        throws MalformedURLException {
+    public HttpClient(String phost, int pport, String url) throws MalformedURLException {
         if (phost != null && pport != -1) {
-            this.isProxy = true;
+            isProxy = true;
         }
-        this.proxyHost = phost;
-        this.proxyPort = pport;
+        proxyHost = phost;
+        proxyPort = pport;
         if (url.trim().startsWith("https:")) {
             isHttps = true;
         }
-        this.urlConnection = getURLConnection(url);
+        urlConnection = getURLConnection(url);
     }
-       /**
-     * @param phost PROXY host name
+
+    /**
      * @param pport PROXY port string
-     * @param url URL string
-     * @param userName string
-     * @param password string
      */
-    public HttpClient(String phost,
-                      int pport,
-                      String url,
-                      String userName,
-                      String password)
-        throws MalformedURLException {
+    public HttpClient(String proxyHostName, int pport, String url, String userName, String password) {
         try {            
-            if (phost != null && pport != -1) {
-                this.isProxy = true;
+            if (proxyHostName != null && pport != -1) {
+                isProxy = true;
             }
-            this.proxyHost = phost;
-            this.proxyPort = pport;
+            proxyHost = proxyHostName;
+            proxyPort = pport;
             if (url.trim().startsWith("https:")) {
                 isHttps = true;
             }
-            this.urlConnection = getURLConnection(url);
-            // set basic authentication information
-            String auth = userName + ":" +  password;   
-            // String encoded = new sun.misc.BASE64Encoder().encode (auth.getBytes());
-            byte[] encodedBytes= Base64.encodeBase64(auth.getBytes());
-            String encoded = new String(encodedBytes);
-            // set basic authorization
-            this.urlConnection.setRequestProperty ("Authorization", "Basic " + encoded);
-            this.urlConnection.setConnectTimeout(600000);
-            this.urlConnection.setReadTimeout(600000);
-        } catch (Exception ex) {
-            HttpClient.getLogger().severe("Unable to set basic authorization for " + userName  + " : " +ex);
-        }        
-    }
-    
-    /**
-     * private method to get the URLConnection
-     * @param str URL string
-     */
-    private URLConnection getURLConnection(String str) 
-        throws MalformedURLException {
-    	try {
-        	
+            urlConnection = getURLConnection(url);
 
+            byte[] encodedBytes = Base64.encodeBase64((userName + ":" + password).getBytes());
+            urlConnection.setRequestProperty("Authorization", "Basic " + new String(encodedBytes));
+            urlConnection.setConnectTimeout(600000);
+            urlConnection.setReadTimeout(600000);
+        }
+        catch (Exception e) {
+            logger.error("Unable to set basic authorization for {} : ", userName, e);
+        }    
+    }
+
+    private URLConnection getURLConnection(String url) throws MalformedURLException {
+    	try {
             if (isHttps) {
-            	
-            	
-            	
-            	
                 /* when communicating with the server which has unsigned or invalid
                  * certificate (https), SSLException or IOException is thrown.
                  * the following line is a hack to avoid that
@@ -136,121 +113,91 @@ public class HttpClient {
                 System.setProperty("java.protocol.handler.pkgs", "com.sun.net.ssl.internal.www.protocol");
                 if (isProxy) {
                     System.setProperty("https.proxyHost", proxyHost);
-                    System.setProperty("https.proxyPort", proxyPort + "");            
+                    System.setProperty("https.proxyPort", String.valueOf(proxyPort));
                 }
-            } else {
+            }
+            else {
                 if (isProxy) {
                     System.setProperty("http.proxyHost", proxyHost);
-                    System.setProperty("http.proxyPort", proxyPort  + "");
+                    System.setProperty("http.proxyPort", String.valueOf(proxyPort));
                 }
-                
             }
-        	SSLUtilities.trustAllHostnames();
-        	SSLUtilities.trustAllHttpsCertificates();
-            URL url = new URL(str);
-            URLConnection uc = url.openConnection();
-            if(isHttps)
-            {
-            	/*((HttpsURLConnection)uc).setHostnameVerifier(new HostnameVerifier()
-            	{
-            		public boolean verify (String hostname, String 
-            				session)
-            				                      {
-            				                        return true;
-            				                      }
-            	});*/
-            }
+            SSLUtilities.trustAllHostnames();
+            SSLUtilities.trustAllHttpsCertificates();
+            URLConnection uc = new URL(url).openConnection();
             // set user agent to mimic a common browser
-            String ua="Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322)";
-            uc.setRequestProperty("user-agent", ua);  
-            
-       
-           
+            uc.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322)");
             return uc;
-        } catch (MalformedURLException me) {
-            throw new MalformedURLException(str + " is not a valid URL");
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        catch (MalformedURLException me) {
+            throw new MalformedURLException(url + " is not a valid URL");
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
     
-    /**
-     * returns the inputstream from URLConnection
-     * @return InputStream
-     */
     public InputStream getInputStream() {
         try {
-            return (this.urlConnection.getInputStream());
-        } catch (Exception e) {
-            e.printStackTrace();
+            return urlConnection.getInputStream();
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    
-    /**
-     * return the OutputStream from URLConnection
-     * @return OutputStream
-     */
+
     public OutputStream getOutputStream() {
-        
         try {
-            return (this.urlConnection.getOutputStream());
-        } catch (Exception e) {
-            e.printStackTrace();
+            return urlConnection.getOutputStream();
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
     
     /**
      * posts data to the inputstream and returns the InputStream.
+     *
      * @param postData data to be posted. must be url-encoded already.
      * @param contentType allows you to set the contentType of the request.
      * @return InputStream input stream from URLConnection
      */
     public InputStream doPost(String postData, String contentType) {
-    	
-    //	System.out.println("postdata:"+postData);
-   // 	System.out.println("ct:"+contentType);
-        this.urlConnection.setDoOutput(true);     
-        if (contentType != null) this.urlConnection.setRequestProperty( "Content-type", contentType );
-               
-        OutputStream os = this.getOutputStream();
-        PrintStream ps = new PrintStream(os);
+        urlConnection.setDoOutput(true);
+        if (contentType != null) {
+            urlConnection.setRequestProperty("Content-type", contentType);
+        }
+
+        PrintStream ps = new PrintStream(getOutputStream());
         ps.print(postData);
         ps.close(); 
-        return (this.getInputStream());
+        return getInputStream();
     }
     
     public String getContentEncoding() {
-        if (this.urlConnection == null) return null;
-        return (this.urlConnection.getContentEncoding());
-    }
-    public int getContentLength() {
-        if (this.urlConnection == null) return -1;
-        return (this.urlConnection.getContentLength());
-    }
-    public String getContentType() {
-        if (this.urlConnection == null) return null;
-        return (this.urlConnection.getContentType());
-    }
-    public long getDate() {
-        if (this.urlConnection == null) return -1;
-        return (this.urlConnection.getDate());
-    }
-    public String getHeader(String name) {
-        if (this.urlConnection == null) return null;
-        return (this.urlConnection.getHeaderField(name));
-    }
-    public long getIfModifiedSince() {
-        if (this.urlConnection == null) return -1;
-        return (this.urlConnection.getIfModifiedSince());
+        return urlConnection == null ? null : urlConnection.getContentEncoding();
     }
 
-    public static Logger getLogger() {
-        if (logger == null) {
-            logger = Logger.getLogger("jmaki.xhp.Log");
-        }
-        return logger;
-    }    
+    public int getContentLength() {
+        return urlConnection == null ? -1 : urlConnection.getContentLength();
+    }
+
+    public String getContentType() {
+        return urlConnection == null ? null : urlConnection.getContentType();
+    }
+
+    public long getDate() {
+        return urlConnection == null ? -1 : urlConnection.getDate();
+    }
+
+    public String getHeader(String name) {
+        return urlConnection == null ? null : urlConnection.getHeaderField(name);
+    }
+
+    public long getIfModifiedSince() {
+        return urlConnection == null ? -1 : urlConnection.getIfModifiedSince();
+    } 
 }

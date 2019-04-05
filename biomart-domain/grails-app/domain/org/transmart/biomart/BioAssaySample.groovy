@@ -16,23 +16,16 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioAssaySample {
     Long bioAssayId
-    Long bioSampleId
     Long bioClinicTrialTimepointId
-    static mapping = {
-        table 'BIO_ASSAY_SAMPLE'
-        version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            bioAssayId column: 'BIO_ASSAY_ID'
-            bioSampleId column: 'BIO_SAMPLE_ID'
-            bioClinicTrialTimepointId column: 'BIO_CLINIC_TRIAL_TIMEPOINT_ID'
-        }
-    }
+    Long bioSampleId
 
+    static mapping = {
+	table 'BIOMART.BIO_ASSAY_SAMPLE'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID']
+        version false
+    }
 }

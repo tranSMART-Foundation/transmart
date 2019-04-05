@@ -16,60 +16,45 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.searchapp
 
 class SearchKeyword {
-    String keyword
     Long bioDataId
-    String uniqueId
-    Long id
     String dataCategory
     String dataSource
     String displayDataCategory
+    String keyword
     Long ownerAuthUserId
+    String uniqueId
+
     static hasMany = [terms: SearchKeywordTerm]
 
     static mapping = {
-        table 'SEARCH_KEYWORD'
+	table 'SEARCHAPP.SEARCH_KEYWORD'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            keyword column: 'KEYWORD'
-            bioDataId column: 'BIO_DATA_ID'
-            uniqueId column: 'UNIQUE_ID'
-            id column: 'SEARCH_KEYWORD_ID'
-            dataCategory column: 'DATA_CATEGORY'
-            dataSource column: 'SOURCE_CODE'
-            displayDataCategory column: 'DISPLAY_DATA_CATEGORY'
-            ownerAuthUserId column: 'OWNER_AUTH_USER_ID'
-            terms column: 'SEARCH_KEYWORD_ID'
-        }
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID'], column: 'SEARCH_KEYWORD_ID'
+
+        dataSource column: 'SOURCE_CODE'
+	terms column: 'SEARCH_KEYWORD_ID' // TODO BB
     }
+
     static constraints = {
-        keyword(maxSize: 400)
-        bioDataId(nullable: true)
-        uniqueId(nullable: true, maxSize: 1000)
-        dataCategory(nullable: true, maxSize: 400)
-        dataSource(nullable: true, maxSize: 200)
-        displayDataCategory(nullable: true, maxSize: 400)
-        ownerAuthUserId(nullable: true)
+	bioDataId nullable: true
+	dataCategory nullable: true, maxSize: 400
+	dataSource nullable: true, maxSize: 200
+	displayDataCategory nullable: true, maxSize: 400
+	keyword maxSize: 400
+	ownerAuthUserId nullable: true
+	uniqueId nullable: true, maxSize: 1000
     }
 
     int hashCode() {
         // handle special case for TEXT SearchKeywords
-        if (id == -1) {
-            return keyword.hashCode()
-        }
-        return id
+	id == -1 ? keyword.hashCode() : id
     }
 
-    boolean equals(obj) {
+    boolean equals(other) {
         // handle special case for TEXT SearchKeywords
-        if (id == -1) {
-            return keyword == obj?.keyword
-        }
-        return id == obj?.id
+	id == -1 ? keyword == other?.keyword : id == other?.id
     }
 }

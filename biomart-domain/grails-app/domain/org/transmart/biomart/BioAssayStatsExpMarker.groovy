@@ -16,23 +16,18 @@
  *
  *
  ******************************************************************/
-
-/**
- *
- */
 package org.transmart.biomart
 
-public class BioAssayStatsExpMarker {
+class BioAssayStatsExpMarker {
     Experiment experiment
     BioMarker marker
-    Long id
+
     static mapping = {
-        table 'BIO_STATS_EXP_MARKER'
-        version false
-        columns {
-            id column: 'BIO_STATS_EXP_MARKER_ID'
-            marker column: 'BIO_MARKER_ID'
-            experiment column: 'BIO_EXPERIMENT_ID'
-        }
+	table 'BIOMART.BIO_STATS_EXP_MARKER'
+        id column: 'BIO_STATS_EXP_MARKER_ID'
+	version false
+
+        experiment column: 'BIO_EXPERIMENT_ID'
+	marker column: 'BIO_MARKER_ID'
     }
 }

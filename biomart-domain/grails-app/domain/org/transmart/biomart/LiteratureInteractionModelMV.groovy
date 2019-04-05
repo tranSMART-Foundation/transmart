@@ -16,19 +16,14 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class LiteratureInteractionModelMV {
-    Long id
     String experimentalModel
+
     static mapping = {
-        table 'BIO_LIT_INT_MODEL_MV'
-        version false
-        columns {
-            id column: 'BIO_LIT_INT_DATA_ID'
-            experimentalModel column: 'EXPERIMENTAL_MODEL'
-        }
+	table 'BIOMART.BIO_LIT_INT_MODEL_MV'
+        id column: 'BIO_LIT_INT_DATA_ID'
+	version false
     }
 }

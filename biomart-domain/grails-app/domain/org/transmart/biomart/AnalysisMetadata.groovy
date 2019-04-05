@@ -14,92 +14,66 @@
  * 
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *
- ******************************************************************/
+ * ******************************************************************/
 
 package org.transmart.biomart
 
 class AnalysisMetadata {
-	Long id
-	String study
-	String dataType
-	String analysisName
-	String description
-	String phenotypeIds
-	String population
-	String tissue
-	String genomeVersion
-	String genotypePlatformIds
-	String expressionPlatformIds
-	String statisticalTest
-	String researchUnit
-	String sampleSize
-	String cellType
-	String modelName
-	String modelDescription
-	Double pValueCutoff
-	Date etlDate
-	Date processDate
-	String filename
-	String status = 'NEW'
-	String sensitiveFlag = 0
-	String sensitiveDesc
+    String analysisName
+    String cellType
+    String dataType
+    String description
+    Date etlDate
+    String expressionPlatformIds
+    String filename
+    String genomeVersion
+    String genotypePlatformIds
+    String modelDescription
+    String modelName
+    String phenotypeIds
+    String population
+    Date processDate
+    Double pValueCutoff
+    String researchUnit
+    String sampleSize
+    String sensitiveDesc
+    String sensitiveFlag = '0'
+    String statisticalTest
+    String status = 'NEW'
+    String study
+    String tissue
 
-	static mapping = {
-		table 'LZ_SRC_ANALYSIS_METADATA'
-		
-		id column: 'ETL_ID', generator:'sequence', params:[sequence:'SEQ_ETL_ID']
-		
-		version false
-		columns {					        //3456789012345678901234567890
-			study 					column:'STUDY_ID'
-			dataType				column:'DATA_TYPE'
-			analysisName			column:'ANALYSIS_NAME'
-			description				column:'DESCRIPTION'
-			phenotypeIds			column:'PHENOTYPE_IDS'
-			population				column:'POPULATION'
-			tissue					column:'TISSUE'
-			genomeVersion			column:'GENOME_VERSION'
-			genotypePlatformIds		column:'GENOTYPE_PLATFORM_IDS'
-			expressionPlatformIds	column:'EXPRESSION_PLATFORM_IDS'
-			statisticalTest			column:'STATISTICAL_TEST'
-			researchUnit			column:'RESEARCH_UNIT'
-			sampleSize				column:'SAMPLE_SIZE'
-			cellType				column:'CELL_TYPE'
-			pValueCutoff			column:'PVALUE_CUTOFF'
-			etlDate					column:'ETL_DATE'
-			filename				column:'FILENAME'
-			status					column:'STATUS'
-			processDate				column:'PROCESS_DATE'
-			modelName				column:'MODEL_NAME'
-			modelDescription		column:'MODEL_DESC'
-			sensitiveFlag			column:'SENSITIVE_FLAG'
-			sensitiveDesc			column:'SENSITIVE_DESC'
-		}
-	}
+    static mapping = {
+	table 'TM_LZ.LZ_SRC_ANALYSIS_METADATA'
+	id generator: 'sequence', params: [sequence: 'TM_LZ.SEQ_ETL_ID'], column: 'ETL_ID'
+	version false
+
+	modelDescription		column:'MODEL_DESC'
+	pValueCutoff column: 'PVALUE_CUTOFF'
+	study column: 'STUDY_ID'
+    }
 	
-	static constraints = {
-		dataType(nullable:true)
-		analysisName(unique: true, maxSize:50)
-		description(nullable:true, maxSize:4000)
-		phenotypeIds(nullable:true)
-		population(nullable:true)
-		tissue(nullable:true)
-		genomeVersion(nullable:true)
-		genotypePlatformIds(nullable:true)
-		expressionPlatformIds(nullable:true)
-		statisticalTest(nullable:true)
-		researchUnit(nullable:true)
-		sampleSize(nullable:true)
-		cellType(nullable:true)
-		pValueCutoff(nullable:true)
-		etlDate(nullable:true)
-		filename(nullable:true)
-		status(nullable:true)
-		processDate(nullable:true)
-		modelName(nullable:true)
-		modelDescription(nullable:true)
-		sensitiveFlag(nullable:false)
-		sensitiveDesc(nullable:true)
-	}
+    static constraints = {
+	analysisName unique: true, maxSize: 50
+	cellType nullable: true
+	dataType nullable: true
+	description nullable: true, maxSize: 4000
+	etlDate nullable: true
+	expressionPlatformIds nullable: true
+	filename nullable: true
+	genomeVersion nullable: true
+	genotypePlatformIds nullable: true
+	modelDescription nullable: true
+	modelName nullable: true
+	phenotypeIds nullable: true
+	population nullable: true
+	processDate nullable: true
+	pValueCutoff nullable: true
+	researchUnit nullable: true
+	sampleSize nullable: true
+	sensitiveDesc nullable: true
+	statisticalTest nullable: true
+	status nullable: true
+	tissue nullable: true
+    }
 }

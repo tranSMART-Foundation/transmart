@@ -1,4 +1,3 @@
-package org.transmart.searchapp
 /*************************************************************************
  * tranSMART - translational medicine data mart
  *
@@ -17,28 +16,22 @@ package org.transmart.searchapp
  *
  *
  ******************************************************************/
+package org.transmart.searchapp
 
 /**
- * Request Map domain class used by Spring Security plugin to determine the security level by URL
+ * Used by Spring Security plugin to persist the security level by URL.
  */
 class Requestmap {
-    String url
     String configAttribute
-    Long id
-    Long version
+    String url
+
     static mapping = {
-        table 'SEARCH_REQUEST_MAP'
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            id column: 'ID'
-            version column: 'VERSION'
-            configAttribute column: 'CONFIG_ATTRIBUTE'
-            url column: 'URL'
-        }
+	table 'SEARCHAPP.SEARCH_REQUEST_MAP'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID']
     }
 
     static constraints = {
-        url(blank: false, unique: true)
-        configAttribute(blank: false)
+	configAttribute blank: false
+	url blank: false, unique: true
     }
 }

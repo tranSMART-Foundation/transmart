@@ -9,10 +9,11 @@ class GalaxyUserDetails implements Serializable {
 
     static mapping = {
         table 'GALAXY.USERS_DETAILS_FOR_EXPORT_GAL'
-        version false
         id column: 'ID',
-                generator: 'increment',
-                params: [sequence: 'GALAXY.HIBERNATE_ID']
+            generator: 'sequence',
+            params: [sequence: 'GALAXY.HIBERNATE_ID']
+        version false
+
         username column: 'USERNAME'
         galaxyKey column: 'GALAXY_KEY'
         mailAddress column: 'MAIL_ADDRESS'

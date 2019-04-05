@@ -16,94 +16,48 @@
  *
  *
  ******************************************************************/
-
-/**
- * $Id: LiteratureInhibitorData.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
 package org.transmart.biomart
 
 class LiteratureInhibitorData extends Literature {
-    Long id
-    LiteratureReferenceData reference
-    String etlId
-    String effectResponseRate
-    String effectDownstream
-    String effectBeneficial
+    String administration
+    String casid
+    String concentration
+    String description
     String effectAdverse
+    String effectBeneficial
     String effectDescription
+    String effectDownstream
+    String effectMolecular
+    String effectNumber
+    String effectPercent
     String effectPharmacos
     String effectPotentials
-    String trialType
-    String trialPhase
-    String trialStatus
-    String trialExperimentalModel
-    String trialTissue
-    String trialBodySubstance
-    String trialDescription
-    String trialDesigns
-    String trialCellLine
-    String trialCellType
-    String trialPatientsNumber
-    String trialInclusionCriteria
-    String inhibitor
-    String inhibitorStandardName
-    String casid
-    String description
-    String concentration
-    String timeExposure
-    String administration
-    String treatment
-    String techniques
-    String effectMolecular
-    String effectPercent
-    String effectNumber
-    String effectValue
+    String effectResponseRate
     String effectSd
     String effectUnit
+    String effectValue
+    String etlId
+    String inhibitor
+    String inhibitorStandardName
+    String techniques
+    String timeExposure
+    String treatment
+    String trialBodySubstance
+    String trialCellLine
+    String trialCellType
+    String trialDescription
+    String trialDesigns
+    String trialExperimentalModel
+    String trialInclusionCriteria
+    String trialPatientsNumber
+    String trialPhase
+    String trialStatus
+    String trialTissue
+    String trialType
+
     static mapping = {
-        table 'BIO_LIT_INH_DATA'
+	table 'BIOMART.BIO_LIT_INH_DATA'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_LIT_INH_DATA_ID'
         version false
-        id column: 'BIO_LIT_INH_DATA_ID'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            reference column: 'BIO_LIT_REF_DATA_ID'
-            etlId column: 'ETL_ID'
-            effectResponseRate column: 'EFFECT_RESPONSE_RATE'
-            effectDownstream column: 'EFFECT_DOWNSTREAM'
-            effectBeneficial column: 'EFFECT_BENEFICIAL'
-            effectAdverse column: 'EFFECT_ADVERSE'
-            effectDescription column: 'EFFECT_DESCRIPTION'
-            effectPharmacos column: 'EFFECT_PHARMACOS'
-            effectPotentials column: 'EFFECT_POTENTIALS'
-            trialType column: 'TRIAL_TYPE'
-            trialPhase column: 'TRIAL_PHASE'
-            trialStatus column: 'TRIAL_STATUS'
-            trialExperimentalModel column: 'TRIAL_EXPERIMENTAL_MODEL'
-            trialTissue column: 'TRIAL_TISSUE'
-            trialBodySubstance column: 'TRIAL_BODY_SUBSTANCE'
-            trialDescription column: 'TRIAL_DESCRIPTION'
-            trialDesigns column: 'TRIAL_DESIGNS'
-            trialCellLine column: 'TRIAL_CELL_LINE'
-            trialCellType column: 'TRIAL_CELL_TYPE'
-            trialPatientsNumber column: 'TRIAL_PATIENTS_NUMBER'
-            trialInclusionCriteria column: 'TRIAL_INCLUSION_CRITERIA'
-            inhibitor column: 'INHIBITOR'
-            inhibitorStandardName column: 'INHIBITOR_STANDARD_NAME'
-            casid column: 'CASID'
-            description column: 'DESCRIPTION'
-            concentration column: 'CONCENTRATION'
-            timeExposure column: 'TIME_EXPOSURE'
-            administration column: 'ADMINISTRATION'
-            treatment column: 'TREATMENT'
-            techniques column: 'TECHNIQUES'
-            effectMolecular column: 'EFFECT_MOLECULAR'
-            effectPercent column: 'EFFECT_PERCENT'
-            effectNumber column: 'EFFECT_NUMBER'
-            effectValue column: 'EFFECT_VALUE'
-            effectSd column: 'EFFECT_SD'
-            effectUnit column: 'EFFECT_UNIT'
-        }
     }
 }

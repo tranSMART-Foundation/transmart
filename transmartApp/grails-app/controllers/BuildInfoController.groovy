@@ -1,30 +1,35 @@
-import grails.util.Holders
+import grails.util.Environment
+import grails.util.Metadata
+import org.codehaus.groovy.grails.plugins.GrailsPluginManager
 
 class BuildInfoController {
 
-    static final List buildInfoProperties = [
-            'scm.version',
-            'build.date',
-            'build.timezone',
-            'build.java',
-            'env.os',
-            'env.username',
-            'env.computer',
-            'env.proc.type',
-            'env.proc.cores'
-    ]
+    private static final List<String> buildInfoProperties = [
+        'scm.version',
+        'build.date',
+        'build.timezone',
+        'build.java',
+        'env.os',
+        'env.username',
+        'env.computer',
+        'env.proc.type',
+	'env.proc.cores'].asImmutable()
 
-    def index = {
-        def buildInfoConfig = Holders.config?.buildInfo
-        def customProperties = buildInfoProperties
-        if (buildInfoConfig?.properties?.exclude) {
-            customProperties -= buildInfoConfig.properties.exclude
+    GrailsPluginManager pluginManager
+
+    def index() {
+	List<String> customProperties = [] + buildInfoProperties
+	if (grailsApplication.config.buildInfo.exclude) {
+	    customProperties.removeAll grailsApplication.config.buildInfo.exclude
         }
-        if (buildInfoConfig?.properties?.include) {
-            customProperties += buildInfoConfig.properties.include
+	if (grailsApplication.config.buildInfo.include) {
+	    customProperties.addAll grailsApplication.config.buildInfo.include
         }
 
-        Map model = [buildInfoProperties: customProperties.sort()]
-        render(view: 'index', model: model)
+	[buildInfoProperties: customProperties.sort(),
+	 envName            : Environment.current.name,
+	 javaVersion        : System.getProperty('java.version'),
+	 plugins            : pluginManager.allPlugins.sort({ it.name.toUpperCase() }),
+	 warDeployed        : Metadata.current.isWarDeployed()]
     }
 }

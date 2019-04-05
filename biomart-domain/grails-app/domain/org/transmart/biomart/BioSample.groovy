@@ -16,47 +16,36 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioSample {
-    Long id
-    String type
-    String characteristics
-    String sourceCode
-    Experiment experiment
-    CellLine cellLine
-    BioSubject bioSubject
-    String source
     Long bioBankId
     Long bioPatientEventId
+    BioSubject bioSubject
+    CellLine cellLine
+    String characteristics
+    Experiment experiment
     String name
+    String source
+    String sourceCode
+    String type
 
     static mapping = {
-        table 'BIO_SAMPLE'
+	table 'BIOMART.BIO_SAMPLE'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_SAMPLE_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_SAMPLE_ID'
-            type column: 'BIO_SAMPLE_TYPE'
-            characteristics column: 'CHARACTERISTICS'
-            sourceCode column: 'SOURCE_CODE'
-            experiment column: 'EXPERIMENT_ID'
-            bioSubject column: 'BIO_SUBJECT_ID'
-            source column: 'SOURCE'
-            bioBankId column: 'BIO_BANK_ID'
-            bioPatientEventId column: 'BIO_PATIENT_EVENT_ID'
-            name column: 'BIO_SAMPLE_NAME'
-            cellLine column: 'BIO_CELL_LINE_ID'
-        }
+
+        cellLine column: 'BIO_CELL_LINE_ID'
+	name column: 'BIO_SAMPLE_NAME'
+	type column: 'BIO_SAMPLE_TYPE'
     }
+
     static constraints = {
-        type(maxSize: 400)
-        characteristics(nullable: true, maxSize: 2000)
-        sourceCode(nullable: true, maxSize: 400)
-        source(nullable: true, maxSize: 400)
-        bioBankId(nullable: true)
-        bioPatientEventId(nullable: true)
+	bioBankId nullable: true
+	bioPatientEventId nullable: true
+	characteristics nullable: true, maxSize: 2000
+	source nullable: true, maxSize: 400
+	sourceCode nullable: true, maxSize: 400
+	type maxSize: 400
     }
 }

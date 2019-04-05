@@ -1,21 +1,21 @@
 import grails.util.Metadata
 
 eventWebXmlStart = { webXmlFile ->
-    ant.echo message: 'Change display-name for web.xml'
+    ant.echo message: "Change display-name for web.xml"
     def tmpWebXmlFile = new File(projectWorkDir, webXmlFile)
-    ant.replace(file: tmpWebXmlFile, token: '@grails.app.name.version@',
-            value: '' + grailsAppName + '-' + grailsAppVersion)
+    ant.replace(file: tmpWebXmlFile, token: "@grails.app.name.version@",
+		value: "${grailsAppName}-${grailsAppVersion}")
 }
 
 eventCreateWarStart = { warname, stagingDir ->
-    event('BuildInfoAddPropertiesStart', [warname, stagingDir])
-    writeProperties(getEnvProperties(), '' + stagingDir + '/WEB-INF/classes/application.properties')
-    event('BuildInfoAddPropertiesEnd', [warname, stagingDir])
-    ant.delete(dir:'' + stagingDir + '/WEB-INF/lib/', includes: 'jfreechart-1.0.11.jar', verbose: true)
+    event("BuildInfoAddPropertiesStart", [warname, stagingDir])
+    writeProperties(getEnvProperties(), "${stagingDir}/WEB-INF/classes/application.properties")
+    event("BuildInfoAddPropertiesEnd", [warname, stagingDir])
+    ant.delete(dir:"${stagingDir}/WEB-INF/lib/", includes: "jfreechart-1.0.11.jar", verbose: true)
 }
 
 eventCompileStart = { kind ->
-    // Unfortunately during 'run-app', the application metadata file loaded is not the one of the staging directory
+    // Unfortunately during "run-app", the application metadata file loaded is not the one of the staging directory
     // We do not want to modify the local metadata file do avoid SCM mess.
     // We might still want these info displayed into the console at compile time for the main application
     getEnvProperties().each { k, v ->
@@ -73,14 +73,13 @@ def getRevision() {
     // maybe a local git?
     if (!scmVersion) {
         try {
-            def command = '''git rev-parse HEAD'''
+            def command = """git rev-parse HEAD"""
             def proc = command.execute()
             proc.waitFor()
             if (proc.exitValue() == 0) {
                 scmVersion = proc.in.text
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // oh well
         }
     }
@@ -115,8 +114,7 @@ private String getRevisionFromSvnCli() {
             def slurper = new XmlSlurper().parseText(out.toString())
             return slurper.entry.@revision
         }
-    }
-    catch (ignore) {
+    } catch (ignore) {
         return null
     }
 }
@@ -125,18 +123,17 @@ def getEstimateRevisionFromGitFolder() {
     try {
         //on system which do not have git in the PATH, try the file system
         //the head this might not always provide accurate commit hash
-        def headFile = new File('.git/HEAD')
+        def headFile = new File(".git/HEAD")
         def refsHeadPath = ''
         if (headFile.exists()) {
             def headContents = headFile.text.trim()
             refsHeadPath = headContents.split(':')[1].trim()
-            def refsHeadFile = new File('.git/' + refsHeadPath)
+            def refsHeadFile = new File(".git/${refsHeadPath}")
             if (refsHeadFile.isFile()) {
                 return refsHeadFile.text.trim()
             }
         }
-    }
-    catch (ignore) {
+    } catch (ignore) {
         return null
     }
 }
@@ -144,7 +141,7 @@ def getEstimateRevisionFromGitFolder() {
 def getPluginEnvProperties(properties) {
     def pluginMeta
     pluginSettings.getSupportedPluginInfos().each { p ->
-        pluginMeta = Metadata.getInstance(new File('' + p.getPluginDir() + '/application.properties')).getFromMap()
+        pluginMeta = Metadata.getInstance(new File("${p.getPluginDir()}/application.properties")).getFromMap()
         if (pluginMeta?.'scm.version' != null) {
             pluginMeta.each { k, v ->
                 properties."plugin.${p.getName()}.${k}" = v

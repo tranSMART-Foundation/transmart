@@ -1,58 +1,86 @@
 package fm
 
-import annotation.*
+import annotation.AmData
+import annotation.AmTagAssociation
+import annotation.AmTagItem
+import annotation.AmTagTemplate
+import annotation.AmTagTemplateAssociation
+import annotation.AmTagValue
+import com.mongodb.MongoClient
+import com.mongodb.gridfs.GridFS
+import com.mongodb.gridfs.GridFSDBFile
 import com.recomdata.util.FolderType
-import org.transmart.mongo.MongoUtils
-
-import grails.util.Holders
+import grails.transaction.Transactional
 import grails.validation.ValidationException
 
 import groovy.util.logging.Slf4j
-
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.FilenameUtils
-import org.apache.solr.util.SimplePostTool
-import org.transmart.biomart.BioData
-import org.transmart.biomart.Experiment
-import org.transmart.searchapp.AccessLog
-import org.transmart.searchapp.AuthUser
-
+import groovyx.net.http.ContentType
+import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.Method
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.apache.http.entity.mime.HttpMultipartMode
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.InputStreamBody
 import org.apache.solr.util.SimplePostTool
-
-import groovyx.net.http.ContentType
-import groovyx.net.http.HTTPBuilder
-import groovyx.net.http.Method
-
-import com.mongodb.Mongo
-import com.mongodb.DB
-import com.mongodb.MongoClient
-import com.mongodb.gridfs.GridFS
-import com.mongodb.gridfs.GridFSDBFile
-
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.transmart.biomart.BioData
+import org.transmart.biomart.Experiment
+import org.transmart.mongo.MongoUtils
+import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.UtilService
 import org.transmart.searchapp.SecureObject
 import org.transmart.searchapp.SecureObjectAccess
+import org.transmartproject.db.log.AccessLogService
+import org.transmartproject.db.ontology.I2b2Secure
 
 @Slf4j('logger')
 class FmFolderService {
 
-    final private static DEFAULT_FILE_TYPES =
-            'xml,json,csv,pdf,doc,docx,ppt,pptx,xls,xlsx,odt,odp,ods,ott,otp,ots,rtf,htm,html,txt,log'
+    private static final String DEFAULT_FILE_TYPES =
+        'xml,json,csv,pdf,doc,docx,ppt,pptx,xls,xlsx,odt,odp,ods,ott,otp,ots,rtf,htm,html,txt,log'
 
-    static transactional = true
+    private static final String filenameBlacklist = '\\/:;*?"<>|'
 
-    def config = Holders.config
-    def importDirectory = config.com.recomdata.FmFolderService.importDirectory
-    def filestoreDirectory = config.com.recomdata.FmFolderService.filestoreDirectory
-    def fileTypes = config.com.recomdata.FmFolderService.fileTypes ?: DEFAULT_FILE_TYPES
-    String solrBaseUrl = config.com.recomdata.solr.baseURL
-    def amTagItemService
-    def springSecurityService
+    @Value('${transmartproject.mongoFiles.apiURL:}')
+    private String apiUrl
+
+    @Value('${transmartproject.mongoFiles.apiKey:}')
+    private String apiKey
+
+    @Value('${transmartproject.mongoFiles.enableMongo:false}')
+    private boolean enableMongo
+
+    @Value('${com.recomdata.FmFolderService.importDirectory:}')
+    private String importDirectory
+
+    @Value('${com.recomdata.FmFolderService.filestoreDirectory:}')
+    private String filestoreDirectory
+
+    @Value('${com.recomdata.FmFolderService.fileTypes:}')
+    private String fileTypes
+
+    @Value('${transmartproject.mongoFiles.dbServer:}')
+    private String mongoServer
+
+    @Value('${transmartproject.mongoFiles.dbPort:0}')
+    private int mongoPort
+
+    @Value('${transmartproject.mongoFiles.dbName:}')
+    private String mongoDbName
+
+    @Value('${com.recomdata.solr.baseURL:}')
+    private String solrBaseUrl
+
+    @Value('${transmartproject.mongoFiles.useDriver:false}')
+    private boolean useDriver
+
+    AccessLogService accessLogService
     def i2b2HelperService
+    @Autowired private SecurityService securityService
+    @Autowired private UtilService utilService
 
     private String getSolrUrl() {
         solrBaseUrl + '/update'
@@ -60,30 +88,26 @@ class FmFolderService {
 
     /**
      * Imports files processing them into filestore and indexing them with SOLR.
-     *
-     * @return
      */
-    def importFiles() {
+    @Transactional
+    void importFiles() {
 
         logger.info 'importFiles() called'
 
-        logger.debug 'Importing files from $importDirectory into $filestoreDirectory'
+	logger.debug 'Importing files from {} into {}', importDirectory, filestoreDirectory
 
         if (!importDirectory || !filestoreDirectory || !solrUrl) {
             if (!importDirectory) {
-                logger.error 'Unable to check for new files. ' +
-                        'com.recomdata.FmFolderService.importDirectory setting ' +
-                        'has not been defined in the Config.groovy file'
+		logger.error 'Unable to check for new files. com.recomdata.FmFolderService.importDirectory ' +
+		    'setting has not been defined in the Config.groovy file'
             }
             if (!filestoreDirectory) {
-                logger.error 'Unable to check for new files. ' +
-                        'com.recomdata.FmFolderService.filestoreDirectory ' +
-                        'setting has not been defined in the Config.groovy file'
+		logger.error 'Unable to check for new files. com.recomdata.FmFolderService.filestoreDirectory ' +
+                    'setting has not been defined in the Config.groovy file'
             }
             if (!solrUrl) {
-                logger.error 'Unable to check for new files. ' +
-                        'com.recomdata.solr.baseURL ' +
-                        'setting has not been defined in the Config.groovy file'
+		logger.error 'Unable to check for new files. com.recomdata.solr.baseURL ' +
+                    'setting has not been defined in the Config.groovy file'
             }
             return
         }
@@ -95,24 +119,17 @@ class FmFolderService {
 
     /**
      * Re-index all files through SOLR.
-     * @return
      */
-    def reindexFiles() {
-
-        logger.info('reindexFiles called')
-        def fmFiles = FmFile.findAll()
-        for (fmFile in fmFiles) {
-            indexFile(fmFile)
+    void reindexFiles() {
+	for (FmFile fmFile in FmFile.list()) {
+	    indexFile fmFile
         }
-
     }
 
     /**
      * Process files and sub-directories in specified directory.
-     *
-     * @param directory
-     * @return
      */
+    @Transactional
     def processDirectory(File directory) {
         def fmFolder = null
         /* null: uninitialized; false: not a folder */
@@ -128,167 +145,140 @@ class FmFolderService {
             try {
                 folderId = Long.parseLong directory.name
             }
-            catch (NumberFormatException ex) {
+	    catch (NumberFormatException ignored) {
                 fmFolder = false
                 return fmFolder
             }
 
-            fmFolder = FmFolder.get folderId
-            if (fmFolder == null) {
-                logger.error 'Folder with id $folderId does not exist (reference ' +
-                        'in directory $directory)'
+	    fmFolder = FmFolder.get(folderId)
+	    if (!fmFolder) {
+		logger.error 'Folder with id {} does not exist (reference in directory {}', folderId, directory
                 fmFolder = false
             }
 
             fmFolder
         }
 
-        logger.debug 'Looking for data in $directory'
+	logger.debug 'Looking for data in {}', directory
 
-        for (File file : directory.listFiles()) {
+	for (File file in directory.listFiles()) {
             if (file.isDirectory()) {
-                processDirectory(file)
+		processDirectory file
             }
             else if (file.name != '.keep') {
                 if (getFmFolder()) {
                     processFile getFmFolder(), file
                 }
                 else {
-                    logger.warn 'Ignoring file $file because its parent ' +
-                            'directory $directory could not be matched to a ' +
-                            'folder in tranSMART'
+		    logger.warn 'Ignoring file {} because its parent directory {} could not be matched to a folder in tranSMART', file, directory
                 }
             }
         }
 
-        if (directory != new File(importDirectory) /* not import root */ &&
-                directory.list().length == 0) {
+	if (directory != new File(importDirectory) /* not import root */ && !directory.list().length) {
             if (!directory.delete()) {
-                logger.warn 'Could not delete presumably empty directory $directory'
+		logger.warn 'Could not delete presumably empty directory {}', directory
             }
             else {
-                logger.debug 'Deleted empty directory $directory'
+		logger.debug 'Deleted empty directory {}', directory
             }
         }
-
     }
 
     /**
-     * Processes a file into the filestore associating it with a folder and
-     * indexes file using SOLR
+     * Processes a file into the filestore associating it with a folder and indexes file using SOLR
      *
      * @param file file to be proceessed
-     * @return
      */
-    private void processFile(FmFolder fmFolder, File file, String customName = null, String description = null) {
-        logger.info 'Importing file $file into folder $fmFolder'
+    @Transactional
+    void processFile(FmFolder fmFolder, File file, String customName = null, String description = null) {
+	logger.info 'Importing file {} into folder {}', file, fmFolder
 
         // Check if folder already contains file with same name.
-        def fmFile
-
-        def newFileName = customName?:file.getName()
-		
+	FmFile fmFile
         for (f in fmFolder.fmFiles) {
-            if (f.originalName == file.getName()) {
+	    if (f.originalName == file.name) {
                 fmFile = f
                 break
             }
         }
-        // If it does, then use existing file record and increment its version.
-        // Otherwise, create a new file.
-        if (fmFile != null) {
+
+	// If it does, then use existing file record and increment its version. Otherwise, create a new file.
+	if (fmFile) {
             fmFile.fileVersion++
             fmFile.fileSize = file.length()
             fmFile.linkUrl = ''
-            logger.info('File = ' + file.getName() + ' (' + fmFile.id + ') - Existing')
+	    logger.debug 'File = {} ({}) - Existing', file.name, fmFile.id
         }
         else {
             fmFile = new FmFile(
-                    displayName: file.getName(),
-                    originalName: file.getName(),
-                    fileType: getFileType(file),
-                    fileSize: file.length(),
-                    filestoreLocation: '',
-                    filestoreName: '',
-                    linkUrl: '',
-                    fileDescription: description
+		displayName: file.name,
+		originalName: file.name,
+                fileType: getFileType(file),
+                fileSize: file.length(),
+                filestoreLocation: '',
+                filestoreName: '',
+                linkUrl: '',
+                fileDescription: description
             )
-            if (!fmFile.save(flush: true)) {
-                fmFile.errors.each {
-                    logger.error(it)
-                }
+	    if (!save(fmFile)) {
                 return
             }
+
             fmFile.filestoreLocation = getFilestoreLocation(fmFolder)
-            fmFolder.addToFmFiles(fmFile)
-            if (!fmFolder.save(flush: true)) {
-                fmFolder.errors.each {
-                    logger.error(it)
-                }
+	    fmFolder.addToFmFiles fmFile
+	    if (!save(fmFolder)) {
                 return
             }
-            logger.info('File = ' + file.getName() + ' (' + fmFile.id + ') - New')
+
+	    logger.info 'File = {}  ({}) - New', file.name, fmFile.id
         }
 
         fmFile.filestoreName = fmFile.id + '-' + fmFile.fileVersion + '.' + fmFile.fileType
-
-        if (!fmFile.save(flush: true)) {
-            fmFile.errors.each {
-                logger.error(it)
-            }
+	if (!save(fmFile)) {
             return
         }
 
         // Use filestore directory based on file's parent study or common directory
         // for files in folders above studies. If directory does not exist, then create it.
         // PREREQUISITE: Service account running tomcat has ownership of filestore directory.
-        File filestoreDir = new File(filestoreDirectory + fmFile.filestoreLocation)
+	File filestoreDir = new File(filestoreDirectory, fmFile.filestoreLocation)
         if (!filestoreDir.exists()) {
             if (!filestoreDir.mkdirs()) {
-                logger.error('unable to create filestore ' + filestoreDir.getPath())
+		logger.error 'unable to create filestore {}', filestoreDir.path
                 return
             }
         }
 
         // Move file to appropriate filestore directory.
-        File filestoreFile = new File(filestoreDirectory + fmFile.filestoreLocation + File.separator + fmFile.filestoreName)
+	File filestoreFile = new File(filestoreDirectory, fmFile.filestoreLocation + '/' + fmFile.filestoreName)
         try {
-            FileUtils.copyFile(file, filestoreFile)
+	    FileUtils.copyFile file, filestoreFile
             if (!file.delete()) {
-                logger.error('unable to delete file ' + file.getPath())
+		logger.error 'unable to delete file {}', file.path
             }
-            //if (!file.renameTo(filestoreFile)) {
         }
-        catch (IOException ex) {
-            logger.error('unable to copy file to ' + filestoreFile.getPath())
+	catch (IOException ignored) {
+	    logger.error 'unable to copy file to {}', filestoreFile.path
             return
         }
 
-        logger.info('Moved file to ' + filestoreFile.getPath())
+	logger.info 'Moved file to {}', filestoreFile.path
 
-        // Call file indexer.
-        indexFile(fmFile)
-
+	indexFile fmFile
     }
 
     /**
-     * Gets type (extension) of specified file or an empty string if it cannot
-     * be determined
-     *
-     * @param file
-     * @return
+     * Gets type (extension) of specified file or an empty string if it cannot be determined
      */
     private String getFileType(File file) {
-        FilenameUtils.getExtension file.getName()
+	FilenameUtils.getExtension file.name
     }
 
     /**
      * Gets filestore location for specified folder. Files are stored in directories
      * grouped by their parent study folder id. If the files are being loaded at
      * the program level, then a default folder, '0' will be used.
-     *
-     * @param folder
-     * @return
      */
     private String getFilestoreLocation(FmFolder fmFolder) {
 
@@ -301,13 +291,13 @@ class FmFolderService {
             filestoreLocation = fmFolder.id
         }
         else {
-            logger.debug('folderFullName = ' + fmFolder.folderFullName + '')
+	    logger.debug 'folderFullName = {}', fmFolder.folderFullName
             int pos = fmFolder.folderFullName.indexOf('\\', 1)
             pos = fmFolder.folderFullName.indexOf('\\', pos + 1)
-            logger.debug('find name = ' + fmFolder.folderFullName.substring(0, pos) + '')
+	    logger.debug 'find name = {}', fmFolder.folderFullName.substring(0, pos)
             FmFolder fmParentFolder = FmFolder.findByFolderFullName(fmFolder.folderFullName.substring(0, pos + 1))
-            if (fmParentFolder == null) {
-                logger.error('Unable to find folder with folderFullName of ' + fmFolder.folderFullName.substring(0, pos + 1))
+	    if (!fmParentFolder) {
+		logger.error 'Unable to find folder with folderFullName of {}', fmFolder.folderFullName.substring(0, pos + 1)
                 filestoreLocation = '0'
             }
             else {
@@ -315,280 +305,242 @@ class FmFolderService {
             }
         }
 
-        return File.separator + filestoreLocation
-
-    }
-
-    /**
-     * Indexes file using SOLR.
-     * @param fileId ID of file to be indexed
-     * @return
-     */
-    private void indexFile(String fileId) {
-
-        FmFile fmFile = FmFile.get(fileId)
-        if (fmFile == null) {
-            logger.error('Unable to locate fmFile with id of ' + fileId)
-            return
-        }
-        indexFile(fmFile)
-
+	File.separator + filestoreLocation
     }
 
     /**
      * Indexes file using SOLR.
      * @param fmFile file to be indexed
-     * @return
      */
     private void indexFile(FmFile fmFile) {
 
         try {
-
-            /*
-             * Create the file entry first - the POST will handle the content.
-             */
-            String xmlString = "<add><doc><field name='id'>" + fmFile.getUniqueId() + "</field><field name='folder'>" + fmFile.folder.getUniqueId() + "</field><field name='name'>" + fmFile.originalName + "</field></doc></add>"
-            xmlString = URLEncoder.encode(xmlString, 'UTF-8')
-            StringBuilder url = new StringBuilder(solrUrl)
-            url.append('?stream.body=').append(xmlString).append('&commit=true')
-            URL updateUrl = new URL(url.toString())
+	    // Create the file entry first - the POST will handle the content.
+	    String xmlString = "<add><doc><field name='id'>" + fmFile.uniqueId +
+		"</field><field name='folder'>" + fmFile.folder.uniqueId +
+		"</field><field name='name'>" + fmFile.originalName + '</field></doc></add>'
+	    URL updateUrl = new URL(solrUrl + '?stream.body=' + URLEncoder.encode(xmlString, 'UTF-8') + '&commit=true')
             HttpURLConnection urlc = (HttpURLConnection) updateUrl.openConnection()
-            if (HttpURLConnection.HTTP_OK != urlc.getResponseCode()) {
-                logger.warn('The SOLR service returned an error #' + urlc.getResponseCode() + ' ' + urlc.getResponseMessage() + ' for url ' + updateUrl)
+	    if (HttpURLConnection.HTTP_OK != urlc.responseCode) {
+		logger.warn 'The SOLR service returned an error #{} {} for url {}',
+		    urlc.responseCode, urlc.responseMessage, updateUrl
             }
             else {
-                logger.debug('Pre-created record for ' + fmFile.getUniqueId())
+		logger.debug 'Pre-created record for {}', fmFile.uniqueId
             }
 
-            /*
-             * POST the file - if it has readable content, the contents will be indexed.
-             */
-            def useMongo = config.transmartproject.mongoFiles.enableMongo
-            url = new StringBuilder(solrUrl)
-            if (useMongo) url.append('/extract')
+	    // POST the file - if it has readable content, the contents will be indexed.
+	    StringBuilder url = new StringBuilder(solrUrl)
+	    if (enableMongo) {
+		url << '/extract'
+	    }
             // Use the file's unique ID as the document ID in SOLR
-            url.append('?').append('literal.id=').append(URLEncoder.encode(fmFile.getUniqueId(), 'UTF-8'))
+	    url << '?literal.id=' << URLEncoder.encode(fmFile.uniqueId, 'UTF-8')
 
             // Use the file's parent folder's unique ID as the folder_uid in SOLR
-            if (fmFile.folder != null) {
-                url.append('&').append('literal.folder=').append(URLEncoder.encode(fmFile.folder.getUniqueId(), 'UTF-8'))
+	    if (fmFile.folder) {
+		url << '&literal.folder=' << URLEncoder.encode(fmFile.folder.uniqueId, 'UTF-8')
             }
 
             // Use the file's name as document name is SOLR
-            url.append('&').append('literal.name=').append(URLEncoder.encode(fmFile.originalName, 'UTF-8'))
+	    url << '&literal.name=' << URLEncoder.encode(fmFile.originalName, 'UTF-8')
 
-            if (!useMongo) {
+	    if (!enableMongo) {
                 // Get path to actual file in filestore.
                 String[] args = [filestoreDirectory + File.separator + fmFile.filestoreLocation + File.separator + fmFile.filestoreName] as String[]
 
-                // Use SOLR SimplePostTool to manage call to SOLR service.
-                SimplePostTool postTool = new SimplePostTool(SimplePostTool.DATA_MODE_FILES, new URL(url.toString()), true,
-                        null, 0, 0, fileTypes, System.out, true, true, args)
-
-                postTool.execute()
+		new SimplePostTool(SimplePostTool.DATA_MODE_FILES, new URL(url.toString()), true,
+				   null, 0, 0, fileTypes ?: DEFAULT_FILE_TYPES,
+				   System.out, true, true, args).execute()
             }
             else {
-                if (config.transmartproject.mongoFiles.useDriver) {
-                    MongoClient mongo = new MongoClient(config.transmartproject.mongoFiles.dbServer, config.transmartproject.mongoFiles.dbPort)
-                    DB db = mongo.getDB(config.transmartproject.mongoFiles.dbName)
-                    GridFS gfs = new GridFS(db)
-                    def http = new HTTPBuilder(url)
-                    GridFSDBFile gfsFile = gfs.findOne(fmFile.filestoreName)
-                    http.request(Method.POST) { request ->
+		if (useDriver) {
+		    MongoClient mongo = new MongoClient(mongoServer, mongoPort)
+		    GridFSDBFile gfsFile = new GridFS(mongo.getDB(mongoDbName)).findOne(fmFile.filestoreName)
+		    new HTTPBuilder(url).request(Method.POST) { request ->
                         requestContentType: 'multipart/form-data'
                         MultipartEntity multiPartContent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE)
-                        multiPartContent.addPart(fmFile.filestoreName, new InputStreamBody(gfsFile.getInputStream(), 'application/octet-stream', fmFile.originalName))
+			multiPartContent.addPart(fmFile.filestoreName,
+				new InputStreamBody(gfsFile.inputStream, 'application/octet-stream', fmFile.originalName))
                         request.setEntity(multiPartContent)
                         response.success = { resp ->
-                            logger.info('File successfully indexed: ' + fmFile.id)
+			    logger.info 'File successfully indexed: {}', fmFile.id
                         }
                         response.failure = { resp ->
-                            logger.error('Problem to index file ' + fmFile.id + ': ' + resp.status)
+			    logger.error 'Problem to index file {} : {}', fmFile.id, resp.status
                         }
                     }
                     mongo.close()
                 }
                 else {
-                    def apiURL = config.transmartproject.mongoFiles.apiURL
-                    def apiKey = config.transmartproject.mongoFiles.apiKey
-                    def http = new HTTPBuilder(apiURL + fmFile.filestoreName + '/fsfile')
-                    url.append('&commit=true')
-                    http.request(Method.GET, ContentType.BINARY) { req ->
+		    url << '&commit=true'
+		    new HTTPBuilder(apiUrl + fmFile.filestoreName + '/fsfile').request(Method.GET, ContentType.BINARY) { req ->
                         headers.'apikey' = MongoUtils.hash(apiKey)
                         response.success = { resp, binary ->
                             assert resp.statusLine.statusCode == 200
-                            def inputStream = binary
+			    InputStream inputStream = binary
 
-                            def http2 = new HTTPBuilder(url)
-                            http2.request(Method.POST) { request ->
+			    new HTTPBuilder(url).request(Method.POST) { request ->
                                 requestContentType: 'multipart/form-data'
                                 MultipartEntity multiPartContent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE)
-                                multiPartContent.addPart(fmFile.filestoreName, new InputStreamBody(inputStream, 'application/octet-stream', fmFile.originalName))
+				multiPartContent.addPart(fmFile.filestoreName,
+					new InputStreamBody(inputStream, 'application/octet-stream', fmFile.originalName))
                                 request.setEntity(multiPartContent)
                                 response.success = { resp2 ->
-                                    logger.info('File successfully indexed: ' + fmFile.id)
+				    logger.info 'File successfully indexed: {}', fmFile.id
                                 }
 
                                 response.failure = { resp2 ->
-                                    logger.error('Problem to index file ' + fmFile.id + ': ' + resp.status)
+				    logger.error 'Problem to index file {}: {}', fmFile.id, resp.status
                                 }
                             }
                         }
                         response.failure = { resp ->
-                            logger.error('Problem during connection to API: ' + resp.status)
+			    logger.error 'Problem during connection to API: {}', resp.status
                         }
                     }
                 }
             }
         }
-        catch (Exception ex) {
-            logger.error('Exception while indexing fmFile with id of ' + fmFile.id, ex)
+	catch (e) {
+	    logger.error 'Exception while indexing fmFile with id of {}', fmFile.id, e
         }
-
     }
 
     /**
      * Removes files/folders by UID from the SOLR index.
      * @param uid UID of file or folder to remove
-     * @return
      */
-    def removeSolrEntry(String uid) {
-
+    void removeSolrEntry(String uid) {
         try {
-
-            String xmlString = '<delete><query>id:\'' + uid + '\'</query></delete>'
-            xmlString = URLEncoder.encode(xmlString, 'UTF-8')
-            StringBuilder url = new StringBuilder(solrUrl)
-            url.append('?stream.body=').append(xmlString).append('&commit=true')
-            URL updateUrl = new URL(url.toString())
+	    String xmlString = URLEncoder.encode('<delete><query>id:"' + uid + '"</query></delete>', 'UTF-8')
+	    URL updateUrl = new URL(solrUrl + '?stream.body=' + xmlString + '&commit=true')
             HttpURLConnection urlc = (HttpURLConnection) updateUrl.openConnection()
-            if (HttpURLConnection.HTTP_OK != urlc.getResponseCode()) {
-                logger.warn('The SOLR service returned an error #' + urlc.getResponseCode() + ' ' + urlc.getResponseMessage() + ' for url ' + updateUrl)
+	    if (HttpURLConnection.HTTP_OK != urlc.responseCode) {
+		logger.warn 'The SOLR service returned an error #{} {} for url {}',
+		    updateUrl, urlc.responseCode, urlc.responseMessage
             }
         }
-        catch (Exception ex) {
-            logger.error('Exception while deleting entry with uid of ' + uid, ex)
+	catch (e) {
+	    logger.error 'Exception while deleting entry with uid of {}', uid, e
         }
-
     }
 
-    def deleteFromAmApp(uniqueId) {
+    private void deleteFromAmApp(String uniqueId) {
         AmTagTemplateAssociation.executeUpdate('delete AmTagTemplateAssociation where objectUid = ?', [uniqueId])
         AmTagAssociation.executeUpdate('delete AmTagAssociation where subjectUid = ?', [uniqueId])
         AmData.executeUpdate('delete AmData where uniqueId not in (select ata.objectUid from AmTagAssociation ata)')
         AmTagValue.executeUpdate('delete AmTagValue where id not in (select ad.id from AmData ad)')
     }
 
-    def deleteFromFmApp(inst) {
+    private void deleteFromFmApp(FmFolder fmFolder) {
         //Delete information
-        FmFolderAssociation.executeUpdate('Delete FmFolderAssociation where fmFolder = ?', [inst])
-        FmFolder.executeUpdate('delete FmFolder where id = ? ', [inst.id])
+	FmFolderAssociation.executeUpdate('Delete FmFolderAssociation where fmFolder = ?', [fmFolder])
+	FmFolder.executeUpdate('delete FmFolder where id = ? ', [fmFolder.id])
         FmData.executeUpdate('delete FmData fd where not exists (Select fm from FmFolder fm where fm.id = fd.id)')
     }
 
-    def deleteStudy(FmFolder study) {
-        deleteFolder(study)
+    @Transactional
+    void deleteStudy(FmFolder study) {
+	deleteFolder study
         //Delete child elements
-        def children = study.getChildren()
-        children.each {
-            deleteFolder(it)
-            deleteFromAmApp(it.getUniqueId())
-            deleteFromFmApp(it)
+	for (FmFolder child in study.children) {
+	    deleteFolder child
+	    deleteFromAmApp child.uniqueId
+	    deleteFromFmApp child
         }
+
         //Check bio_experiment
-        Experiment experiment = FmFolderAssociation.findByFmFolder(study)?.getBioObject()
+	Experiment experiment = FmFolderAssociation.findByFmFolder(study)?.bioObject
         if (experiment) {
-            if (!org.transmartproject.db.ontology.I2b2Secure.findBySecureObjectToken(FmFolderAssociation.findByFmFolder(study).objectUid)) {
+	    if (!I2b2Secure.findBySecureObjectToken(FmFolderAssociation.findByFmFolder(study).objectUid)) {
                 Experiment.executeUpdate('DELETE Experiment where id = ?', [experiment.id])
                 BioData.executeUpdate('Delete BioData where id = ?', [experiment.id])
-                def secureObject = SecureObject.findByBioDataId(experiment.id)
+		SecureObject secureObject = SecureObject.findByBioDataId(experiment.id)
                 if (secureObject) {
                     SecureObjectAccess.executeUpdate('Delete SecureObjectAccess where secureObject = ?', [secureObject])
                     secureObject.delete(flush: true)
                 }
             }
         }
+
         //Delete study
-        deleteFromAmApp(study.getUniqueId())
-        deleteFromFmApp(study)
+	deleteFromAmApp study.uniqueId
+	deleteFromFmApp study
     }
 
-    def deleteProgram(FmFolder program) {
-        deleteFolder(program)
-        def children = program.getChildren()
-        children.each {
-            if (it.folderType == 'STUDY') {
-                deleteStudy(it)
+    @Transactional
+    void deleteProgram(FmFolder program) {
+	deleteFolder program
+	for (FmFolder child in program.children) {
+	    if (child.folderType == 'STUDY') {
+		deleteStudy child
             }
-            else if (it.folderType == 'FOLDER') {
-                deleteFolder(it)
+	    else if (child.folderType == 'FOLDER') {
+		deleteFolder child
             }
         }
 
         //Delete program
-        deleteFromAmApp(program.getUniqueId())
-        deleteFromFmApp(program)
+	deleteFromAmApp program.uniqueId
+	deleteFromFmApp program
     }
 
-    def deleteFolder(FmFolder folder) {
+    @Transactional
+    void deleteFolder(FmFolder folder) {
         //Delete all files within this folder.
-        //Convert PersistentSets to Arrays to avoid concurrent modification
-        def files = folder.fmFiles.toArray()
-        for (file in files) {
-            deleteFile(file)
+	//Convert PersistentSets to list to avoid concurrent modification
+	for (file in (folder.fmFiles as List)) {
+	    deleteFile file
         }
-        def children = folder.children.toArray()
-        for (child in children) {
-            deleteFolder(child)
-        }
+
+	for (child in (folder.children as List)) {
+	    deleteFolder child
+	}
+
         folder.activeInd = false
-        removeSolrEntry(folder.getUniqueId())
+	removeSolrEntry folder.uniqueId
+
         if (!folder.save(flush: true)) {
-            logger.error('Unable to delete folder with uid of ' + folder.getUniqueId())
+	    logger.error 'Unable to delete folder with uid of {}', folder.uniqueId
         }
         else {
-            def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'Browse-Delete object', eventmessage: folder.folderType + ': ' + folder.folderName + ' (' + folder.getUniqueId() + ')', accesstime: new java.util.Date())
-            al.save()
+	    accessLogService.report 'Browse-Delete object',
+		folder.folderType + ': ' + folder.folderName + ' (' + folder.uniqueId + ')'
         }
     }
 
-    def getFile(FmFile file) {
-        new File(
-                new File(filestoreDirectory, file.filestoreLocation),
-                file.filestoreName)
+    File getFile(FmFile file) {
+	new File(new File(filestoreDirectory, file.filestoreLocation), file.filestoreName)
     }
 
-    def deleteFile(FmFile file) {
-        def deleted = false
+    @Transactional
+    boolean deleteFile(FmFile file) {
+	boolean deleted = false
         try {
-            if (config.transmartproject.mongoFiles.enableMongo) {
-                if (config.transmartproject.mongoFiles.useDriver) {
-                    MongoClient mongo = new MongoClient(config.transmartproject.mongoFiles.dbServer, config.transmartproject.mongoFiles.dbPort)
-                    DB db = mongo.getDB(config.transmartproject.mongoFiles.dbName)
-                    GridFS gfs = new GridFS(db)
-                    gfs.remove(file.filestoreName)
+	    if (enableMongo) {
+		if (useDriver) {
+		    MongoClient mongo = new MongoClient(mongoServer, mongoPort)
+		    new GridFS(mongo.getDB(mongoDbName)).remove file.filestoreName
                     mongo.close()
                     deleted = true
                 }
                 else {
-                    def apiURL = config.transmartproject.mongoFiles.apiURL
-                    def apiKey = config.transmartproject.mongoFiles.apiKey
-                    def http = new HTTPBuilder(apiURL + file.filestoreName + '/delete')
-                    http.request(Method.GET) { req ->
+		    new HTTPBuilder(apiUrl + file.filestoreName + '/delete').request(Method.GET) { req ->
                         headers.'apikey' = MongoUtils.hash(apiKey)
-                        headers.'User-Agent' = "Mozilla/5.0 Firefox/3.0.4"
+			headers.'User-Agent' = 'Mozilla/5.0 Firefox/3.0.4'
                         response.success = { resp ->
                             if (resp.statusLine.statusCode == 200) {
-                                logger.info('File deleted: ' + file.filestoreName)
+				logger.info 'File deleted: {}', file.filestoreName
                                 deleted = true
                             }
                             else {
-                                logger.error('Error when deleting file: ' + file.filestoreName)
+				logger.error 'Error when deleting file: {}', file.filestoreName
                             }
                         }
 
                         response.failure = { resp ->
-                            logger.error('Error when deleting file: ' + resp.status)
+			    logger.error 'Error when deleting file: {}', resp.status
                         }
                     }
                 }
@@ -600,125 +552,116 @@ class FmFolderService {
                 }
                 deleted = true
             }
+
             if (deleted) {
-                removeSolrEntry(file.getUniqueId())
-                def data = FmData.get(file.id)
-                if (data) {
-                    data.delete(flush: true)
-                }
-                file.folder.fmFiles.remove(file)
+		removeSolrEntry file.uniqueId
+		FmData.get(file.id)?.delete(flush: true)
+		file.folder.fmFiles.remove file
                 file.folder.save(flush: true)
-                def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'Browse-Delete file', eventmessage: file.displayName + ' (' + file.getUniqueId() + ')', accesstime: new java.util.Date())
-                al.save()
+		accessLogService.report 'Browse-Delete file', file.displayName + ' (' + file.uniqueId + ')'
                 return true
             }
-            else {
-                return false
-            }
         }
-        catch (Exception ex) {
-            System.out.println('Exception while deleting file with uid of ' + file.getUniqueId(), ex)
-            logger.error('Exception while deleting file with uid of ' + file.getUniqueId(), ex)
+	catch (e) {
+	    logger.error 'Exception while deleting file with uid of {}', file.uniqueId, e
         }
     }
 
     List<FmFolder> getFolderContents(id) {
-        def parent
-        def folderLevel = 0L
+	FmFolder parent
+	long folderLevel = 0
         if (id) {
             parent = FmFolder.get(id)
             folderLevel = parent.folderLevel + 1
         }
 
         FmFolder.createCriteria().list {
-            if (parent != null) {
-                eq('parent', parent)
+	    if (parent) {
+		eq 'parent', parent
             }
-            eq('folderLevel', folderLevel)
-            eq('activeInd', true)
-            order('folderName', 'asc')
+	    eq 'folderLevel', folderLevel
+	    eq 'activeInd', true
+	    order 'folderName', 'asc'
         }
     }
 
-    Map<FmFolder, String> getAccessLevelInfoForFolders(AuthUser user, Collection<FmFolder> fmFolders) {
-        if (!fmFolders) return [:]
+    Map<FmFolder, String> getAccessLevelInfoForFolders(Collection<FmFolder> fmFolders) {
+	if (!fmFolders) {
+	    return [:]
+	}
 
-        boolean isAdmin = user && (user.isAdmin() || user.isDseAdmin())
+	boolean isAdmin = securityService.principal().isAdminOrDseAdmin()
 
-        def foldersByStudy = fmFolders.groupBy { it.findParentStudyFolder() }
+	Map<FmFolder, List<FmFolder>> foldersByStudy = fmFolders.groupBy { it.findParentStudyFolder() }
 
-        def userAssignedTokens, studyFolderStudyIdMap, studyTokensMap
+	Map<String, String> userAssignedTokens
+	Map<FmFolder, String> studyFolderStudyIdMap
+	Map<String, String> studyTokensMap
         if (!isAdmin) {
             studyFolderStudyIdMap = foldersByStudy.keySet().findAll().collectEntries {
-                def studyId = FmFolderAssociation.findByFmFolder(it)?.getBioObject()?.accession
+		String studyId = FmFolderAssociation.findByFmFolder(it)?.bioObject?.accession
                 [(it): studyId]
             }
 
             studyTokensMap = i2b2HelperService.getSecureTokensForStudies(studyFolderStudyIdMap.values().findAll())
 
-            userAssignedTokens = i2b2HelperService.getSecureTokensWithAccessForUser(user)
+	    userAssignedTokens = i2b2HelperService.getSecureTokensWithAccessForUser()
         }
 
-        def results = [:]
+	Map<FmFolder, String> results = [:]
         foldersByStudy.each { FmFolder studyFolder, List<FmFolder> folders ->
             if (studyFolder) {
                 if (isAdmin) {
-                    results += folders.collectEntries { [(it): 'ADMIN'] }
+		    results.putAll folders.collectEntries { [(it): 'ADMIN'] }
                 }
                 else {
-                    def studyId = studyFolderStudyIdMap[studyFolder]
-                    def token = studyTokensMap[studyId]
-                    def accessLevelInfo = userAssignedTokens[token] ?: 'LOCKED'
-                    results += folders.collectEntries { [(it): accessLevelInfo] }
+		    String studyId = studyFolderStudyIdMap[studyFolder]
+		    String token = studyTokensMap[studyId]
+		    String accessLevelInfo = userAssignedTokens[token] ?: 'LOCKED'
+		    results.putAll folders.collectEntries { [(it): accessLevelInfo] }
                 }
             }
             else {
-                results += folders.collectEntries { [(it): 'NA'] }
+		results.putAll folders.collectEntries { [(it): 'NA'] }
             }
         }
 
         results
     }
 
-    String getAccessLevelInfoForFolder(AuthUser user, FmFolder fmFolder) {
-        def map = getAccessLevelInfoForFolders(user, [fmFolder])
-        map ? map.values()[0] : null
+    Map<FmFolder, String> getFolderContentsWithAccessLevelInfo(folderId) {
+	getAccessLevelInfoForFolders getFolderContents(folderId)
     }
 
-    Map<FmFolder, String> getFolderContentsWithAccessLevelInfo(AuthUser user, folderId) {
-        def childFolders = getFolderContents(folderId)
-        getAccessLevelInfoForFolders(user, childFolders)
-    }
-
-    def getAssociatedAccession(fmFolder) {
+    String getAssociatedAccession(FmFolder fmFolder) {
         //Walk up the tree to find the study accession for this folder
         if (!fmFolder) {
             return null
         }
 
-        if (fmFolder.folderType.equals(FolderType.PROGRAM.name())) {
+	if (fmFolder.folderType == FolderType.PROGRAM.name()) {
             //Programs use their folderUID as accession
-            return fmFolder.getUniqueId()
+	    return fmFolder.uniqueId
         }
 
-        if (fmFolder.folderType.equals(FolderType.STUDY.name())) {
-            def experiment = FmFolderAssociation.findByFmFolder(fmFolder)?.getBioObject()
+	if (fmFolder.folderType == FolderType.STUDY.name()) {
+	    def experiment = FmFolderAssociation.findByFmFolder(fmFolder)?.bioObject
             if (!experiment) {
-                logger.error('No experiment associated with study folder: ' + fmFolder.folderFullName)
+		logger.error 'No experiment associated with study folder: {}', fmFolder.folderFullName
             }
-            return experiment?.accession
+	    experiment?.accession
         }
         else {
-            return getAssociatedAccession(fmFolder.parent)
+	    getAssociatedAccession fmFolder.parent
         }
     }
 
-    def getPath(fmFolder, safe = false) {
+    String getPath(FmFolder fmFolder, boolean safe = false) {
         //Get the full path of a folder by gathering folder names
-        def names = [fmFolder.folderName]
-        while (fmFolder.parent != null) {
+	List<String> names = [fmFolder.folderName]
+	while (fmFolder.parent) {
             fmFolder = fmFolder.parent
-            names.add(0, fmFolder.folderName)
+	    names.add 0, fmFolder.folderName
         }
 
         if (safe) {
@@ -727,115 +670,177 @@ class FmFolderService {
             }
         }
 
-        def path = names.join('/')
-        return path
+	names.join '/'
     }
 
-    def filenameBlacklist = '\\/:;*?"<>|'
-
-    def safeFileName(name) {
+    String safeFileName(String name) {
         //Handle special cases - files should not be named like this!
-        if (name.equals('.')) {
+	if (name == '.') {
             return 'dot'
         }
-        if (name.equals('..')) {
+
+	if (name == '..') {
             return 'dotdot'
         }
+
         //Normal sanitation, should cover Windows/Unix
         for (chr in filenameBlacklist) {
             name = name.replace(chr, '_')
         }
-        return name
+
+	name
+    }
+
+    /**
+     * Helper method to check whether a folder's parent program is included in the current search results.
+     *
+     * @param folderSearchString The current search string
+     * @param folderFullName The folder's full path (from which the program UID can be extracted).
+     */
+    boolean searchMatchesParentProgram(String folderSearchString, String folderFullName) {
+	String programUid = folderFullName.substring(1, folderFullName.indexOf('\\', 1))
+	('\\' + programUid + '\\') in folderSearchString.split(',')
+    }
+
+    FmFolder getFolderByBioDataObject(bioDataObject) {
+	def uniqueId = bioDataObject?.uniqueId?.uniqueId
+	if (!uniqueId) {
+	    logger.error 'No unique ID found for bio object {}', bioDataObject?.id
+	    return null
+	}
+
+	FmFolderAssociation ffa = FmFolderAssociation.findByObjectUid(uniqueId)
+	if (!ffa) {
+	    logger.error 'No fmFolderAssociation found for unique ID {}', uniqueId
+	}
+
+	ffa?.fmFolder
+    }
+
+    /**
+     * @return list of folders which are the children of the folder of which the identifier is passed as parameter
+     */
+    List<FmFolder> getChildrenFolder(String parentId) {
+	FmFolder folder = FmFolder.get(parentId)
+	FmFolder.executeQuery('''
+			from FmFolder as fd
+			where fd.activeInd = true
+			  and fd.folderFullName like :fn escape '*'
+			  and fd.folderLevel= :fl''',
+			[fl: folder.folderLevel + 1, fn: folder.folderFullName + '%'])
+    }
+
+    /**
+     * @return list of folders which are the children of the folder of which the identifier is passed as parameter by folder types
+     */
+    List<FmFolder> getChildrenFolderByType(Long parentId, String folderType) {
+	FmFolder folder = FmFolder.get(parentId)
+	FmFolder.executeQuery('''
+		from FmFolder as fd
+		where fd.activeInd = true
+		  and fd.folderFullName like :fn escape '*'
+		  and fd.folderLevel= :fl
+		  and upper(fd.folderType) = upper(:ft)''',
+		[fl: folder.folderLevel + 1, fn: folder.folderFullName + '%', ft: folderType])
+    }
+
+    /**
+     * @return list of folders which are the children of the folder of which the identifier is passed as parameter
+     */
+    List<String> getChildrenFolderTypes(Long parentId) {
+	FmFolder folder = FmFolder.get(parentId)
+	FmFolder.executeQuery('''
+		select distinct(fd.folderType)
+		from FmFolder as fd
+		where fd.activeInd = true
+		  and fd.folderFullName like :fn escape '*'
+		  and fd.folderLevel= :fl''',
+		[fl: folder.folderLevel + 1, fn: folder.folderFullName + '%'])
     }
 
     /**
      * Validates and saves folder, associated business, and metadata fields.
-     * @param folder
      * @param object associated business object or folder, if there is none
-     * @param values params
-     * @throws ValidationException if required fields are missing or error saving to database
      */
-    private void saveFolder(FmFolder folder, Object object, Map values) {
+    @Transactional
+    void saveFolder(FmFolder folder, object, GrailsParameterMap params) {
 
         AmTagTemplate template = AmTagTemplate.findByTagTemplateType(folder.folderType)
 
         // If this is new folder, then use viewInGrid items for validation, otherwise use editable items.
-        def sql
+	String column
         if (folder.id == null) {
-            sql = 'from AmTagItem ati where ati.amTagTemplate.id = :templateId and ati.viewInGrid = 1 order by displayOrder'
+	    column = 'viewInGrid'
         }
         else {
-            sql = 'from AmTagItem ati where ati.amTagTemplate.id = :templateId and ati.editable = 1 order by displayOrder'
+	    column = 'editable'
         }
-        List items = AmTagItem.findAll(sql, [templateId: template.id])
 
-        validateFolder(folder, object, items, values)
-        doSaveFolder(folder, object, template, items, values)
+	String hql = 'from AmTagItem ati where ati.amTagTemplate.id = :templateId and ati.' + column + ' = 1 order by displayOrder'
+	List<AmTagItem> items = AmTagItem.findAll(hql, [templateId: template.id])
 
+	validateFolder folder, object, items, params
+	doSaveFolder folder, object, template, items, params
     }
 
     /**
      * Validates required folder and meta data fields.
-     * @param folder
-     * @param object
-     * @param items
-     * @param values
-     * @throws ValidationException
      */
-    private void validateFolder(FmFolder folder, Object object, List items, Map values) {
+    private void validateFolder(FmFolder folder, object, List<AmTagItem> items, GrailsParameterMap params) {
 
-        if ((object instanceof Experiment) && (object.id)) {
-            def existingFolder = FmFolder.executeQuery('select ff from ' +
-                    'BioData bdu, ' +
-                    'FmFolderAssociation fla, ' +
-                    'FmFolder ff ' +
-                    'where ' +
-                    'fla.objectUid = bdu.uniqueId and ' +
-                    'fla.fmFolder = ff.id ' +
-                    'and bdu.id = ? ' +
-                    'and ff.activeInd = TRUE', [object.id])
-            if (!existingFolder.isEmpty() && (existingFolder[0] != folder)) {
-                folder.errors.rejectValue('id', 'blank', ['StudyId'] as String[], "{0} must be unique.")
+	if (object instanceof Experiment && object.id) {
+	    List<FmFolder> existingFolders = FmFolder.executeQuery('''
+			select ff
+			from BioData bdu, FmFolderAssociation fla, FmFolder ff
+			where fla.objectUid = bdu.uniqueId
+			  and fla.fmFolder = ff
+			  and bdu.id = ?
+			  and ff.activeInd = true''',
+			[object.id])
+	    if (existingFolders && existingFolders[0] != folder) {
+		folder.errors.rejectValue 'id', 'blank',
+		    ['StudyId'] as String[], '{0} must be unique.'
             }
         }
         // Validate folder specific fields, if there is no business object
         if (folder == object) {
-            List fields = [[displayName: 'Name', fieldName: 'folderName'],
-                           [displayName: 'Description', fieldName: 'description']]
-            for (field in fields) {
-                def value = values[field.fieldName]
-                if (value == null || value.length() == 0) {
-                    folder.errors.rejectValue(field.fieldName, 'blank', [field.displayName] as String[], '{0} field requires a value.')
+	    List<Map<String, String>> fields = [
+		[displayName: 'Name', fieldName: 'folderName'],
+		[displayName: 'Description', fieldName: 'description']]
+	    for (Map<String, String> field in fields) {
+		def value = params[field.fieldName]
+		if (!value) {
+		    folder.errors.rejectValue field.fieldName, 'blank',
+			[field.displayName] as String[], '{0} field requires a value.'
                 }
             }
         }
 
-        for (item in items) {
+	for (AmTagItem item in items) {
             if (item.required) {
                 def value = null
-                if (item.tagItemType.equals('FIXED')) {
-                    value = values.list(item.tagItemAttr)
-                    //					logger.info 'validate item.tagItemAtrr = ' + item.tagItemAttr + ''
+		if (item.tagItemType == 'FIXED') {
+		    value = params.list(item.tagItemAttr)
                 }
                 else {
-                    value = values.list('amTagItem_' + item.id)
-                    //					logger.info 'validate item.tagItemAtrr = amTagItem_' + item.id + ''
+		    value = params.list('amTagItem_' + item.id)
                 }
-                //				logger.info 'validate value = ' + value + ', value.size() = ' + value.size() + ''
-                if (value.size() == 0 || value[0] == null || value[0].length() == 0) {
-                    folder.errors.rejectValue('id', 'blank', [item.displayName] as String[], '{0} field requires a value.')
+		if (!value || value[0] == null || value[0].length() == 0) {
+		    folder.errors.rejectValue 'id', 'blank',
+			[item.displayName] as String[], '{0} field requires a value.'
                 }
                 // TODO: Check for max values
             }
             else {
-                logger.info item.displayName + ' not required'
+		logger.info '{} not required', item.displayName
             }
 
             //check for unique study identifer
             if (item.codeTypeName == 'STUDY_IDENTIFIER') {
-                def experiment = Experiment.findByAccession(values.list(item.tagItemAttr))
-                if ((experiment != null) && (object == experiment) && (!(object instanceof Experiment))) {
-                    folder.errors.rejectValue('id', 'blank', [item.displayName] as String[], '{0} must be unique.')
+		Experiment experiment = Experiment.findByAccession(params.list(item.tagItemAttr));
+		if (experiment && object == experiment && (!(object instanceof Experiment))) {
+		    folder.errors.rejectValue 'id', 'blank',
+			[item.displayName] as String[], '{0} must be unique.'
                 }
             }
         }
@@ -843,7 +848,6 @@ class FmFolderService {
         if (folder.hasErrors()) {
             throw new ValidationException('Validation errors occurred.', folder.errors)
         }
-
     }
 
     /**
@@ -852,26 +856,27 @@ class FmFolderService {
      * @param object associated business object or folder, if there is none
      * @param template tag template associated with folder
      * @param items items associated with template
-     * @param values field values to be saved
+     * @param params field values to be saved
      * @throws ValidationException if there are any errors persisting data to the database
      */
-    private void doSaveFolder(FmFolder folder, Object object, AmTagTemplate template, List items, Map values) {
+    private void doSaveFolder(FmFolder folder, object, AmTagTemplate template, List<AmTagItem> items,
+	                      GrailsParameterMap params) {
 
         // Save folder object
         folder.save(flush: true, failOnError: true)
 
         // Using items associated with this folder's template, set business object property values or create tags.
         for (tagItem in items) {
-            def newValue = null
-            if (tagItem.tagItemType.equals('FIXED')) {
-                newValue = values.'' + tagItem.tagItemAttr + ''
+	    def newValue
+	    if (tagItem.tagItemType == 'FIXED') {
+		newValue = params[tagItem.tagItemAttr]
                 if (newValue != null) {
-                    def value = ''
-                    if (tagItem.tagItemSubtype.equals('MULTIPICKLIST')) {
-                        newValue = values.list('' + tagItem.tagItemAttr + '')
-                        if (newValue != null && newValue != '' && newValue.size() > 0) {
-                            newValue.each {
-                                if (value != '') {
+		    String value = ''
+		    if (tagItem.tagItemSubtype == 'MULTIPICKLIST') {
+			newValue = params.list(tagItem.tagItemAttr)
+			if (newValue) {
+			    for (it in newValue) {
+				if (value) {
                                     value += '|'
                                 }
                                 value += it
@@ -881,139 +886,118 @@ class FmFolderService {
                     else {
                         value = newValue
                     }
-                    object[tagItem.tagItemAttr] = val
+		    object[tagItem.tagItemAttr] = value
                 }
             }
-            else if (tagItem.tagItemType.equals('CUSTOM')) {
-                newValue = values.'amTagItem_' + tagItem.id + ''
-                if (tagItem.tagItemSubtype.equals('FREETEXT') || tagItem.tagItemSubtype.equals('FREETEXTAREA')) {
-                    AmTagAssociation.executeUpdate('delete from AmTagAssociation as ata where ata.objectType=:objectType and ata.subjectUid=:subjectUid and ata.tagItemId=:tagItemId', [objectType: 'AM_TAG_VALUE', subjectUid: folder.getUniqueId(), tagItemId: tagItem.id])
-                    if (newValue != null && newValue != '') {
+	    else if (tagItem.tagItemType == 'CUSTOM') {
+		newValue = params['amTagItem_' + tagItem.id]
+		if (tagItem.tagItemSubtype == 'FREETEXT' || tagItem.tagItemSubtype == 'FREETEXTAREA') {
+		    AmTagAssociation.executeUpdate '''
+				delete from AmTagAssociation as ata
+				where ata.objectType=:objectType
+				and ata.subjectUid=:subjectUid
+				and ata.tagItemId=:tagItemId''',
+				[objectType: 'AM_TAG_VALUE', subjectUid: folder.uniqueId, tagItemId: tagItem.id]
+		    if (newValue) {
                         AmTagValue newTagValue = new AmTagValue(value: newValue)
                         newTagValue.save(flush: true, failOnError: true)
-                        AmTagAssociation tagAssoc = new AmTagAssociation(objectType: 'AM_TAG_VALUE', subjectUid: folder.getUniqueId(), objectUid: newTagValue.getUniqueId(), tagItemId: tagItem.id)
-                        tagAssoc.save(flush: true, failOnError: true)
-                    }
-                }
-                else if (tagItem.tagItemSubtype.equals('PICKLIST')) {
-                    AmTagAssociation.executeUpdate('delete from AmTagAssociation as ata where ata.objectType=:objectType and ata.subjectUid=:subjectUid and ata.tagItemId=:tagItemId', [objectType: 'BIO_CONCEPT_CODE', subjectUid: folder.getUniqueId(), tagItemId: tagItem.id])
-                    if (newValue != null && newValue != '') {
-                        AmTagAssociation tagAssoc = new AmTagAssociation(objectType: 'BIO_CONCEPT_CODE', subjectUid: folder.getUniqueId(), objectUid: newValue, tagItemId: tagItem.id)
-                        tagAssoc.save(flush: true, failOnError: true)
-                    }
-                }
-                else if (tagItem.tagItemSubtype.equals('MULTIPICKLIST')) {
-                    AmTagAssociation.executeUpdate('delete from AmTagAssociation as ata where ata.objectType=:objectType and ata.subjectUid=:subjectUid and ata.tagItemId=:tagItemId', [objectType: 'BIO_CONCEPT_CODE', subjectUid: folder.getUniqueId(), tagItemId: tagItem.id])
-                    newValue = values.list('amTagItem_' + tagItem.id + '')
-                    if (newValue != null && newValue != '' && newValue.size() > 0) {
-                        newValue.each {
-                            if (it) {
-                                AmTagAssociation tagAssoc = new AmTagAssociation(objectType: 'BIO_CONCEPT_CODE', subjectUid: folder.getUniqueId(), objectUid: it, tagItemId: tagItem.id)
-                                tagAssoc.save(flush: true, failOnError: true)
-                            }
-                            else {
-                                logger.error('amTagItem_' + tagItem.id + ' is null')
-                            }
+			new AmTagAssociation(
+			    objectType: 'AM_TAG_VALUE',
+			    subjectUid: folder.uniqueId,
+			    objectUid: newTagValue.uniqueId,
+			    tagItemId: tagItem.id).save(flush: true, failOnError: true)
+		    }
+		}
+		else if (tagItem.tagItemSubtype == 'PICKLIST') {
+		    AmTagAssociation.executeUpdate '''
+				delete from AmTagAssociation as ata
+				where ata.objectType=:objectType
+				and ata.subjectUid=:subjectUid
+				and ata.tagItemId=:tagItemId''',
+				[objectType: 'BIO_CONCEPT_CODE', subjectUid: folder.uniqueId, tagItemId: tagItem.id]
+		    if (newValue) {
+			new AmTagAssociation(
+			    objectType: 'BIO_CONCEPT_CODE',
+			    subjectUid: folder.uniqueId,
+			    objectUid: newValue,
+			    tagItemId: tagItem.id).save(flush: true, failOnError: true)
+		    }
+		}
+		else if (tagItem.tagItemSubtype == 'MULTIPICKLIST') {
+		    AmTagAssociation.executeUpdate '''
+			delete from AmTagAssociation as ata
+			where ata.objectType=:objectType
+			  and ata.subjectUid=:subjectUid
+			  and ata.tagItemId=:tagItemId''',
+			[objectType: 'BIO_CONCEPT_CODE', subjectUid: folder.uniqueId, tagItemId: tagItem.id]
+		    for (it in params.list('amTagItem_' + tagItem.id)) {
+                        if (it) {
+			    new AmTagAssociation(
+				objectType: 'BIO_CONCEPT_CODE',
+				subjectUid: folder.uniqueId,
+				objectUid: it,
+				tagItemId: tagItem.id).save(flush: true, failOnError: true)
+                        }
+                        else {
+			    logger.error 'amTagItem_{} is null', tagItem.id
                         }
                     }
                 }
             }
             else {
-                newValue = values.list('amTagItem_' + tagItem.id + '')
-                AmTagAssociation.executeUpdate('delete from AmTagAssociation as ata where ata.objectType=:objectType and ata.subjectUid=:subjectUid and ata.tagItemId=:tagItemId', [objectType: tagItem.tagItemType, subjectUid: folder.getUniqueId(), tagItemId: tagItem.id])
-                if (newValue != null && newValue != '' && newValue.size() > 0) {
-                    newValue.each {
-                        if (it) {
-                            AmTagAssociation tagAssoc = new AmTagAssociation(objectType: tagItem.tagItemType, subjectUid: folder.getUniqueId(), objectUid: it, tagItemId: tagItem.id)
-                            tagAssoc.save(flush: true, failOnError: true)
-                        }
-                        else {
-                            logger.error('amTagItem_' + tagItem.id + ' is null')
-                        }
+		AmTagAssociation.executeUpdate('''
+			delete from AmTagAssociation as ata
+			where ata.objectType=:objectType
+			  and ata.subjectUid=:subjectUid
+			  and ata.tagItemId=:tagItemId''',
+			[objectType: tagItem.tagItemType,
+			 subjectUid: folder.uniqueId,
+			 tagItemId: tagItem.id])
+		for (it in params.list('amTagItem_' + tagItem.id)) {
+                    if (it) {
+			new AmTagAssociation(
+			    objectType: tagItem.tagItemType,
+			    subjectUid: folder.uniqueId,
+			    objectUid: it,
+			    tagItemId: tagItem.id).save(flush: true, failOnError: true)
+                    }
+                    else {
+			logger.error 'amTagItem_{} is null', tagItem.id
                     }
                 }
             }
-
         }
 
         // Create tag template association between folder and template, if it does not already exist
-        AmTagTemplateAssociation templateAssoc = AmTagTemplateAssociation.findByObjectUid(folder.getUniqueId())
+	AmTagTemplateAssociation templateAssoc = AmTagTemplateAssociation.findByObjectUid(folder.uniqueId)
         if (templateAssoc == null) {
-            templateAssoc = new AmTagTemplateAssociation(tagTemplateId: template.id, objectUid: folder.getUniqueId())
-            templateAssoc.save(flush: true, failOnError: true)
-            def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'Browse-Create object', eventmessage: folder.folderType + ': ' + folder.folderName + ' (' + folder.getUniqueId() + ')', accesstime: new java.util.Date())
-            al.save()
+	    new AmTagTemplateAssociation(tagTemplateId: template.id, objectUid: folder.uniqueId).save(flush: true, failOnError: true)
+	    accessLogService.report 'Browse-Create object', folder.folderType + ': ' + folder.folderName + ' (' + folder.uniqueId + ')'
         }
         else {
-            def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'Browse-Modify object', eventmessage: folder.folderType + ': ' + folder.folderName + ' (' + folder.getUniqueId() + ')', accesstime: new java.util.Date())
-            al.save()
+	    accessLogService.report 'Browse-Modify object', folder.folderType + ': ' + folder.folderName + ' (' + folder.uniqueId + ')'
         }
 
         // If there is business object associated with folder, then save it and create association, if it does not exist.
         if (object != folder) {
-            //			logger.info 'FmFolderService.saveFolder object.properties = ' + object.properties + ''
             object.save(flush: true, failOnError: true)
             FmFolderAssociation folderAssoc = FmFolderAssociation.findByFmFolder(folder)
-            if (folderAssoc == null) {
-                BioData bioData = BioData.get(object.id)
-                folderAssoc = new FmFolderAssociation(objectUid: bioData.uniqueId, objectType: object.getClass().getName(), fmFolder: folder)
-                folderAssoc.save(flush: true, failOnError: true)
-            }
+	    if (!folderAssoc) {
+		new FmFolderAssociation(
+		    objectUid: BioData.get(object.id).uniqueId,
+		    objectType: object.getClass().name,
+		    fmFolder: folder).save(flush: true, failOnError: true)
+	    }
         }
     }
 
-    /**
-     * Helper method to check whether a folder's parent program is included in the current search results.
-     *
-     * @param folderSearchString The current search string
-     * @param folderFullName The folder's full path (from which the program UID can be extracted).
-     * @return
-     */
-    def searchMatchesParentProgram(folderSearchString, folderFullName) {
-        def paths = folderSearchString.split(',')
-        def index = folderFullName.indexOf('\\', 1)
-        def programUID = folderFullName.substring(1, index)
-        return ('\\' + programUID + '\\' in paths)
-    }
-
-    def getFolderByBioDataObject(bioDataObject) {
-        def uniqueId = bioDataObject?.getUniqueId()?.uniqueId
-        if (!uniqueId) {
-            logger.error('No unique ID found for bio object ' + bioDataObject?.id)
-            return null
-        }
-        FmFolderAssociation ffa = FmFolderAssociation.findByObjectUid(uniqueId)
-        if (!ffa) {
-            logger.error('No fmFolderAssociation found for unique ID ' + uniqueId)
-        }
-        return ffa?.fmFolder
-    }
-
-    /**
-     * @param parentId
-     * @return list of folders which are the children of the folder of which the identifier is passed as parameter
-     */
-    List<FmFolder> getChildrenFolder(String parentId) {
-        def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
-    }
-
-    /**
-     * @param parentId
-     * @return list of folders which are the children of the folder of which the identifier is passed as parameter by folder types
-     */
-    List<FmFolder> getChildrenFolderByType(Long parentId, String folderType) {
-        def folder = FmFolder.get(parentId)
-        return FmFolder.executeQuery("from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl and upper(fd.folderType) = upper(:ft)", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%", ft: folderType])
-    }
-
-    /**
-     * @param parentId
-     * @return list of folders which are the children of the folder of which the identifier is passed as parameter
-     */
-    List getChildrenFolderTypes(Long parentId) {
-        def folder = FmFolder.get(parentId)
-        logger.info 'escaped query for parentId ' + parentId + ' folderFullname ' + folder.folderFullName + ''
-        return FmFolder.executeQuery("select distinct(fd.folderType) from FmFolder as fd where fd.activeInd = true and fd.folderFullName like :fn escape '*' and fd.folderLevel= :fl ", [fl: folder.folderLevel + 1, fn: folder.folderFullName + "%"])
+    private boolean save(o) {
+	if (o.save(flush: true)) {
+	    true
+	}
+	else {
+	    logger.error '{}', utilService.errorStrings(o)
+	    false
+	}
     }
 }

@@ -7,6 +7,7 @@ import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.dataquery.highdim.HighDimensionResource
+import org.transmartproject.core.dataquery.highdim.projections.AllDataProjection
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.core.exceptions.NoSuchResourceException
 
@@ -14,63 +15,67 @@ import javax.annotation.PostConstruct
 
 @Slf4j('logger')
 class TabSeparatedExporter implements HighDimExporter {
-    final static String SEPARATOR = '\t'
+    static final String SEPARATOR = '\t'
 
-    @Autowired
-    HighDimensionResource highDimensionResourceService
+    // These maps specify the row header in the output file for each database field name.
+    private static final Map translationMap = [
+	rawIntensity: 'value',
+	intensity   : 'value',
+	value       : 'value',
+	logIntensity: 'log2e',
+	zscore      : 'zscore',
 
-    @Autowired
-    HighDimExporterRegistry highDimExporterRegistry
+	geneSymbol  : 'gene symbol',
+	geneId      : 'gene id',
+	mirnaId     : 'mirna id',
+	peptide     : 'peptide sequence',
+	antigenName : 'analyte name',
+	uniprotId   : 'uniprot id',
+	transcriptId: 'transcript id'].asImmutable()
+
+    @Autowired HighDimensionResource highDimensionResourceService
+    @Autowired HighDimExporterRegistry highDimExporterRegistry
 
     @PostConstruct
     void init() {
-        this.highDimExporterRegistry.registerHighDimensionExporter(
-                format, this)
+	highDimExporterRegistry.registerHighDimensionExporter format, this
     }
 
-    @Override
-    public boolean isDataTypeSupported(String dataType) {
+    boolean isDataTypeSupported(String dataType) {
         // Each datatype that supports the projection used
         // can be exported as tsv
         try {
             HighDimensionDataTypeResource dataTypeResource =
-                    highDimensionResourceService.getSubResourceForType(dataType)
-            return projection in
-                    dataTypeResource.supportedProjections
+                highDimensionResourceService.getSubResourceForType(dataType)
+	    projection in dataTypeResource.supportedProjections
         }
         catch (NoSuchResourceException e) {
             // No resource found for datatype, so not supported.
-            logger.warn(e.getMessage())
-            return false
+	    logger.warn e.message
+	    false
         }
     }
 
-    @Override
-    public String getFormat() {
-        return 'TSV'
+    String getFormat() {
+	'TSV'
     }
 
-    @Override
-    public String getDescription() {
-        return 'Tab separated file'
+    String getDescription() {
+	'Tab separated file'
     }
 
-    @Override
-    public void export(TabularResult tabularResult, Projection projection,
-                       Closure<OutputStream> newOutputStream) {
-        export(tabularResult, projection, newOutputStream, { false })
-    }
+    void export(TabularResult tabularResult, Projection proj,
+	        Closure<OutputStream> newOutputStream, Closure<Boolean> isCancelled = null) {
 
-    @Override
-    public void export(TabularResult tabularResult, Projection projection,
-                       Closure<OutputStream> newOutputStream, Closure<Boolean> isCancelled) {
+	logger.info 'started exporting to {}', format
 
-        logger.info('started exporting to ' + format + ' ')
-        def startTime = System.currentTimeMillis()
-
-        if (isCancelled()) {
+	if (isCancelled && isCancelled()) {
             return
         }
+
+	AllDataProjection projection = proj
+
+	long startTime = System.currentTimeMillis()
 
         // Determine the fields to be exported, and the label they get
         Map<String, String> dataKeys = projection.dataProperties.collectEntries {
@@ -80,50 +85,47 @@ class TabSeparatedExporter implements HighDimExporter {
             [it.key, getFieldTranslation(it.key).toUpperCase()]
         }
 
-        newOutputStream('data', format).withWriter('UTF-8') { writer ->
+	newOutputStream('data', format).withWriter('UTF-8') { Writer writer ->
 
             // First write the header
-            writeLine(writer, createHeader(dataKeys.values() + rowKeys.values()))
+	    writeLine writer, createHeader(dataKeys.values() + rowKeys.values())
 
             // Determine the order of the assays
             List<AssayColumn> assayList = tabularResult.indicesList
 
             // Start looping 
-            for (DataRow<AssayColumn, Object> datarow : tabularResult) {
+	    for (DataRow<AssayColumn, Object> datarow in tabularResult) {
                 // Test periodically if the export is cancelled
-                if (isCancelled()) {
+		if (isCancelled && isCancelled()) {
                     return null
                 }
 
-                for (AssayColumn assay : assayList) {
-                    // Retrieve data for the current assay from the datarow
-                    def data = datarow[assay]
-
+		for (AssayColumn assay in assayList) {
+		    // Retrieve data for the current assay from the datarow
+		    def data = datarow[assay]
                     if (data == null) {
                         continue
                     }
 
                     // Add values for default columns
-                    List<String> line = [
-                            assay.id,
-                    ]
+		    List<String> line = [assay.id]
 
                     // Return data for this specific assay
-                    for (String dataField : dataKeys.keySet()) {
+		    for (String dataField in dataKeys.keySet()) {
                         line << data[dataField]
                     }
 
                     // Return generic data for the row.
-                    for (String rowField : rowKeys.keySet()) {
-                        line << datarow."$rowField"
+		    for (String rowField in rowKeys.keySet()) {
+			line << datarow[rowField]
                     }
 
-                    writeLine(writer, line)
+		    writeLine writer, line
                 }
             }
         }
 
-        logger.info('Exporting data took ' + System.currentTimeMillis() - startTime + ' ms')
+	logger.info 'Exporting data took {} ms', System.currentTimeMillis() - startTime
     }
 
     /**
@@ -133,9 +135,7 @@ class TabSeparatedExporter implements HighDimExporter {
      * @return List of headers to be put into the output file
      */
     protected List<String> createHeader(List additionalHeaderFields) {
-        [
-                'Assay ID',
-        ] + (additionalHeaderFields ?: [])
+	['Assay ID'] + (additionalHeaderFields ?: [])
     }
 
     /**
@@ -146,24 +146,7 @@ class TabSeparatedExporter implements HighDimExporter {
      * @return A translation from a database field name to a field name in the output file
      */
     protected String getFieldTranslation(String fieldname) {
-        // These maps specify the row header in the output file for each database field name.
-        Map translationMap = [
-                rawIntensity: 'value',
-                intensity   : 'value',
-                value       : 'value',
-                logIntensity: 'log2e',
-                zscore      : 'zscore',
-
-                geneSymbol  : 'gene symbol',
-                geneId      : 'gene id',
-                mirnaId     : 'mirna id',
-                peptide     : 'peptide sequence',
-                antigenName : 'analyte name',
-                uniprotId   : 'uniprot id',
-                transcriptId: 'transcript id'
-        ]
-
-        translationMap.get(fieldname, fieldname)
+	translationMap.get(fieldname) ?: fieldname
     }
 
     /**
@@ -173,12 +156,9 @@ class TabSeparatedExporter implements HighDimExporter {
      */
     protected void writeLine(Writer writer, List<String> data) {
         writer << data.join(SEPARATOR) << '\n'
-
     }
 
-    @Override
-    public String getProjection() {
+    String getProjection() {
         Projection.ALL_DATA_PROJECTION
     }
-
 }

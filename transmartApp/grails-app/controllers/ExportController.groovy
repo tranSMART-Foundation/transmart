@@ -1,111 +1,87 @@
-/**
- * $Id: ExportController.groovy 10098 2011-10-19 18:39:32Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 10098 $
- *
- */
 import grails.converters.JSON
 import groovy.util.logging.Slf4j
-import org.transmart.searchapp.AuthUser
+import org.transmart.plugin.shared.UtilService
 
-import javax.servlet.ServletOutputStream
-
+/**
+ * @author mmcduffie
+ */
 @Slf4j('logger')
 class ExportController {
 
-    def index = {}
-    def i2b2HelperService
-    def springSecurityService
-    def dataCountService
+    I2b2HelperService i2b2HelperService
+    UtilService utilService
 
-    def exportSecurityCheck = {
-        logger.debug('Check export security')
-        String rid1 = request.getParameter('result_instance_id1')
-        String rid2 = request.getParameter('result_instance_id2')
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-        def canExport = CanExport(user, rid1, rid2)
-        logger.debug('CANEXPORT:' + canExport)
-        def result = [canExport: canExport]
-        logger.trace(result as JSON)
-        render result as JSON
+    def index() {}
+
+    def exportSecurityCheck(String result_instance_id1, String result_instance_id2) {
+	logger.debug 'Check export security'
+	boolean canExport = canExport(result_instance_id1, result_instance_id2)
+	logger.debug 'CANEXPORT:{}', canExport
+	render([canExport: canExport] as JSON)
     }
 
-    private boolean CanExport(AuthUser user, String rid1, String rid2) {
-        def trials = i2b2HelperService.getDistinctTrialsInPatientSets(rid1, rid2)
-        def sectokens = i2b2HelperService.getSecureTokensWithAccessForUser(user)
-        for (String it : trials) {
-            if (!sectokens.containsKey(it)) {
-                logger.debug('not found key in export check:' + it)
-                return false; //short circuit if found a single one that isnt in the tokens collection
+    private boolean canExport(String rid1, String rid2) {
+	def sectokens = i2b2HelperService.getSecureTokensWithAccessForUser()
+	for (String trial in i2b2HelperService.getDistinctTrialsInPatientSets(rid1, rid2)) {
+	    if (!sectokens.containsKey(trial)) {
+		logger.debug 'not found key in export check:{}', trial
+		return false //short circuit if found a single one that isnt in the tokens collection
+	    }
 
-            }
-            else if (sectokens.containsKey(it)) {
-                logger.debug('checking found key:' + it + ':' + sectokens[it])
-                logger.debug('equals own:' + sectokens[it].equals('OWN'))
-                logger.debug('equals export:' + sectokens[it].equals('EXPORT'))
-                if (!(sectokens[it].equals('OWN')) & !(sectokens[it].equals('EXPORT'))) {
-		   //if not export or own then also return false
-                    logger.debug('in return false inner')
-                    return false
-                }
+	    logger.debug 'checking found key:{}:{}', trial, sectokens[trial]
+	    logger.debug 'equals own:{}', sectokens[trial] == 'OWN'
+	    logger.debug 'equals export:{}', sectokens[trial] == 'EXPORT'
+	    if (sectokens[trial] != 'OWN' & sectokens[trial] != 'EXPORT') {//if not export or own then also return false
+		logger.debug 'in return false inner'
+                return false
             }
         }
-        logger.debug('made it to end of loop so the user can export')
-        return true
+
+	logger.debug 'made it to end of loop so the user can export'
+	true
     }
 
     /**
      * Checks to see if the user has run at least one heatmap.  If so, return true
-     * so we can export the file.  If not, notify the client so they can alert the
-     * user.
+     * so we can export the file.  If not, notify the client so they can alert the user.
      */
-    def check = {
-        boolean exportReady = session.expdsfilename != null
-        //   PrintWriter pw=new PrintWriter(response.getOutputStream())
-        //	pw.write(exportReady.toString())
-        //	pw.flush()
-        def result = [ready: exportReady]
-        render result as JSON
+    def check() {
+	render([ready: session.expdsfilename != null] as JSON)
     }
 
     /**
-     * This method simply just takes the stored csv file that was stored and presents
+     * Simply just takes the stored csv file that was stored and presents
      * it to the user.  Kinda silly to save it locally and then just restream it to the
      * user but we'll leave that for now.  We could also cache the initial results
      * or just take the tab separated values that are saved, convert it and then
      * send it to the user.
      */
-    def exportDataset = {
-        logger.debug('Export filename: ' + session.expdsfilename)
-        byte[] bytes = new String('No data to export').getBytes()
-        if (session.expdsfilename != null) {
-            logger.debug('Made it to exportDataset for file: ' + session.expdsfilename)
-            File testFile = new File(session.expdsfilename)
-            InputStream is = new FileInputStream(testFile)
-            long fLen = testFile.length()
-            logger.debug('Length: ' + fLen)
-            bytes = new byte[(int) fLen]
+    def exportDataset() {
+	String expdsfilename = session.expdsfilename
+	logger.debug 'Export filename: {}', expdsfilename
+	byte[] bytes = 'No data to export'.bytes
+	if (expdsfilename != null) {
+	    logger.debug 'Made it to exportDataset for file: {}', expdsfilename
+	    File testFile = new File(expdsfilename)
+	    InputStream inputStream = new FileInputStream(testFile)
+	    long length = testFile.length()
+	    logger.debug 'Length: {}', length
+	    bytes = new byte[(int) length]
             int offset = 0
             int numRead = 0
-            while (offset < bytes.length && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+	    while (offset < bytes.length && (numRead = inputStream.read(bytes, offset, bytes.length - offset)) >= 0) {
                 offset += numRead
             } // Ensure all the bytes have been read in
 
             if (offset < bytes.length) {
-                throw new IOException('Could not completely read file ' + file.getName())
+		throw new IOException('Could not completely read file ' + expdsfilename)
             }
 
-            is.close()
+	    inputStream.close()
         }
 
         int outputSize = bytes.length
-        logger.debug('Size of bytes: ' + outputSize)
-        response.setContentType('text/csv')
-        response.setHeader('Content-disposition', 'attachment; filename=' + 'exportdatasets.csv')
-        response.setContentLength(outputSize)
-        ServletOutputStream servletoutputstream = response.getOutputStream()
-        servletoutputstream.write(bytes)
-        servletoutputstream.flush()
-
+	logger.debug 'Size of bytes: {}', outputSize
+	utilService.sendDownload response, 'text/csv', 'exportdatasets.csv', bytes
     }
 }

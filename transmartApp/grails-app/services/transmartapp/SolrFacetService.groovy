@@ -2,636 +2,471 @@ package transmartapp
 
 import fm.FmFolder
 import fm.FmFolderAssociation
-import grails.util.Holders
+import fm.FmFolderService
 import groovy.util.logging.Slf4j
+import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NoChildren
 import groovy.util.slurpersupport.NodeChild
-import groovy.xml.StreamingMarkupBuilder
-import org.json.JSONObject
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.BioMarker
 import org.transmart.biomart.BioMarkerExpAnalysisMV
-import org.transmartproject.db.support.InQuery
 
 @Slf4j('logger')
 class SolrFacetService {
 
-    def ontologyService
-    def fmFolderService
+    static transactional = false
 
-    boolean transactional = true
-    def searchLog = [] //Search log for debug only! Will be shared across all sessions
+    @Autowired private FmFolderService fmFolderService
+    @Autowired private OntologyService ontologyService
 
-    def getCombinedResults(categoryList, page, globalOperator, passedInSearchLog) {
+    @Value('${com.rwg.solr.browse.path:}')
+    private String solrBrowsePath
+
+    @Value('${com.rwg.solr.host:}')
+    private String solrHost
+
+    @Value('${com.rwg.solr.scheme:}')
+    private String solrScheme
+
+    @Value('${com.rwg.solr.update.path:}')
+    private String solrUpdatePath
+
+    private List searchLog = [] //Search log for debug only! Will be shared across all sessions
+
+    Map getCombinedResults(List<String> categoryList, String page, String globalOperator, List<String> passedInSearchLog) {
 
         String solrRequestUrl = createSOLRQueryPath()
 
-        def searchResultIds = []
+	List<String> searchResultIds = []
         searchLog = passedInSearchLog
 
-        //boolean to see if it is the first category. It is used for the search with AND operator: 
-        def firstCategory = true
+	// whether it is the first category. It is used for the search with AND operator:
+	boolean firstCategory = true
 
         //For each category (except Datanode), construct a SOLR query
-        for (category in categoryList) {
-            searchLog += ' - - - Examining category: ' + category
+	for (String category in categoryList) {
+	    searchLog << ' - - - Examining category: ' + category
             //Split off the operator with ::
-            category = ((String) category)
-            def operator = category.split('::')[1].toUpperCase()
+	    String operator = category.split('::')[1].toUpperCase()
             category = category.split('::')[0]
 
-            def categoryName = category.split(':', 2)[0]
-            def termList = category.split(':', 2)[1].split('\\|')
+	    String categoryName = category.split(':', 2)[0]
+	    String[] termList = category.split(':', 2)[1].split('\\|')
 
             //If in Browse, we're gathering folder paths. If in Analyze, we want i2b2 paths
             //CategoryResultIds is used to gather IDs returned by this category - always add to this list, don't intersect (producing OR).
-            def categoryResultIds = []
+	    List<String> categoryResultIds = []
 
-            /*
-            * Start HERE if we're looking for metadata (anything other than text)
-            */
-            if (!categoryName.equals('text')) {
+	    // Start HERE if we're looking for metadata (anything other than text)
+	    if (categoryName != 'text') {
                 //Make this metadata field into a SOLR query
-                searchLog += 'Searching for metadata: ' + termList.join(',')
+		searchLog << 'Searching for metadata: ' + termList.join(',')
 
-                def categoryQuery = createCategoryQueryString(categoryName, termList, operator)
-                def solrQuery = 'q=' + createSOLRQueryString(URLEncoder.encode(categoryQuery), '', '')
-                searchLog += solrQuery
-                def xml = executeSOLRFacetedQuery(solrRequestUrl, solrQuery, false)
+		String categoryQuery = createCategoryQueryString(categoryName, termList, operator)
+		String solrQuery = 'q=' + createSOLRQueryString(URLEncoder.encode(categoryQuery), '', '')
+		searchLog << solrQuery
+		GPathResult xml = executeSOLRFacetedQuery(solrRequestUrl, solrQuery)
 
                 //If browse, convert this to a folder path list - if analyze, a node path list
-                if (page.equals('RWG')) {
-                    categoryResultIds += getFolderList(xml)
-                    if (categoryName.equals('GENE')) {
-                        searchLog += 'Getting browse folders for gene categories...'
-                        categoryResultIds += getAnalysesForGenes(termList, operator, false)
+		if (page == 'RWG') {
+		    categoryResultIds.addAll getFolderList(xml)
+		    if (categoryName == 'GENE') {
+			searchLog << 'Getting analyses for gene categories...'
+			categoryResultIds.addAll getAnalysesForGenes(termList, operator, false)
                     }
                 }
                 else {
-                    categoryResultIds += getNodesByAccession(getAccessions(xml))
-                    if (categoryName.equals('GENE')) {
-                        searchLog += 'Getting analyses for gene categories...'
-                        categoryResultIds += getAnalysesForGenes(termList, operator, true)
+		    categoryResultIds.addAll getNodesByAccession(getAccessions(xml))
+		    if (categoryName == 'GENE') {
+			searchLog << 'Getting analyses for gene categories...'
+			categoryResultIds.addAll getAnalysesForGenes(termList, operator, true)
                     }
                 }
             }
-
-            /*
-            * Start HERE if we're looking for text - and include datanodes (as OR)
-            */
+	    // Start HERE if we're looking for text - and include datanodes (as OR)
             else {
                 //Content: Get the list of terms, and search in text field OR the data nodes
-                searchLog += 'Searching for freetext: ' + termList.join(',')
+		searchLog << 'Searching for freetext: ' + termList.join(',')
 
-                def categoryQuery = createCategoryQueryString('text', termList, operator)
-                def solrQuery = 'q=' + createSOLRQueryString(URLEncoder.encode(categoryQuery), '', '')
-                searchLog += solrQuery
+		String categoryQuery = createCategoryQueryString('text', termList, operator)
+		String solrQuery = 'q=' + createSOLRQueryString(URLEncoder.encode(categoryQuery), '', '')
+		searchLog << solrQuery
 
-                def xml = executeSOLRFacetedQuery(solrRequestUrl, solrQuery, false)
+		GPathResult xml = executeSOLRFacetedQuery(solrRequestUrl, solrQuery)
 
                 //If browse, convert this to a folder path list - if analyze, a node path list
-                if (page.equals('RWG')) {
-                    categoryResultIds += getFolderList(xml)
+		if (page == 'RWG') {
+		    categoryResultIds.addAll getFolderList(xml)
                 }
                 else {
-                    categoryResultIds += getNodesByAccession(getAccessions(xml))
+		    categoryResultIds.addAll getNodesByAccession(getAccessions(xml))
                 }
 
                 //If browse, get the studies from SOLR that correspond to the returned accessions - if analyze, just add the paths.
-                if (page.equals('RWG')) {
-                    searchLog += 'Getting accessions for datanode search: ' + termList
+		if (page == 'RWG') {
+		    searchLog << 'Getting accessions for datanode search: ' + termList
                     def ontologyAccessions = ontologyService.searchOntology(null, termList, 'ALL', 'accession', null, operator)
 
                     if (ontologyAccessions) {
-                        def solrQueryString = ''
+			StringBuilder sb = new StringBuilder()
 
                         for (accession in ontologyAccessions) {
-                            searchLog += ('Got accession from i2b2 search: ' + accession)
-
-                            if (solrQueryString) {
-                                solrQueryString += ' OR '
+			    searchLog << 'Got accession from i2b2 search: ' + accession
+			    if (sb) {
+				sb << ' OR '
                             }
-
-                            solrQueryString += 'ACCESSION:\'' + accession + '\''
+			    sb << 'ACCESSION:"' << accession << '"'
                         }
 
-                        solrQueryString = 'q=(' + solrQueryString + ')&facet=false&rows=1000'
+			String solrQueryString = 'q=(' + sb + ')&facet=false&rows=1000'
 
-                        searchLog += 'Searching SOLR for studies with accessions: ' + solrQueryString
-                        xml = executeSOLRFacetedQuery(solrRequestUrl, solrQueryString, false)
-                        categoryResultIds += getFolderList(xml)
+			searchLog << 'Searching SOLR for studies with accessions: ' + solrQueryString
+			xml = executeSOLRFacetedQuery(solrRequestUrl, solrQueryString)
+			categoryResultIds.addAll getFolderList(xml)
                     }
                     else {
-                        searchLog += 'No accessions found.'
+			searchLog << 'No accessions found.'
                     }
                 }
                 else {
-                    searchLog += 'Getting paths for datanode search: ' + termList
-                    categoryResultIds += ontologyService.searchOntology(null, termList, 'ALL', 'path', null, operator)
+		    searchLog << 'Getting paths for datanode search: ' + termList
+		    categoryResultIds.addAll ontologyService.searchOntology(
+			null, termList, 'ALL', 'path', null, operator)
                 }
             }
 
-            searchLog += 'Category result IDs: ' + categoryResultIds
+	    searchLog << 'Category result IDs: ' + categoryResultIds
 
             //If the master searchResultsIds list is empty, copy this in - otherwise intersect.
             //If we have nothing for a search category during an AND search, return nothing immediately!
-            if (!categoryResultIds && globalOperator.equals('AND')) {
-                searchLog += 'No results for this category during an AND search - stopping.'
+	    if (!categoryResultIds && globalOperator == 'AND') {
+		searchLog << 'No results for this category during an AND search - stopping.'
                 return [paths: [], searchLog: searchLog]
             }
 
             if (!searchResultIds) {
                 if (firstCategory) {
-                    searchLog += 'Starting search results list with the above IDs.'
+		    searchLog << 'Starting search results list with the above IDs.'
                     searchResultIds = categoryResultIds
                     firstCategory = false
                 }
                 else {
-                    searchLog += 'Starting search results list with empty list.'
+		    searchLog << 'Starting search results list with empty list.'
                     searchResultIds = []
                 }
             }
             else {
-                searchLog += 'Search results so far are these IDs: ' + searchResultIds
-                if (globalOperator.equals('AND')) {
-                    searchLog += 'Doing hierarchical intersect for AND search.'
+		searchLog << 'Search results so far are these IDs: ' + searchResultIds
+		if (globalOperator == 'AND') {
+		    searchLog << 'Doing hierarchical intersect for AND search.'
                     searchResultIds = hierarchicalIntersect(searchResultIds, categoryResultIds)
                 }
                 else {
-                    searchLog += 'Combining for OR search.'
-                    searchResultIds = searchResultIds + categoryResultIds
+		    searchLog << 'Combining for OR search.'
+		    searchResultIds.addAll categoryResultIds
                 }
-                searchLog += 'Search results after combining: ' + searchResultIds
-            }
-
+		searchLog << 'Search results after combining: ' + searchResultIds
+	    }
         }
 
         //And return the complete list of folder/i2b2 paths!
-        return [paths: searchResultIds, searchLog: searchLog]
-
+	[paths: searchResultIds, searchLog: searchLog]
     }
 
-    def getAnalysesForGenes(termList, operator, convertToNodes) {
+    private List<String> getAnalysesForGenes(String[] termList, String operator, boolean convertToNodes) {
         //We get a list of genes here - slash-delimited for OR.
         //For each set of terms, create a list then check against materialized view.
-        def analysisResults = []
+	List<BioAssayAnalysis> analysisResults = []
 
-        for (geneList in termList) {
-            searchLog += 'Getting analyses for genes: ' + geneList
-            def geneUids = geneList.split('/')
-            def bioMarkers = []
-            for (uid in geneUids) {
-                bioMarkers.push(BioMarker.findByUniqueId(uid))
+	for (String geneList in termList) {
+	    searchLog << 'Getting analyses for genes: ' + geneList
+	    List<BioMarker> bioMarkers = []
+	    for (String uid in geneList.split('/')) {
+		bioMarkers << BioMarker.findByUniqueId(uid)
+	    }
+	    List<BioMarkerExpAnalysisMV> result = BioMarkerExpAnalysisMV.createCriteria().list {
+		'in'('marker', bioMarkers)
             }
-            def result = InQuery.addIn(BioMarkerExpAnalysisMV.createCriteria(), 'marker', bioMarkers).list()
 
-            searchLog += 'Found ' + result.size() + ' analysis matches'
+	    searchLog << 'Found ' + result.size() + ' analysis matches'
 
             //Union or intersection, as needed by AND/OR
-            if (operator.equals('OR')) {
-                analysisResults += result*.analysis
+	    if (operator == 'OR') {
+		analysisResults.addAll result*.analysis
             }
             else {
                 if (!result) {
                     return []
                 }
+
+                if (!analysisResults) {
+                    analysisResults = result*.analysis
+                }
                 else {
-                    if (!analysisResults) {
-                        analysisResults = result*.analysis
-                    }
-                    else {
-                        def newAnalyses = result*.analysis
-                        //Manually intersect
-                        def newResults = []
-                        for (aResult in analysisResults) {
-                            for (newResult in newAnalyses) {
-                                if (aResult.id == newResult.id) {
-                                    newResults.add(aResult)
-                                }
+		    List<BioAssayAnalysis> newAnalyses = result*.analysis
+                    //Manually intersect
+		    List<BioAssayAnalysis> newResults = []
+		    for (BioAssayAnalysis aResult in analysisResults) {
+			for (BioAssayAnalysis newResult in newAnalyses) {
+                            if (aResult.id == newResult.id) {
+				newResults << aResult
                             }
                         }
-                        analysisResults = newResults
-                        if (!analysisResults) {
-                            return []
-                        }
+                    }
+                    analysisResults = newResults
+                    if (!analysisResults) {
+                        return []
                     }
                 }
             }
         }
 
-        searchLog += 'Final analysis ID list: ' + (analysisResults*.id).join(', ')
+	searchLog << 'Final analysis ID list: ' + (analysisResults*.id).join(', ')
 
         //Convert to folder UIDs, then convert to nodes if needed
-        def folders = []
-        for (result in analysisResults) {
-            def folderAssoc = FmFolderAssociation.findByObjectUid(result.getUniqueId().uniqueId)
+	List<FmFolder> folders = []
+	for (BioAssayAnalysis result in analysisResults) {
+	    FmFolderAssociation folderAssoc = FmFolderAssociation.findByObjectUid(result.uniqueId.uniqueId)
             if (folderAssoc) {
-                def folder = folderAssoc.fmFolder
-                if (folder.activeInd) folders.push(folder)
+		FmFolder folder = folderAssoc.fmFolder
+		if (folder.activeInd) {
+		    folders << folder
+		}
             }
         }
 
-        if (convertToNodes) {
-            def accessions = []
-            for (fmFolder in folders) {
-                searchLog += 'Finding associated accession for folder: ' + fmFolder.folderFullName
-                def accession = fmFolderService.getAssociatedAccession(fmFolder)
-                if (accession) {
-                    searchLog += 'Got accession: ' + accession
-                    accessions.push(accession)
-                }
-                else {
-                    searchLog += 'No accession found'
-                }
-            }
-            return getNodesByAccession(accessions)
+	if (!convertToNodes) {
+	    return folders*.folderFullName
         }
-        else {
-            def paths = []
-            for (folder in folders) {
-                paths.push(folder.folderFullName)
+
+	List<String> accessions = []
+	for (FmFolder fmFolder in folders) {
+	    searchLog << 'Finding associated accession for folder: ' + fmFolder.folderFullName
+	    String accession = fmFolderService.getAssociatedAccession(fmFolder)
+	    if (accession) {
+		searchLog << 'Got accession: ' + accession
+		accessions << accession
             }
-            return paths
+            else {
+		searchLog << 'No accession found'
+            }
         }
+
+	getNodesByAccession accessions
     }
 
-    def hierarchicalIntersect(searchResults, categoryResults) {
+    private List<String> hierarchicalIntersect(List<String> searchResults, List<String> categoryResults) {
 
-        def newSearchResults = []
+	List<String> newSearchResults = []
 
         //Add both sets of results to a map - folder/annotation.
-        def oldMap = [:]
-        def newMap = [:]
-        for (s in searchResults) {
-            oldMap.put(s, [])
+	Map<String, List<String>> oldMap = [:]
+	Map<String, List<String>> newMap = [:]
+	for (String s in searchResults) {
+	    oldMap[s] = []
         }
-        for (c in categoryResults) {
-            newMap.put(c, [])
+	for (String c in categoryResults) {
+	    newMap[c] = []
         }
 
-        //Iterate over both maps, annotating items according to whether old result is a superset, new result is a superset/match, or a conflict is created.
-        def oldKeys = oldMap.keySet()
-        def newKeys = newMap.keySet()
+	// Iterate over both maps, annotating items according to whether old result is a superset,
+	// new result is a superset/match, or a conflict is created.
 
-        for (nk in newKeys) {
-            for (ok in oldKeys) {
+	for (String nk in newMap.keySet()) {
+	    for (String ok in oldMap.keySet()) {
                 if (nk.startsWith(ok)) {
-                    newMap[nk].push('N')
-                    oldMap[ok].push('N')
-                } else if (ok.startsWith(nk)) { //Equal will have been handled above
-                    newMap[nk].push('O')
-                    oldMap[ok].push('O')
+		    newMap[nk] << 'N'
+		    oldMap[ok] << 'N'
+		}
+		else if (ok.startsWith(nk)) { //Equal will have been handled above
+		    newMap[nk] << 'O'
+		    oldMap[ok] << 'O'
                 }
             }
         }
 
         //Take Os from old keys, Ns from new keys
-        for (nk in newKeys) {
+	for (nk in newMap.keySet()) {
             if (newMap[nk].contains('N') && !newSearchResults.contains(nk)) {
-                newSearchResults.push(nk)
+		newSearchResults << nk
             }
         }
-        for (ok in oldKeys) {
+	for (ok in oldMap.keySet()) {
             if (oldMap[ok].contains('O') && !newSearchResults.contains(ok)) {
-                newSearchResults.push(ok)
+		newSearchResults << ok
             }
         }
 
-
-        return newSearchResults
-
+	newSearchResults
     }
 
-
-    def getNodesByAccession(accessions) {
+    private List<String> getNodesByAccession(List<String> accessions) {
         if (!accessions) {
             return []
         }
 
         //If we have any accessions, return the node paths from i2b2 (on the study level)
-        else {
-            searchLog += 'Finding study paths in i2b2 with these accessions: ' + accessions
-            def results = ontologyService.searchOntology(null, null, 'ALL', 'path', accessions, "")
-            searchLog += 'Got paths: ' + results
-            return results
-        }
+	searchLog << 'Finding study paths in i2b2 with these accessions: ' + accessions
+	List<String> results = ontologyService.searchOntology(
+	    null, null, 'ALL', 'path', accessions, '')
+	searchLog << 'Got paths: ' + results
+	results
     }
 
-    def getAccessions(xml) {
-        searchLog += 'Getting accessions from SOLR search results'
-        def result = new StreamingMarkupBuilder().bind {
-            mkp.yield xml
-        }
+    private List<String> getAccessions(xml) {
+	searchLog << 'Getting accessions from SOLR search results'
 
-        def resultNodes = xml.result.doc
+	List<String> accessions = []
 
-        def accessions = []
+	for (node in xml.result.doc) {
 
-        for (node in resultNodes) {
-
-            def folderId
+	    String folderId
             //Use 'folder' if this is a file result, 'id' otherwise
             def folderNode = node.str.findAll { it.@name == 'folder' }
             if (folderNode.size() > 0) {
                 folderId = folderNode.text()
-                searchLog += 'Got folder ID from SOLR file result: ' + folderId
+		searchLog << 'Got folder ID from SOLR file result: ' + folderId
             }
             else {
                 def idNode = node.str.findAll { it.@name == 'id' }
                 if (idNode.size() > 0) {
                     folderId = idNode.text()
-                    searchLog += 'Got folder ID from SOLR folder result: ' + folderId
+		    searchLog << 'Got folder ID from SOLR folder result: ' + folderId
                 }
                 else {
                     logger.error 'SolrFacetService.getAccessions: result node does not contain an id or folder'
                 }
             }
 
-            def fmFolder = FmFolder.findByUniqueId(folderId)
-            searchLog += 'Finding associated accession for folder: ' + folderId
-            def accession = fmFolderService.getAssociatedAccession(fmFolder)
+	    FmFolder fmFolder = FmFolder.findByUniqueId(folderId)
+	    searchLog << 'Finding associated accession for folder: ' + folderId
+	    String accession = fmFolderService.getAssociatedAccession(fmFolder)
             if (accession) {
-                searchLog += 'Got accession: ' + accession
-                accessions.push(accession)
+		searchLog << 'Got accession: ' + accession
+		accessions << accession
             }
             else {
-                searchLog += 'No accession found'
+		searchLog << 'No accession found'
             }
         }
 
-        return accessions
+	accessions
     }
 
-    def getFolderList(xml) {
+    private List<String> getFolderList(GPathResult xml) {
 
         //retrieve all folderUIDs from the returned data
 
-        def result = new StreamingMarkupBuilder().bind {
-            mkp.yield xml
-        }
-        logger.debug result
+	List<String> folderSearchList = []
+	for (node in xml.result.doc) {
 
-        def resultNodes = xml.result.doc
-
-        def folderSearchList = []
-        for (node in resultNodes) {
-
-            def folderId
+	    String folderId
             //Use 'folder' if this is a file result, 'id' otherwise
             def folderNode = node.str.findAll { it.@name == 'folder' }
             if (folderNode.size() > 0) {
                 folderId = folderNode.text()
-                searchLog += 'Got folder ID from SOLR file result: ' + folderId
+		searchLog << 'Got folder ID from SOLR file result: ' + folderId
             }
             else {
                 def idNode = node.str.findAll { it.@name == 'id' }
                 if (idNode.size() > 0) {
                     folderId = idNode.text()
-                    searchLog += 'Got folder ID from SOLR folder result: ' + folderId
+		    searchLog << 'Got folder ID from SOLR folder result: ' + folderId
                 }
                 else {
                     logger.error 'SolrFacetService.getFolderList: result node does not contain an id or folder'
                 }
             }
 
-            def fmFolder = FmFolder.findByUniqueId(folderId)
-            if (fmFolder != null) {
-                folderSearchList.push(fmFolder?.folderFullName)
+	    FmFolder fmFolder = FmFolder.findByUniqueId(folderId)
+	    if (fmFolder) {
+		folderSearchList << fmFolder?.folderFullName
             }
             else {
-                logger.error 'No folder found for unique ID: ' + folderId
+		logger.error 'No folder found for unique ID: {}', folderId
             }
         }
 
-        return folderSearchList
+	folderSearchList
     }
 
     /**
      * Create a query string for the category in the form of (<cat1>:'term1' OR <cat1>:'term2')
      */
-    def createCategoryQueryString = { category, termList, operator ->
+    private String createCategoryQueryString(String category, String[] termList, String operator) {
 
         // create a query for the category in the form of (<cat1>:'term1' OR <cat1>:'term2')
-        String categoryQuery = ''
-        for (t in termList) {
-
-            def pathwayInGeneSearch = null
-
+	StringBuilder categoryQuery = new StringBuilder()
+	for (String t in termList) {
             t = cleanForSOLR(t)
 
+	    String pathwayInGeneSearch = null
+
             //If searching on text and we have no spaces (not a phrase search), add wildcards instead of quote marks
-            if (category.equals('text')) {
-                if (t.indexOf(' ') > -1) {
-                    t = ('\'' + t.toLowerCase() + '\'')
+	    if (category == 'text') {
+		if (t.contains(' ')) {
+		    t = '"' + t.toLowerCase() + '"'
                 }
                 else {
-                    t = ('*' + t.toLowerCase() + '*')
+		    t = '*' + t.toLowerCase() + '*'
                 }
             }
-            else if (category.equals('GENE')) {
+	    else if (category == 'GENE') {
                 //GENE may have individual genes separated by slashes. OR these, and quote each individual one
                 //If this is a pathway, flag it
-                def geneList = []
+		List<String> geneList = []
                 for (g in t.split('/')) {
                     if (g.startsWith('PATHWAY')) {
                         pathwayInGeneSearch = g
                     }
                     else {
-                        geneList += ('\'' + g + '\'')
+			geneList << '"' + g + '"'
                     }
                 }
                 t = '(' + geneList.join(' OR ') + ')'
             }
             else {
-                t = ('\'' + t + '\'')
+		t = '"' + t + '"'
             }
 
-            def queryTerm
+	    String queryTerm
 
             //Special case for pathways in a gene search
-            if (category.equals('GENE') && pathwayInGeneSearch) {
-                queryTerm = /(PATHWAY:('' + pathwayInGeneSearch) OR GENE:${t})/
+	    if (category == 'GENE' && pathwayInGeneSearch) {
+		queryTerm = '(PATHWAY:("' + pathwayInGeneSearch + '") OR GENE:' + t + ')'
             }
             else {
-                queryTerm = /${category}:${t}/
+		queryTerm = category + ':' + t
             }
 
-            if (categoryQuery == '') {
-                categoryQuery = queryTerm
+	    if (categoryQuery) {
+		categoryQuery << ' ' << operator << ' ' << queryTerm
             }
             else {
-                categoryQuery = /${categoryQuery} ${operator} ${queryTerm}/
+		categoryQuery << queryTerm
             }
         }
 
         // enclose query clause in parens
-        categoryQuery = /(${categoryQuery})/
-
-        return categoryQuery
+	'(' + categoryQuery + ')'
     }
 
-    def cleanForSOLR(t) {
-        return t.replace('&', '%26').replace('(', '\\(').replace(')', '\\)')
-    }
-
-    /**
-     * Create a query string for the category in the form of (<cat1>:'term1' OR <cat1>:'term2')
-     */
-    def getDataNodeSearchTerms = { queryParams ->
-
-        def datanodeterms = []
-        for (qp in queryParams) {
-
-            // each queryParam is in form cat1:term1|term2|term3
-            String category = qp.split(':')[0]
-
-            if (category.equals('DATANODE') || category.equals('text')) {
-                String termList = qp.split(':')[1]
-
-                for (t in termList.tokenize('|')) {
-                    datanodeterms.push(t)
-                }
-            }
-        }
-
-        return datanodeterms
-    }
-
-    /**
-     * Create the SOLR query string for the faceted fields (i.e. those that are in tree) that
-     *   are not being filtered on
-     * It will be of form facet.field=<cat1>&facet.field=<cat2>
-     */
-    def createSOLRFacetedFieldsString = { facetFieldsParams ->
-        def facetedFields = ''
-        // loop through each regular query parameter
-        for (ff in facetFieldsParams) {
-
-            //This list should be in a config, but we don't facet on some of the fields.
-            if (ff != 'REGION_OF_INTEREST' && ff != 'GENE' && ff != 'SNP') {
-                // skip TEXT search fields (these wouldn't be in tree so throw exception since this should never happen)
-                if (ff == 'TEXT') {
-                    throw new Exception('TEXT field encountered when creating faceted fields string')
-                }
-
-                def ffClause = /facet.field=${ff}/
-
-                if (facetedFields == '') {
-                    facetedFields = /${ffClause}/
-                }
-                else {
-                    facetedFields = /${facetedFields}&${ffClause}/
-                }
-            }
-        }
-
-        return facetedFields
-    }
-
-    /**
-     * Create the SOLR query string for the faceted fields (i.e. those that are in tree) that are being filtered
-     * It will be of form facet=true&facet.field=(!ex=c1)<cat1>&facet.field=(!ex=c2)<cat2>&
-     *     fq={!tag=c1}(<cat1>:'term1' OR <cat1>:'term2')&.... )
-     * Each category query gets tagged in fq clauses {!tag=c1}, and then the category query is excluded
-     *   for determining the facet counts (!ex=c1) in facet.field clauses
-     */
-    def createSOLRFacetedQueryString = { facetQueryParams ->
-        def facetedQuery = ''
-        // loop through each regular query parameter
-        for (qp in facetQueryParams) {
-
-            // each queryParam is in form cat1:term1|term2|term3
-            String category = qp.split(';')[0]
-            String termList = qp.split(';')[1]
-
-            // skip DATANODE search fields
-            if (category == 'DATANODE') {
-                continue
-            }
-
-            def categoryQueryString = createCategoryQueryString(category, termList)
-
-            def categoryTag = /{!tag=${category}}/
-
-            def fqClause = /fq=${categoryTag}${categoryQueryString}/
-
-            def categoryExclusion = /{!ex=${category}}/
-            def ffClause = /facet.field=${categoryExclusion}${category}/
-
-            def categoryClause = /${ffClause}&${fqClause}/
-
-            if (facetedQuery == '') {
-                facetedQuery = /${categoryClause}/
-            }
-            else {
-                facetedQuery = /${facetedQuery}&${categoryClause}/
-            }
-
-        }
-
-        return facetedQuery
-    }
-
-    /**
-     * Create the SOLR query string for the nonfaceted fields (i.e. those that are not in tree)
-     * It will be of form ((<cat1>:'term1' OR <cat1>:'term2') AND ( (<cat2>:'term3') ) AND () .. )
-     */
-    public String createSOLRNonfacetedQueryString(List queryParams) {
-        def nonfacetedQuery = ''
-        // loop through each regular query parameter
-        for (qp in queryParams) {
-
-            // each queryParam is in form cat1:term1|term2|term3
-            String category = ((String) qp).split(':', 2)[0]
-            String termList = ((String) qp).split(':', 2)[1]
-
-            def categoryQueryString = createCategoryQueryString(category, termList)
-
-            // skip DATANODE search fields - handled later
-            if (category == 'DATANODE') {
-                continue
-            }
-
-            // add category query to main nonfaceted query string using ANDs between category clauses
-            if (nonfacetedQuery == '') {
-                nonfacetedQuery = categoryQueryString
-            }
-            else {
-                nonfacetedQuery = /${nonfacetedQuery} AND ${categoryQueryString}/
-            }
-        }
-
-        // use all query if no params provided
-        if (nonfacetedQuery == '') {
-            nonfacetedQuery = '*:*'
-        }
-
-        nonfacetedQuery = /q=(${nonfacetedQuery})/
-
-        return nonfacetedQuery
+    String cleanForSOLR(String t) {
+	t.replace('&', '%26').replace('(', '\\(').replace(')', '\\)')
     }
 
     /**
      * Create the base URL for the SOLR request
      * @return string containing the base URL for the SOLR query
      */
-    def createSOLRQueryPath = {
-
-        String solrScheme = Holders.config.com.rwg.solr.scheme
-        String solrHost = Holders.config.com.rwg.solr.host
-        String solrPath = Holders.config.com.rwg.solr.browse.path
-        String solrRequestUrl = new URI(solrScheme, solrHost, solrPath, '', '').toURL()
-
-        return solrRequestUrl
+    private String createSOLRQueryPath() {
+	new URI(solrScheme, solrHost, solrBrowsePath, '', '').toURL()
     }
 
-    def createSOLRUpdatePath = {
-
-        String solrScheme = Holders.config.com.rwg.solr.scheme
-        String solrHost = Holders.config.com.rwg.solr.host
-        String solrPath = Holders.config.com.rwg.solr.update.path
-        String solrRequestUrl = new URI(solrScheme, solrHost, solrPath, '', '').toURL()
-
-        return solrRequestUrl
+    private String createSOLRUpdatePath() {
+	new URI(solrScheme, solrHost, solrUpdatePath, '', '').toURL()
     }
 
     /**
@@ -640,20 +475,21 @@ class SolrFacetService {
      * @param facetedQueryString - the portion of the URL containing the faceted query string
      * @param facetedFieldsString - the portion of the URL containing the faceted fields string
      * @param maxRows - max number of result rows to return (default to 0
-     * @return string containing the SOLR query string
+     * @return the SOLR query
      */
-    def createSOLRQueryString = {
-        nonfacetedQueryString, facetedQueryString, facetedFieldsString, maxRows = 1000, facetFlag = false ->
-            def solrQuery = /${nonfacetedQueryString}&facet=${facetFlag}&rows=${maxRows}/
+    private String createSOLRQueryString(nonfacetedQueryString, facetedQueryString, facetedFieldsString,
+	                                 int maxRows = 1000, boolean facetFlag = false) {
+	String solrQuery = nonfacetedQueryString + '&facet=' + facetFlag + '&rows=' + maxRows
 
-            if (facetedQueryString != '') {
-                solrQuery = /${solrQuery}&${facetedQueryString}/
-            }
+	if (facetedQueryString) {
+	    solrQuery += '&' + facetedQueryString
+        }
 
-            if (facetedFieldsString != '') {
-                solrQuery = /${solrQuery}&${facetedFieldsString}/
-            }
-            return solrQuery
+	if (facetedFieldsString) {
+	    solrQuery += '&' + facetedFieldsString
+        }
+
+	solrQuery
     }
 
     /**
@@ -662,128 +498,113 @@ class SolrFacetService {
      * @param solrQueryParams - the query string for the faceted search, to be passed into the data for the POST request
      * @return JSONObject containing the facet counts
      */
-    def executeSOLRFacetedQuery = { solrRequestUrl, solrQueryParams, returnAnalysisIds ->
+    private GPathResult executeSOLRFacetedQuery(String solrRequestUrl, String solrQueryParams) {
 
-        logger.debug(solrQueryParams)
-
-        JSONObject facetCounts = new JSONObject()
-
-        def slurper = new XmlSlurper()
+	logger.debug solrQueryParams
 
         // submit request
-        def solrConnection = new URL(solrRequestUrl).openConnection()
+	URLConnection solrConnection = new URL(solrRequestUrl).openConnection()
         solrConnection.requestMethod = 'POST'
         solrConnection.doOutput = true
 
         // add params to request
-        def dataWriter = new OutputStreamWriter(solrConnection.outputStream)
-        dataWriter.write(solrQueryParams)
-        dataWriter.write('&fl=id,folder')
+	Writer dataWriter = new OutputStreamWriter(solrConnection.outputStream)
+	dataWriter.write solrQueryParams
+	dataWriter.write '&fl=id,folder'
         dataWriter.flush()
         dataWriter.close()
 
-        def folderIdNodes   // will store the folder IDs
-
         // process response
         if (solrConnection.responseCode == solrConnection.HTTP_OK) {
-            def xml
-
-            solrConnection.inputStream.withStream {
-                xml = slurper.parse(it)
-            }
-
+	    def xml = solrConnection.inputStream.withStream { InputStream it -> new XmlSlurper().parse(it) }
             solrConnection.disconnect()
             return xml
         }
-        else {
-            throw new Exception('SOLR Request failed! Request url:' + solrRequestUrl + '  Response code:' + solrConnection.responseCode + '  Response message:' + solrConnection.responseMessage)
-        }
+
+	throw new Exception('SOLR Request failed! Request url:' + solrRequestUrl +
+			    '  Response code:' + solrConnection.responseCode +
+			    '  Response message:' + solrConnection.responseMessage)
     }
 
-    def reindexFolder = { folderUid, folderType = '' ->
+    void reindexFolder(folderUid, String folderType = '') {
 
-        def solrRequestUrl = createSOLRUpdatePath()
-        def solrUpdateParams = 'command=full-import&commit=true&clean=false&uid=' + folderUid
+	String solrRequestUrl = createSOLRUpdatePath()
+	String solrUpdateParams = 'command=full-import&commit=true&clean=false&uid=' + folderUid
         if (folderType) {
             solrUpdateParams += '&entity=' + folderType
         }
 
         // submit request
-        def solrConnection = new URL(solrRequestUrl).openConnection()
+	URLConnection solrConnection = new URL(solrRequestUrl).openConnection()
         solrConnection.requestMethod = 'POST'
         solrConnection.doOutput = true
 
         // add params to request
-        def dataWriter = new OutputStreamWriter(solrConnection.outputStream)
-        dataWriter.write(solrUpdateParams)
+	Writer dataWriter = new OutputStreamWriter(solrConnection.outputStream)
+	dataWriter.write solrUpdateParams
         dataWriter.flush()
         dataWriter.close()
 
         //If HTTP OK, return success
         if (solrConnection.responseCode == solrConnection.HTTP_OK) {
             solrConnection.disconnect()
-            return true
         }
         else {
-            logger.error('SOLR update failed! Request url:' + solrRequestUrl + '  Response code:' + solrConnection.responseCode + '  Response message:' + solrConnection.responseMessage)
-        }
-
+	    logger.error 'SOLR update failed! Request url:{}  Response code:{}  Response message:{}',
+		solrRequestUrl, solrConnection.responseCode, solrConnection.responseMessage
+	}
     }
 
-    public Map getSearchHighlight(FmFolder folder, categoryList) {
-        String hlTitle
-        String hlDescription
-        List<String> hlFileIds = []
+    Map getSearchHighlight(FmFolder folder, List<String> categoryList) {
 
         String textSearch = categoryList?.find { it.startsWith('text:') }
-        if (textSearch) {
+	if (!textSearch) return
 
-            // Parse the search terms into an operator, category and term list
-            def operator = textSearch.split('::')[1].toUpperCase()
-            textSearch = textSearch.split('::')[0]
-            def categoryName = textSearch.split(':', 2)[0]
-            def termList = textSearch.split(':', 2)[1].split('\\|')
+        // Parse the search terms into an operator, category and term list
+	String operator = textSearch.split('::')[1].toUpperCase()
+        textSearch = textSearch.split('::')[0]
+	String categoryName = textSearch.split(':', 2)[0]
+	String[] termList = textSearch.split(':', 2)[1].split('\\|')
 
-            // Construct search query (with highlight parameters)
-            String url = createSOLRQueryPath()
-            String categoryQuery = createCategoryQueryString(categoryName, termList, operator)
-            String solrQuery = 'q=' + createSOLRQueryString(URLEncoder.encode(categoryQuery), '', '')
-            String highlight = 'hl=true&hl.fl=title+description&hl.fragsize=0' +
-                    '&hl.simple.pre=<mark><b>&hl.simple.post=</b></mark>'
-            String parameters = [solrQuery, highlight].join('&')
+        // Construct search query (with highlight parameters)
+        String url = createSOLRQueryPath()
+        String categoryQuery = createCategoryQueryString(categoryName, termList, operator)
+        String solrQuery = 'q=' + createSOLRQueryString(URLEncoder.encode(categoryQuery), '', '')
+        String highlight = 'hl=true&hl.fl=title+description&hl.fragsize=0' +
+            '&hl.simple.pre=<mark><b>&hl.simple.post=</b></mark>'
+        String parameters = [solrQuery, highlight].join('&')
 
-            // Execute search
-            NodeChild xml = executeSOLRFacetedQuery(url, parameters, false)
+        // Execute search
+	NodeChild xml = executeSOLRFacetedQuery(url, parameters)
 
-            // Search the response for the current folder and matching file ids
-            def highlighting = xml.lst.find { it.@name == 'highlighting' }
-            if (!(highlighting instanceof NoChildren)) {
-                for (NodeChild match : highlighting.lst) {
-                    String matchId = match.@name.text()
-                    if (matchId == folder.uniqueId) {
-                        // Extract the highlighted title & description from the result
-                        def hlTitleNode = match.arr.find { it.@name == 'title' }
-                        if (!(hlTitleNode instanceof NoChildren)) {
-                            hlTitle = hlTitleNode.str[0].text()
-                        }
-                        def hlDescriptionNode = match.arr.find { it.@name == 'description' }
-                        if (!(hlDescriptionNode instanceof NoChildren)) {
-                            hlDescription = hlDescriptionNode.str[0].text()
-                        }
+	String hlTitle
+	String hlDescription
+	List<String> hlFileIds = []
+        // Search the response for the current folder and matching file ids
+        def highlighting = xml.lst.find { it.@name == 'highlighting' }
+        if (!(highlighting instanceof NoChildren)) {
+	    for (NodeChild match in highlighting.lst) {
+                String matchId = match.@name.text()
+                if (matchId == folder.uniqueId) {
+                    // Extract the highlighted title & description from the result
+                    def hlTitleNode = match.arr.find { it.@name == 'title' }
+                    if (!(hlTitleNode instanceof NoChildren)) {
+                        hlTitle = hlTitleNode.str[0].text()
                     }
-                    if (matchId.startsWith('FIL')) {
-                        // File match found; add it for highlighting in filesTable
-                        hlFileIds.add(matchId)
+                    def hlDescriptionNode = match.arr.find { it.@name == 'description' }
+                    if (!(hlDescriptionNode instanceof NoChildren)) {
+                        hlDescription = hlDescriptionNode.str[0].text()
                     }
                 }
+                if (matchId.startsWith('FIL')) {
+                    // File match found; add it for highlighting in filesTable
+		    hlFileIds << matchId
+                }
             }
-            return [title      : hlTitle,
-                    description: hlDescription,
-                    fileIds    : hlFileIds
-            ]
         }
-        return null
+
+	[title      : hlTitle,
+         description: hlDescription,
+	 fileIds    : hlFileIds]
     }
-
-
 }

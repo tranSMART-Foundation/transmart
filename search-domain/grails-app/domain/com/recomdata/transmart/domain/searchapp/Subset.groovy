@@ -16,49 +16,36 @@
  * 
  *
  ******************************************************************/
-  
-
 package com.recomdata.transmart.domain.searchapp
 
 import java.text.SimpleDateFormat
 
 class Subset {
-	Long id
-	Date timestamp = new Date()
-	String description
-	String creatingUser
-	boolean publicFlag = false
-	boolean deletedFlag = false
-	Long queryID1
-	Long queryID2
-	String study
+    String creatingUser
+    boolean deletedFlag
+    String description
+    boolean publicFlag
+    Long queryID1
+    Long queryID2
+    String study
+    Date timestamp = new Date()
 	
-static mapping = {
- table 'SEARCHAPP.SUBSET'
- version false
- id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
- columns {
-	id column:'SUBSET_ID'
-	description column:'DESCRIPTION'
-	timestamp column:'CREATE_DATE'
-	creatingUser column:'CREATING_USER'
-	publicFlag column:'PUBLIC_FLAG'
-	deletedFlag column:'DELETED_FLAG'
+    static mapping = {
+	table 'SEARCHAPP.SUBSET'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'SUBSET_ID'
+	version false
+
 	queryID1 column:'QUERY_MASTER_ID_1'
 	queryID2 column:'QUERY_MASTER_ID_2'
-	}
+	timestamp column: 'CREATE_DATE'
+    }
+
+    static constraints = {
+	queryID2 nullable: true
+	study nullable: true
+    }
+
+    String getDisplayDate() {
+	new SimpleDateFormat('MM-dd-yyyy').format timestamp
+    }
 }
-
-static constraints = {
- queryID2(nullable:true)
- study(nullable:true)
-	}
-
-def getDisplayDate(){
-	def dateFormat = new SimpleDateFormat('MM-dd-yyyy')
-	return dateFormat.format(timestamp)
-}
-
-}
-
-

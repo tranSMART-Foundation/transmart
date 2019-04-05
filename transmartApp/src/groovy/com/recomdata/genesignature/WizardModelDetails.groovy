@@ -4,39 +4,41 @@
 package com.recomdata.genesignature
 
 import com.recomdata.util.ModelDetails
+import groovy.transform.CompileStatic
 import org.transmart.biomart.ConceptCode
+import org.transmart.searchapp.GeneSignature
 
 /**
  * @author jspencer
- * @version
  */
-public class WizardModelDetails extends ModelDetails {
+@CompileStatic
+class WizardModelDetails extends ModelDetails {
+
     // wizard tyes
-    static def WIZ_TYPE_CREATE = 0
-    static def WIZ_TYPE_EDIT = 1
-    static def WIZ_TYPE_CLONE = 2
+    static final int WIZ_TYPE_CREATE = 0
+    static final int WIZ_TYPE_EDIT = 1
+    static final int WIZ_TYPE_CLONE = 2
 
     // default is create
-    def wizardType = WIZ_TYPE_CREATE
+    int wizardType = WIZ_TYPE_CREATE
 
     // pick lists
-    def sources
-    def owners
-    def species
-    def mouseSources
-    def tissueTypes
-    def expTypes
-    def analyticTypes
-    def normMethods
     def analysisMethods
-    def schemas
-    def pValCutoffs
-    def foldChgMetrics
-    def platforms
+    def analyticTypes
     def compounds
+    def expTypes
+    def foldChgMetrics
+    def mouseSources
+    def normMethods
+    def owners
+    def platforms
+    def pValCutoffs
+    def schemas
+    def sources
+    def species
+    def tissueTypes
 
-    // domain class
-    def geneSigInst
+    GeneSignature geneSigInst
 
     // id of domain being edited
     def editId
@@ -45,9 +47,7 @@ public class WizardModelDetails extends ModelDetails {
     /**
      * add an empty other ConceptCode item
      */
-    public static void addOtherItem(List<ConceptCode> items, String optionId) {
-        if (optionId == null) optionId = 'other'
-        items.add(new ConceptCode(bioConceptCode: optionId, codeName: 'other'))
+    static void addOtherItem(List<ConceptCode> items, String optionId) {
+	items << new ConceptCode(bioConceptCode: optionId ?: 'other', codeName: 'other')
     }
-
 }

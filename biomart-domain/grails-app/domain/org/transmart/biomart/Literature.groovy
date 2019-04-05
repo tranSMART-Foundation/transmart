@@ -16,39 +16,32 @@
  *
  *
  ******************************************************************/
-
-/**
- * $Id: Literature.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
 package org.transmart.biomart
 
 class Literature {
-    Long id
-    LiteratureReferenceData reference
     Long bioCurationDatasetId
+    String dataType
+    LiteratureReferenceData reference
     String statement
     String statementStatus
-    String dataType
-    static hasMany = [diseases: Disease, compounds: Compound, markers: BioMarker, files: ContentReference]
-    static belongsTo = [Disease, Compound, BioMarker, ContentReference]
+
+    static hasMany = [compounds: Compound,
+	              diseases: Disease,
+	              files: ContentReference,
+	              markers: BioMarker]
+
+    static belongsTo = [BioMarker, Compound, ContentReference, Disease]
+
     static mapping = {
-        table 'BIO_DATA_LITERATURE'
+	table 'BIOMART.BIO_DATA_LITERATURE'
         tablePerHierarchy false
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_DATA_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_DATA_ID'
-            reference column: 'BIO_LIT_REF_DATA_ID'
-            bioCurationDatasetId column: 'BIO_CURATION_DATASET_ID'
-            statement column: 'STATEMENT'
-            statementStatus column: 'STATEMENT_STATUS'
-            dataType column: 'DATA_TYPE'
-            diseases joinTable: [name: 'BIO_DATA_DISEASE', key: 'BIO_DATA_ID']
-            markers joinTable: [name: 'BIO_DATA_OMIC_MARKER', key: 'BIO_DATA_ID']
-            compounds joinTable: [name: 'BIO_DATA_COMPOUND', key: 'BIO_DATA_ID']
-            files joinTable: [name: 'BIO_CONTENT_REFERENCE', key: 'BIO_DATA_ID', column: 'BIO_CONTENT_REFERENCE_ID']
-        }
+
+	compounds joinTable: [name: 'BIOMART.BIO_DATA_COMPOUND', key: 'BIO_DATA_ID']
+	diseases joinTable: [name: 'BIOMART.BIO_DATA_DISEASE', key: 'BIO_DATA_ID']
+	files joinTable: [name: 'BIOMART.BIO_CONTENT_REFERENCE', key: 'BIO_DATA_ID', column: 'BIO_CONTENT_REFERENCE_ID']
+	markers joinTable: [name: 'BIOMART.BIO_DATA_OMIC_MARKER', key: 'BIO_DATA_ID']
+        reference column: 'BIO_LIT_REF_DATA_ID'
     }
 }

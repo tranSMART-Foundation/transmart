@@ -1,16 +1,18 @@
 package org.transmartproject.export
 
-import groovy.util.logging.Log4j
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 import org.transmartproject.core.dataquery.highdim.BioMarkerDataRow
 import org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow
 import org.transmartproject.core.dataquery.highdim.projections.Projection
-import org.transmartproject.db.dataquery.highdim.chromoregion.RegionRowImpl
 
 import javax.annotation.PostConstruct
 
-@Log4j
+@CompileStatic
+@Slf4j('logger')
 class RnaSeqBedExporter extends AbstractChromosomalRegionBedExporter {
 
     @Autowired
@@ -18,33 +20,24 @@ class RnaSeqBedExporter extends AbstractChromosomalRegionBedExporter {
 
     @PostConstruct
     void init() {
-        this.highDimExporterRegistry.registerHighDimensionExporter(format, this)
+	highDimExporterRegistry.registerHighDimensionExporter(format, this)
     }
 
-    @Override
     boolean isDataTypeSupported(String dataType) {
         dataType == 'rnaseq'
     }
 
-    @Override
     String getProjection() {
         Projection.ALL_DATA_PROJECTION
     }
 
-    @Override
-    protected calculateRow(RegionRow datarow, AssayColumn assay) {
+    @CompileDynamic
+    protected List calculateRow(RegionRow datarow, AssayColumn assay) {
         int readcount = datarow[assay]['readcount']
-        [
-                datarow.chromosome,
-                datarow.start,
-                datarow.end,
-                //Name of the BED line
-                datarow instanceof BioMarkerDataRow ?
-                        datarow.bioMarker ?: datarow.name
-                        : datarow.name,
-                //Score
-                readcount
-        ]
+	[datarow.chromosome,
+         datarow.start,
+         datarow.end,
+	 datarow instanceof BioMarkerDataRow ? datarow.bioMarker ?: datarow.name : datarow.name, //Name of the BED line
+	 readcount] // Score
     }
-
 }

@@ -1,35 +1,36 @@
 import com.recomdata.search.query.AssayAnalysisDataQuery
+import com.recomdata.search.query.Query
+import groovy.transform.CompileStatic
+import org.transmart.GlobalFilter
 import org.transmart.SearchFilter
 import org.transmart.biomart.BioAssayAnalysisData
 import org.transmart.biomart.ClinicalTrial
+import org.transmart.biomart.Compound
+import org.transmart.biomart.Disease
 import org.transmart.biomart.Experiment
 import org.transmart.searchapp.SearchKeyword
 
 /**
- * $Id: FilterQueryService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
-
+@CompileStatic
 class FilterQueryService {
 
-    def trialDiseaseFilter() {
-        return experimentDiseaseFilter('Clinical Trial')
+    static transactional = false
+
+    List<Disease> trialDiseaseFilter(SearchFilter filter) {
+	findExperimentDiseaseFilter filter, 'Clinical Trial'
     }
 
-    def trialDiseaseFilter(SearchFilter filter) {
-        return findExperimentDiseaseFilter(filter, 'Clinical Trial')
+    List<Compound> trialCompoundFilter(SearchFilter filter) {
+	findExperimentCompoundFilter filter, 'Clinical Trial'
     }
 
-    def trialCompoundFilter(SearchFilter filter) {
-        return findExperimentCompoundFilter(filter, 'Clinical Trial')
-    }
+    List<Disease> findExperimentDiseaseFilter(SearchFilter filter, experimentType) {
+	GlobalFilter gfilter = filter.globalFilter
 
-    def findExperimentDiseaseFilter(SearchFilter filter, experimentType) {
-        def gfilter = filter.globalFilter
-
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
-        def alias = query.mainTableAlias + '_dis'
+	Query query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+	String alias = query.mainTableAlias + '_dis'
         query.addTable('org.transmart.biomart.BioAssayAnalysisData baad')
         query.addTable('JOIN ' + query.mainTableAlias + '.experiment.diseases ' + alias)
         query.addSelect(alias)
@@ -37,61 +38,58 @@ class FilterQueryService {
         query.addCondition(query.mainTableAlias + ".experiment.type='" + experimentType + "'")
         query.createGlobalFilterCriteria(gfilter, true)
 
-        // createSubFilterCriteria(filter.expAnalysisFilter, query)
-        //	println(query.generateSQL())
+	BioAssayAnalysisData.executeQuery(query.generateSQL()) as List<Disease>
+	}
 
+    List<SearchKeyword> experimentCompoundFilter(String experimentType) {
+	SearchKeyword.executeQuery('''
+		SELECT distinct sk
+		FROM org.transmart.searchapp.SearchKeyword sk, org.transmart.biomart.Experiment exp
+		JOIN exp.compounds cpd
+		WHERE sk.bioDataId = cpd.id
+		  AND exp.type=?
+		ORDER BY sk.keyword''',
+		[experimentType])
+	}
 
-        return BioAssayAnalysisData.executeQuery(query.generateSQL())
+    List<Compound> findExperimentCompoundFilter(SearchFilter filter, String experimentType) {
+	GlobalFilter gfilter = filter.globalFilter
+
+	Query query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
+	String alias = query.mainTableAlias + '_cpd'
+	query.addTable 'org.transmart.biomart.BioAssayAnalysisData baad'
+	query.addTable 'JOIN ' + query.mainTableAlias + '.experiment.compounds ' + alias
+	query.addSelect alias
+	query.addOrderBy alias + '.genericName'
+	query.addCondition query.mainTableAlias + ".experiment.type='" + experimentType + "'"
+	query.createGlobalFilterCriteria gfilter, true
+
+	BioAssayAnalysisData.executeQuery query.generateSQL()
     }
 
-//	def experimentDiseaseFilter(String experimentType){
-//		def query = 'SELECT distinct sk FROM org.transmart.searchapp.SearchKeyword sk, org.transmart.biomart.Experiment exp JOIN exp.diseases ds '+
-//		' WHERE sk.bioDataId = ds.id AND exp.type=? ORDER BY sk.keyword'
-//		return org.transmart.searchapp.SearchKeyword.executeQuery(query, experimentType)
-//	}
-
-//	def experimentDiseaseFilterNew(String experimentType){
-//		def query = 'SELECT distinct sk FROM org.transmart.searchapp.SearchKeyword sk, org.transmart.biomart.Experiment exp JOIN exp.diseases ds '+
-//		' WHERE sk.bioDataId = ds.id AND exp.type=? ORDER BY sk.keyword'
-//		return org.transmart.searchapp.SearchKeyword.executeQuery(query, experimentType)
-//}
-
-    def experimentCompoundFilter(String experimentType) {
-        def query = 'SELECT distinct sk FROM org.transmart.searchapp.SearchKeyword sk, org.transmart.biomart.Experiment exp JOIN exp.compounds cpd ' +
-                ' WHERE sk.bioDataId = cpd.id AND exp.type=? ORDER BY sk.keyword'
-        return SearchKeyword.executeQuery(query, experimentType)
+    List<String> studyTypeFilter() {
+	ClinicalTrial.executeQuery '''
+		SELECT distinct exp.studyType
+		from org.transmart.biomart.ClinicalTrial exp
+		WHERE exp.studyType IS NOT NULL
+		ORDER BY exp.studyType'''
     }
 
-    def findExperimentCompoundFilter(SearchFilter filter, experimentType) {
-        def gfilter = filter.globalFilter
-
-        def query = new AssayAnalysisDataQuery(mainTableAlias: 'baad', setDistinct: true)
-        def alias = query.mainTableAlias + '_cpd'
-        query.addTable('org.transmart.biomart.BioAssayAnalysisData baad')
-        query.addTable('JOIN ' + query.mainTableAlias + '.experiment.compounds ' + alias)
-        query.addSelect(alias)
-        query.addOrderBy(alias + '.genericName')
-        query.addCondition(query.mainTableAlias + ".experiment.type='" + experimentType + "'")
-        query.createGlobalFilterCriteria(gfilter, true)
-
-        // createSubFilterCriteria(filter.expAnalysisFilter, query)
-        //	println(query.generateSQL())
-
-        return BioAssayAnalysisData.executeQuery(query.generateSQL())
+    List<String> trialPhaseFilter() {
+	ClinicalTrial.executeQuery '''
+		SELECT distinct exp.studyPhase
+		FROM org.transmart.biomart.ClinicalTrial exp
+		WHERE exp.studyPhase IS NOT NULL
+		ORDER BY exp.studyPhase'''
     }
 
-    def studyTypeFilter() {
-        def query = 'SELECT distinct exp.studyType from org.transmart.biomart.ClinicalTrial exp WHERE exp.studyType IS NOT NULL ORDER BY exp.studyType'
-        return ClinicalTrial.executeQuery(query)
+    List<String> studyDesignFilter(String experimentType) {
+	Experiment.executeQuery '''
+		SELECT DISTINCT exp.design
+		FROM org.transmart.biomart.Experiment exp
+		WHERE exp.type=?
+		AND exp.design IS NOT NULL
+		ORDER BY exp.design''',
+		[experimentType]
     }
-
-    def trialPhaseFilter() {
-        def query = 'SELECT distinct exp.studyPhase FROM org.transmart.biomart.ClinicalTrial exp WHERE exp.studyPhase IS NOT NULL ORDER BY exp.studyPhase'
-        return ClinicalTrial.executeQuery(query)
-    }
-
-    def studyDesignFilter(String experimentType) {
-        return Experiment.executeQuery('SELECT DISTINCT exp.design FROM org.transmart.biomart.Experiment exp WHERE exp.type=? AND exp.design IS NOT NULL ORDER BY exp.design', experimentType)
-    }
-
 }

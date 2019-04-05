@@ -1,149 +1,126 @@
 import com.recomdata.search.DocumentHit
 import com.recomdata.search.DocumentQuery
-import grails.util.Holders
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.transmart.GlobalFilter
+import org.transmart.KeywordSet
 import org.transmart.SearchFilter
+import org.transmart.SearchKeywordService
+import org.transmart.searchapp.SearchKeyword
 
 /**
- * $Id: DocumentService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
-class DocumentService {
+class DocumentService implements InitializingBean {
 
-    def searchKeywordService
-    def globalFilterService
-    def String index = Holders.config.com.recomdata.searchengine.index.toString()
-    def DocumentQuery documentQuery = new DocumentQuery(index)
+    static transactional = false
 
-    def documentCount(SearchFilter sfilter) {
+    @Autowired private SearchKeywordService searchKeywordService
+    @Autowired private GlobalFilterService globalFilterService
 
-        LinkedHashMap<String, ArrayList<String>> terms = documentTerms(sfilter)
-        LinkedHashMap<String, ArrayList<String>> filters = sfilter.documentFilter.getFilters()
-        return documentQuery.searchCount(terms, filters)
+    @Value('${com.recomdata.searchengine.index:}')
+    private String index
 
+    private DocumentQuery documentQuery
+
+    int documentCount(SearchFilter sfilter) {
+	Map<String, List<String>> terms = documentTerms(sfilter)
+	Map<String, List<String>> filters = sfilter.documentFilter.filters
+	documentQuery.searchCount terms, filters
     }
 
-    def documentData(SearchFilter sfilter, params) {
-
-        params = globalFilterService.createPagingParamMap(params)
-        LinkedHashMap<String, ArrayList<String>> terms = documentTerms(sfilter)
-        LinkedHashMap<String, ArrayList<String>> filters = sfilter.documentFilter.getFilters()
-        DocumentHit[] documents = documentQuery.search(terms, filters, params.max, params.offset)
-        def results = []
-        if (documents != null) {
-            for (document in documents) {
-                results.add(document)
-            }
-        }
-        return results
-
+    List<DocumentHit> documentData(SearchFilter sfilter, GrailsParameterMap params) {
+	Map pagingParams = globalFilterService.createPagingParamMap(params)
+	Map<String, List<String>> terms = documentTerms(sfilter)
+	Map<String, List<String>> filters = sfilter.documentFilter.filters
+	DocumentHit[] documents = documentQuery.search(terms, filters, pagingParams.max, pagingParams.offset)
+	documents ? documents as List : []
     }
 
-    LinkedHashMap<String, ArrayList<String>> documentTerms(SearchFilter sfilter) {
+    Map<String, List<String>> documentTerms(SearchFilter sfilter) {
 
-        def gfilter = sfilter.globalFilter
-        def geneFilters = gfilter.getGeneFilters()
-        def pathwayIds = gfilter.formatIdList(gfilter.getAllListFilters(), ',')
+	GlobalFilter gfilter = sfilter.globalFilter
+	KeywordSet geneFilters = gfilter.geneFilters
+	String pathwayIds = gfilter.formatIdList(gfilter.allListFilters, ',')
         // If there are pathways, then get all genes in pathways and add them to the geneFilters (hash set)
-        if (pathwayIds.size() > 0) {
-            geneFilters.addAll(searchKeywordService.expandAllListToGenes(pathwayIds))
+	if (pathwayIds) {
+	    geneFilters.addAll searchKeywordService.expandAllListToGenes(pathwayIds)
         }
-        def compoundFilters = gfilter.getCompoundFilters()
-        def diseaseFilters = gfilter.getDiseaseFilters()
-        def trialFilters = gfilter.getTrialFilters()
-        def textFilters = gfilter.getTextFilters()
 
-        LinkedHashMap<String, ArrayList<String>> terms = new LinkedHashMap<String, ArrayList<String>>()
-
+	Map<String, List<String>> terms = [:]
         int termCount = 0
-        if (geneFilters.size() > 0) {
-            def list = getTermList(geneFilters)
-            termCount += list.size()
-            if (termCount < DocumentQuery.MAX_CLAUSE_COUNT) {
-                terms.put(gfilter.CATEGORY_GENE, list)
-            }
-        }
-        if (compoundFilters.size() > 0) {
-            def list = getTermList(compoundFilters)
-            termCount += list.size()
-            if (termCount < DocumentQuery.MAX_CLAUSE_COUNT) {
-                terms.put(gfilter.CATEGORY_COMPOUND, list)
-            }
-        }
-        if (diseaseFilters.size() > 0) {
-            def list = getTermList(diseaseFilters)
-            termCount += list.size()
-            if (termCount < DocumentQuery.MAX_CLAUSE_COUNT) {
-                terms.put(gfilter.CATEGORY_DISEASE, list)
-            }
-        }
-        if (trialFilters.size() > 0) {
-            def list = getTermList(trialFilters)
-            termCount += list.size()
-            if (termCount < DocumentQuery.MAX_CLAUSE_COUNT) {
-                terms.put(gfilter.CATEGORY_TRIAL, list)
-            }
-        }
-        if (textFilters.size() > 0) {
-            def list = getTermList(textFilters)
-            termCount += list.size()
-            if (termCount < DocumentQuery.MAX_CLAUSE_COUNT) {
-                terms.put(gfilter.CATEGORY_TEXT, list)
-            }
-        }
+	processKeywordSet geneFilters, terms, GlobalFilter.CATEGORY_GENE, termCount
+	processKeywordSet gfilter.compoundFilters, terms, GlobalFilter.CATEGORY_COMPOUND, termCount
+	processKeywordSet gfilter.diseaseFilters, terms, GlobalFilter.CATEGORY_DISEASE, termCount
+	processKeywordSet gfilter.trialFilters, terms, GlobalFilter.CATEGORY_TRIAL, termCount
+	processKeywordSet gfilter.textFilters, terms, GlobalFilter.CATEGORY_TEXT, termCount
 
-        return terms
-
+	terms
     }
 
-    ArrayList<String> getTermList(keywords) {
-
-        ArrayList<String> terms = new ArrayList<String>()
-        for (keyword in keywords) {
+    private List<String> getTermList(KeywordSet keywords) {
+	List<String> terms = []
+	for (SearchKeyword keyword in keywords) {
             if (terms.size() < DocumentQuery.MAX_CLAUSE_COUNT - 1) {
-                terms.add(keyword.keyword)
+		terms << keyword.keyword
             }
             else {
                 break
             }
         }
-        return terms
 
+	terms
     }
 
     // Encode string value for display on HMTL page and encode out-of-band characters.
     String encodeHTML(String value) {
-
-        if (value == null) {
+	if (!value) {
             return ''
         }
-        value = value.replace('<span class=\'search-term\'>', '???HIT_OPEN???')
+
+	value = value.replace('<span class="search-term">', '???HIT_OPEN???')
         value = value.replace('</span>', '???HIT_CLOSE???')
         value = value.encodeAsHTML()
-        value = value.replace('???HIT_OPEN???', '<span class=\'search-term\'>')
+	value = value.replace('???HIT_OPEN???', '<span class="search-term">')
         value = value.replace('???HIT_CLOSE???', '</span>')
 
-        def StringBuilder result = new StringBuilder()
+	StringBuilder result = new StringBuilder()
 
-        if (value.length() > 0) {
-            def len = value.length() - 1
+	if (value) {
+	    int len = value.length() - 1
             for (i in 0..len) {
-                def int ch = value.charAt(i)
+		int ch = value.charAt(i)
                 if (ch < 32) {
-                    result.append(' ')
+		    result << ' '
                 }
                 else if (ch >= 128) {
-                    result.append('&#')
-                    result.append(ch)
+		    result << '&#' << ch
                 }
                 else {
-                    result.append((char) ch)
+		    result << (char) ch
                 }
             }
         }
 
-        return result.toString()
-
+	result
     }
 
+    private int processKeywordSet(KeywordSet keywordSet, Map<String, List<String>> terms,
+	                          String key, int termCount) {
+	if (keywordSet) {
+	    List<String> list = getTermList(keywordSet)
+	    termCount += list.size()
+	    if (termCount < DocumentQuery.MAX_CLAUSE_COUNT) {
+		terms[key] = list
+	    }
+	}
+
+	termCount
+    }
+
+    void afterPropertiesSet() {
+	documentQuery = new DocumentQuery(index)
+    }
 }

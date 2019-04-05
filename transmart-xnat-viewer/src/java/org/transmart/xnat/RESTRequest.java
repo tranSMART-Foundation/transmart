@@ -1,66 +1,45 @@
 package org.transmart.xnat;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
- *
  * @author Sijin He
  */
 public class RESTRequest {
 
-    public HttpResponse doGet(String url, String session) {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-        HttpResponse response = null;
-
+    public HttpResponse doGet(String url, String sessionId) {
         try {
-
-            DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpGet getRequest = new HttpGet(url);
-            getRequest.addHeader("Cookie", session);
-
-            response = httpClient.execute(getRequest);
-
-            
-
-        } catch (ClientProtocolException e) {
-
-            e.printStackTrace();
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
+            getRequest.addHeader("Cookie", sessionId);
+            return new DefaultHttpClient().execute(getRequest);
         }
-        
-        return response;
-
-
+        catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
     }
 
-    public HttpResponse doPost(String url, List parameters) {
-
-        HttpResponse response = null;
-
-        try {
-
-            HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost(url);
+    public HttpResponse doPost(String url, List<? extends NameValuePair> parameters) {
+        try {            HttpPost post = new HttpPost(url);
 
             post.setEntity(new UrlEncodedFormEntity(parameters));
-            response = client.execute(post);
-
-        } catch (IOException ex) {
-            Logger.getLogger(XNATREST.class.getName()).log(Level.SEVERE, null, ex);
+            return new DefaultHttpClient().execute(post);
         }
-        return response;
+        catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
     }
 }

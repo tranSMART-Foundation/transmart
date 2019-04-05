@@ -1,14 +1,13 @@
 package com.recomdata.util
 
 import groovy.sql.Sql
-import oracle.net.aso.e
 
 /**
  Procedure of SNP Annotation Data Loading
 
- 1. Check that the database user 'biomart_user' has set up synonym to de_snp_info, de_snp_probe, de_snp_gene_map
- 2. Create sequence 'snp_temp_id_seq', 'snp_id_seq' and 'snp_probe_id_seq'
- 3. Create a temporary table de_snp_loading_temp in 'biomart_user' schema, or in 'deapp' schema with synonym in 'biomart_user'.
+ 1. Check that the database user "biomart_user" has set up synonym to de_snp_info, de_snp_probe, de_snp_gene_map
+ 2. Create sequence "snp_temp_id_seq", "snp_id_seq" and "snp_probe_id_seq"
+ 3. Create a temporary table de_snp_loading_temp in "biomart_user" schema, or in "deapp" schema with synonym in "biomart_user".
  create table de_snp_loading_temp (
  snp_temp_id	NUMBER(22,0) PRIMARY KEY,
  name	VARCHAR2(255),
@@ -17,7 +16,7 @@ import oracle.net.aso.e
  probe_name	VARCHAR2(255),
  entrez_gene_string	VARCHAR2(2048)
  )
-
+ 
  4. Use WinSCP to copy over the data file and control file SqlLoaderSnpInfo.ctl
  5. Use SSH to log into the database server, execute:
  sqlldr control=SqlLoaderSnpInfo.ctl, log=SqlLoaderSnpInfo.log,bad=SqlLoaderSnpInfo.bad userid=biomart_user/biomart_user rows=1
@@ -100,82 +99,80 @@ import oracle.net.aso.e
  */
 
 /**
- * This class is to load SNP annotation files, which may have millions of records.
+ * Loads SNP annotation files, which may have millions of records.
  * SQL loader and stored procedures are needs in combination with file parsing code.
  * @author DLiu
- *
  */
 class SnpAnnotLoading {
 
+    public static String UCSC_SNP_132_File_Name = 'snp132.txt'
+    public static String UCSC_SNP_132_TRIM_File_Name = 'snp132_trim.txt'
+    public static String UCSC_SNP_132_EXCEPTION_File_Name = 'snp132_exception.txt'
 
-    private Sql sql = null
+    private Sql sql
 
     private Properties loadConfiguration(String file) throws IOException {
-
-        Properties prop = new Properties()
+	Properties properties = new Properties()
         FileInputStream fis = new FileInputStream(file)
-        prop.load(fis)
+	properties.load(fis)
         fis.close()
-
-        return prop
+	properties
     }
 
-    /** This function simply parse the gene list for each probe */
-    void parseSNPAnnotForSqlLoader(String annotFileName, String loadingFileName) throws Exception {
-        File annotFile = new File(annotFileName)
+    /** Simply parse the gene list for each probe */
+    void parseSNPAnnotForSqlLoader(String annotFileName, String loadingFileName) {
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(loadingFileName))
 
         int lineCount = 0
-        annotFile.eachLine { line ->
-            if (line.startsWith('#') == false && line.startsWith('\'Probe Set ID\'') == false) {
-                String[] valueList = line.split('\',\'')
+	for (String line in new File(annotFileName).readLines()) {
+	    if (!line.startsWith('#') && !line.startsWith('"Probe Set ID"')) {
+		String[] valueList = line.split('","')
                 // It is important to split with ',' . Comma is not enough, since gene name has comma inside
                 String probeName = valueList[0].replaceAll('"', '')
                 String snpName = valueList[1].replaceAll('"', '')
                 String chrom = valueList[2].replaceAll('"', '')
-                if (chrom != null && chrom.indexOf('---') >= 0)
+		if (chrom?.contains('---')) {
                     chrom = ''
+		}
                 String chromPos = valueList[3].replaceAll('"', '')
-                if (chromPos != null && chromPos.indexOf('---') >= 0)
+		if (chromPos && chromPos.contains('---')) {
                     chromPos = ''
+		}
 
-                Set<String> entrezIdSet = new HashSet<String>()
+		Set<String> entrezIdSet = []
                 String geneAllString = valueList[10].replaceAll('"', '')
                 String[] geneStringList = geneAllString.split('///')
-                if (geneStringList != null && geneStringList.size() != 0) {
-                    for (int i = 0; i < geneStringList.size(); i++) {
+		if (geneStringList) {
+		    for (int i = 0; i < geneStringList.length; i++) {
                         String geneString = geneStringList[i].trim()
-                        if (geneString != null && geneString.size() != 0) {
+			if (geneString) {
                             String[] geneValueList = geneString.split('//')
                             if (geneValueList == null || geneValueList.size() < 6) {
-                                // print('\n Error in line ' + (lineCount + 1) + ': ' + line + '\n')
-                                // print('\tThe Gene String: ' + geneString + '\n')
                             }
                             else {
                                 String entrezIdStr = geneValueList[5].trim()
-                                if (entrezIdStr != null && entrezIdStr.length() != 0 && entrezIdStr.equals('---') == false) {
+				if (entrezIdStr && entrezIdStr != "---") {
                                     Long entrezIdLong = null
                                     try {
-                                        entrezIdLong = new Long(entrezIdStr)
+					entrezIdLong = Long.valueOf(entrezIdStr)
+				    }
+				    catch (e) {
+					print("\n Error in line " + (lineCount + 1) + ": " + line + "\n")
+					print("\tThe Entrez ID String: " + entrezIdStr + "\n")
                                     }
-                                    catch (Exception e) {
-                                        print('\n Error in line ' + (lineCount + 1) + ': ' + line + '\n')
-                                        print('\tThe Entrez ID String: ' + entrezIdStr + '\n')
+				    if (entrezIdLong != null) {
+					entrezIdSet << entrezIdLong.toString()
                                     }
-                                    if (entrezIdLong != null)
-                                        entrezIdSet.add(entrezIdLong.toString())
                                 }
                             }
                         }
                     }
                 }
 
-                if (entrezIdSet.size() != 0) {
-                    Iterator<e> setIt = entrezIdSet.iterator()
-                    while (setIt.hasNext()) {
-                        String entrezIdStr = setIt.next()
-                        writer.write(snpName + '\t' + chrom + '\t' + chromPos + '\t' + probeName + '\t' + entrezIdStr + '\n')
+		if (entrezIdSet) {
+		    for (String entrezIdStr in entrezIdSet) {
+			writer.write snpName + "\t" + chrom + "\t" + chromPos + "\t" + probeName + "\t" + entrezIdStr + "\n"
                     }
                 }
             }
@@ -186,16 +183,14 @@ class SnpAnnotLoading {
         writer.close()
     }
 
-    public static String UCSC_SNP_132_File_Name = 'snp132.txt'
-    public static String UCSC_SNP_132_TRIM_File_Name = 'snp132_trim.txt'
-    public static String UCSC_SNP_132_EXCEPTION_File_Name = 'snp132_exception.txt'
-
     /** The deapp.de_snp_132 table schema is very similar to UCSC snp_132 schema,
      * except that with flexible and delimited text field, Oracle SQLLoader has a limit of 255 characters.
-     * Shorten the field to 255, log the shorted record to exception file. Reload using slower Java JDBC if necessary. */
-    void parseUCSCSnp132ForSqlLoader(String snpFileDirName) throws Exception {
-        if (snpFileDirName.endsWith(File.separator) == false)
-            snpFileDirName = snpFileDirName + File.separator
+     * Shorten the field to 255, log the shorted record to exception file. Reload using slower Java JDBC if necessary.
+     */
+    void parseUCSCSnp132ForSqlLoader(String snpFileDirName) {
+	if (!snpFileDirName.endsWith(File.separator)) {
+	    snpFileDirName = snpFileDirName + File.separatorChar
+	}
 
         BufferedReader reader = new BufferedReader(new FileReader(snpFileDirName + UCSC_SNP_132_File_Name))
 
@@ -204,24 +199,24 @@ class SnpAnnotLoading {
 
         String line = reader.readLine()
         while (line != null) {
-            String[] values = line.split('\t')
+	    String[] values = line.split("\t")
             boolean isException = false
 
-            StringBuffer lineBuf = new StringBuffer()
-            for (String value : values) {
-                if (lineBuf.length() != 0)
-                    lineBuf.append('\t')
-                if (value != null && value.length() > 255) {
-                    value = value.substring(0, 255 - 4)
-                    value += '...'
+	    StringBuilder lineBuf = new StringBuilder()
+	    for (String value in values) {
+		if (lineBuf) {
+		    lineBuf << "\t"
+		}
+		if (value?.length() > 255) {
+		    value = value.substring(0, 255 - 4) + "..."
                     isException = true
                 }
-                lineBuf.append(value)
+		lineBuf << value
             }
-            writer.write(lineBuf.toString() + '\n')
+	    writer.write(lineBuf.toString() + "\n")
 
-            if (isException == true) {
-                exceptionWriter.write(line + '\n')
+	    if (isException) {
+		exceptionWriter.write(line + "\n")
             }
 
             line = reader.readLine()
@@ -232,23 +227,21 @@ class SnpAnnotLoading {
         exceptionWriter.close()
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SnpAnnotLoading sdl = new SnpAnnotLoading()
 
         // extract parameters
         File path = new File(SnpAnnotLoading.class.getProtectionDomain().getCodeSource().getLocation().getPath())
-        String configFilePath = path.getParent() + File.separator + 'SnpViewer.properties'
+	String configFilePath = path.getParent() + File.separator + "SnpViewer.properties"
         Properties props = sdl.loadConfiguration(configFilePath)
 
         /*
-        String annotFileName = props.get('affy_annotation_file')
-        String dataFileName = props.get('affy_annotation_data_file')
-        sdl.parseSNPAnnotForSqlLoader(annotFileName, dataFileName)
-        */
+	 String annotFileName = props.get("affy_annotation_file")
+	 String dataFileName = props.get("affy_annotation_data_file")
+         sdl.parseSNPAnnotForSqlLoader(annotFileName, dataFileName)
+         */
 
-        String snp132DirName = props.get('ucsc_snp_132_data_dir')
+	String snp132DirName = props.get("ucsc_snp_132_data_dir")
         sdl.parseUCSCSnp132ForSqlLoader(snp132DirName)
-
-
     }
 }

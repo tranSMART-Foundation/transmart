@@ -16,38 +16,29 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.searchapp
 
 /**
- * domain class for auto refresh materialized view in SearchApp (for gene signature items)
+ * For auto refresh materialized view in SearchApp (for gene signature items).
  */
 class SearchBioMarkerCorrelFastMV {
 
     // correlation types
-    static def GENE_CORREL_TYPE = 'GENE'
-    static def PATHWAY_CORREL_TYPE = 'PATHWAY_GENE'
-    static def GENE_SIG_CORREL_TYPE = 'GENE_SIGNATURE_ITEM'
+    public static final String GENE_CORREL_TYPE = 'GENE'
+    public static final String PATHWAY_CORREL_TYPE = 'PATHWAY_GENE'
+    public static final String GENE_SIG_CORREL_TYPE = 'GENE_SIGNATURE_ITEM'
 
-    Long id
-    Long domainObjectId
     Long assocBioMarkerId
     String correlationType
+    Long domainObjectId
     Long valueMetric
 
     static mapping = {
-        table 'SEARCH_BIO_MKR_CORREL_FAST_MV'
-        version false
-        columns {
-            id column: 'MV_ID'
-            domainObjectId column: 'DOMAIN_OBJECT_ID'
-            assocBioMarkerId column: 'ASSO_BIO_MARKER_ID'
-            correlationType column: 'CORREL_TYPE'
-            valueMetric column: 'VALUE_METRIC'
-        }
-    }
+	table 'SEARCHAPP.SEARCH_BIO_MKR_CORREL_FAST_MV'
+        id column: 'MV_ID'
+	version false
 
-    static constraints = {
+        assocBioMarkerId column: 'ASSO_BIO_MARKER_ID'
+        correlationType column: 'CORREL_TYPE'
     }
 }

@@ -1,340 +1,264 @@
-/*
- * $Id: CustomFilterController.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- */
-
+import org.springframework.beans.factory.annotation.Autowired
 import org.transmart.GlobalFilter
+import org.transmart.KeywordSet
+import org.transmart.SearchFilter
+import org.transmart.plugin.shared.SecurityService
 import org.transmart.searchapp.CustomFilter
 import org.transmart.searchapp.CustomFilterItem
 import org.transmart.searchapp.SearchKeyword
 
 /**
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
 class CustomFilterController {
 
-    def springSecurityService
-    static def allowedMethods = [save: 'POST', update: 'POST']
+    static allowedMethods = [save: 'POST', update: 'POST']
 
-    def list = {
-        if (!params.max) params.max = 10
-        def user = springSecurityService.getPrincipal()
-        def customFilters = CustomFilter.findAllBySearchUserId(user.id)
-        for (customFilter in customFilters) {
-            def keywordMap = createKeywordMap(customFilter)
-            def summary = createSummaryWithLinks(keywordMap)
-            customFilter.summary = summary
+    @Autowired private SecurityService securityService
+
+    def list() {
+	if (!params.max) {
+	    params.max = 10
         }
-        [customFilterInstanceList: customFilters]
+
+	List<CustomFilter> customFilters = CustomFilter.findAllBySearchUserId(securityService.currentUserId())
+	for (CustomFilter customFilter in customFilters) {
+	    customFilter.summary = createSummaryWithLinks(createKeywordMap(customFilter))
+	}
+	[customFilters: customFilters]
     }
 
-    def delete = {
-        def customFilterInstance = CustomFilter.get(params.id)
-        if (!customFilterInstance) {
-            flash.message = 'CustomFilter not found with id ' + params.id
-            redirect(action: 'list')
-        }
-        else if (!canUpdate(customFilterInstance)) {
-            flash.message = 'You are not authorized to delete the custom filter with ID ' + params.id + '.'
-            redirect(action: 'list')
-        }
-        else {
-            customFilterInstance.delete()
-            flash.message = 'CustomFilter ' + params.id + ' deleted'
-            redirect(action: 'list', params: [ts: new Date().getTime()])
-        }
+    def delete(CustomFilter customFilter) {
+	if (!customFilter) {
+	    flash.message = "CustomFilter not found with id ${params.id}"
+	    redirect action: 'list'
+	    return
+	}
+
+	if (!canUpdate(customFilter)) {
+	    flash.message = "You are not authorized to delete the custom filter with ID ${params.id}."
+	    redirect action: 'list'
+	    return
+	}
+
+	customFilter.delete()
+	flash.message = "CustomFilter ${params.id} deleted"
+	redirect action: 'list', params: [ts: System.currentTimeMillis()]
     }
 
-    def edit = {
-        def customFilterInstance = CustomFilter.get(params.id)
+    def edit(CustomFilter customFilter) {
+	if (!customFilter) {
+	    flash.message = "CustomFilter not found with id ${params.id}"
+	    redirect action: 'list'
+	    return
+        }
 
-        if (!customFilterInstance) {
-            flash.message = 'CustomFilter not found with id ' + params.id
-            redirect(action: 'list')
+	if (!canUpdate(customFilter)) {
+	    flash.message = "You are not authorized to edit the custom filter with ID ${params.id}."
+	    redirect action: 'list'
+	    return
         }
-        else if (!canUpdate(customFilterInstance)) {
-            flash.message = 'You are not authorized to edit the custom filter with ID ' + params.id + '.'
-            redirect(action: 'list')
-        }
-        else {
-            def keywordMap = createKeywordMap(customFilterInstance)
-            def summary = createSummaryWithLinks(keywordMap)
-            customFilterInstance.summary = summary
-            return [customFilterInstance: customFilterInstance]
-        }
+
+	customFilter.summary = createSummaryWithLinks(createKeywordMap(customFilter))
+	[customFilter: customFilter]
     }
 
-    def update = {
-        params.privateFlag = (params?.privateFlag != 'on') ? 'N' : 'Y'
-        def customFilterInstance = CustomFilter.get(params.id)
-
-        if (customFilterInstance) {
-            customFilterInstance.properties = params
-            if (!customFilterInstance.hasErrors() && customFilterInstance.save()) {
-                flash.message = 'CustomFilter ' + params.id + ' updated'
-                redirect(action: 'list', params: [ts: new Date().getTime(), lastFilterID: params.id])
+    def update(CustomFilter customFilter) {
+	params.privateFlag = params.privateFlag == 'on' ? 'Y' : 'N'
+	if (customFilter) {
+	    customFilter.properties = params
+	    if (!customFilter.hasErrors() && customFilter.save()) {
+		flash.message = "CustomFilter ${params.id} updated"
+		redirect action: 'list', params: [ts: System.currentTimeMillis(), lastFilterID: params.id]
             }
             else {
-                render(view: 'edit', model: [customFilterInstance: customFilterInstance])
+		render view: 'edit', model: [customFilter: customFilter]
             }
         }
         else {
-            flash.message = 'CustomFilter not found with id ' + params.id
-            redirect(action: 'edit', id: params.id)
+	    flash.message = "CustomFilter not found with id ${params.id}"
+	    redirect action: 'edit', id: params.id
         }
     }
 
-    def create = {
-        def user = springSecurityService.getPrincipal()
-        def filter = new CustomFilter()
-        filter.properties.searchUserId = user.id
-        filter.properties.privateFlag = 'N'
-        def map = createKeywordMap(session.searchFilter.globalFilter)
-        filter.properties.summary = createSummaryWithLinks(map)
-        return ['customFilterInstance': filter]
+    def create() {
+	Map<String, Collection<SearchKeyword>> map = createKeywordMap(sessionSearchFilter().globalFilter)
+	[customFilter: new CustomFilter(
+	    searchUserId: securityService.currentUserId(),
+	    privateFlag: 'N',
+	    summary: createSummaryWithLinks(map))]
     }
 
-    def save = {
-
-        //	println('private flag:'+params.privateFlag)
-        params.privateFlag = (params?.privateFlag != 'on') ? 'N' : 'Y'
-        def filter = new CustomFilter(params)
-        //println(filter)
-        def map = createKeywordMap(session.searchFilter.globalFilter)
-        for (key in map.keySet()) {
-            def keywords = map[(key)]
-            for (keyword in keywords) {
-                CustomFilterItem item = new CustomFilterItem()
-                item.uniqueId = keyword.uniqueId
-                item.bioDataType = keyword.dataCategory
-                filter.addToItems(item)
+    def save() {
+	params.privateFlag = params.privateFlag == 'on' ? 'Y' : 'N'
+	CustomFilter filter = new CustomFilter(params)
+	Map<String, Collection<SearchKeyword>> map = createKeywordMap(sessionSearchFilter().globalFilter)
+	for (String key in map.keySet()) {
+	    Collection<SearchKeyword> keywords = map[key]
+	    for (SearchKeyword keyword in keywords) {
+		filter.addToItems new CustomFilterItem(uniqueId: keyword.uniqueId, bioDataType: keyword.dataCategory)
             }
         }
         if (!filter.hasErrors() && filter.save()) {
-            flash.message = 'CustomFilter ' + filter.id + ' created'
-            redirect(action: 'list', params: [ts: new Date().getTime(), lastFilterID: filter.id])
+	    flash.message = "CustomFilter ${filter.id} created"
+	    redirect action: 'list', params: [ts: System.currentTimeMillis(), lastFilterID: filter.id]
         }
         else {
-            render(view: 'create', model: [customFilterInstance: filter])
+	    render view: 'create', model: [customFilter: filter]
         }
     }
 
-    boolean canUpdate(customFilter) {
-        def user = springSecurityService.getPrincipal()
-        if (customFilter != null && customFilter.searchUserId == user.id) {
-            return true
-        }
-        return false
+    private boolean canUpdate(CustomFilter customFilter) {
+	customFilter?.searchUserId == securityService.currentUserId()
     }
 
-    boolean canSelect(customFilter) {
-        def user = springSecurityService.getPrincipal()
-        if (customFilter != null && (customFilter.privateFlag != 'Y' || customFilter.searchUserId == user.id)) {
-            return true
-        }
-        return false
+    private Map<String, Collection<SearchKeyword>> createKeywordMap(GlobalFilter gfilter) {
+	Map<String, Collection<SearchKeyword>> map = [:]
+	addToMap gfilter.geneFilters, map, 'GENE'
+	addToMap gfilter.pathwayFilters, map, 'PATHWAY'
+	addToMap gfilter.compoundFilters, map, 'COMPOUND'
+	addToMap gfilter.diseaseFilters, map, 'DISEASE'
+	addToMap gfilter.trialFilters, map, 'TRIAL'
+	addToMap gfilter.studyFilters, map, 'STUDY'
+	addToMap gfilter.geneSignatureFilters, map, 'GENESIG'
+	addToMap gfilter.textFilters, map, 'TEXT'
+	map
     }
 
-    private createKeywordMap(GlobalFilter gfilter) {
-        def map = [:]
-        def list
-        list = gfilter.getGeneFilters()
-        if (list.size() > 0) {
-            map.put('GENE', list)
+    private void addToMap(KeywordSet keywordSet, Map<String, Collection<SearchKeyword>> map, String key) {
+	if (keywordSet) {
+	    map[key] = keywordSet
         }
-        list = gfilter.getPathwayFilters()
-        if (list.size() > 0) {
-            map.put('PATHWAY', list)
-        }
-        list = gfilter.getCompoundFilters()
-        if (list.size() > 0) {
-            map.put('COMPOUND', list)
-        }
-        list = gfilter.getDiseaseFilters()
-        if (list.size() > 0) {
-            map.put('DISEASE', list)
-        }
-        list = gfilter.getTrialFilters()
-        if (list.size() > 0) {
-            map.put('TRIAL', list)
-        }
-        list = gfilter.getStudyFilters()
-        if (list.size() > 0) {
-            map.put('STUDY', list)
-        }
-        list = gfilter.getGeneSignatureFilters()
-        if (list.size() > 0) {
-            map.put('GENESIG', list)
-        }
-        list = gfilter.getTextFilters()
-        if (list.size() > 0) {
-            map.put('TEXT', list)
-        }
-
-        return map
     }
 
-    private createKeywordMap(CustomFilter filter) {
+    private Map<String, Collection<SearchKeyword>> createKeywordMap(CustomFilter filter) {
 
-        def map = [:]
-        def uniqueIds = []
-        for (item in filter.items) {
-            def id = item.uniqueId
+	Map<String, Collection<SearchKeyword>> map = [:]
+	List<String> uniqueIds = []
+	for (CustomFilterItem item in filter.items) {
+	    String id = item.uniqueId
             if (item.bioDataType == 'TEXT') {
-                def list
+		Collection<SearchKeyword> list
                 if (map.containsKey('TEXT')) {
-                    list = map['TEXT']
+		    list = map.TEXT
                 }
                 else {
                     list = []
-                    map['TEXT'] = list
+		    map.TEXT = list
                 }
-                def keyword = new SearchKeyword()
-                keyword.keyword = id.substring(id.indexOf(':') + 1)
-                keyword.id = -1
-                keyword.uniqueId = id
-                keyword.dataCategory = 'TEXT'
-                list.add(keyword)
+
+		list << new SearchKeyword(
+		    keyword: id.substring(id.indexOf(':') + 1),
+		    uniqueId: id,
+		    dataCategory: 'TEXT')
             }
             else {
-                uniqueIds.add(item.uniqueId)
+		uniqueIds << item.uniqueId
             }
         }
-        if (uniqueIds.size() > 0) {
-            def keywords = SearchKeyword.findAllByUniqueIdInList(uniqueIds)
-            for (keyword in keywords) {
-                def list
+
+	if (uniqueIds) {
+	    Collection<SearchKeyword> keywords = SearchKeyword.findAllByUniqueIdInList(uniqueIds)
+	    for (SearchKeyword keyword in keywords) {
+		Collection<SearchKeyword> list
                 if (map.containsKey(keyword.dataCategory)) {
-                    list = map[(keyword.dataCategory)]
+		    list = map[keyword.dataCategory]
                 }
                 else {
                     list = []
-                    map[(keyword.dataCategory)] = list
+		    map[keyword.dataCategory] = list
                 }
-                list.add(keyword)
+		list << keyword
             }
         }
 
-        return map
-
+	map
     }
 
     /**
      * Creates link to detatils for specified filter keyword.
      */
-    def createSummaryFilter(SearchKeyword keyword) {
+    private String createSummaryFilter(SearchKeyword keyword) {
 
-        def link = new StringBuilder()
-        def type = keyword.dataCategory.toLowerCase()
+	String type = keyword.dataCategory.toLowerCase()
 
-        link.append('<nobr>')
+	StringBuilder link = new StringBuilder('<nobr>')
         if (type == 'text') {
-            link.append(createFilterDetailsLink(id: keyword.keyword, label: keyword.keyword, type: type))
+	    link << createFilterDetailsLink(id: keyword.keyword, label: keyword.keyword, type: type)
         }
         else {
-            def label = keyword.keyword
-            if (type == 'pathway' && keyword.dataSource != null && keyword.dataSource != '') {
+	    String label = keyword.keyword
+	    if (type == 'pathway' && keyword.dataSource) {
                 label = keyword.dataSource + '-' + label
             }
-            link.append(createFilterDetailsLink(id: keyword.bioDataId, label: label, type: type))
+	    link << createFilterDetailsLink(id: keyword.bioDataId, label: label, type: type)
         }
-        link.append('</nobr>')
-        return link.toString()
-
+	link << '</nobr>'
+	link
     }
 
     /**
      * Creates section in summary for given categories filters.
      */
-    def createSummarySection(category, keywordMap) {
+    private String createSummarySection(String category, Map<String, Collection<SearchKeyword>> keywordMap) {
 
-        def section = new StringBuilder()
-        def filters = keywordMap[(category)]
-        for (filter in filters) {
-            if (section.length() > 0) {
-                section.append(' OR ')
+	StringBuilder section = new StringBuilder()
+	Collection<SearchKeyword> filters = keywordMap[(category)]
+	for (SearchKeyword filter in filters) {
+	    if (section) {
+		section << ' OR '
             }
-            section.append(createSummaryFilter(filter))
+	    section << createSummaryFilter(filter)
         }
 
-        if (section.length() == 0) {
+	if (!section) {
             return ''
         }
 
-        def span = new StringBuilder()
-        span.append('<span class="filter-item filter-item-')
-        span.append(category.toLowerCase())
-        span.append('">')
-        span.append(formatCategory(category))
+	StringBuilder span = new StringBuilder()
+	span << '<span class="filter-item filter-item-'
+	span << category.toLowerCase()
+	span << '">'
+	span << formatCategory(category)
         if (filters.size() > 1) {
-            span.append('s')
+	    span << 's'
         }
-        span.append('&gt;&nbsp;</span>')
-        span.append(section)
+	span << '&gt;&nbsp;</span>'
+	span << section
 
-        return span.toString()
-
+	span
     }
+
     /**
      * Creates summary of filters with links to details for filters.
      */
-    def createSummaryWithLinks(keywordMap) {
-
-        def genes = createSummarySection('GENE', keywordMap)
-        def pathways = createSummarySection('PATHWAY', keywordMap)
-        def compounds = createSummarySection('COMPOUND', keywordMap)
-        def diseases = createSummarySection('DISEASE', keywordMap)
-        def trials = createSummarySection('TRIAL', keywordMap)
-        def genesigs = createSummarySection('GENESIG', keywordMap)
-        def studies = createSummarySection('STUDY', keywordMap)
-        def texts = createSummarySection('TEXT', keywordMap)
-        def summary = new StringBuilder()
-
-        if (genes) {
-            summary.append(genes)
-        }
-
-        if (summary.length() > 0 && pathways.length() > 0) {
-            summary.append(' OR ')
-        }
-        summary.append(pathways)
-
-        if (summary.length() > 0 && genesigs.length() > 0) {
-            summary.append(' OR ')
-        }
-        summary.append(genesigs)
-
-        if (summary.length() > 0 && compounds.length() > 0) {
-            summary.append(' AND ')
-        }
-        summary.append(compounds)
-
-        if (summary.length() > 0 && diseases.length() > 0) {
-            summary.append(' AND ')
-        }
-        summary.append(diseases)
-
-        if (summary.length() > 0 && trials.length() > 0) {
-            summary.append(' AND ')
-        }
-        summary.append(trials)
-
-        if (summary.length() > 0 && studies.length() > 0) {
-            summary.append(' AND ')
-        }
-        summary.append(studies)
-
-        if (summary.length() > 0 && texts.length() > 0) {
-            summary.append(' AND ')
-        }
-        summary.append(texts)
-
-        return summary.toString()
-
+    private String createSummaryWithLinks(Map<String, Collection<SearchKeyword>> keywordMap) {
+	StringBuilder summary = new StringBuilder()
+	appendSummarySection 'GENE', keywordMap, summary, true
+	appendSummarySection 'PATHWAY', keywordMap, summary, true
+	appendSummarySection 'GENESIG', keywordMap, summary, true
+	appendSummarySection 'COMPOUND', keywordMap, summary, false
+	appendSummarySection 'DISEASE', keywordMap, summary, false
+	appendSummarySection 'TRIAL', keywordMap, summary, false
+	appendSummarySection 'STUDY', keywordMap, summary, false
+	appendSummarySection 'TEXT', keywordMap, summary, false
+	summary
     }
 
-    def formatCategory(category) {
-        return category.substring(0, 1).toUpperCase() + category.substring(1).toLowerCase()
+    private void appendSummarySection(String category, Map<String, Collection<SearchKeyword>> keywordMap,
+	                              StringBuilder summary, boolean or) {
+	String section = createSummarySection(category, keywordMap)
+	if (summary && section) {
+	    summary << or ? ' OR ' : ' AND '
+	}
+	summary << section
     }
 
+    private String formatCategory(String category) {
+	category.substring(0, 1).toUpperCase() + category.substring(1).toLowerCase()
+    }
+
+    private SearchFilter sessionSearchFilter() {
+	session.searchFilter
+    }
 }

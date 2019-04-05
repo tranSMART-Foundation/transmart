@@ -1,41 +1,42 @@
 package org.transmartproject.security
 
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
+
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSession
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
-import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 
-public class SSLCertificateValidation {
+@CompileStatic
+@Slf4j('logger')
+class SSLCertificateValidation {
 
-    public static void disable() {
+    static void disable() {
         try {
             SSLContext sslContext = SSLContext.getInstance('TLS')
-            TrustManager[] trustManagerArray = [ new NullX509TrustManager() ]
-            sslContext.init(null, trustManagerArray, null)
-            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory())
-            HttpsURLConnection.setDefaultHostnameVerifier(new NullHostnameVerifier())
+	    TrustManager[] trustManagers = [new NullX509TrustManager()]
+	    sslContext.init null, trustManagers, null
+	    HttpsURLConnection.setDefaultSSLSocketFactory sslContext.socketFactory
+	    HttpsURLConnection.setDefaultHostnameVerifier new NullHostnameVerifier()
         }
-        catch(Exception e) {
-            e.printStackTrace()
+	catch (e) {
+	    logger.error e.message, e
         }
     }
 
+    @CompileStatic
     private static class NullX509TrustManager implements X509TrustManager {
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException { }
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException { }
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0]
-        }
+	void checkClientTrusted(X509Certificate[] chain, String authType) {}
+	void checkServerTrusted(X509Certificate[] chain, String authType) {}
+	X509Certificate[] getAcceptedIssuers() { new X509Certificate[0] }
     }
 
+    @CompileStatic
     private static class NullHostnameVerifier implements HostnameVerifier {
-        public boolean verify(String hostname, SSLSession session) {
-            return true
-        }
+	boolean verify(String hostname, SSLSession session) { true }
     }
-
 }

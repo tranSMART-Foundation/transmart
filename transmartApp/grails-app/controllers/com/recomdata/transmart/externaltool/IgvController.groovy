@@ -2,140 +2,81 @@ package com.recomdata.transmart.externaltool
 
 import com.recomdata.export.IgvFiles
 import groovy.util.logging.Slf4j
-import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.util.Assert
+import org.transmart.plugin.shared.SecurityService
 
 @Slf4j('logger')
 class IgvController {
 
-    def springSecurityService
-    def igvDataService
+    @Autowired private SecurityService securityService
+    @Autowired private IgvDataService igvDataService
 
-    def launchJNLP = {
+    @Value('${com.recomdata.analysis.data.file.dir:}')
+    private String fileDirName
 
-        def webRootDir = servletContext.getRealPath('/')
-        /*
-        // get data first
-        //String newIGVLink = new ApplicationTagLib().createLink(controller:'analysis', action:'getGenePatternFile', absolute:true)
-        String fileDirName = grailsApplication.config.com.recomdata.analysis.data.file.dir
-        if(fileDirName == null)
-        fileDirName = 'data'
-        String newIGVLink = new ApplicationTagLib().createLink(controller:fileDirName, , absolute:true)
-
-        IgvFiles igvFiles = new IgvFiles(getIgvFileDirName(),newIGVLink)
-
-        // testing data
-        def f = new File (webRootDir + '/data/' + 'test.vcf')
-        igvFiles.addFile(f)
-
-        String userName = springSecurityService.getPrincipal().username
-
-
-        // create session file URL
-        def sessionfileURL = igvDataService.createSessionURL(igvFiles, userName)
-
-        // create JNLP file
-
-
-        */
-
-        def sessionFileURL = params.sessionFile
-        logger.debug(sessionFileURL)
-        def ftext = igvDataService.createJNLPasString(webRootDir, sessionFileURL)
-
-
-        response.setHeader('Content-Type', 'application/x-java-jnlp-file')
-
-        //println(ftext)
-        response.outputStream << ftext
-
+    def launchJNLP() {
+	String webRootDir = servletContext.getRealPath('/')
+	String sessionFileUrl = params.sessionFile
+	logger.debug sessionFileUrl
+	header 'Content-Type', 'application/x-java-jnlp-file'
+	response.outputStream << igvDataService.createJNLPasString(webRootDir, sessionFileUrl)
     }
 
     //This URL will be launched with the job ID in the query string.
-    def launchIGV = {
+    def launchIGV(String jobName) {
+	Assert.hasLength fileDirName, 'property com.recomdata.analysis.data.file.dir is not set '
 
-        def webRootDir = servletContext.getRealPath('/')
-
-        //Grab the job ID from the query string.
-        String jobName = params.jobName
-        println params
-
-        // loop through and find all files
-        def resultfileDir = getIgvFileDirName()
-
-        // get data first
-        String fileDirName = grailsApplication.config.com.recomdata.analysis.data.file.dir
-        if (fileDirName == null)
-            throw new Exception('property com.recomdata.analysis.data.file.dir is not set ')
-        String newIGVLink = new ApplicationTagLib().createLink(controller: fileDirName, , absolute: true)
-
+	String resultfileDir = getIgvFileDirName()
+	String newIGVLink = createLink(controller: fileDirName, absolute: true)
         IgvFiles igvFiles = new IgvFiles(getIgvFileDirName(), newIGVLink)
 
+	FileNameFinder finder = new FileNameFinder()
+
         // find result files -might be multiple
-        def pattern = jobName + '*.vcf'
-        def dataFiles = new FileNameFinder().getFileNames(resultfileDir, pattern)
-        dataFiles.each {
-            igvFiles.addFile(new File(it))
+	String pattern = jobName + '*.vcf'
+	for (String name in finder.getFileNames(resultfileDir, pattern)) {
+	    igvFiles.addFile new File(name)
         }
 
         // find param files - should have one
-        def parampattern = jobName + '_vcf.params'
-        def pFiles = new FileNameFinder().getFileNames(resultfileDir, parampattern)
-        println('param files:' + pFiles)
-        def paramfile = ''
-        def locus = null
-        def gene = null
-        def chr = null
-        def snp = null
-        if (pFiles != null && !pFiles.isEmpty()) {
-            paramfile = pFiles[0]
-            logger.debug('find paramfile:' + paramfile)
-            def f = new File(paramfile)
+	List<String> pFiles = finder.getFileNames(resultfileDir, jobName + '_vcf.params')
+	String locus = null
+	if (pFiles) {
+	    String gene = null
+	    String chr = null
+	    String snp = null
+	    String paramfile = pFiles[0]
+	    logger.debug 'find paramfile:{}', paramfile
+	    File f = new File(paramfile)
             if (f.exists()) {
-                f.eachLine { line ->
-                    if (line.startsWith('Chr=') && chr == null) {
+		for (String line in f.readLines()) {
+		    if (line.startsWith('Chr=') && !chr) {
                         chr = line.substring(4)
                     }
-                    if (line.startsWith('Gene=') && gene == null) {
+		    if (line.startsWith('Gene=') && !gene) {
                         gene = line.substring(5)
                     }
-                    if (line.startsWith('SNP=') && snp == null) {
+		    if (line.startsWith('SNP=') && !snp) {
                         snp = line.substring(4)
                     }
                 }
             }
 
             // try to create locus hint for igv
-            if (snp != null) {
-                locus = snp
-            }
-            else if (gene != null) {
-                locus = gene
-            }
-            else {
-                locus = chr
-            }
-
+	    locus = snp ?: gene ?: chr
         }
 
-        // testing 	data
-        //	def f = new File (webRootDir + '/data/' + 'test.vcf')
-        //	igvFiles.addFile(f)
-
-        String userName = springSecurityService.getPrincipal().username
-
-        // create session file URL
-        def sessionfileURL = igvDataService.createSessionURL(igvFiles, userName, locus)
-
-        render(view: 'launch', model: [sessionFile: sessionfileURL])
-
-
+	render view: 'launch', model: [sessionFile: igvDataService.createSessionURL(
+	    igvFiles, securityService.currentUsername(), locus)]
     }
 
     protected String getIgvFileDirName() {
-        String fileDirName = grailsApplication.config.com.recomdata.analysis.data.file.dir
-        def webRootName = servletContext.getRealPath('/')
-        if (webRootName.endsWith(File.separator) == false)
+	String webRootName = servletContext.getRealPath('/')
+	if (!webRootName.endsWith(File.separator)) {
             webRootName += File.separator
-        return webRootName + fileDirName
+	}
+	webRootName + fileDirName
     }
 }

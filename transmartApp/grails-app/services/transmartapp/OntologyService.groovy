@@ -1,165 +1,160 @@
 package transmartapp
 
-import grails.converters.JSON
 import groovy.util.logging.Slf4j
-import org.transmart.searchapp.AuthUser
+import i2b2.OntNode
 
 @Slf4j('logger')
 class OntologyService {
 
-    boolean transactional = true
+    static transactional = false
 
     def i2b2HelperService
-    def springSecurityService
 
-    def searchOntology(searchtags, searchterms, tagsearchtype, returnType, accessionsToInclude, searchOperator) {
+    def searchOntology(searchTags, searchTerms, String tagSearchType, String returnType,
+	               accessionsToInclude, String searchOperator) {
 
-        def concepts = []
-        def myNodes
+	List<Map> concepts = []
+	List<OntNode> myNodes
+	int myCount
 
-        if (searchterms?.size() == 0) {
-            searchterms = null
+	if (!searchTerms) {
+	    searchTerms = null
         }
-        logger.trace('searching for:' + searchtags + ' of type' + tagsearchtype + 'with searchterms:' + searchterms?.join(','))
-        def myCount = 0
-        def allSystemCds = []
-        def visualAttrHiddenWild = '%H%'
+	logger.trace 'searching for: {} of type {} with searchterms:{}', searchTags, tagSearchType, searchTerms?.join(',')
 
         //Build queries for search terms and accessions to include
-        def searchtermstring = ''
-        for (searchterm in searchterms) {
+	String searchTermsHql = ''
+	for (searchterm in searchTerms) {
             searchterm = searchterm?.trim()
             if (searchterm) {
-                if (!searchtermstring.equals('')) {
-                    searchtermstring += ' ' + searchOperator + ' '
+		if (searchTermsHql) {
+		    searchTermsHql += ' ' + searchOperator + ' '
                 }
-                def searchtermWild = '%' + searchterm.toLowerCase().replace("'", "''") + '%'
-                searchtermstring += "lower(o.name) like '" + searchtermWild + "' "
+		String searchtermWild = '%' + searchterm.toLowerCase().replace("'", "''") + '%'
+		searchTermsHql += "lower(o.name) like '" + searchtermWild + "' "
             }
         }
-        if (!searchtermstring) {
-            searchtermstring = '2=1'; //No free-text search terms, so this section of the query is always false
+	if (!searchTermsHql) {
+	    searchTermsHql = '2=1' //No free-text search terms, so this section of the query is always false
         }
 
-        def accessionSearchString = ''
-        if (accessionsToInclude) {
-            accessionSearchString += " OR (o.visualattributes = 'FAS' AND o.sourcesystemcd IN ("
-            accessionSearchString += "'" + accessionsToInclude.join("','") + "'"
-            accessionSearchString += '))'
-        }
+	if (tagSearchType == 'ALL') {
+	    String accessionSearch = ''
+            if (accessionsToInclude) {
+		accessionSearch += ''' OR (o.visualattributes = 'FAS' AND o.sourcesystemcd IN ('''
+		accessionSearch += "'" + accessionsToInclude.join("','") + "'"
+		accessionSearch += '))'
+	    }
 
-        if (tagsearchtype == 'ALL') {
-            def countQuery = "SELECT COUNT(DISTINCT o.id) from i2b2.OntNode o WHERE (_searchterms_) _accessionSearch_ AND o.visualattributes NOT like '" + visualAttrHiddenWild + "'"
-            def nodeQuery = "SELECT o from i2b2.OntNode o WHERE (_searchterms_) _accessionSearch_ AND o.visualattributes NOT like '" + visualAttrHiddenWild + "'"
-
-            countQuery = countQuery.replace('_searchterms_', searchtermstring).replace('_accessionSearch_', accessionSearchString)
-            nodeQuery = nodeQuery.replace('_searchterms_', searchtermstring).replace('_accessionSearch_', accessionSearchString)
-
-            logger.debug(nodeQuery)
-
-            myCount = i2b2.OntNode.executeQuery(countQuery)[0]
-            myNodes = i2b2.OntNode.executeQuery(nodeQuery, [max: 100])
-
+	    myCount = OntNode.executeQuery('''
+					SELECT COUNT(DISTINCT o.id)
+					from OntNode o
+					WHERE (''' + searchTermsHql + ')' + '''
+					''' + accessionSearch + '''
+					  AND o.visualattributes NOT like '%H%' ''')[0]
+	    myNodes = OntNode.executeQuery('''
+					SELECT o
+					from OntNode o
+					WHERE (''' + searchTermsHql + ')' + '''
+					''' + accessionSearch + '''
+					  AND o.visualattributes NOT like '%H%' ''',
+					[max: 100])
         }
         else {
+	    List<String> allSystemCds = OntNode.executeQuery('''
+					SELECT DISTINCT o.sourcesystemcd
+					FROM OntNode o JOIN o.tags t
+					WHERE t.tag IN (:tagArg)
+					  AND t.tagtype =:tagTypeArg''',
+					[tagArg: searchTags, tagTypeArg: tagSearchType], [max: 800])
 
-            def cdQuery = 'SELECT DISTINCT o.sourcesystemcd FROM i2b2.OntNode o JOIN o.tags t WHERE t.tag IN (:tagArg) AND t.tagtype =:tagTypeArg'
-            allSystemCds = i2b2.OntNode.executeQuery(cdQuery, [tagArg: searchtags, tagTypeArg: tagsearchtype], [max: 800])
+	    myCount = OntNode.executeQuery('''
+					SELECT COUNT(DISTINCT o.id)
+					from OntNode o
+					WHERE o.sourcesystemcd IN (:scdArg)
+					AND (''' + searchTermsHql + ')' + '''
+					AND o.visualattributes NOT like '%H%' ''',
+					[scdArg: allSystemCds])[0]
 
-            def countQuery = "SELECT COUNT(DISTINCT o.id) from i2b2.OntNode o WHERE o.sourcesystemcd IN (:scdArg) AND (_searchterms_) AND o.visualattributes NOT like '" + visualAttrHiddenWild + "'"
-            countQuery = countQuery.replace('_searchterms_', searchtermstring)
-            myCount = i2b2.OntNode.executeQuery(countQuery, [scdArg: allSystemCds])[0]
-
-            def nodeQuery = "SELECT o from i2b2.OntNode o WHERE o.sourcesystemcd IN (:scdArg) AND (_searchterms_) AND o.visualattributes NOT like '" + visualAttrHiddenWild + "'"
-            nodeQuery = nodeQuery.replace('_searchterms_', searchtermstring)
-            myNodes = i2b2.OntNode.executeQuery(nodeQuery, [scdArg: allSystemCds], [max: 100])
+	    myNodes = OntNode.executeQuery('''
+					SELECT o
+					from OntNode o
+					WHERE o.sourcesystemcd IN (:scdArg)
+					AND (''' + searchTermsHql + ')' + '''
+					AND o.visualattributes NOT like '%H%' ''',
+					[scdArg: allSystemCds], [max: 100])
         }
-        //}
 
         //check the security
-        def keys = [:]
-        myNodes.each { node ->
-            //keys.add('\\'+node.id.substring(0,node.id.indexOf('\\',2))+node.id)
-            keys.put(node.id, node.securitytoken)
-            logger.trace(node.id + ' security token:' + node.securitytoken)
-        }
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-        def access = i2b2HelperService.getAccess(keys, user)
-        logger.trace(access as JSON)
+	Map<String, String> keys = [:]
+	for (OntNode node in myNodes) {
+	    keys[node.id] = node.securitytoken
+	    logger.trace '{} security token: {}', node.id, node.securitytoken
+	}
 
-        if (returnType.equals('JSON')) {
-            //build the JSON for the client
-            myNodes.each { node ->
-                logger.trace(node.id)
-                def level = node.hlevel
-                def key = '\\' + node.id.substring(0, node.id.indexOf('\\', 2)) + node.id
-                def name = node.name
-                def synonym_cd = node.synonymcd
-                def visualattributes = node.visualattributes
-                def totalnum = node.totalnum
-                def facttablecolumn = node.facttablecolumn
-                def tablename = node.tablename
-                def columnname = node.columnname
-                def columndatatype = node.columndatatype
-                def operator = node.operator
-                def dimcode = node.dimcode
-                def comment = node.comment
-                def tooltip = node.tooltip
-                def metadataxml = i2b2HelperService.metadataxmlToJSON(node.metadataxml)
-                concepts.add([level: level, key: key, name: name, synonym_cd: synonym_cd, visualattributes: visualattributes, totalnum: totalnum, facttablecolumn: facttablecolumn, tablename: tablename, columnname: columnname, columndatatype: columndatatype, operator: operator, dimcode: dimcode, comment: comment, tooltip: tooltip, metadataxml: metadataxml, access: access[node.id]])
+	Map access = i2b2HelperService.getAccess(keys)
 
+	if (returnType == 'JSON') {
+	    //build the JSON for the client
+	    for (OntNode node in myNodes) {
+		concepts << [level: node.hlevel,
+			     key: '\\' + node.id.substring(0, node.id.indexOf('\\', 2)) + node.id,
+			     name: node.name,
+			     synonym_cd: node.synonymcd,
+			     visualattributes: node.visualattributes,
+			     totalnum: node.totalnum,
+			     facttablecolumn: node.facttablecolumn,
+			     tablename: node.tablename,
+			     columnname: node.columnname,
+			     columndatatype: node.columndatatype,
+			     operator: node.operator,
+			     dimcode: node.dimcode,
+			     comment: node.comment,
+			     tooltip: node.tooltip,
+			     metadataxml: i2b2HelperService.metadataxmlToJSON(node.metadataxml),
+			     access: access[node.id]]
             }
-            def resulttext
+
+	    String resultText
             if (myCount < 100) {
-                resulttext = 'Found ' + myCount + ' results.'
+		resultText = 'Found ' + myCount + ' results.'
             }
             else {
-                resulttext = 'Returned first 100 of ' + myCount + ' results.'
+		resultText = 'Returned first 100 of ' + myCount + ' results.'
             }
 
-            def result = [concepts: concepts, resulttext: resulttext]
-            logger.trace(result as JSON)
-
-            return result
+	    return [concepts: concepts, resulttext: resultText]
         }
-        else if (returnType.equals('accession')) {
-            def accessions = []
-            myNodes.each { node ->
+
+	if (returnType == 'accession') {
+	    List<String> accessions = []
+	    for (OntNode node in myNodes) {
                 if (!accessions.contains(node.sourcesystemcd)) {
-                    accessions.add(node.sourcesystemcd)
+		    accessions << node.sourcesystemcd
                 }
             }
             return accessions
         }
-        else if (returnType.equals('path')) {
-            def ids = []
 
-            myNodes.each { node ->
-                def key = '\\' + node.id.substring(0, node.id.indexOf('\\', 2)) + node.id // ?!
+	if (returnType == 'path') {
+	    List<String> ids = []
+
+	    for (OntNode node in myNodes) {
+		String key = '\\' + node.id.substring(0, node.id.indexOf('\\', 2)) + node.id // ?!
                 if (!ids.contains(key)) {
-                    ids.add(key)
+		    ids << key
                 }
             }
             return ids
         }
     }
 
-    def checkSubjectLevelData(accession) {
-
-        def nodes = i2b2.OntNode.createCriteria().list {
-            eq('sourcesystemcd', accession?.toUpperCase())
-            maxResults(1)
-        }
-
-        return (nodes.size() > 0)
+    boolean checkSubjectLevelData(String accession) {
+	OntNode.findBySourcesystemcd accession?.toUpperCase()
     }
 
-    def getPathForAccession(accession) {
-        def node = i2b2.OntNode.createCriteria().get {
-            eq('sourcesystemcd', accession.toUpperCase())
-            eq('hlevel', 1L)
-        }
-
-        return ('\\' + node.id.substring(0, node.id.indexOf('\\', 2)) + node.id).replace('\\', '\\\\')
+    String getPathForAccession(String accession) {
+	OntNode node = OntNode.findBySourcesystemcdAndHlevel(accession.toUpperCase(), 1L)
+	('\\' + node.id.substring(0, node.id.indexOf('\\', 2)) + node.id).replace '\\', '\\\\'
     }
 }

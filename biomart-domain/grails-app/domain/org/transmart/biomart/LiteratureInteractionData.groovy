@@ -16,52 +16,27 @@
  *
  *
  ******************************************************************/
-
-/**
- * $Id: LiteratureInteractionData.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
 package org.transmart.biomart
 
 class LiteratureInteractionData extends Literature {
-    Long id
-    LiteratureReferenceData reference
-    LiteratureModelData inVivoModel
-    LiteratureModelData inVitroModel
+    String effect
     String etlId
+    String interactionMode
+    LiteratureModelData inVitroModel
+    LiteratureModelData inVivoModel
+    String localization
+    String mechanism
+    String region
+    String regulation
     String sourceComponent
     String sourceGeneId
     String targetComponent
     String targetGeneId
-    String interactionMode
-    String regulation
-    String mechanism
-    String effect
-    String localization
-    String region
     String techniques
+
     static mapping = {
-        table 'BIO_LIT_INT_DATA'
+	table 'BIOMART.BIO_LIT_INT_DATA'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_LIT_INT_DATA_ID'
         version false
-        id column: 'BIO_LIT_INT_DATA_ID'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            reference column: 'BIO_LIT_REF_DATA_ID'
-            inVivoModel column: 'IN_VIVO_MODEL_ID'
-            inVitroModel column: 'IN_VITRO_MODEL_ID'
-            etlId column: 'ETL_ID'
-            sourceComponent column: 'SOURCE_COMPONENT'
-            sourceGeneId column: 'SOURCE_GENE_ID'
-            targetComponent column: 'TARGET_COMPONENT'
-            targetGeneId column: 'TARGET_GENE_ID'
-            interactionMode column: 'INTERACTION_MODE'
-            regulation column: 'REGULATION'
-            mechanism column: 'MECHANISM'
-            effect column: 'EFFECT'
-            localization column: 'LOCALIZATION'
-            region column: 'REGION'
-            techniques column: 'TECHNIQUES'
-        }
     }
 }

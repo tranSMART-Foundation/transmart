@@ -20,16 +20,17 @@
 package org.transmart.logging
 
 import com.google.common.base.Charsets
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 import groovy.util.logging.Slf4j
 import org.apache.log4j.AppenderSkeleton
-import org.apache.log4j.spi.LoggingEvent
 import org.apache.log4j.helpers.LogLog
+import org.apache.log4j.spi.LoggingEvent
+import org.springframework.util.Assert
 import org.transmart.logging.JsonLayout
 
-import static java.lang.ProcessBuilder.Redirect.*
-
+import static java.lang.ProcessBuilder.Redirect.INHERIT
 
 /**
  * This appender spawns a process, and sends log messages encoded as json to the process which can read them on its
@@ -78,30 +79,29 @@ class ChildProcessAppender extends AppenderSkeleton {
     // The appender being broken should be unlikely. It indicates a misconfiguration or an error in the child program.
     protected boolean broken = false
 
-    private ThreadLocal<int[]> recursionCount = [
-        initialValue: { [0] as int[] }
-    ] as ThreadLocal<int[]>
+    private ThreadLocal<int[]> recursionCount = createRecursionCount()
+
+    ChildProcessAppender() {
+	layout = new JsonLayout(singleLine: true)
+    }
 
     void setRestartLimit(int l) {
-        if (l < 0) throw new IllegalArgumentException('restartLimit cannot be negative (use 0 to disable the limit)')
-        this.restartLimit = l
+	Assert.isTrue l >= 0, "restartLimit cannot be negative (use 0 to disable the limit)"
+	restartLimit = l
     }
 
     void setRestartWindow(int w) {
-        if (w <= 0) throw new IllegalArgumentException('restartWindow must be larger than 0')
-        this.restartWindow = w
+	Assert.isTrue w > 0, "restartWindow must be larger than 0"
+	restartWindow = w
     }
 
     boolean isBroken() { return broken }
 
-    ChildProcessAppender() {
-        layout = new JsonLayout(singleLine: true)
-    }
+    // We cannot call into the normal logging system while we have this appender
+    // locked (that risks deadlock), so use the backup logging system
 
-    /* We cannot call into the normal logging system while we have this appender locked (that risks deadlock), so use
-     * the backup logging system.*/
     private void debug(String msg) {
-        LogLog.debug('' + this.class.name + '(name: ' + name + '): ' + msg)
+	LogLog.debug getClass().name + "(name: " + name + "): " + msg
     }
 
     private synchronized startProcess() {
@@ -109,18 +109,20 @@ class ChildProcessAppender extends AppenderSkeleton {
             starttime = System.currentTimeMillis()
         }
         process = new ProcessBuilder(command).redirectOutput(INHERIT).redirectError(INHERIT).start()
-        input = new OutputStreamWriter(process.getOutputStream(), Charsets.UTF_8)
+	input = new OutputStreamWriter(process.outputStream, Charsets.UTF_8)
         // Give child some time to fail if it fails quickly
-        sleep(1)
+	sleep 1
     }
 
     synchronized boolean getChildAlive() {
-        if (process == null) return false
+	if (process == null) {
+	    return false
+	}
         try {
             process.exitValue()
             return false
         }
-        catch (IllegalThreadStateException _) {
+	catch (IllegalThreadStateException ignored) {
             return true
         }
     }
@@ -133,15 +135,15 @@ class ChildProcessAppender extends AppenderSkeleton {
         if (restartLimit != 0 && inWindow && failcount > restartLimit) {
             broken = true
             // Don't log from here while we are synchronized, that would cause a deadlock condition
-            return 'Failed to restart external log handling process \'' + command.join(' ') + '\', failed $failcount times' +
-                    ' in less than ' + restartWindow + ' seconds'
+	    return "Failed to restart external log handling process \"${command.join(' ')}\", failed $failcount times" +
+		" in less than $restartWindow seconds"
         }
         input.close()
         if (!inWindow) {
             starttime = now
             failcount = 0
         }
-        debug('Restarting external logging process ' + command.join(' '))
+	debug("Restarting external logging process ${command.join(' ')}")
         startProcess()
         return null
     }
@@ -152,15 +154,17 @@ class ChildProcessAppender extends AppenderSkeleton {
         try {
             rc[0]++
             // Recursive call, ignore
-            if (rc[0] > 1) return
+	    if (rc[0] > 1) {
+		return
+	    }
 
             if (broken) {
-                String msg = 'Attempting to write to broken external log handling process'
+		String msg = "Attempting to write to broken external log handling process"
                 if (throwOnFailure) {
                     throw new ChildFailedException(msg)
                 }
                 else {
-                    logger.warn(msg)
+		    logger.warn msg
                     return
                 }
             }
@@ -179,7 +183,7 @@ class ChildProcessAppender extends AppenderSkeleton {
                         return
                     }
                     catch (IOException e) {
-                        debug('Caught IOException while writing to child process: ' + e)
+			debug("Caught IOException while writing to child process: $e")
                         errmsg = restartChild()
                     }
                 }
@@ -187,7 +191,7 @@ class ChildProcessAppender extends AppenderSkeleton {
 
             assert errmsg != null
             // Log outside of the synchronized block
-            logger.error(errmsg)
+	    logger.error errmsg
             if (throwOnFailure) {
                 throw new ChildFailedException(errmsg)
             }
@@ -200,7 +204,9 @@ class ChildProcessAppender extends AppenderSkeleton {
     @Override
     void append(LoggingEvent event) {
         // Check for recursive invocation
-        if (recursionCount.get()[0] > 0) return
+	if (recursionCount.get()[0] > 0) {
+	    return
+	};
 
         write(layout.format(event))
     }
@@ -214,6 +220,14 @@ class ChildProcessAppender extends AppenderSkeleton {
         input?.close()
     }
 
+    @CompileDynamic
+    private static ThreadLocal<int[]> createRecursionCount() {
+	new ThreadLocal<int[]>() {
+	    protected int[] initialValue() { [0] as int[] }
+	}
+    }
+
+    @CompileStatic
     @InheritConstructors
     static class ChildFailedException extends IOException {}
 }

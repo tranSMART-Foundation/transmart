@@ -1,5 +1,3 @@
-package org.transmart.biomart
-
 /*************************************************************************
  * tranSMART - translational medicine data mart
  * 
@@ -18,34 +16,33 @@ package org.transmart.biomart
  * 
  *
  ******************************************************************/
+package org.transmart.biomart
 
 class Observation {
-		Long id
-		String name
-		String code
-		String description
-		Long etlId
-		String type
-		String codeSource
-		static hasMany=[experiments:Experiment,literatures:Literature,analyses:BioAssayAnalysis]
- static mapping = {
-	 table 'BIO_OBSERVATION'
-	 version false
-	 cache usage:'read-only'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
-	 columns {
-		id column:'BIO_OBSERVATION_ID'
-		name column:'OBS_NAME'
-		code column:'OBS_CODE'
-		description column:'OBS_DESCR'
-		etlId column: 'ETL_ID'
-		type column: 'OBS_TYPE'
-		codeSource column: 'OBS_CODE_SOURCE'
-		
-		experiments joinTable:[name:'BIO_DATA_OBSERVATION', key:'BIO_OBSERVATION_ID']
-		literatures joinTable:[name:'BIO_DATA_OBSERVATION', key:'BIO_OBSERVATION_ID']
-		analyses joinTable:[name:'BIO_DATA_OBSERVATION', key:'BIO_OBSERVATION_ID']
-		}
-	}
+    String code
+    String codeSource
+    String description
+    Long etlId
+    String name
+    String type
 
+    static hasMany = [analyses   : BioAssayAnalysis,
+	              experiments: Experiment,
+	              literatures: Literature]
+
+    static mapping = {
+	table 'BIOMART.BIO_OBSERVATION'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_OBSERVATION_ID'
+	version false
+	cache usage:'read-only'
+
+	analyses joinTable: [name: 'BIOMART.BIO_DATA_OBSERVATION', key: 'BIO_OBSERVATION_ID']
+	code column:'OBS_CODE'
+	codeSource column: 'OBS_CODE_SOURCE'
+	description column:'OBS_DESCR'
+	experiments joinTable: [name: 'BIOMART.BIO_DATA_OBSERVATION', key: 'BIO_OBSERVATION_ID']
+	literatures joinTable: [name: 'BIOMART.BIO_DATA_OBSERVATION', key: 'BIO_OBSERVATION_ID']
+	name column: 'OBS_NAME'
+	type column: 'OBS_TYPE'
+    }
 }

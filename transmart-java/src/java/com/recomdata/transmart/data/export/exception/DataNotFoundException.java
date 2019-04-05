@@ -15,21 +15,14 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.transmart.data.export.exception;
-
-
 public class DataNotFoundException extends Exception {
 
-	private static final long serialVersionUID = 1268973588723740635L;
+    private static final long serialVersionUID = 1268973588723740635L;
 	
-	public DataNotFoundException() { }
-	
-	public DataNotFoundException(String specificErrorMessage)
-	{
-		//this.errorMessage = specificErrorMessage;
-		super(specificErrorMessage);
-	}
+    public DataNotFoundException(String message) {
+        super(message);
+    }
 }

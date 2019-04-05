@@ -16,38 +16,32 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioAssayDataset {
-    Long id
-    String name
-    String description
-    String criteria
-    Date createDate
     BioAssay bioAssay
+    Date createDate
+    String criteria
+    String description
     Experiment experiment
+    String name
 
     static mapping = {
-        table 'BIO_ASSAY_DATASET'
+	table 'BIOMART.BIO_ASSAY_DATASET'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASSAY_DATASET_ID'
         version false
         cache usage: 'read-only'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_ASSAY_DATASET_ID'
-            name column: 'DATASET_NAME'
-            description column: 'DATASET_DESCRIPTION'
-            criteria column: 'DATASET_CRITERIA'
-            createDate column: 'CREATE_DATE'
-            bioAssay column: 'BIO_ASSAY_ID'
-            experiment column: 'BIO_EXPERIMENT_ID'
-        }
+
+        criteria column: 'DATASET_CRITERIA'
+	description column: 'DATASET_DESCRIPTION'
+        experiment column: 'BIO_EXPERIMENT_ID'
+	name column: 'DATASET_NAME'
     }
+
     static constraints = {
-        name(nullable: true, maxSize: 800)
-        description(nullable: true, maxSize: 2000)
-        criteria(nullable: true, maxSize: 2000)
-        createDate(nullable: true)
+	createDate nullable: true
+	criteria nullable: true, maxSize: 2000
+	description nullable: true, maxSize: 2000
+	name nullable: true, maxSize: 800
     }
 }

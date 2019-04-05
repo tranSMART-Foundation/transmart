@@ -1,14 +1,13 @@
 package org.transmart
 
+import groovy.transform.CompileStatic
 import org.transmart.biomart.BioAssayAnalysis
 
-
 /**
- * $Id: AnalysisResult.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- * */
-public class AnalysisResult implements Comparable {
+ * @author mmcduffie
+ */
+@CompileStatic
+class AnalysisResult implements Comparable<AnalysisResult> {
 
     // TEA metrics
     Double teaScore
@@ -17,54 +16,46 @@ public class AnalysisResult implements Comparable {
     int defaultTop = 5
 
     BioAssayAnalysis analysis
-    def experimentId
-    def experimentAccession
-    List assayAnalysisValueList = [] // collection of AssayAnalysisValue objects
-    Long bioMarkerCount = 0
+    Long experimentId
+    String experimentAccession
+    List<AssayAnalysisValue> assayAnalysisValueList = []
+    long bioMarkerCount = 0
 
-    def size() {
-        return assayAnalysisValueList.size()
+    int size() {
+	assayAnalysisValueList.size()
     }
 
-
-    def getGeneNames() {
-        if (assayAnalysisValueList == null || assayAnalysisValueList.isEmpty())
+    String getGeneNames() {
+	if (!assayAnalysisValueList) {
             return null
+	}
 
         StringBuilder s = new StringBuilder()
-        LinkedHashSet nameSet = new LinkedHashSet()
+	LinkedHashSet<String> nameSet = []
         // remove dup first
         for (value in assayAnalysisValueList) {
             def marker = value.bioMarker
             if (marker.isGene()) {
-                nameSet.add(marker.name)
+		nameSet << marker.name
             }
         }
 
         for (name in nameSet) {
-            if (s.size() > 0)
-                s.append(', ')
-            s.append(name)
+	    if (s) {
+		s << ', '
+	    }
+	    s << name
         }
 
-        //	println('get gene:'+s.toString())
-        return s.toString()
+	s
     }
 
-    def showTop() {
+    boolean showTop() {
         // bioMarkerCount was populated only when it's NOT searching for genes
-        return bioMarkerCount > defaultTop
+	bioMarkerCount > defaultTop
     }
 
-    //def getBioMarkerCount(){
-//		if(bioMarkerCount==0 && assayAnalysisValueList!=null && !assayAnalysisValueList.isEmpty()){
-//			bioMarkerCount = assayAnalysisValueList.size()
-//		}
-//		return bioMarkerCount
-//	}
-
-    def getAnalysisValueSubList() {
-
+    List<AssayAnalysisValue> getAnalysisValueSubList() {
         if (showTop()) {
             def total = defaultTop
             if (assayAnalysisValueList.size() <= defaultTop) {
@@ -74,47 +65,46 @@ public class AnalysisResult implements Comparable {
                 total = 0
             }
 
-            return assayAnalysisValueList.subList(0, total)
+	    assayAnalysisValueList.subList(0, total)
         }
         else {
             // show all
-            return assayAnalysisValueList
+	    assayAnalysisValueList
         }
     }
 
     /**
      * comparable interface implementation, sort on TEAScore
      */
-    public int compareTo(Object obj) {
-        // verify correct object type
-        if (!(obj instanceof AnalysisResult)) return -1
-
-        // compare objects
-        AnalysisResult compare = (AnalysisResult) obj
+    int compareTo(AnalysisResult compare) {
         Double thisScore = teaScore
         Double compScore = compare.teaScore
 
         // handle invalid values
-        if (compScore == null && thisScore != null) return 1
-        if (thisScore == null && compScore != null) return -1
-        if (thisScore == null && compScore == null) return 0
-
-        // if score is the same, sort on biomarker ct (desc)
-        if (thisScore == compScore) {
-            return (-1 * assayAnalysisValueList.size().compareTo(compare.assayAnalysisValueList.size()))
+	if (compScore == null && thisScore != null) {
+	    1
+	}
+	else if (thisScore == null && compScore != null) {
+	    -1
+	}
+	else if (thisScore == null && compScore == null) {
+	    0
+	}
+	else if (thisScore == compScore) {
+            // if score is the same, sort on biomarker ct (desc)
+	    -1 * assayAnalysisValueList.size().compareTo(compare.assayAnalysisValueList.size())
         }
         else {
-            return (thisScore.compareTo(compScore))
+	    thisScore.compareTo(compScore)
         }
     }
 
     /**
      * the TEA score is calculated as -log(teaScore) for UI purposes
      */
-    def calcDisplayTEAScore() {
-        def displayScore = null
-        if (teaScore != null) displayScore = -Math.log(teaScore.doubleValue())
-        return displayScore
+    double calcDisplayTEAScore() {
+	if (teaScore != null) {
+	    -Math.log(teaScore.doubleValue())
+	}
     }
-
 }

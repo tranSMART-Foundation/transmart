@@ -16,51 +16,42 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class Content {
-    Long id
+    String contentAbstract
+    String location
     String name
     ContentRepository repository
-    String location
     String title
-    String contentAbstract
     String type
 
-    def getAbsolutePath() {
-        String root = repository.location == null ? '' : repository.location
-        String path = location == null ? '' : location
-        String file = name == null ? '' : name
-        return root + java.io.File.separator + path + java.io.File.separator + file
-    }
-
-    def getLocationType() {
-        return repository.locationType
-    }
+    static transients = ['absolutePath', 'locationType']
 
     static mapping = {
-        table 'BIO_CONTENT'
+	table 'BIOMART.BIO_CONTENT'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_FILE_CONTENT_ID'
         version false
         cache usage: 'read-only'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_FILE_CONTENT_ID'
-            name column: 'FILE_NAME'
-            repository column: 'REPOSITORY_ID'
-            location column: 'LOCATION'
-            title column: 'TITLE'
-            contentAbstract column: 'ABSTRACT'
-            type column: 'FILE_TYPE'
-        }
-    }
-    static constraints = {
-        name(nullable: true, maxSize: 2000)
-        location(nullable: true, maxSize: 800)
-        title(nullable: true, maxSize: 2000)
-        contentAbstract(nullable: true, maxSize: 4000)
-        type(maxSize: 400)
+
+        contentAbstract column: 'ABSTRACT'
+	name column: 'FILE_NAME'
+        type column: 'FILE_TYPE'
     }
 
+    static constraints = {
+	contentAbstract nullable: true, maxSize: 4000
+	location nullable: true, maxSize: 800
+	name nullable: true, maxSize: 2000
+	title nullable: true, maxSize: 2000
+	type maxSize: 400
+    }
+
+    String getAbsolutePath() {
+	(repository.location ?: '') + File.separatorChar + (location ?: '') + File.separatorChar + (name ?: '')
+    }
+
+    String getLocationType() {
+	repository.locationType
+    }
 }

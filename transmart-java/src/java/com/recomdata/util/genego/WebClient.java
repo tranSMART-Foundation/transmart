@@ -17,26 +17,24 @@
  *
  ******************************************************************/
   
-
-/**
- * $Id: WebClient.java 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
 package com.recomdata.util.genego;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.rpc.ServiceException;
 import java.rmi.RemoteException;
 
+/**
+ * @author mmcduffie
+ */
 public class WebClient {
-    static final String DEMO_USER = "demo";
-    static final String DEMO_PWD = "demo";
+    private static final String DEMO_USER = "demo";
+    private static final String DEMO_PWD = "demo";
         
-    static Logger log = Logger.getLogger(WebClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebClient.class);
     
-    GeneGOLocator ggL = null;    
+    GeneGOLocator ggL;
     
     /**
      * Main login method for GeneGO
@@ -48,10 +46,9 @@ public class WebClient {
         String authKey = null;
         try {
             authKey = ggL.getGeneGOPort().login(DEMO_USER, DEMO_PWD);
-        } catch(ServiceException se)    {
-            log.error(se.getLocalizedMessage(), se);
-        } catch(RemoteException re) {
-            log.error(re.getLocalizedMessage(), re);
+        }
+        catch (ServiceException | RemoteException e) {
+            logger.error(e.getLocalizedMessage(), e);
         }
         return authKey;
     }
@@ -64,10 +61,9 @@ public class WebClient {
     public void logout(String authKey)    {
         try {
             ggL.getGeneGOPort().logout(authKey);
-        } catch(ServiceException se)    {
-            log.error(se.getLocalizedMessage(), se);
-        } catch(RemoteException re) {
-            log.error(re.getLocalizedMessage(), re);
+        }
+        catch (ServiceException | RemoteException e) {
+            logger.error(e.getLocalizedMessage(), e);
         }
     }
 }

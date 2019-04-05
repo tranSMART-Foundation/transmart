@@ -1,132 +1,112 @@
 import com.recomdata.util.ExcelGenerator
 import com.recomdata.util.ExcelSheet
 import grails.converters.JSON
-import groovy.util.logging.Slf4j
+import org.transmart.KeywordSet
+import org.transmart.SearchFilter
+import org.transmart.SearchKeywordService
 import org.transmart.biomart.BioAssayAnalysis
 import org.transmart.biomart.BioAssayAnalysisData
+import org.transmart.plugin.shared.UtilService
 import org.transmart.searchapp.SearchKeyword
 
 /**
- * $Id: HeatmapController.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- *
+ * @author mmcduffie
  */
+class HeatmapController {
 
-@Slf4j('logger')
-public class HeatmapController {
+    HeatmapService heatmapService
+    SearchKeywordService searchKeywordService
+    TrialQueryService trialQueryService
+    UtilService utilService
 
-    def trialQueryService
-    def heatmapService
-    def searchKeywordService
-
-    def initheatmap = {
-        session.searchFilter.heatmapFilter.reset()
+    def initheatmap() {
+	sessionSearchFilter().heatmapFilter.reset()
     }
 
-    def filterheatmap = {
-        //			 set session variable
-        session.searchFilter.heatmapFilter.heatmapfiltertype = params.heatmapfiltertype
+    def filterheatmap(SearchKeyword searchKeyword, String heatmapfiltertype) {
+	sessionSearchFilter().heatmapFilter.heatmapfiltertype = heatmapfiltertype
 
-        if (params.id != null && params.id.length() > 0) {
-            session.searchFilter.heatmapFilter.searchTerm = SearchKeyword.get(Long.valueOf(params.id))
-
+	if (searchKeyword) {
+	    sessionSearchFilter().heatmapFilter.searchTerm = searchKeyword
         }
-        render(view: 'initheatmap')
+
+	render view: 'initheatmap'
     }
 
-    def showheatmap = {
+    def showheatmap() {
 
-        def dataResult = generateHeatmaps()
+	Map dataResult = generateHeatmaps()
 
-        def hmapcount = 1
-        def comtable = null
-        def cortable = null
-        def rbmtable = null
-        def rhotable = null
+	int hmapcount = 1
 
-        if (!dataResult['comresult']['datatable'].isEmpty()) {
-            comtable = (dataResult['comresult']['datatable'] as JSON)
+	def comtable = null
+	if (dataResult.comresult.datatable) {
+	    comtable = dataResult.comresult.datatable as JSON
         }
-        if (!dataResult['corresult']['datatable'].isEmpty()) {
+
+	def cortable = null
+	if (dataResult.corresult.datatable) {
             hmapcount++
-            cortable = (dataResult['corresult']['datatable'] as JSON)
+	    cortable = dataResult.corresult.datatable as JSON
         }
-        if (!dataResult['rbmresult']['datatable'].isEmpty()) {
+
+	def rbmtable = null
+	if (dataResult.rbmresult.datatable) {
             hmapcount++
-            rbmtable = (dataResult['rbmresult']['datatable'] as JSON)
+	    rbmtable = dataResult.rbmresult.datatable as JSON
         }
-        if (!dataResult['rhoresult']['datatable'].isEmpty()) {
+
+	def rhotable = null
+	if (dataResult.rhoresult.datatable) {
             hmapcount++
-            rhotable = (dataResult['rhoresult']['datatable'] as JSON)
+	    rhotable = dataResult.rhoresult.datatable as JSON
         }
 
-        def allanalysis = new ArrayList<BioAssayAnalysis>()
-        allanalysis.addAll(dataResult['comresult']['analysislist'])
-        allanalysis.addAll(dataResult['corresult']['analysislist'])
-        allanalysis.addAll(dataResult['rbmresult']['analysislist'])
-        allanalysis.addAll(dataResult['rhoresult']['analysislist'])
+	List<BioAssayAnalysis> allanalysis = []
+	allanalysis.addAll dataResult.comresult.analysislist
+	allanalysis.addAll dataResult.corresult.analysislist
+	allanalysis.addAll dataResult.rbmresult.analysislist
+	allanalysis.addAll dataResult.rhoresult.analysislist
 
-        // sort on short tile
-        def ac = [compare: { a, b -> a.shortDescription.toLowerCase().compareTo(b.shortDescription.toLowerCase()) }] as Comparator
-        Collections.sort(allanalysis, ac)
+	allanalysis.sort { BioAssayAnalysis a, BioAssayAnalysis b ->
+	    a.shortDescription.toLowerCase() <=> b.shortDescription.toLowerCase()
+	}
 
-        def hmapwidth = 100 / hmapcount
-        // Convert table object to JSON format
-
-        //logger.info (heatmap.rhotable==null)?'empty':'not empty'
-        return ['comtable'   : comtable,
-                'cortable'   : cortable,
-                'rbmtable'   : rbmtable,
-                'rhotable'   : rhotable,
-                'hmapwidth'  : hmapwidth,
-                'contentlist': allanalysis]
+	[comtable: comtable,
+	 cortable: cortable,
+	 rbmtable: rbmtable,
+	 rhotable: rhotable,
+	 hmapwidth: 100 / hmapcount,
+	 contentlist: allanalysis]
     }
 
-    def downloadheatmapexcel = {
+    def downloadheatmapexcel() {
 
-        def dataResult = generateHeatmaps()
+	Map dataResult = generateHeatmaps()
 
-        //	logger.info dataResult
-        def sheets = []
+	List<ExcelSheet> sheets = []
 
-        if (!dataResult['comresult']['datatable'].isEmpty()) {
-
-            //logger.info 'has comparison data'
-
-            sheets.add(createExcelSheet(dataResult['comresult']['datatable'].table, "Gene Expression Comparison"))
-        }
-        if (!dataResult['corresult']['datatable'].isEmpty()) {
-
-            sheets.add(createExcelSheet(dataResult['corresult']['datatable'].table, "Gene Expression Correlation"))
-        }
-        if (!dataResult['rbmresult']['datatable'].isEmpty()) {
-
-            sheets.add(createExcelSheet(dataResult['rbmresult']['datatable'].table, "RBM"))
-        }
-        if (!dataResult['rhoresult']['datatable'].isEmpty()) {
-            sheets.add(createExcelSheet(dataResult['rhoresult']['datatable'].table, "RBM Spearman Correlation"))
+	if (dataResult.comresult.datatable) {
+	    sheets << createExcelSheet(dataResult.comresult.datatable.table, 'Gene Expression Comparison')
         }
 
-        //logger.info sheets
+	if (dataResult.corresult.datatable) {
+	    sheets << createExcelSheet(dataResult.corresult.datatable.table, 'Gene Expression Correlation')
+        }
 
-        def gen = new ExcelGenerator()
-        response.setHeader('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
-        response.setHeader('Content-Disposition', 'attachment; filename=\'heatmap.xls\'')
-        response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
-        response.setHeader('Pragma', 'public')
-        response.setHeader('Expires', '0')
-        response.outputStream << gen.generateExcel(sheets)
+	if (dataResult.rbmresult.datatable) {
+	    sheets << createExcelSheet(dataResult.rbmresult.datatable.table, 'RBM')
+        }
 
+	if (dataResult.rhoresult.datatable) {
+	    sheets << createExcelSheet(dataResult.rhoresult.datatable.table, 'RBM Spearman Correlation')
+	}
+
+	utilService.sendDownload response, 'application/vnd.ms-excel; charset=utf-8','heatmap.xls',
+	    new ExcelGenerator().generateExcel(sheets)
     }
 
-    /**
-     *  generate heatmap results
-     */
-    def generateHeatmaps() {
-
-        // use filter values from session to generate heatmap
-        def sfilter = session.searchFilter
+    private Map generateHeatmaps() {
 
         // need to decide which algorithm to run
         // we have 3 algorithms
@@ -138,196 +118,163 @@ public class HeatmapController {
         boolean searchHeatmapFilter = false
 
         // for genes to be displayed in the heatmap - this is used for searchHeatmapFilter and search global filter
-        def orderedGenes = new LinkedHashSet()
-        def searchGeneIds = []
-        def searchAnalysisIds = BioAssayAnalysisData.executeQuery(trialQueryService.createAnalysisIDSelectQuery(sfilter), [max: 100])
+	Set<SearchKeyword> orderedGenes = []
+	List<Long> searchGeneIds = []
+	List<Long> searchAnalysisIds = BioAssayAnalysisData.executeQuery(
+	    trialQueryService.createAnalysisIDSelectQuery(sessionSearchFilter()), [max: 100])
 
 
-        if ('topgene'.equalsIgnoreCase(sfilter.heatmapFilter.heatmapfiltertype)) {
+	if ('topgene'.equalsIgnoreCase(sessionSearchFilter().heatmapFilter.heatmapfiltertype)) {
             searchTopGene = true
-
         }
         else {
-            def keyword = session.searchFilter.heatmapFilter.searchTerm
-            if (keyword != null) {
+	    SearchKeyword keyword = sessionSearchFilter().heatmapFilter.searchTerm
+	    if (keyword) {
                 searchHeatmapFilter = true
 
                 if (keyword.dataCategory.equalsIgnoreCase('PATHWAY') ||
-                        keyword.dataCategory.equalsIgnoreCase('GENESIG') ||
-                        keyword.dataCategory.equalsIgnoreCase('GENELIST')
-                ) {
-                    // pathway
-                    List allGenes = searchKeywordService.expandAllListToGenes(keyword.bioDataId, 200)
+                    keyword.dataCategory.equalsIgnoreCase('GENESIG') ||
+		    keyword.dataCategory.equalsIgnoreCase('GENELIST')) {
+		    List<SearchKeyword> allGenes = searchKeywordService.expandAllListToGenes(keyword.bioDataId, 200)
 
-                    //		logger.info allGenes
-                    for (k in allGenes) {
-                        searchGeneIds.add(k.bioDataId)
+		    for (SearchKeyword k in allGenes) {
+			searchGeneIds << k.bioDataId
                     }
-                    orderedGenes.addAll(allGenes)
+		    orderedGenes.addAll allGenes
 
-                } else { // gene
-
-                    orderedGenes.add(keyword)
-
-                    searchGeneIds.add(keyword.bioDataId)
+		}
+		else { // gene
+		    orderedGenes << keyword
+		    searchGeneIds << keyword.bioDataId
                 }
             }
         }
+
         // if not by top gene nor by heatmap filer then use global filters
         if (!searchTopGene && !searchHeatmapFilter) {
             // otherwise use global filters
 
-            def allPathwayGenes = []
-            if (sfilter.globalFilter.hasAnyListFilters())
-                allPathwayGenes = searchKeywordService.expandAllListToGenes(sfilter.globalFilter.getAllListFilters().getKeywordDataIdString(), 200)
-            def genes = sfilter.globalFilter.getGeneFilters()
-            orderedGenes.addAll(genes)
-            orderedGenes.addAll(allPathwayGenes)
-            for (g in genes) {
-                searchGeneIds.add(g.bioDataId)
+	    List<SearchKeyword> allPathwayGenes = []
+	    if (sessionSearchFilter().globalFilter.hasAnyListFilters()) {
+		allPathwayGenes = searchKeywordService.expandAllListToGenes(
+		    sessionSearchFilter().globalFilter.allListFilters.keywordDataIdString, 200)
+	    }
 
+	    KeywordSet genes = sessionSearchFilter().globalFilter.geneFilters
+	    orderedGenes.addAll genes
+	    orderedGenes.addAll allPathwayGenes
+	    for (SearchKeyword g in genes) {
+		searchGeneIds << g.bioDataId
             }
-            for (pg in allPathwayGenes) {
-                searchGeneIds.add(pg.bioDataId)
+	    for (SearchKeyword pg in allPathwayGenes) {
+		searchGeneIds << pg.bioDataId
             }
         }
 
         // now it's time to get the data back
 
-        def dataList = [:]
-        def maxshortdescr = 39
+	Map dataList = [:]
+	int maxshortdescr = 39
 
         // comparison
+	dataList.comresult = createHeatmapData('comparison', 'Gene Expression', searchTopGene,
+			       searchAnalysisIds, searchGeneIds, orderedGenes, maxshortdescr)
 
-        dataList['comresult'] = createHeatmapData("comparison", "Gene Expression", searchTopGene, searchAnalysisIds, searchGeneIds, orderedGenes, maxshortdescr)
         // correlation
-
-        dataList['corresult'] = createHeatmapData("correlation", "Gene Expression", searchTopGene, searchAnalysisIds, searchGeneIds, orderedGenes, maxshortdescr + 2)
+	dataList.corresult = createHeatmapData('correlation', 'Gene Expression', searchTopGene,
+			       searchAnalysisIds, searchGeneIds, orderedGenes, maxshortdescr + 2)
 
         // rbm comparison
-
-        dataList['rbmresult'] = createHeatmapData("comparison", "RBM", searchTopGene, searchAnalysisIds, searchGeneIds, orderedGenes, maxshortdescr)
+	dataList.rbmresult = createHeatmapData('comparison', 'RBM', searchTopGene,
+			       searchAnalysisIds, searchGeneIds, orderedGenes, maxshortdescr)
 
         // rbm spearman
-        dataList['rhoresult'] = createHeatmapData("spearman correlation", "RBM", searchTopGene, searchAnalysisIds, searchGeneIds, orderedGenes, maxshortdescr)
+	dataList.rhoresult = createHeatmapData('spearman correlation', 'RBM', searchTopGene,
+			       searchAnalysisIds, searchGeneIds, orderedGenes, maxshortdescr)
 
-        //println(dataList['comresult'].analysislist?.size())
-        //println(dataList['corresult'].analysislist?.size())
-        //println(dataList['rbmresult'].analysislist?.size())
-        //println(dataList['rhoresult'].analysislist?.size())
-        //println('searchanalysisids'+searchAnalysisIds.size())
-
-        return dataList
-
+	dataList
     }
 
     /*
      * create heatmap result data
      */
+    private Map createHeatmapData(String method, String dataType, boolean searchTopGene, List<Long> searchAnalysisIds,
+	                          List<Long> searchGeneIds, Set<SearchKeyword> orderedGenes, int maxcolLength) {
 
-    def createHeatmapData(method,
-                          dataType,
-                          searchTopGene,
-                          searchAnalysisIds,
-                          searchGeneIds,
-                          orderedGenes,
-                          maxcolLength) {
+	List dataList = heatmapService.createHeatMapData(sessionSearchFilter(), method, dataType,
+				searchTopGene, searchGeneIds, searchAnalysisIds)
 
-        def sfilter = session.searchFilter
+	double cutoff = 4.5
 
-        def dataList = heatmapService.createHeatMapData(sfilter, method, dataType, searchTopGene, searchGeneIds, searchAnalysisIds)
-
-        //println('datalist:'+dataList?.size())
-        def cutoff = 4.5
-
-        if (dataList != null && !dataList.isEmpty()) {
+	if (dataList) {
             // create column name list and map using analysis name
             // get all analysis out of the bioDataFact object and format their names
 
-            def columnList = []
-            // columns
-            columnList.add([type: 'n', label: 'Gene Name', pattern: "", id: 0])
-            def ccount = 0
-            def columnPosMap = [:]
-            def analysisId = null
-            def analysis = null
-            def analysisName = null
-            def analysisNameMap = [:]
-            def assayAnalysisList = []
-            for (data in dataList) {
+	    List<Map> columnList = [[type: 'n', label: 'Gene Name', pattern: '', id: 0]]
+	    int ccount = 0
+	    Map columnPosMap = [:]
+	    Map analysisNameMap = [:]
+	    List<BioAssayAnalysis> assayAnalysisList = []
 
-                //analysisId = data.assayAnalysisId
-                //logger.info 'data:'+data.id+':'+data.bioMarkerId
-                analysisName = analysisNameMap.get(data.assayAnalysisId)
+	    for (data in dataList) {
+		String analysisName = analysisNameMap[data.assayAnalysisId]
                 // reformat & shorten analysis name
                 if (analysisName == null) {
-                    analysis = BioAssayAnalysis.get(data.assayAnalysisId)
+		    BioAssayAnalysis analysis = BioAssayAnalysis.get(data.assayAnalysisId)
                     analysisName = analysis.shortDescription
                     if (analysisName == null) {
                         analysisName = analysis.name
                     }
 
                     analysisName = analysisName.replaceAll('\\s+', '_')
-                    analysisName = analysisName.replaceAll("'", "*")
+		    analysisName = analysisName.replaceAll("'", '*')
 
                     if (analysisName.length() > maxcolLength) {
                         analysisName = analysisName.substring(0, maxcolLength - 3) + '...'
                     }
                     else {
-                        def paddingnum = maxcolLength - analysisName.length()
-                        def sp = new StringBuilder(maxcolLength).append(analysisName)
+			int paddingnum = maxcolLength - analysisName.length()
+			StringBuilder sb = new StringBuilder(maxcolLength).append(analysisName)
                         for (pi in 0..paddingnum - 1) {
-                            sp.append(' ')
+			    sb << ' '
                         }
-                        analysisName = sp.toString()
+			analysisName = sb.toString()
                     }
-                    analysisNameMap.put(data.assayAnalysisId, analysisName)
-                    assayAnalysisList.add(analysis)
+		    analysisNameMap[data.assayAnalysisId] = analysisName
+		    assayAnalysisList << analysis
 
                     // add into column list
-                    columnList.add([type: 'n', label: analysisName.toUpperCase(), pattern: '', id: ccount])
-                    columnPosMap.put(data.assayAnalysisId, ccount)
+		    columnList << [type: 'n', label: analysisName.toUpperCase(), pattern: '', id: ccount]
+		    columnPosMap[data.assayAnalysisId] = ccount
                     ccount++
                 }
             }
 
             // rows
-            def rowmap = new TreeMap()
-            def totalcols = columnList.size() - 1
+	    Map<String, Object[]> rowmap = new TreeMap()
+	    int totalcols = columnList.size() - 1
 
-            // build empty data structure first
-            // for each data object build a row with bioMaker as first column value
-            def datavalue = null
-            def assayData = null
-            def rowArray = null
-            // handle ordered gene first
-            // this is the case that we need to display all genes in pathways
-
-            if (!orderedGenes.isEmpty()) {
-                for (keyword in orderedGenes) {
-                    rowmap.put(keyword.keyword, new Object[totalcols])
-                }
+            for (keyword in orderedGenes) {
+		rowmap[keyword.keyword] = new Object[totalcols]
             }
 
             // data list later
             for (data in dataList) {
-
-                rowArray = rowmap.get(data.bioMarkerName)
-
+		Object[] rowArray = rowmap[data.bioMarkerName]
                 if (rowArray == null) {
                     rowArray = new Object[totalcols]
-                    rowmap.put(data.bioMarkerName, rowArray)
+		    rowmap[data.bioMarkerName] = rowArray
                 }
 
                 // find column index by analysis id
-                def columnIndex = columnPosMap.get(data.assayAnalysisId)
+		int columnIndex = columnPosMap[data.assayAnalysisId]
 
                 if (rowArray != null) {
-
-                    if ('correlation'.equals(method)) {
+		    def datavalue
+		    if ('correlation' == method) {
                         datavalue = data.rvalue
                     }
-                    else if ('spearman correlation'.equals(method)) {
+		    else if ('spearman correlation' == method) {
                         datavalue = data.rhoValue
                     }
                     else {
@@ -335,30 +282,26 @@ public class HeatmapController {
                     }
                     rowArray[columnIndex] = datavalue
                 }
-                //	logger.info 'loading:'+data.bioMarkerId
             }
 
+	    List rowlist = []
+	    for (Map.Entry entry in rowmap.entrySet()) {
 
-            def rowlist = []
-            def rowcount = 0
-            for (entryset in rowmap.entrySet()) {
-
-                def row = []
+		List row = []
                 // this is the gene name
-                String rowname = entryset.key
+		String rowname = entry.key
 
                 if (rowname == null) {
                     rowname = ''
                 }
                 else {
-                    rowname = rowname.replaceAll("'", "*")
+		    rowname = rowname.replaceAll("'", '*')
                 }
 
                 // this is an array
-                def rvalues = entryset.value
-                //logger.info rvalues
+		def rvalues = entry.value
                 // handle null value rows
-                def hasRowValue = false
+		boolean hasRowValue = false
                 // if not RBM
                 if ('RBM'.equalsIgnoreCase(dataType)) {
                     for (value in rvalues) {
@@ -373,61 +316,61 @@ public class HeatmapController {
                 }
 
                 if (hasRowValue) {
-                    row.add([v: rowname, f: rowname])
+		    row << [v: rowname, f: rowname]
                 }
                 else {
-                    row.add([v: 'N/A', f: 'N/A'])
+		    row << [v: 'N/A', f: 'N/A']
                 }
 
                 for (value in rvalues) {
                     def vvalue = value
                     if (vvalue != null) {
-                        if (vvalue > cutoff)
+			if (vvalue > cutoff) {
                             vvalue = cutoff
-                        if (vvalue < -cutoff)
+			}
+			if (vvalue < -cutoff) {
                             vvalue = -cutoff
+			}
                     }
-                    row.add([v: vvalue, f: value])
-                }
+		    row << [v: vvalue, f: value]
+		}
 
-                rowlist.add(row)
+		rowlist << row
+	    }
 
-            }
-
-            def table = [table: [cols: columnList, rows: rowlist]]
-
-            return ['datatable': table, 'analysislist': assayAnalysisList]
+	    [datatable: [table: [cols: columnList, rows: rowlist]], analysislist: assayAnalysisList]
         }
         else {
-            return ['datatable': [], 'analysislist': []]
+	    [datatable: [], analysislist: []]
         }
-
+	
     }
 
-
-    def createExcelSheet(table, name) {
-        def cols = []
+    private ExcelSheet createExcelSheet(table, String name) {
+	List cols = []
         for (col in table.cols) {
-            cols.add(col.label)
+	    cols << col.label
         }
-        def rows = []
 
+	List rows = []
         for (row in table.rows) {
-            //logger.info row
             if (row[0].f != 'N/A') {
-                def newrow = []
+		List newrow = []
                 for (value in row) {
-                    newrow.add(value.f)
+		    newrow << value.f
                 }
-                rows.add(newrow)
+		rows << newrow
             }
         }
-        return new ExcelSheet(name: name, headers: cols, values: rows)
 
+	new ExcelSheet(name: name, headers: cols, values: rows)
     }
 
+    def noResult() {
+	render view: 'noresult'
+    }
 
-    def noResult = {
-        render(view: 'noresult')
+    private SearchFilter sessionSearchFilter() {
+	session.searchFilter
     }
 }

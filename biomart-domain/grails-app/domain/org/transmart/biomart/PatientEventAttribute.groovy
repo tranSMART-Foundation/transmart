@@ -16,33 +16,27 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class PatientEventAttribute {
-    String bioPatientAttrCode
-    String attributeTextValue
     String attributeNumericValue
+    String attributeTextValue
     Long bioClinicTrialAttributeId
+    String bioPatientAttrCode
     Long bioPatientAttributeId
     Long bioPatientEventId
+
     static mapping = {
-        table 'BIO_PATIENT_EVENT_ATTR'
+	table 'BIOMART.BIO_PATIENT_EVENT_ATTR'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID']
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            bioPatientAttrCode column: 'BIO_PATIENT_ATTR_CODE'
-            attributeTextValue column: 'ATTRIBUTE_TEXT_VALUE'
-            attributeNumericValue column: 'ATTRIBUTE_NUMERIC_VALUE'
-            bioClinicTrialAttributeId column: 'BIO_CLINIC_TRIAL_ATTR_ID'
-            bioPatientAttributeId column: 'BIO_PATIENT_ATTRIBUTE_ID'
-            bioPatientEventId column: 'BIO_PATIENT_EVENT_ID'
-        }
+
+        bioClinicTrialAttributeId column: 'BIO_CLINIC_TRIAL_ATTR_ID'
     }
+
     static constraints = {
-        bioPatientAttrCode(maxSize: 400)
-        attributeTextValue(nullable: true, maxSize: 400)
-        attributeNumericValue(nullable: true, maxSize: 400)
+	attributeNumericValue nullable: true, maxSize: 400
+	attributeTextValue nullable: true, maxSize: 400
+	bioPatientAttrCode maxSize: 400
     }
 }

@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.export;
 
@@ -24,47 +23,41 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * 
  * @author Chris Uhrich
- * @version 1.0
- * 
- * Copyright 2008 Recombinant Data Corp.
  */
 public class ExportRow {
-	private LinkedHashMap<String, ExportValue> values;
 	
+    private Map<String, ExportValue> values = new LinkedHashMap<>();
 	
-	public ExportRow(String gene, Set<String> columns) {
-		values = new LinkedHashMap<String, ExportValue>();
-		for (Iterator<String> i = columns.iterator(); i.hasNext(); ) {
-			String columnName = i.next();
-			if (columnName.equals("Gene")) {
-				values.put(columnName, new ExportValue(gene));
-			} else {
-				values.put(columnName, new ExportValue(""));
-			}
-		}
-	}
-	public Collection<ExportValue> getValues() {
-		return values.values();
-	}
+    public ExportRow(String gene, Set<String> columns) {
+        for (String columnName : columns) {
+            if (columnName.equals("Gene")) {
+                values.put(columnName, new ExportValue(gene));
+            }
+            else {
+                values.put(columnName, new ExportValue(""));
+            }
+        }
+    }
 
-	public void put(String columnName, String value) {
-		//System.out.println(columnName+" "+value);
-		ExportValue hmv = values.get(columnName); 
-		hmv.setValue(value);
-	}
+    public Collection<ExportValue> getValues() {
+        return values.values();
+    }
+
+    public void put(String columnName, String value) {
+        values.get(columnName).setValue(value);
+    }
 	
-	public JSONArray toJSONArray() throws JSONException {
-		JSONArray json = new JSONArray();
-		for (Iterator<ExportValue> i = values.values().iterator(); i.hasNext(); ) {
-			json.put(i.next().toJSONObject());
-		}
-		return json;
-	}
+    public JSONArray toJSONArray() throws JSONException {
+        JSONArray json = new JSONArray();
+        for (ExportValue exportValue : values.values()) {
+            json.put(exportValue.toJSONObject());
+        }
+        return json;
+    }
 }

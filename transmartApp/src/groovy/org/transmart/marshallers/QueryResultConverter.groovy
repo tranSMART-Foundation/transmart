@@ -1,14 +1,17 @@
 package org.transmart.marshallers
 
+import groovy.transform.CompileStatic
 import org.transmartproject.core.querytool.QueryResult
 
 /**
- * This class is not a marshaller because there is already a marshaller for QueryResult in the rest api. The
- * conversion here is needed for the transmartApp GUI. Call this conversion method explicitly when you need it.
+ * Not a marshaller because there is already a marshaller for QueryResult in
+ * the rest api. The conversion here is needed for the transmartApp GUI. Call
+ * this conversion method explicitly when you need it.
  */
+@CompileStatic
 class QueryResultConverter {
 
-    static def convert(QueryResult queryResult) {
+    static Map convert(QueryResult queryResult) {
         getPropertySubsetForSuperType(queryResult, QueryResult, ['patients', 'username'])
     }
 
@@ -17,19 +20,15 @@ class QueryResultConverter {
      * defined on a subtype of that object.
      * This method used to have its own class but now this is the only place where it is still used.
      */
-    private static getPropertySubsetForSuperType(Object o,
-                                                   Class superType,
-                                                   List<String> excludes = []) {
+    private static Map getPropertySubsetForSuperType(o, Class superType, List<String> excludes = []) {
         if (!superType.isAssignableFrom(o.getClass())) {
-            throw new IllegalArgumentException("Object '$o' is not of type " +
-                    '' + superType)
+	    throw new IllegalArgumentException('Object "' + o + '" is not of type ' + superType.name)
         }
 
         superType.metaClass.properties.findAll {
-            !(it.name in excludes)
-        }.collectEntries { MetaBeanProperty prop ->
+	    MetaProperty it -> !(it.name in excludes)
+	}.collectEntries { MetaProperty prop ->
             [prop.name, prop.getProperty(o)]
         }
     }
-
 }

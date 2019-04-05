@@ -1,46 +1,50 @@
 package xnat.plugin
-import grails.util.Holders
-import grails.transaction.Transactional
 
-@Transactional
+import groovy.transform.CompileStatic
+import org.springframework.beans.factory.annotation.Value
+
+@CompileStatic
 class ScanService {
 
+    static transactional = false
 
-    def getDomain(){
-        return Holders.config.org.xnat.domain
+    @Value('${org.xnat.domain:}')
+    private String domain
+
+    @Value('${org.xnat.password:}')
+    private String password
+
+    @Value('${org.xnat.projectName:}')
+    private String projectName
+
+    @Value('${org.xnat.username:}')
+    private String username
+
+    String getDomain() {
+	domain
     }
 
-    def getUsername(){
-        return Holders.config.org.xnat.username
+    String getUsername() {
+	username
     }
 
-    def getPassword(){
-        return Holders.config.org.xnat.password
+    String getPassword() {
+	password
     }
 
-    def getProjectName(){
-        return Holders.config.org.xnat.projectName
+    String getProjectName() {
+	projectName
     }
 
-
-
-    def generateInfoURL (def sessionID, def scanID) {
-
-        String URL = 'http://' + getDomain() + '/data/experiments/'+sessionID.toString()+'/scans/'+scanID.toString()
-        return URL
+    String generateInfoUrl(String sessionId, String scanId) {
+	'http://' + getDomain() + '/data/experiments/' + sessionId + '/scans/' + scanId
     }
 
-    def generateThumbnailURL (def sessionID, def scanID, def resourceID, def fileName) {
-
-        String URL = 'http://' + getDomain() + fileName.toString()
-        return URL
+    String generateThumbnailUrl(String fileName) {
+	'http://' + getDomain() + fileName
     }
 
-    def generateDownloadURL(def sessionID, def scanID) {
-        String URL = 'http://' + getDomain() + '/data/experiments/'+sessionID.toString()
-        URL += '/scans/'+scanID
-        URL += '/files?format=zip'
-        return URL
+    String generateDownloadUrl(String sessionId, String scanId) {
+	'http://' + getDomain() + '/data/experiments/' + sessionId + '/scans/' + scanId + '/files?format=zip'
     }
-
 }

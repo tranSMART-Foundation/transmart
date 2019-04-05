@@ -1,61 +1,48 @@
 package org.transmartfoundation.status
 
-import grails.util.Holders
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
-import java.net.MalformedURLException
-import java.net.URL
-import java.net.URLConnection
+import groovy.transform.CompileStatic
+import org.springframework.beans.factory.annotation.Value
 
+@CompileStatic
 class GwavaStatusService {
 
-    def errorMessage = ''
+    static transactional = false
 
-    def getStatus() {
+    @Value('${com.recomdata.rwg.webstart.codebase:}')
+    private String webstartCodebase
 
-        def urlString = Holders.config.com.recomdata.rwg.webstart.codebase
-        def enabled = isGwavaEnabled()
-        def canConnect = canConnect(urlString)
+    @Value('${com.recomdata.rwg.webstart.transmart.url:}')
+    private String webstartTransmartUrl
 
-        def settings = [
-                'url'                   : urlString,
-                'enabled'               : enabled,
-                'connected'             : canConnect,
-                'errorMessage'          : errorMessage,
-                'lastProbe'             : new Date()
-        ]
-
-        GwavaStatus status = new GwavaStatus(settings)
-        return status
-    }
-
-    def isGwavaEnabled() {
-        return !!Holders.config.com.recomdata.rwg.webstart.transmart.url
-    }
-
-    def canConnect(urlString) {
-        errorMessage = 'URL did not respond'
+    GwavaStatus getStatus() {
+	String errorMessage = 'URL did not respond'
         boolean sawText = false
         URL gwava
         try {
-            gwava = new URL(urlString)
-            gwava.eachLine {line ->
+	    gwava = new URL(webstartCodebase)
+	    for (String line in gwava.text.readLines()) {
                 errorMessage = ''
                 if (line.contains('GWAVA QuickStart')) {
                     sawText = true
+		    break
                 }
             }
         }
         catch (MalformedURLException e) {
             errorMessage = 'MalformedURLException: ' + e.message
         }
-        catch (IOException e1) {
-            errorMessage = 'IOException: ' + e1.message
+	catch (IOException e) {
+	    errorMessage = 'IOException: ' + e.message
         }
-        catch (Exception ex) {
-            errorMessage = 'Unexpected error: ' + ex.message
+	catch (e) {
+	    errorMessage = 'Unexpected error: ' + e.message
         }
-        return sawText
+
+	new GwavaStatus(
+	    url: webstartCodebase,
+	    enabled: webstartTransmartUrl.length() > 0,
+	    connected: sawText,
+	    errorMessage: errorMessage,
+	    lastProbe: new Date())
     }
 }

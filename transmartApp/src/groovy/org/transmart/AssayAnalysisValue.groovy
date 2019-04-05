@@ -1,17 +1,16 @@
 package org.transmart
 
-
+import groovy.transform.CompileStatic
+import org.transmart.biomart.BioAssayAnalysisData
 import org.transmart.biomart.BioMarker
 
 /**
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- * $Id: AssayAnalysisValue.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- *
+ * @author mmcduffie
  */
-public class AssayAnalysisValue implements Comparable {
+@CompileStatic
+class AssayAnalysisValue implements Comparable<AssayAnalysisValue> {
 
-    def analysisData
+    BioAssayAnalysisData analysisData
     BioMarker bioMarker
 
     // indicator for the up/down regulation (i.e. gene lists and signatures). If null implies
@@ -21,21 +20,22 @@ public class AssayAnalysisValue implements Comparable {
     /**
      * comparable interface implementation, sort on NPV
      */
-    public int compareTo(Object obj) {
-        // verify correct object type
-        if (!(obj instanceof AssayAnalysisValue)) return -1
-
-        // compare objects
-        AssayAnalysisValue compare = (AssayAnalysisValue) obj;
+    int compareTo(AssayAnalysisValue compare) {
         Double thisScore = analysisData.teaNormalizedPValue
         Double compScore = compare.analysisData.teaNormalizedPValue
 
         // handle invalid values
-        if (compScore == null && thisScore != null) return 1;
-        if (thisScore == null && compScore != null) return -1;
-        if (thisScore == null && compScore == null) return 0;
-
-        return (thisScore.compareTo(compScore))
+	if (compScore == null && thisScore != null) {
+	    1
+	}
+	else if (thisScore == null && compScore != null) {
+	    -1
+	}
+	else  if (thisScore == null && compScore == null) {
+	    0
+	}
+	else {
+	    thisScore <=> compScore
+	}
     }
-
 }

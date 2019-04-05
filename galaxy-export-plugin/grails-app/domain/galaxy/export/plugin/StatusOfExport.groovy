@@ -10,10 +10,11 @@ class StatusOfExport {
 
     static mapping = {
         table 'GALAXY.STATUS_OF_EXPORT_JOB'
-        version false
         id column: 'ID',
-                generator: 'increment',
-                params: [sequence: 'GALAXY.STATUS_OF_EXPORT_JOB_SEQ']
+            generator: 'sequence',
+            params: [sequence: 'GALAXY.STATUS_OF_EXPORT_JOB_SEQ']
+        version false
+
         jobName column: 'JOB_NAME_ID'
         jobStatus column: 'JOB_STATUS'
         lastExportName column: 'LAST_EXPORT_NAME'

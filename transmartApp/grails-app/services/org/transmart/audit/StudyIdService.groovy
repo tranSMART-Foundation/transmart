@@ -19,30 +19,30 @@
 
 package org.transmart.audit
 
-import javax.annotation.Resource
 import grails.plugin.cache.Cacheable
 import groovy.util.logging.Slf4j
 import org.transmartproject.core.exceptions.NoSuchResourceException
+import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.Study
-import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.querytool.QueriesResource
 import org.transmartproject.core.querytool.QueryResult
+
+import javax.annotation.Resource
 
 @Slf4j('logger')
 class StudyIdService {
 
-    @Resource
-    QueriesResource queriesResourceService
+    static transactional = false
 
-    @Resource
-    ConceptsResource conceptsResourceService
+    @Resource QueriesResource queriesResourceService
+    @Resource ConceptsResource conceptsResourceService
 
     /**
      * Fetches the study id associated with a concept from the 
      * {@link ConceptsResource} using the concept key.
      * 
-     * @param concept_key the concept key.
+	 * @param conceptKey the concept key.
      * @param options map with optional parameters:
      *  - 'studyConceptOnly': if set, a study name will only be returned if the
      *    concept is a study.
@@ -51,28 +51,29 @@ class StudyIdService {
      *         or the concept could not be found.
      */
     @Cacheable('org.transmart.audit.StudyIdService')
-    public String getStudyIdForConceptKey(Map options = [:], String concept_key) {
-        if (concept_key == null) {
+    String getStudyIdForConceptKey(Map options = [:], String conceptKey) {
+	if (conceptKey == null) {
             return null
         }
-        concept_key = concept_key.trim()
-        if (concept_key.empty) {
+
+	conceptKey = conceptKey.trim()
+	if (!conceptKey) {
             return ''
         }
+
         String studyId = ''
         try {
-            logger.debug 'Query study id for concept key: ' + concept_key
-            OntologyTerm term = conceptsResourceService.getByKey(concept_key)
+	    logger.debug 'Query study id for concept key: {}', conceptKey
+	    OntologyTerm term = conceptsResourceService.getByKey(conceptKey)
             Study study = term?.study
             studyId = study?.id
             if (options?.studyConceptOnly && study?.ontologyTerm != term) {
                 studyId = null
             }
-            logger.debug 'Study id for concept key ' + concept_key + ' is: ' + studyId
+	    logger.debug 'Study id for concept key {} is: {}', conceptKey, studyId
         }
-        catch(NoSuchResourceException e) {
-            logger.warn 'Resource not found: ' +
-                    'ConceptResource.getByKey(' + concept_key + ')'
+	catch (NoSuchResourceException ignored) {
+	    logger.warn 'Resource not found: ConceptResource.getByKey({})', conceptKey
         }
         studyId
     }
@@ -81,13 +82,12 @@ class StudyIdService {
     Set<String> getStudyIdsForQueryId(Long queryId) {
         Set<String> result = []
         try {
-            logger.debug 'Query trials for query id: ' + queryId
+	    logger.debug 'Query trials for query id: {}', queryId
             QueryResult queryResult = queriesResourceService.getQueryResultFromId(queryId)
             result = queryResult.patients*.trial as Set
         }
-        catch (NoSuchResourceException e) {
-            logger.warn 'Resource not found: ' +
-                    'QueriesResource.getQueryResultFromId(' + queryId + ')'
+	catch (NoSuchResourceException ignored) {
+	    logger.warn 'Resource not found: QueriesResource.getQueryResultFromId({})', queryId
         }
         result
     }
@@ -102,24 +102,22 @@ class StudyIdService {
      *        are passed as string.
      * @return a string with the comma-separated list study ids.
      */
-    public String getStudyIdsForQueries(List<String> queryIds) {
+    String getStudyIdsForQueries(List<String> queryIds) {
         Set<String> studyIds = []
-        for (String queryId: queryIds) {
-            if (queryId != null && queryId != 'null') {
+	for (String queryId in queryIds) {
+	    if (queryId && queryId != 'null') {
                 queryId = queryId.trim()
-                if (!queryId.empty) {
-                    if (!queryId.isLong()) {
-                        logger.warn 'Query id is not an integer: ' + queryId
+		if (queryId) {
+		    if (queryId.isLong()) {
+			studyIds << getStudyIdsForQueryId(queryId.toLong())
                     }
                     else {
-                        Long qId = queryId.toLong()
-                        studyIds += getStudyIdsForQueryId(qId)
+			logger.warn 'Query id is not an integer: {}', queryId
                     }
                 }
             }
         }
-        List<String> studyIdList = studyIds as List
-        studyIdList.sort()
-        studyIdList.join(',')
+
+	studyIds.sort().join ','
     }
 }

@@ -1,6 +1,11 @@
 package com.recomdata.util;
 
-import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 
 import java.io.ByteArrayOutputStream;
@@ -9,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Florian on 05/01/14.
+ * @author Florian
  */
 public class ExcelGenerator {
 
@@ -17,14 +22,13 @@ public class ExcelGenerator {
 
         ExcelSheet sheet = new ExcelSheet("Sheet 1", headers, values);
 
-        List<ExcelSheet> sheets = new ArrayList<ExcelSheet>();
+        List<ExcelSheet> sheets = new ArrayList<>(1);
         sheets.add(sheet);
-
         return generateExcel(sheets);
 
     }
 
-    public static byte[] generateExcel(List sheets) {
+    public static byte[] generateExcel(List<ExcelSheet> sheets) {
 
         HSSFWorkbook wb = new HSSFWorkbook();
 
@@ -64,12 +68,12 @@ public class ExcelGenerator {
                 for (Object v : (List) value) {
                     HSSFCell dcell = row.createCell((short) cellCount);
                     if (v == null || (v instanceof String && v.toString().trim().length() == 0)) {
-                        // println("empty cell");
-                    } else {
+                    }
+                    else {
                         try {
-                            Double d = Double.parseDouble(v.toString());
-                            dcell.setCellValue(d);
-                        } catch (NumberFormatException nfe) {
+                            dcell.setCellValue(Double.parseDouble(v.toString()));
+                        }
+                        catch (NumberFormatException e) {
                             dcell.setCellValue(v.toString());
                             if (v.toString().length() > 100) {
                                 dcell.setCellStyle(csWrapText);
@@ -90,12 +94,9 @@ public class ExcelGenerator {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         try {
             wb.write(output);
-        } catch (IOException ex) {
-            // TODO: log error
         }
-        return output.toByteArray();
-
+        catch (IOException ignored) {
+            // TODO: log error
+        }        return output.toByteArray();
     }
-
 }
-

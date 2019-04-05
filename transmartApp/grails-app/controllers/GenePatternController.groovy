@@ -1,105 +1,106 @@
 import com.rdc.snp.haploview.PEDFormat
+import com.recomdata.asynchronous.GenePatternService
+import com.recomdata.asynchronous.JobResultsService
 import com.recomdata.export.GenePatternFiles
 import com.recomdata.export.GwasFiles
 import com.recomdata.export.SurvivalAnalysisFiles
 import com.recomdata.genepattern.JobStatus
 import com.recomdata.genepattern.WorkflowStatus
+import com.recomdata.transmart.asynchronous.job.AsyncJobService
 import grails.converters.JSON
+import grails.gsp.PageRenderer
 import groovy.util.logging.Slf4j
+import org.hibernate.SessionFactory
 import org.json.JSONObject
 import org.quartz.JobDataMap
 import org.quartz.JobDetail
+import org.quartz.Scheduler
 import org.quartz.impl.JobDetailImpl
 import org.quartz.impl.triggers.SimpleTriggerImpl
+import org.springframework.beans.factory.annotation.Value
 import org.transmart.CohortInformation
 import org.transmart.ExperimentData
 import org.transmart.HeatmapValidator
-import org.transmart.searchapp.AccessLog
+import org.transmart.plugin.shared.SecurityService
+import org.transmart.searchapp.SearchKeyword
+import org.transmartproject.db.log.AccessLogService
+
+import javax.sql.DataSource
+import java.sql.Connection
 
 @Slf4j('logger')
 class GenePatternController {
-    def quartzScheduler
-    def genePatternService
-    def springSecurityService
-    def i2b2HelperService
-    def jobResultsService
-    def asyncJobService
-    def dataSource
 
-    static String GENE_PATTERN_WHITE_SPACE_DEFAULT = '0'
-    static String GENE_PATTERN_WHITE_SPACE_EMPTY = ''
+    private static final String GENE_PATTERN_WHITE_SPACE_DEFAULT = '0'
+    private static final String GENE_PATTERN_WHITE_SPACE_EMPTY = ''
+    private static final String TEMP_DIR = System.getProperty('java.io.tmpdir')
+    private static final List<String> chroms = ['ALL', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13',
+	                                        '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y'].asImmutable()
+
+    AccessLogService accessLogService
+    AsyncJobService asyncJobService
+    DataSource dataSource
+    PageRenderer groovyPageRenderer
+    I2b2HelperService i2b2HelperService
+    JobResultsService jobResultsService
+    SampleInfoService sampleInfoService
+    Scheduler quartzScheduler
+    SecurityService securityService
+    SessionFactory sessionFactory
+
+    @Value('${com.recomdata.analysis.genepattern.file.dir:}')
+    private String genePatternFileDir
+
+    @Value('${com.recomdata.search.genepathway:}')
+    private String genepathway
 
     /**
-     * Method that is called asynchronously from the datasetExplorer Javascript
-     * Will determine the type of heatmap to run and then kick off the heatmap job in genePatternService
+     * Called asynchronously from the datasetExplorer Javascript.
+     * Determines the type of heatmap to run and then kicks off the heatmap job in genePatternService.
      */
-    def runheatmap = {
-
-        //If debug mode is enabled, write all the parameters to the debug logger.
-        if (logger.isDebugEnabled()) {
-            request.getParameterMap().keySet().each { _key -> logger.debug('' + _key + ' -> ' + request.getParameter(_key)) }
-        }
-
-        //Retrieve the parameters from the submitted form.
-        //This is the analysis type. In a heat map we have 'PCA','Select','KMeans','Cluster','Compare'
-        def analysis = request.getParameter('analysis')
-
-        //If we are analyzing RMB data this is the Panels filter.
-        def rbmPanels1 = request.getParameter('rbmPanels1')
-        def rbmPanels2 = request.getParameter('rbmPanels2')
-
-        //If we are filtering by a sample code it gets passed in here.
-        def sample1 = request.getParameter('sample1')
-        def sample2 = request.getParameter('sample2')
+    def runheatmap(String analysis, String rbmPanels1, String rbmPanels2, String sample1, String sample2,
+	           String result_instance_id1, String result_instance_id2, String nclusters,
+	           String timepoints1, String timepoints2, String resulttype, String datatype,
+	           String jobName, String pathway_name) {
+	logParams()
 
         //On the DataSet explorer side we build an i2b2 Query that we later reference the results by this result instance id.
-        def rID1 = nullCheck(request.getParameter('result_instance_id1'))
-        def rID2 = nullCheck(request.getParameter('result_instance_id2'))
+	result_instance_id1 = nullCheck(result_instance_id1)
+	result_instance_id2 = nullCheck(result_instance_id2)
 
-        //Number of clusters when running a clustering algorithm.
-        def nclusters = request.getParameter('nclusters')
+	// resulttype may be deprecated but we will leave it in in case we want to support different result types in the future.
+	// There used to be an 'Image' result type.
 
-        //If we are filtering by timepoints they get passed in here.
-        def timepoints1 = request.getParameter('timepoints1')
-        def timepoints2 = request.getParameter('timepoints2')
-
-        //This may be deprecated but we will leave it in in case we want to support different result types in the future. There used to be an 'Image' result type.
-        def resulttype = request.getParameter('resulttype')
-
-        //This tells us the mRNA platform or if the data type is RBM.
-        def datatype = request.getParameter('datatype')
-
-        //The name of the job as given by the job creation web service call.
-        def jobName = request.getParameter('jobName')
+	// datatype tells us the mRNA platform or if the data type is RBM.
 
         //Build the status list that we display to the user as the job processes.
         // TODO: Stick this in JobResultsService as an enum
-        def statusList = ['Validating Parameters', 'Obtaining Query Definitions',
-                          'Obtaining subject IDs', 'Obtaining concepts', 'Obtaining heatmap data',
-                          'Triggering GenePattern job']
+	List<String> statusList = ['Validating Parameters', 'Obtaining Query Definitions',
+				   'Obtaining subject IDs', 'Obtaining concepts', 'Obtaining heatmap data',
+				   'Triggering GenePattern job']
         if (analysis == 'Compare') {
-            statusList.add('Uploading file')
-            statusList.add('Running Heatmap Viewer')
+	    statusList << 'Uploading file'
+	    statusList << 'Running Heatmap Viewer'
         }
         else if (analysis == 'Cluster') {
-            statusList.add('Performing Hierarchical Clustering')
-            statusList.add('Running Hierarchical Clustering Viewer')
+	    statusList << 'Performing Hierarchical Clustering'
+	    statusList << 'Running Hierarchical Clustering Viewer'
         }
         else if (analysis == 'KMeans') {
-            statusList.add('Performing KMeans Clustering')
-            statusList.add('Running KMeans Clustering Viewer')
+	    statusList << 'Performing KMeans Clustering'
+	    statusList << 'Running KMeans Clustering Viewer'
         }
         else if (analysis == 'Select') {
-            statusList.add('Imputing Missing Value KNN')
-            statusList.add('Performing Comparative Marker Selection')
-            statusList.add('Extracting Comparative Marker Results')
-            statusList.add('Running Heatmap Viewer')
-            statusList.add('Running Comparative Marker Selection Viewer')
+	    statusList << 'Imputing Missing Value KNN'
+	    statusList << 'Performing Comparative Marker Selection'
+	    statusList << 'Extracting Comparative Marker Results'
+	    statusList << 'Running Heatmap Viewer'
+	    statusList << 'Running Comparative Marker Selection Viewer'
         }
         else if (analysis == 'PCA') {
-            statusList.add('Uploading file')
-            statusList.add('Running PCA')
-            statusList.add('Running PCA Viewer')
+	    statusList << 'Uploading file'
+	    statusList << 'Running PCA'
+	    statusList << 'Running PCA Viewer'
         }
 
         //Update our job object to have the list relevant to the job we are running.
@@ -113,24 +114,18 @@ class GenePatternController {
         //Create the object which represents the gene pattern files we use to run the job.
         GenePatternFiles gpf = new GenePatternFiles()
 
-        // Get the user name so we can use it in the access logger.
-        def userName = springSecurityService.getPrincipal().username
+	accessLogService.report "Heatmap Analysis: $analysis, Job: $jobName",
+	    "result_instance_id1: $result_instance_id1, result_instance_id2: $result_instance_id2"
 
-        //Create an entry in the access logger.
-        def al = new AccessLog(username: userName, event: 'Heatmap Analysis: ' + analysis + ', Job: ' + jobName, eventmessage: 'RID1: ' + rID1 + ', RID2: ' + rID2, accesstime: new java.util.Date())
-        al.save()
-
-        //Get the pathway name based on the id passed in.
-        def pathway_name = derivePathwayName(analysis, request.getParameter('pathway_name'))
-        logger.info('Pathway Name set to ' + pathway_name)
+	logger.info 'Pathway Name set to {}', pathway_name
 
         //We once again validate to make sure two subsets were selected when we run a Comparative Marker Analysis.
-        logger.debug('Ensuring at least two subsets for comparative marker selection...')
-        if (analysis == 'Select' && (rID1 == null || rID2 == null)) {
-            def error = 'Comparative marker selection requires two subsets'
+	logger.debug 'Ensuring at least two subsets for comparative marker selection...'
+	if (analysis == 'Select' && (!result_instance_id1 || !result_instance_id2)) {
+	    String error = 'Comparative marker selection requires two subsets'
             jobResultsService[jobName]['Status'] = 'Error'
             jobResultsService[jobName]['Exception'] = error
-            logger.error(error)
+	    logger.error error
             return
         }
 
@@ -139,49 +134,36 @@ class GenePatternController {
             return
         }
 
-        //Create stringwriters which we use for writing the query definition to the debug logger.
         StringWriter def1 = new StringWriter()
         StringWriter def2 = new StringWriter()
 
-        //Get the query definition from the result instance id.
-        i2b2HelperService.renderQueryDefinition(rID1, 'Subset1', def1)
-        i2b2HelperService.renderQueryDefinition(rID2, 'Subset2', def2)
+	i2b2HelperService.renderQueryDefinition(result_instance_id1, 'Subset1', def1)
+	i2b2HelperService.renderQueryDefinition(result_instance_id2, 'Subset2', def2)
 
-        //Write the query definition to the logger.
-        if (logger.isDebugEnabled()) {
-            logger.debug('def1: ' + def1.toString())
-            logger.debug('def2: ' + def2.toString())
-        }
+	logger.debug 'def1: {}', def1
+	logger.debug 'def2: {}', def2
 
         //This updates the status and checks to see if the job has been canceled.
         if (asyncJobService.updateStatus(jobName, statusList[2])) {
             return
         }
 
-        //Get the subject IDs from the result instance id.
-        def subjectIds1 = i2b2HelperService.getSubjects(rID1)
-        def subjectIds2 = i2b2HelperService.getSubjects(rID2)
+	String subjectIds1 = i2b2HelperService.getSubjects(result_instance_id1)
+	String subjectIds2 = i2b2HelperService.getSubjects(result_instance_id2)
 
-        //If debug is enabled, write the subject IDs to the logger.
-        if (logger.isDebugEnabled()) {
-            logger.debug('subjectIds1: ' + subjectIds1)
-            logger.debug('subjectIds2: ' + subjectIds2)
-        }
+	logger.debug 'subjectIds1: {}', subjectIds1
+	logger.debug 'subjectIds2: {}', subjectIds2
 
         //This updates the status and checks to see if the job has been canceled.
         if (asyncJobService.updateStatus(jobName, statusList[3])) {
             return
         }
 
-        //Get the concept codes based on the result instance id.
-        def concepts1 = i2b2HelperService.getConcepts(rID1)
-        def concepts2 = i2b2HelperService.getConcepts(rID2)
+	String concepts1 = i2b2HelperService.getConcepts(result_instance_id1)
+	String concepts2 = i2b2HelperService.getConcepts(result_instance_id2)
 
-        //If debug is enabled, write the concept IDs to the logger.
-        if (logger.isDebugEnabled()) {
-            logger.debug('concepts1: ' + concepts1)
-            logger.debug('concepts2: ' + concepts2)
-        }
+	logger.debug 'concepts1: {}', concepts1
+	logger.debug 'concepts2: {}', concepts2
 
         //If we are doing a Heatmap we need to address a '*' in the subject heading.
         boolean fixlast = analysis == 'Compare'
@@ -193,100 +175,78 @@ class GenePatternController {
             return
         }
         try {
-            i2b2HelperService.getHeatMapData(pathway_name, subjectIds1, subjectIds2,
-                    concepts1, concepts2, timepoints1, timepoints2, sample1, sample2,
-                    rbmPanels1, rbmPanels2, datatype, gpf, fixlast, rawdata, analysis)
-            def expfilename = System.getProperty('java.io.tmpdir') + File.separator + 'datasetexplorer' + File.separator + gpf.getCSVFileName()
+	    i2b2HelperService.getHeatMapData pathway_name, subjectIds1, subjectIds2,
+                concepts1, concepts2, timepoints1, timepoints2, sample1, sample2,
+		rbmPanels1, rbmPanels2, datatype, gpf, fixlast, rawdata, analysis
+	    String expfilename = TEMP_DIR + File.separator + 'datasetexplorer' + File.separator + gpf.CSVFileName
             session.expdsfilename = expfilename
-            logger.info('Filename for export has been set to ' + expfilename)
+	    logger.info 'Filename for export has been set to {}', expfilename
         }
-        catch (Exception e) {
-            def error = e.getMessage()
-            logger.error('Exception: ' + error, e)
-            jobResultsService[jobName]['Status'] = 'Error'
-            jobResultsService[jobName]['Exception'] = error
-            return
+	catch (e) {
+	    handleException e
         }
 
-        logger.debug('Checking to see if the user cancelled the job prior to running it')
+	logger.debug 'Checking to see if the user cancelled the job prior to running it'
         if (jobResultsService[jobName]['Status'] == 'Cancelled') {
-            logger.warn('' + jobName + ' has been cancelled')
+	    logger.warn '{} has been cancelled', jobName
             return
         }
-
-        def jdm = new JobDataMap()
-        jdm.put('analysis', analysis)
-        jdm.put('gctFile', gpf.gctFile())
-        jdm.put('clsFile', gpf.clsFile())
-        jdm.put('resulttype', resulttype)
-        jdm.put('nclusters', nclusters)
-        jdm.put('userName', userName)
-
-        def group = 'heatmaps'
-        def jobDetail = new JobDetailImpl(jobName, group, genePatternService.getClass())
-        jobDetail.setJobDataMap(jdm)
 
         if (asyncJobService.updateStatus(jobName, statusList[5])) {
             return
         }
-        quartzScheduler.scheduleJob jobDetail, new SimpleTriggerImpl('triggerNow', group)
 
-        ////println 'WIP: Gene Pattern replacement'
-        // logger.debug('WIP: Gene Pattern replacement')
+	String group = 'heatmaps'
+	JobDetail jobDetail = new JobDetailImpl(jobName, group, GenePatternService)
+	jobDetail.jobDataMap = new JobDataMap(
+	    analysis: analysis,
+	    gctFile: gpf.gctFile,
+	    clsFile: gpf.clsFile,
+	    resulttype: resulttype,
+	    nclusters: nclusters,
+	    userName: securityService.currentUsername())
+	quartzScheduler.scheduleJob jobDetail, new SimpleTriggerImpl('triggerNow', group)
 
-        JSONObject jsonResult = new JSONObject()
-        jsonResult.put('jobName', jobName)
-        response.setContentType('text/json')
-        response.outputStream << jsonResult.toString()
+	render([jobName: jobName] as JSON)
     }
 
     /**
      * Method that is called asynchronously from the datasetExplorer Javascript
      * Will determine the type of heatmap to run and then kick off the heatmap job in genePatternService
      */
-    def runheatmapsample = {
+    def runheatmapsample(String sampleIdList, String analysis, String datatype, String pathway_name,
+	                 String nclusters, String resulttype, String jobName) {
 
-        //Gather our parameters from the form submission.
-        def sampleIdList = request.getParameter('sampleIdList')
-
-        //The sampleIdList will look like {'SampleIdList':{'subset1':['Sample1'],'subset2':[],'subset3':[]}}
+	//The sampleIdList will look like {"SampleIdList":{"subset1":["Sample1"],"subset2":[],"subset3":[]}}
         def sampleIdListJSON = JSON.parse(sampleIdList)
 
-        def analysis = request.getParameter('analysis')
-        def datatype = request.getParameter('datatype')
-        def pathway_name = request.getParameter('pathway_name')
-        def nclusters = request.getParameter('nclusters')
-        def resulttype = request.getParameter('resulttype')
-        def jobName = request.getParameter('jobName')
-        def userName = springSecurityService.getPrincipal().username
-        def error = null
-
         // TODO: Put switch in based on analysis
-        def statusList = ['Validating Parameters', 'Obtaining heatmap data', 'Writing GenePattern files', 'Triggering GenePattern job']
+	List<String> statusList = ['Validating Parameters', 'Obtaining heatmap data',
+		                   'Writing GenePattern files', 'Triggering GenePattern job']
 
         if (analysis == 'Compare') {
-            statusList.add('Uploading file')
-            statusList.add('Running Heatmap Viewer')
+	    statusList << 'Uploading file'
+	    statusList << 'Running Heatmap Viewer'
         }
         else if (analysis == 'Cluster') {
-            statusList.add('Performing Hierarchical Clustering')
-            statusList.add('Running Hierarchical Clustering Viewer')
+	    statusList << 'Performing Hierarchical Clustering'
+	    statusList << 'Running Hierarchical Clustering Viewer'
         }
         else if (analysis == 'KMeans') {
-            statusList.add('Performing KMeans Clustering')
-            statusList.add('Running KMeans Clustering Viewer')
+	    statusList << 'Performing KMeans Clustering'
+	    statusList << 'Running KMeans Clustering Viewer'
         }
         else if (analysis == 'Select') {
-            statusList.add('Imputing Missing Value KNN')
-            statusList.add('Performing Comparative Marker Selection')
-            statusList.add('Extracting Comparative Marker Results')
-            statusList.add('Running Heatmap Viewer')
-            statusList.add('Running Comparative Marker Selection Viewer')
+	    statusList << 'Imputing Missing Value KNN'
+	    statusList << 'Performing Comparative Marker Selection'
+	    statusList << 'Extracting Comparative Marker Results'
+	    statusList << 'Running Heatmap Viewer'
+	    statusList << 'Running Comparative Marker Selection Viewer'
         }
         else if (analysis == 'PCA') {
-            statusList.add('Uploading file')
-            statusList.add('Running PCA')
-            statusList.add('Running PCA Viewer')
+	    statusList << 'Uploading file'
+	    statusList << 'Running PCA'
+	    statusList << 'Running PCA Viewer'
         }
 
         jobResultsService[jobName]['StatusList'] = statusList
@@ -306,14 +266,15 @@ class GenePatternController {
         //For most cases, GenePattern server cannot accept gct file with empty expression ratio.
         //Use 0 rather than empty cell. However, Comparative Marker Select needs to use empty space
         String whiteString = GENE_PATTERN_WHITE_SPACE_DEFAULT
-        if (analysis == 'Select') whiteString = GENE_PATTERN_WHITE_SPACE_EMPTY
+	if (analysis == 'Select') {
+	    whiteString = GENE_PATTERN_WHITE_SPACE_EMPTY
+	}
 
         //Create the gene patterns file object we use to pass to the gene pattern server.
         GenePatternFiles gpf = new GenePatternFiles()
 
         //This is the object we use to build the GenePatternFiles.
-        ExperimentData experimentData = new ExperimentData()
-
+	ExperimentData experimentData = new ExperimentData(dataSource, sessionFactory, sampleInfoService)
         experimentData.gpf = gpf
         experimentData.dataType = datatype
         experimentData.analysisType = analysis
@@ -323,14 +284,12 @@ class GenePatternController {
         experimentData.rawdata = rawdata
         experimentData.pathwayName = pathway_name
 
-        //
         if (asyncJobService.updateStatus(jobName, statusList[1])) {
             return
         }
 
         experimentData.getHeatMapDataSample()
 
-        //
         if (asyncJobService.updateStatus(jobName, statusList[2])) {
             return
         }
@@ -338,316 +297,252 @@ class GenePatternController {
         experimentData.writeGpFiles()
 
         //Verify user has not cancelled job.
-        logger.debug('Checking to see if the user cancelled the job prior to running it')
-        def isCancelled = jobResultsService[jobName + ':Status']
-        if (isCancelled == 'Cancelled') {
-            logger.warn('' + jobName + ' has been cancelled')
+	logger.debug 'Checking to see if the user cancelled the job prior to running it'
+	if (jobResultsService[jobName + ':Status'] == 'Cancelled') {
+	    logger.warn '{} has been cancelled', jobName
             return
         }
 
-        //Job information
-        def jdm = new JobDataMap()
-        jdm.put('analysis', analysis)
-        jdm.put('gctFile', experimentData.gpf.gctFile())
-        jdm.put('clsFile', gpf.clsFile())
-        jdm.put('resulttype', resulttype)
-        jdm.put('userName', userName)
-        jdm.put('nclusters', nclusters)
-        jdm.put('error', error)
-
-        def group = 'heatmaps'
-        def jobDetail = new JobDetailImpl(jobName, group, genePatternService.getClass())
-        jobDetail.setJobDataMap(jdm)
-
-        //
         if (asyncJobService.updateStatus(jobName, statusList[3])) {
             return
         }
 
+	String group = 'heatmaps'
+	JobDetail jobDetail = new JobDetailImpl(jobName, group, GenePatternService)
+	jobDetail.jobDataMap = new JobDataMap(
+	    analysis: analysis,
+	    gctFile: experimentData.gpf.gctFile,
+	    clsFile: gpf.clsFile,
+	    resulttype: resulttype,
+	    userName: securityService.currentUsername(),
+	    nclusters: nclusters)
         quartzScheduler.scheduleJob jobDetail, new SimpleTriggerImpl('triggerNow', group)
-        //   println 'WIP: Gene Pattern replacement'
-        // logger.debug('WIP: Gene Pattern replacement')
 
-        //We feed some text we got back from the job call back to the browser.
-        JSONObject jsonResult = new JSONObject()
-        jsonResult.put('jobName', jobName)
-        response.setContentType('text/json')
-        response.outputStream << jsonResult.toString()
-
+	render([jobName: jobName] as JSON)
     }
 
     /**
-     * Method that will run a survival analysis and is called asynchronously from the datasetexplorer
+     * Runs a survival analysis; called asynchronously from the datasetexplorer.
      */
-    def runsurvivalanalysis = {
-        if (logger.isDebugEnabled()) {
-            request.getParameterMap().keySet().each { _key ->
-                logger.debug('' + _key + ' -> ' + request.getParameter(_key))
-            }
-        }
+    def runsurvivalanalysis(String result_instance_id1, String result_instance_id2,
+	                    String querySummary1, String querySummary2, String jobName) {
+	logParams()
 
-        def rID1 = nullCheck(request.getParameter('result_instance_id1'))
-        def rID2 = nullCheck(request.getParameter('result_instance_id2'))
-        def qS1 = request.getParameter('querySummary1')
-        def qS2 = request.getParameter('querySummary2')
-        def jobName = request.getParameter('jobName')
+	result_instance_id1 = nullCheck(result_instance_id1)
+	result_instance_id2 = nullCheck(result_instance_id2)
 
-        def statusList = ['Validating Parameters', 'Obtaining Cohort Information',
-                          'Obtaining Survival Analysis data', 'Triggering GenePattern job',
-                          'Running Cox Regression', 'Calculating Survival Curve']
+	List<String> statusList = ['Validating Parameters', 'Obtaining Cohort Information',
+				   'Obtaining Survival Analysis data', 'Triggering GenePattern job',
+				   'Running Cox Regression', 'Calculating Survival Curve']
 
         jobResultsService[jobName]['StatusList'] = statusList
 
         asyncJobService.updateStatus(jobName, statusList[0])
 
-        SurvivalAnalysisFiles saFiles = new SurvivalAnalysisFiles()
+	accessLogService.report "Survival Analysis, Job: $jobName",
+	    "result_instance_id1: $result_instance_id1, result_instance_id2: $result_instance_id2"
 
-        def userName = springSecurityService.getPrincipal().username
-        def al = new AccessLog(username: userName, event: 'Survival Analysis, Job: ' + jobName,
-                eventmessage: 'RID1: ' + rID1 + ', RID2: ' + rID2, accesstime: new java.util.Date())
-        al.save()
+	asyncJobService.updateStatus jobName, statusList[1]
 
         List<String> subjectIds1
-        List<String> subjectIds2
         List<String> concepts1
-        List<String> concepts2
-        def hv1 = new HeatmapValidator()
-        def hv2 = new HeatmapValidator()
-        def ci1 = new CohortInformation()
-        def ci2 = new CohortInformation()
-
-        asyncJobService.updateStatus(jobName, statusList[1])
-        if (rID1 != null) {
-            subjectIds1 = i2b2HelperService.getSubjectsAsList(rID1)
-            concepts1 = i2b2HelperService.getConceptsAsList(rID1)
+	HeatmapValidator hv1 = new HeatmapValidator()
+	CohortInformation ci1 = new CohortInformation()
+	if (result_instance_id1) {
+	    subjectIds1 = i2b2HelperService.getSubjectsAsList(result_instance_id1)
+	    concepts1 = i2b2HelperService.getConceptsAsList(result_instance_id1)
             i2b2HelperService.fillHeatmapValidator(subjectIds1, concepts1, hv1)
             i2b2HelperService.fillCohortInformation(subjectIds1, concepts1, ci1, CohortInformation.TRIALS_TYPE)
         }
 
-        if (rID2 != null) {
-            subjectIds2 = i2b2HelperService.getSubjectsAsList(rID2)
-            concepts2 = i2b2HelperService.getConceptsAsList(rID2)
+	List<String> subjectIds2
+	List<String> concepts2
+	HeatmapValidator hv2 = new HeatmapValidator()
+	CohortInformation ci2 = new CohortInformation()
+	if (result_instance_id2) {
+	    subjectIds2 = i2b2HelperService.getSubjectsAsList(result_instance_id2)
+	    concepts2 = i2b2HelperService.getConceptsAsList(result_instance_id2)
             i2b2HelperService.fillHeatmapValidator(subjectIds2, concepts2, hv2)
             i2b2HelperService.fillCohortInformation(subjectIds2, concepts2, ci2, CohortInformation.TRIALS_TYPE)
         }
 
-        asyncJobService.updateStatus(jobName, statusList[2])
+	asyncJobService.updateStatus jobName, statusList[2]
+
+	SurvivalAnalysisFiles saFiles = new SurvivalAnalysisFiles()
         try {
-            i2b2HelperService.getSurvivalAnalysisData(concepts1, concepts2, subjectIds1, subjectIds2, saFiles)
+	    i2b2HelperService.getSurvivalAnalysisData concepts1, concepts2, subjectIds1, subjectIds2, saFiles
         }
-        catch (Exception e) {
-            def error = e.getMessage()
-            logger.error('Exception: ' + error, e)
-            jobResultsService[jobName]['Status'] = 'Error'
-            jobResultsService[jobName]['Exception'] = error
+	catch (e) {
+	    handleException e
             return
         }
 
-        logger.debug('Checking to see if the user cancelled the job prior to running it')
+	logger.debug 'Checking to see if the user cancelled the job prior to running it'
         if (jobResultsService[jobName]['Status'] == 'Cancelled') {
-            logger.warn('' + jobName + ' has been cancelled')
+	    logger.warn '{} has been cancelled', jobName
             return
         }
-
-        def imgTmpDir = '/images/datasetExplorer'
-
-        def jdm = new JobDataMap()
-        jdm.put('analysis', 'Survival')
-        jdm.put('gctFile', saFiles.getDataFile())
-        jdm.put('clsFile', saFiles.getClsFile())
-        jdm.put('imgTmpDir', imgTmpDir)
-        jdm.put('imgTmpPath', servletContext.getRealPath(imgTmpDir))
-        jdm.put('ctxtPath', servletContext.getContextPath())
-        jdm.put('querySum1', qS1)
-        jdm.put('querySum2', qS2)
-
-        jdm.put('userName', userName)
-
-        def group = 'heatmaps'
-        def jobDetail = new JobDetailImpl(jobName, group, genePatternService.getClass())
-        jobDetail.setJobDataMap(jdm)
 
         asyncJobService.updateStatus(jobName, statusList[3])
+
+	String imgTmpDir = '/images/datasetExplorer'
+	String group = 'heatmaps'
+	JobDetail jobDetail = new JobDetailImpl(jobName, group, GenePatternService)
+	jobDetail.jobDataMap = new JobDataMap(
+	    analysis: 'Survival',
+	    gctFile: saFiles.dataFile,
+	    clsFile: saFiles.clsFile,
+	    imgTmpDir: imgTmpDir,
+	    imgTmpPath: servletContext.getRealPath(imgTmpDir),
+	    ctxtPath: servletContext.contextPath,
+	    querySum1: querySummary1,
+	    querySum2: querySummary2,
+	    userName: securityService.currentUsername())
         quartzScheduler.scheduleJob jobDetail, new SimpleTriggerImpl('triggerNow', group)
-        //println 'WIP: Gene Pattern replacement'
-        //logger.debug('WIP: Gene Pattern replacement')
-        JSONObject jsonResult = new JSONObject()
-        jsonResult.put('jobName', jobName)
-        response.setContentType('text/json')
-        response.outputStream << jsonResult.toString()
+
+	render([jobName: jobName] as JSON)
     }
 
     /**
-     * Method that is called asynchronously from the datasetExplorer Javascript
-     * Will run the haploviewer but does not use the Quartz job scheduler due to the need for the database connection
+     * Called asynchronously from the datasetExplorer Javascript.
+     * Will run the haploviewer but does not use Quartz due to the need for the database connection
      */
-    def runhaploviewer = {
-        if (logger.isDebugEnabled()) {
-            request.getParameterMap().keySet().each { _key ->
-                logger.debug('' + _key + ' -> ' + request.getParameter(_key))
-            }
-        }
-        def rID1 = nullCheck(request.getParameter('result_instance_id1'))
-        def rID2 = nullCheck(request.getParameter('result_instance_id2'))
-        def genes = request.getParameter('genes')
-        def jobName = request.getParameter('jobName')
+    def runhaploviewer(String result_instance_id1, String result_instance_id2, String genes, String jobName) {
+	logParams()
 
-        def statusList = ['Validating Parameters']
+	result_instance_id1 = nullCheck(result_instance_id1)
+	result_instance_id2 = nullCheck(result_instance_id2)
 
-        def statusIndex = 1
+	List<String> statusList = ['Validating Parameters']
 
-        if (rID1 != null) {
-            statusList.add('Creating haploview for subset 1')
+	int statusIndex = 1
+
+	if (result_instance_id1) {
+	    statusList << 'Creating haploview for subset 1'
         }
 
-        if (rID2 != null) {
-            statusList.add('Creating haploview for subset 2')
+	if (result_instance_id2) {
+	    statusList << 'Creating haploview for subset 2'
         }
 
         jobResultsService[jobName]['StatusList'] = statusList
 
         asyncJobService.updateStatus(jobName, statusList[0])
 
-        def userName = springSecurityService.getPrincipal().username
-        def al = new AccessLog(username: userName, event: 'Haploview Job: ' + jobName,
-                eventmessage: 'RID1: ' + rID1 + ', RID2: ' + rID2 + ', Genes: ' + genes, accesstime: new java.util.Date())
-        al.save()
-
-        def con
+	accessLogService.report "Haploview Job: $jobName",
+	    "result_instance_id1: $result_instance_id1, result_instance_id2: $result_instance_id2, Genes: $genes"
 
         StringBuilder sb = new StringBuilder()
-        sb.append('<a  href="javascript:showInfo(\'help/happloview.html\');"><img src="' + resource(dir:'images',file:'information.png') + '"></a>')
-        sb.append('<b>Genes Selected: ' + genes + '</b>')
-        sb.append('<table><tr>')
+	sb << "<a  href=\"javascript:showInfo('help/happloview.html');\"><img src=\"${resource(dir: 'images', file: 'information.png')}\"></a>"
+	sb << '<b>Genes Selected: ' << genes << '</b>'
+	sb << '<table><tr>'
 
+	Connection con
         try {
             con = dataSource.getConnection()
-            if (rID1 != null) {
+	    if (result_instance_id1) {
                 asyncJobService.updateStatus(jobName, statusList[statusIndex])
-                sb.append(createHaploView(rID1, genes, con))
-                statusIndex += 1
+		sb << createHaploView(result_instance_id1, genes, con)
+		statusIndex++
             }
-            if (rID2 != null) {
+	    if (result_instance_id2) {
                 asyncJobService.updateStatus(jobName, statusList[statusIndex])
-                sb.append(createHaploView(rID2, genes, con))
+		sb << createHaploView(result_instance_id2, genes, con)
             }
         }
-        catch (Exception e) {
-            def error = e.getMessage()
-            logger.error('Exception: ' + error, e)
-            jobResultsService[jobName]['Status'] = 'Error'
-            jobResultsService[jobName]['Exception'] = error
+	catch (e) {
+	    handleException e
         }
         finally {
             con?.close()
         }
 
-        sb.append('</tr></table>')
+	sb << '</tr></table>'
         jobResultsService[jobName]['Results'] = sb.toString()
     }
 
     /**
-     * Method that is called asynchronously from the sampleExplorer Javascript
-     * Will run the haploviewer but does not use the Quartz job scheduler due to the need for the database connection
+     * Called asynchronously from the sampleExplorer Javascript.
+     * Will run the haploviewer but does not use Quartz due to the need for the database connection
      */
-    def runhaploviewersample = {
-        if (logger.isDebugEnabled()) {
-            request.getParameterMap().keySet().each { _key ->
-                logger.debug('' + _key + ' -> ' + request.getParameter(_key))
-            }
-        }
+    def runhaploviewersample(String sampleIdList, String genes, String jobName) {
+	logParams()
 
-        //Gather our parameters from the form submission.
-        def sampleIdList = request.getParameter('sampleIdList')
-        def genes = request.getParameter('genes')
-        def jobName = request.getParameter('jobName')
-
-        //The sampleIdList will look like {'SampleIdList':{'subset1':['Sample1'],'subset2':[],'subset3':[]}}
+	//The sampleIdList will look like {"SampleIdList":{"subset1":["Sample1"],"subset2":[],"subset3":[]}}
         def sampleIdListJSON = JSON.parse(sampleIdList)
 
         //Initialize status list.
-        def statusList = ['Validating Parameters']
+	List<String> statusList = ['Validating Parameters']
 
-        //Add a status for each subset.
-        sampleIdList.each {
-                    subsetItem ->
+	for (subsetItem in sampleIdList) {
 
-                        def subsetSampleList = subsetItem.value
+	    List subsetSampleList = subsetItem.value
 
-                        //Don't add a subset if there are no items in the subset.
-                        if (subsetSampleList.size() > 0) {
-                            statusList.add('Creating haploview for subset ' + subsetItem.key)
-                        }
-                }
+            //Don't add a subset if there are no items in the subset.
+	    if (subsetSampleList) {
+		statusList << 'Creating haploview for subset ' + subsetItem.key
+            }
+        }
 
-        //Assign the status list.
         jobResultsService[jobName]['StatusList'] = statusList
 
-        //Update to our initial status.
         asyncJobService.updateStatus(jobName, statusList[0])
 
-        //Log the action firing in our access logger.
-        def userName = springSecurityService.getPrincipal().username
-        def al = new AccessLog(username: userName, event: 'Haploview Job: ' + jobName, eventmessage: 'Sample IDs JSON: ' + sampleIdListJSON + ', Genes: ' + genes, accesstime: new java.util.Date())
-        al.save()
+	accessLogService.report "Haploview Job: $jobName",
+	    "Sample IDs JSON: $sampleIdListJSON, Genes: $genes"
 
         //Add some links to the returned page.
         StringBuilder sb = new StringBuilder()
-        sb.append('<a  href="javascript:showInfo(\'help/happloview.html\');"><img src="' + resource(dir:'images',file:'information.png') + '"></a>')
-        sb.append('<b>Genes Selected: ' + genes + '</b>')
-        sb.append('<table><tr>')
+	sb << "<a  href=\"javascript:showInfo('help/happloview.html');\"><img src=\"${resource(dir: 'images', file: 'information.png')}\"></a>"
+	sb << '<b>Genes Selected: ' << genes << '</b>'
+	sb << '<table><tr>'
 
-        //We need to increment the status as we generate the Halplo data for each set.
-        def statusIndex = 1
+	// increment the status as we generate the Halplo data for each set.
+	int statusIndex = 1
 
+	Connection con
         try {
             //Create the connection we will use for our SQL statements.
-            def con = dataSource.getConnection()
+	    con = dataSource.getConnection()
 
             //Get data for each subset.
-            sampleIdList.each {
-                        subsetItem ->
+	    for (subsetItem in sampleIdList) {
 
-                            def subsetSampleList = subsetItem.value
+		List subsetSampleList = subsetItem.value
 
-                            //Don't use a subset if there are no items in the subset.
-                            if (subsetSampleList.size() > 0) {
-                                //Make a note of which subset we are working on.
-                                asyncJobService.updateStatus(jobName, statusList[statusIndex])
+                //Don't use a subset if there are no items in the subset.
+		if (subsetSampleList) {
+                    //Make a note of which subset we are working on.
+                    asyncJobService.updateStatus(jobName, statusList[statusIndex])
 
-                                //Attach data from creating the haploview for our subset.
-                                sb.append(createHaploViewSample(subsetSampleList, genes, con))
+                    //Attach data from creating the haploview for our subset.
+		    sb << createHaploViewSample(subsetSampleList, genes, con)
 
-                                //Update our status index.
-                                statusIndex += 1
-                            }
-                    }
+                    //Update our status index.
+		    statusIndex++
+                }
+            }
         }
-        catch (Exception e) {
-            def error = e.getMessage()
-            logger.error('Exception: ' + error, e)
-            jobResultsService[jobName]['Status'] = 'Error'
-            jobResultsService[jobName]['Exception'] = error
+	catch (e) {
+	    handleException e
         }
         finally {
             con?.close()
         }
 
-        sb.append('</tr></table>')
+	sb << '</tr></table>'
         jobResultsService[jobName]['Results'] = sb.toString()
     }
 
-    private void callHaploText(String[] args) {
+    private void callHaploText(List<String> args) {
         try {
             // yes, this class does all the work in the constructor and
             // it's instantiated for the collaterals. Don't believe it? See
             // https://github.com/jazzywhit/Haploview/blob/69f7ca282/edu/mit/wi/haploview/HaploText.java#L210
-            Class.forName('edu.mit.wi.haploview.HaploText').
-                    newInstance(args)
+	    Class.forName('edu.mit.wi.haploview.HaploText').newInstance(args as String[])
         }
         catch (ClassNotFoundException e) {
-            logger.error('Haploview class not found. It is not bundled anymore. ' +
-                    'You will need to add its jar as a dependency')
+	    logger.error 'Haploview class not found. It is not bundled anymore. You will need to add its jar as a dependency'
         }
     }
 
@@ -658,41 +553,34 @@ class GenePatternController {
      * @param genes - the list of genes
      * @param con - the database connection
      */
-    private String createHaploView(String rID, String genes, java.sql.Connection con) {
-        def retValue
+    private String createHaploView(String rID, String genes, Connection con) {
 
-        PEDFormat ped = new PEDFormat()
+	String ids = i2b2HelperService.getSubjects(rID)
 
-        def ids = i2b2HelperService.getSubjects(rID)
-
-        String fileroot = System.getProperty('java.io.tmpdir')
+	String fileroot = TEMP_DIR
         File tempFile = File.createTempFile('haplo', '.tmp', new File(fileroot))
-        def filenamein = tempFile.getName()
 
         if (!fileroot.endsWith(File.separator)) {
             fileroot = fileroot + File.separator
         }
 
-        def pathin = fileroot + filenamein
-        def pathinped = fileroot + filenamein + '.ped'
-        def pathininfo = fileroot + filenamein + '.info'
+	String filenamein = tempFile.name
+	String pathin = fileroot + filenamein
+	String pathinped = fileroot + filenamein + '.ped'
+	String pathininfo = fileroot + filenamein + '.info'
 
-        boolean s1 = ped.createPEDFile(genes, ids, pathin, con)
+	boolean s1 = new PEDFormat().createPEDFile(genes, ids, pathin, con)
 
-        String[] args = ['-nogui', '-quiet', '-pedfile', pathinped, '-info', pathininfo, '-png']
-
-        callHaploText(args)
+	callHaploText(['-nogui', '-quiet', '-pedfile', pathinped, '-info', pathininfo, '-png'])
         String filename = filenamein + '.ped.LD.PNG'
 
-        String hapleUrl = request.getContextPath() + '/chart/displayChart?filename=' + filename
+	String hapleUrl = request.contextPath + '/chart/displayChart?filename=' + filename
         if (s1) {
-            retValue = "<td><img src='${hapleUrl}'  border=0></td>"
+	    '<td><img src="' + hapleUrl + '" border="0"></td>'
         }
         else {
-            retValue = '<td>Not enough data to generate haploview</td>'
+	    '<td>Not enough data to generate haploview</td>'
         }
-
-        return retValue
     }
 
     /**
@@ -702,258 +590,236 @@ class GenePatternController {
      * @param genes - the list of genes
      * @param con - the database connection
      */
-    private String createHaploViewSample(sampleIdList, String genes, java.sql.Connection con) {
-        //This will hold the html we send back to the browser.
-        def retValue
+    private String createHaploViewSample(sampleIdList, String genes, Connection con) {
 
-        //This is the file format that has to be fed to the HaploViewer
-        PEDFormat ped = new PEDFormat()
+	List<String> ids = i2b2HelperService.getSubjectsAsListFromSample(sampleIdList)
 
-        //Get the list of subject IDs based on Sample ID.
-        def ids = i2b2HelperService.getSubjectsAsListFromSample(sampleIdList)
-
-        //Create temporary files.
-        String fileroot = System.getProperty('java.io.tmpdir')
+	String fileroot = TEMP_DIR
         File tempFile = File.createTempFile('haplo', '.tmp', new File(fileroot))
-        def filenamein = tempFile.getName()
+	String filenamein = tempFile.name
 
         if (!fileroot.endsWith(File.separator)) {
             fileroot = fileroot + File.separator
         }
 
-        //Create path strings.
-        def pathin = fileroot + filenamein
-        def pathinped = fileroot + filenamein + '.ped'
-        def pathininfo = fileroot + filenamein + '.info'
+	String pathin = fileroot + filenamein
+	String pathinped = fileroot + filenamein + '.ped'
+	String pathininfo = fileroot + filenamein + '.info'
 
-        //Create PED file.
-        boolean s1 = ped.createPEDFile(genes, ids, pathin, con)
-
-        //If we were able to write the file,
+	boolean s1 = new PEDFormat().createPEDFile(genes, ids, pathin, con)
         if (s1) {
-            //Create argument array.
-            String[] args = ['-nogui', '-quiet', '-pedfile', pathinped, '-info', pathininfo, '-png']
+	    callHaploText(['-nogui', '-quiet', '-pedfile', pathinped, '-info', pathininfo, '-png'])
 
-            callHaploText(args)
-
-            //This is the filename of the image.
             String filename = filenamein + '.ped.LD.PNG'
+	    String hapleUrl = request.contextPath + '/chart/displayChart?filename=' + filename
 
-            String hapleUrl = request.getContextPath() + '/chart/displayChart?filename=' + filename
-
-            retValue = "<td><img src='${hapleUrl}'  border=0></td>"
+	    '<td><img src="' + hapleUrl + '" border="0"></td>'
         }
         else {
-            retValue = '<td>Not enough data to generate haploview</td>'
+	    '<td>Not enough data to generate haploview</td>'
         }
-
-        return retValue
     }
 
-    def showGwasSelection = {
-        String resultInstanceID1 = request.getParameter('result_instance_id1')
-        String resultInstanceID2 = request.getParameter('result_instance_id2')
+    def showGwasSelection(String result_instance_id1, String result_instance_id2) {
 
-        def snpDatasetNum_1 = 0, snpDatasetNum_2 = 0
-        if (resultInstanceID1 != null && resultInstanceID1.trim().length() != 0) {
-            String subjectIds1 = i2b2HelperService.getSubjects(resultInstanceID1)
+	int snpDatasetNum1 = 0
+	int snpDatasetNum2 = 0
+	if (result_instance_id1?.trim()) {
+	    String subjectIds1 = i2b2HelperService.getSubjects(result_instance_id1)
             List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds1)
-            if (idList != null) snpDatasetNum_1 = idList.size()
+	    if (idList) {
+		snpDatasetNum1 = idList.size()
+	    }
         }
-        if (resultInstanceID2 != null && resultInstanceID2.trim().length() != 0) {
-            String subjectIds2 = i2b2HelperService.getSubjects(resultInstanceID2)
+	if (result_instance_id2?.trim()) {
+	    String subjectIds2 = i2b2HelperService.getSubjects(result_instance_id2)
             List<Long> idList = i2b2HelperService.getSNPDatasetIdList(subjectIds2)
-            if (idList != null) snpDatasetNum_2 = idList.size()
+	    if (idList) {
+		snpDatasetNum2 = idList.size()
+	    }
         }
 
         String warningMsg = null
-        if (snpDatasetNum_1 + snpDatasetNum_2 > 10) {
+	if (snpDatasetNum1 + snpDatasetNum2 > 10) {
             warningMsg = 'Note: The performance may be slow with more than 10 SNP datasets. Please consider displaying individual chromosomes.'
         }
-        def chroms = ['ALL', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
-        [chroms: chroms, snpDatasetNum_1: snpDatasetNum_1, snpDatasetNum_2: snpDatasetNum_2, warningMsg: warningMsg, chromDefault: 'ALL']
+
+	[chroms: chroms,
+	 snpDatasetNum_1: snpDatasetNum1,
+	 snpDatasetNum_2: snpDatasetNum2,
+	 warningMsg: warningMsg,
+	 chromDefault: 'ALL']
     }
 
     /**
      * Method that will run a survival analysis and is called asynchronously from the datasetexplorer
      */
-    def runGwas = {
-        if (logger.isDebugEnabled()) {
-            request.getParameterMap().keySet().each { _key ->
-                logger.debug('' + _key + ' -> ' + request.getParameter(_key))
-            }
-        }
+    def runGwas(String result_instance_id1, String result_instance_id2, String querySummary1,
+	        String querySummary2, String jobName, String chroms) {
+	logParams()
 
-        def rID1 = nullCheck(request.getParameter('result_instance_id1'))
-        def rID2 = nullCheck(request.getParameter('result_instance_id2'))
-        def qS1 = request.getParameter('querySummary1')
-        def qS2 = request.getParameter('querySummary2')
-        def jobName = request.getParameter('jobName')
+	result_instance_id1 = nullCheck(result_instance_id1)
+	result_instance_id2 = nullCheck(result_instance_id2)
 
-        def statusList = ['Validating Parameters', 'Obtaining Cohort Information',
-                          'Obtaining SNP data', 'Triggering PLINK job',
-                          'Running PLINK']
+	List<String> statusList = ['Validating Parameters', 'Obtaining Cohort Information',
+		                   'Obtaining SNP data', 'Triggering PLINK job', 'Running PLINK']
 
         jobResultsService[jobName]['StatusList'] = statusList
 
-        asyncJobService.updateStatus(jobName, statusList[0])
+	asyncJobService.updateStatus jobName, statusList[0]
 
-        def userName = springSecurityService.getPrincipal().username
-        def al = new AccessLog(username: userName, event: 'Survival Analysis, Job: ' + jobName,
-                eventmessage: 'RID1: ' + rID1 + ', RID2: ' + rID2, accesstime: new java.util.Date())
-        al.save()
+	accessLogService.report "Survival Analysis, Job: $jobName",
+	    eventMessage: "result_instance_id1: $result_instance_id1, result_instance_id2: $result_instance_id2"
 
-        List<String> subjectIds1
-        List<String> subjectIds2
-        List<String> concepts1
-        List<String> concepts2
+	asyncJobService.updateStatus jobName, statusList[1]
 
-        asyncJobService.updateStatus(jobName, statusList[1])
-        if (rID1 != null) {
-            subjectIds1 = i2b2HelperService.getSubjectsAsList(rID1)
-            concepts1 = i2b2HelperService.getConceptsAsList(rID1)
+	List<String> subjectIds1
+	if (result_instance_id1) {
+	    subjectIds1 = i2b2HelperService.getSubjectsAsList(result_instance_id1)
         }
 
-        if (rID2 != null) {
-            subjectIds2 = i2b2HelperService.getSubjectsAsList(rID2)
-            concepts2 = i2b2HelperService.getConceptsAsList(rID2)
+	List<String> subjectIds2
+	if (result_instance_id2) {
+	    subjectIds2 = i2b2HelperService.getSubjectsAsList(result_instance_id2)
         }
 
-        asyncJobService.updateStatus(jobName, statusList[2])
+	asyncJobService.updateStatus jobName, statusList[2]
 
         GwasFiles gwasFiles = new GwasFiles(getGenePatternFileDirName(),
-                createLink(controller: 'analysis', action: 'getGenePatternFile', absolute: true))
-        String chroms = request.getParameter('chroms')
+					    createLink(controller: 'analysis', action: 'getGenePatternFile', absolute: true).toString())
         try {
             i2b2HelperService.getGwasDataByPatient(subjectIds1, subjectIds2, chroms, gwasFiles)
         }
-        catch (Exception e) {
-            def error = e.getMessage()
-            logger.error('Exception: ' + error, e)
-            jobResultsService[jobName]['Status'] = 'Error'
-            jobResultsService[jobName]['Exception'] = error
+	catch (e) {
+	    handleException e
             return
         }
 
-        logger.debug('Checking to see if the user cancelled the job prior to running it')
+	logger.debug 'Checking to see if the user cancelled the job prior to running it'
         if (jobResultsService[jobName]['Status'] == 'Cancelled') {
-            logger.warn('' + jobName + ' has been cancelled')
+	    logger.warn '{} has been cancelled', jobName
             return
         }
 
-        def jdm = new JobDataMap()
-        jdm.put('analysis', 'GWAS')
-        jdm.put('gwasFiles', gwasFiles)
-        jdm.put('querySum1', qS1)
-        jdm.put('querySum2', qS2)
+	asyncJobService.updateStatus jobName, statusList[3]
 
-        jdm.put('userName', userName)
+	String group = 'heatmaps'
+	JobDetail jobDetail = new JobDetailImpl(jobName, group, GenePatternService)
+	jobDetail.jobDataMap = new JobDataMap(
+	    analysis: 'GWAS',
+	    gwasFiles: gwasFiles,
+	    querySum1: querySummary1,
+	    querySum2: querySummary2,
+	    userName: securityService.currentUsername())
+	quartzScheduler.scheduleJob jobDetail, new SimpleTriggerImpl('triggerNow', group)
 
-        def group = 'heatmaps'
-        def jobDetail = new JobDetailImpl(jobName, group, genePatternService.getClass())
-        jobDetail.setJobDataMap(jdm)
-
-        asyncJobService.updateStatus(jobName, statusList[3])
-	quartzScheduler.scheduleJob(jobDetail, trigger)
-        //println 'WIP: Gene Pattern replacement'
-        //logger.debug('WIP: Gene Pattern replacement')
-
-        JSONObject jsonResult = new JSONObject()
-        jsonResult.put('jobName', jobName)
-        response.setContentType('text/json')
-        response.outputStream << jsonResult.toString()
+	render([jobName: jobName] as JSON)
     }
 
     protected String getGenePatternFileDirName() {
-        String fileDirName = grailsApplication.config.com.recomdata.analysis.genepattern.file.dir
         String webRootName = servletContext.getRealPath('/')
-        if (webRootName.endsWith(File.separator) == false)
+	if (webRootName.endsWith(File.separator) == false) {
             webRootName += File.separator
-        return webRootName + fileDirName
+	}
+	return webRootName + genePatternFileDir
     }
 
     /**
      * Helper method to return null from Javascript calls
      *
-     * @param inputArg - the input arguments
+     * @param s - the input arguments
      * @return null or the input argument if it is not null (or empty or undefined)
      */
-    private String nullCheck(inputArg) {
-        logger.debug('Input argument to nullCheck: ' + inputArg)
-        if (inputArg == 'undefined' || inputArg == 'null' || inputArg == '') {
-            logger.debug('Returning null in nullCheck')
-            return null
+    private String nullCheck(String s) {
+	logger.debug 'Input argument to nullCheck: {}', s
+	if (s && s != 'undefined' && s != 'null') {
+	    s
+	}
+	else {
+	    logger.debug 'Returning null in nullCheck'
         }
-        return inputArg
     }
 
     /**
      * Helper method to derive the pathway name
      *
      * @param analysis the type of analysis to run
-     * @param pathway_name the pathway name in the request
+     * @param pathwayName the pathway name in the request
      * @return the pathway name, null or the search result
      */
-    private String derivePathwayName(analysis, pathway_name) {
-        logger.info('Derived pathway name as ' + pathway_name)
+    private String derivePathwayName(String analysis, String pathwayName) {
+	logger.info 'Derived pathway name as {}', pathwayName
         if (analysis != 'Select' && analysis != 'PCA') {
-            logger.debug('Pathway name has been set to ' + pathway_name)
-            if (pathway_name == null || pathway_name.length() == 0 || pathway_name == 'null') {
-                logger.debug('Resetting pathway name to null')
-                pathway_name = null
-            }
-            boolean nativeSearch = grailsApplication.config.com.recomdata.search.genepathway == 'native'
-            logger.debug('nativeSearch: ' + nativeSearch)
-            if (!nativeSearch && pathway_name != null) {
-                pathway_name = SearchKeyword.get(Long.valueOf(pathway_name)).uniqueId
-                logger.debug('pathway_name has been set to a keyword ID: ' + pathway_name)
+	    logger.debug 'Pathway name has been set to {}', pathwayName
+	    if (!pathwayName || pathwayName == 'null') {
+		logger.debug 'Resetting pathway name to null'
+		pathwayName = null
+	    }
+	    boolean nativeSearch = genepathway == 'native'
+	    logger.debug 'nativeSearch: {}', nativeSearch
+	    if (!nativeSearch) {
+		pathwayName = SearchKeyword.get(pathwayName).uniqueId
+		logger.debug 'pathway_name has been set to a keyword ID: {}', pathwayName
             }
         }
-        return pathway_name
+	pathwayName
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // These are for the synchronous operation - soon to be replaced
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    def showWorkflowStatus = {
-        def wfstatus = session['workflowstatus']
-        if (wfstatus == null) {
+    def showWorkflowStatus() {
+	WorkflowStatus wfstatus = sessionWorkflowstatus()
+	if (!wfstatus) {
             wfstatus = new WorkflowStatus()
-            session['workflowstatus'] = wfstatus
-            session['workflowstatus'].setCurrentJobStatus(new JobStatus(name: 'initializing Workflow', status: 'R'))
+	    wfstatus.setCurrentJobStatus new JobStatus(name: 'initializing Workflow', status: 'R')
+	    session.workflowstatus = wfstatus
         }
 
-        render(view: 'workflowStatus')
+	render view: 'workflowStatus'
     }
 
-    def checkWorkflowStatus = {
-        // check session status
-        def wfstatus = session['workflowstatus']
+    def checkWorkflowStatus() {
+	WorkflowStatus wfstatus = sessionWorkflowstatus()
 
-        JSONObject result = wfstatus.result
-        if (result == null) {
-            result = new JSONObject()
-        }
+	JSONObject result = wfstatus.result ?: new JSONObject()
 
-        def statusHtml = g.render(template: 'jobStatus', model: [wfstatus: wfstatus]).toString()
-        result.put('statusHTML', statusHtml)
-        println(statusHtml)
+	String statusHtml = groovyPageRenderer.render(template: 'jobStatus', model: [wfstatus: wfstatus])
+	result.put 'statusHTML', statusHtml
 
         if (wfstatus.isCompleted()) {
-            result.put('wfstatus', 'completed')
+	    result.put 'wfstatus', 'completed'
             wfstatus.rpCount++
-            result.put('rpCount', wfstatus.rpCount)
+	    result.put 'rpCount', wfstatus.rpCount
         }
         else {
-            result.put('wfstatus', 'running')
+	    result.put 'wfstatus', 'running'
         }
         render result.toString()
     }
 
-    def cancelJob = {
-        def wfstatus = session['workflowstatus']
+    def cancelJob() {
+	WorkflowStatus wfstatus = sessionWorkflowstatus()
         wfstatus.setCancelled()
         render(wfstatus.jobStatusList as JSON)
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private WorkflowStatus sessionWorkflowstatus() {
+	session.workflowstatus
+    }
+
+    private void logParams() {
+	if (logger.debugEnabled) {
+	    for (String key in request.parameterMap.keySet()) {
+		logger.debug '{} -> {}', key, request.getParameter(key)
+	    }
+	}
+    }
+
+    private void handleException(Exception e) {
+	String error = e.message
+	logger.error 'Exception: {}', error, e
+	jobResultsService[jobName]['Status'] = 'Error'
+	jobResultsService[jobName]['Exception'] = error
+    }
 }

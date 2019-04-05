@@ -1,209 +1,126 @@
-/**
- * @author JIsikoff
- *
- */
 import com.recomdata.datasetexplorer.proxy.XmlHttpProxy
 import com.recomdata.datasetexplorer.proxy.XmlHttpProxyServlet
 import groovy.util.logging.Slf4j
 
-import javax.servlet.ServletContext
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-
+/**
+ * @author JIsikoff
+ */
 @Slf4j('logger')
 class ProxyController {
 
     static defaultAction = 'proxy'
 
-    def proxy = {
-        def post = false
-        if (request.getMethod() == 'POST')
-            post = true
-        doProcess(request, response, post)
-    }
+    def proxy(String callback, String urlparams, String count, String url) {
+	String serviceKey = null // TODO always null
 
+	String bodyContent = request.inputStream.text
 
-    private doProcess(HttpServletRequest req, HttpServletResponse res, boolean isPost) {
-
-        boolean allowXDomain = true
-        boolean requireSession = false
-        String responseContentType = 'text/xml;charset=UTF-8';  //changed from text/json in jmaki source
-        boolean rDebug = false
-        XmlHttpProxy xhp = new XmlHttpProxy(); 
-        ServletContext ctx
-        println(this)
-
-        StringBuilder bodyContent = new StringBuilder(); 
-        OutputStream out = null
-        PrintWriter writer = null
-        String serviceKey = null
-
-        /*try {
-            BufferedReader inp = req.getReader()
-            String line = null
-            while ((line = inp.readLine()) != null) {
-                if (bodyContent == null) bodyContent = new StringBuffer()
-                bodyContent.append(line)
-                //logger.trace(line)
-            }
-        }
-        catch (Exception e) {
-            println(e)
-            logger.error(e.toString())
-        }*/
-
-        BufferedReader bufferedReader = null
-        try {
-            InputStream inputStream = req.getInputStream()
-            if (inputStream != null) {
-                bufferedReader = new BufferedReader(new InputStreamReader(
-                        inputStream))
-                char[] charBuffer = new char[128]
-                int bytesRead = -1
-                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                    bodyContent.append(charBuffer, 0, bytesRead)
-                }
-            }
-            else {
-                bodyContent.append('')
-            }
-        }
-        catch (IOException ex) {
-            logger.error(ex)
-            // throw ex
-        }
-        finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close()
-                }
-                catch (IOException ex) {
-                    logger.error(ex)
-                    //throw ex
-                }
-            }
-        }
-
-        //	println(bodyContent.toString())
         try {
             String urlString = null
-            String xslURLString = null
-            String userName = null
-            String password = null
-            String format = 'json'
-            String callback = req.getParameter('callback')
-            String urlParams = req.getParameter('urlparams')
-            String countString = req.getParameter('count')
             // encode the url to prevent spaces from being passed along
-            if (urlParams != null) {
-                urlParams = urlParams.replace(' ', '+')
+	    if (urlparams) {
+		urlparams = urlparams.replace(' ', '+')
             }
 
             try {
-                if (false) {
-                    logger.trace('wrong')
-                }
                 //code for passing the url directly through instead of using configuration file
-                else if (req.getParameter('url') != null) {
-                    String serviceURL = req.getParameter('url')
+		if (url) {
                     // build the URL
-                    if (urlParams != null && serviceURL.indexOf('?') == -1) {
-                        serviceURL += '?'
+		    if (urlparams && !url.contains('?')) {
+			url += '?'
                     }
-                    else if (urlParams != null) {
-                        serviceURL += '&'
+		    else if (urlparams) {
+			url += '&'
                     }
-                    urlString = serviceURL
-                    if (urlParams != null) urlString += urlParams
-                }
-                else {
-                    writer = res.getWriter()
-                    if (serviceKey == null) writer.write('XmlHttpProxyServlet Error: id parameter specifying serivce required.')
-                    else writer.write("XmlHttpProxyServlet Error : service for id '" + serviceKey + "' not  found.")
+		    urlString = url
+		    if (urlparams) {
+			urlString += urlparams
+		    }
+		}
+		else {
+		    PrintWriter writer = response.writer
+		    if (serviceKey == null) {
+			writer.write 'XmlHttpProxyServlet Error: id parameter specifying serivce required.'
+                    }
+                    else {
+			writer.write "XmlHttpProxyServlet Error : service for id '" + serviceKey + "' not  found."
+		    }
                     writer.flush()
                     return
                 }
             }
-            catch (Exception ex) {
-                logger.error('XmlHttpProxyServlet Error loading service: ' + ex)
+	    catch (e) {
+		logger.error 'XmlHttpProxyServlet Error loading service: {}', e.message, e
             }
 
-            Map paramsMap = new HashMap()
-            paramsMap.put('format', format)
+	    Map paramsMap = [format: 'json']
             // do not allow for xdomain unless the context level setting is enabled.
-            if (callback != null && allowXDomain) {
-                paramsMap.put('callback', callback)
+	    boolean allowXDomain = true // TODO always true
+	    if (callback && allowXDomain) {
+		paramsMap.callback = callback
             }
-            if (countString != null) {
-                paramsMap.put('count', countString)
+	    if (count) {
+		paramsMap.count = count
             }
 
-            InputStream xslInputStream = null
-
-            if (urlString == null) {
-                writer = res.getWriter()
-                writer.write('XmlHttpProxyServlet parameters:  id[Required] urlparams[Optional] format[Optional] callback[Optional]')
+	    if (!urlString) {
+		PrintWriter writer = response.writer
+		writer.write 'XmlHttpProxyServlet parameters:  id[Required] urlparams[Optional] format[Optional] callback[Optional]'
                 writer.flush()
                 return
             }
-            // default to JSON
-            res.setContentType(responseContentType)
-            out = res.getOutputStream()
-            // get the stream for the xsl stylesheet
-            if (xslURLString != null) {
-                // check the web root for the resource
-                URL xslURL = null
-                xslURL = ctx.getResource(resourcesDir + 'xsl/' + xslURLString)
-                // if not in the web root check the classpath
+
+	    response.contentType = 'text/xml;charset=UTF-8' //changed from text/json in jmaki source
+	    OutputStream out = response.outputStream
+
+	    InputStream xslInputStream = null
+	    String xslURLString = null
+	    if (xslURLString != null) {  // TODO always null
+		URL xslURL = servletContext.getResource(resourcesDir + 'xsl/' + xslURLString)
                 if (xslURL == null) {
-                    xslURL = XmlHttpProxyServlet.class.getResource(classpathResourcesDir + 'xsl/' + xslURLString)
+		    xslURL = XmlHttpProxyServlet.getResource(classpathResourcesDir + 'xsl/' + xslURLString)
                 }
                 if (xslURL != null) {
                     xslInputStream = xslURL.openStream()
                 }
                 else {
-                    String message = 'Could not locate the XSL stylesheet provided for service id ' + serviceKey + '. Please check the XMLHttpProxy configuration.'
-                    logger.debug(message)
+		    String message = 'Could not locate the XSL stylesheet provided for service id ' +
+			serviceKey + '. Please check the XMLHttpProxy configuration.'
+		    logger.debug message
                     try {
-                        out.write(message.getBytes())
+			out.write message.bytes
                         out.flush()
                         return
                     }
-                    catch (java.io.IOException iox) {
-                    }
+		    catch (IOException ignored) {}
                 }
             }
-            //	println('url:'+urlString)
-            //	println('body:'+bodyContent)
-            if (!isPost) {
-                logger.trace('proxying to:' + urlString)
-                xhp.doGet(urlString, out, xslInputStream, paramsMap, userName, password)
+
+	    String userName = null // TODO always null
+	    String password = null // TODO always null
+	    if (!request.post) {
+		logger.trace 'proxying to:{}', urlString
+		new XmlHttpProxy().doGet urlString, out, xslInputStream, paramsMap, userName, password
             }
             else {
-                if (bodyContent == null || bodyContent.length() == 0) logger.debug('XmlHttpProxyServlet attempting to post to url ' + urlString + ' with no body content')
-                logger.trace('proxying to:' + urlString)
-                xhp.doPost(urlString, out, xslInputStream, paramsMap, bodyContent.toString(), req.getContentType(), userName, password)
+		if (!bodyContent) {
+		    logger.debug 'XmlHttpProxyServlet attempting to post to url {} with no body content', urlString
+		}
+		logger.trace 'proxying to:{}', urlString
+		new XmlHttpProxy().doPost urlString, out, xslInputStream, paramsMap, bodyContent,
+		    request.contentType, userName, password
             }
         }
-        catch (Exception iox) {
-            iox.printStackTrace()
-            logger.trace('XmlHttpProxyServlet: caught ' + iox)
+	catch (e) {
+	    logger.error 'XmlHttpProxyServlet: caught {}', e.message, e
             try {
-                writer = res.getWriter()
-                writer.write('XmlHttpProxyServlet error loading service for ' + serviceKey + ' . Please notify the administrator.')
-                writer.flush()
+		PrintWriter writer = response.writer
+		writer.write 'XmlHttpProxyServlet error loading service for ' +
+		    serviceKey + ' . Please notify the administrator.'
+		writer.flush()
             }
-            catch (java.io.IOException ix) {
-                ix.printStackTrace()
-            }
-            return
-        }
-        finally {
-            try {
-                //if (out != null) out.close()
-                //if (writer != null) writer.close()
-            }
-            catch (java.io.IOException iox) {
+	    catch (IOException ioe) {
+		logger.error ioe.message, ioe
             }
         }
     }

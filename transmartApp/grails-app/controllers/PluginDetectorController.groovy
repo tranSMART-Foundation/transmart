@@ -1,17 +1,11 @@
-import grails.util.Holders
+import org.codehaus.groovy.grails.plugins.GrailsPluginManager
+import org.springframework.beans.factory.annotation.Autowired
 
 class PluginDetectorController {
 
-    def checkPlugin = {
+    @Autowired private GrailsPluginManager pluginManager
 
-        // get plugin name
-        def pluginName = request.getParameter('pluginName')
-        def result = false
-
-        if (Holders.pluginManager.hasGrailsPlugin(pluginName)) { // check if plugin is installed
-            result = true
-        }
-
-        render result
+    def checkPlugin(String pluginName) {
+	render pluginManager.hasGrailsPlugin(pluginName)
     }
 }

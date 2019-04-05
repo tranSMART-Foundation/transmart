@@ -1,9 +1,11 @@
 package org.transmart.authorization
 
-import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import groovy.transform.CompileStatic
 import org.springframework.beans.factory.FactoryBean
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.util.Assert
+import org.transmart.plugin.shared.SecurityService
 import org.transmartproject.core.users.User
 import org.transmartproject.core.users.UsersResource
 
@@ -12,13 +14,11 @@ import javax.annotation.PostConstruct
 /**
  * Should be request scoped!
  */
+@CompileStatic
 class CurrentUserBeanFactoryBean implements FactoryBean<User> {
 
-    @Autowired
-    SpringSecurityService springSecurityService
-
-    @Autowired
-    UsersResource usersResource
+    @Autowired SecurityService securityService
+    @Autowired UsersResource usersResource
 
     final boolean singleton = true
 
@@ -28,25 +28,14 @@ class CurrentUserBeanFactoryBean implements FactoryBean<User> {
 
     @PostConstruct
     void fetchUser() {
-        if (springSecurityService == null) {
-            throw new IllegalStateException('springSecurityService not injected')
-        }
+	Assert.state securityService != null, 'securityService not injected'
+	Assert.state SpringSecurityUtils.securityConfig.active as boolean, 'Spring Security not active'
+	Assert.state securityService.loggedIn(), 'User is not logged in'
 
-        if (!SpringSecurityUtils.securityConfig.active) {
-            throw new IllegalStateException('springSecurityService not active')
-        }
-
-        if (!springSecurityService.isLoggedIn()) {
-            throw new IllegalStateException('User is not logged in')
-        }
-
-        def username = springSecurityService.principal.username
-
-        user = usersResource.getUserFromUsername(username)
+	user = usersResource.getUserFromUsername(securityService.currentUsername())
     }
 
-    @Override
-    User getObject() throws Exception {
+    User getObject() {
         user
     }
 }

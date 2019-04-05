@@ -1,34 +1,78 @@
 import com.recomdata.export.SnpViewerFiles
-import i2b2.*
+import groovy.sql.Sql
+import i2b2.GeneWithSnp
+import i2b2.SnpDataByProbe
+import i2b2.SnpDataset
+import i2b2.SnpDatasetListByProbe
+import i2b2.SnpInfo
+import i2b2.SnpProbeSortedDef
+import i2b2.StringLineReader
+import org.springframework.util.Assert
+
+import javax.sql.DataSource
+import java.sql.Clob
 
 class SnpService {
 
-    def dataSource
+    static transactional = false
 
-    public void getSNPViewerDataByPatient(List<Long>[] patientNumListArray, String chroms, SnpViewerFiles snpFiles) throws Exception {
-        if (snpFiles == null) throw new Exception('The SNPViewerFiles object is not instantiated')
+    DataSource dataSource
 
-        // Get SQL query String for all the subject IDs
-        String subjectListStr = ''
+    private static final char QUOTE = "'"
+    private static final Map<String, String[]> chromEndProbeLineMap =
+	['1' : ['SNP_A-8575125\t1\t564621', 'SNP_A-8391333\t1\t249198692'],
+	 '2' : ['SNP_A-8615982\t2\t15703', 'SNP_A-8304446\t2\t243048760'],
+	 '3' : ['SNP_A-2100278\t3\t66866', 'SNP_A-8336753\t3\t197856433'],
+	 '4' : ['SNP_A-8661350\t4\t45410', 'SNP_A-8713585\t4\t190921709'],
+	 '5' : ['SNP_A-8392711\t5\t36344', 'SNP_A-2186029\t5\t180692833'],
+	 '6' : ['SNP_A-8533260\t6\t203249', 'SNP_A-8608599\t6\t170918031'],
+	 '7' : ['SNP_A-8539824\t7\t43259', 'SNP_A-8436508\t7\t159119220'],
+	 '8' : ['SNP_A-8325516\t8\t161222', 'SNP_A-2094900\t8\t146293414'],
+	 '9' : ['SNP_A-8574568\t9\t37747', 'SNP_A-8302801\t9\t141071475'],
+	 '10': ['SNP_A-8435658\t10\t104427', 'SNP_A-4271863\t10\t135434551'],
+	 '11': ['SNP_A-8300213\t11\t198510', 'SNP_A-2246844\t11\t134944770'],
+	 '12': ['SNP_A-8434276\t12\t161382', 'SNP_A-4219877\t12\t133777645'],
+	 '13': ['SNP_A-8687595\t13\t19045720', 'SNP_A-8587371\t13\t115106996'],
+	 '14': ['SNP_A-8430270\t14\t20211644', 'SNP_A-2127677\t14\t107285437'],
+	 '15': ['SNP_A-8429754\t15\t20071673', 'SNP_A-8685263\t15\t102400037'],
+	 '16': ['SNP_A-1807459\t16\t86671', 'SNP_A-1841720\t16\t90163275'],
+	 '17': ['SNP_A-8398136\t17\t6689', 'SNP_A-8656409\t17\t81049726'],
+	 '18': ['SNP_A-8496414\t18\t11543', 'SNP_A-8448011\t18\t78015057'],
+	 '19': ['SNP_A-8509279\t19\t260912', 'SNP_A-8451148\t19\t59095126'],
+	 '20': ['SNP_A-8559313\t20\t61795', 'SNP_A-8480501\t20\t62912463'],
+	 '21': ['SNP_A-4217519\t21\t9764385', 'SNP_A-8349060\t21\t48084820'],
+	 '22': ['SNP_A-8656401\t22\t16055171', 'SNP_A-8313387\t22\t51219006'],
+	 'X' : ['SNP_A-8572888\tX\t119805', 'SNP_A-8363487\tX\t154925045'],
+	 'Y' : ['SNP_A-8655052\tY\t2722506', 'SNP_A-8433021\tY\t28758193']]
 
-        //Loop through the array of Lists.
+    private static final String[] allChroms = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+	                                       '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y']
+
+    void getSNPViewerDataByPatient(List<Long>[] patientNumListArray, String chroms, SnpViewerFiles snpFiles) {
+	Assert.notNull snpFiles, 'The SNPViewerFiles object is not instantiated'
+
+	StringBuilder sb = new StringBuilder()
+
         for (int i = 0; i < patientNumListArray.length; i++) {
-            //Add a comma to seperate the lists.
-            if (subjectListStr != '') subjectListStr += ','
+	    if (sb) {
+		sb << ','
+	    }
 
             //This is a list of patients, add it to our string.
-            subjectListStr += patientNumListArray[i].join(',')
+	    sb << patientNumListArray[i].join(',')
         }
 
-        Map<Long, SnpDataset[]> snpDatasetBySubjectMap = new HashMap<Long, SnpDataset[]>()
-        getSnpDatasetBySubjectMap(snpDatasetBySubjectMap, subjectListStr)
-        if (snpDatasetBySubjectMap == null || snpDatasetBySubjectMap.size() == 0) {
+	String subjectListStr = sb
+
+	Map<Long, SnpDataset[]> snpDatasetBySubjectMap = [:]
+	getSnpDatasetBySubjectMap snpDatasetBySubjectMap, subjectListStr
+	if (!snpDatasetBySubjectMap) {
             throw new Exception('Error: The selected cohorts do not have SNP data.')
         }
 
-        StringBuffer sampleInfoBuf = new StringBuffer()
-        List<SnpDataset> datasetList = new ArrayList<SnpDataset>()
-        List<String> datasetNameForSNPViewerList = new ArrayList<String>()
+	StringBuilder sampleInfoBuf = new StringBuilder()
+	List<SnpDataset> datasetList = []
+	List<String> datasetNameForSNPViewerList = []
         getSnpSampleInfo(datasetList, datasetNameForSNPViewerList, patientNumListArray, snpDatasetBySubjectMap, sampleInfoBuf)
 
         Map<Long, Map<String, String>> snpDataByDatasetByChrom = getSNPDataByDatasetByChrom(subjectListStr, chroms)
@@ -39,115 +83,111 @@ class SnpService {
          SNPViewer can display the chrom number correctly. Need to build a list of chroms to the last used chrom*/
 
         List<String> neededChroms = getSortedChromList(chroms)
-        String[] allChroms = getAllChromArray()
-        Map<String, String[]> allChromEndProbeLines = getChromEndProbeLineMap()
-        String lastChrom = neededChroms.get(neededChroms.size() - 1)
+	Map<String, String[]> allChromEndProbeLines = chromEndProbeLineMap
+	String lastChrom = neededChroms[-1]
 
-        String platform = datasetList.get(0).platformName
+	String platform = datasetList[0].platformName
         Map<String, SnpProbeSortedDef> probeDefMap = getSNPProbeDefMap(platform, chroms)
 
         BufferedWriter dataWriter = new BufferedWriter(new FileWriter(snpFiles.dataFile))
 
         // Write the header column
         dataWriter.write('SNP\tChromosome\tPhysicalPosition')
-        for (String datasetName : datasetNameForSNPViewerList) {
+	for (String datasetName in datasetNameForSNPViewerList) {
             dataWriter.write('\t' + datasetName + '\t' + datasetName + ' Call')
         }
         dataWriter.write('\n')
 
-        for (String chrom : neededChroms) {
-            SnpProbeSortedDef probeDef = probeDefMap.get(chrom)
-            if (probeDef != null) {    // This chrom is selected by user
+	for (String chrom in neededChroms) {
+	    SnpProbeSortedDef probeDef = probeDefMap[chrom]
+	    if (probeDef) { // This chrom is selected by user
                 // Create the list of BufferedReader for SNP data for each dataset for this chrom
-                List<StringLineReader> snpDataReaderList = new ArrayList<StringLineReader>()
-                for (SnpDataset dataset : datasetList) {
-                    Map<String, String> snpDataByChrom = snpDataByDatasetByChrom.get(dataset.id)
-                    String snpDataStr = snpDataByChrom.get(chrom)
-                    StringLineReader dataReader = new StringLineReader(snpDataStr)
-                    snpDataReaderList.add(dataReader)
+		List<StringLineReader> snpDataReaderList = []
+		for (SnpDataset dataset in datasetList) {
+		    Map<String, String> snpDataByChrom = snpDataByDatasetByChrom[dataset.id]
+		    snpDataReaderList << new StringLineReader(snpDataByChrom[chrom])
                 }
 
-                String probeDefStr = probeDef.snpIdDef
-                Integer numProbe = probeDef.getNumProbe()
-                StringLineReader probeReader = new StringLineReader(probeDefStr)
-                for (int idx = 0; idx < numProbe.intValue(); idx++) {
+		int numProbe = probeDef.numProbe
+		StringLineReader probeReader = new StringLineReader(probeDef.snpIdDef)
+		for (int idx = 0; idx < numProbe; idx++) {
                     String probeLine = probeReader.readLine()
-                    if (probeLine == null || probeLine.trim().length() == 0)
+		    if (!probeLine) {
                         throw new Exception('The number ' + idx + ' line in probe definition file for chromosome ' + chrom + ' is empty')
+					}
                     dataWriter.write(probeLine)
 
-                    for (StringReader dataReader : snpDataReaderList) {
+		    for (StringLineReader dataReader in snpDataReaderList) {
                         dataWriter.write('\t' + dataReader.readLine())
                     }
                     dataWriter.write('\n')
                 }
-            } else { // This chrom need dummy data for the starting and ending probes
-                String[] endProbeLines = allChromEndProbeLines.get(chrom)
+	    }
+	    else { // This chrom need dummy data for the starting and ending probes
+		String[] endProbeLines = allChromEndProbeLines[chrom]
                 dataWriter.write(endProbeLines[0])
-                for (SnpDataset dataset : datasetList) {
+		for (SnpDataset dataset in datasetList) {
                     dataWriter.write('\t2.0\tNC')
                 }
                 dataWriter.write('\n')
 
                 dataWriter.write(endProbeLines[1])
-                for (SnpDataset dataset : datasetList) {
+		for (SnpDataset dataset in datasetList) {
                     dataWriter.write('\t2.0\tNC')
                 }
                 dataWriter.write('\n')
             }
-            if (chrom.equals(lastChrom)) break;    // Stop at the last needed chrom
+	    if (chrom == lastChrom) {
+		// Stop at the last needed chrom
+		break
+	    }
         }
-        snpFiles.sampleFile << sampleInfoBuf
-        dataWriter.close()
-
+	snpFiles.sampleFile << sampleInfoBuf
+	dataWriter.close()
     }
 
     /**
      * For now the patients have to be in the same trial, for the sake of simplicity.
-     *
-     * @param subjectIds1
-     * @param subjectIds2
-     * @param geneSearchIdList
-     * @param snpFiles
      */
-    public void getSNPViewerDataByProbe(List<Long>[] patientNumListArray, List<Long> geneSearchIdList, List<String> geneNameList,
-                                        List<String> snpNameList, SnpViewerFiles snpFiles, StringBuffer geneSnpPageBuf) throws Exception {
-        if (snpFiles == null) throw new Exception('The SNPViewerFiles object is not instantiated')
-        if (geneSnpPageBuf == null) throw new Exception('The geneSnpPageBuf object is not instantiated')
+    void getSNPViewerDataByProbe(List<Long>[] patientNumListArray, List<Long> geneSearchIdList, List<String> geneNameList,
+	                         List<String> snpNameList, SnpViewerFiles snpFiles, StringBuilder geneSnpPageBuf) {
+	Assert.notNull snpFiles, 'The SNPViewerFiles object is not instantiated'
+	Assert.notNull geneSnpPageBuf, 'The geneSnpPageBuf object is not instantiated'
 
         //This object is seemingly used to initialize objects which get assigned to local variables later.
         SnpDatasetListByProbe allDataByProbe = new SnpDatasetListByProbe()
 
-        // Get SQL query String for all the subject IDs
-        String subjectListStr = ''
+	StringBuilder sb = new StringBuilder()
 
-        //Loop through the array of Lists.
         for (int i = 0; i < patientNumListArray.length; i++) {
-            //Add a comma to seperate the lists.
-            if (subjectListStr != '') subjectListStr += ','
+	    if (sb) {
+		sb << ','
+	    }
 
             //This is a list of patients, add it to our string.
-            subjectListStr += patientNumListArray[i].join(',')
+	    sb << patientNumListArray[i].join(',')
         }
+	String subjectListStr = sb
 
         // Get the gene-snp map, and the snp set related to all the user-input genes.
         // Map<chrom, Map<chromPos of Gene, GeneWithSnp>>
-        Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> geneSnpMapForGene = new HashMap<String, SortedMap<Long, Map<Long, GeneWithSnp>>>()
-        Map<Long, GeneWithSnp> geneEntrezIdMap = new HashMap<Long, GeneWithSnp>()
-        Map<String, GeneWithSnp> geneNameToGeneWithSnpMap = new HashMap<String, GeneWithSnp>()
+	Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> geneSnpMapForGene = [:]
+	Map<Long, GeneWithSnp> geneEntrezIdMap = [:]
+	Map<String, GeneWithSnp> geneNameToGeneWithSnpMap = [:]
         getGeneWithSnpMapForGenes(geneSnpMapForGene, geneEntrezIdMap, geneNameToGeneWithSnpMap, geneSearchIdList)
 
         // Get the gene-snp map for the user-selected SNPs.
-        Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> geneSnpMapForSnp = new HashMap<String, SortedMap<Long, Map<Long, GeneWithSnp>>>()
+	Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> geneSnpMapForSnp = [:]
         getGeneWithSnpMapForSnps(geneSnpMapForSnp, snpNameList)
 
-        Collection<Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>>> geneSnpMapList = new ArrayList<Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>>>()
-        geneSnpMapList.add(geneSnpMapForGene)
-        geneSnpMapList.add(geneSnpMapForSnp)
+	Collection<Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>>> geneSnpMapList = []
+	geneSnpMapList << geneSnpMapForGene
+	geneSnpMapList << geneSnpMapForSnp
         Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> allGeneSnpMap = mergeGeneWithSnpMap(geneSnpMapList)
 
-        if (allGeneSnpMap == null || allGeneSnpMap.size() == 0)
+	if (!allGeneSnpMap) {
             throw new Exception('There is no SNP data for selected genes and SNP IDs')
+	}
 
         // Generate the web page to display the Gene and SNP selected by User
         getSnpGeneAnnotationPage(geneSnpPageBuf, allGeneSnpMap, geneEntrezIdMap, geneNameToGeneWithSnpMap, geneNameList, snpNameList)
@@ -156,7 +196,7 @@ class SnpService {
         //Fill the SnpDatasets. We use the map to keep track of the patients.
         getSnpDatasetBySubjectMap(snpDatasetBySubjectMap, subjectListStr)
 
-        StringBuffer sampleInfoBuf = new StringBuffer()
+	StringBuilder sampleInfoBuf = new StringBuilder()
         List<SnpDataset> datasetList = allDataByProbe.datasetList
         List<String> datasetNameForSNPViewerList = allDataByProbe.datasetNameForSNPViewerList
         getSnpSampleInfo(datasetList, datasetNameForSNPViewerList, patientNumListArray, snpDatasetBySubjectMap, sampleInfoBuf)
@@ -164,41 +204,38 @@ class SnpService {
         // Get the compacted SNP data and insert them into the map, organized by chrom, and further ordered by chrom position
         Map<String, List<SnpDataByProbe>> snpDataByChromMap = allDataByProbe.snpDataByChromMap
 
-        //
         Set<Long> allSnpIdSet = getSnpSet(allGeneSnpMap)
         getSNPDataByProbeByChrom(datasetList, snpDataByChromMap, allSnpIdSet)
 
         // Write the sample info text file for SNPViewer
-        File sampleFile = snpFiles.getSampleFile()
+	File sampleFile = snpFiles.sampleFile
         sampleFile << sampleInfoBuf.toString()
 
         // Write the xcn file
-        File dataFile = snpFiles.getDataFile()
+	File dataFile = snpFiles.dataFile
         BufferedWriter dataWriter = new BufferedWriter(new FileWriter(dataFile))
         // Write the header column
         dataWriter.write('SNP\tChromosome\tPhysicalPosition')
-        for (String datasetName : datasetNameForSNPViewerList) {
+	for (String datasetName in datasetNameForSNPViewerList) {
             dataWriter.write('\t' + datasetName + '\t' + datasetName + ' Call')
         }
         dataWriter.write('\n')
         // Write the data section, by chrom. Stop at the last used chrom in snpDataByChromMap
         List<String> sortedChromList = getSortedChromList(snpDataByChromMap.keySet())
-        String lastChrom = sortedChromList.get(sortedChromList.size() - 1)
-        String[] allChromArray = getAllChromArray()
-        Map<String, String[]> chromEndProbeLineMap = getChromEndProbeLineMap()
-        for (String chrom_it : allChromArray) {
-            List<SnpDataByProbe> snpDataByProbeList = snpDataByChromMap.get(chrom_it)
-            if (snpDataByProbeList != null && snpDataByProbeList.size() != 0) {
+	String lastChrom = sortedChromList[-1]
+	for (String chrom in allChroms) {
+	    List<SnpDataByProbe> snpDataByProbeList = snpDataByChromMap[chrom]
+	    if (snpDataByProbeList) {
                 // SNPViewer has problem rendering single SNP without boundary blank SNPs.
-                String[] chromEndProbeLine = chromEndProbeLineMap.get(chrom_it)
+		String[] chromEndProbeLine = chromEndProbeLineMap[chrom]
                 dataWriter.write(chromEndProbeLine[0])
                 for (int i = 0; i < datasetList.size(); i++) {
                     dataWriter.write('\t2.0\tNC')
                 }
                 dataWriter.write('\n')
 
-                for (SnpDataByProbe snpDataByProbe : snpDataByProbeList) {
-                    dataWriter.write(snpDataByProbe.snpName + '\t' + chrom_it + '\t' + snpDataByProbe.chromPos)
+		for (SnpDataByProbe snpDataByProbe in snpDataByProbeList) {
+		    dataWriter.write(snpDataByProbe.snpName + '\t' + chrom + '\t' + snpDataByProbe.chromPos)
                     String[][] dataArray = snpDataByProbe.dataArray
                     for (int i = 0; i < datasetList.size(); i++) {
                         dataWriter.write('\t' + dataArray[i][0].trim() + '\t' + dataArray[i][1])
@@ -211,8 +248,9 @@ class SnpService {
                     dataWriter.write('\t2.0\tNC')
                 }
                 dataWriter.write('\n')
-            } else {    // There is no snp data needed for this chrom
-                String[] chromEndProbeLine = chromEndProbeLineMap.get(chrom_it)
+	    }
+	    else { // There is no snp data needed for this chrom
+		String[] chromEndProbeLine = chromEndProbeLineMap[chrom]
                 for (int idxEndProbe = 0; idxEndProbe < 2; idxEndProbe++) {
                     dataWriter.write(chromEndProbeLine[idxEndProbe])
                     for (int i = 0; i < datasetList.size(); i++) {
@@ -222,7 +260,9 @@ class SnpService {
                 }
             }
 
-            if (chrom_it.equals(lastChrom)) break
+	    if (chrom == lastChrom) {
+		break
+	    }
         }
         dataWriter.close()
     }
@@ -231,68 +271,58 @@ class SnpService {
     //These are all helper methods.
     /** ******************************************************************/
 
-    /**
-     *
-     * @param subjectIdStr
-     * @return
-     */
-    private List<Long> getPatientNumListFromSubjectIdStr(String subjectIdStr) {
-        if (subjectIdStr == null || subjectIdStr.length() == 0) return null
-        List<Long> patientNumList = new ArrayList<Long>()
-        String[] subjectArray = subjectIdStr.split(',')
-        for (String subjectId : subjectArray) {
-            Long patientNum = new Long(subjectId.trim())
-            patientNumList.add(patientNum)
-        }
-        return patientNumList
-    }
-
-
     void getSnpDatasetBySubjectMap(Map<Long, SnpDataset[]> snpDatasetBySubjectMap, String subjectListStr) {
-        if (snpDatasetBySubjectMap == null || subjectListStr == null || subjectListStr.length() == 0) return
+	if (snpDatasetBySubjectMap == null || !subjectListStr) {
+	    return
+	}
 
         // The display concept name like 'Normal Blood Lymphocyte' for dataset with conceptId of '1222211'
-        Map<String, String> conceptIdToDisplayNameMap = new HashMap<String, String>()
+	Map<String, String> conceptIdToDisplayNameMap = [:]
 
         // Get the dataset list from subject lists, and organize them in pairs for each patient.
-        String commonPlatformName = null;    // To make sure there is noly one platform among all the datasets
-        String commonTrialName = null;    // For now only one trial is allowed.
+	String commonPlatformName = null // To make sure there is noly one platform among all the datasets
+	String commonTrialName = null // For now only one trial is allowed.
 
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        String sqlStr = 'select * from de_subject_snp_dataset where patient_num in (' + subjectListStr + ')'
-        sql.eachRow(sqlStr) { row ->
-            SnpDataset snpDataset = new SnpDataset()
-            snpDataset.id = row.subject_snp_dataset_id
-            snpDataset.datasetName = row.dataset_name
-            snpDataset.conceptId = row.concept_cd
-            snpDataset.conceptName = getConceptDisplayName(snpDataset.conceptId, conceptIdToDisplayNameMap)
-            snpDataset.platformName = row.platform_name
+	String sql = '''
+			select * from DEAPP.de_subject_snp_dataset
+			where patient_num in (''' + subjectListStr + ')'
+	new Sql(dataSource).eachRow(sql) { row ->
+	    SnpDataset snpDataset = new SnpDataset(
+		id: row.subject_snp_dataset_id,
+		datasetName: row.dataset_name,
+		conceptId: row.concept_cd,
+		conceptName: getConceptDisplayName(snpDataset.conceptId, conceptIdToDisplayNameMap),
+		platformName: row.platform_name,
+		patientNum: row.patient_num,
+		timePoint: row.timepoint,
+		subjectId: row.subject_id,
+		sampleType: row.sample_type,
+		pairedDatasetId: row.paired_dataset_id,
+		patientGender: row.patient_gender)
 
             if (commonPlatformName == null) {
                 commonPlatformName = snpDataset.platformName
             }
-            else if (commonPlatformName.equals(snpDataset.platformName) == false) {
-                throw new Exception('The platform for SnpDataset ' + snpDataset.datasetName + ', ' + snpDataset.platformName + ', is different from previous platform ' + commonPlatformName)
+	    else if (commonPlatformName != snpDataset.platformName) {
+		throw new Exception('The platform for SnpDataset ' + snpDataset.datasetName + ', ' +
+				    snpDataset.platformName + ', is different from previous platform ' + commonPlatformName)
             }
 
             snpDataset.trialName = row.trial_name
-            if (commonTrialName == null) commonTrialName = snpDataset.trialName
-            else if (commonTrialName.equals(snpDataset.trialName) == false) {
-                throw new Exception('The trial for SnpDataset ' + snpDataset.datasetName + ', ' + snpDataset.trialName + ', is different from previous trial ' + commonTrialName)
-            }
-            snpDataset.patientNum = row.patient_num
-            snpDataset.timePoint = row.timepoint
-            snpDataset.subjectId = row.subject_id
-            snpDataset.sampleType = row.sample_type
-            snpDataset.pairedDatasetId = row.paired_dataset_id
-            snpDataset.patientGender = row.patient_gender
+	    if (commonTrialName == null) {
+		commonTrialName = snpDataset.trialName
+	    }
+	    else if (commonTrialName != snpDataset.trialName) {
+		throw new Exception('The trial for SnpDataset ' + snpDataset.datasetName + ', ' +
+				    snpDataset.trialName + ', is different from previous trial ' + commonTrialName)
+	    }
 
-            SnpDataset[] snpDatasetPair = snpDatasetBySubjectMap.get(snpDataset.patientNum)
+	    SnpDataset[] snpDatasetPair = snpDatasetBySubjectMap[snpDataset.patientNum]
             if (snpDatasetPair == null) {
                 snpDatasetPair = new SnpDataset[2]
-                snpDatasetBySubjectMap.put(snpDataset.patientNum, snpDatasetPair)
+		snpDatasetBySubjectMap[snpDataset.patientNum] = snpDatasetPair
             }
-            if (snpDataset.sampleType.equals(SnpDataset.SAMPLE_TYPE_NORMAL)) {
+	    if (snpDataset.sampleType == SnpDataset.SAMPLE_TYPE_NORMAL) {
                 snpDatasetPair[0] = snpDataset
             }
             else {
@@ -301,45 +331,56 @@ class SnpService {
         }
     }
 
-    void getSnpSampleInfo(List<SnpDataset> datasetList, List<String> datasetNameForSNPViewerList, List<Long>[] patientNumListArray, Map<Long, SnpDataset[]> snpDatasetBySubjectMap, StringBuffer sampleInfoBuf) {
-        if (datasetList == null) throw new Exception('The datasetList is null')
-        if (patientNumListArray == null) throw new Exception('The patient number list for two subsets cannot be null')
-        if (sampleInfoBuf == null) throw new Exception('The StringBuffer for sample info text needs to instantiated')
+    void getSnpSampleInfo(List<SnpDataset> datasetList, List<String> datasetNameForSNPViewerList,
+	                  List<Long>[] patientNumListArray, Map<Long, SnpDataset[]> snpDatasetBySubjectMap,
+	                  StringBuilder sampleInfoBuf) {
+
+	Assert.notNull datasetList, 'The datasetList is null'
+	Assert.notNull patientNumListArray, 'The patient number list for two subsets cannot be null'
+	Assert.notNull sampleInfoBuf, 'The StringBuilder for sample info text needs to instantiated'
+
         // Organize the datasetList and SNPViewer dataset name List, also generate the SNPViewer sample info text in this pass
-        sampleInfoBuf.append('Array\tSample\tType\tPloidy(numeric)\tGender\tPaired')
+	sampleInfoBuf << 'Array\tSample\tType\tPloidy(numeric)\tGender\tPaired'
         for (int idxSubset = 0; idxSubset < 1; idxSubset++) {
             if (patientNumListArray[idxSubset] != null) {
-                for (Long patientNum : patientNumListArray[idxSubset]) {
-                    SnpDataset[] snpDatasetPair = snpDatasetBySubjectMap.get(patientNum.longValue())
-                    println(snpDatasetPair)
+		for (Long patientNum in patientNumListArray[idxSubset]) {
+		    SnpDataset[] snpDatasetPair = snpDatasetBySubjectMap[patientNum.longValue()]
                     if (snpDatasetPair != null) {
                         String datasetNameForSNPViewer_1 = null
-                        String datasetNameForSNPViewer_2 = null
+			String datasetNameForSNPViewer_2
 
                         if (snpDatasetPair[0] != null) {    // Has the control dataset
                             SnpDataset snpDataset_1 = snpDatasetPair[0]
                             datasetNameForSNPViewer_1 = 'S' + (idxSubset + 1) + '_' + snpDataset_1.datasetName
-                            datasetList.add(snpDataset_1)
-                            datasetNameForSNPViewerList.add(datasetNameForSNPViewer_1)
-                            sampleInfoBuf.append('\n' + datasetNameForSNPViewer_1 + '\t' + datasetNameForSNPViewer_1 + '\t' + snpDataset_1.conceptName + '\t2\t' + snpDataset_1.patientGender + '\t')
+			    datasetList << snpDataset_1
+			    datasetNameForSNPViewerList << datasetNameForSNPViewer_1
+			    sampleInfoBuf << '\n' << datasetNameForSNPViewer_1 << '\t' << datasetNameForSNPViewer_1
+			    sampleInfoBuf << '\t' << snpDataset_1.conceptName << '\t2\t' << snpDataset_1.patientGender << '\t'
 
-                            if (snpDatasetPair[1] != null)
-                                sampleInfoBuf.append('Yes');    // Paired
-                            else
-                                sampleInfoBuf.append('No');    // Not paired
+			    if (snpDatasetPair[1] != null) {
+				// Paired
+				sampleInfoBuf << 'Yes'
+			    }
+			    else {
+				sampleInfoBuf << 'No'
+			    }
                         }
 
                         if (snpDatasetPair[1] != null) {    // Has the control dataset
                             SnpDataset snpDataset_2 = snpDatasetPair[1]
                             datasetNameForSNPViewer_2 = 'S' + (idxSubset + 1) + '_' + snpDataset_2.datasetName
-                            datasetList.add(snpDataset_2)
-                            datasetNameForSNPViewerList.add(datasetNameForSNPViewer_2)
-                            sampleInfoBuf.append('\n' + datasetNameForSNPViewer_2 + '\t' + datasetNameForSNPViewer_2 + '\t' + snpDataset_2.conceptName + '\t2\t' + snpDataset_2.patientGender + '\t')
+			    datasetList << snpDataset_2
+			    datasetNameForSNPViewerList << datasetNameForSNPViewer_2
+			    sampleInfoBuf << '\n' << datasetNameForSNPViewer_2 << '\t' << datasetNameForSNPViewer_2
+			    sampleInfoBuf << '\t' << snpDataset_2.conceptName << '\t2\t' << snpDataset_2.patientGender << '\t'
 
-                            if (snpDatasetPair[0] != null)
-                                sampleInfoBuf.append(datasetNameForSNPViewer_1);    // Paired
-                            else
-                                sampleInfoBuf.append('No');    // Not paired
+			    if (snpDatasetPair[0] != null) {
+				// Paired
+				sampleInfoBuf << datasetNameForSNPViewer_1
+			    }
+			    else {
+				sampleInfoBuf << 'No'
+			    }
                         }
                     }
                 }
@@ -349,228 +390,116 @@ class SnpService {
 
     List<String> getSortedChromList(String chromListStr) {
         String[] chromArray = chromListStr.split(',')
-        Set<String> chromSet = new HashSet<String>()
-        for (String chrom : chromArray) {
-            chromSet.add(chrom.trim())
+	Set<String> chromSet = []
+	for (String chrom in chromArray) {
+	    chromSet << chrom.trim()
         }
-        return getSortedChromList(chromSet)
+	getSortedChromList chromSet
     }
 
-    Map<Long, Map<String, String>> getSNPDataByDatasetByChrom(String subjectIds, String chroms) throws Exception {
-        if (subjectIds == null || subjectIds.trim().length() == 0) return null
-        Map<Long, Map<String, String>> snpDataByDatasetByChrom = new HashMap<Long, Map<String, String>>()
+    Map<Long, Map<String, String>> getSNPDataByDatasetByChrom(String subjectIds, String chroms) {
+	if (!subjectIds) {
+	    return null
+	}
+	Map<Long, Map<String, String>> snpDataByDatasetByChrom = [:]
         // Map<[datasetId], Map<chrom, data>>
 
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-
         // Get the list of dataset first, SNP data will be fetched later
-        String sqlt = 'SELECT a.*, b.chrom as chrom, b.data_by_patient_chr as data FROM de_subject_snp_dataset a, de_snp_data_by_patient b '
-        sqlt += 'WHERE a.subject_snp_dataset_id = b.snp_dataset_id and a.patient_num in (' + subjectIds + ') '
-        sqlt += ' and b.chrom in (' + getSqlStrFromChroms(chroms) + ') '
+	String sql = '''
+			SELECT a.*, b.chrom as chrom, b.data_by_patient_chr as data
+			FROM DEAPP.de_subject_snp_dataset a, DEAPP.de_snp_data_by_patient b
+			WHERE a.subject_snp_dataset_id = b.snp_dataset_id
+			  and a.patient_num in (''' + subjectIds + ') ' +
+			' and b.chrom in (' + getSqlStrFromChroms(chroms) + ')'
 
-        sql.eachRow(sqlt) { row ->
+	new Sql(dataSource).eachRow(sql) { row ->
             Long datasetId = row.subject_snp_dataset_id
             String chrom = row.chrom
-            java.sql.Clob clob = (java.sql.Clob) row.data
-            String data = clob.getAsciiStream().getText()
+	    String data = ((Clob) row.data).asciiStream.text
 
-            Map<String, String> dataByChromMap = snpDataByDatasetByChrom.get(datasetId)
-            if (dataByChromMap == null) {
-                dataByChromMap = new HashMap<String, String>()
-                snpDataByDatasetByChrom.put(datasetId, dataByChromMap)
+	    Map<String, String> dataByChrom = snpDataByDatasetByChrom[datasetId]
+	    if (dataByChrom == null) {
+		dataByChrom = [:]
+		snpDataByDatasetByChrom[datasetId] = dataByChrom
             }
-            dataByChromMap.put(chrom, data)
+	    dataByChrom[chrom] = data
         }
 
-        return snpDataByDatasetByChrom
+	snpDataByDatasetByChrom
     }
 
     String[] getAllChromArray() {
-        String[] allChroms = [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12',
-                '13',
-                '14',
-                '15',
-                '16',
-                '17',
-                '18',
-                '19',
-                '20',
-                '21',
-                '22',
-                'X',
-                'Y'
-        ]
-        return allChroms
+	allChroms
     }
 
     Map<String, String[]> getChromEndProbeLineMap() {
-
-        Map<String, String[]> chromEndProbeLineMap = new HashMap<String, String[]>()
-        chromEndProbeLineMap.put('1', [
-                'SNP_A-8575125\t1\t564621',
-                'SNP_A-8391333\t1\t249198692'
-        ])
-        chromEndProbeLineMap.put('2', [
-                'SNP_A-8615982\t2\t15703',
-                'SNP_A-8304446\t2\t243048760'
-        ])
-        chromEndProbeLineMap.put('3', [
-                'SNP_A-2100278\t3\t66866',
-                'SNP_A-8336753\t3\t197856433'
-        ])
-        chromEndProbeLineMap.put('4', [
-                'SNP_A-8661350\t4\t45410',
-                'SNP_A-8713585\t4\t190921709'
-        ])
-        chromEndProbeLineMap.put('5', [
-                'SNP_A-8392711\t5\t36344',
-                'SNP_A-2186029\t5\t180692833'
-        ])
-        chromEndProbeLineMap.put('6', [
-                'SNP_A-8533260\t6\t203249',
-                'SNP_A-8608599\t6\t170918031'
-        ])
-        chromEndProbeLineMap.put('7', [
-                'SNP_A-8539824\t7\t43259',
-                'SNP_A-8436508\t7\t159119220'
-        ])
-        chromEndProbeLineMap.put('8', [
-                'SNP_A-8325516\t8\t161222',
-                'SNP_A-2094900\t8\t146293414'
-        ])
-        chromEndProbeLineMap.put('9', [
-                'SNP_A-8574568\t9\t37747',
-                'SNP_A-8302801\t9\t141071475'
-        ])
-        chromEndProbeLineMap.put('10', [
-                'SNP_A-8435658\t10\t104427',
-                'SNP_A-4271863\t10\t135434551'
-        ])
-        chromEndProbeLineMap.put('11', [
-                'SNP_A-8300213\t11\t198510',
-                'SNP_A-2246844\t11\t134944770'
-        ])
-        chromEndProbeLineMap.put('12', [
-                'SNP_A-8434276\t12\t161382',
-                'SNP_A-4219877\t12\t133777645'
-        ])
-        chromEndProbeLineMap.put('13', [
-                'SNP_A-8687595\t13\t19045720',
-                'SNP_A-8587371\t13\t115106996'
-        ])
-        chromEndProbeLineMap.put('14', [
-                'SNP_A-8430270\t14\t20211644',
-                'SNP_A-2127677\t14\t107285437'
-        ])
-        chromEndProbeLineMap.put('15', [
-                'SNP_A-8429754\t15\t20071673',
-                'SNP_A-8685263\t15\t102400037'
-        ])
-        chromEndProbeLineMap.put('16', [
-                'SNP_A-1807459\t16\t86671',
-                'SNP_A-1841720\t16\t90163275'
-        ])
-        chromEndProbeLineMap.put('17', [
-                'SNP_A-8398136\t17\t6689',
-                'SNP_A-8656409\t17\t81049726'
-        ])
-        chromEndProbeLineMap.put('18', [
-                'SNP_A-8496414\t18\t11543',
-                'SNP_A-8448011\t18\t78015057'
-        ])
-        chromEndProbeLineMap.put('19', [
-                'SNP_A-8509279\t19\t260912',
-                'SNP_A-8451148\t19\t59095126'
-        ])
-        chromEndProbeLineMap.put('20', [
-                'SNP_A-8559313\t20\t61795',
-                'SNP_A-8480501\t20\t62912463'
-        ])
-        chromEndProbeLineMap.put('21', [
-                'SNP_A-4217519\t21\t9764385',
-                'SNP_A-8349060\t21\t48084820'
-        ])
-        chromEndProbeLineMap.put('22', [
-                'SNP_A-8656401\t22\t16055171',
-                'SNP_A-8313387\t22\t51219006'
-        ])
-        chromEndProbeLineMap.put('X', [
-                'SNP_A-8572888\tX\t119805',
-                'SNP_A-8363487\tX\t154925045'
-        ])
-        chromEndProbeLineMap.put('Y', [
-                'SNP_A-8655052\tY\t2722506',
-                'SNP_A-8433021\tY\t28758193'
-        ])
-        return chromEndProbeLineMap
+	chromEndProbeLineMap
     }
 
     /**
      * Original example data files for SNPViewer and IGV use probe name such as 'SNP_A-1780419'.
      * It is better to use the target SNP id like 'rs6576700' in the data file, so the tooltip in IGV will show the SNP rs id.
-     * @param platformName
-     * @param chroms
-     * @return
      */
-    Map<String, SnpProbeSortedDef> getSNPProbeDefMap(String platformName, String chroms) throws Exception {
-        if (platformName == null || platformName.trim().length() == 0) return null
-        Map<String, SnpProbeSortedDef> snpProbeDefMap = new HashMap<String, SnpProbeSortedDef>()
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        String sqlt = "SELECT snp_probe_sorted_def_id, platform_name, num_probe, chrom, snp_id_def FROM de_snp_probe_sorted_def WHERE platform_name = '"
-        sqlt += platformName + "' and chrom in (" + getSqlStrFromChroms(chroms) + ") order by chrom"
-        sql.eachRow(sqlt) { row ->
-            SnpProbeSortedDef probeDef = new SnpProbeSortedDef()
-            probeDef.id = row.snp_probe_sorted_def_id
-            probeDef.platformName = row.platform_name
-            probeDef.numProbe = row.num_probe
-            probeDef.chrom = row.chrom
-            java.sql.Clob clob = (java.sql.Clob) row.snp_id_def
-            probeDef.snpIdDef = clob.getAsciiStream().getText()
+    Map<String, SnpProbeSortedDef> getSNPProbeDefMap(String platformName, String chroms) {
+	if (!platformName?.trim()) {
+	    return null
+	}
 
-            snpProbeDefMap.put(probeDef.chrom, probeDef)
+	Map<String, SnpProbeSortedDef> snpProbeDefMap = [:]
+	String sql = '''
+			SELECT snp_probe_sorted_def_id, platform_name, num_probe, chrom, snp_id_def
+			FROM DEAPP.de_snp_probe_sorted_def
+			WHERE platform_name = ?
+			and chrom in (''' + getSqlStrFromChroms(chroms) + ') order by chrom'
+	new Sql(dataSource).eachRow(sql, [platformName]) { row ->
+	    snpProbeDefMap[probeDef.chrom] = new SnpProbeSortedDef(
+		id: row.snp_probe_sorted_def_id,
+		platformName: row.platform_name,
+		numProbe: row.num_probe,
+		chrom: row.chrom,
+		snpIdDef: ((Clob) row.snp_id_def).asciiStream.text)
         }
-        return snpProbeDefMap
+	snpProbeDefMap
     }
 
     void getGeneWithSnpMapForGenes(Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> geneSnpMapByChrom,
-                                   Map<Long, GeneWithSnp> geneEntrezIdMap, Map<String, GeneWithSnp> geneNameToGeneWithSnpMap, List<Long> geneSearchIdList) {
-        if (geneSearchIdList == null || geneSearchIdList.size() == 0) return
-        if (geneSnpMapByChrom == null) throw new Exception('geneSnpMapByChrom is not instantiated')
-        if (geneEntrezIdMap == null) throw new Exception('geneEntrezIdMap is not instantiated')
+	                           Map<Long, GeneWithSnp> geneEntrezIdMap, Map<String, GeneWithSnp> geneNameToGeneWithSnpMap,
+	                           List<Long> geneSearchIdList) {
+	if (!geneSearchIdList) {
+	    return
+	}
+
+	Assert.notNull geneSnpMapByChrom, 'geneSnpMapByChrom is not instantiated'
+	Assert.notNull geneEntrezIdMap, 'geneEntrezIdMap is not instantiated'
+
         String geneSearchIdListStr = getStringFromCollection(geneSearchIdList)
 
         // Get the gene entrez id
-        String sqlStr = 'select unique_id, keyword from search_keyword where search_keyword_id in (' + geneSearchIdListStr + ') '
-        sqlStr += " and data_category = 'GENE'"
-        String geneEntrezIdListStr = ''
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+	String sqlStr = '''
+			select unique_id, keyword
+			from SEARCHAPP.search_keyword
+			where data_category = 'GENE'
+			  and search_keyword_id in (''' + geneSearchIdListStr + ') '
+	StringBuilder geneEntrezIds = new StringBuilder()
+	Sql sql = new Sql(dataSource)
         sql.eachRow(sqlStr) { row ->
-            String unique_id = row.unique_id
-            int idx = unique_id.indexOf(':')
-            String geneEntrezIdStr = unique_id.substring(idx + 1).trim()
-            if (geneEntrezIdListStr.size() != 0) geneEntrezIdListStr += ','
-            geneEntrezIdListStr += geneEntrezIdStr
-            GeneWithSnp gene = new GeneWithSnp()
-            gene.entrezId = new Long(geneEntrezIdStr)
-            gene.name = row.keyword
-            geneEntrezIdMap.put(gene.entrezId, gene)
-            geneNameToGeneWithSnpMap.put(gene.name, gene)
+	    String uniqueId = row.unique_id
+	    String geneEntrezIdStr = uniqueId.substring(uniqueId.indexOf(':') + 1).trim()
+	    if (geneEntrezIds) {
+		geneEntrezIds << ','
+	    }
+	    geneEntrezIds << geneEntrezIdStr
+	    GeneWithSnp gene = new GeneWithSnp(entrezId: Long.valueOf(geneEntrezIdStr), name: row.keyword)
+	    geneEntrezIdMap[gene.entrezId] = gene
+	    geneNameToGeneWithSnpMap[gene.name] = gene
         }
 
         // Get the snp association and chrom mapping
-        sqlStr = 'select a.entrez_gene_id, b.* from de_snp_gene_map a, de_snp_info b where a.snp_id = b.snp_info_id and a.entrez_gene_id in (' + geneEntrezIdListStr + ') '
+	sqlStr = '''
+			select a.entrez_gene_id, b.*
+			from DEAPP.de_snp_gene_map a, DEAPP.de_snp_info b
+			where a.snp_id = b.snp_info_id
+			and a.entrez_gene_id in (''' + geneEntrezIds + ') '
         sql.eachRow(sqlStr) { row ->
             Long snpId = row.snp_info_id
             String snpName = row.name
@@ -578,54 +507,55 @@ class SnpService {
             Long chromPos = row.chrom_pos
             Long entrezId = row.entrez_gene_id
 
-            GeneWithSnp gene = geneEntrezIdMap.get(entrezId)
+	    GeneWithSnp gene = geneEntrezIdMap[entrezId]
             if (gene.chrom == null) {
                 gene.chrom = chrom
             }
             else {
-                if (gene.chrom.equals(chrom) == false) {
-                    throw new Exception('Inconsistant SNP-Gene mapping in database: The Gene ' + gene.name + ', with Entrez ID of ' + gene.entrezId + ', is mapped to chromosome ' +
-                            gene.chrom + ' and ' + chrom)
+		if (gene.chrom != chrom) {
+		    throw new Exception('Inconsistant SNP-Gene mapping in database: The Gene ' + gene.name +
+					', with Entrez ID of ' + gene.entrezId + ', is mapped to chromosome ' +
+					gene.chrom + ' and ' + chrom)
                 }
             }
 
-            SnpInfo snpInfo = new SnpInfo()
-            snpInfo.id = snpId
-            snpInfo.name = snpName
-            snpInfo.chrom = chrom
-            snpInfo.chromPos = chromPos
-
-            gene.snpMap.put(chromPos, snpInfo)
+	    gene.snpMap[chromPos] = new SnpInfo(id: snpId, name: snpName, chrom: chrom, chromPos: chromPos)
         }
 
         // Organize the GeneWithSnp by chrom
-        for (Map.Entry geneEntry : geneEntrezIdMap) {
-            GeneWithSnp gene = geneEntry.getValue()
-            if (gene.chrom == null || gene.snpMap == null || gene.snpMap.size() == 0) continue
-            SortedMap<Long, Map<Long, GeneWithSnp>> genes = geneSnpMapByChrom.get(gene.chrom)
+	for (GeneWithSnp gene in geneEntrezIdMap.values()) {
+	    if (gene.chrom == null || !gene.snpMap) {
+		continue
+	    }
+	    SortedMap<Long, Map<Long, GeneWithSnp>> genes = geneSnpMapByChrom[gene.chrom]
             if (genes == null) {
                 genes = new TreeMap<Long, Map<Long, GeneWithSnp>>()
-                geneSnpMapByChrom.put(gene.chrom, genes)
+		geneSnpMapByChrom[gene.chrom] = genes
             }
             Long chromPosGene = gene.snpMap.firstKey()
-            Map<Long, GeneWithSnp> geneMap = genes.get(chromPosGene)
+	    Map<Long, GeneWithSnp> geneMap = genes[chromPosGene]
             if (geneMap == null) {
-                geneMap = new HashMap<Long, GeneWithSnp>()
-                genes.put(chromPosGene, geneMap)
+		geneMap = [:]
+		genes[chromPosGene] = geneMap
             }
-            geneMap.put(gene.entrezId, gene)
+	    geneMap[gene.entrezId] = gene
         }
     }
 
     void getGeneWithSnpMapForSnps(Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> geneSnpMapByChrom, List<String> snpNameList) {
-        if (snpNameList == null || snpNameList.size() == 0) return
-        if (geneSnpMapByChrom == null) throw new Exception('geneSnpMapByChrom is not instantiated')
-        String snpNameListStr = getStringFromCollection(snpNameList)
+	if (!snpNameList) {
+	    return
+	}
+	Assert.notNull geneSnpMapByChrom, 'geneSnpMapByChrom is not instantiated'
 
-        Map<Long, GeneWithSnp> geneEntrezIdMap = new HashMap<Long, GeneWithSnp>()
+	Map<Long, GeneWithSnp> geneEntrezIdMap = [:]
         // Get the snp association and chrom mapping
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        String sqlStr = 'select a.entrez_gene_id, b.* from de_snp_gene_map a, de_snp_info b where a.snp_id = b.snp_info_id and b.name in (' + snpNameListStr + ') '
+	Sql sql = new Sql(dataSource)
+	String sqlStr = '''
+			select a.entrez_gene_id, b.*
+			from DEAPP.de_snp_gene_map a, DEAPP.de_snp_info b
+			where a.snp_id = b.snp_info_id
+			  and b.name in (''' + getStringFromCollection(snpNameList) + ')'
         sql.eachRow(sqlStr) { row ->
             Long snpId = row.snp_info_id
             String snpName = row.name
@@ -633,67 +563,63 @@ class SnpService {
             Long chromPos = row.chrom_pos
             Long entrezId = row.entrez_gene_id
 
-            GeneWithSnp gene = geneEntrezIdMap.get(entrezId)
+	    GeneWithSnp gene = geneEntrezIdMap[entrezId]
             if (gene == null) {
-                gene = new GeneWithSnp()
-                gene.entrezId = entrezId
-                geneEntrezIdMap.put(gene.entrezId, gene)
+		gene = new GeneWithSnp(entrezId: entrezId)
+		geneEntrezIdMap[gene.entrezId] = gene
             }
             if (gene.chrom == null) {
                 gene.chrom = chrom
             }
             else {
-                if (gene.chrom.equals(chrom) == false) {
-                    throw new Exception('The Gene ' + gene.name + ', with Entrez ID of ' + gene.entrezId + ', is on chromosome ' +
-                            gene.chrom + ' and ' + chrom)
+		if (gene.chrom != chrom) {
+		    throw new Exception('The Gene ' + gene.name + ', with Entrez ID of ' + gene.entrezId +
+					', is on chromosome ' + gene.chrom + ' and ' + chrom)
                 }
             }
 
-            SnpInfo snpInfo = new SnpInfo()
-            snpInfo.id = snpId
-            snpInfo.name = snpName
-            snpInfo.chrom = chrom
-            snpInfo.chromPos = chromPos
-
-            gene.snpMap.put(chromPos, snpInfo)
+	    gene.snpMap[chromPos] = new SnpInfo(id: snpId, name: snpName, chrom: chrom, chromPos: chromPos)
         }
 
         // Construct the unique_id list from Entrez IDs
-        String geneSearchStr = ''
-        for (Map.Entry entry : geneEntrezIdMap) {
-            if (geneSearchStr.length() != 0) {
-                geneSearchStr += ','
+	StringBuilder geneSearchStr = new StringBuilder()
+	for (String key in geneEntrezIdMap.keySet()) {
+	    if (geneSearchStr) {
+		geneSearchStr << ','
             }
-            geneSearchStr += "'GENE:" + entry.getKey() + "'"
+	    geneSearchStr << "'GENE:" << key << QUOTE
         }
 
         // Get the gene name from search_keyword table
-        sqlStr = 'select unique_id, keyword from search_keyword where unique_id in (' + geneSearchStr + ') '
-        sqlStr += " and data_category = 'GENE'"
+	sqlStr = '''
+			select unique_id, keyword
+			from SEARCHAPP.search_keyword
+			where data_category = 'GENE'
+			  and unique_id in (''' + geneSearchStr + ')'
         sql.eachRow(sqlStr) { row ->
-            String unique_id = row.unique_id
-            int idx = unique_id.indexOf(':')
-            String geneEntrezIdStr = unique_id.substring(idx + 1).trim()
-            GeneWithSnp gene = geneEntrezIdMap.get(new Long(geneEntrezIdStr))
+	    String uniqueId = row.unique_id
+	    String geneEntrezIdStr = uniqueId.substring(uniqueId.indexOf(':') + 1).trim()
+	    GeneWithSnp gene = geneEntrezIdMap[Long.valueOf(geneEntrezIdStr)]
             gene.name = row.keyword
         }
 
         // Organize the GeneWithSnp by chrom
-        for (Map.Entry geneEntry : geneEntrezIdMap) {
-            GeneWithSnp gene = geneEntry.getValue()
-            if (gene.chrom == null || gene.snpMap == null || gene.snpMap.size() == 0) continue
-            SortedMap<Long, Map<Long, GeneWithSnp>> genes = geneSnpMapByChrom.get(gene.chrom)
+	for (GeneWithSnp gene in geneEntrezIdMap.values()) {
+	    if (gene.chrom == null || !gene.snpMap) {
+		continue
+	    }
+	    SortedMap<Long, Map<Long, GeneWithSnp>> genes = geneSnpMapByChrom[gene.chrom]
             if (genes == null) {
                 genes = new TreeMap<Long, Map<Long, GeneWithSnp>>()
-                geneSnpMapByChrom.put(gene.chrom, genes)
+		geneSnpMapByChrom[gene.chrom] = genes
             }
             Long chromPosGene = gene.snpMap.firstKey()
-            Map<Long, GeneWithSnp> geneMap = genes.get(chromPosGene)
+	    Map<Long, GeneWithSnp> geneMap = genes[chromPosGene]
             if (geneMap == null) {
-                geneMap = new HashMap<Long, GeneWithSnp>()
-                genes.put(chromPosGene, geneMap)
+		geneMap = [:]
+		genes[chromPosGene] = geneMap
             }
-            geneMap.put(gene.entrezId, gene)
+	    geneMap[gene.entrezId] = gene
         }
     }
 
@@ -702,286 +628,288 @@ class SnpService {
 
     Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> mergeGeneWithSnpMap(Collection<Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>>> mapList) {
 
-        Map<Long, GeneWithSnp> geneMap = new TreeMap<Long, GeneWithSnp>()
-        for (Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> map : mapList) {
-            if (map == null || map.size() == 0) continue
-            for (Map.Entry mapEntry : map) {
-                String chrom = mapEntry.getKey()
-                SortedMap<Long, Map<Long, GeneWithSnp>> geneWithSnpMap = mapEntry.getValue()
-                for (Map.Entry geneMapEntry : geneWithSnpMap) {
-                    Map<Long, GeneWithSnp> entrezIdGeneMap = geneMapEntry.getValue()
-                    for (Map.Entry entrezIdGeneMapEntry : entrezIdGeneMap) {
-                        Long entrezId = entrezIdGeneMapEntry.getKey()
-                        GeneWithSnp geneWithSnp = entrezIdGeneMapEntry.getValue()
-                        GeneWithSnp geneWithSnpInMap = geneMap.get(entrezId)
+	Map<Long, GeneWithSnp> geneMap = new TreeMap<>()
+	for (Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> map in mapList) {
+	    if (!map) {
+		continue
+	    }
+	    for (SortedMap<Long, Map<Long, GeneWithSnp>> geneWithSnpMap in map.values()) {
+		for (Map<Long, GeneWithSnp> entrezIdGeneMap in geneWithSnpMap.values()) {
+		    for (Map.Entry<Long, GeneWithSnp> entrezIdGeneMapEntry in entrezIdGeneMap) {
+			Long entrezId = entrezIdGeneMapEntry.key
+			GeneWithSnp geneWithSnp = entrezIdGeneMapEntry.value
+			GeneWithSnp geneWithSnpInMap = geneMap[entrezId]
                         if (geneWithSnpInMap == null) {
                             // First time to have this entrezId, use the existing gene structure
                             geneWithSnpInMap = geneWithSnp
-                            geneMap.put(entrezId, geneWithSnpInMap)
-                        } else {    // The gene structure and associated snp list already exist
-                            geneWithSnpInMap.snpMap.putAll(geneWithSnp.snpMap)
+			    geneMap[entrezId] = geneWithSnpInMap
+			}
+			else { // The gene structure and associated snp list already exist
+			    geneWithSnpInMap.snpMap.putAll geneWithSnp.snpMap
                         }
                     }
                 }
             }
         }
-        Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> mergedMap = new HashMap<String, SortedMap<Long, Map<Long, GeneWithSnp>>>()
-        for (Map.Entry geneEntry : geneMap) {
-            GeneWithSnp gene = geneEntry.getValue()
-            SortedMap<Long, Map<Long, GeneWithSnp>> geneWithSnpMapByChrom = mergedMap.get(gene.chrom)
+
+	Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> mergedMap = [:]
+	for (GeneWithSnp gene in geneMap.values()) {
+	    SortedMap<Long, Map<Long, GeneWithSnp>> geneWithSnpMapByChrom = mergedMap[gene.chrom]
             if (geneWithSnpMapByChrom == null) {
                 geneWithSnpMapByChrom = new TreeMap<Long, Map<Long, GeneWithSnp>>()
-                mergedMap.put(gene.chrom, geneWithSnpMapByChrom)
+		mergedMap[gene.chrom] = geneWithSnpMapByChrom
             }
             Long chromPosGene = gene.snpMap.firstKey()
-            Map<Long, GeneWithSnp> entrezIdgeneMap = geneWithSnpMapByChrom.get(chromPosGene)
+	    Map<Long, GeneWithSnp> entrezIdgeneMap = geneWithSnpMapByChrom[chromPosGene]
             if (entrezIdgeneMap == null) {
-                entrezIdgeneMap = new HashMap<Long, GeneWithSnp>()
-                geneWithSnpMapByChrom.put(chromPosGene, entrezIdgeneMap)
+		entrezIdgeneMap = [:]
+		geneWithSnpMapByChrom[chromPosGene] = entrezIdgeneMap
             }
-            entrezIdgeneMap.put(gene.entrezId, gene)
+	    entrezIdgeneMap[gene.entrezId] = gene
         }
 
-        return mergedMap
+	mergedMap
     }
 
-
-    void getSnpGeneAnnotationPage(StringBuffer geneSnpPageBuf, Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> allGeneSnpMap,
+    void getSnpGeneAnnotationPage(StringBuilder geneSnpPageBuf, Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> allGeneSnpMap,
                                   Map<Long, GeneWithSnp> geneEntrezIdMap, Map<String, GeneWithSnp> geneNameToGeneWithSnpMap,
                                   List<String> geneNameList, List<String> snpNameList) {
-        geneSnpPageBuf.append('<html><header></hearder><body><p>Selected Genes and SNPs</p>')
-        geneSnpPageBuf.append("<table width='100%' border='1' cellpadding='4' cellspacing='3'><tr align='center'><th>Gene</th><th>SNP</th><th>Chrom</th><th>Position</th></tr>")
-        String[] allChromArray = getAllChromArray()
-        Set<String> snpNameSet = new HashSet<String>()
-        if (snpNameList != null) {
-            snpNameSet.addAll(snpNameList)
-        }
+	geneSnpPageBuf << '<html><header></hearder><body><p>Selected Genes and SNPs</p>'
+	geneSnpPageBuf << "<table width='100%' border='1' cellpadding='4' cellspacing='3'>"
+	geneSnpPageBuf << "<tr align='center'><th>Gene</th><th>SNP</th><th>Chrom</th><th>Position</th></tr>"
+	Set<String> snpNameSet = []
+	if (snpNameList) {
+	    snpNameSet.addAll snpNameList
+	}
 
-        Set<String> geneNotUsedNameSet = new HashSet<String>()
-        if (geneNameList != null && geneNameList.size() != 0) {
-            for (String geneName : geneNameList) {
-                if (geneNameToGeneWithSnpMap.containsKey(geneName) == false)
-                    geneNotUsedNameSet.add(geneName)
+	Set<String> geneNotUsedNameSet = []
+	if (geneNameList) {
+	    for (String geneName in geneNameList) {
+		if (!geneNameToGeneWithSnpMap.containsKey(geneName)) {
+		    geneNotUsedNameSet << geneName
+		}
             }
         }
 
-        Set<String> snpUsedNameSet = new HashSet<String>()
+	Set<String> snpUsedNameSet = []
 
-        for (String chrom : allChromArray) {
-            SortedMap<Long, Map<Long, GeneWithSnp>> geneMapChrom = allGeneSnpMap.get(chrom)
-            for (Map.Entry geneMapEntry : geneMapChrom) {
-                Map<Long, GeneWithSnp> geneMap = geneMapEntry.getValue()
-                for (Map.Entry geneEntry : geneMap) {
-                    GeneWithSnp gene = geneEntry.getValue()
+	for (String chrom in allChroms) {
+	    SortedMap<Long, Map<Long, GeneWithSnp>> geneMapChrom = allGeneSnpMap[chrom]
+	    for (Map<Long, GeneWithSnp> geneMap in geneMapChrom.values()) {
+		for (GeneWithSnp gene in geneMap.values()) {
                     SortedMap<Long, SnpInfo> snpMap = gene.snpMap
                     String geneDisplay = gene.name
-                    if (geneEntrezIdMap != null && geneEntrezIdMap.get(gene.entrezId) != null) {
+		    if (geneEntrezIdMap && geneEntrezIdMap[gene.entrezId] != null) {
                         // This gene is selected by user
-                        geneDisplay = "<font color='red'>" + gene.name + "</font>"
+			geneDisplay = "<font color='red'>" + gene.name + '</font>'
                     }
-                    geneSnpPageBuf.append("<tr align='center' valign='top'><td rowspan='" + snpMap.size() + "'>" + geneDisplay + "</td>")
+		    geneSnpPageBuf << "<tr align='center' valign='top'><td rowspan='" << snpMap.size() << "'>" << geneDisplay << '</td>'
                     boolean firstEntry = true
-                    for (Map.Entry snpEntry : snpMap) {
-                        SnpInfo snp = snpEntry.getValue()
+		    for (SnpInfo snp in snpMap.values()) {
                         String snpDisplay = snp.name
-                        snpUsedNameSet.add(snpDisplay)
-                        if (snpNameSet != null && snpNameSet.contains(snp.name)) {    // This SNP is entered by user
-                            snpDisplay = "<font color='red'>" + snp.name + "</font>"
+			snpUsedNameSet << snpDisplay
+			if (snpNameSet?.contains(snp.name)) { // This SNP is entered by user
+			    snpDisplay = "<font color='red'>" + snp.name + '</font>'
                         }
-                        if (firstEntry == true) {
-                            geneSnpPageBuf.append('<td>' + snpDisplay + '</td><td>' + snp.chrom + '</td><td>' + snp.chromPos + '</td></tr>')
+			if (firstEntry) {
+			    geneSnpPageBuf << '<td>' << snpDisplay << '</td><td>' << snp.chrom << '</td><td>' << snp.chromPos << '</td></tr>'
                         }
                         else {
-                            geneSnpPageBuf.append("<tr align='center'><td>" + snpDisplay + "</td><td>" + snp.chrom + "</td><td>" + snp.chromPos + "</td></tr>")
+			    geneSnpPageBuf << "<tr align='center'><td>" << snpDisplay << '</td><td>' << snp.chrom << '</td><td>' << snp.chromPos << '</td></tr>'
                         }
                         firstEntry = false
                     }
                 }
             }
         }
-        geneSnpPageBuf.append('</table>')
+	geneSnpPageBuf << '</table>'
 
-        if (geneNotUsedNameSet != null && geneNotUsedNameSet.size() != 0) {
-            StringBuffer geneBuf = new StringBuffer()
-            for (String geneName : geneNotUsedNameSet) {
-                if (geneBuf.length() != 0)
-                    geneBuf.append(', ')
-                geneBuf.append(geneName)
-            }
-            geneSnpPageBuf.append('<p>The user-selected genes that do not have matching SNP data: ' + geneBuf.toString() + '</p>')
+	if (geneNotUsedNameSet) {
+	    geneSnpPageBuf << '<p>The user-selected genes that do not have matching SNP data: ' << geneNotUsedNameSet.join(', ') << '</p>'
         }
 
-        if (snpNameList != null && snpNameList.size() != 0) {
-            Set<String> snpNotUsedNameSet = new HashSet<String>()
+	if (snpNameList) {
+	    Set<String> snpNotUsedNameSet = []
             // Need to get the list of SNPs that do not have data
-            for (String snpName : snpNameList) {
-                if (snpUsedNameSet != null && snpUsedNameSet.size() != 0) {
-                    if (snpUsedNameSet.contains(snpName) == false)
-                        snpNotUsedNameSet.add(snpName)
-                }
-                else {
-                    snpNotUsedNameSet.add(snpName)
-                }
-            }
-            if (snpNotUsedNameSet != null && snpNotUsedNameSet.size() != 0) {
-                StringBuffer snpBuf = new StringBuffer()
-                for (String snpName : snpNotUsedNameSet) {
-                    if (snpBuf.length() != 0)
-                        snpBuf.append(', ')
-                    snpBuf.append(snpName)
-                }
-                geneSnpPageBuf.append('<p>The user-selected SNPs that do not have data: ' + snpBuf.toString() + '</p>')
-            }
-        }
-
-        geneSnpPageBuf.append('</body></html>')
-    }
-
-
-    Set<Long> getSnpSet(Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> allGeneSnpMap) {
-        if (allGeneSnpMap == null || allGeneSnpMap.size() == 0) return null
-        Set<Long> allSnpSet = new HashSet<Long>()
-        for (Map.Entry mapEntry : allGeneSnpMap) {
-            SortedMap<Long, Map<Long, GeneWithSnp>> geneWithSnpMapChrom = mapEntry.getValue()
-            for (Map.Entry geneWithSnpMapChromEntry : geneWithSnpMapChrom) {
-                Map<Long, GeneWithSnp> geneMap = geneWithSnpMapChromEntry.getValue()
-                for (Map.Entry geneMapEntry : geneMap) {
-                    GeneWithSnp gene = geneMapEntry.getValue()
-                    for (Map.Entry snpMapEntry : gene.snpMap) {
-                        SnpInfo snp = snpMapEntry.getValue()
-                        allSnpSet.add(snp.id)
+	    for (String snpName in snpNameList) {
+		if (snpUsedNameSet) {
+		    if (!snpUsedNameSet.contains(snpName)) {
+			snpNotUsedNameSet << snpName
                     }
                 }
+		else {
+		    snpNotUsedNameSet << snpName
+		}
+            }
+	    if (snpNotUsedNameSet) {
+		geneSnpPageBuf << '<p>The user-selected SNPs that do not have data: ' << snpNotUsedNameSet.join(', ') << '</p>'
             }
         }
-        return allSnpSet
+
+	geneSnpPageBuf << '</body></html>'
     }
 
+    Set<Long> getSnpSet(Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> allGeneSnpMap) {
+	if (!allGeneSnpMap) {
+	    return null
+        }
+
+	Set<Long> allSnpSet = []
+	for (SortedMap<Long, Map<Long, GeneWithSnp>> geneWithSnpMapChrom in allGeneSnpMap.values()) {
+	    for (Map<Long, GeneWithSnp> geneMap in geneWithSnpMapChrom.values()) {
+		for (GeneWithSnp gene in geneMap.values()) {
+		    for (SnpInfo snp in gene.snpMap.values()) {
+			allSnpSet << snp.id
+                    }
+		}
+            }
+	}
+
+	allSnpSet
+    }
 
     void getSNPDataByProbeByChrom(List<SnpDataset> datasetList, Map<String, List<SnpDataByProbe>> snpDataByChromMap,
                                   Collection snpIds) {
-        if (datasetList == null || datasetList.size() == 0) throw new Exception('The datasetList is empty')
-        if (snpDataByChromMap == null) throw new Exception('The snpDataByChromMap is null')
-        if (snpIds == null || snpIds.size() == 0) throw new Exception('The snpIds is empty')
+	if (!datasetList) {
+	    throw new Exception('The datasetList is empty')
+	}
+	Assert.notNull snpDataByChromMap, 'The snpDataByChromMap is null'
+	if (!snpIds) {
+	    throw new Exception('The snpIds is empty')
+	}
 
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+	Sql sql = new Sql(dataSource)
 
-        String trialName = datasetList.get(0).trialName
+	String trialName = datasetList[0].trialName
         // Get the order of each dataset in the compacted data String
-        Map<Long, Integer> datasetCompactLocationMap = new HashMap<Long, Integer>()
-        String sqlStr = 'select snp_dataset_id, location from de_snp_data_dataset_loc where trial_name = ?'
+	Map<Long, Integer> datasetCompactLocationMap = [:]
+	String sqlStr = 'select snp_dataset_id, location from DEAPP.de_snp_data_dataset_loc where trial_name = ?'
         sql.eachRow(sqlStr, [trialName]) { row ->
             Long datasetId = row.snp_dataset_id
             Integer order = row.location
-            datasetCompactLocationMap.put(datasetId, order)
+	    datasetCompactLocationMap[datasetId] = order
         }
 
         String snpIdListStr = getStringFromCollection(snpIds)
         // Get the compacted SNP data and insert them into the map, organized by chrom, and further ordered by chrom position
-        sqlStr = 'select b.name, b.chrom, b.chrom_pos, c.snp_data_by_probe_id, c.snp_id, c.probe_id, c.probe_name, c.trial_name, c.data_by_probe '
-        sqlStr += 'from de_snp_info b, de_snp_data_by_probe c where b.snp_info_id = c.snp_id '
-        sqlStr += 'and c.trial_name = ? and b.snp_info_id in (' + snpIdListStr + ') order by b.chrom, b.chrom_pos'
+	sqlStr = '''
+			select b.name, b.chrom, b.chrom_pos, c.snp_data_by_probe_id, c.snp_id, c.probe_id, c.probe_name, c.trial_name, c.data_by_probe
+			from DEAPP.de_snp_info b, DEAPP.de_snp_data_by_probe c
+			where b.snp_info_id = c.snp_id
+			  and c.trial_name = ?
+			  and b.snp_info_id in (''' + snpIdListStr + ') order by b.chrom, b.chrom_pos'
         sql.eachRow(sqlStr, [trialName]) { row ->
-            SnpDataByProbe snpDataByProbe = new SnpDataByProbe()
-            snpDataByProbe.snpDataByProbeId = row.snp_data_by_probe_id
-            snpDataByProbe.snpInfoId = row.snp_id
-            snpDataByProbe.snpName = row.name
-            snpDataByProbe.probeId = row.probe_id
-            snpDataByProbe.probeName = row.probe_name
-            snpDataByProbe.trialName = row.trial_name
-            snpDataByProbe.chrom = row.chrom
-            snpDataByProbe.chromPos = row.chrom_pos
-            java.sql.Clob clob = (java.sql.Clob) row.data_by_probe
-            String dataByProbe = clob.getAsciiStream().getText()
-            snpDataByProbe.dataArray = getSnpDataArrayFromCompactedString(datasetList, datasetCompactLocationMap, dataByProbe)
+	    String dataByProbe = ((Clob) row.data_by_probe).asciiStream.text
+	    SnpDataByProbe snpDataByProbe = new SnpDataByProbe(
+		snpDataByProbeId: row.snp_data_by_probe_id,
+		snpInfoId: row.snp_id,
+		snpName: row.name,
+		probeId: row.probe_id,
+		probeName: row.probe_name,
+		trialName: row.trial_name,
+		chrom: row.chrom,
+		chromPos: row.chrom_pos,
+		dataArray: getSnpDataArrayFromCompactedString(datasetList, datasetCompactLocationMap, dataByProbe))
 
-            List<SnpDataByProbe> snpDataByProbeList = snpDataByChromMap.get(snpDataByProbe.chrom)
+	    List<SnpDataByProbe> snpDataByProbeList = snpDataByChromMap[snpDataByProbe.chrom]
             if (snpDataByProbeList == null) {
-                snpDataByProbeList = new ArrayList<SnpDataByProbe>()
-                snpDataByChromMap.put(snpDataByProbe.chrom, snpDataByProbeList)
+		snpDataByProbeList = []
+		snpDataByChromMap[snpDataByProbe.chrom] = snpDataByProbeList
             }
-            snpDataByProbeList.add(snpDataByProbe)
+	    snpDataByProbeList << snpDataByProbe
         }
     }
 
-    List<Long> getSNPDatasetIdList(String subjectIds) throws Exception {
-        if (subjectIds == null || subjectIds.trim().length() == 0) return null
+    List<Long> getSNPDatasetIdList(String subjectIds) {
+	if (!subjectIds) {
+	    return null
+	}
+
         List<Long> idList = null
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        String sqlt = 'SELECT subject_snp_dataset_id as id FROM de_subject_snp_dataset WHERE patient_num in (' + subjectIds + ') '
-        sql.eachRow(sqlt) { row ->
+	String sql = '''
+			SELECT subject_snp_dataset_id as id
+			FROM DEAPP.de_subject_snp_dataset
+			WHERE patient_num in (''' + subjectIds + ')'
+	new Sql(dataSource).eachRow(sql) { row ->
             Long id = row.id
             if (idList == null) {
-                idList = new ArrayList<Long>()
+		idList = []
             }
-            idList.add(id)
+	    idList << id
         }
-        return idList
+	idList
     }
 
     String getConceptDisplayName(String conceptId, Map<String, String> conceptIdToDisplayNameMap) {
-        if (conceptId == null || conceptId.length() == 0 || conceptIdToDisplayNameMap == null) return null
-        String conceptDisplayName = conceptIdToDisplayNameMap.get(conceptId)
+	if (!conceptId || conceptIdToDisplayNameMap == null) {
+	    return null
+	}
+
+	String conceptDisplayName = conceptIdToDisplayNameMap[conceptId]
         if (conceptDisplayName == null) {
-            groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-            sql.eachRow('select name_char from concept_dimension where concept_cd = ?', [conceptId]) { row ->
+	    new Sql(dataSource).eachRow('select name_char from I2B2DEMODATA.concept_dimension where concept_cd = ?', [conceptId]) { row ->
                 conceptDisplayName = row.name_char
             }
         }
-        return conceptDisplayName
+
+	conceptDisplayName
     }
 
     String getStringFromCollection(Collection inCollection) {
-        if (inCollection == null || inCollection.size() == 0) return null
-        StringBuffer buf = new StringBuffer()
-        for (Object obj : inCollection) {
-            if (buf.length() != 0) buf.append(', ')
+	if (!inCollection) {
+	    return null
+	}
+
+	StringBuilder buf = new StringBuilder()
+	for (obj in inCollection) {
+	    if (buf) {
+		buf << ', '
+	    }
             if (obj instanceof Long || obj instanceof Integer || obj instanceof Float || obj instanceof Double) {
-                buf.append(obj)
+		buf << obj
             }
             else {
-                buf.append("'" + obj + "'")
+		buf << QUOTE << obj << QUOTE
             }
         }
-        return buf.toString()
+	buf
     }
 
     String getSqlStrFromChroms(String chroms) {
-        if (chroms == null || chroms.trim().length() == 0)
+	if (!chroms?.trim()) {
             return "'ALL'"
+	}
+
         String[] values = chroms.split(',')
-        StringBuffer buf = new StringBuffer()
+	StringBuilder buf = new StringBuilder()
         for (int i = 0; i < values.length; i++) {
-            if (i != 0) buf.append(',')
-            buf.append("'" + values[i] + "'")
+	    if (i) {
+		buf << ','
+	    }
+	    buf << QUOTE << values[i] << QUOTE
         }
-        return buf.toString()
+	buf
     }
 
     List<String> getSortedChromList(Set<String> chromSet) {
-        if (chromSet == null || chromSet.size() == 0) return null
-        List<String> chromList = new ArrayList<String>()
-        if (chromSet.size() == 1) {
-            for (String chrom : chromSet) {
-                chromList.add(chrom)
-            }
-            return chromList
+	if (!chromSet) {
+	    return null
         }
 
-        String[] allChroms = getAllChromArray()
-        SortedMap<Integer, String> chromIndexMap = new TreeMap<Integer, String>()
-        for (String chrom : chromSet) {
+	if (chromSet.size() == 1) {
+	    return chromSet
+        }
+
+	SortedMap<Integer, String> chromIndexMap = new TreeMap<>()
+	for (String chrom in chromSet) {
             for (int i = 0; i < allChroms.length; i++) {
-                if (chrom.equals(allChroms[i])) {
-                    chromIndexMap.put(new Integer(i), chrom)
-                }
+		if (chrom == allChroms[i]) {
+		    chromIndexMap[i] = chrom
+		}
             }
         }
-        Iterator mapIt = chromIndexMap.iterator()
-        for (Map.Entry<Integer, String> entry : chromIndexMap.entrySet()) {
-            chromList.add(entry.getValue())
-        }
-        return chromList
+
+	chromIndexMap.values()
     }
 
     String[][] getSnpDataArrayFromCompactedString(List<SnpDataset> datasetList,
@@ -989,15 +917,15 @@ class SnpService {
         String[][] dataArray = new String[datasetList.size()][2]
 
         for (int i = 0; i < datasetList.size(); i++) {
-            SnpDataset snpDataset = datasetList.get(i)
-            Integer location = datasetCompactLocationMap.get(snpDataset.id)
+	    SnpDataset snpDataset = datasetList[i]
+	    int location = datasetCompactLocationMap[snpDataset.id]
             // The snp data is compacted in the format of [##.##][AB] for copy number and genotype
-            String copyNumber = dataByProbe.substring(location.intValue() * 7, location.intValue() * 7 + 5)
-            String genotype = dataByProbe.substring(location.intValue() * 7 + 5, location.intValue() * 7 + 7)
+	    String copyNumber = dataByProbe.substring(location * 7, location * 7 + 5)
+	    String genotype = dataByProbe.substring(location * 7 + 5, location * 7 + 7)
             dataArray[i][0] = copyNumber
             dataArray[i][1] = genotype
         }
-        return dataArray
-    }
 
+	dataArray
+    }
 }

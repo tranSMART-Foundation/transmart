@@ -1,207 +1,208 @@
 package com.thomsonreuters.lsps.transmart
 
 import groovy.util.logging.Slf4j
-import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
-import org.apache.http.util.EntityUtils
-
-import static groovyx.net.http.ContentType.*
-import static groovyx.net.http.Method.*
-
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.transmart.plugin.shared.SecurityService
 
 @Slf4j('logger')
-class MetacoreEnrichmentService {
+class MetacoreEnrichmentService implements InitializingBean {
 
-    boolean transactional = true
+    static transactional = false
 
-	def springSecurityService
-	def grailsApplication
-	def httpBuilderService
+    @Autowired private HttpBuilderService httpBuilderService
+    @Autowired private SecurityService securityService
 
-	def systemMetacoreSettingsDefined() {
-		return grailsApplication.config.com.thomsonreuters.transmart.metacoreURL \
-				&& grailsApplication.config.com.thomsonreuters.transmart.metacoreDefaultLogin \
-				&& grailsApplication.config.com.thomsonreuters.transmart.metacoreDefaultPassword
-	}
+    @Value('${com.thomsonreuters.transmart.demoEnrichmentURL:http://pathwaymaps.com}')
+    private String demoEnrichmentUrl
 
-	def areSettingsConfigured() {
-		return UserSettings.isConfigured()
-	}
+    @Value('${com.thomsonreuters.transmart.demoMapBaseURL:http://pathwaymaps.com/maps/}')
+    private String demoMapBaseUrl
 
-	def metacoreSettingsMode() {
-		def user = springSecurityService.getPrincipal()
-		def userid = user?.id
+    @Value('${com.thomsonreuters.transmart.metacoreURL:}')
+    private String metacoreUrl
 
-		if (areSettingsConfigured()) {
+    @Value('${com.thomsonreuters.transmart.metacoreDefaultLogin:}')
+    private String metacoreDefaultLogin
 
-			def mode = UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreSettingsMode')
+    @Value('${com.thomsonreuters.transmart.metacoreDefaultPassword:}')
+    private String metacoreDefaultPassword
 
-			if (mode == 'demo' || mode == 'system' || mode == 'user')
-				return mode
-			else
-				if (systemMetacoreSettingsDefined())
-					return 'system'
-				else
-					return 'demo'
-		}
-		else
-			return 'demo'
-	}
+    private Map<String, String> defaultMetacoreParams
 
-	def setMetacoreSettingsMode(mode) {
-		def user = springSecurityService.getPrincipal()
-		def userid = user?.id
-
-		if (mode == 'demo' || mode == 'system' || mode == 'user')
-			UserSettings.setSetting(userid, 'com.thomsonreuters.transmart.metacoreSettingsMode', mode)
-	}
-
-	def setMetacoreBaseUrl(url) {
-		def user = springSecurityService.getPrincipal()
-		def userid = user?.id
-
-		UserSettings.setSetting(userid, 'com.thomsonreuters.transmart.metacoreURL', url)
-	}
-
-	def setMetacoreLogin(login) {
-		def user = springSecurityService.getPrincipal()
-		def userid = user?.id
-
-		UserSettings.setSetting(userid, 'com.thomsonreuters.transmart.metacoreLogin', login)
-	}
-
-	def setMetacorePassword(pass) {
-		def user = springSecurityService.getPrincipal()
-		def userid = user?.id
-
-		UserSettings.setSetting(userid, 'com.thomsonreuters.transmart.metacorePassword', pass)
-	}
-
-	def getMetacoreParams() {
-		def defaultMetacoreParams = [
-			baseUrl: grailsApplication?.config?.com?.thomsonreuters?.transmart?.metacoreURL,
-			login: grailsApplication?.config?.com?.thomsonreuters?.transmart?.metacoreDefaultLogin,
-			password: grailsApplication?.config?.com?.thomsonreuters?.transmart?.metacoreDefaultPassword
-		]
-
-		if (! (defaultMetacoreParams.baseUrl && defaultMetacoreParams.login && defaultMetacoreParams.password))
-			defaultMetacoreParams = null
-
-		def user = springSecurityService.getPrincipal()
-		def userid = user?.id
-
-		if (userid) {
-			def settingsMode = metacoreSettingsMode()
-
-			if (settingsMode == 'user') {
-				return [
-					baseUrl: UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreURL')?:defaultMetacoreParams['baseUrl'],
-					login: UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreLogin')?:defaultMetacoreParams['login'],
-					password: UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacorePassword')?:defaultMetacoreParams['password']
-				]
-			}
-			else {
-				if (settingsMode == 'system')
-					return defaultMetacoreParams
-				else
-					return null
-			}
-		}
-		else
-			return defaultMetacoreParams
-	}
-
-
-	// cohortGeneList = [ IdType: id_type, Data: [list1, list2] ], where list is just a list of EntrezGene IDs
-	// metacoreParams = [ 'baseUrl': url, 'login': login, 'password': password ]
-    def getEnrichmentByMaps(cohortGeneLists, metacoreParams) {
-		def res
-		def baseUrl = ''
-		def mapBaseUrl = ''
-		// only one list is supported so far
-
-		def settingsMode = metacoreSettingsMode()
-
-		if (settingsMode == 'demo') {
-			baseUrl = grailsApplication?.config?.com?.thomsonreuters?.transmart?.demoEnrichmentURL?:'http://pathwaymaps.com'
-			mapBaseUrl = grailsApplication?.config?.com?.thomsonreuters?.transmart?.demoMapBaseURL?:'http://pathwaymaps.com/maps/'
-		}
-		else {
-			baseUrl = metacoreParams['baseUrl']
-			mapBaseUrl = baseUrl
-		}
-
-		def site = httpBuilderService.getInstance(baseUrl)
-
-		if (settingsMode == 'demo') {
-			// demo enrichment
-
-			logger.info 'Running demo enrichment: ' + baseUrl
-
-            site.post( path: '/enrichmentApp/enrichment',
-                    body: [ limit: 50, idtype: cohortGeneLists['IdType'], id: cohortGeneLists['Data'][0] ]) {
-                resp, json ->
-
-                    if (json.Code == 0)
-                        res = json
-            }
-		}
-		else {
-			// call API functions
-
-			logger.info 'MetaCore - logging in'
-			site.get( path: '/api/rpc.cgi',
-			  query: [ proc: 'login', login: metacoreParams.login, passwd: metacoreParams.password, output: 'json' ] ) {
-			  	resp, json ->
-
-				  def authKey = json?.Result[0]?.Key
-				  if (authKey) {
-					  logger.info 'MetaCore - running enrichment'
-
-					  EntityUtils.consumeQuietly(resp.entity) // avoid 'IllegalStateException: Invalid use of BasicClientConnManager: connection still allocated' thanks to http://stackoverflow.com/a/16211729/535203
-
-					  site.post( path: '/api/rpc.cgi',
-						body: [ proc: 'getEnrichment', diagram_type: 'maps', limit: 50, lists_origin: 'ids', list_name: 'Cohort 1',
-						idtype: cohortGeneLists['IdType'], includeObjectIds: 0, output: 'json', auth_key: authKey, id: cohortGeneLists['Data'][0] ]) {
-						  resp2, json2 ->
-
-						  if (json2?.Code == 0) {
-						  	res = json2
-						  }
-
-						  EntityUtils.consumeQuietly(resp2.entity) // avoid 'IllegalStateException: Invalid use of BasicClientConnManager: connection still allocated' thanks to http://stackoverflow.com/a/16211729/535203
-					  }
-
-					  logger.info 'MetaCore - logging out'
-					  site.get ( path: '/api/rpc.cgi', query: [ proc: 'logout', auth_key: authKey ] )
-				  }
-			}
-		}
-
-		if (res?.Result)
-			// updating URLs
-			res.Result[0].enrichment.info_url = mapBaseUrl + res.Result[0].enrichment.info_url
-
-		return res
+    boolean systemMetacoreSettingsDefined() {
+	metacoreUrl && metacoreDefaultLogin && metacoreDefaultPassword
     }
 
-	def userMetacoreSettingsDefined() {
-		def user = springSecurityService.getPrincipal()
-		def userid = user?.id
+    boolean areSettingsConfigured() {
+	UserSettings.isConfigured()
+    }
 
-		def res =
-			UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreURL') \
-			&& UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacoreLogin') \
-			&& UserSettings.getSetting(userid, 'com.thomsonreuters.transmart.metacorePassword')
+    String metacoreSettingsMode() {
+	if (areSettingsConfigured()) {
+	    String mode = getSetting('metacoreSettingsMode')
+	    if (mode == 'demo' || mode == 'system' || mode == 'user') {
+		mode
+	    }
+	    else if (systemMetacoreSettingsDefined()) {
+		'system'
+	    }
+	    else {
+		'demo'
+	    }
+	}
+	else {
+	    'demo'
+	}
+    }
 
-		return res
+    void setMetacoreSettingsMode(String mode) {
+	if (mode == 'demo' || mode == 'system' || mode == 'user') {
+	    setSetting 'metacoreSettingsMode', mode
+	}
+    }
+
+    void setMetacoreBaseUrl(String url) {
+	setSetting 'metacoreURL', url
+    }
+
+    void setMetacoreLogin(String login) {
+	setSetting 'metacoreLogin', login
+    }
+
+    void setMetacorePassword(String password) {
+	setSetting 'metacorePassword', password
+    }
+
+    Map<String, String> getMetacoreParams() {
+	if (!(defaultMetacoreParams.baseUrl && defaultMetacoreParams.login && defaultMetacoreParams.password)) {
+	    defaultMetacoreParams = null
 	}
 
-	def metacoreSettingsDefined() {
-		def settings = getMetacoreParams()
-		return settings != null
+	if (!securityService.loggedIn()) {
+	    return defaultMetacoreParams
 	}
 
+	String settingsMode = metacoreSettingsMode()
+	if (settingsMode == 'user') {
+	    [baseUrl : getSetting('metacoreURL') ?: defaultMetacoreParams.baseUrl,
+	     login   : getSetting('metacoreLogin') ?: defaultMetacoreParams.login,
+	     password: getSetting('metacorePassword') ?: defaultMetacoreParams.password]
+	}
+	else {
+	    if (settingsMode == 'system') {
+		defaultMetacoreParams
+	    }
+	    else {
+		null
+	    }
+	}
+    }
 
+    // cohortGeneList = [ IdType: id_type, Data: [list1, list2] ], where list is just a list of EntrezGene IDs
+    // metacoreParams = [ 'baseUrl': url, 'login': login, 'password': password ]
+    def getEnrichmentByMaps(Map cohortGeneLists, Map metacoreParams) {
+	def res
+	String mapBaseUrl
+	// only one list is supported so far
+
+	String settingsMode = metacoreSettingsMode()
+
+	String baseUrl
+	if (settingsMode == 'demo') {
+	    baseUrl = demoEnrichmentUrl
+	    mapBaseUrl = demoMapBaseUrl
+	}
+	else {
+	    baseUrl = metacoreParams.baseUrl
+	    mapBaseUrl = baseUrl
+	}
+
+	HTTPBuilder site = httpBuilderService.getInstance(baseUrl)
+
+	if (settingsMode == 'demo') {
+	    // demo enrichment
+
+	    logger.info 'Running demo enrichment: {}', baseUrl
+
+	    Map<String, ?> args = [path: '/enrichmentApp/enrichment',
+			           body: [limit: 50,
+			                  idtype: cohortGeneLists.IdType,
+			                  id: cohortGeneLists.Data[0]]]
+	    site.post(args) { resp, json ->
+		if (json.Code == 0) {
+                    res = json
+		}
+	    }
+	}
+	else {
+	    // call API functions
+
+	    logger.info 'MetaCore - logging in'
+	    Map<String, ?> args = [path: '/api/rpc.cgi',
+			           query: [proc: 'login',
+			                   login: metacoreParams.login,
+			                   passwd: metacoreParams.password,
+			                   output: 'json']]
+	    site.get(args) { resp, json ->
+		def authKey = json?.Result[0]?.Key
+		if (authKey) {
+		    logger.info 'MetaCore - running enrichment'
+		    args = [path: '/api/rpc.cgi',
+			    body: [proc  : 'getEnrichment',
+				   diagram_type: 'maps',
+				   limit: 50,
+				   lists_origin: 'ids',
+				   list_name: 'Cohort 1',
+				   idtype: cohortGeneLists.IdType,
+				   includeObjectIds: 0,
+				   output: 'json',
+				   auth_key: authKey,
+				   id: cohortGeneLists.Data[0]]]
+		    site.post(args) { resp2, json2 ->
+			if (json2?.Code == 0) {
+			    res = json2
+			}
+		    }
+
+		    logger.info 'MetaCore - logging out'
+		    site.get ( path: '/api/rpc.cgi', query: [ proc: 'logout', auth_key: authKey ] )
+		}
+	    }
+	}
+
+	if (res?.Result) {
+	    // updating URLs
+	    res.Result[0].enrichment.info_url = mapBaseUrl + res.Result[0].enrichment.info_url
+	}
+
+	res
+    }
+
+    boolean userMetacoreSettingsDefined() {
+	getSetting('metacoreURL') &&
+	    getSetting('metacoreLogin') &&
+	    getSetting('metacorePassword')
+    }
+
+    boolean metacoreSettingsDefined() {
+	getMetacoreParams() != null
+    }
+
+    private String getSetting(String name) {
+	UserSettings.getSetting securityService.currentUserId(), 'com.thomsonreuters.transmart.' + name
+    }
+
+    private void setSetting(String name, String value) {
+	UserSettings.setSetting securityService.currentUserId(), name, value
+    }
+
+    void afterPropertiesSet() {
+	defaultMetacoreParams = [
+	    baseUrl : metacoreUrl,
+	    login   : metacoreDefaultLogin,
+	    password: metacoreDefaultPassword].asImmutable()
+    }
 }

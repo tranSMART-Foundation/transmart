@@ -1,31 +1,29 @@
 import com.recomdata.search.query.Query
+import groovy.transform.CompileStatic
+import org.springframework.beans.factory.annotation.Autowired
 import org.transmart.ExperimentAnalysisResult
 import org.transmart.SearchFilter
 
 /**
- * $Id: ExperimentAnalysisTEAService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  * todo -- make a super class for experimentanalysisqueryservice and trialqueryservice
  */
-
-
+@CompileStatic
 class ExperimentAnalysisTEAService extends AnalysisTEABaseService {
 
-    def experimentAnalysisQueryService
+    static transactional = false
 
-    def getExpType() {
-        return 'Experiment'
+    @Autowired private ExperimentAnalysisQueryService experimentAnalysisQueryService
+
+    String getExpType() {
+	'Experiment'
     }
 
-    def createResultObject() {
-        return new ExperimentAnalysisResult()
+    ExperimentAnalysisResult createResultObject() {
+	new ExperimentAnalysisResult()
     }
 
-
-    def createSubFilterCriteria(SearchFilter filter, Query query) {
-        experimentAnalysisQueryService.createSubFilterCriteria(filter.expAnalysisFilter, query)
+    void createSubFilterCriteria(SearchFilter filter, Query query) {
+	experimentAnalysisQueryService.createSubFilterCriteria filter.expAnalysisFilter, query
     }
-
-
 }

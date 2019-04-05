@@ -1,110 +1,104 @@
 package com.recomdata.transmart.plugin
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
+
 class PluginController {
-    def pluginService
 
-    def index = { redirect(action: 'list', params: params) }
-
-    // the delete, save and update actions only accept POST requests
     static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+    static defaultAction = 'list'
 
-    def list = {
-        params.max = Math.min(params.max ? params.max.toInteger() : 10, 100)
-        [pluginInstanceList: Plugin.list(params), pluginInstanceTotal: Plugin.count()]
+    @Autowired private  PluginService pluginService
+
+    def list() {
+	params.max = Math.min(params.int('max', 10), 100)
+	[plugins: Plugin.list(params), pluginCount: Plugin.count()]
     }
 
-    def modules = {
-        params.pluginName = params.pluginName?.trim() ? params.pluginName?.trim() : 'R-Modules'
-        def result = pluginService.getPluginModulesAsJSON(params.pluginName)
-
-        response.setContentType('text/json')
-        response.outputStream << result?.toString()
+    def modules(String pluginName) {
+	response.contentType = 'text/json'
+	response.outputStream << pluginService.getPluginModulesAsJSON(
+	    pluginName?.trim() ?: 'R-Modules')?.toString()
     }
 
-    def show = {
-        def pluginInstance = Plugin.get(params.id)
-
-        if (!pluginInstance) {
-            flash.message = 'Plugin not found with id ' + params.id
-            redirect(action: 'list')
+    def show(Plugin plugin) {
+	if (plugin) {
+	    [plugin: plugin]
         }
         else {
-            return [pluginInstance: pluginInstance]
+	    flash.message = "Plugin not found with id ${params.id}"
+	    redirect action: 'list'
         }
     }
 
-    def delete = {
-        def pluginInstance = Plugin.get(params.id)
-        if (pluginInstance) {
+    def delete(Plugin plugin) {
+	if (plugin) {
             try {
-                pluginInstance.delete()
-                flash.message = 'Plugin ' + params.id + ' deleted'
-                redirect(action: 'list')
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = 'Plugin ' + params.id + ' could not be deleted'
-                redirect(action: 'show', id: params.id)
-            }
-        }
-        else {
-            flash.message = 'Plugin not found with id ' + params.id
-            redirect(action: 'list')
-        }
-    }
-
-    def edit = {
-        def pluginInstance = Plugin.get(params.id)
-
-        if (!pluginInstance) {
-            flash.message = 'Plugin not found with id ' + params.id
-            redirect(action: 'list')
-        }
-        else {
-            return [pluginInstance: pluginInstance]
-        }
-    }
-
-    def update = {
-        def pluginInstance = Plugin.get(params.id)
-        if (pluginInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (pluginInstance.version > version) {
-
-                    pluginInstance.errors.rejectValue('version', 'plugin.optimistic.locking.failure', 'Another user has updated this Plugin while you were editing.')
-                    render(view: 'edit', model: [pluginInstance: pluginInstance])
-                    return
-                }
-            }
-            pluginInstance.properties = params
-            if (!pluginInstance.hasErrors() && pluginInstance.save()) {
-                flash.message = 'Plugin ' + params.id + ' updated'
-                redirect(action: 'show', id: pluginInstance.id)
-            }
-            else {
-                render(view: 'edit', model: [pluginInstance: pluginInstance])
+		plugin.delete()
+		flash.message = "Plugin ${params.id} deleted"
+		redirect action: 'list'
+	    }
+	    catch (DataIntegrityViolationException e) {
+		flash.message = "Plugin ${params.id} could not be deleted"
+		redirect action: 'show', id: params.id
             }
         }
         else {
-            flash.message = 'Plugin not found with id ' + params.id
-            redirect(action: 'edit', id: params.id)
+	    flash.message = "Plugin not found with id ${params.id}"
+	    redirect action: 'list'
         }
     }
 
-    def create = {
-        def pluginInstance = new Plugin()
-        pluginInstance.properties = params
-        return ['pluginInstance': pluginInstance]
-    }
-
-    def save = {
-        def pluginInstance = new Plugin(params)
-        if (!pluginInstance.hasErrors() && pluginInstance.save()) {
-            flash.message = 'Plugin ' + pluginInstance.id + ' created'
-            redirect(action: 'show', id: pluginInstance.id)
+    def edit(Plugin plugin) {
+	if (plugin) {
+	    [plugin: plugin]
         }
         else {
-            render(view: 'create', model: [pluginInstance: pluginInstance])
+	    flash.message = "Plugin not found with id ${params.id}"
+	    redirect action: 'list'
+        }
+    }
+
+    def update(Plugin plugin) {
+	if (!plugin) {
+	    flash.message = "Plugin not found with id ${params.id}"
+	    redirect action: 'edit', id: params.id
+            return
+        }
+
+	if (params.version) {
+	    long version = params.long('version', 0)
+	    if (plugin.version > version) {
+		plugin.errors.rejectValue 'version',
+		    'plugin.optimistic.locking.failure',
+		    'Another user has updated this Plugin while you were editing.'
+		render view: 'edit', model: [plugin: plugin]
+		return
+            }
+        }
+
+	plugin.properties = params
+	if (!plugin.hasErrors() && plugin.save()) {
+	    flash.message = "Plugin ${params.id} updated"
+	    redirect action: 'show', id: plugin.id
+        }
+        else {
+	    render view: 'edit', model: [plugin: plugin]
+        }
+    }
+
+    def create() {
+	[plugin: new Plugin(params)]
+    }
+
+    def save() {
+	Plugin plugin = new Plugin(params)
+	if (!plugin.hasErrors() && plugin.save()) {
+	    flash.message = "Plugin ${plugin.id} created"
+	    redirect action: 'show', id: plugin.id
+        }
+        else {
+	    render view: 'create', model: [plugin: plugin]
         }
     }
 }

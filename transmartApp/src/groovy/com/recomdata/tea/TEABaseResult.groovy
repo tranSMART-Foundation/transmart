@@ -1,32 +1,42 @@
 package com.recomdata.tea
 
+import groovy.transform.CompileStatic
+import org.transmart.AnalysisResult
+
 /**
+ * Base class for result classes for trials and experiments
  * @author jspencer
- * base class for result classes for trials and experiments
  */
-public class TEABaseResult {
-    Long analysisCount = 0
-    Long inSignificantAnalCount = 0
+@CompileStatic
+class TEABaseResult {
+
+    Long expCount
+
+    long analysisCount = 0
+    long inSignificantAnalCount = 0
 
     // contains all analyses
-    List analysisResultList = []
+    List<AnalysisResult> analysisResultList = []
 
     // subset of above (insignificant TEA analyses)
-    List insigAnalResultList = []
+    List<AnalysisResult> insigAnalResultList = []
 
-    //flag indicates if results should be groupd by experiment
-    boolean groupByExp = false;
+    // if results should be groupd by experiment
+    boolean groupByExp = false
 
     // count of biomarkers included in the search
-    Long bioMarkerCt = 0
+    long bioMarkerCt = 0
 
     /**
      * set list of insignificat TEA analyses
      */
-    def populateInsignificantTEAAnalysisList() {
-        analysisResultList.each { if (!it.bSignificantTEA) insigAnalResultList.add(it) }
-        Collections.sort(insigAnalResultList)
+    void populateInsignificantTEAAnalysisList() {
+	for (AnalysisResult it in analysisResultList) {
+	    if (!it.bSignificantTEA) {
+		insigAnalResultList << it
+	    }
+	}
+	insigAnalResultList.sort()
         inSignificantAnalCount = insigAnalResultList.size()
     }
-
 }

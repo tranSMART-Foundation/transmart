@@ -1,13 +1,12 @@
-/**
- * @author JIsikoff
- *
- */
 package command
 
 import grails.validation.Validateable
 
+/**
+ * @author JIsikoff
+ */
 @Validateable
-public class SecureObjectAccessCommand {
+class SecureObjectAccessCommand {
     String[] sobjectstoadd
     String[] sobjectstoremove
     String[] groupstoadd

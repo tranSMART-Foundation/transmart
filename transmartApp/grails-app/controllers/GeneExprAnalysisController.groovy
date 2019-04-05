@@ -1,76 +1,74 @@
 /**
- * $Id: GeneExprAnalysisController.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- */
-/**
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
 class GeneExprAnalysisController {
 
-    def findgenerifs = {
-        // use session object to render null or generifs
-        def openrifs = session['opengenerifs']
+    def findgenerifs(String id) {
+	Map openrifs = sessionOpengenerifs()
         if (openrifs == null) {
             openrifs = [:]
-            session['opengenerifs'] = openrifs
+	    session.opengenerifs = openrifs
         }
 
-        def search = true
-        if (openrifs[params.id] != null) {
-            openrifs.remove(params.id)
+	boolean search = true
+	if (openrifs[id] != null) {
+	    openrifs.remove id
             search = false
         }
         else {
-            openrifs[params.id] = 'y'
-            if (session['details'] != null)
-                session['details'].remove(params.id)
+	    openrifs[id] = 'y'
+	    sessionDetails()?.remove id
         }
 
         if (search) {
             def geneExprAnalysis = GeneExprAnalysis.get(params.id)
             def rifs = GeneRifs.findAllByGeneSymbolLike(geneExprAnalysis.geneSymbol)
-            render(template: 'generifs', model: [generifs: rifs])
+	    render template: 'generifs', model: [generifs: rifs]
         }
         else {
-            render(template: 'emptyTemplate')
+	    render template: 'emptyTemplate'
         }
     }
 
-    def detail = {
-        def details = session['details']
+    def detail(String id) {
+	Map details = sessionDetails()
         if (details == null) {
             details = [:]
-            session['details'] = details
+	    session.details = details
         }
 
-        def search = true
-        if (details[params.id] != null) {
-            details.remove(params.id)
+	boolean search = true
+	if (details[id] != null) {
+	    details.remove id
             search = false
         }
         else {
-            details[params.id] = 'y'
-            if (session['opengenrifs'] != null)
-                session['opengenerifs'].remove(params.id)
+	    details[id] = 'y'
+	    sessionOpengenerifs()?.remove id
         }
+
         if (search) {
             def geneExprAnalysis = GeneExprAnalysis.get(params.id)
 
-            if (!geneExprAnalysis) {
-                flash.message = 'GeneExprAnalysis not found with id ' + params.id
-
+	    if (!geneExprAnalysis) {
+		flash.message = "GeneExprAnalysis not found with id ${params.id}"
             }
-            //  println('here')
-            //  render(template:'emptyTemplate')
-            render(template: '/geneExprAnalysis/detail', model: [geneExprAnalysis: geneExprAnalysis])
+	    render template: '/geneExprAnalysis/detail', model: [geneExprAnalysis: geneExprAnalysis]
         }
         else {
-            render(template: 'emptyTemplate')
+	    render template: 'emptyTemplate'
         }
     }
 
+    def noResult() {
+	render view: 'noresult'
+    }
 
-    def noResult = {
-        render(view: 'noresult')
+    private Map sessionDetails() {
+	session.details
+    }
+
+    private Map sessionOpengenerifs() {
+	session.opengenerifs
     }
 }

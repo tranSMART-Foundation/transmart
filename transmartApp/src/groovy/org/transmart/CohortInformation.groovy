@@ -1,10 +1,11 @@
 package org.transmart
 
+import groovy.transform.CompileStatic
+
 /**
- *
  * @author mkapoor
- *
  */
+@CompileStatic
 class CohortInformation {
 
     public static final int PLATFORMS_TYPE = 1
@@ -15,24 +16,15 @@ class CohortInformation {
     public static final int TISSUE_TYPE = 6
     public static final int RBM_PANEL_TYPE = 7
 
-    def platforms = new ArrayList()
-    def trials = new ArrayList()
-    def timepoints = new ArrayList()
-    def samples = new ArrayList()
-    def gpls = new ArrayList()
-    def tissues = new ArrayList()
-    def rbmpanels = new ArrayList()
+    List platforms = []
+    List trials = []
+    List timepoints = []
+    List samples = []
+    List gpls = []
+    List tissues = []
+    List rbmpanels = []
 
-    def getAllTrials = {
-                StringBuilder strng = new StringBuilder()
-                Iterator itr = trials.iterator()
-                if (itr.hasNext()) {
-                    strng.append(itr.next())
-                }
-                while (itr.hasNext()) {
-                    strng.append(',').append(itr.next())
-                }
-
-                return strng.toString()
-            }
+    String getAllTrials() {
+	trials.join ','
+    }
 }

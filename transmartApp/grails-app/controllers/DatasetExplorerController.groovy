@@ -1,77 +1,141 @@
-import com.recomdata.transmart.domain.searchapp.Subset
+import com.recomdata.extensions.ExtensionsRegistry
 import grails.converters.JSON
-import groovy.util.logging.Slf4j
-import org.transmart.searchapp.AuthUser
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.transmart.plugin.shared.SecurityService
+import transmartapp.OntologyService
 
-@Slf4j('logger')
 class DatasetExplorerController {
-    def springSecurityService
-    def i2b2HelperService
-    def ontologyService
 
-    def defaultAction = 'index'
+    @Value('${com.recomdata.i2b2.subject.domain:}')
+    private String i2b2Domain
 
-    def index = {
-        logger.trace('in index')
+    @Value('${com.recomdata.i2b2.subject.projectid:}')
+    private String i2b2ProjectId
 
-        def pathToExpand
-        //If we have an accession passed, retrieve its path
-        if (params.accession) {
-            pathToExpand = ontologyService.getPathForAccession(params.accession)
-        }
+    @Value('${com.recomdata.i2b2.subject.username:}')
+    private String i2b2Username
 
+    @Value('${com.recomdata.i2b2.subject.password}')
+    private String i2b2Password
+
+    @Value('${com.recomdata.datasetExplorer.usePMHost:}')
+    private String usePmHost
+
+    @Value('${com.recomdata.datasetExplorer.genePatternURL:}')
+    private String genePatternUrl
+
+    @Value('${com.recomdata.datasetExplorer.enableGenePattern:false}')
+    private boolean enableGenePattern
+
+    @Value('${com.recomdata.search.genepathway:}')
+    private String searchGenepathway
+
+    @Value('${com.recomdata.adminHelpURL:}')
+    private String adminHelpUrl
+
+    @Value('${org.transmartproject.helpUrls.hiDomePopUp:}')
+    private String hidomePopupHelpUrl
+
+    @Value('${com.recomdata.contactUs:}')
+    private String contactUs
+
+    @Value('${com.recomdata.appTitle:}')
+    private String appTitle
+
+    @Value('${com.recomdata.datasetExplorer.hideAcrossTrialsPanel:false}')
+    private boolean hideAcrossTrialsPanel
+
+    @Value('${ui.tabs.datasetExplorer.gridView.hide:false}')
+    private boolean hideGridView
+
+    @Value('${ui.tabs.datasetExplorer.dataExport.hide:false}')
+    private boolean hideDataExport
+
+    @Value('${ui.tabs.datasetExplorer.dataExportJobs.hide:false}')
+    private boolean hideDataExportJobs
+
+    @Value('${ui.tabs.datasetExplorer.analysisJobs.show:false}')
+    private boolean analysisJobsEnabled
+
+    @Value('${ui.tabs.datasetExplorer.workspace.hide:false}')
+    private boolean hideWorkspace
+
+    @Value('${ui.tabs.sampleExplorer.show:false}')
+    private boolean sampleExplorerEnabled
+
+    @Value('${com.thomsonreuters.transmart.metacoreAnalyticsEnable:false}')
+    private boolean metacoreAnalyticsEnabled
+
+    @Value('${com.thomsonreuters.transmart.metacoreURL:}')
+    private String metacoreUrl
+
+    @Value('${ui.tabs.browse.hide:false}')
+    private String hideBrowse
+
+    @Value('${ui.tabs.datasetExplorer.xnatEnabled.show:false}')
+    private boolean xnatEnabled
+
+    @Autowired private I2b2HelperService i2b2HelperService
+    @Autowired private OntologyService ontologyService
+    @Autowired private SecurityService securityService
+    @Autowired private ExtensionsRegistry transmartExtensionsRegistry
+
+    def index(String accession, String path) {
         //code for retrieving a saved comparison
-        pathToExpand = pathToExpand ?: params.path
-        def rwgSearchFilter = session['rwgSearchFilter']
-        if (rwgSearchFilter) {
-            rwgSearchFilter = rwgSearchFilter.join(',,,')
-        }
-        else {
-            rwgSearchFilter = ''
+	String pathToExpand
+	//If we have an accession passed, retrieve its path
+	if (accession) {
+	    pathToExpand = ontologyService.getPathForAccession(accession)
         }
 
-        def rwgSearchOperators = session['rwgSearchOperators']
-        if (rwgSearchOperators) {
-            rwgSearchOperators = rwgSearchOperators.join(';')
-        }
-        else {
-            rwgSearchOperators = ''
-        }
+	def rwgSearchFilter = session.rwgSearchFilter
+	def rwgSearchOperators = session.rwgSearchOperators
 
-        def searchCategory = session['searchCategory']
-        def globalOperator = session['globalOperator']
-        def dseOpenedNodes = session['dseOpenedNodes']
-        def dseClosedNodes = session['dseClosedNodes']
+	String tokens = i2b2HelperService.getSecureTokensCommaSeparated()
+	String initialaccess = new JSON(i2b2HelperService.getAccess(i2b2HelperService.getRootPathsWithTokens())).toString()
+	boolean canSeeData = securityService.principal().isAdminOrDseAdmin()
 
-        //Grab i2b2 credentials from the config file
-        def i2b2Domain = grailsApplication.config.com.recomdata.i2b2.subject.domain
-        def i2b2ProjectID = grailsApplication.config.com.recomdata.i2b2.subject.projectid
-        def i2b2Username = grailsApplication.config.com.recomdata.i2b2.subject.username
-        def i2b2Password = grailsApplication.config.com.recomdata.i2b2.subject.password
-
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-        def admin = i2b2HelperService.isAdmin(user)
-        def tokens = i2b2HelperService.getSecureTokensCommaSeparated(user)
-        def initialaccess = new JSON(i2b2HelperService.getAccess(i2b2HelperService.getRootPathsWithTokens(), user)).toString()
-        logger.trace('admin =' + admin)
-        render(view: 'datasetExplorer', model: [pathToExpand      : pathToExpand,
-                                                admin             : admin,
-                                                tokens            : tokens,
-                                                initialaccess     : initialaccess,
-                                                i2b2Domain        : i2b2Domain,
-                                                i2b2ProjectID     : i2b2ProjectID,
-                                                i2b2Username      : i2b2Username,
-                                                i2b2Password      : i2b2Password,
-                                                rwgSearchFilter   : rwgSearchFilter,
-                                                rwgSearchOperators: rwgSearchOperators,
-                                                globalOperator    : globalOperator,
-                                                rwgSearchCategory : searchCategory,
-                                                debug             : params.debug,
-                                                dseOpenedNodes    : dseOpenedNodes,
-                                                dseClosedNodes    : dseClosedNodes])
+	render view: 'datasetExplorer', model: [
+	    pathToExpand            : pathToExpand ?: path,
+	    admin                   : securityService.principal().isAdmin(),
+            tokens                  : tokens,
+            initialaccess           : initialaccess,
+            i2b2Domain              : i2b2Domain,
+	    i2b2ProjectID           : i2b2ProjectId,
+            i2b2Username            : i2b2Username,
+            i2b2Password            : i2b2Password,
+	    rwgSearchFilter         : rwgSearchFilter ? rwgSearchFilter.join(',,,') : '',
+	    rwgSearchOperators      : rwgSearchOperators ? rwgSearchOperators.join(';') : '',
+	    globalOperator          : session.globalOperator,
+	    rwgSearchCategory       : session.searchCategory,
+            debug                   : params.debug,
+	    dseOpenedNodes          : session.dseOpenedNodes,
+	    dseClosedNodes          : session.dseClosedNodes,
+	    usePmHost               : usePmHost,
+	    genePatternUrl          : genePatternUrl,
+	    enableGenePattern       : enableGenePattern.toString(),
+	    searchGenepathway       : searchGenepathway,
+	    adminHelpUrl            : adminHelpUrl,
+	    hidomePopupHelpUrl      : hidomePopupHelpUrl,
+	    contactUs               : contactUs,
+	    appTitle                : appTitle,
+	    hideAcrossTrialsPanel   : hideAcrossTrialsPanel,
+	    gridViewEnabled         : canSeeData && !hideGridView,
+	    dataExportEnabled       : canSeeData && !hideDataExport,
+	    dataExportJobsEnabled   : canSeeData && !hideDataExportJobs,
+	    analysisJobsEnabled     : analysisJobsEnabled,
+	    workspaceEnabled        : !hideWorkspace,
+	    sampleExplorerEnabled   : sampleExplorerEnabled,
+	    metacoreAnalyticsEnabled: metacoreAnalyticsEnabled,
+	    metacoreUrl             : metacoreUrl,
+	    analysisTabExtensions   : transmartExtensionsRegistry.analysisTabExtensions as JSON,
+	    hideBrowse              : hideBrowse,
+	    xnatEnabled             : canSeeData && xnatEnabled
+	]
     }
 
-    def queryPanelsLayout = {
-        render(view: '_queryPanel', model: [])
+    def queryPanelsLayout() {
+	render view: '_queryPanel'
     }
 }

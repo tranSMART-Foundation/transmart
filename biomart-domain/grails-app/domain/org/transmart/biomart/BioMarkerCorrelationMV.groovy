@@ -16,24 +16,16 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioMarkerCorrelationMV {
-    Long bioMarkerId
     Long assoBioMarkerId
-    Long id
+    Long bioMarkerId
     String correlType
-    static mapping = {
-        table 'BIO_MARKER_CORREL_MV'
-        version false
-        columns {
-            id column: 'MV_ID'
-            bioMarkerId column: 'BIO_MARKER_ID'
-            assoBioMarkerId column: 'ASSO_BIO_MARKER_ID'
-            correlType column: 'CORREL_TYPE'
-        }
-    }
 
+    static mapping = {
+	table 'BIOMART.BIO_MARKER_CORREL_MV'
+        id column: 'MV_ID'
+	version false
+    }
 }

@@ -1,31 +1,17 @@
 package org.transmart
 
-/**
- * stores results for expression profile 
- */
+import groovy.transform.CompileStatic
 
 /**
- * $Id: ExpressionProfileResult.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * stores results for expression profile
+ * @author mmcduffie
  */
-public class ExpressionProfileResult {
-
-    // genes retrieved from a search
-    def genes = []
-
-    // diseases retrieved from search or gene change
-    def diseases = []
-
-    // probesets
+@CompileStatic
+class ExpressionProfileResult {
+    def genes = [] // genes retrieved from a search
+    def diseases = [] // diseases retrieved from search or gene change
     def probeSets = []
-
-    // box plot URL
-    def graphURL = null
-
-    // dataset items associated with box plot
-    def datasetItems = []
-
-    // experiment count from search
-    def profCount = 0
+    def graphURL // box plot URL
+    def datasetItems = [] // dataset items associated with box plot
+    int profCount = 0 // experiment count from search
 }

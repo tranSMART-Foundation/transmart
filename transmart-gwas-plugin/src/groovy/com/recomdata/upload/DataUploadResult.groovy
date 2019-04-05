@@ -15,17 +15,17 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.upload
 
-public class DataUploadResult {
+import groovy.transform.CompileStatic
 
-	boolean success
-	List<String> requiredFields
-	List<String> missingFields
-	List<String> providedFields
-	String error
-
+@CompileStatic
+class DataUploadResult {
+    boolean success
+    List<String> requiredFields
+    List<String> missingFields
+    List<String> providedFields
+    String error
 }

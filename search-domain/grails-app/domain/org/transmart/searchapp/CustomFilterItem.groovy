@@ -16,29 +16,23 @@
  *
  *
  ******************************************************************/
-
-/*
- * $Id: CustomFilterItem.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- */
 package org.transmart.searchapp
 
 class CustomFilterItem {
-    Long id
-    String uniqueId
     String bioDataType
+    String uniqueId
+
     static belongsTo = [customFilter: CustomFilter]
+
     static mapping = {
-        table 'SEARCH_CUSTOM_FILTER_ITEM'
+	table 'SEARCHAPP.SEARCH_CUSTOM_FILTER_ITEM'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID'], column: 'SEARCH_CUSTOM_FILTER_ITEM_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            id column: 'SEARCH_CUSTOM_FILTER_ITEM_ID'
-            customFilter column: 'SEARCH_CUSTOM_FILTER_ID'
-            uniqueId column: 'UNIQUE_ID'
-            bioDataType column: 'BIO_DATA_TYPE'
-        }
+
+        customFilter column: 'SEARCH_CUSTOM_FILTER_ID'
     }
+
     static constraints = {
-        bioDataType(maxSize: 100)
+	bioDataType maxSize: 100
     }
 }

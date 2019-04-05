@@ -1,8 +1,9 @@
 package com.recomdata.security
 
-import grails.util.Holders
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.ldap.core.DirContextAdapter
 import org.springframework.ldap.core.DirContextOperations
 import org.springframework.security.core.GrantedAuthority
@@ -11,53 +12,63 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper
 import org.springframework.util.Assert
-import org.transmart.searchapp.AccessLog
+import org.transmart.plugin.shared.security.AuthUserDetails
+import org.transmart.plugin.shared.security.Roles
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.Role
+import org.transmartproject.db.log.AccessLogService
+import org.transmartproject.security.BruteForceLoginLockService
 
 /**
- * User: Florian Guitton
- * Date: 15/10/13
- * Time: 11:23
+ * @author Florian Guitton
  */
-public class LdapAuthUserDetailsMapper implements UserDetailsContextMapper {
-    def springSecurityService
-    def bruteForceLoginLockService
+@Slf4j('logger')
+class LdapAuthUserDetailsMapper implements UserDetailsContextMapper {
 
-    String mappedUsernameProperty = 'username' // also "federatedId" allowed
+    AccessLogService accessLogService
+    BruteForceLoginLockService bruteForceLoginLockService
+    SpringSecurityService springSecurityService
+
+    String mappedUsernameProperty = 'username' // also 'federatedId' allowed
     boolean inheritPassword = false
     // Pattern for newly created username generation, ignored if mappedUsernameProperty == 'username'
     String newUsernamePattern
     // List of roles assigned to new user
     List<String> defaultAuthorities
 
-    private final Log logger = LogFactory.getLog(LdapAuthUserDetailsMapper.class)
     private String passwordAttributeName = 'userPassword'
     private String rolePrefix = 'ROLE_'
     private String[] roleAttributes = null
     private boolean convertToUpperCase = true
 
+    @Value('${transmartproject.ldap.caseInsensitive:false}')
+    private boolean caseInsensitive
+
+    @Value('${transmartproject.ldap.doNotCreateUserIfNotExist:false}')
+    private boolean doNotCreateUserIfNotExist
+
     protected Collection<? extends GrantedAuthority> collectAuthoritiesForRoleAttributes(DirContextOperations ctx) {
-        Collection<? extends GrantedAuthority> result = new ArrayList<>()
+	Collection<? extends GrantedAuthority> result = []
         if (!roleAttributes) {
             return result
         }
-        for (int i = 0; i < roleAttributes.length; i++) {
-            String[] rolesForAttribute = ctx.getStringAttributes(roleAttributes[i])
 
+	for (String roleAttribute in roleAttributes) {
+	    String[] rolesForAttribute = ctx.getStringAttributes(roleAttribute)
             if (rolesForAttribute == null) {
-                logger.debug("Couldn't read role attribute '" + roleAttributes[i] + "' for user " + ctx.dn)
+		logger.debug '''Couldn't read role attribute '{}' for user {}''', roleAttribute, ctx.dn
                 continue
             }
 
-            for (int j = 0; j < rolesForAttribute.length; j++) {
-                GrantedAuthority authority = createAuthority(rolesForAttribute[j])
-                if (authority != null) {
-                    result.add(authority)
+	    for (String role in rolesForAttribute) {
+		GrantedAuthority authority = createAuthority(role)
+		if (authority) {
+		    result << authority
                 }
             }
         }
-        return result
+
+	result
     }
 
     protected Collection<? extends GrantedAuthority> collectDatabaseAuthorities(AuthUser user) {
@@ -69,10 +80,8 @@ public class LdapAuthUserDetailsMapper implements UserDetailsContextMapper {
         String email = ctx.getStringAttribute('mail')
         String password = mapPassword(ctx)
 
-        def ldapConfig = Holders.config.transmartproject.ldap
-
         AuthUser user
-        if (ldapConfig.caseInsensitive) {
+	if (caseInsensitive) {
             user = AuthUser.createCriteria().get { eq(mappedUsernameProperty, username, [ignoreCase: true])}
             if (user == null) {
                 user = AuthUser.create()
@@ -88,137 +97,131 @@ public class LdapAuthUserDetailsMapper implements UserDetailsContextMapper {
         user.email = email
 
         def created = !user.id
-        def willGenerateUsername = false
+	boolean willGenerateUsername = false
 
-        if (created && ldapConfig.doNotCreateUserIfNotExist) {
-            logger.warn("Can't create user '${username}' because transmartproject.ldap.doNotCreateUserIfNotExist is set.")
-            throw new UsernameNotFoundException("User '${username}' does not exist in transmart DB.")
+	if (created && doNotCreateUserIfNotExist) {
+	    logger.warn '''Can't create user '{}' because transmartproject.ldap.doNotCreateUserIfNotExist is set.''', username
+	    throw new UsernameNotFoundException("User '$username' does not exist in transmart DB.")
         }
-        else {
-            if (created) {
-                user.emailShow = true
-                user.enabled = true
-                if (mappedUsernameProperty != 'username') {
-                    // we will set username later
-                    if (!newUsernamePattern) {
-                        user.username = username
-                    }
-                    else if (UsernameUtils.patternHasId(newUsernamePattern)) {
-                        willGenerateUsername = true
-                        user.username = UsernameUtils.randomName()
-                    }
-                    else {
-                        user.username = UsernameUtils.evaluatePattern(user, newUsernamePattern)
-                    }
+
+        if (created) {
+            user.emailShow = true
+            user.enabled = true
+            if (mappedUsernameProperty != 'username') {
+                // we will set username later
+                if (!newUsernamePattern) {
+                    user.username = username
+                }
+                else if (UsernameUtils.patternHasId(newUsernamePattern)) {
+                    willGenerateUsername = true
+                    user.username = UsernameUtils.randomName()
+                }
+                else {
+                    user.username = UsernameUtils.evaluatePattern(user, newUsernamePattern)
                 }
             }
+        }
+        user.save(flush: true)
+
+        // generate user name after initial save, because it can use identifier
+        if (!user.hasErrors() && willGenerateUsername) {
+            user.username = UsernameUtils.evaluatePattern(user, newUsernamePattern)
             user.save(flush: true)
-
-            // generate user name after initial save, because it can use identifier
-            if (!user.hasErrors() && willGenerateUsername) {
-                user.username = UsernameUtils.evaluatePattern(user, newUsernamePattern)
-                user.save(flush: true)
-            }
-
-            if (user.hasErrors()) {
-                logger.error("Can't save User: ${username}:")
-                user.errors.allErrors.each { logger.error(it) }
-                return null
-            }
-
-            if (created) {
-                def authorities = defaultAuthorities ?: [Role.SPECTATOR_ROLE]
-                Role.findAllByAuthorityInList(authorities).each { user.addToAuthorities(it) }
-
-                new AccessLog(
-                        username: 'LDAP',
-                        event: 'User Created',
-                        eventmessage: "User '${user.username}' for ${user.userRealName} created",
-                        accesstime: new Date()).save()
-            }
-
-            if (!user.enabled) {
-                logger.error('User is disabled: ' + username)
-                return null
-            }
-
-            return user
         }
+
+        if (user.hasErrors()) {
+	    logger.error '''Can't save User: {}''', username
+	    user.errors.allErrors.each { logger.error '{}', it }
+            return null
+        }
+
+        if (created) {
+	    List<String> authorities = defaultAuthorities ?: [Roles.SPECTATOR.authority]
+            Role.findAllByAuthorityInList(authorities).each { user.addToAuthorities(it) }
+	    accessLogService.report 'LDAP', 'User Created', "User '$user.username' for $user.userRealName created"
+        }
+
+        if (!user.enabled) {
+	    logger.error 'User is disabled: {}', username
+            return null
+        }
+
+        return user
     }
 
-
-    public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities) {
+    @Transactional(readOnly=true)
+    UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities) {
         username = username.replaceAll(/[^0-9A-Za-z]*/, '').toLowerCase()
-        logger.debug('Mapping user details from context and database with username: ' + username)
+	logger.debug 'Mapping user details from context and database with username: {}', username
 
-        AuthUser.withTransaction { status ->
-            def user = findOrSaveUser(ctx, username)
-            if (!user) {
-                return null
-            }
-
-            Collection<? extends GrantedAuthority> collectedAuthorities = new HashSet<? extends GrantedAuthority>()
-            collectedAuthorities.addAll(authorities)
-            collectedAuthorities.addAll(collectAuthoritiesForRoleAttributes(ctx))
-            collectedAuthorities.addAll(collectDatabaseAuthorities(user))
-
-            return new AuthUserDetails(
-                    user.username,
-                    user.passwd,
-                    user.enabled,
-                    true,
-                    true,
-                    !bruteForceLoginLockService.isLocked(user.username),
-                    collectedAuthorities ?: AuthUserDetailsService.NO_ROLES,
-                    user.id,
-                    "LDAP '${user.userRealName}'")
+	AuthUser user = findOrSaveUser(ctx, username)
+        if (!user) {
+            return null
         }
+
+	Collection<? extends GrantedAuthority> collectedAuthorities = new HashSet<>()
+        collectedAuthorities.addAll(authorities)
+        collectedAuthorities.addAll(collectAuthoritiesForRoleAttributes(ctx))
+        collectedAuthorities.addAll(collectDatabaseAuthorities(user))
+
+	new AuthUserDetails(
+            user.username,
+            user.passwd,
+            user.enabled,
+            true,
+            true,
+            !bruteForceLoginLockService.isLocked(user.username),
+            collectedAuthorities ?: AuthUserDetailsService.NO_ROLES,
+            user.id,
+	    "LDAP '${user.userRealName}'",
+	    user.email)
     }
 
-    public void mapUserToContext(UserDetails user, DirContextAdapter ctx) {
+    void mapUserToContext(UserDetails user, DirContextAdapter ctx) {
         throw new UnsupportedOperationException('LdapAuthUserDetailsMapper only supports reading from a context. Please' +
-                'use a subclass if mapUserToContext() is required.')
+						'use a subclass if mapUserToContext() is required.')
     }
 
     protected String mapPassword(DirContextOperations ctx) {
         if (!inheritPassword) {
             return 'NO_PASSWORD'
         }
+
         String password = ''
-        Object passwordValue = ctx.getObjectAttribute('userPasswordRaw')
+	def passwordValue = ctx.getObjectAttribute('userPasswordRaw')
         if (passwordValue != null) {
             if (!(passwordValue instanceof String)) {
                 passwordValue = new String((byte[]) passwordValue)
             }
             password = (String) passwordValue
         }
-        return springSecurityService.encodePassword(password)
+
+	springSecurityService.encodePassword(password)
     }
 
-    protected GrantedAuthority createAuthority(Object role) {
+    protected GrantedAuthority createAuthority(role) {
         if (role instanceof String) {
             if (convertToUpperCase) {
-                role = ((String) role).toUpperCase()
+		role = role.toUpperCase()
             }
             return new SimpleGrantedAuthority(rolePrefix + role)
         }
-        return null
     }
 
-    public void setConvertToUpperCase(boolean convertToUpperCase) {
-        this.convertToUpperCase = convertToUpperCase
+    void setConvertToUpperCase(boolean convert) {
+	convertToUpperCase = convert
     }
 
-    public void setPasswordAttributeName(String passwordAttributeName) {
-        this.passwordAttributeName = passwordAttributeName
+    void setPasswordAttributeName(String name) {
+	passwordAttributeName = name
     }
 
-    public void setRoleAttributes(String[] roleAttributes) {
-        Assert.notNull(roleAttributes, 'roleAttributes array cannot be null')
-        this.roleAttributes = roleAttributes
+    void setRoleAttributes(String[] attributes) {
+	Assert.notNull(attributes, 'roleAttributes array cannot be null')
+	roleAttributes = attributes
     }
 
-    public void setRolePrefix(String rolePrefix) {
-        this.rolePrefix = rolePrefix
+    void setRolePrefix(String prefix) {
+	rolePrefix = prefix
     }
 }

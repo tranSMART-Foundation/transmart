@@ -1,11 +1,10 @@
 class ReqconsultController {
 
-    def defaultAction = 'newrequest'
-    def newrequest = {}
+    static defaultAction = 'newrequest'
 
-    def saverequest = {
+    def newrequest() {}
 
-        render(view: 'saverequest', model: ['reqtext': params.consulttext])
-
+    def saverequest() {
+	[reqtext: params.consulttext]
     }
 }

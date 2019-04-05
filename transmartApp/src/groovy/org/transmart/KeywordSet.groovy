@@ -1,46 +1,55 @@
 package org.transmart
 
+import groovy.transform.CompileStatic
+import org.transmart.searchapp.SearchKeyword
+
 /**
- * $Id: KeywordSet.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
-public class KeywordSet extends LinkedHashSet {
+@CompileStatic
+class KeywordSet extends LinkedHashSet<SearchKeyword> {
 
-    def getKeywordUniqueIds() {
-        def uidlist = []
-        for (keyword in this) {
-            uidlist.add(keyword.uniqueId)
-        }
-        return uidlist
+    KeywordSet plus(KeywordSet ks) {
+	if (ks) {
+	    addAll ks
+	}
+	this
     }
 
-    def getKeywordDataIds() {
-        def bioids = []
-        for (keyword in this) {
-            bioids.add(keyword.bioDataId)
+    List<String> getKeywordUniqueIds() {
+	List<String> uniqueIds = []
+	for (SearchKeyword keyword in this) {
+	    uniqueIds << keyword.uniqueId
         }
-        return bioids
+	uniqueIds
     }
 
-    def getKeywordDataIdString() {
+    List<Long> getKeywordDataIds() {
+	List<Long> bioDataIds = []
+	for (SearchKeyword keyword in this) {
+	    bioDataIds << keyword.bioDataId
+        }
+	bioDataIds
+    }
+
+    String getKeywordDataIdString() {
         StringBuilder s = new StringBuilder()
 
-        for (keyword in this) {
-            if (s.length() > 0) {
-                s.append(', ')
+	for (SearchKeyword keyword in this) {
+	    if (s) {
+		s << ', '
             }
-            s.append(keyword.bioDataId)
+	    s << keyword.bioDataId
         }
-        return s.toString()
+
+	s.toString()
     }
 
-    def removeKeyword(keyword) {
+    boolean removeKeyword(SearchKeyword keyword) {
         for (k in this) {
-            if (k.uniqueId.equals(keyword.uniqueId)) {
-                return this.remove(k)
+	    if (k.uniqueId == keyword.uniqueId) {
+		return remove(k)
             }
         }
     }
-
 }

@@ -16,94 +16,49 @@
  *
  *
  ******************************************************************/
-
-/**
- * $Id: LiteratureAssocMoleculeDetailsData.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
 package org.transmart.biomart
 
 class LiteratureAssocMoleculeDetailsData {
-    Long id
     Long bioLitAltDataId
+    String coExpNumber
+    String coExpPercent
+    String coExpSd
+    String coExpUnit
+    String coExpValue
+    String description
     String etlId
     String molecule
     String moleculeType
-    String totalExpPercent
-    String totalExpNumber
-    String totalExpValue
-    String totalExpSd
-    String totalExpUnit
-    String overExpPercent
+    String mutationChange
+    String mutationNumber
+    String mutationPercent
+    String mutationSites
+    String mutationType
     String overExpNumber
-    String overExpValue
+    String overExpPercent
     String overExpSd
     String overExpUnit
-    String coExpPercent
-    String coExpNumber
-    String coExpValue
-    String coExpSd
-    String coExpUnit
-    String mutationType
-    String mutationSites
-    String mutationChange
-    String mutationPercent
-    String mutationNumber
-    String targetExpPercent
+    String overExpValue
     String targetExpNumber
-    String targetExpValue
+    String targetExpPercent
     String targetExpSd
     String targetExpUnit
-    String targetOverExpPercent
+    String targetExpValue
     String targetOverExpNumber
-    String targetOverExpValue
+    String targetOverExpPercent
     String targetOverExpSd
     String targetOverExpUnit
+    String targetOverExpValue
     String techniques
-    String description
+    String totalExpNumber
+    String totalExpPercent
+    String totalExpSd
+    String totalExpUnit
+    String totalExpValue
+
     static mapping = {
-        table 'BIO_LIT_AMD_DATA'
+	table 'BIOMART.BIO_LIT_AMD_DATA'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_LIT_AMD_DATA_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_LIT_AMD_DATA_ID'
-            bioLitAltDataId column: 'BIO_LIT_ALT_DATA_ID'
-            etlId column: 'ETL_ID'
-            molecule column: 'MOLECULE'
-            moleculeType column: 'MOLECULE_TYPE'
-            totalExpPercent column: 'TOTAL_EXP_PERCENT'
-            totalExpNumber column: 'TOTAL_EXP_NUMBER'
-            totalExpValue column: 'TOTAL_EXP_VALUE'
-            totalExpSd column: 'TOTAL_EXP_SD'
-            totalExpUnit column: 'TOTAL_EXP_UNIT'
-            overExpPercent column: 'OVER_EXP_PERCENT'
-            overExpNumber column: 'OVER_EXP_NUMBER'
-            overExpValue column: 'OVER_EXP_VALUE'
-            overExpSd column: 'OVER_EXP_SD'
-            overExpUnit column: 'OVER_EXP_UNIT'
-            coExpPercent column: 'CO_EXP_PERCENT'
-            coExpNumber column: 'CO_EXP_NUMBER'
-            coExpValue column: 'CO_EXP_VALUE'
-            coExpSd column: 'CO_EXP_SD'
-            coExpUnit column: 'CO_EXP_UNIT'
-            mutationType column: 'MUTATION_TYPE'
-            mutationSites column: 'MUTATION_SITES'
-            mutationChange column: 'MUTATION_CHANGE'
-            mutationPercent column: 'MUTATION_PERCENT'
-            mutationNumber column: 'MUTATION_NUMBER'
-            targetExpPercent column: 'TARGET_EXP_PERCENT'
-            targetExpNumber column: 'TARGET_EXP_NUMBER'
-            targetExpValue column: 'TARGET_EXP_VALUE'
-            targetExpSd column: 'TARGET_EXP_SD'
-            targetExpUnit column: 'TARGET_EXP_UNIT'
-            targetOverExpPercent column: 'TARGET_OVER_EXP_PERCENT'
-            targetOverExpNumber column: 'TARGET_OVER_EXP_NUMBER'
-            targetOverExpValue column: 'TARGET_OVER_EXP_VALUE'
-            targetOverExpSd column: 'TARGET_OVER_EXP_SD'
-            targetOverExpUnit column: 'TARGET_OVER_EXP_UNIT'
-            techniques column: 'TECHNIQUES'
-            description column: 'DESCRIPTION'
-        }
     }
 }

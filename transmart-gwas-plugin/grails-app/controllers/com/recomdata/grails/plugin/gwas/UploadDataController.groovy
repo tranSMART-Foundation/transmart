@@ -1,10 +1,3 @@
-package com.recomdata.grails.plugin.gwas
-
-import com.recomdata.upload.DataUploadResult
-import fm.FmFile
-import grails.converters.JSON
-import groovy.util.logging.Slf4j
-
 /*************************************************************************
  * tranSMART - translational medicine data mart
  *
@@ -23,256 +16,176 @@ import groovy.util.logging.Slf4j
  *
  *
  ******************************************************************/
-import grails.util.Holders
-import org.transmart.biomart.*
-import org.transmart.searchapp.AccessLog
+package com.recomdata.grails.plugin.gwas
+
+import com.recomdata.upload.DataUploadResult
+import fm.FmFile
+import fm.FmFolder
+import fm.FmFolderService
+import grails.converters.JSON
+import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.web.multipart.MultipartFile
+import org.transmart.biomart.AnalysisMetadata
+import org.transmart.biomart.BioAssayPlatform
+import org.transmart.biomart.ConceptCode
+import org.transmart.biomart.Disease
+import org.transmart.biomart.Experiment
+import org.transmart.biomart.Observation
+import org.transmart.plugin.shared.UtilService
+import org.transmartproject.db.log.AccessLogService
 
 import java.text.SimpleDateFormat
 
 /**
- * Class for controlling the Upload Data page.
  * @author DNewton
- *
  */
 @Slf4j('logger')
 class UploadDataController {
 
-    //This server is used to access security objects.
-    def springSecurityService
-    def dataUploadService
-    def fmFolderService
-    def grailsApplication
+    private static final String DATE_FORMAT = 'yyyyMMddHHmmss'
 
-    static SimpleDateFormat sdf = new SimpleDateFormat('yyyyMMddHHmmss')
+    @Autowired private AccessLogService accessLogService
+    @Autowired private DataUploadService dataUploadService
+    @Autowired private FmFolderService fmFolderService
+    @Autowired private UtilService utilService
 
-    def index = {
-                //Create an event record for this access.
-                def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'UploadData-Index', eventmessage: 'Upload Data index page', accesstime: new Date())
-                al.save()
-                def uploadDataInstance = new AnalysisMetadata()
-                def uploadFileInstance
-                if (Holders.pluginManager.hasGrailsPlugin('folder-management')) {
-                    uploadFileInstance = new FmFile()
-                }
-                def model = [uploadDataInstance: uploadDataInstance, uploadFileInstance: uploadFileInstance]
+    @Value('${com.recomdata.FmFolderService.filestoreDirectory:}')
+    private String filestoreDirectory
 
-                addFieldData(model, null)
-                render(view: 'uploadData', model: model)
-            }
+    @Value('${com.recomdata.dataUpload.templates.dir:}')
+    private String templatesDir
 
-    def edit = {
-                def uploadDataInstance = null
-                if (params.id) {
-                    uploadDataInstance = AnalysisMetadata.get(params.id)
-                }
-                if (!uploadDataInstance) {
-                    uploadDataInstance = new AnalysisMetadata()
-                }
-                def model = [uploadDataInstance: uploadDataInstance]
+    @Value('${com.recomdata.dataUpload.uploads.dir:}')
+    private String uploadsDir
 
+    def index() {
+	accessLogService.report 'UploadData-Index', 'Upload Data index page'
 
-
-                uploadDataInstance.setSensitiveFlag('0')
-                addFieldData(model, uploadDataInstance)
-                render(view: 'uploadData', model: model)
-            }
-
-    def template = {
-        String templatesDir = grailsApplication.config.com.recomdata.dataUpload.templates.dir
-        def type = params.type
-
-        if (!type) {
-            render(status: 500, text: 'No template type given')
-            return
-        }
-
-        def filename = type + '-template.txt'
-        def templateFile = new File(templatesDir + '/' + filename)
-        String template
-        if(templateFile == null) {
-            logger.info('template file not found: ' + templatesDir + '/' + filename + '')
-            template = ''
-        }
-        else {
-            template = templateFile.getText()
-        }
-        response.setContentType('text/plain')
-        response.setHeader('Content-Disposition', 'attachment; filename=' + filename)
-        response.addHeader('Content-length', template.length().toString())
-        response.outputStream << template
-        response.outputStream.flush()
+	Map model = [uploadDataInstance: new AnalysisMetadata(), uploadFileInstance: new FmFile()]
+	addFieldData model, null
+	render view: 'uploadData', model: model
     }
-    def skipp = {
-        def paramMap = params
-        def upload = null
-        def result = new DataUploadResult(success: true)
-        if (params.id) {
-            upload = AnalysisMetadata.get(params.id)
+
+    def edit(AnalysisMetadata uploadData) {
+	if (!uploadData) {
+	    uploadData = new AnalysisMetadata()
+	}
+	uploadData.sensitiveFlag = '0'
+
+	Map model = [uploadDataInstance: uploadData]
+	addFieldData model, uploadData
+	render view: 'uploadData', model: model
+    }
+
+    def template(String type) {
+	if (type) {
+	    utilService.sendDownload response, 'text/plain', type + '-template.txt',
+		new File(templatesDir, filename).bytes
         }
         else {
+	    render status: 500, text: 'No template type given'
+        }
+    }
+
+    def skipp(AnalysisMetadata upload) {
+	DataUploadResult result = new DataUploadResult(success: true)
+
+	if (!upload) {
             upload = new AnalysisMetadata(params)
             result.success = false
             result.error = 'Could not find id for the analysis, something is wrong...'
-            render(view: 'complete', model: [result: result, uploadDataInstance: upload])
+	    render view: 'complete', model: [result: result, uploadDataInstance: upload]
+	    return
         }
-        bindData(upload, params)
+
+	bindData upload, params
         upload.status = 'PENDING'
         upload.save(flush: true)
+
         try {
             dataUploadService.runStaging(upload.id)
         }
-        catch (Exception e) {
-            logger.error(e.getMessage(), e)
+	catch (e) {
+	    logger.error e.message, e
         }
+
         if (upload.hasErrors()) {
             flash.message = 'The metadata could not be saved - please correct the highlighted errors.'
-            def errors = upload.errors
-            def model = [uploadDataInstance: upload]
-            addFieldData(model, upload)
-            render(view: 'uploadData', model: model)
+	    Map model = [uploadDataInstance: upload]
+	    addFieldData model, upload
+	    render view: 'uploadData', model: model
         }
         else {
-            render(view: 'complete', model: [result: result, uploadDataInstance: upload])
+	    render view: 'complete', model: [result: result, uploadDataInstance: upload]
         }
     }
 
-    def uploadFile = {
-        def paramMap = params
-        def f = request.getFile('uploadFile')
-        def description = params.fileDescription
-        def fileName = params.displayName
-        def accession = params.study
+    def uploadFile(String fileDescription, String displayName) {
+	MultipartFile f = request.getFile('uploadFile')
+	String accession = params.study
 
-        if (!fileName) {
-            fileName = f.getOriginalFilename()
+	if (!displayName) {
+	    displayName = f.originalFilename
         }
 
-        if (description == null) {
-            description = ''
-        }
-
-        //Get the fmFolder associated with this study
-        Experiment experiment = Experiment.findByAccession(accession)
-        def folder = fmFolderService.getFolderByBioDataObject(experiment)
-        def tempFile = new File(grailsApplication.config.com.recomdata.FmFolderService.filestoreDirectory, f.getOriginalFilename())
-        f.transferTo(tempFile)
-        fmFolderService.processFile(folder, tempFile, fileName, description)
+	FmFolder folder = fmFolderService.getFolderByBioDataObject(Experiment.findByAccession(accession))
+	File tempFile = new File(filestoreDirectory, f.originalFilename)
+	f.transferTo tempFile
+	fmFolderService.processFile folder, tempFile, displayName, fileDescription
         tempFile.delete()
-        render(view: 'fileComplete')
+	render view: 'fileComplete'
     }
 
-    def upload = {
-        def paramMap = params
-        def upload = null
-        if (params.id) {
-            upload = AnalysisMetadata.get(params.id)
-        }
-        else {
-            upload = new AnalysisMetadata(params)
+    def upload(AnalysisMetadata upload) {
+	if (!upload) {
+	    upload = new AnalysisMetadata()
         }
         bindData(upload, params)
 
-        //Save the uploaded file, if any
-        def result = new DataUploadResult()
-
         //Handle special cases where separated lists must be saved
 
-        if (params.tags) {
-            if (params.tags instanceof String) {
-                upload.phenotypeIds = params.tags
-            }
-            else {
-                upload.phenotypeIds = params.tags.join(';')
-            }
-        }
-        else {
-            upload.phenotypeIds = ''
-            flash.message = 'Phenotypes is a required field.'
-            result.error='Phenotypes is a required field.'
-            upload.status = 'ERROR'
-            upload.save(flush: true)
-            render(view: 'complete', model: [result: result, uploadDataInstance: upload])
-            return
-        }
+	setFromStringOrList upload, 'tags', 'phenotypeIds'
+	setFromStringOrList upload, 'genotypePlatform', 'genotypePlatformIds'
+	setFromStringOrList upload, 'expressionPlatform', 'expressionPlatformIds'
+	setFromStringOrList upload, 'researchUnit', 'researchUnit'
 
-        if (params.genotypePlatform) {
-            logger.info 'genotypePlatform ' + params.genotypePlatform + ''
-            if (params.genotypePlatform instanceof String) {
-                upload.genotypePlatformIds = params.genotypePlatform
-            }
-            else {
-                upload.genotypePlatformIds = params.genotypePlatform.join(';')
-            }
-        }
-        else {
-            upload.genotypePlatformIds = ''
-        }
-
-        if (params.expressionPlatform) {
-            logger.info 'expressionPlatform ' + params.expressionPlatform + ''
-            if (params.expressionPlatform instanceof String) {
-                upload.expressionPlatformIds = params.expressionPlatform
-            }
-            else {
-                upload.expressionPlatformIds = params.expressionPlatform.join(';')
-            }
-        }
-        else {
-            upload.expressionPlatformIds = ''
-        }
-
-        if (params.researchUnit) {
-            logger.info 'researchUnit ' + params.researchUnit + ''
-            if (params.researchUnit instanceof String) {
-                upload.researchUnit = params.researchUnit
-            }
-            else {
-                upload.researchUnit = params.researchUnit.join(';')
-            }
-        }
-        else {
-            upload.researchUnit = ''
-        }
-        def f = null
-        def filename = null
-        def uploadsDir = null
-        f = request.getFile('file')
+	MultipartFile f = request.getFile('file')
+	String filename = null
 
         if (f && !f.isEmpty()) {
-            uploadsDir = grailsApplication.config.com.recomdata.dataUpload.uploads.dir
-
             upload.etlDate = new Date()
-            filename = sdf.format(upload.etlDate) + f.getOriginalFilename()
+	    filename = new SimpleDateFormat(DATE_FORMAT).format(upload.etlDate) + f.originalFilename
             upload.filename = uploadsDir + '/' + filename
-            logger.info 'upload.filename ' + upload.filename + ''
         }
 
+	//Save the uploaded file, if any
+	DataUploadResult result = new DataUploadResult()
+
         if (f && !f.isEmpty()) {
-            def fullpath = uploadsDir + '/' + filename
+	    String fullpath = uploadsDir + '/' + filename
             try {
                 result = dataUploadService.writeFile(fullpath, f, upload)
                 if (!result.success) {
                     upload.status = 'ERROR'
                     upload.save(flush: true)
-                    render(view: 'complete', model: [result: result, uploadDataInstance: upload])
+		    render view: 'complete', model: [result: result, uploadDataInstance: upload]
                     return
                 }
-                logger.info 'wrote uploaded data to file ' + fullpath + ''
             }
-            catch (Exception e) {
+	    catch (e) {
                 upload.status = 'ERROR'
                 upload.save(flush: true)
-                if (e.getMessage() != null) {
-                    logger.info 'exception message ' + e.getMessage() + ''
-                    flash.message2 = e.getMessage() + ". If you wish to skip those SNPs, please click 'Continue'. If you wish to reload, click 'Cancel'."
-                    def model = [uploadDataInstance: upload]
-                    logger.info 'add field data so far ' + upload + ''
-                    addFieldData(model, upload)
-                    render(view: 'uploadData', model: model)
+		if (e.message) {
+		    flash.message2 = e.message + ". If you wish to skip those SNPs, please click 'Continue'. If you wish to reload, click 'Cancel'."
+		    Map model = [uploadDataInstance: upload]
+		    addFieldData model, upload
+		    render view: 'uploadData', model: model
                 }
                 else {
-                    result = new DataUploadResult(success: false, error: 'Could not verify file: unexpected exception occured.' + e.getMessage())
-                    render(view: 'complete', model: [result: result, uploadDataInstance: upload])
+		    result = new DataUploadResult(success: false, error: 'Could not verify file: unexpected exception occured.' + e.message)
+		    render view: 'complete', model: [result: result, uploadDataInstance: upload]
                 }
                 return
             }
@@ -282,57 +195,56 @@ class UploadDataController {
         }
         else {
             //This file was previously uploaded with an error - flag this!
-            if (upload.status.equals('ERROR')) {
+	    if (upload.status == 'ERROR') {
                 result.error = 'The existing file for this metadata failed to upload and needs to be replaced. Please upload a new file.'
             }
         }
 
         upload.save(flush: true)
-        result.success = upload.status.equals('PENDING')
+	result.success = upload.status == 'PENDING'
 
         //If the file is now pending, start the staging process
         if (result.success) {
             try {
                 dataUploadService.runStaging(upload.id)
             }
-            catch (Exception e) {
-                logger.error(e.getMessage(), e)
+	    catch (e) {
+		logger.error e.message, e
             }
         }
 
         if (upload.hasErrors()) {
             flash.message = 'The metadata could not be saved - please correct the highlighted errors.'
-            logger.info "upload errors '${upload.errors}'"
-            def errors = upload.errors
-            def model = [uploadDataInstance: upload]
-            addFieldData(model, upload)
-            render(view: 'uploadData', model: model)
+	    Map model = [uploadDataInstance: upload]
+	    addFieldData model, upload
+	    render view: 'uploadData', model: model
         }
         else {
-            render(view: 'complete', model: [result: result, uploadDataInstance: upload])
+	    render view: 'complete', model: [result: result, uploadDataInstance: upload]
         }
     }
 
-    private void addFieldData(model, upload) {
-        def tagMap = [:]
-        def genotypeMap = [:]
-        def expressionMap = [:]
-        def researchUnitMap = [:]
+    private void addFieldData(Map model, AnalysisMetadata upload) {
+	Map<String, Map> tagMap = [:]
+	Map<String, String> genotypeMap = [:]
+	Map<String, String> expressionMap = [:]
+	Map<String, String> researchUnitMap = [:]
+
         if (upload) {
             if (upload.phenotypeIds) {
                 for (tag in upload.phenotypeIds.split(';')) {
-                    def splitTag = tag.split(':')
-                    def meshCode = tag
+		    String[] splitTag = tag.split(':')
+		    String meshCode = tag
                     if (splitTag.length > 1) {
                         meshCode = splitTag[1]
                     }
-                    def disease = Disease.findByMeshCode(meshCode)
-                    def observation = Observation.findByCode(meshCode)
+		    Disease disease = Disease.findByMeshCode(meshCode)
                     if (disease) {
-                        tagMap.put(tag, [code: disease.meshCode, type: 'DISEASE'])
+			tagMap[tag] = [code: disease.meshCode, type: 'DISEASE']
                     }
+		    Observation observation = Observation.findByCode(meshCode)
                     if (observation) {
-                        tagMap.put(tag, [code: observation.name, type: 'OBSERVATION'])
+			tagMap[tag] = [code: observation.name, type: 'OBSERVATION']
                     }
                 }
             }
@@ -340,93 +252,109 @@ class UploadDataController {
             //Platform ID display and ID are both codes
             if (upload.genotypePlatformIds) {
                 for (tag in upload.genotypePlatformIds.split(';')) {
-                    def platform = BioAssayPlatform.findByAccession(tag)
-                    genotypeMap.put(tag, platform.vendor + ': ' + tag)
+		    genotypeMap[tag] = BioAssayPlatform.findByAccession(tag).vendor + ': ' + tag
                 }
             }
 
             if (upload.expressionPlatformIds) {
                 for (tag in upload.expressionPlatformIds.split(';')) {
-                    def platform = BioAssayPlatform.findByAccession(tag)
-                    expressionMap.put(tag, platform.vendor + ': ' + tag)
+		    expressionMap[tag] = BioAssayPlatform.findByAccession(tag).vendor + ': ' + tag
                 }
             }
 
             if (upload.researchUnit) {
                 for (tag in upload.researchUnit.split(';')) {
-                    //def platform = BioAssayPlatform.findByAccession(tag)
-                    researchUnitMap.put(tag, tag)
+		    researchUnitMap[tag] = tag
                 }
             }
 
-            model.put('tags', tagMap)
-            model.put('genotypePlatforms', genotypeMap)
-            model.put('expressionPlatforms', expressionMap)
-            model.put('researchUnit', researchUnitMap)
-            model.put('study', Experiment.findByAccession(upload.study))
+	    model.tags = tagMap
+	    model.genotypePlatforms = genotypeMap
+	    model.expressionPlatforms = expressionMap
+	    model.researchUnit = researchUnitMap
+	    model.study = Experiment.findByAccession(upload.study)
         }
 
         //Vendor names can be null - avoid adding these
-        def expVendorlist = []
-        def snpVendorlist = []
-        def expVendors = BioAssayPlatform.executeQuery("SELECT DISTINCT vendor FROM BioAssayPlatform as p WHERE p.platformType='Gene Expression' ORDER BY p.vendor")
-        def snpVendors = BioAssayPlatform.executeQuery("SELECT DISTINCT vendor FROM BioAssayPlatform as p WHERE p.platformType='SNP' ORDER BY p.vendor")
-
-        for (expVendor in expVendors) {
-            //println(expVendor)
+	List<String> expVendorlist = []
+	List<String> expVendors = BioAssayPlatform.executeQuery('''
+		SELECT DISTINCT vendor
+		FROM BioAssayPlatform as p
+		WHERE p.platformType='Gene Expression'
+		ORDER BY p.vendor''')
+	for (String expVendor in expVendors) {
             if (expVendor) {
-                expVendorlist.add(expVendor)
+		expVendorlist << expVendor
             }
         }
-        for (snpVendor in snpVendors) {
-            //println(snpVendor)
+	model.expVendors = expVendorlist
+
+	List<String> snpVendorlist = []
+	List<String> snpVendors = BioAssayPlatform.executeQuery('''
+		SELECT DISTINCT vendor
+		FROM BioAssayPlatform as p
+		WHERE p.platformType='SNP'
+		ORDER BY p.vendor''')
+	for (String snpVendor in snpVendors) {
             if (snpVendor) {
-                snpVendorlist.add(snpVendor)
+		snpVendorlist << snpVendor
             }
         }
-        model.put('expVendors', expVendorlist)
-        model.put('snpVendors', snpVendorlist)
+	model.snpVendors = snpVendorlist
 
-        def ResearchUnitlist = []
-        def ResearchUnits = ConceptCode.executeQuery("SELECT DISTINCT codeName FROM ConceptCode as p WHERE p.codeTypeName='RESEARCH_UNIT' ORDER BY p.codeName")
-
-        for (ResearchUnit in ResearchUnits) {
-            //println(ResearchUnit)
-            if (ResearchUnit) {
-                ResearchUnitlist.add(ResearchUnit)
+	List<String> researchUnits = []
+	List<String> codeNames = ConceptCode.executeQuery('''
+		SELECT DISTINCT codeName
+		FROM ConceptCode as p
+		WHERE p.codeTypeName='RESEARCH_UNIT'
+		ORDER BY p.codeName''')
+	for (String codeName in codeNames) {
+	    if (codeName) {
+		researchUnits << codeName
             }
         }
-        model.put('ResearchUnits', ResearchUnitlist)
+	model.ResearchUnits = researchUnits
     }
 
-
-    def list = {
-        def uploads = AnalysisMetadata.createCriteria().list {
+    def list() {
+	List<AnalysisMetadata> uploads = AnalysisMetadata.createCriteria().list {
             order('id', 'desc')
             maxResults(20)
         }
 
-        render(view: 'list', model: [uploads: uploads])
+	[uploads: uploads]
     }
 
-    def studyHasFolder = {
+    def studyHasFolder() {
         //Verify that a given study has a folder to upload to.
         //TODO This assumes folder-management
-        def returnData = [:]
-        def folder
+	Map returnData = [:]
         Experiment experiment = Experiment.findByAccession(params.accession)
         if (!experiment) {
             returnData.message = 'No experiment found with accession ' + params.accession
         }
-        if(experiment) {
-            folder = fmFolderService.getFolderByBioDataObject(experiment)
-            if (!folder) {
-                returnData.message = 'No folder association found for accession ' + experiment.accession + ', unique ID ' + experiment.uniqueId?.uniqueId
-            }
-            else {
-                returnData.put('found', true)
-            }
+
+	def folder = fmFolderService.getFolderByBioDataObject(experiment)
+        if (!folder) {
+            returnData.message = 'No folder association found for accession ' + experiment.accession + ', unique ID ' + experiment.uniqueId?.uniqueId
+        }
+        else {
+	    returnData.found = true
         }
         render returnData as JSON
+    }
+
+    private void setFromStringOrList(AnalysisMetadata amd, String paramName, String propertyName) {
+	if (params[paramName]) {
+	    if (params[paramName] instanceof String) {
+		amd[propertyName] = params[paramName]
+	    }
+	    else {
+		amd[propertyName] = params[paramName].join(';')
+	    }
+	}
+	else {
+	    amd[propertyName] = ''
+	}
     }
 }

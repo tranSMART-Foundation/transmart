@@ -16,157 +16,118 @@
  *
  *
  ******************************************************************/
-
-/**
- * $Id: Experiment.groovy 10303 2011-11-01 03:27:41Z jliu $
- * @author $Author: jliu $
- * @version $Revision: 10303 $
- */
-
 package org.transmart.biomart
 
 import com.recomdata.util.IExcelProfile
 
 class Experiment implements IExcelProfile {
-    Long id
-    String type
-    String title
+    String accession
+    String accessType
+    String bioMarkerType
+    Date completionDate
+    String country
     String description
     String design
-    String status
-    String overallDesign
-    String accession
-    Date startDate
-    Date completionDate
-    String primaryInvestigator
     String institution
-    String country
-    String bioMarkerType
+    String overallDesign
+    String primaryInvestigator
+    Date startDate
+    String status
     String target
-    String accessType
+    String title
+    String type
 
-    static hasMany = [compounds: Compound, diseases: Disease, files: ContentReference, uniqueIds: BioData, organisms: Taxonomy]
-    static belongsTo = [Compound, Disease, Taxonomy, ContentReference]
+    static transients = ['compoundNames', 'diseaseNames', 'expId', 'expValues',
+	                 'organismNames', 'uniqueId', 'values']
+
+    static hasMany = [compounds: Compound,
+	              diseases : Disease,
+	              files    : ContentReference,
+	              organisms: Taxonomy,
+	              uniqueIds: BioData]
+
+    static belongsTo = [Compound, ContentReference, Disease, Taxonomy]
 
     static mapping = {
+	table 'BIOMART.BIO_EXPERIMENT'
         tablePerHierarchy false
-        table 'BIO_EXPERIMENT'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_EXPERIMENT_ID'
         version false
-        id column: 'BIO_EXPERIMENT_ID', generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_EXPERIMENT_ID'
-            type column: 'BIO_EXPERIMENT_TYPE'
-            title column: 'TITLE'
-            description column: 'DESCRIPTION'
-            design column: 'DESIGN'
-            status column: 'STATUS'
-            startDate column: 'START_DATE'
-            completionDate column: 'COMPLETION_DATE'
-            overallDesign column: 'OVERALL_DESIGN'
-            accession column: 'ACCESSION'
-            institution column: 'INSTITUTION'
-            country column: 'COUNTRY'
-            accessType column: 'ACCESS_TYPE'
-            target column: 'TARGET'
-            bioMarkerType column: 'BIOMARKER_TYPE'
-            primaryInvestigator column: 'PRIMARY_INVESTIGATOR'
-            compounds joinTable: [name: 'BIO_DATA_COMPOUND', key: 'BIO_DATA_ID'], cache: true
-            diseases joinTable: [name: 'BIO_DATA_DISEASE', key: 'BIO_DATA_ID'], cache: true
-            organisms joinTable: [name: 'BIO_DATA_TAXONOMY', key: 'BIO_DATA_ID'], cache: true
-            files joinTable: [name: 'BIO_CONTENT_REFERENCE', key: 'BIO_DATA_ID', column: 'BIO_CONTENT_REFERENCE_ID'], cache: true
-            uniqueIds joinTable: [name: 'BIO_DATA_UID', key: 'BIO_DATA_ID']
-        }
+
+        bioMarkerType column: 'BIOMARKER_TYPE'
+	compounds joinTable: [name: 'BIOMART.BIO_DATA_COMPOUND', key: 'BIO_DATA_ID'], cache: true
+	diseases joinTable: [name: 'BIOMART.BIO_DATA_DISEASE', key: 'BIO_DATA_ID'], cache: true
+	files joinTable: [name: 'BIOMART.BIO_CONTENT_REFERENCE', key: 'BIO_DATA_ID', column: 'BIO_CONTENT_REFERENCE_ID'], cache: true
+	organisms joinTable: [name: 'BIOMART.BIO_DATA_TAXONOMY', key: 'BIO_DATA_ID'], cache: true
+	type column: 'BIO_EXPERIMENT_TYPE'
+	uniqueIds joinTable: [name: 'BIOMART.BIO_DATA_UID', key: 'BIO_DATA_ID']
     }
 
     static constraints = {
-        type(nullable: true, maxSize: 400)
-        title(nullable: true, maxSize: 2000)
-        description(nullable: true, maxSize: 4000)
-        design(nullable: true, maxSize: 4000)
-        overallDesign(nullable: true, maxSize: 4000)
-        startDate(nullable: true)
-        completionDate(nullable: true)
-        primaryInvestigator(nullable: true, maxSize: 800)
-        institution(nullable: true)
-        bioMarkerType(nullable: true)
-        country(nullable: true)
-        accessType(nullable: true)
-        target(nullable: true)
-        status(nullable: true)
+	accessType nullable: true
+	bioMarkerType nullable: true
+	completionDate nullable: true
+	country nullable: true
+	description nullable: true, maxSize: 4000
+	design nullable: true, maxSize: 4000
+	institution nullable: true
+	overallDesign nullable: true, maxSize: 4000
+	primaryInvestigator nullable: true, maxSize: 800
+	startDate nullable: true
+	status nullable: true
+	target nullable: true
+	title nullable: true, maxSize: 2000
+	type nullable: true, maxSize: 400
     }
 
-    def getCompoundNames() {
-        StringBuilder compoundNames = new StringBuilder()
-        compounds.each {
-            if (it.getName() != null) {
-                if (compoundNames.length() > 0) {
-                    compoundNames.append('; ')
-                }
-                compoundNames.append(it.getName())
-            }
-        }
-        return compoundNames.toString()
+    String getCompoundNames() {
+	getNames compounds, 'name'
     }
 
-    def getDiseaseNames() {
-        StringBuilder diseaseNames = new StringBuilder()
-        diseases.each {
-            if (it.disease != null) {
-                if (diseaseNames.length() > 0) {
-                    diseaseNames.append('; ')
-                }
-                diseaseNames.append(it.disease)
-            }
-        }
-        return diseaseNames.toString()
+    String getDiseaseNames() {
+	getNames diseases, 'disease'
     }
 
-    def getOrganismNames() {
-        StringBuilder taxNames = new StringBuilder()
-        organisms.each {
-            if (it.name != null) {
-                if (taxNames.length() > 0) {
-                    taxNames.append('; ')
-                }
-                taxNames.append(it.name)
-            }
-        }
-        return taxNames.toString()
+    String getOrganismNames() {
+	getNames organisms, 'name'
+    }
+
+    List getValues() {
+	[accession, type, title, description, design, status, overallDesign, startDate,
+	 completionDate, primaryInvestigator, compoundNames, diseaseNames]
+    }
+
+    List getExpValues() {
+	[accession, type, title, description, design, status, overallDesign, startDate,
+	 completionDate, primaryInvestigator, compoundNames, diseaseNames]
+    }
+
+    BioData getUniqueId() {
+	uniqueIds?.iterator()?.next()
     }
 
     /**
-     * Get values to Export to Excel
+     * hack to get around GORM inheritance bug
      */
-    public List getValues() {
-
-        return [accession, type, title, description, design, status, overallDesign, startDate, completionDate, primaryInvestigator, getCompoundNames(), getDiseaseNames()]
+    Long getExpId() {
+	id
     }
 
-    public List getExpValues() {
-
-        return [accession, type, title, description, design, status, overallDesign, startDate, completionDate, primaryInvestigator, getCompoundNames(), getDiseaseNames()]
+    String toString() {
+	'id: ' + expId + '; type: ' + type + '; title: ' + title + '; description: ' + description + '; accession: ' + accession
     }
 
+    private String getNames(Collection c, String propertyName) {
+	StringBuilder names = new StringBuilder()
+	for (item in c) {
+	    if (item[propertyName]) {
+		if (names) {
+		    names << '; '
+		}
+		names << item[propertyName]
+	    }
+	}
 
-    def getUniqueId() {
-        if (uniqueIds != null && !uniqueIds.isEmpty())
-            return uniqueIds.iterator().next()
-        return null
-    }
-
-    /**
-     * hack to get around gorm inheritance bug
-     */
-    def getExpId() {
-        return this.getId()
-    }
-
-    /**
-     * override display
-     */
-    public String toString() {
-        StringBuilder sb = new StringBuilder()
-        sb.append('id: ').append(getExpId()).append('; type: ').append(type).append('; title: ').append(title).append('; description: ').append(description).append('; accesion: ').append(accession)
-        return sb.toString()
+	names
     }
 }

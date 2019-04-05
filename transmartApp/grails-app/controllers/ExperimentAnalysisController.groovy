@@ -1,51 +1,51 @@
-/**
- * $Id: ExperimentAnalysisController.groovy 10098 2011-10-19 18:39:32Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 10098 $
- */
-
 import com.recomdata.export.ExportColumn
 import com.recomdata.export.ExportRowNew
 import com.recomdata.export.ExportTableNew
 import com.recomdata.util.DomainObjectExcelHelper
 import com.recomdata.util.ElapseTimer
-import fm.FmFolder
-import fm.FmFolderAssociation
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.transmart.AnalysisResult
+import org.transmart.ExpAnalysisResultSet
+import org.transmart.ExperimentAnalysisResult
+import org.transmart.SearchFilter
 import org.transmart.SearchResult
 import org.transmart.biomart.BioAssayAnalysis
+import org.transmart.biomart.BioAssayPlatform
+import org.transmart.biomart.Disease
 import org.transmart.biomart.Experiment
+import org.transmart.plugin.shared.UtilService
+import org.transmart.searchapp.SearchKeyword
 
+/**
+ * @author mmcduffie
+ */
 @Slf4j('logger')
 class ExperimentAnalysisController {
 
-    def experimentAnalysisQueryService
-    def filterQueryService
-    def analysisDataExportService
-    def searchService
-    def experimentAnalysisTEAService
-    def formLayoutService
-
     // session attribute
-    static def TEA_PAGING_DATA = 'analListPaging'
+    private static final String TEA_PAGING_DATA = 'analListPaging'
 
-    def showFilter = {
-        def filter = session.searchFilter
+    @Autowired private AnalysisDataExportService analysisDataExportService
+    @Autowired private ExperimentAnalysisQueryService experimentAnalysisQueryService
+    @Autowired private ExperimentAnalysisTEAService experimentAnalysisTEAService
+    @Autowired private FilterQueryService filterQueryService
+    @Autowired private FormLayoutService formLayoutService
+    @Autowired private SearchService searchService
+    @Autowired private UtilService utilService
 
-        def datasources = []
-        def stimer = new ElapseTimer()
-        //logger.info '>> Compound query:'
-        def compounds = filterQueryService.experimentCompoundFilter('Experiment')
+    @Value('${com.recomdata.search.paginate.max:0}')
+    private int paginateMax
 
-        //logger.info '>> Diseases query:'
-        def diseases = filterQueryService.findExperimentDiseaseFilter(session.searchFilter, 'Experiment')
-        //if(diseases==null) diseases=[]
-        //logger.info 'diseases: ' + diseases)
+    def showFilter() {
+	SearchFilter filter = sessionSearchFilter()
 
-        //logger.info '>> Exp designs query:'
-        def expDesigns = experimentAnalysisQueryService.findExperimentDesignFilter(filter)
-        if (expDesigns == null) expDesigns = []
-        //logger.info 'expDesigns: ' + expDesigns
+	ElapseTimer stimer = new ElapseTimer()
+
+	List<SearchKeyword> compounds = filterQueryService.experimentCompoundFilter('Experiment')
+	List<Disease> diseases = filterQueryService.findExperimentDiseaseFilter(filter, 'Experiment')
+	List<String> expDesigns = experimentAnalysisQueryService.findExperimentDesignFilter(filter)
 
         // no data?
         def celllines = [] //GeneExprAnalysis.executeQuery(queryCellLines.toString(),filter.gids)
@@ -53,269 +53,236 @@ class ExperimentAnalysisController {
         // no data?
         def expTypes = [] //experimentAnalysisQueryService.findExperimentTypeFilter()
 
-        def platformOrganisms = experimentAnalysisQueryService.findPlatformOrganizmFilter(filter)
+	List<String> platformOrganisms = experimentAnalysisQueryService.findPlatformOrganizmFilter(filter)
 
-        stimer.logElapsed('Loading Exp Analysis Filters', true)
+	stimer.logElapsed 'Loading Exp Analysis Filters', true
         // note: removed datasource, celllines and expTypes since no data being retrieved (removed from filter page too)
-        render(template: 'expFilter', model: [diseases: diseases, compounds: compounds, expDesigns: expDesigns, platformOrganisms: platformOrganisms])
+	render template: 'expFilter', model: [
+	    diseases: diseases,
+	    compounds: compounds,
+	    expDesigns: expDesigns,
+	    platformOrganisms: platformOrganisms]
     }
 
-    def filterResult = {
-        def sResult = new SearchResult()
-        session.searchFilter.datasource = 'experiment'
-        bindData(session.searchFilter.expAnalysisFilter, params)
+    def filterResult() {
+	SearchResult sResult = new SearchResult()
+	sessionSearchFilter().datasource = 'experiment'
+	bindData sessionSearchFilter().expAnalysisFilter, params
 
-        //  logger.info params
-        searchService.doResultCount(sResult, session.searchFilter)
-        render(view: '/search/list', model: [searchresult: sResult, page: false])
+	searchService.doResultCount sResult, sessionSearchFilter()
+	render view: '/search/list', model: [searchresult: sResult, page: false]
     }
 
     /**
      * summary result view
      */
-    def datasourceResult = {
-        //def diseases = experimentAnalysisQueryService.findExperimentDiseaseFilter(session.searchFilter, 'Experiment')
-        //logger.info diseases
-        def stimer = new ElapseTimer()
+    def datasourceResult() {
+	ElapseTimer stimer = new ElapseTimer()
 
-        //	logger.info params
-        def max = grailsApplication.config.com.recomdata.search.paginate.max
-        def paramMap = searchService.createPagingParamMap(params, max, 0)
+	Map<String, ?> paramMap = searchService.createPagingParamMap(params, paginateMax, 0)
 
-        def sResult = new SearchResult()
-        //	sResult.experimentCount = experimentAnalysisQueryService.countExperiment(session.searchFilter)
-        sResult.experimentCount = experimentAnalysisQueryService.countExperimentMV(session.searchFilter)
+	SearchResult sResult = new SearchResult(
+	    experimentCount: experimentAnalysisQueryService.countExperimentMV(sessionSearchFilter()))
 
-        def expAnalysisCount = experimentAnalysisQueryService.countAnalysisMV(session.searchFilter)
-        //def expAnalysisCount = 9
+	int expAnalysisCount = experimentAnalysisQueryService.countAnalysisMV(sessionSearchFilter())
 
         stimer.logElapsed('Loading Exp Analysis Counts', true)
 
-        sResult.result = experimentAnalysisQueryService.queryExperiment(session.searchFilter, paramMap)
+	sResult.result = experimentAnalysisQueryService.queryExperiment(sessionSearchFilter(), paramMap)
         sResult.result.analysisCount = expAnalysisCount
         sResult.result.expCount = sResult.experimentCount
-        //	sResult.experimentCount = experimentAnalysisTEAService.countAnalysis(session.searchFilter)
-        //	sResult.result = experimentAnalysisTEAService.queryExperiment(session.searchFilter, paramMap)
-        render(template: 'experimentResult', model: [searchresult: sResult, page: false])
+
+	render template: 'experimentResult', model: [searchresult: sResult, page: false]
     }
 
     /**
      * tea result view
      */
-    def datasourceResultTEA = {
-        //def diseases = experimentAnalysisQueryService.findExperimentDiseaseFilter(session.searchFilter, 'Experiment')
-        //logger.info diseases
-        def stimer = new ElapseTimer()
+    def datasourceResultTEA() {
+	ElapseTimer stimer = new ElapseTimer()
 
-        def max = grailsApplication.config.com.recomdata.search.paginate.max
-        def paramMap = searchService.createPagingParamMap(params, max, 0)
-
-        def sResult = new SearchResult()
-        //sResult.result=experimentAnalysisQueryService.queryExperiment(session.searchFilter, paramMap)
-        //sResult.experimentCount = experimentAnalysisTEAService.countAnalysis(session.searchFilter)
-
-        sResult.experimentCount = experimentAnalysisQueryService.countExperimentMV(session.searchFilter)
-        //sResult.experimentCount = experimentAnalysisQueryService.countExperiment(session.searchFilter)
-
-        sResult.result = experimentAnalysisTEAService.queryExpAnalysis(session.searchFilter, paramMap)
-        stimer.logElapsed('Loading Exp TEA Counts', true)
+	SearchResult sResult = new SearchResult(
+	    experimentCount: experimentAnalysisQueryService.countExperimentMV(sessionSearchFilter()),
+	    result: experimentAnalysisTEAService.queryExpAnalysis(sessionSearchFilter()))
+	stimer.logElapsed 'Loading Exp TEA Counts', true
         sResult.result.expCount = sResult.experimentCount
 
-        def ear = sResult.result.expAnalysisResults[0]
-        ear.pagedAnalysisList = pageTEAData(ear.analysisResultList, 0, max)
+	ExperimentAnalysisResult ear = sResult.result.expAnalysisResults[0]
+	ear.pagedAnalysisList = pageTEAData(ear.analysisResultList, 0, paginateMax)
 
         // store in session for paging requests
-        session.setAttribute(TEA_PAGING_DATA, sResult)
+	session.setAttribute TEA_PAGING_DATA, sResult
 
-        render(template: 'experimentResult', model: [searchresult: sResult, page: true])
+	render template: 'experimentResult', model: [searchresult: sResult, page: true]
     }
 
     /**
      * page TEA analysis view
      */
-    def pageTEAAnalysisView = {
-
-        def max = Integer.parseInt(params.max)
-        def offset = Integer.parseInt(params.offset)
+    def pageTEAAnalysisView() {
 
         // retrieve session data, page analyses
-        def sResult = session.getAttribute(TEA_PAGING_DATA)
-        def ear = sResult.result.expAnalysisResults[0]
-        ear.pagedAnalysisList = pageTEAData(ear.analysisResultList, offset, max)
+	SearchResult sResult = session.getAttribute(TEA_PAGING_DATA)
+	ExperimentAnalysisResult ear = sResult.result.expAnalysisResults[0]
+	ear.pagedAnalysisList = pageTEAData(ear.analysisResultList, params.int('offset'), params.int('max'))
 
-        render(template: 'experimentResult', model: [searchresult: sResult, page: true])
+	render template: 'experimentResult', model: [searchresult: sResult, page: true]
     }
 
-    def expDetail = {
+    def expDetail(String accession, Long id) {
         logger.info '** action: expDetail called!'
-        logger.info params
-        def expid = params.id
-        def expaccession = params.accession
 
-        def exp
-        if (expid) {
-            exp = Experiment.get(expid)
+	Experiment exp
+	if (id) {
+	    exp = Experiment.get(id)
         }
         else {
-            exp = Experiment.findByAccession(expaccession)
-        }
-        logger.info 'exp.id = ' + exp.id
-        def platforms = experimentAnalysisQueryService.getPlatformsForExperment(exp.id)
-        def organisms = new HashSet()
-        for (pf in platforms) {
-            organisms.add(pf.organism)
+	    exp = Experiment.findByAccession(accession)
         }
 
-        def formLayout = formLayoutService.getLayout('study')
+	List<BioAssayPlatform> platforms = experimentAnalysisQueryService.getPlatformsForExperment(exp)
+	Set<String> organisms = platforms*.organism
 
-        def parent = FmFolderAssociation.findByObjectUid(expid)
-
-        logger.info 'Parent = ' + parent
-
-//		def analysisFolders = FmFolder.executeQuery("from FmFolder as fd where fd.folderType = :folderType and fd.folderLevel = :level and fd.folderFullName like '" + parent.folderFullName + "%' escape '*' order by folderName", [folderType: FolderType.ANALYSIS.name(), level: parent.folderLevel + 1])
-
-//		logger.info 'Subfolders = ' + analysisFolders
+	List<FormLayout> formLayout = formLayoutService.getLayout('study')
 
         ExportTableNew table
 
         //Keep this if you want to cache the grid data
-        //ExportTableNew table=(ExportTableNew)request.getSession().getAttribute('gridtable')
+	//ExportTableNew table=(ExportTableNew) session.gridtable
 
         if (table == null) {
             table = new ExportTableNew()
         }
 
-        def table2 = new ExportTableNew()
-        table2.putColumn('name', new ExportColumn('name', 'Name', '', 'String'))
-        table2.putColumn('biosource', new ExportColumn('biosource', 'Biosource', '', 'String'))
-        table2.putColumn('Technology', new ExportColumn('Technology', 'Technology', '', 'String'))
-        table2.putColumn('Biomarkersstudied', new ExportColumn('Biomarkersstudied', 'Biomarkers studied', '', 'String'))
+	ExportTableNew table2 = new ExportTableNew()
+	table2.putColumn 'name', new ExportColumn('name', 'Name', '', 'String')
+	table2.putColumn 'biosource', new ExportColumn('biosource', 'Biosource', '', 'String')
+	table2.putColumn 'Technology', new ExportColumn('Technology', 'Technology', '', 'String')
+	table2.putColumn 'Biomarkersstudied', new ExportColumn('Biomarkersstudied', 'Biomarkers studied', '', 'String')
 
         ExportRowNew newrow4 = new ExportRowNew()
-        newrow4.put('name', 'My Analysis')
-        newrow4.put('biosource', 'Endometrial tumor')
-        newrow4.put('Technology', 'IHC')
-        newrow4.put('Biomarkersstudied', 'PTEN')
-        table2.putRow('somerow', newrow4)
+	newrow4.put 'name', 'My Analysis'
+	newrow4.put 'biosource', 'Endometrial tumor'
+	newrow4.put 'Technology', 'IHC'
+	newrow4.put 'Biomarkersstudied', 'PTEN'
+	table2.putRow 'somerow', newrow4
 
-
-        table.putColumn('name', new ExportColumn('name', 'Name', '', 'String'))
-        table.putColumn('biosource', new ExportColumn('biosource', 'Biosource', '', 'String'))
-        table.putColumn('Technology', new ExportColumn('Technology', 'Technology', '', 'String'))
-        table.putColumn('Biomarkersstudied', new ExportColumn('Biomarkersstudied', 'Biomarkers studied', '', 'String'))
+	table.putColumn 'name', new ExportColumn('name', 'Name', '', 'String')
+	table.putColumn 'biosource', new ExportColumn('biosource', 'Biosource', '', 'String')
+	table.putColumn 'Technology', new ExportColumn('Technology', 'Technology', '', 'String')
+	table.putColumn 'Biomarkersstudied', new ExportColumn('Biomarkersstudied', 'Biomarkers studied', '', 'String')
 
         ExportRowNew newrow = new ExportRowNew()
-        newrow.put('name', 'Assay 1')
-        newrow.put('biosource', 'Endometrial tumor')
-        newrow.put('Technology', 'IHC')
-        newrow.put('Biomarkersstudied', 'PTEN')
+	newrow.put 'name', 'Assay 1'
+	newrow.put 'biosource', 'Endometrial tumor'
+	newrow.put 'Technology', 'IHC'
+	newrow.put 'Biomarkersstudied', 'PTEN'
 
         ExportRowNew newrow2 = new ExportRowNew()
-        newrow2.put('name', 'Assay 2')
-        newrow2.put('biosource', 'Endometrial tumor')
-        newrow2.put('Technology', 'H&E')
-        newrow2.put('Biomarkersstudied', 'None')
+	newrow2.put 'name', 'Assay 2'
+	newrow2.put 'biosource', 'Endometrial tumor'
+	newrow2.put 'Technology', 'H&E'
+	newrow2.put 'Biomarkersstudied', 'None'
 
         ExportRowNew newrow3 = new ExportRowNew()
-        newrow3.put('name', 'Assay 3')
-        newrow3.put('biosource', 'Endometrial tumor')
-        newrow3.put('Technology', 'nucleotide sequencing')
-        newrow3.put('Biomarkersstudied', 'AKT1; BRAF; ESR1; HRAS; KRAS;')
+	newrow3.put 'name', 'Assay 3'
+	newrow3.put 'biosource', 'Endometrial tumor'
+	newrow3.put 'Technology', 'nucleotide sequencing'
+	newrow3.put 'Biomarkersstudied', 'AKT1; BRAF; ESR1; HRAS; KRAS;'
 
-        table.putRow('somerow', newrow)
-        table.putRow('somerow2', newrow2)
-        table.putRow('somerow3', newrow3)
+	table.putRow 'somerow', newrow
+	table.putRow 'somerow2', newrow2
+	table.putRow 'somerow3', newrow3
 
-        def jSONToReturn1 = table.toJSON_DataTables('').toString(5)
-        def jSONToReturn2 = table2.toJSON_DataTables('').toString(5)
+	session.gridtable = table
 
-        request.getSession().setAttribute('gridtable', table)
-
-        logger.info 'formLayout = ' + formLayout
-        render(template: '/experiment/expDetail', model: [layout: formLayout, experimentInstance: exp, expPlatforms: platforms, expOrganisms: organisms, search: 1, jSONForGrid: jSONToReturn2, jSONForGrid1: jSONToReturn1])
+	logger.info 'formLayout = {}', formLayout
+	render template: '/experiment/expDetail', model: [
+	    layout: formLayout,
+	    experimentInstance: exp,
+	    expPlatforms: platforms,
+	    expOrganisms: organisms,
+	    search: 1,
+	    jSONForGrid: table2.toJSON_DataTables('').toString(5),
+	    jSONForGrid1: table.toJSON_DataTables('').toString(5)]
     }
 
-    def getAnalysis = {
-        def expid = params.id
-        def tResult = experimentAnalysisQueryService.queryAnalysis(expid, session.searchFilter)
-        render(template: '/trial/trialAnalysis', model: [trialresult: tResult])
+    def getAnalysis(Long id) {
+	render template: '/trial/trialAnalysis', model: [
+	    trialresult: experimentAnalysisQueryService.queryAnalysis(id, sessionSearchFilter())]
     }
 
     // download search result into excel
-    def downloadanalysisexcel = {
-
-        response.setHeader('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
-        response.setHeader('Content-Disposition', 'attachment; filename=\'pre_clinical.xls\'')
-        response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
-        response.setHeader('Pragma', 'public')
-        response.setHeader('Expires', '0')
-        def analysis = BioAssayAnalysis.get(Long.parseLong(params.id.toString()))
-        response.outputStream << analysisDataExportService.renderAnalysisInExcel(analysis)
+    def downloadanalysisexcel(BioAssayAnalysis analysis) {
+	utilService.sendDownload response, 'application/vnd.ms-excel; charset=utf-8',
+	    'pre_clinical.xls', analysisDataExportService.renderAnalysisInExcel(analysis)
     }
 
     //	 download search result to GPE file for Pathway Studio
-    def downloadanalysisgpe = {
-        response.setHeader('Content-Disposition', 'attachment; filename=\'expression.gpe\'')
-        response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
-        response.setHeader('Pragma', 'public')
-        response.setHeader('Expires', '0')
-        def analysis = BioAssayAnalysis.get(Long.parseLong(params.id.toString()))
-        response.outputStream << analysisDataExportService.renderAnalysisInExcel(analysis)
+    def downloadanalysisgpe(BioAssayAnalysis analysis) {
+	utilService.sendDownload response, 'application/vnd.ms-excel; charset=utf-8',
+	    'expression.gpe', analysisDataExportService.renderAnalysisInExcel(analysis)
     }
 
     /**
      * page the tea analysis data
      */
-    private List pageTEAData(List analysisList, int offset, int pageSize) {
+    private List<AnalysisResult> pageTEAData(List<AnalysisResult> analysisList, int offset, int pageSize) {
 
-        List pagedData = new ArrayList()
+	List<AnalysisResult> pagedData = []
         int numRecs = analysisList.size()
-        int lastIndex = (offset + pageSize <= numRecs) ? (offset + pageSize - 1) : numRecs
+	int lastIndex = offset + pageSize <= numRecs ? offset + pageSize - 1 : numRecs
 
-        // iteratre through list starting from start index
-        ListIterator it = analysisList.listIterator(offset)
-
+	ListIterator<AnalysisResult> it = analysisList.listIterator(offset)
         while (it.hasNext()) {
-            //attach to hibernate session
-            def ar = it.next()
-            if (!ar.analysis.isAttached()) ar.analysis.attach()
+	    AnalysisResult ar = it.next()
+	    if (!ar.analysis.isAttached()) {
+		ar.analysis.attach()
+	    }
 
-            pagedData.add(ar)
+	    pagedData << ar
             int nextIdx = it.nextIndex()
-            if (nextIdx > lastIndex) break
-        }
-        logger.info('Paged data: start Idx: ' + offset + '; last idx: ' + lastIndex + ' ; size: ' + pagedData.size())
-        return pagedData
+	    if (nextIdx > lastIndex) {
+		break
+            }
+	}
+	logger.info 'Paged data: start Idx: {}; last idx: {}; size: {}', offset, lastIndex, pagedData.size()
+	pagedData
     }
 
-    def downloadAnalysis = {
-        logger.info('Downloading the Experimental Analysis (Study) view')
-        def sResult = new SearchResult()
-        def analysisRS = null
-        def eaMap = [:]
+    def downloadAnalysis() {
+	logger.info 'Downloading the Experimental Analysis (Study) view'
+	Map<Experiment, List<AnalysisResult>> eaMap = [:]
 
-        sResult.result = experimentAnalysisQueryService.queryExperiment(session.searchFilter, null)
-        sResult.result.expAnalysisResults.each() {
-            analysisRS = experimentAnalysisQueryService.queryAnalysis(it.experiment.id, session.searchFilter)
-            eaMap.put(it.experiment, analysisRS.analysisResultList)
+	ExpAnalysisResultSet result = experimentAnalysisQueryService.queryExperiment(sessionSearchFilter(), null)
+	for (ExperimentAnalysisResult ear in result.expAnalysisResults) {
+	    ExperimentAnalysisResult analysisRS = experimentAnalysisQueryService.queryAnalysis(ear.experiment.id, sessionSearchFilter())
+	    eaMap[ear.experiment] = analysisRS.analysisResultList
         }
-        DomainObjectExcelHelper.downloadToExcel(response, 'analysisstudyviewexport.xls', analysisDataExportService.createExcelEAStudyView(sResult, eaMap))
+	DomainObjectExcelHelper.downloadToExcel response, 'analysisstudyviewexport.xls',
+	    analysisDataExportService.createExcelEAStudyView(new SearchResult(result: result), eaMap)
     }
 
-    def downloadAnalysisTEA = {
-        logger.info('Downloading the Experimental Analysis TEA view')
-        def sResult = new SearchResult()
-
-        sResult.result = experimentAnalysisTEAService.queryExpAnalysis(session.searchFilter, null)
-        DomainObjectExcelHelper.downloadToExcel(response, 'analysisteaviewexport.xls', analysisDataExportService.createExcelEATEAView(sResult))
+    def downloadAnalysisTEA() {
+	logger.info 'Downloading the Experimental Analysis TEA view'
+	DomainObjectExcelHelper.downloadToExcel response, 'analysisteaviewexport.xls',
+	    analysisDataExportService.createExcelEATEAView(
+	    new SearchResult(result: experimentAnalysisTEAService.queryExpAnalysis(sessionSearchFilter())))
     }
 
     /**
-     * This will render a UI where the user can pick an experiment from a list of all the experiments in the system. Selection of multiple studies is allowed.
+     * Renders a UI where the user can pick an experiment from the experiments in the system.
+     * Selection of multiple studies is allowed.
      */
-    def browseAnalysisMultiSelect = {
-        def analyses = org.transmart.biomart.BioAssayAnalysis.executeQuery('select id, name, etlId from BioAssayAnalysis b order by b.name')
-        render(template: 'browseMulti', model: [analyses: analyses])
+    def browseAnalysisMultiSelect() {
+	List<Object[]> analyses = BioAssayAnalysis.executeQuery('''
+				select id, name, etlId
+				from BioAssayAnalysis b
+				order by b.name''')
+	render template: 'browseMulti', model: [analyses: analyses]
     }
 
+    private SearchFilter sessionSearchFilter() {
+	session.searchFilter
+    }
 }

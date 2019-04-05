@@ -36,185 +36,167 @@ package com.recomdata.util;
 import java.io.Serializable;
 
 /**
- * This class encapsulates the normal distribution with specified parameters.
+ * Encapsulates the normal distribution with specified parameters.
  * @author Kyle Siegrist
  * @author Dawn Duehring
- * @version August, 2003
  */
 public class NormalDistribution extends Distribution implements Serializable {
 
-	private static final long serialVersionUID = 5310804038054903917L;
-	//Paramters
-	public final static double SQRT2PI = Math.sqrt(2 * Math.PI);
-	private double location, scale, c;
+    private static final long serialVersionUID = 5310804038054903917L;
 
-	/**
-	 * This general constructor creates a new normal distribution with specified
-	 * parameter values.
-	 * @param m the location parameter
-	 * @param s the scale parameter
-	 */
-	public NormalDistribution(double m, double s){
-		setParameters(m, s);
-	}
+    public final static double SQRT2PI = Math.sqrt(2 * Math.PI);
 
-	/**
-	 * This default constructor creates a new standard normal distribution (with
-	 * location parameter 0 and scale parameter 1).
-	 */
-	public NormalDistribution(){
-		this(0, 1);
-	}
+    private double location;
+    private double scale;
+    private double c;
 
-	/**
-	 * This method sets the parameters and defines the default domain.
-	 * @param m the location parameter
-	 * @param s the scale parameter
-	 */
-	public void setParameters(double m, double s){
-		double lower, upper, width;
-		//Correct for invalid scale
-		if (s < 0) s = 1;
-		location = m; scale = s;
-		c = SQRT2PI * scale;
-		upper = location + 4 * scale;
-		lower = location - 4 * scale;
-		width = (upper - lower) / 100;
-		setDomain(lower, upper, width, CONTINUOUS);
-	}
+    /**
+     * @param m the location parameter
+     * @param s the scale parameter
+     */
+    public NormalDistribution(double m, double s){
+        setParameters(m, s);
+    }
 
-	/**
-        This method defines the probability density function.
-	 * @param x a number in the domain of the distribution
-	 * @return the probability density at x
-	 */
-	public double getDensity(double x){
-		double z = (x - location) / scale;
-		return Math.exp(- z * z / 2) / c;
-	}
+    /**
+     * Creates a new standard normal distribution (with location 0 and scale 1).
+     */
+    public NormalDistribution(){
+        this(0, 1);
+    }
 
-	/**
-	 * This method returns the maximum value of the density function.
-	 * @return the maximum value of the probability density function
-	 */
-	public double getMaxDensity(){
-		return getDensity(location);
-	}
+    /**
+     * @param m the location parameter
+     * @param s the scale parameter
+     */
+    public void setParameters(double m, double s){
+        //Correct for invalid scale
+        if (s < 0) s = 1;
+        location = m;
+        scale = s;
+        c = SQRT2PI * scale;
+        double upper = location + 4 * scale;
+        double lower = location - 4 * scale;
+        double width = (upper - lower) / 100;
+        setDomain(lower, upper, width, CONTINUOUS);
+    }
 
-	/**
-	 * This method returns the median, which is the same as the location parameter.
-	 * @return the median
-	 */
-	public double getMedian(){
-		return location;
-	}
+    /**
+     * Defines the probability density function.
+     * @param x a number in the domain of the distribution
+     * @return the probability density at x
+     */
+    public double getDensity(double x){
+        double z = (x - location) / scale;
+        return Math.exp(- z * z / 2) / c;
+    }
 
-	/**
-	 * This method returns the mean, which is the same as the location parameter.
-	 * @return the mean
-	 */
-	public double getMean(){
-		return location;
-	}
+    /**
+     * @return the maximum value of the probability density function
+     */
+    public double getMaxDensity(){
+        return getDensity(location);
+    }
 
-	/**
-	 * This method returns the variance of the distribution.
-	 * @return the variance
-	 */
-	public double getVariance(){
-		return scale * scale;
-	}
+    /**
+     * The median, which is the same as the location parameter.
+     * @return the median
+     */
+    public double getMedian(){
+        return location;
+    }
 
-	/**
-	 * This method computes the central moment of a specifed order.
-	 * @param n the order
-	 * @return the central moment of order n
-	 */
-	public double getCentralMoment(int n){
-		if (n == 2 * (n / 2)) return Functions.factorial(n) * Math.pow(scale, n) / (Functions.factorial(n / 2) * Math.pow(2, n / 2));
-		else return 0;
-	}
+    /**
+     * This method returns the mean, which is the same as the location parameter.
+     * @return the mean
+     */
+    public double getMean(){
+        return location;
+    }
 
-	/**
-	 * This method computes the moment of a specified order about a specified point.
-	 * @param a the center
-	 * @param n the order
-	 * @return the moment of order n about a
-	 */
-	public double getMoment(double a, int n){
-		double sum = 0;
-		for (int k = 0; k <= n; k++) sum = sum + Functions.comb(n, k) * getCentralMoment(k) * Math.pow(location - a, n - k);
-		return sum;
-	}
+    /**
+     * @return the variance of the distribution
+     */
+    public double getVariance(){
+        return scale * scale;
+    }
 
-	/**
-	 * This method returns the moment generating function.
-	 * @param t a real number
-	 * @return the moment generating function at t
-	 */
-	public double getMGF(double t){
-		return Math.exp(location * t + scale * scale * t * t / 2);
-	}
+    /**
+     * Computes the central moment of a specifed order.
+     * @param n the order
+     * @return the central moment of order n
+     */
+    public double getCentralMoment(int n){
+        if (n == 2 * (n / 2)) {
+            return Functions.factorial(n) * Math.pow(scale, n) / (Functions.factorial(n / 2) * Math.pow(2, n / 2));
+        }
+        return 0;
+    }
 
-	/**
-	 * This method simulates a value from the distribution.
-	 * @return a simulated value from the distribution
-	 */
-	public double simulate(){
-		double r = Math.sqrt(-2 * Math.log(Math.random()));
-		double theta = 2 * Math.PI * Math.random();
-		return location + scale * r * Math.cos(theta);
-	}
+    /**
+     * Computes the moment of a specified order about a specified point.
+     * @param a the center
+     * @param n the order
+     * @return the moment of order n about a
+     */
+    public double getMoment(double a, int n){
+        double sum = 0;
+        for (int k = 0; k <= n; k++) {
+            sum = sum + Functions.comb(n, k) * getCentralMoment(k) * Math.pow(location - a, n - k);
+        }
+        return sum;
+    }
 
-	/**
-	 * This method returns the location parameter.
-	 * @return the location parameter
-	 */
-	public double getLocation(){
-		return location;
-	}
+    /**
+     * @param t a real number
+     * @return the moment generating function at t
+     */
+    public double getMGF(double t){
+        return Math.exp(location * t + scale * scale * t * t / 2);
+    }
 
-	/**
-	 * This method sets the location parameter.
-	 * @param m the location parameter
-	 */
-	public void setLocation(double m){
-		setParameters(m, scale);
-	}
+    /**
+     * @return a simulated value from the distribution
+     */
+    public double simulate(){
+        double r = Math.sqrt(-2 * Math.log(Math.random()));
+        double theta = 2 * Math.PI * Math.random();
+        return location + scale * r * Math.cos(theta);
+    }
 
-	/**
-	 * This method gets the scale parameter.
-	 * @return the scale parameter
-	 */
-	public double getScale(){
-		return scale;
-	}
+    public double getLocation(){
+        return location;
+    }
 
-	/**
-	 * This method sets the scale parameter.
-	 * @param s the scale parameter
-	 */
-	public void setScale(double s){
-		setParameters(location, s);
-	}
+    public void setLocation(double m){
+        setParameters(m, scale);
+    }
 
-	/**
-	 * This method computes the cumulative distribution function.
-	 * @param x a number in the domain of the distribution
-	 * @return the cumulative probability at x
-	 */
-	public double getCDF(double x){
-		double z = (x - location) / scale;
-		if (z >= 0) return 0.5 + 0.5 * Functions.gammaCDF(z * z / 2, 0.5);
-		else return 0.5 - 0.5 * Functions.gammaCDF(z * z / 2, 0.5);
-	}
+    public double getScale(){
+        return scale;
+    }
 
-	/**
-	 * This method returns a string that gives the name of the distribution and the values of
-	 * the parameters.
-	 * @return a string giving the name of the distribution and the values of the parameters
-	 */
-	public String toString(){
-		return "Normal distribution [location = " + location + ", scale = " + scale + "]";
-	}
+    public void setScale(double s){
+        setParameters(location, s);
+    }
+
+    /**
+     * Computes the cumulative distribution function..
+     * @param x a number in the domain of the distribution
+     * @return the cumulative probability at x
+     */
+    public double getCDF(double x){
+        double z = (x - location) / scale;
+        if (z >= 0) {
+            return 0.5 + 0.5 * Functions.gammaCDF(z * z / 2, 0.5);
+        }
+        return 0.5 - 0.5 * Functions.gammaCDF(z * z / 2, 0.5);
+    }
+
+    /**
+     * The name of the distribution and the values of the parameters.
+     */
+    public String toString(){
+        return "Normal distribution [location = " + location + ", scale = " + scale + "]";
+    }
 }

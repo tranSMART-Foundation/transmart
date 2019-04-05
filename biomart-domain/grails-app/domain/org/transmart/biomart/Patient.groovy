@@ -16,59 +16,44 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class Patient {
-    Long id
-    String firstName
-    String lastName
-    String middleName
+    String addressZipCode
+    Long bioClinicalTrialPGroupId
+    Long bioExperimentId
     Date birthDate
     String birthDateOrig
-    String genderCode
-    String raceCode
-    String ethnicGroupCode
-    String addressZipCode
     String countryCode
+    String ethnicGroupCode
+    String firstName
+    String genderCode
     String informedConsentCode
-    Long bioExperimentId
-    Long bioClinicalTrialPGroupId
+    String lastName
+    String middleName
+    String raceCode
+
     static mapping = {
-        table 'BIO_PATIENT'
+	table 'BIOMART.BIO_PATIENT'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_PATIENT_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_PATIENT_ID'
-            firstName column: 'FIRST_NAME'
-            lastName column: 'LAST_NAME'
-            middleName column: 'MIDDLE_NAME'
-            birthDate column: 'BIRTH_DATE'
-            birthDateOrig column: 'BIRTH_DATE_ORIG'
-            genderCode column: 'GENDER_CODE'
-            raceCode column: 'RACE_CODE'
-            ethnicGroupCode column: 'ETHNIC_GROUP_CODE'
-            addressZipCode column: 'ADDRESS_ZIP_CODE'
-            countryCode column: 'COUNTRY_CODE'
-            informedConsentCode column: 'INFORMED_CONSENT_CODE'
-            bioExperimentId column: 'BIO_EXPERIMENT_ID'
-            bioClinicalTrialPGroupId column: 'BIO_CLINICAL_TRIAL_P_GROUP_ID'
-        }
+
+        bioClinicalTrialPGroupId column: 'BIO_CLINICAL_TRIAL_P_GROUP_ID'
     }
+
     static constraints = {
-        firstName(nullable: true, maxSize: 400)
-        lastName(nullable: true, maxSize: 400)
-        middleName(nullable: true, maxSize: 400)
-        birthDate(nullable: true)
-        birthDateOrig(nullable: true, maxSize: 400)
-        genderCode(nullable: true, maxSize: 400)
-        raceCode(nullable: true, maxSize: 400)
-        ethnicGroupCode(nullable: true, maxSize: 400)
-        addressZipCode(nullable: true, maxSize: 400)
-        countryCode(nullable: true, maxSize: 400)
-        informedConsentCode(nullable: true, maxSize: 400)
-        bioExperimentId(nullable: true)
-        bioClinicalTrialPGroupId(nullable: true)
+	addressZipCode nullable: true, maxSize: 400
+	bioClinicalTrialPGroupId nullable: true
+	bioExperimentId nullable: true
+	birthDate nullable: true
+	birthDateOrig nullable: true, maxSize: 400
+	countryCode nullable: true, maxSize: 400
+	ethnicGroupCode nullable: true, maxSize: 400
+	firstName nullable: true, maxSize: 400
+	genderCode nullable: true, maxSize: 400
+	informedConsentCode nullable: true, maxSize: 400
+	lastName nullable: true, maxSize: 400
+	middleName nullable: true, maxSize: 400
+	raceCode nullable: true, maxSize: 400
     }
 }

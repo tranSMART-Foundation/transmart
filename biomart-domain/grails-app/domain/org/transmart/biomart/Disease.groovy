@@ -16,35 +16,29 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class Disease {
-    Long id
-    String disease
     String ccsCategory
+    String disease
     String icd10Code
-    String meshCode
     String icd9Code
+    String meshCode
     String preferredName
-    static hasMany = [experiments: Experiment, literatures: Literature]
+
+    static hasMany = [experiments: Experiment,
+	              literatures: Literature]
+
     static mapping = {
-        table 'BIO_DISEASE'
+	table 'BIOMART.BIO_DISEASE'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_DISEASE_ID'
         version false
         cache usage: 'read-only'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_DISEASE_ID'
-            disease column: 'DISEASE'
-            ccsCategory column: 'CCS_CATEGORY'
-            icd10Code column: 'ICD10_CODE'
-            meshCode column: 'MESH_CODE'
-            icd9Code column: 'ICD9_CODE'
-            preferredName column: 'PREFERED_NAME'
-            experiments joinTable: [name: 'BIO_DATA_DISEASE', key: 'BIO_DISEASE_ID']
-            literatures joinTable: [name: 'BIO_DATA_DISEASE', key: 'BIO_DISEASE_ID']
-        }
+	
+	experiments joinTable: [name: 'BIOMART.BIO_DATA_DISEASE', key: 'BIO_DISEASE_ID']
+        icd10Code column: 'ICD10_CODE'
+        icd9Code column: 'ICD9_CODE'
+	literatures joinTable: [name: 'BIOMART.BIO_DATA_DISEASE', key: 'BIO_DISEASE_ID']
+        preferredName column: 'PREFERED_NAME'
     }
-
 }

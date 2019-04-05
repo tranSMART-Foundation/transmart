@@ -16,42 +16,25 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class CellLine {
-    String disease
-    String primarySite
-    String metastaticSite
-    String species
     String attcNumber
-    String cellLineName
-    Long id
     Long bioDiseaseId
-    String origin
+    String cellLineName
     String description
+    String disease
     String diseaseStage
     String diseaseSubtype
+    String metastaticSite
+    String origin
+    String primarySite
+    String species
+
     static mapping = {
-        table 'BIO_CELL_LINE'
+	table 'BIOMART.BIO_CELL_LINE'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_CELL_LINE_ID'
         version false
         cache true
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            disease column: 'DISEASE'
-            primarySite column: 'PRIMARY_SITE'
-            metastaticSite column: 'METASTATIC_SITE'
-            species column: 'SPECIES'
-            attcNumber column: 'ATTC_NUMBER'
-            cellLineName column: 'CELL_LINE_NAME'
-            id column: 'BIO_CELL_LINE_ID'
-            bioDiseaseId column: 'BIO_DISEASE_ID'
-            origin column: 'ORIGIN'
-            description column: 'DESCRIPTION'
-            diseaseStage column: 'DISEASE_STAGE'
-            diseaseSubtype column: 'DISEASE_SUBTYPE'
-        }
     }
-
 }

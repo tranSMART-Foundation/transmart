@@ -1,57 +1,67 @@
 package fm
-import java.net.UnknownHostException
-import java.io.FileOutputStream
-import java.io.OutputStream
-import java.io.InputStream
-import org.springframework.web.multipart.commons.CommonsMultipartFile
 
-import com.mongodb.DB
-import com.mongodb.Mongo
 import com.mongodb.MongoClient
 import com.mongodb.gridfs.GridFS
 import com.mongodb.gridfs.GridFSInputFile
-
-import fm.FmData
-import fm.FmFile
-import fm.FmFolder
-import grails.util.Holders
+import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import org.transmart.mongo.MongoUtils
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
-
-import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.HttpMultipartMode
+import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.InputStreamBody
-
-import groovyx.net.http.*
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.web.multipart.commons.CommonsMultipartFile
+import org.transmart.mongo.MongoUtils
+import org.transmart.plugin.shared.UtilService
 
 @Slf4j('logger')
 class UploadFilesService {
 
-    boolean transactional = true
-    def config = Holders.config
-    def filestoreDirectory = config.com.recomdata.FmFolderService.filestoreDirectory
-    def fmFolderService
+    FmFolderService fmFolderService
+    UtilService utilService
 
+    @Value('${transmartproject.mongoFiles.enableMongo:false}')
+    private boolean enableMongo
+
+    @Value('${com.recomdata.FmFolderService.filestoreDirectory:}')
+    private String filestoreDirectory
+
+    @Value('${transmartproject.mongoFiles.apiKey:}')
+    private String mongoApiKey
+
+    @Value('${transmartproject.mongoFiles.apiURL:}')
+    private String mongoApiUrl
+
+    @Value('${transmartproject.mongoFiles.dbName:}')
+    private String mongoDbName
+
+    @Value('${transmartproject.mongoFiles.dbPort:0}')
+    private int mongoPort
+
+    @Value('${transmartproject.mongoFiles.dbServer:}')
+    private String mongoServer
+
+    @Value('${transmartproject.mongoFiles.useDriver:false}')
+    private boolean useDriver
+
+    @Transactional
     def upload(CommonsMultipartFile fileToUpload, String parentId){
-        def fmFile
-        def fileBytes
+	FmFile fmFile
         try{
-            def fileName = fileToUpload.getOriginalFilename().toString()
-            def fileType = fileName.split('\\.', -1)[fileName.split('\\.',-1).length-1]
-            def fileSize = fileToUpload.getSize()
-            //create fmfile
+	    String fileName = fileToUpload.originalFilename
+	    String fileType = fileName.split('\\.', -1)[-1]
+	    long fileSize = fileToUpload.size
             FmFolder fmFolder
             try {
                 fmFolder = FmFolder.get(parentId)
-                if (fmFolder == null) {
-                    logger.error('Folder with id ' + parentId + ' does not exist.')
+		if (!fmFolder) {
+		    logger.error 'Folder with id {} does not exist.', parentId
                     return 'Folder with id ' + parentId + ' does not exist.'
                 }
             }
-            catch (NumberFormatException ex) {
-                logger.error('Loading failed: '+e.toString())
+	    catch (NumberFormatException e) {
+		logger.error 'Loading failed: {}', e.message
                 return 'Loading failed'
             }
 
@@ -59,129 +69,117 @@ class UploadFilesService {
             fmFile = fmFolder.fmFiles.find { it.originalName == fileName }
             // If it does, then use existing file record and increment its version.
             // Otherwise, create a new file.
-            if (fmFile != null) {
+	    if (fmFile) {
                 fmFile.fileVersion++
                 fmFile.fileSize = fileSize
                 fmFile.linkUrl = ''
-                logger.info('File = ' + fileName + ' (' + fmFile.id + ') - Existing')
+		logger.debug 'File = {} ({}) - Existing', fileName, fmFile.id
             }
             else {
-                fmFile = new FmFile(
-                    displayName: fileName,
-                    originalName: fileName,
-                    fileType: fileType,
-                    fileSize: fileSize,
-                    filestoreLocation: '',
-                    filestoreName: '',
-                    linkUrl: ''
-                )
-                if (!fmFile.save(flush:true)) {
-                    fmFile.errors.each {
-                        logger.error('File saving failed: '+it)
-                    }
+		fmFile = new FmFile(displayName: fileName, originalName: fileName, fileType: fileType,
+				    fileSize: fileSize, filestoreLocation: '', filestoreName: '', linkUrl: '')
+		if (!save(fmFile, 'File saving failed')) {
                     return 'Loading failed: fmfile saving'
                 }
-                fmFolder.addToFmFiles(fmFile)
-                if (!fmFolder.save(flush:true)) {
-                    fmFolder.errors.each {
-                        logger.error('Folder saving failed: '+it)
-                    }
+		fmFolder.addToFmFiles fmFile
+		if (!save(fmFolder, 'Folder saving failed')) {
                     return 'Loading failed: fmfolder saving'
                 }
             }
             fmFile.filestoreLocation = parentId
             fmFile.filestoreName = fmFile.id + '-' + fmFile.fileVersion + '.' + fmFile.fileType
-            if (!fmFile.save(flush:true)) {
-                fmFile.errors.each {
-                    logger.error('File saving failed: '+it)
-                }
+	    if (!save(fmFile, 'File saving failed')) {
                 return 'Loading failed: file saving'
-             }
-            logger.info('File = ' + fmFile.filestoreName + ' (' + fileName + ') - Stored')
+            }
+	    logger.debug 'File = {} ({}) - Stored', fmFile.filestoreName, fileName
 
-            def useMongo=Holders.config.transmartproject.mongoFiles.enableMongo
-            if(!useMongo){
-                logger.info "Writing to filestore file '" + filestoreDirectory + File.separator + parentId + File.separator + fmFile.filestoreName + "'"
-                File filestoreDir = new File(filestoreDirectory + File.separator + parentId)
+	    if (!enableMongo) {
+		File file = new File(filestoreDirectory, parentId + '/' + fmFile.filestoreName)
+		logger.debug 'Writing to filestore file {}', file.path
+		File filestoreDir = new File(filestoreDirectory, parentId)
                 if (!filestoreDir.exists()) {
                     if (!filestoreDir.mkdirs()) {
-                        logger.error('unable to create filestoredir ' + filestoreDir.getPath())
+			logger.error 'unable to create filestoredir {}', filestoreDir.path
                         return 'Loading failed: unable to create filestoredir'
                     }
                 }
-                OutputStream outputStream = new FileOutputStream(new File(filestoreDirectory + File.separator + parentId + File.separator + fmFile.filestoreName))
-                logger.info 'Copying from fileToUpload '+fileToUpload
-                logger.info 'Create outputStream ' + outputStream + ''
-                if(outputStream != null) {
-                    fileBytes = new byte[1024]
+		OutputStream outputStream = new FileOutputStream(file)
+		logger.debug 'Copying from fileToUpload {}', fileToUpload
+		logger.debug 'Create outputStream {}', outputStream
+		if (outputStream) {
+		    byte[] fileBytes = new byte[1024]
                     int nread
-                    InputStream inputStream = fileToUpload.inputStream
-                    while((nread = inputStream.read(fileBytes)) != -1) {
-                        outputStream.write(fileBytes,0,nread)
+		    while ((nread = fileToUpload.inputStream.read(fileBytes)) != -1) {
+			outputStream.write fileBytes, 0, nread
                     }
                     outputStream.close()
-                    fmFolderService.indexFile(fmFile)
-                    logger.info('File successfully loaded: '+fmFile.id)
+		    fmFolderService.indexFile fmFile
+		    logger.debug 'File successfully loaded: {}', fmFile.id
                     return 'File successfully loaded'
                 }
                 else {
-                    logger.error 'Unable to write to filestoreDirectory '+filestoreDirectory
+		    logger.error 'Unable to write to filestoreDirectory {}', filestoreDirectory
                     return 'Unable to write to filestoreDirectory'
                 }
             }
             else {
-                    if(Holders.config.transmartproject.mongoFiles.useDriver){
-                    MongoClient mongo = new MongoClient(Holders.config.transmartproject.mongoFiles.dbServer,
-                                                        Holders.config.transmartproject.mongoFiles.dbPort)
-                    DB db = mongo.getDB( Holders.config.transmartproject.mongoFiles.dbName)
-                    GridFS gfs = new GridFS(db)
-                    GridFSInputFile file=gfs.createFile(fileToUpload.inputStream, fmFile.filestoreName)
-                    file.setContentType(fileToUpload.contentType)
+		if (useDriver) {
+		    MongoClient mongo = new MongoClient(mongoServer, mongoPort)
+		    GridFSInputFile file = new GridFS(mongo.getDB(mongoDbName)).createFile(fileToUpload.inputStream, fmFile.filestoreName)
+		    file.contentType = fileToUpload.contentType
                     file.save()
                     mongo.close()
-                    fmFolderService.indexFile(fmFile)
-                    logger.info('File successfully loaded: '+fmFile.id)
+		    fmFolderService.indexFile fmFile
+		    logger.debug 'File successfully loaded: {}', fmFile.id
                     return 'File successfully loaded'
                 }
-                else{
-                    def apiURL = Holders.config.transmartproject.mongoFiles.apiURL
-                    def apiKey = Holders.config.transmartproject.mongoFiles.apiKey
-                    def http = new HTTPBuilder( apiURL+'insert/'+fmFile.filestoreName )
-                    http.request(Method.POST) {request ->
-                        headers.'apikey' = MongoUtils.hash(apiKey)
+                else {
+		    new HTTPBuilder(mongoApiUrl + 'insert/' + fmFile.filestoreName).request(Method.POST) { request ->
+			headers.'apikey' = MongoUtils.hash(mongoApiKey)
                         requestContentType: 'multipart/form-data'
                         MultipartEntity multiPartContent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE)
                         multiPartContent.addPart(fmFile.filestoreName,
-                                                 new InputStreamBody(fileToUpload.inputStream,
-                                                                     fileToUpload.contentType,
-                                                                     fileToUpload.originalFilename))
+                                 new InputStreamBody(fileToUpload.inputStream,
+                                                     fileToUpload.contentType,
+                                                     fileToUpload.originalFilename))
 
                         request.setEntity(multiPartContent)
 
                         response.success = { resp ->
                             if(resp.status < 400){
                                 fmFolderService.indexFile(fmFile)
-                                logger.info('File successfully loaded: '+fmFile.id)
+				logger.debug 'File successfully loaded: {}', fmFile.id
                                 return 'File successfully loaded'
                             }
                         }
 
                         response.failure = { resp ->
-                            logger.error('Problem during connection to API: '+resp.status)
-                            if(fmFile!=null) fmFile.delete()
+			    logger.error 'Problem during connection to API: {}', resp.status
+			    fmFile?.delete()
                             if(resp.status ==404){
-                                return 'Problem during connection to API'
+				'Problem during connection to API'
                             }
-                            return 'Loading failed'
-                        }
+			    else {
+				'Loading failed'
+                            }
+			}
                     }
-                }
+		}
             }
-        }
-        catch(Exception e){
-            logger.error('transfer error: '+e.toString())
-            if(fmFile != null) fmFile.delete()
+	}
+	catch (e) {
+	    logger.error 'transfer error: {}', e.message
+	    fmFile?.delete()
         }
     }
 
+    private boolean save(o, String message) {
+	if (o.save(flush: true)) {
+	    true
+	}
+	else {
+	    logger.error '{}', utilService.errorStrings(o)
+	    false
+	}
+    }
 }

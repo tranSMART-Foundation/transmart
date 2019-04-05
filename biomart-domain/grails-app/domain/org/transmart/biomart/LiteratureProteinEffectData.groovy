@@ -16,32 +16,17 @@
  *
  *
  ******************************************************************/
-
-/**
- * $Id: LiteratureProteinEffectData.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
 package org.transmart.biomart
 
 class LiteratureProteinEffectData extends Literature {
-    Long id
-    LiteratureReferenceData reference
-    LiteratureModelData inVivoModel
-    LiteratureModelData inVitroModel
-    String etlId
     String description
+    String etlId
+    LiteratureModelData inVitroModel
+    LiteratureModelData inVivoModel
+
     static mapping = {
-        table 'BIO_LIT_PE_DATA'
+	table 'BIOMART.BIO_LIT_PE_DATA'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_LIT_PE_DATA_ID'
         version false
-        id column: 'BIO_LIT_PE_DATA_ID'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            reference column: 'BIO_LIT_REF_DATA_ID'
-            inVivoModel column: 'IN_VIVO_MODEL_ID'
-            inVitroModel column: 'IN_VITRO_MODEL_ID'
-            etlId column: 'ETL_ID'
-            description column: 'DESCRIPTION'
-        }
     }
 }

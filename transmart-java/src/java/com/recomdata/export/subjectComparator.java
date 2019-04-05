@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.export;
 
@@ -26,24 +25,22 @@ import java.util.Comparator;
 
 public class subjectComparator implements Comparator {
 
-	public int compare(Object obj1, Object obj2) { 
-		
-		Integer g1 = Integer.parseInt( ((String) obj1).substring(1,2) );
-		Integer g2 = Integer.parseInt( ((String) obj2).substring(1,2) );
-		
-		Integer id1 = Integer.parseInt( ((String) obj1).substring(3));
-		Integer id2 = Integer.parseInt( ((String) obj2).substring(3));
-		
-		if (g1 > g2) {
-			return 1;
-		} else if (g1 < g2) {
-			return -1;
-		} else if (id1 > id2) {
-			return 1;
-		} else if (id1 < id2) {
-			return -1;
-		} else {
-			return 0;
-		}
-	}
+    public int compare(Object obj1, Object obj2) { 
+
+        int g1 = Integer.parseInt(((String) obj1).substring(1, 2));
+        int g2 = Integer.parseInt(((String) obj2).substring(1, 2));
+
+        int id1 = Integer.parseInt(((String) obj1).substring(3));
+        int id2 = Integer.parseInt(((String) obj2).substring(3));
+
+        if (g1 > g2) {
+            return 1;
+        }
+
+        if (g1 < g2) {
+            return -1;
+        }
+
+        return Integer.compare(id1, id2);
+    }
 }

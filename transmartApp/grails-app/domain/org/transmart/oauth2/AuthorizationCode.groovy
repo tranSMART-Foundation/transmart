@@ -6,12 +6,12 @@ class AuthorizationCode {
     String code
 
     static constraints = {
-        code nullable: false, blank: false, unique: true
-        authentication nullable: false, minSize: 1, maxSize: 1024 * 32
+	code blank: false, unique: true
+	authentication minSize: 1, maxSize: 1024 * 4
     }
 
     static mapping = {
-        datasource 'oauth2'
         version false
+	datasource 'oauth2'
     }
 }

@@ -1,175 +1,157 @@
 package com.recomdata.transmart.data.export
 
+import com.recomdata.dataexport.util.BiomarkerDataRowProcessor
 import com.recomdata.transmart.data.export.util.FileWriterUtil
-import grails.util.Holders
+import grails.plugin.springsecurity.SpringSecurityService
+import groovy.sql.Sql
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.apache.commons.lang.StringUtils
-import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
+import org.springframework.beans.factory.annotation.Value
 import org.transmart.searchapp.SearchKeyword
+import org.transmartproject.db.support.DatabasePortabilityService
 
+import javax.sql.DataSource
 import java.sql.Clob
-import java.sql.Connection
-import java.sql.PreparedStatement
-import java.sql.ResultSet
+import java.sql.Statement
 
 import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.checkQueryResultAccess
 
 @Slf4j('logger')
 class SnpDataService {
 
-    boolean transactional = false
+    private static final char QUOTE = "'"
+    private static final char separator = '\t'
+    private static final String[] HEADER = ['FAMILY ID', 'PATIENT ID', 'GENDER', 'MATERNAL ID', 'PATERNAL ID', 'CHROMOSOME DATA']
+    private static final String lineSeparator = System.getProperty('line.separator')
 
-    def dataSource
+    static transactional = false
+
+    DatabasePortabilityService databasePortabilityService
+    DataSource dataSource
+    GeneExpressionDataService geneExpressionDataService
     def i2b2HelperService
-    def springSecurityService
     def plinkService
-    def fileDownloadService
-    def utilService
-    def databasePortabilityService
+    SpringSecurityService springSecurityService
 
-    def Map getData(studyDir, fileName, jobName, resultInstanceId) {
-        def snpFilesMap = [:]
-        snpFilesMap.put('PEDFiles', writePEDFiles(studyDir, fileName, jobName, resultInstanceId))
+    @Value('${com.recomdata.search.genepathway:}')
+    private String genepathway
 
-        snpFilesMap.put('MAPFiles', writeMAPFiles(studyDir, fileName, jobName, resultInstanceId))
-        return snpFilesMap
+    @Value('${com.recomdata.plugins.resultSize:-1}')
+    private int resultSize
+
+    @Value('${RModules.host:}')
+    private String rmodulesHost
+
+    @Value('${RModules.port:0}')
+    private int rmodulesPort
+
+    @Value('${com.recomdata.transmart.data.export.rScriptDirectory:}')
+    private String rScriptDirectory
+
+    Map getData(studyDir, fileName, jobName, resultInstanceId) {
+	[PEDFiles: writePEDFiles(studyDir, fileName, jobName, resultInstanceId),
+	 MAPFiles: writeMAPFiles(studyDir, fileName, jobName, resultInstanceId)]
     }
 
-    def private getPatientId(subjectId) {
-        def groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        def patientIdQuery = 'SELECT SOURCESYSTEM_CD FROM PATIENT_DIMENSION WHERE PATIENT_NUM = ?'
-        def firstRow = sql.firstRow(patientIdQuery, [subjectId])
-        def patientId = utilService.getActualPatientId(firstRow?.SOURCESYSTEM_CD)
-
-        return patientId
+    private String getPatientId(subjectId) {
+	def firstRow = new Sql(dataSource).firstRow(
+	    'SELECT SOURCESYSTEM_CD FROM I2B2DEMODATA.PATIENT_DIMENSION WHERE PATIENT_NUM = ?', [subjectId])
+	geneExpressionDataService.getActualPatientId firstRow?.SOURCESYSTEM_CD
     }
 
-    def class PatientData {
-        def patientId, omicPatientId, subjectId
-    }
-
-    private def getPatientData(resultInstanceId) {
-        def groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        def query = '''
-						SELECT DISTINCT patient_id, omic_patient_id, subject_id
-						FROM de_subject_sample_mapping 
-						WHERE platform = 'SNP' and patient_id in (
-							SELECT DISTINCT patient_num 
-							FROM qt_patient_set_collection 
-							WHERE result_instance_id = ?)
-					'''
-        def patientDataMap = [:]
-        sql.eachRow(query, [resultInstanceId]) { row ->
-            PatientData patientData = new PatientData()
-            patientData.patientId = row.PATIENT_ID
-            patientData.omicPatientId = row.OMIC_PATIENT_ID
-            patientData.subjectId = row.SUBJECT_ID
-            patientDataMap.put(row.PATIENT_ID, patientData)
+    private Map<Long, PatientData> getPatientData(resultInstanceId) {
+	String query = '''
+				SELECT DISTINCT patient_id, omic_patient_id, subject_id
+				FROM DEAPP.de_subject_sample_mapping
+				WHERE platform = 'SNP'
+				  and patient_id in (
+					SELECT DISTINCT patient_num 
+						FROM I2B2DEMODATA.qt_patient_set_collection
+						WHERE result_instance_id = ?
+				  )
+			'''
+	Map patientDataMap = [:]
+	new Sql(dataSource).eachRow(query, [resultInstanceId]) { row ->
+	    patientDataMap[row.PATIENT_ID] = new PatientData(
+		patientId: row.PATIENT_ID,
+		omicPatientId: row.OMIC_PATIENT_ID,
+		subjectId: row.SUBJECT_ID)
         }
 
-        return patientDataMap
+	patientDataMap
     }
 
-    def public getDataByPatientByProbes(studyDir, resultInstanceId, jobName) {
+    def getDataByPatientByProbes(File studyDir, String resultInstanceId, String jobName) {
         checkQueryResultAccess resultInstanceId
 
-        def dataTypeName = 'SNP'
-        def dataTypeFolder = 'Processed_data'
-        char separator = '\t'
-        def flushCount = 0
-        def flushInterval = 5000
-        def groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+	String dataTypeName = 'SNP'
+	String dataTypeFolder = 'Processed_data'
+	int flushCount = 0
+	int flushInterval = 5000
+	Sql sql = new Sql(dataSource)
 
-        def subjectIds = i2b2HelperService.getSubjectsAsList(resultInstanceId)
-        /**
-         * Input params required for the R script are parentDir and subjectIdsStr
-         */
-        def parentDir = null
-        def subjectIdsStr = i2b2HelperService.getSubjects(resultInstanceId)
+	List<String> subjectIds = i2b2HelperService.getSubjectsAsList(resultInstanceId)
+	// Input params required for the R script are parentDir and subjectIdsStr
+	String parentDir
+	String subjectIdsStr = i2b2HelperService.getSubjects(resultInstanceId)
 
-        def patientDataMap = getPatientData(resultInstanceId)
-        //Create objects we use to form JDBC connection.
-        def Connection conn = null
-        def PreparedStatement pStmt = null
-        def ResultSet rs = null
-
-        //Grab the connection from the grails object.
-        conn = dataSource.getConnection()
+	Map<Long, PatientData> patientDataMap = getPatientData(resultInstanceId)
 
         //check if there are data for copy number. If not, don't create files for this
-        def query = '''
-            select dssm.patient_id,
-                dssm.trial_name,
-                dssd.snp_name,
-                null as chrom,
-                null as chrom_pos,
-                dssd.copy_number
-            from deapp.de_subject_sample_mapping dssm
-                inner join deapp.DE_SAMPLE_SNP_DATA dssd
-                on dssm.sample_cd = dssd.sample_id
-            where dssm.patient_id in (
-                select distinct patient_num
-                from i2b2demodata.qt_patient_set_collection
-                where result_instance_id = ?
-            )'''
-        pStmt = conn.prepareStatement(query)
-        pStmt.setBigDecimal(1, Integer.valueOf(resultInstanceId))
-        rs = pStmt.executeQuery()
-        if (rs.next()) {
-            if (rs.getInt(1) == 0) {
-                logger.info('No copy number data for these cohorts. Skip copy number export')
+	String query = '''
+		select dssm.patient_id, dssm.trial_name, dssd.snp_name, null as chrom, null as chrom_pos, dssd.copy_number
+                from deapp.de_subject_sample_mapping dssm
+		inner join deapp.DE_SAMPLE_SNP_DATA dssd on dssm.sample_cd = dssd.sample_id
+                where dssm.patient_id in (
+                    select distinct patient_num
+                    from i2b2demodata.qt_patient_set_collection
+                    where result_instance_id = ?
+                )'''
+	def first = new Sql(dataSource).firstRow(query, Integer.valueOf(resultInstanceId))
+	if (first) {
+	    if (first[0] == 0) {
+		logger.info 'No copy number data for these cohorts. Skip copy number export'
                 return
             }
         }
-        //Grab the configuration that sets the fetch size.
-        def rsize = Holders.config.com.recomdata.plugins.resultSize
-        Integer fetchSize = 10000
-        if (rsize != null) {
-            try {
-                fetchSize = Integer.parseInt(rsize)
-            }
-            catch (Exception exs) {
-                logger.warn('com.recomdata.plugins.resultSize is not set!')
-            }
+
+	int fetchSize
+	if (resultSize == -1) {
+	    logger.warn 'com.recomdata.plugins.resultSize is not set!'
+	    fetchSize = 10000
+        }
+	else {
+	    fetchSize = resultSize
         }
 
-        logger.debug('Starting the long query to get cnv file information')
+	logger.debug 'Starting the long query to get cnv file information'
 
-        subjectIds.each { subjectId ->
-            def PatientData patientData = patientDataMap.get(subjectId.toLong())
+	for (subjectId in subjectIds) {
+	    PatientData patientData = patientDataMap[subjectId.toLong()]
 
-            /**
-             * Prepare the query to extract the records for this subject
-             */
-            query = ''' select dssm.sample_cd as gsm_num,
-                              dssd.snp_name,
-                              dssd.copy_number
+	    // Prepare the query to extract the records for this subject
+	    query = '''
+			select dssm.sample_cd as gsm_num, dssd.snp_name, dssd.copy_number
                         from deapp.de_subject_sample_mapping dssm
-                            inner join deapp.DE_SAMPLE_SNP_DATA dssd
-                            on dssm.sample_cd = dssd.sample_id
+			inner join deapp.DE_SAMPLE_SNP_DATA dssd on dssm.sample_cd = dssd.sample_id
                         where dssm.patient_id = ?'''
 
-            def filename = subjectId + '.CNV'
-            def FileWriterUtil writerUtil = new FileWriterUtil(studyDir, filename, jobName, dataTypeName, dataTypeFolder, separator)
-            def output = writerUtil.outputFile.newWriter(true)
-
+	    String filename = subjectId + '.CNV'
+	    FileWriterUtil writerUtil = new FileWriterUtil(studyDir, filename, jobName, dataTypeName, dataTypeFolder, separator)
+	    BufferedWriter output = writerUtil.outputFile.newWriter(true)
             output << 'SAMPLE\tPATIENT ID\tPROBE ID\tCOPY NUMBER\n'
 
-            //Prepare the SQL statement.
-            pStmt = conn.prepareStatement(query)
-            pStmt.setBigDecimal(1, patientData?.omicPatientId)
-            pStmt.setFetchSize(fetchSize)
-
-            rs = pStmt.executeQuery()
-            while (rs?.next()) {
-                output.write(StringUtils.isNotEmpty(rs?.getString('GSM_NUM')) ? rs?.getString('GSM_NUM') : '')
-                output.write(separator)
-                output.write(StringUtils.isNotEmpty(patientData?.subjectId) ? patientData?.subjectId : '')
-                output.write(separator)
-                output.write(StringUtils.isNotEmpty(rs?.getString('SNP_NAME')) ? rs?.getString('SNP_NAME') : '')
-                output.write(separator)
-                output.write(StringUtils.isNotEmpty(rs?.getString('COPY_NUMBER')) ? rs?.getString('COPY_NUMBER') : '')
+	    Sql s = new Sql(dataSource)
+	    s.withStatement{ Statement stmt -> stmt.fetchSize = fetchSize }
+	    s.eachRow query, [patientData?.omicPatientId], { row ->
+		output.write row.GSM_NUM ?: ''
+		output.write separator
+		output.write patientData?.subjectId ?: ''
+		output.write separator
+		output.write row.SNP_NAME ?: ''
+		output.write separator
+		output.write row.COPY_NUMBER ?: ''
                 output.newLine()
 
                 flushCount++
@@ -184,537 +166,360 @@ class SnpDataService {
             output?.close()
         }
 
-        logger.debug('Finished the long query to get cnv file information')
-        logger.debug('Starting the query to get platform')
+	logger.debug 'Finished the long query to get cnv file information; Starting the query to get platform'
 
         String platformQuery = '''
-		SELECT dgi.title FROM de_subject_snp_dataset ssd
-		INNER JOIN de_gpl_info dgi on dgi.platform=ssd.platform_name
-		INNER JOIN de_subject_sample_mapping dssm on ssd.patient_num=dssm.omic_patient_id
-		WHERE dssm.patient_id IN (SELECT DISTINCT patient_num
-							FROM qt_patient_set_collection 
-							WHERE result_instance_id = ?)'''
+				SELECT dgi.title
+				FROM DEAPP.de_subject_snp_dataset ssd
+				INNER JOIN DEAPP.de_gpl_info dgi on dgi.platform=ssd.platform_name
+				INNER JOIN DEAPP.de_subject_sample_mapping dssm on ssd.patient_num=dssm.omic_patient_id
+				WHERE dssm.patient_id IN (
+					SELECT DISTINCT patient_num
+					FROM I2B2DEMODATA.qt_patient_set_collection
+					WHERE result_instance_id = ?
+				)'''
 
         def firstRow = sql.firstRow(platformQuery, [resultInstanceId])
-        def platformName = firstRow.title
-        if (StringUtils.isEmpty(platformName)) platformName = 'Output'
+	String platformName = firstRow.title ?: 'Output'
 
-        logger.debug('Finished the query to get platform')
+	logger.debug 'Finished the query to get platform'
 
-        /**
-         * R script invocation starts here
-         */
-        logger.debug('Invoking R for transformations')
-        RConnection c = new RConnection(Holders.config.RModules.host, Holders.config.RModules.port)
-        //Set the working directory to be our temporary location.
-        String workingDirectoryCommand = "setwd('${parentDir}')".replace("\\", "\\\\")
-        //Run the R command to set the working directory to our temp directory.
-        REXP x = c.eval(workingDirectoryCommand)
+	// R script invocation starts here
+	logger.debug 'Invoking R for transformations'
+	RConnection c = new RConnection(rmodulesHost, rmodulesPort)
+	String workingDirectoryCommand = "setwd('$parentDir')".replace('\\', '\\\\')
+	c.eval workingDirectoryCommand
 
-        String rScriptDirectory = Holders.config.com.recomdata.transmart.data.export.rScriptDirectory
-        String compilePivotDataCommand = "source('${rScriptDirectory}/PivotData/PivotSNPCNVData.R')"
-        REXP comp = c.eval(compilePivotDataCommand)
-        //Prepare command to call the PivotSNPCNVData.R script
+	String compilePivotDataCommand = "source('$rScriptDirectory/PivotData/PivotSNPCNVData.R')"
+	c.eval compilePivotDataCommand
+
         parentDir = parentDir.replace('\\', '\\\\')
+
         String pivotDataCommand = "PivotSNPCNVData.pivot('$subjectIdsStr', ',', '$parentDir', '$platformName')"
-        //Run the R command to pivot the data in the clinical.i2b2trans file.
-        REXP pivot = c.eval(pivotDataCommand)
-        logger.debug('Finished R transformations')
+	c.eval pivotDataCommand
+
+	logger.debug 'Finished R transformations'
 
         c.close()
     }
 
-    def private Map writeMAPFiles(studyDir, fileName, jobName, resultInstanceId) {
-        def groovy.sql.Sql sql = null
-        def FileWriterUtil writerUtil = null
-        def output = null
-        def buffer = new byte[1000]
+    private Map writeMAPFiles(File studyDir, String fileName, jobName, resultInstanceId) {
+	FileWriterUtil writerUtil = null
         try {
-            //def subjectIds = i2b2HelperService.getSubjects(resultInstanceId)
+	    String platform = plinkService.getStudyInfoByResultInstanceId(resultInstanceId)[0]
+	    if (platform) {
+		String query = '''
+				SELECT probe_def
+				FROM DEAPP.de_snp_probe_sorted_def
+				WHERE chrom != 'ALL'
+				  and probe_def is not null
+				  and platform_name=?'''
 
-            def platform = plinkService.getStudyInfoByResultInstanceId(resultInstanceId)[0]
-            if (StringUtils.isNotEmpty(platform)) {
-                String query = """ SELECT probe_def FROM de_snp_probe_sorted_def
-				WHERE chrom != 'ALL' and probe_def is not null and platform_name=?"""
-
-                sql = new groovy.sql.Sql(dataSource)
-
-                def snpMapDataRows = []
-                sql.eachRow(query?.toString(), [platform]) { row ->
-                    snpMapDataRows.add(['PROBE_DEF': (java.sql.Clob) row.PROBE_DEF])
+		List<String> clobStrings = []
+		Sql sql = new Sql(dataSource)
+		sql.eachRow(query, [platform]) { row ->
+		    clobStrings << ((Clob) row.PROBE_DEF).asciiStream.text
                 }
                 //Since the file write takes a lot of time we close the connection once we have all the data for this patient
-                sql?.close()
-                if (snpMapDataRows?.size() > 0) {
-                    def dataTypeName = 'SNP'
-                    def dataTypeFolder = 'Processed_data'
-                    char separator = '\t'
-                    def snpFileName = 'SNPData.MAP'
+		sql.close()
+		if (clobStrings) {
+		    String dataTypeName = 'SNP'
+		    String dataTypeFolder = 'Processed_data'
+		    String snpFileName = 'SNPData.MAP'
 
                     writerUtil = new FileWriterUtil(studyDir, snpFileName, jobName, dataTypeName, dataTypeFolder, separator)
-                    snpMapDataRows.each { row ->
-                        java.sql.Clob clob = (java.sql.Clob) row.PROBE_DEF
+		    for (String s in clobStrings) {
                         // change probe_def format from 'SNP  chr  position' to 'chr  SNP position'
-                        clob.getAsciiStream().getText().eachLine {
-                            def items = it.split()
-                            if (null != items && items?.length == 3) writerUtil?.writeLine([items[1], items[0], items[2]] as String[])
-                        }
+			s.eachLine { String line ->
+			    String[] items = line.split()
+			    if (items?.length == 3) {
+				writerUtil.writeLine([items[1], items[0], items[2]] as String[])
+                            }
+			}
                     }
-                }
+		}
             }
-        }
-        catch (Exception e) {
-            logger.info('Potential issue while exporting map file')
-            logger.info(e.getMessage())
+	}
+	catch (e) {
+	    logger.error 'Potential issue while exporting map file {}', e.message
         }
         finally {
-            sql?.close()
             writerUtil?.finishWriting()
         }
     }
 
-    def private Map writePEDFiles(studyDir, fileName, jobName, resultInstanceId) {
-        def subjectIds = i2b2HelperService.getSubjectsAsList(resultInstanceId)
-        def patientConceptCdPEDFileMap = [:]
-        def groovy.sql.Sql sql = null
-        def FileWriterUtil writerUtil = null
-        def buffer = new byte[1000]
-        def snpDataRows = null
+    private Map<String, String> writePEDFiles(File studyDir, String fileName, String jobName, String resultInstanceId) {
+	List<String> subjectIds = i2b2HelperService.getSubjectsAsList(resultInstanceId)
+	Map<String, String> patientConceptCdPEDFileMap = [:]
+	FileWriterUtil writerUtil = null
 
-        subjectIds.each { subjectId ->
-            def snpDataBySampleQry = """SELECT t1.PATIENT_NUM, t1.CHROM, t1.PED_BY_PATIENT_CHR,
-												case t2.PATIENT_GENDER
-													 when 'M' then 1
-													 when 'F' then 2
-													 else 0
-												 end as PATIENT_GENDER, t2.CONCEPT_CD, t2.SUBJECT_ID 
-											FROM DE_SNP_DATA_BY_PATIENT t1 
-											INNER JOIN(SELECT DISTINCT PATIENT_NUM, TRIAL_NAME, PATIENT_GENDER, CONCEPT_CD, SUBJECT_ID FROM DE_SUBJECT_SNP_DATASET) t2 on t1.patient_num=t2.patient_num
-                      						INNER JOIN DE_SUBJECT_SAMPLE_MAPPING t3 on t1.patient_num=t3.omic_patient_id
-                      						WHERE t1.TRIAL_NAME=t2.TRIAL_NAME
-                        						and t1.CHROM != 'ALL'
-                        						and t1.PED_BY_PATIENT_CHR is not null 
-                        						and t3.patient_id = ?
-                        						and t3.platform='SNP'
-											ORDER BY t1.PATIENT_NUM, t2.CONCEPT_CD, t2.SUBJECT_ID
-									"""
+	for (subjectId in subjectIds) {
+	    String snpDataBySampleQry = '''
+			SELECT t1.PATIENT_NUM, t1.CHROM, t1.PED_BY_PATIENT_CHR,
+				case t2.PATIENT_GENDER
+					 when 'M' then 1
+					 when 'F' then 2
+					 else 0
+				          end as PATIENT_GENDER,
+			       t2.CONCEPT_CD, t2.SUBJECT_ID
+				FROM DEAPP.DE_SNP_DATA_BY_PATIENT t1
+				INNER JOIN(SELECT DISTINCT PATIENT_NUM, TRIAL_NAME, PATIENT_GENDER, CONCEPT_CD, SUBJECT_ID
+			           FROM DEAPP.DE_SUBJECT_SNP_DATASET) t2 on t1.patient_num=t2.patient_num
+					INNER JOIN DEAPP.DE_SUBJECT_SAMPLE_MAPPING t3 on t1.patient_num=t3.omic_patient_id
+					WHERE t1.TRIAL_NAME=t2.TRIAL_NAME
+					and t1.CHROM != 'ALL'
+					and t1.PED_BY_PATIENT_CHR is not null 
+					and t3.patient_id = ?
+                        		and t3.platform='SNP'
+					ORDER BY t1.PATIENT_NUM, t2.CONCEPT_CD, t2.SUBJECT_ID
+			'''
             try {
-                sql = new groovy.sql.Sql(dataSource)
-
-                def dataTypeName = 'SNP'
-                snpDataRows = []
+		String dataTypeName = 'SNP'
+		List<Map> snpDataRows = []
+		Sql sql = new Sql(dataSource)
                 sql.eachRow(snpDataBySampleQry?.toString(), [subjectId]) { row ->
-                    snpDataRows.add(['FAMILY_ID'         : row.SUBJECT_ID?.toString(),
-                                     'PATIENT_NUM'       : row.PATIENT_NUM?.toString(),
-                                     'CHROM'             : row.CHROM?.toString(),
-                                     'PED_BY_PATIENT_CHR': (Clob) row.PED_BY_PATIENT_CHR,
-                                     'PATIENT_GENDER'    : row.PATIENT_GENDER?.toString(),
-                                     'CONCEPT_CD'        : row.CONCEPT_CD?.toString()])
+		    snpDataRows << [FAMILY_ID : row.SUBJECT_ID?.toString(),
+				    PATIENT_NUM: row.PATIENT_NUM?.toString(),
+				    CHROM : row.CHROM?.toString(),
+				    PED_BY_PATIENT_CHR: (Clob) row.PED_BY_PATIENT_CHR,
+				    PATIENT_GENDER : row.PATIENT_GENDER?.toString(),
+				    CONCEPT_CD : row.CONCEPT_CD?.toString()]
                 }
                 //Since the file write takes a lot of time we close the connection once we have all the data for this patient
-                sql?.close()
+		sql.close()
 
-                if (snpDataRows?.size() > 0) {
-                    String familyId = null
-                    String patientNum = null
-                    //String chromosome = null
-                    Clob pedByPatientChrClob = null
-                    String patientGender = null
-                    String conceptCd = null
-
-                    def patientId = getPatientId(subjectId)
-                    def dataTypeFolder = 'Processed_data'
-                    char separator = '\t'
-                    def snpFileName = 'SNPData_' + patientId + '.PED'
+		if (snpDataRows) {
+		    String patientId = getPatientId(subjectId)
+		    String dataTypeFolder = 'Processed_data'
+		    String snpFileName = 'SNPData_' + patientId + '.PED'
                     writerUtil = new FileWriterUtil(studyDir, snpFileName, jobName, dataTypeName, dataTypeFolder, separator)
-                    writerUtil?.writeLine([
-                            'FAMILY ID',
-                            'PATIENT ID',
-                            'GENDER',
-                            'MATERNAL ID',
-                            'PATERNAL ID',
-                            'CHROMOSOME DATA']
-                            as String[])
+		    writerUtil.writeLine HEADER
 
-                    snpDataRows.each { row ->
-                        familyId = row.FAMILY_ID?.toString()
-                        patientNum = row.PATIENT_NUM?.toString()
-                        //chromosome = row.CHROM?.toString()
-                        pedByPatientChrClob = (Clob) row.PED_BY_PATIENT_CHR
-                        patientGender = row.PATIENT_GENDER?.toString()
-                        conceptCd = row.CONCEPT_CD?.toString()
+		    for (row in snpDataRows) {
+			String familyId = row.FAMILY_ID
+			String patientNum = row.PATIENT_NUM
+			Clob pedByPatientChrClob = row.PED_BY_PATIENT_CHR
+			String patientGender = row.PATIENT_GENDER
+			String conceptCd = row.CONCEPT_CD
 
                         //store the map between patient_conceptcd and the file created for it
-                        if (null == patientConceptCdPEDFileMap.get(patientNum + '_' + conceptCd)) {
-                            patientConceptCdPEDFileMap.put(patientNum + '_' + conceptCd, writerUtil?.outputFile?.name)
+			String key = patientNum + '_' + conceptCd
+			if (null == patientConceptCdPEDFileMap[key]) {
+			    patientConceptCdPEDFileMap[key] = writerUtil.outputFile.name
                         }
 
-                        def strVal = writerUtil?.getClobAsString(pedByPatientChrClob)
-                        writerUtil?.writeLine([
-                                familyId,
-                                patientId,
-                                patientGender,
-                                '0',
-                                '0',
-                                strVal]
-                                as String[])
-
-                        //Clean-up the objects and re-use them in the next iteration
-                        familyId = null
-                        patientNum = null
-                        //chromosome = null
-                        pedByPatientChrClob = null
-                        patientGender = null
-                        conceptCd = null
+			writerUtil.writeLine([familyId, patientId, patientGender, '0', '0',
+					      writerUtil.getClobAsString(pedByPatientChrClob)] as String[])
                     }
                 }
             }
             finally {
                 //Close existing file and flush out the contents
                 writerUtil?.finishWriting()
-                snpDataRows = null
-            }
-        }
+	    }
+	}
 
-        return patientConceptCdPEDFileMap
+	patientConceptCdPEDFileMap
     }
 
-    def private String getSubjects(result_instance_ids) {
-        def Set subjectsSet = new HashSet()
+    boolean getSnpDataByResultInstanceAndGene(resultInstanceId, String study, String pathway,
+	                                      String sampleType, String timepoint, String tissueType,
+	                                      BiomarkerDataRowProcessor rowProcessor, String fileLocation,
+	                                      boolean genotype, boolean copyNumber) {
 
-        //Get all the patient_ids/subjects
-        result_instance_ids.each { resultInstance ->
-            subjectsSet.addAll(i2b2HelperService.getSubjectsAsList(resultInstance.value))
-        }
+	boolean includePathwayInfo = false
+	boolean retrievedData = false
 
-        def subjectsStr = new StringBuilder()
-        subjectsSet.each { subject -> subjectsStr.append(subject).append(',') }
-        def subjectIds = (subjectsStr.toString() != '') ? subjectsStr.toString()[0..-2] : ''
-
-        return subjectIds
-    }
-
-    def private List getSubjectsAsList(result_instance_ids) {
-        def Set subjectsSet = new HashSet()
-
-        //Get all the patient_ids/subjects
-        result_instance_ids.each { resultInstance ->
-            subjectsSet.addAll(i2b2HelperService.getSubjectsAsList(resultInstance.value))
-        }
-
-        return subjectsSet?.toList()
-    }
-
-    def private getDataForMAPFile(String fileName, String jobName, HashMap result_instance_ids) {
-        def subjectIds = getSubjects(result_instance_ids)
-        // 0 -- Platform Name   1 -- Trial Name
-        def platform = plinkService.getStudyInfoBySubject(subjectIds)[0]
-        //writeData(fileName, jobName, cached)
-    }
-
-    private void downloadCELFiles(studyList, File studyDir, resultInstanceId, String jobName) {
-        String studies = '(' + convertList(studyList, true, 1000) + ')'
-
-        def groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-
-        def query = """
-			SELECT b.* 
-			FROM bio_content b
-			WHERE b.study_name in ${studies}
-			AND b.file_name IN (SELECT DISTINCT sg.gsm_num FROM de_snp_calls_by_gsm sg WHERE sg.patient_num IN (
-			    SELECT DISTINCT patient_num FROM qt_patient_set_collection WHERE result_instance_id = ?
-					 AND patient_num IN (SELECT patient_num FROM patient_dimension WHERE sourcesystem_cd NOT LIKE '%:S:%')))
-		"""
-
-        def celFiles = sql.rows(query, [resultInstanceId])
-        def filesList = []
-        for (file in celFiles) {
-            def fileURL = (new StringBuffer(file.CEL_LOCATION).append(file.FILE_NAME).append(file.CEL_FILE_SUFFIX)).toString()
-            filesList.add(fileURL)
-        }
-
-        File snpDir = (new FileWriterUtil()).createDir(studyDir, 'SNP')
-        File rawDataDir = (new FileWriterUtil()).createDir(snpDir, 'Raw_data')
-
-        fileDownloadService.getFiles(filesList, rawDataDir.getPath())
-    }
-
-    //This tells us whether we need to include the pathway information or not.
-    private Boolean includePathwayInfo = false
-
-    def getSnpDataByResultInstanceAndGene(resultInstanceId, study, pathway, sampleType, timepoint, tissueType, rowProcessor, fileLocation, genotype, copyNumber) {
-        //This boolean tells us whether we retrieved data or not.
-        Boolean retrievedData = false
-
-        //SQL Object to gather data.
-        def groovy.sql.Sql sql = null
-        sql = new groovy.sql.Sql(dataSource)
-
-        //Get the pathway to use the uniqueid.
         pathway = derivePathwayName(pathway)
-
-        //String studies = convertList(studyList, true, 1000)
 
         //These will be the two parts of the SQL statement. This SQL gets our SNP data by probe. We'll need to extract the actual genotypes/copynumber later.
         StringBuilder sSelect = new StringBuilder()
         StringBuilder sTables = new StringBuilder()
 
-        sSelect.append('''
-						SELECT  SNP.SNP_NAME AS SNP,
-						DSM.PATIENT_ID, DSM.SUBJECT_ID, 
-						bm.BIO_MARKER_NAME AS GENE,
-						DSM.sample_type,
-						DSM.timepoint,
-						DSM.tissue_type,
-						SNP.SNP_CALLS AS GENOTYPE,
-						SNP.COPY_NUMBER AS COPYNUMBER,
-						PD.sourcesystem_cd,
-						DSM.GPL_ID
-					''')
+	sSelect << '''
+				SELECT SNP.SNP_NAME AS SNP, DSM.PATIENT_ID, DSM.SUBJECT_ID, bm.BIO_MARKER_NAME AS GENE, DSM.sample_type,
+				       DSM.timepoint, DSM.tissue_type, SNP.SNP_CALLS AS GENOTYPE, SNP.COPY_NUMBER AS COPYNUMBER,
+				       PD.sourcesystem_cd, DSM.GPL_ID
+		'''
 
         //This from statement needs to be in all selects.
-        sTables.append(''' 	FROM DE_SUBJECT_SAMPLE_MAPPING DSM
-							INNER JOIN patient_dimension PD ON DSM.patient_id = PD.patient_num 
-							INNER JOIN qt_patient_set_collection qt ON qt.result_instance_id = ? AND qt.PATIENT_NUM = DSM.PATIENT_ID
-							INNER JOIN DE_SAMPLE_SNP_DATA SNP ON DSM.SAMPLE_CD = SNP.SAMPLE_ID
-							INNER JOIN DE_SNP_GENE_MAP D2 ON D2.SNP_NAME = SNP.SNP_NAME
-							INNER JOIN bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = ''' + databasePortabilityService.toChar('D2.ENTREZ_GENE_ID'))
+	sTables << '''
+				FROM DEAPP.DE_SUBJECT_SAMPLE_MAPPING DSM
+				INNER JOIN I2B2DEMODATA.patient_dimension PD ON DSM.patient_id = PD.patient_num
+				INNER JOIN I2B2DEMODATA.qt_patient_set_collection qt ON qt.result_instance_id = ? AND qt.PATIENT_NUM = DSM.PATIENT_ID
+				INNER JOIN DEAPP.DE_SAMPLE_SNP_DATA SNP ON DSM.SAMPLE_CD = SNP.SAMPLE_ID
+				INNER JOIN DEAPP.DE_SNP_GENE_MAP D2 ON D2.SNP_NAME = SNP.SNP_NAME
+				INNER JOIN BIOMART.bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = ''' + databasePortabilityService.toChar('D2.ENTREZ_GENE_ID')
 
-        //If a list of genes was entered, look up the gene ids and add them to the query. If a gene signature or list was supplied then we modify the query to join on the tables that link the list to the gene ids.
-        if (pathway != null && pathway.length() > 0 && !(pathway.startsWith('GENESIG') || pathway.startsWith('GENELIST'))) {
-            String genes
-            //Get the list of gene ids based on the search ids.
-            //genes = getGenes(pathway)
-
-            sSelect.append(',sk.SEARCH_KEYWORD_ID ')
+	// If a list of genes was entered, look up the gene ids and add them to the query.
+	// If a gene signature or list was supplied then we modify the query to join on the tables that link the list to the gene ids.
+	if (pathway && !(pathway.startsWith('GENESIG') || pathway.startsWith('GENELIST'))) {
+	    sSelect << ', sk.SEARCH_KEYWORD_ID '
 
             //Include the tables we join on to get the unique_id.
-            sTables.append('''
-				INNER JOIN bio_marker_correl_mv sbm ON sbm.asso_bio_marker_id = bm.bio_marker_id
-				INNER JOIN search_keyword sk ON sk.bio_data_id = sbm.bio_marker_id
-			''')
+	    sTables << """
+				INNER JOIN BIOMART.bio_marker_correl_mv sbm ON sbm.asso_bio_marker_id = bm.bio_marker_id
+				INNER JOIN SEARCHAPP.search_keyword sk ON sk.bio_data_id = sbm.bio_marker_id
+			"""
 
-            sTables.append(' WHERE DSM.trial_name = ?')
-            sTables.append(' AND sk.unique_id IN ').append(convertStringToken(pathway)).append(' ')
+	    sTables << ' WHERE DSM.trial_name = ?'
+	    sTables << ' AND sk.unique_id IN ' << convertStringToken(pathway) << ' '
 
             includePathwayInfo = true
         }
-        else if ((pathway!=null)&&(pathway.startsWith('GENESIG') || pathway.startsWith('GENELIST'))) {
+	else if (pathway && (pathway.startsWith('GENESIG') || pathway.startsWith('GENELIST'))) {
             //If we are querying by a pathway, we need to include that id in the final output.
-            sSelect.append(',sk.SEARCH_KEYWORD_ID ')
+	    sSelect << ', sk.SEARCH_KEYWORD_ID '
 
             //Include the tables we join on to filter by the pathway.
-            sTables.append('''
-				INNER JOIN search_bio_mkr_correl_fast_mv sbm ON sbm.asso_bio_marker_id = bm.bio_marker_id
-				INNER JOIN search_keyword sk ON sk.bio_data_id = sbm.domain_object_id
-			''')
+	    sTables << """
+				INNER JOIN SEARCHAPP.search_bio_mkr_correl_fast_mv sbm ON sbm.asso_bio_marker_id = bm.bio_marker_id
+				INNER JOIN SEARCHAPP.search_keyword sk ON sk.bio_data_id = sbm.domain_object_id
+			"""
 
             //Include the normal filter.
-            sTables.append(' WHERE DSM.trial_name = ?')
-            sTables.append(' AND sk.unique_id IN ').append(convertStringToken(pathway)).append(' ')
+	    sTables << ' WHERE DSM.trial_name = ?'
+	    sTables << ' AND sk.unique_id IN ' << convertStringToken(pathway) << ' '
 
             includePathwayInfo = true
         }
         else {
-            sTables.append(' WHERE DSM.trial_name = ?')
+	    sTables << ' WHERE DSM.trial_name = ?'
         }
 
-        //If we have a sample type, append it to the query.
-        if (sampleType != null && sampleType.length() > 0) {
-            sTables.append(' AND DSM.sample_type_cd IN ').append(convertStringToken(sampleType))
+	if (sampleType) {
+	    sTables << ' AND DSM.sample_type_cd IN ' << convertStringToken(sampleType)
         }
 
-        //If we have timepoints, append it to the query.
-        if (timepoint != null && timepoint.trim().length() > 0) {
-            sTables.append(' AND DSM.timepoint_cd IN ').append(convertStringToken(timepoint))
+	if (timepoint?.trim()) {
+	    sTables << ' AND DSM.timepoint_cd IN ' << convertStringToken(timepoint)
         }
 
-        //If we have tissues, append it to the query.
-        if (tissueType != null && tissueType.trim().length() > 0) {
-            sTables.append(' AND DSM.tissue_type_cd IN ').append(convertStringToken(tissueType))
+	if (tissueType?.trim()) {
+	    sTables << ' AND DSM.tissue_type_cd IN ' << convertStringToken(tissueType)
         }
 
-        sSelect.append(sTables.toString())
+	sSelect << sTables
 
-        logger.debug('SNP Query : ' + sSelect.toString())
+	logger.debug 'SNP Query : {}',  sSelect
 
-        //Create objects we use to form JDBC connection.
-        def Connection conn = null
-        def PreparedStatement pStmt = null
-        def ResultSet rs = null
-
-        //Grab the connection from the grails object.
-        conn = dataSource.getConnection()
-
-        //Grab the configuration that sets the fetch size.
-        def rsize = Holders.config.com.recomdata.plugins.resultSize
-        Integer fetchSize = 5000
-        if (rsize != null) {
-            try {
-                fetchSize = Integer.parseInt(rsize)
-            }
-            catch (Exception exs) {
-                logger.warn('com.recomdata.plugins.resultSize is not set!')
-            }
+	int fetchSize
+	if (resultSize == -1) {
+	    logger.warn 'com.recomdata.plugins.resultSize is not set!'
+	    fetchSize = 5000
+        }
+	else {
+	    fetchSize = resultSize
         }
 
-        //Prepare the SQL statement.
-        pStmt = conn.prepareStatement(sSelect.toString())
-        pStmt.setString(1, resultInstanceId)
-        pStmt.setString(2, study)
-        pStmt.setFetchSize(fetchSize)
-
-        rs = pStmt.executeQuery()
-        //while(rs?.next()) {
-        //Create our output file.
-        new File(fileLocation).withWriterAppend { out ->
+	new File(fileLocation).withWriterAppend { Writer out ->
 
             //Write the header line to the file.
-            if (includePathwayInfo)
-                out.write('PATIENT.ID\tGENE\tPROBE.ID\tGENOTYPE\tCOPYNUMBER\tSAMPLE.TYPE\tTIMEPOINT\tTISSUE.TYPE\tGPL.ID\tSEARCH_ID' + System.getProperty('line.separator'))
-            else
-                out.write('PATIENT.ID\tGENE\tPROBE.ID\tGENOTYPE\tCOPYNUMBER\tSAMPLE\tTIMEPOINT\tTISSUE.TYPE\tGPL.ID' + System.getProperty('line.separator'))
+	    if (includePathwayInfo) {
+		out.write 'PATIENT.ID\tGENE\tPROBE.ID\tGENOTYPE\tCOPYNUMBER\tSAMPLE.TYPE\tTIMEPOINT\tTISSUE.TYPE\tGPL.ID\tSEARCH_ID'
+            }
+            else {
+		out.write 'PATIENT.ID\tGENE\tPROBE.ID\tGENOTYPE\tCOPYNUMBER\tSAMPLE\tTIMEPOINT\tTISSUE.TYPE\tGPL.ID'
+            }
+	    out.write lineSeparator
 
-            //For each of the probe records we need to extract out the data for a given patient.
-            //sql.eachRow(sSelect.toString(),[resultInstanceId])
-            //{
-            while (rs?.next()) {
-                //row ->
+	    Sql s = new Sql(dataSource)
+	    s.withStatement{ Statement stmt -> stmt.fetchSize = fetchSize }
+	    s.eachRow sSelect.toString(), [resultInstanceId, study], { row ->
+		retrievedData = true
 
-                retrievedData = true
-
-                //This data object holds onto our values.
-                SnpDataObject snpDataObject = new SnpDataObject()
-
-                //snpDataObject.patientNum = row.PATIENT_ID
-                snpDataObject.patientNum = rs?.getString('SUBJECT_ID')
-                snpDataObject.probeName = rs?.getString('SNP')
-                snpDataObject.geneName = rs?.getString('GENE')
-                snpDataObject.sample = rs?.getString('sample_type')
-                snpDataObject.timepoint = rs?.getString('timepoint')
-                snpDataObject.tissue = rs?.getString('tissue_type')
-
-                if (genotype) {
-                    snpDataObject.genotype = rs?.getString('GENOTYPE')
-                }
-                else {
-                    snpDataObject.genotype = 'NA'
-                }
-
-                if (copyNumber) {
-                    snpDataObject.copyNumber = rs?.getString('COPYNUMBER')
-                }
-                else {
-                    snpDataObject.copyNumber = 'NA'
-                }
-
+		SnpDataObject snpDataObject = new SnpDataObject(
+		    patientNum: row.SUBJECT_ID,
+		    probeName: row.SNP,
+		    geneName: row.GENE,
+		    sample: row.sample_type,
+		    timepoint: row.timepoint,
+		    tissue: row.tissue_type,
+		    genotype: genotype ? row.GENOTYPE : 'NA',
+		    copyNumber: copyNumber ? row.COPYNUMBER : 'NA',
+		    gplId: row.GPL_ID)
                 if (includePathwayInfo) {
-                    snpDataObject.searchKeywordId = StringUtils.isNotEmpty(rs?.getString('SEARCH_KEYWORD_ID')?.toString()) ? rs?.getString('SEARCH_KEYWORD_ID')?.toString() : ''
+		    snpDataObject.searchKeywordId = row.SEARCH_KEYWORD_ID ?: ''
                 }
-                else {
-                    snpDataObject.searchKeywordId = null
-                }
-
-                snpDataObject.gplId = rs?.getString('GPL_ID')
 
                 //Write record.
-                rowProcessor.processDataRow(snpDataObject, out)
+		rowProcessor.processDataRow snpDataObject, out
             }
         }
 
-        return retrievedData
+	retrievedData
     }
 
-    def convertStringToken(String t) {
+    String convertStringToken(String t) {
         String[] ts = t.split(',')
         StringBuilder s = new StringBuilder('(')
         for (int i = 0; i < ts.length; i++) {
-            if (i > 0)
-                s.append(',')
-            s.append("'")
-            s.append(ts[i])
-            s.append("'")
+	    if (i > 0) {
+		s << ','
+	    }
+	    s << QUOTE
+	    s << ts[i]
+	    s << QUOTE
         }
-        s.append(')')
-        return s.toString()
+	s << ')'
+	s
     }
 
-    private String derivePathwayName(pathway_name) {
-        if (pathway_name == null || pathway_name.length() == 0 || pathway_name == 'null') {
-            pathway_name = null
+    private String derivePathwayName(String pathwayName) {
+	if (!pathwayName || pathwayName == 'null') {
+	    pathwayName = null
         }
 
-        boolean nativeSearch = Holders.config.com.recomdata.search.genepathway == 'native'
+	boolean nativeSearch = genepathway == 'native'
 
-        if (!nativeSearch && pathway_name != null) {
+	if (!nativeSearch && pathwayName) {
             //If we have multiple genes they will be comma separated. We need to split the string and find the unique ID for each.
-            def pathwayGeneList = pathway_name.split(',')
+	    String[] pathwayGeneList = pathwayName.split(',')
 
             //For each gene, get the long ID.
-            pathway_name = pathwayGeneList.collect { SearchKeyword.get(Long.valueOf(it)).uniqueId }.join(',')
+	    pathwayName = pathwayGeneList.collect { SearchKeyword.get(it).uniqueId }.join(',')
         }
 
-        logger.debug('pathway_name has been set to a keyword ID: ' + pathway_name)
-        return pathway_name
+	logger.debug 'pathway_name has been set to a keyword ID: {}', pathwayName
+	return pathwayName
     }
 
     /**
      * Get the genes in a pathway based on the data in the search database.
-     * @param pathwayName
-     * @return
      */
-    def String getGenes(String pathwayName) {
+    String getGenes(String pathwayName) {
 
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+	String sql = '''
+				select distinct bm.primary_external_id as gene_id
+				from SEARCHAPP.search_keyword sk, BIOMART.bio_marker_correl_mv sbm, BIOMART.bio_marker bm
+				where sk.bio_data_id = sbm.bio_marker_id
+				  and sbm.asso_bio_marker_id = bm.bio_marker_id
+				  and sk.unique_id IN ''' + convertStringToken(pathwayName)
 
-        //Determine if a gene signature or list was used based on the string passed in.
-        StringBuilder pathwayS = new StringBuilder()
-
-        pathwayS.append(' select  distinct bm.primary_external_id as gene_id from ')
-                .append('search_keyword sk, ')
-                .append(' bio_marker_correl_mv sbm,')
-                .append(' bio_marker bm')
-                .append(' where sk.bio_data_id = sbm.bio_marker_id')
-                .append(' and sbm.asso_bio_marker_id = bm.bio_marker_id')
-                .append(' and sk.unique_id IN ')
-
-        //Construct an in list in case the user had multiple genes separated by ','.
-        pathwayS.append(convertStringToken(pathwayName))
-
-        println('query to get genes from pathway: ' + pathwayS.toString())
-        logger.debug('query to get genes from pathway: ' + pathwayS.toString())
-
-        //Add genes to an array.
         def genesArray = []
-        sql.eachRow(pathwayS.toString(), { row ->
+	new Sql(dataSource).eachRow sql, { row ->
             if (row.gene_id != null) {
-                genesArray.add(row.gene_id)
+		genesArray << row.gene_id
             }
         }
-        )
 
-        //Convert the genes array to a string.
-        String genes = convertList(genesArray, false, 1000)
-        return genes
+	convertList(genesArray, false, 1000)
     }
 
-    /**
-     * convert id list
-     */
-    def convertList(idList, boolean isString, int max) {
+    String convertList(idList, boolean isString, int max) {
         StringBuilder s = new StringBuilder()
         int i = 0
         for (id in idList) {
             if (i < max) {
-                if (s.length() > 0) {
-                    s.append(',')
+		if (s) {
+		    s << ','
                 }
                 if (isString) {
-                    s.append("'")
+		    s << QUOTE
                 }
-                s.append(id)
+		s << id
                 if (isString) {
-                    s.append("'")
+		    s << QUOTE
                 }
             }
             else {
@@ -722,10 +527,11 @@ class SnpDataService {
             }
             i++
         }
-        return s.toString()
+	s
     }
 }
 
+@CompileStatic
 class SnpDataObject {
     String patientNum
     String probeName
@@ -737,4 +543,11 @@ class SnpDataObject {
     String timepoint
     String tissue
     String gplId
+}
+
+@CompileStatic
+class PatientData {
+    def patientId
+    def omicPatientId
+    def subjectId
 }

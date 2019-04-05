@@ -17,70 +17,58 @@
  *
  ******************************************************************/
   
-
-/**
- * 
- */
 package com.recomdata.transmart.data.export;
 
-import com.recomdata.transmart.TransmartContextHolder;
 import com.recomdata.transmart.data.export.util.FTPUtil;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Map;
+import java.util.Date;
 
 /**
  * @author SMunikuntla
- * 
  */
 public class ExportDataProcessor {
 
-	private static org.apache.log4j.Logger log = Logger
-			.getLogger(ExportDataProcessor.class);
-	@SuppressWarnings("rawtypes")
-	private static final Map config = TransmartContextHolder.getGrailsApplication().getFlatConfig();
+    private static final Logger logger = LoggerFactory.getLogger(ExportDataProcessor.class);
 
-	private static final String TEMP_DIR = (String) config.get("com.recomdata.plugins.tempFolderDirectory");
+    private final String tempFolderDirectory;
 
-	public InputStream getExportJobFileStream(String fileToGet) {
-		InputStream inputStream = null;
-		File jobZipFile = null;
-		try {
-			if (StringUtils.isEmpty(fileToGet))
-				return null;
+    public ExportDataProcessor(String directory) {
+        tempFolderDirectory = directory;
+    }
 
-			inputStream = FTPUtil.downloadFile(true, fileToGet);
-			//If the file was not found at the FTP location try to download it from the server Temp dir
-			if (null == inputStream) {
-				String filePath = TEMP_DIR + File.separator + fileToGet;
-				jobZipFile = new File(filePath);
-				if (jobZipFile.isFile()) {
-					inputStream = new FileInputStream(jobZipFile);
-				}
-			}
-		} catch (Exception e) {
-			log.error("Failed to SFTP GET the ZIP file");
-		}
+    public InputStream getExportJobFileStream(String fileToGet) {
+        InputStream inputStream = null;
+        try {
+            if (StringUtils.isEmpty(fileToGet)) {
+                return null;
+            }
 
-		return inputStream;
-	}
+            inputStream = FTPUtil.downloadFile(true, fileToGet);
+            //If the file was not found at the FTP location try to download it from the server Temp dir
+            if (null == inputStream) {
+                File jobZipFile = new File(tempFolderDirectory, fileToGet);
+                if (jobZipFile.isFile()) {
+                    inputStream = new FileInputStream(jobZipFile);
+                }
+            }
+        }
+        catch (FileNotFoundException | RuntimeException e) {
+            logger.error("Failed to SFTP GET the ZIP file");
+        }
 
-	@SuppressWarnings("unused")
-	private String getZipFileName(String studyName) {
-		StringBuilder fileName = new StringBuilder();
-		DateFormat formatter = new SimpleDateFormat("MMddyyyyHHmmss");
-		fileName.append(TEMP_DIR);
-		fileName.append(studyName);
-		fileName.append(formatter.format(Calendar.getInstance().getTime()));
-		fileName.append(".zip");
+        return inputStream;
+    }
 
-		return fileName.toString();
-	}
+    @SuppressWarnings("unused")
+    private String getZipFileName(String studyName) {
+        return tempFolderDirectory + studyName + new SimpleDateFormat("MMddyyyyHHmmss").format(new Date()) + ".zip";
+    }
 }

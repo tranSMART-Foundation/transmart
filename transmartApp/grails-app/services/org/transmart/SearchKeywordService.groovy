@@ -1,528 +1,371 @@
 package org.transmart
 
+import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.BioDataExternalCode
 import org.transmart.biomart.ConceptCode
+import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.UtilService
 import org.transmart.searchapp.GeneSignature
 import org.transmart.searchapp.SearchKeyword
 import org.transmart.searchapp.SearchKeywordTerm
 
 /**
- * @author $Author: mmcduffie $
- * $Id: SearchKeywordService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * $Revision: 9178 $
- *
+ * @author mmcduffie
  */
-
 @Slf4j('logger')
-public class SearchKeywordService {
+class SearchKeywordService {
 
-    def springSecurityService
-
-    // probably not needed but makes all methods transactional
-    static transactional = true
+    @Autowired private SecurityService securityService
+    @Autowired private UtilService utilService
 
     //Hard-coded list of items that we consider filter categories... configure in Config/database?
-    def filtercats = [
+    private static final List<Map> filtercats = [
 
-            [codeTypeName: 'THERAPEUTIC_DOMAIN', category: 'THERAPEUTIC_DOMAIN', displayName: 'Program Therapeutic Domain'],
-            [codeTypeName: 'PROGRAM_INSTITUTION', category: 'PROGRAM_INSTITUTION', displayName: 'Program Institution'],
+        [codeTypeName: 'THERAPEUTIC_DOMAIN', category: 'THERAPEUTIC_DOMAIN', displayName: 'Program Therapeutic Domain'],
+        [codeTypeName: 'PROGRAM_INSTITUTION', category: 'PROGRAM_INSTITUTION', displayName: 'Program Institution'],
 
-            [codeTypeName: 'STUDY_PHASE', category: 'STUDY_PHASE', displayName: 'Study Phase'],
-            [codeTypeName: 'STUDY_OBJECTIVE', category: 'STUDY_OBJECTIVE', displayName: 'Study Objective'],
-            [codeTypeName: 'STUDY_DESIGN', category: 'STUDY_DESIGN', displayName: 'Study Design'],
-            [codeTypeName: 'STUDY_BIOMARKER_TYPE', category: 'STUDY_BIOMARKER_TYPE', displayName: 'Study Biomarker Type'],
-            [codeTypeName: 'STUDY_ACCESS_TYPE', category: 'STUDY_ACCESS_TYPE', displayName: 'Study Access Type'],
-            [codeTypeName: 'STUDY_INSTITUTION', category: 'STUDY_INSTITUTION', displayName: 'Study Institution'],
+        [codeTypeName: 'STUDY_PHASE', category: 'STUDY_PHASE', displayName: 'Study Phase'],
+        [codeTypeName: 'STUDY_OBJECTIVE', category: 'STUDY_OBJECTIVE', displayName: 'Study Objective'],
+        [codeTypeName: 'STUDY_DESIGN', category: 'STUDY_DESIGN', displayName: 'Study Design'],
+        [codeTypeName: 'STUDY_BIOMARKER_TYPE', category: 'STUDY_BIOMARKER_TYPE', displayName: 'Study Biomarker Type'],
+        [codeTypeName: 'STUDY_ACCESS_TYPE', category: 'STUDY_ACCESS_TYPE', displayName: 'Study Access Type'],
+        [codeTypeName: 'STUDY_INSTITUTION', category: 'STUDY_INSTITUTION', displayName: 'Study Institution'],
 
-            [codeTypeName: 'ASSAY_TYPE_OF_BM_STUDIED', category: 'ASSAY_TYPE_OF_BM_STUDIED', displayName: 'Assay Type of Biomarkers'],
-            [category: 'ASSAY_MEASUREMENT_TYPE', displayName: 'Assay Measurement Type', useText: true, platformProperty: 'platformType'],
-            [category: 'ASSAY_TECHNOLOGY', displayName: 'Assay Technology', prefix: true, useText: true, platformProperty: 'platformTechnology'],
-            [category: 'ASSAY_VENDOR', displayName: 'Assay Vendor', prefix: true, useText: true, platformProperty: 'vendor'],
-            [category: 'ASSAY_PLATFORM_NAME', displayName: 'Assay Platform Name', useText: true, platformProperty: 'name'],
+        [codeTypeName: 'ASSAY_TYPE_OF_BM_STUDIED', category: 'ASSAY_TYPE_OF_BM_STUDIED', displayName: 'Assay Type of Biomarkers'],
+        [category: 'ASSAY_MEASUREMENT_TYPE', displayName: 'Assay Measurement Type', useText: true, platformProperty: 'platformType'],
+        [category: 'ASSAY_TECHNOLOGY', displayName: 'Assay Technology', prefix: true, useText: true, platformProperty: 'platformTechnology'],
+        [category: 'ASSAY_VENDOR', displayName: 'Assay Vendor', prefix: true, useText: true, platformProperty: 'vendor'],
+        [category: 'ASSAY_PLATFORM_NAME', displayName: 'Assay Platform Name', useText: true, platformProperty: 'name'],
 
-            [category: 'ANALYSIS_MEASUREMENT_TYPE', displayName: 'Analysis Measurement Type', useText: true, platformProperty: 'platformType'],
-            [category: 'ANALYSIS_TECHNOLOGY', displayName: 'Analysis Technology', prefix: true, useText: true, platformProperty: 'platformTechnology'],
-            [category: 'ANALYSIS_VENDOR', displayName: 'Analysis Vendor', prefix: true, useText: true, platformProperty: 'vendor'],
-            [category: 'ANALYSIS_PLATFORM_NAME', displayName: 'Analysis Platform Name', useText: true, platformProperty: 'name'],
+        [category: 'ANALYSIS_MEASUREMENT_TYPE', displayName: 'Analysis Measurement Type', useText: true, platformProperty: 'platformType'],
+        [category: 'ANALYSIS_TECHNOLOGY', displayName: 'Analysis Technology', prefix: true, useText: true, platformProperty: 'platformTechnology'],
+        [category: 'ANALYSIS_VENDOR', displayName: 'Analysis Vendor', prefix: true, useText: true, platformProperty: 'vendor'],
+        [category: 'ANALYSIS_PLATFORM_NAME', displayName: 'Analysis Platform Name', useText: true, platformProperty: 'name'],
 
-            [codeTypeName: 'FILE_TYPE', category: 'FILE_TYPE', displayName: 'File type']
-    ]
+        [codeTypeName: 'FILE_TYPE', category: 'FILE_TYPE', displayName: 'File type']
+    ].asImmutable()
 
     /** Finds all of the search categories pertaining to search keywords */
-    def findSearchCategories() {
-        logger.info 'Finding all of the search categories...'
+    List<Map<String, String>> findSearchCategories() {
+	logger.debug 'Finding all of the search categories...'
 
-        def c = SearchKeyword.createCriteria()
-        def results = c.list {
+	List<String> results = SearchKeyword.createCriteria().list {
             projections {
-                distinct('dataCategory')
+		distinct 'dataCategory'
             }
-            order('dataCategory', 'asc')
+	    order 'dataCategory', 'asc'
         }
 
-        logger.info('Categories found: ' + results.size())
+	logger.debug 'Categories found: {}', results.size()
 
-        def categories = []
+	List<Map<String, String>> categories = []
 
         for (result in results) {
-            categories.add(['category': result])
+	    categories << [category: result]
         }
 
-        return categories
+	categories
     }
 
-    def findFilterCategories() {
+    List<Map> findFilterCategories() {
 
-        def categories = []
+	List<Map> categories = []
 
-        for (filtercat in filtercats) {
-            def results
+	for (Map filtercat in filtercats) {
+
+	    Set<Map> choices = new TreeSet<>(new Comparator<Map>() {
+		int compare(Map m1, Map m2) {
+		    m1.name.compareTo m2.name
+		}
+	    })
 
             if (filtercat.platformProperty) {
-                results = BioAssayPlatform.createCriteria().list {
+		List<String> results = BioAssayPlatform.createCriteria().list {
                     projections {
-                        distinct(filtercat.platformProperty)
+			distinct filtercat.platformProperty
                     }
-                    order(filtercat.platformProperty, 'asc')
+		    order filtercat.platformProperty, 'asc'
                 }
-            }
-            else if (filtercat.prefix) {
-                results = ConceptCode.createCriteria().list {
-                    like('codeTypeName', filtercat.codeTypeName + ':%')
-                    order('codeName', 'asc')
+		for (String result in results) {
+		    if (filtercat.platformProperty) {
+			choices << [name: result, uid: result]
+		    }
                 }
             }
             else {
-                results = ConceptCode.createCriteria().list {
-                    eq('codeTypeName', filtercat.codeTypeName)
-                    order('codeName', 'asc')
+		List<ConceptCode> results
+		if (filtercat.prefix) {
+		    results = ConceptCode.findAllByCodeTypeNameLike(filtercat.codeTypeName + ':%', [sort: 'codeName', order: 'asc'])
                 }
-            }
-
-            def choices = new TreeSet<Map>(new Comparator() {
-                int compare(Object o1, Object o2) {
-                    if (!o1 instanceof Map || !o2 instanceof Map) {
-                        return 0
+		else {
+		    results = ConceptCode.findAllByCodeTypeName(filtercat.codeTypeName, [sort: 'codeName', order: 'asc'])
+                }
+		for (ConceptCode result in results) {
+		    if (filtercat.useText) {
+			choices << [name: result.codeName, uid: result.codeName]
                     }
-                    Map m1 = (Map) o1
-                    Map m2 = (Map) o2
-                    return o1.get('name').compareTo(o2.get('name'))
-                }
-            })
-            for (result in results) {
-                if (filtercat.platformProperty) {
-                    choices.add([name: result, uid: result])
-                }
-                else if (filtercat.useText) {
-                    choices.add([name: result.codeName, uid: result.codeName])
-                }
-                else {
-                    choices.add([name: result.codeName, uid: result.bioDataUid.uniqueId[0]])
+                    else {
+			choices << [name: result.codeName, uid: result.bioDataUid.uniqueId[0]]
+		    }
                 }
             }
 
             if (choices) {
-                categories.add(['category': filtercat, 'choices': choices])
+		categories << [category: filtercat, choices: choices]
             }
         }
 
-        return categories
+	categories
     }
 
     /** Searches for all keywords for a given term (like %il%) */
-    def findSearchKeywords(category, term, max) {
-        logger.info 'Finding matches for ' + term + ' in ' + category
+    List<Map> findSearchKeywords(String category, String term, int max) {
+	logger.debug 'Finding matches for {} in {}', term, category
 
-        def user = springSecurityService.getPrincipal()
-
-        def c = SearchKeywordTerm.createCriteria()
-        def results = c.list {
-            if (term.size() > 0) {
-                like('keywordTerm', term.toUpperCase() + '%')
+	List results = SearchKeywordTerm.createCriteria().list {
+	    if (term) {
+		like 'keywordTerm', term.toUpperCase() + '%'
             }
 
-            if ('GENE_OR_SNP'.equals(category)) {
+	    if ('GENE_OR_SNP' == category) {
                 searchKeyword {
                     or {
-                        eq('dataCategory', 'GENE')
-                        eq('dataCategory', 'SNP')
+			eq 'dataCategory', 'GENE'
+			eq 'dataCategory', 'SNP'
                     }
                 }
             }
             else if ('ALL'.compareToIgnoreCase(category) != 0) {
                 searchKeyword {
-                    eq('dataCategory', category.toUpperCase())
+		    eq 'dataCategory', category.toUpperCase()
                 }
             }
 
-            if (!user.isAdmin()) {
-                logger.info('User is not an admin so filter out gene lists or signatures that are not public')
+	    if (!securityService.principal().isAdmin()) {
+		logger.debug 'User is not an admin so filter out gene lists or signatures that are not public'
                 or {
-                    isNull('ownerAuthUserId')
-                    eq('ownerAuthUserId', user.id)
+		    isNull 'ownerAuthUserId'
+		    eq 'ownerAuthUserId', securityService.currentUserId()
                 }
             }
-            maxResults(max)
-            order('rank', 'asc')
-            order('termLength', 'asc')
-            order('keywordTerm', 'asc')
+	    maxResults max
+	    order 'rank', 'asc'
+	    order 'termLength', 'asc'
+	    order 'keywordTerm', 'asc'
         }
-        logger.info('Search keywords found: ' + results.size())
+	logger.debug 'Search keywords found: {}', results.size()
 
-        def keywords = []
-        def dupeList = []            // store category:keyword for a duplicate check until DB is cleaned up
+	List<Map> keywords = []
+	List<String> dupeList = [] // store category:keyword for a duplicate check until DB is cleaned up
 
         for (result in results) {
-            def m = [:]
             def sk = result
             //////////////////////////////////////////////////////////////////////////////////
             // HACK:  Duplicate check until DB is cleaned up
-            def dupeKey = sk.searchKeyword.displayDataCategory + ':' + sk.searchKeyword.keyword +
-                    ':' + sk.searchKeyword.bioDataId
+	    String dupeKey = sk.searchKeyword.displayDataCategory + ':' + sk.searchKeyword.keyword +
+                ':' + sk.searchKeyword.bioDataId
             if (dupeKey in dupeList) {
-                logger.info 'Found duplicate: ' + dupeKey
+		logger.debug 'Found duplicate: {}', dupeKey
                 continue
             }
             else {
-                logger.info 'Found new entry, adding to the list: ' + dupeList
+		logger.debug 'Found new entry, adding to the list: {}', dupeList
                 dupeList << dupeKey
             }
             ///////////////////////////////////////////////////////////////////////////////////
 
-            m.put('label', sk.searchKeyword.keyword)
-            m.put('category', sk.searchKeyword.displayDataCategory)
-            m.put('categoryId', sk.searchKeyword.dataCategory)
+	    Map m = [label: sk.searchKeyword.keyword, category: sk.searchKeyword.displayDataCategory,
+		     categoryId: sk.searchKeyword.dataCategory]
 
-            if ('GENE_OR_SNP'.equals(category) || ('SNP'.equals(category))) {
-                m.put('id', sk.searchKeyword.id)
+	    if ('GENE_OR_SNP' == category || 'SNP' == category) {
+		m.id = sk.searchKeyword.id
             }
             else {
-                m.put('id', sk.searchKeyword.uniqueId)
+		m.id == sk.searchKeyword.uniqueId
             }
 
             if ('TEXT'.compareToIgnoreCase(sk.searchKeyword.dataCategory) != 0) {
-                def synonyms = org.transmart.biomart.BioDataExternalCode.findAllWhere(bioDataId: sk.searchKeyword.bioDataId, codeType: 'SYNONYM')
-                def synList = new StringBuilder()
+		List<BioDataExternalCode> synonyms = BioDataExternalCode.findAllWhere(bioDataId: sk.searchKeyword.bioDataId, codeType: 'SYNONYM')
+		StringBuilder synList = new StringBuilder()
                 for (synonym in synonyms) {
-                    if (synList.size() > 0) {
-                        synList.append(', ')
+		    if (synList) {
+			synList << ', '
                     }
                     else {
-                        synList.append('(')
+			synList << '('
                     }
-                    synList.append(synonym.code)
+		    synList << synonym.code
                 }
-                if (synList.size() > 0) {
-                    synList.append(')')
+		if (synList) {
+		    synList << ')'
                 }
-                m.put('synonyms', synList.toString())
+		m.synonyms = synList.toString()
             }
-            keywords.add(m)
+	    keywords << m
         }
 
-        /*
-        * Get results from Bio Concept Code table
-        */
+	// Get results from Bio Concept Code table
 
-        if (category.equals('ALL')) {
+	if (category == 'ALL') {
             results = ConceptCode.createCriteria().list {
-                if (term.size() > 0) {
-                    like('bioConceptCode', term.toUpperCase().replace(' ', '_') + '%')
+		if (term) {
+		    like 'bioConceptCode', term.toUpperCase().replace(' ', '_') + '%'
                 }
                 or {
-                    'in'("codeTypeName", filtercats*.codeTypeName)
+		    'in' 'codeTypeName', filtercats*.codeTypeName
                 }
-                maxResults(max)
-                order('bioConceptCode', 'asc')
+		maxResults max
+		order 'bioConceptCode', 'asc'
             }
-            logger.info('Bio concept code keywords found: ' + results.size())
+	    logger.debug 'Bio concept code keywords found: {}', results.size()
 
             for (result in results) {
-                def m = [:]
-
                 //Get display name by category
                 def cat = filtercats.find { result.codeTypeName.startsWith(it.codeTypeName) }
 
-                m.put('label', result.codeName)
-                m.put('category', cat.displayName)
-                m.put('categoryId', cat.category)
-                if (cat.useText) {
-                    m.put('id', result.codeName)
+		Map m = [label: result.codeName, category: cat.displayName, categoryId: cat.category,
+			 id: cat.useText ? result.codeName : result.bioDataUid.uniqueId[0]]
+		if (!keywords.find { it.id == m.id }) {
+		    keywords << m
                 }
-                else {
-                    m.put('id', result.bioDataUid.uniqueId[0])
-                }
-                if (!keywords.find { it.id.equals(m.id) }) {
-                    keywords.add(m)
-                }
-
             }
 
             //If we're not over the maximum result threshold, query the platform table as well
             if (keywords.size() < max) {
 
                 //Perform a query for each platform field
-                for (cat in filtercats) {
+		for (Map cat in filtercats) {
                     if (cat.platformProperty) {
                         results = BioAssayPlatform.createCriteria().list {
-                            ilike(cat.platformProperty, term + '%')
-                            maxResults(max)
-                            order(cat.platformProperty, 'asc')
-                        }
-                        logger.info('Platform ' + cat.platformProperty + ' keywords found: ' + results.size())
+			    ilike cat.platformProperty, term + '%'
+			    maxResults max
+			    order cat.platformProperty, 'asc'
+			}
+			logger.debug 'Platform {} keywords found: {}', cat.platformProperty, results.size()
 
-                        for (result in results) {
-                            def m = [:]
+			for (result in results) {
+			    Map m = [label: result[cat.platformProperty], category: cat.displayName,
+				     categoryId: cat.category, id: result[cat.platformProperty]]
+			    if (!keywords.find { it.id == m.id && it.category == m.category }) {
+				keywords << m
+			    }
+			}
+		    }
+		}
+	    }
+	}
 
-                            m.put("label", result."${cat.platformProperty}")
-                            m.put('category', cat.displayName)
-                            m.put('categoryId', cat.category)
-                            m.put("id", result."${cat.platformProperty}")
-
-                            if (!keywords.find { it.id.equals(m.id) && it.category.equals(m.category) }) {
-                                keywords.add(m)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        return keywords
-    }
-
-    /** Searches for all keywords for a given term (like %il%) */
-    def findSearchKeywords(category, term) {
-        logger.info 'Finding matches for ' + term + ' in ' + category
-
-        def user = springSecurityService.getPrincipal()
-
-        def c = SearchKeywordTerm.createCriteria()
-        def results = c.list {
-            if (term.size() > 0) {
-                ilike('keywordTerm', '%' + term + '%')
-            }
-            if (category.class.name.toLowerCase() == 'java.util.arraylist') {
-                searchKeyword {
-                    inList('dataCategory', category)
-                }
-            }
-            else {
-                if ('ALL'.compareToIgnoreCase(category) != 0) {
-                    searchKeyword {
-                        eq('dataCategory', category, [ignoreCase: true])
-                    }
-                }
-            }
-
-            if (!user.isAdmin()) {
-                logger.info('User is not an admin so filter out gene lists or signatures that are not public')
-                or {
-                    isNull('ownerAuthUserId')
-                    eq('ownerAuthUserId', user.id)
-                }
-            }
-            maxResults(20)
-            order('rank', 'asc')
-            order('termLength', 'asc')
-            order('keywordTerm', 'asc')
-        }
-        logger.info('Search keywords found: ' + results.size())
-
-        def keywords = []
-        def dupeList = []            // store category:keyword for a duplicate check until DB is cleaned up
-
-        for (result in results) {
-            def m = [:]
-            def sk = result
-            //////////////////////////////////////////////////////////////////////////////////
-            // HACK:  Duplicate check until DB is cleaned up
-            def dupeKey = sk.searchKeyword.displayDataCategory + ':' + sk.searchKeyword.keyword
-            if (dupeKey in dupeList) {
-                logger.info 'Found duplicate: ' + dupeKey
-                continue
-            }
-            else {
-                logger.info 'Found new entry, adding to the list: ' + dupeList
-                dupeList << dupeKey
-            }
-            ///////////////////////////////////////////////////////////////////////////////////
-            m.put('label', sk.searchKeyword.keyword)
-            m.put('id', sk.searchKeyword.id)
-            m.put('category', sk.searchKeyword.displayDataCategory)
-            m.put('categoryId', sk.searchKeyword.dataCategory)
-            if ('TEXT'.compareToIgnoreCase(sk.searchKeyword.dataCategory) != 0) {
-                def synonyms = BioDataExternalCode.findAllWhere(bioDataId: sk.searchKeyword.bioDataId, codeType: 'SYNONYM')
-                def synList = new StringBuilder()
-                for (synonym in synonyms) {
-                    if (synList.size() > 0) {
-                        synList.append(', ')
-                    }
-                    else {
-                        synList.append('(')
-                    }
-                    synList.append(synonym.code)
-                }
-                if (synList.size() > 0) {
-                    synList.append(')')
-                }
-                m.put('synonyms', synList.toString())
-            }
-            keywords.add(m)
-        }
-        return keywords
-    }
-    /**
-     * This will render a UI where the user can pick an experiment from a list of all the experiments in the system. Selection of multiple studies is allowed.
-     */
-    def browseAnalysisMultiSelect = {
-        def analyses = org.transmart.biomart.BioAssayAnalysis.executeQuery('select id, name, etlId from BioAssayAnalysis b order by b.name')
-        render(template: 'browseMulti', model: [analyses: analyses])
+	keywords
     }
 
     /**
      * convert pathways to a list of genes
      */
-    def expandPathwayToGenes(pathwayIds) {
-        return expandPathwayToGenes(pathwayIds, null)
-    }
-
-    /**
-     * convert pathways to a list of genes
-     */
-    def expandPathwayToGenes(pathwayIds, Long max) {
-        if (pathwayIds == null || pathwayIds.length() == 0) {
+    List<SearchKeyword> expandPathwayToGenes(String pathwayIds) {
+	if (!pathwayIds) {
             return []
         }
-        def query = 'select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.biomart.BioDataCorrelation c where k.bioDataId=c.associatedBioDataId and c.bioDataId in (' + pathwayIds + ') ORDER BY k.keyword'
-        if (max != null)
-            return SearchKeyword.executeQuery(query, [max: max])
-        else
-            return SearchKeyword.executeQuery(query)
 
-
+	SearchKeyword.executeQuery '''
+				select DISTINCT k
+				from org.transmart.searchapp.SearchKeyword k, org.transmart.biomart.BioDataCorrelation c
+				where k.bioDataId=c.associatedBioDataId and c.bioDataId in (''' + pathwayIds + ')' + '''
+				ORDER BY k.keyword
+		'''
     }
 
-    def expandAllListToGenes(pathwayIds) {
-        return expandAllListToGenes(pathwayIds, null)
-    }
-
-    def expandAllListToGenes(pathwayIds, Long max) {
-        if (pathwayIds == null || pathwayIds.length() == 0) {
+    List<SearchKeyword> expandAllListToGenes(String pathwayIds, Long max = null) {
+	if (!pathwayIds) {
             return []
         }
-        def result = []
+
+	List<SearchKeyword> result = []
         // find pathways
-        def query = 'select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.biomart.BioDataCorrelation c where k.bioDataId=c.associatedBioDataId and c.bioDataId in (' + pathwayIds + ') ORDER BY k.keyword'
+	String hql = '''
+				select DISTINCT k
+			from org.transmart.searchapp.SearchKeyword k, org.transmart.biomart.BioDataCorrelation c
+			where k.bioDataId=c.associatedBioDataId
+			  and c.bioDataId in (''' + pathwayIds + ')' + '''
+			ORDER BY k.keyword'''
+	if (max != null) {
+	    result.addAll SearchKeyword.executeQuery(hql, [max: max])
+	}
+
         // find gene sigs
-        def query2 = 'select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.searchapp.SearchBioMarkerCorrelFastMV c where k.bioDataId=c.assocBioMarkerId and c.domainObjectId in (' + pathwayIds + ') ORDER BY k.keyword'
-        if (max != null)
-            result.addAll(SearchKeyword.executeQuery(query, [max: max]))
+	String hql2 = '''
+			select DISTINCT k from org.transmart.searchapp.SearchKeyword k, org.transmart.searchapp.SearchBioMarkerCorrelFastMV c
+			where k.bioDataId=c.assocBioMarkerId
+			and c.domainObjectId in (''' + pathwayIds + ')' + '''
+			ORDER BY k.keyword'''
         if (result.size() < max) {
-            result.addAll(SearchKeyword.executeQuery(query2, [max: (max - result.size())]))
+	    result.addAll SearchKeyword.executeQuery(hql2, [max: (max - result.size())])
         }
         else {
-            result.addAll(SearchKeyword.executeQuery(query))
-            result.addAll(SearchKeyword.executeQuery(query2))
+	    result.addAll SearchKeyword.executeQuery(hql)
+	    result.addAll SearchKeyword.executeQuery(hql2)
         }
-        return result
 
-    }
-
-    /**
-     * link a GeneSignature new instance to search
-     */
-    def newGeneSignatureLink(GeneSignature gs, boolean bFlush) {
-        // link  gs to search
-        SearchKeyword keyword = createSearchKeywordFromGeneSig(gs)
-
-        keyword.validate()
-        println('keyword validate()')
-
-        if (keyword.hasErrors()) {
-            println('WARN: SearchKeyword validation error!')
-            keyword.errors.each { println it }
-        }
-        println('INFO: saving new SearchKeyword!')
-        keyword.save(flush: bFlush)
+	result
     }
 
     /**
      * update GeneSignature/List link to search
      */
-    def updateGeneSignatureLink(GeneSignature gs, String domainKey, boolean bFlush) {
+    @Transactional
+    void updateGeneSignatureLink(GeneSignature gs, String domainKey, boolean flush) {
         // find keyword record
         SearchKeyword keyword = SearchKeyword.findByBioDataIdAndDataCategory(gs.id, domainKey)
-        logger.info('updateGeneSignatureLink: domainKey ' + domainKey + ' concept ' + gs.foldChgMetricConceptCode.bioConceptCode + ' retrieved ' + keyword)
 
         // delete search keywords
-        if (gs.deletedFlag || (domainKey == GeneSignature.DOMAIN_KEY_GL && gs.foldChgMetricConceptCode.bioConceptCode != 'NOT_USED') || (domainKey == GeneSignature.DOMAIN_KEY && gs.foldChgMetricConceptCode.bioConceptCode == 'NOT_USED')) {
-            logger.info('updateGeneSignatureLink delete keyword')
-            if (keyword != null) keyword.delete(flush: bFlush)
+	if (gs.deletedFlag ||
+	    (domainKey == GeneSignature.DOMAIN_KEY_GL && gs.foldChgMetricConceptCode.bioConceptCode != 'NOT_USED') ||
+	    (domainKey == GeneSignature.DOMAIN_KEY && gs.foldChgMetricConceptCode.bioConceptCode == 'NOT_USED')) {
+	    keyword?.delete(flush: flush)
         }
         else {
             // add if does not exist
             if (keyword == null) {
-                logger.info('updateGeneSignatureLink create keyword')
                 keyword = createSearchKeywordFromGeneSig(gs, domainKey)
             }
             else {
                 // update keyword
-                logger.info('updateGeneSignatureLink update keyword ' + gs.name + ' ')
                 keyword.keyword = gs.name
                 keyword.ownerAuthUserId = gs.publicFlag ? null : gs.createdByAuthUser.id
-                keyword.terms.each {
-                    logger.info('INFO: ' + it)
-                    it.keywordTerm = gs.name.toUpperCase()
-                    it.ownerAuthUserId = gs.publicFlag ? null : gs.createdByAuthUser.id
-                    //logger.info('INFO: setting owner to: '+it.ownerAuthUserId)
+		for (SearchKeywordTerm term in keyword.terms) {
+		    term.keywordTerm = gs.name.toUpperCase()
+		    term.ownerAuthUserId = gs.publicFlag ? null : gs.createdByAuthUser.id
                 }
             }
 
-            keyword.validate()
-            if (keyword.hasErrors()) {
-                logger.info('WARN: SearchKeyword validation error!')
-                keyword.errors.each {logger.info('keyword error: ' + it)}
+	    if (!keyword.save(flush: flush)) {
+		logger.error '{}', utilService.errorStrings(keyword)
             }
-            logger.info('INFO: trying to save SearchKeyword')
-            keyword.save(flush: bFlush)
         }
     }
 
     /**
-     * create a new SearchKeyword for a GeneSignatute
+     * create a new SearchKeyword for a GeneSignature
      */
-    def createSearchKeywordFromGeneSig(GeneSignature gs, String domainKey) {
-        println('INFO: creating SearchKeyword for GS: ' + gs.name + '[' + domainKey + ']')
+    private SearchKeyword createSearchKeywordFromGeneSig(GeneSignature gs, String domainKey) {
 
-        // display category GS or GL?
-        def displayName = (domainKey == GeneSignature.DOMAIN_KEY) ? GeneSignature.DISPLAY_TAG : GeneSignature.DISPLAY_TAG_GL
+	String displayName = domainKey == GeneSignature.DOMAIN_KEY ? GeneSignature.DISPLAY_TAG : GeneSignature.DISPLAY_TAG_GL
 
-        SearchKeyword keyword = new SearchKeyword()
-        keyword.properties.keyword = gs.name
-        keyword.properties.bioDataId = gs.id
-        keyword.properties.uniqueId = gs.uniqueId
-        keyword.properties.dataCategory = domainKey
-        keyword.properties.displayDataCategory = displayName
-        keyword.properties.dataSource = 'Internal'
-        if (!gs.publicFlag) keyword.properties.ownerAuthUserId = gs.createdByAuthUser?.id
+	SearchKeyword keyword = new SearchKeyword(keyword: gs.name, bioDataId: gs.id, uniqueId: gs.uniqueId,
+						  dataCategory: domainKey, displayDataCategory: displayName, dataSource: 'Internal')
+	if (!gs.publicFlag) {
+	    keyword.ownerAuthUserId = gs.createdByAuthUserId
+	}
 
-        // keyword term
-        SearchKeywordTerm term = new SearchKeywordTerm()
-        term.properties.keywordTerm = gs.name.toUpperCase()
-        term.properties.rank = 1
-        term.properties.termLength = gs.name.length()
-        if (!gs.publicFlag) term.properties.ownerAuthUserId = gs.createdByAuthUser?.id
+	SearchKeywordTerm term = new SearchKeywordTerm(keywordTerm: gs.name.toUpperCase(), rank: 1, termLength: gs.name.length())
+	if (!gs.publicFlag) {
+	    term.ownerAuthUserId = gs.createdByAuthUserId
+	}
 
-        // associate term
-        keyword.addToTerms(term)
+	keyword.addToTerms term
 
-        //println(keyword)
-        //println('properties:\n'+keyword.properties)
-        return keyword
+	keyword
     }
-
 }

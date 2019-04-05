@@ -1,45 +1,58 @@
+import groovy.sql.Sql
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.beans.factory.annotation.Autowired
 
+import javax.sql.DataSource
+
+@CompileStatic
 @Slf4j('logger')
-class SampleService {
+class SampleService implements InitializingBean {
 
-    def dataSource
-    def i2b2HelperService
-    def grailsApplication
-    def solrService
+    static transactional = false
 
-    boolean transactional = true
+    @Autowired private DataSource dataSource
+    @Autowired private I2b2HelperService i2b2HelperService
+    @Autowired private GrailsApplication grailsApplication
+    @Autowired private SolrService solrService
+
+    private Map<String, String> sampleBreakdownMap
 
     //Populate the QT_PATIENT_SAMPLE_COLLECTION table based on a result_instance_id.
-    public void generateSampleCollection(String result_instance_id) {
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        sql.execute('INSERT INTO QT_PATIENT_SAMPLE_COLLECTION (SAMPLE_ID, PATIENT_ID, RESULT_INSTANCE_ID) SELECT DISTINCT DSSM.SAMPLE_ID, DSSM.patient_id, ? FROM QT_PATIENT_SET_COLLECTION QT INNER JOIN DE_SUBJECT_SAMPLE_MAPPING DSSM ON DSSM.PATIENT_ID = QT.PATIENT_NUM WHERE RESULT_INSTANCE_ID = ?', [result_instance_id.toInteger(), result_instance_id.toInteger()])
+    void generateSampleCollection(String resultInstanceId) {
+	new Sql(dataSource).execute('''
+			INSERT INTO I2B2DEMODATA.QT_PATIENT_SAMPLE_COLLECTION (SAMPLE_ID, PATIENT_ID, RESULT_INSTANCE_ID)
+			SELECT DISTINCT DSSM.SAMPLE_ID, DSSM.patient_id, ?
+			FROM I2B2DEMODATA.QT_PATIENT_SET_COLLECTION QT
+			INNER JOIN DEAPP.DE_SUBJECT_SAMPLE_MAPPING DSSM ON DSSM.PATIENT_ID = QT.PATIENT_NUM
+			WHERE RESULT_INSTANCE_ID = ?''',
+			resultInstanceId.toInteger(), resultInstanceId.toInteger())
     }
 
-    public loadSampleStatisticsObject(String result_instance_id) {
-        //This is the value object we store the count values in.
-        def sampleSummary = [:]
+    Map loadSampleStatisticsObject(String resultInstanceId) {
 
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+	StringWriter writer = new StringWriter()
 
-        StringWriter writer1 = new StringWriter()
-        PrintWriter pw1 = new PrintWriter(writer1)
+	i2b2HelperService.renderQueryDefinition resultInstanceId, 'Query Definition', new PrintWriter(writer)
 
-        i2b2HelperService.renderQueryDefinition(result_instance_id, 'Query Definition', pw1)
+	Map<String, Object> sampleSummary = [:]
 
-        sampleSummary['queryDefinition'] = writer1.toString()
+	sampleSummary.queryDefinition = writer.toString()
 
-        grailsApplication.config.edu.harvard.transmart.sampleBreakdownMap.each {
-            currentCountVariable ->
-
-                sampleSummary[currentCountVariable.value] = solrService.getFacetCountForField(currentCountVariable.key, result_instance_id, 'sample')
-
-                logger.debug('Finished count for field ' + currentCountVariable.value + ' - ' + currentCountVariable.key)
-                logger.debug(sampleSummary[currentCountVariable.value])
-
+	sampleBreakdownMap.each { String key, String value ->
+	    int count = solrService.getFacetCountForField(key, resultInstanceId, 'sample')
+	    sampleSummary[value] = count
+	    logger.debug 'Finished count for field {} - {}: {}', value, key, count
         }
 
-        return sampleSummary
+	sampleSummary
     }
 
+    @CompileDynamic
+    void afterPropertiesSet() {
+	sampleBreakdownMap = grailsApplication.config.edu.harvard.transmart.sampleBreakdownMap
+    }
 }

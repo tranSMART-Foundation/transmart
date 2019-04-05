@@ -1,27 +1,35 @@
 package org.transmart
 
+import groovy.transform.CompileStatic
+
 /**
- * $Id: LiteratureFilter.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
+ * @author mmcduffie
  */
+@CompileStatic
 class LiteratureFilter {
 
     String dataType
 
     // Reference
     Long bioDiseaseId
-    Set diseaseSite = new HashSet()
-    Set componentList = new HashSet()
-    List pairCompList = new ArrayList()
-    List pairGeneList = new ArrayList()
+    Set diseaseSite = []
+    Set componentList = []
+    List pairCompList = []
+    List pairGeneList = []
 
     // Alteration
     String mutationType
     String mutationSite
     String epigeneticType
     String epigeneticRegion
-    LinkedHashMap alterationTypes = new LinkedHashMap()
+    Map<String, Boolean> alterationTypes = [
+	'Epigenetic Event'    : true,
+	Expression            : true,
+	'Gene Amplification'  : true,
+	'Genomic Level Change': true,
+	LOH                   : true,
+	Mutation              : true,
+	PTM                   : true]
     String moleculeType
     String regulation
     String ptmType
@@ -39,151 +47,136 @@ class LiteratureFilter {
     String inhibitorName
     String trialExperimentalModel
 
-    LiteratureFilter() {
-
-        alterationTypes.put('Epigenetic Event', true)
-        alterationTypes.put('Expression', true)
-        alterationTypes.put('Gene Amplification', true)
-        alterationTypes.put('Genomic Level Change', true)
-        alterationTypes.put('LOH', true)
-        alterationTypes.put('Mutation', true)
-        alterationTypes.put('PTM', true)
-
+    boolean hasDisease() {
+	bioDiseaseId > 0
     }
 
-    def hasDisease() {
-        return bioDiseaseId != null && bioDiseaseId > 0
+    boolean hasDiseaseSite() {
+	diseaseSite && diseaseSite.iterator().next()
     }
 
-    def hasDiseaseSite() {
-        return diseaseSite != null && diseaseSite.size() > 0 && (diseaseSite.iterator().next() != '')
+    boolean hasComponent() {
+	componentList && componentList.iterator().next()
     }
 
-    def hasComponent() {
-        return componentList != null && componentList.size() > 0 && (componentList.iterator().next() != '')
+    boolean hasMutationType() {
+	mutationType
     }
 
-    def hasMutationType() {
-        return mutationType != null && mutationType.length() > 0
+    boolean hasMutationSite() {
+	mutationSite
     }
 
-    def hasMutationSite() {
-        return mutationSite != null && mutationSite.length() > 0
+    boolean hasEpigeneticType() {
+	epigeneticType
     }
 
-    def hasEpigeneticType() {
-        return epigeneticType != null && epigeneticType.length() > 0
+    boolean hasEpigeneticRegion() {
+	epigeneticRegion
     }
 
-    def hasEpigeneticRegion() {
-        return epigeneticRegion != null && epigeneticRegion.length() > 0
-    }
-
-    def hasAlterationType() {
+    boolean hasAlterationType() {
         int count = 0
-        for (type in alterationTypes) {
-            if (type.value == true) {
+	for (boolean value in alterationTypes.values()) {
+	    if (value) {
                 count++
             }
         }
         // NOTE: Only want to filter if any of the types are not selected.
-        return count < alterationTypes.size()
+	count < alterationTypes.size()
     }
 
-    def hasMoleculeType() {
-        return moleculeType != null && moleculeType.length() > 0
+    boolean hasMoleculeType() {
+	moleculeType
     }
 
-    def hasRegulation() {
-        return regulation != null && regulation.length() > 0
+    boolean hasRegulation() {
+	regulation
     }
 
-    def hasPtmType() {
-        return ptmType != null && ptmType.length() > 0
+    boolean hasPtmType() {
+	ptmType
     }
 
-    def hasPtmRegion() {
-        return ptmRegion != null && ptmRegion.length() > 0
+    boolean hasPtmRegion() {
+	ptmRegion
     }
 
-    def hasSource() {
-        return source != null && source.length() > 0
+    boolean hasSource() {
+	source
     }
 
-    def hasTarget() {
-        return target != null && target.length() > 0
+    boolean hasTarget() {
+	target
     }
 
-    def hasExperimentalModel() {
-        return experimentalModel != null && experimentalModel.length() > 0
+    boolean hasExperimentalModel() {
+	experimentalModel
     }
 
-    def hasMechanism() {
-        return mechanism != null && mechanism.length() > 0
+    boolean hasMechanism() {
+	mechanism
     }
 
-    def hasTrialType() {
-
-        return trialType != null && trialType.length() > 0
+    boolean hasTrialType() {
+	trialType
     }
 
-    def hasTrialPhase() {
-        return trialPhase != null && trialPhase.length() > 0
+    boolean hasTrialPhase() {
+	trialPhase
     }
 
-    def hasInhibitorName() {
-        return inhibitorName != null && inhibitorName.length() > 0
+    boolean hasInhibitorName() {
+	inhibitorName
     }
 
-    def hasTrialExperimentalModel() {
-        return trialExperimentalModel != null && trialExperimentalModel.length() > 0
+    boolean hasTrialExperimentalModel() {
+	trialExperimentalModel
     }
 
     /**
-     * Return the set of alteration types that are selected in the filter
+     * The alteration types that are selected in the filter
      *
-     * @return set of alteration types that the user has selected
+     * @return alteration types that the user has selected
      */
-    def getSelectedAlterationTypes() {
-        Set returnSet = new HashSet()
-        for (key in alterationTypes.keySet()) {
-            if (alterationTypes.get(key) == true) {
-                returnSet.add(key.toUpperCase().replace('_', ' '))
+    Set<String> getSelectedAlterationTypes() {
+	Set<String> types = []
+	for (String key in alterationTypes.keySet()) {
+	    if (alterationTypes[key]) {
+		types << key.toUpperCase().replace('_', ' ')
             }
         }
-        return returnSet
+	types
     }
 
-    def parseDiseaseSite(list) {
+    void parseDiseaseSite(list) {
         if (list != null) {
             if (list instanceof String) {
-                diseaseSite.add(list)
+		diseaseSite << list
             }
             else {
-                for (item in list) {
-                    diseaseSite.add(item)
-                }
+		diseaseSite.addAll list
             }
         }
     }
 
-    def parseComponentList(list) {
+    void parseComponentList(list) {
         pairCompList.clear()
         pairGeneList.clear()
         componentList.clear()
-        if (list != null) {
-            if (list instanceof String && list.trim().length() > 0) {
-                componentList.add(list)
-                def compArray = list.split(',')
-                pairCompList.add(compArray[0].replace('[', '').trim())
-                pairGeneList.add(compArray[1].replace(']', '').trim())
+	if (list) {
+	    if (list instanceof String && list.trim()) {
+		componentList << list
+		String[] compArray = list.split(',')
+		pairCompList << compArray[0].replace('[', '').trim()
+		pairGeneList << compArray[1].replace(']', '').trim()
             }
             else {
-                for (item in list) {
-                    componentList.add(item)
-                    def compArray = item.split(',')
-                    pairCompList.add(compArray[0].replace('[', '').trim())
-                    pairGeneList.add(compArray[1].replace(']', '').trim())
+		for (String item in list) {
+		    componentList << item
+		    String[] compArray = item.split(',')
+		    pairCompList << compArray[0].replace('[', '').trim()
+		    pairGeneList << compArray[1].replace(']', '').trim()
                 }
             }
         }

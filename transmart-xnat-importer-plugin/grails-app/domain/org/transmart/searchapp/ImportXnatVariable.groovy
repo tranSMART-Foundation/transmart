@@ -1,4 +1,3 @@
-package org.transmart.searchapp
 /*************************************************************************
  * tranSMART - translational medicine data mart
  * 
@@ -18,35 +17,24 @@ package org.transmart.searchapp
  *
  ******************************************************************/
 
-/**
- * Request Map domain class used by Spring Security plugin to determine the security level by URL
- */
+package org.transmart.searchapp
+
 class ImportXnatVariable {
-	String name
-	String datatype
-	String url
-	Long id
+    String datatype
+    String name
+    String url
 
-	//Version for complete coupling config
-	//SEQUENCE ID
+    static belongsTo = [configuration: ImportXnatConfiguration]
 
-	static belongsTo = [configuration: ImportXnatConfiguration]
-
-	static mapping ={
-		table 'IMPORT_XNAT_VARIABLE'
-		id generator:'sequence', params:[sequence:'SEQ_SEARCH_DATA_ID', schema: 'searchapp']
-		version false
-		columns {
-			id column:'ID'
-			name column:'NAME'
-			datatype column:'DATATYPE'
-			url column:'URL'
-		}
-	}
+    static mapping ={
+	table 'SEARCHAPP.IMPORT_XNAT_VARIABLE'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID', schema: 'searchapp']
+	version false
+    }
 	
-	static constraints = {
-		name(blank: false)
-		datatype(blank: false)
-		url(blank: false)
-	}
+    static constraints = {
+	datatype blank: false
+	name blank: false
+	url blank: false
+    }
 }

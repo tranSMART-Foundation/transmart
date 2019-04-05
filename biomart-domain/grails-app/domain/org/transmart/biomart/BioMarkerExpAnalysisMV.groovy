@@ -16,23 +16,20 @@
  *
  *
  ******************************************************************/
-
-
-
 package org.transmart.biomart
 
 class BioMarkerExpAnalysisMV {
-    BioMarker marker
-    Experiment experiment
     BioAssayAnalysis analysis
+    Experiment experiment
+    BioMarker marker
+
     static mapping = {
         table 'BIO_MARKER_EXP_ANALYSIS_MV'
-        version false
-        columns {
-            id column: 'MV_ID'
-            marker column: 'BIO_MARKER_ID'
-            analysis column: 'BIO_ASSAY_ANALYSIS_ID'
-            experiment column: 'BIO_EXPERIMENT_ID'
-        }
+        id column: 'MV_ID'
+	version false
+
+        analysis column: 'BIO_ASSAY_ANALYSIS_ID'
+        experiment column: 'BIO_EXPERIMENT_ID'
+	marker column: 'BIO_MARKER_ID'
     }
 }

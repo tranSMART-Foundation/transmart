@@ -16,38 +16,32 @@
  *
  *
  ******************************************************************/
-
-/*
- * $Id: CustomFilter.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- */
 package org.transmart.searchapp
 
 class CustomFilter {
-    Long id
-    Long searchUserId
-    String name
     String description
+    String name
     String privateFlag
+    Long searchUserId
+
     String summary
-    static hasMany = [items: CustomFilterItem]
+
     static transients = ['summary']
+
+    static hasMany = [items: CustomFilterItem]
+
     static mapping = {
-        table 'SEARCH_CUSTOM_FILTER'
+	table 'SEARCHAPP.SEARCH_CUSTOM_FILTER'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID'], column: 'SEARCH_CUSTOM_FILTER_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            id column: 'SEARCH_CUSTOM_FILTER_ID'
-            searchUserId column: 'SEARCH_USER_ID'
-            name column: 'NAME'
-            description column: 'DESCRIPTION'
-            privateFlag column: 'PRIVATE'
-            items column: 'SEARCH_CUSTOM_FILTER_ID'
-        }
+
+        items column: 'SEARCH_CUSTOM_FILTER_ID'
+	privateFlag column: 'PRIVATE'
     }
 
     static constraints = {
-        name(maxSize: 400)
-        description(nullable: true, maxSize: 4000)
-        privateFlag(maxSize: 1)
+	description nullable: true, maxSize: 4000
+	name maxSize: 400
+	privateFlag maxSize: 1
     }
 }

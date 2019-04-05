@@ -17,138 +17,78 @@
  *
  ******************************************************************/
 
-
 package com.recomdata.grails.plugin.gwas
+
+import org.springframework.beans.factory.annotation.Autowired
 
 class GwasWebController {
 
-    def gwasWebService
+    private static final Map<Long, String> typeIds = [1L: 'GWAS', 2L: 'EQTL', 3L: 'Metabolic GWAS'].asImmutable()
 
-    def computeGeneBounds = {
-        def snpSource = params.snpSource
-        if (!snpSource) {snpSource = '19'}
-        def results = gwasWebService.computeGeneBounds(params.geneSymbol, '0', snpSource)
-        renderDataSet(results)
+    @Autowired private GwasWebService gwasWebService
+
+    def computeGeneBounds(String snpSource, String geneSymbol) {
+	renderDataSet gwasWebService.computeGeneBounds(geneSymbol, snpSource ?: '19')
     }
 
-    def getGeneByPosition = {
-        def snpSource = params.snpSource
-        if (!snpSource) {snpSource = '19'}
-        def results = gwasWebService.getGeneByPosition(params.chromosome, params.long('start'), params.long('stop'), snpSource)
-        renderDataSet(results)
+    def getGeneByPosition(String snpSource, String chromosome, Long start, Long stop) {
+	renderDataSet gwasWebService.getGeneByPosition(chromosome, start, stop, snpSource ?: '19')
     }
 
-    def getModelInfoByDataType = {
-
-        def type = 'NONE'
-        def typeId = params.long('dataType')
-
-        switch (typeId) {
-            case 1: type = 'GWAS'; break
-            case 2: type = 'EQTL'; break
-            case 3: type = 'Metabolic GWAS'; break
-        }
-
-        def results = gwasWebService.getModelInfo(type)
-        renderDataSet(results)
+    def getModelInfoByDataType(Long dataType) {
+	renderDataSet gwasWebService.getModelInfo(typeIds[dataType] ?: 'NONE')
     }
 
-	def getSecureModelInfoByDataType() {
-
-				def type = 'NONE'
-				def typeId = params.long('dataType')
-				def cUser = params.user
-
-				switch (typeId) {
-					case 1: type = 'GWAS'; break
-					case 2: type = 'EQTL'; break
-					case 3: type = 'Metabolic GWAS'; break
-				}
-
-				def sessionUserMap = servletContext['gwasSessionUserMap']
-
-				if (sessionUserMap == null){
-					sessionUserMap = new HashMap<String, String>()
-					servletContext['gwasSessionUserMap'] = sessionUserMap
-				}
-
-				if (sessionUserMap.get(cUser)!=null) { // fetch user info existing session id
-					cUser = sessionUserMap[cUser]
-				}
-				else {
-					cUser = null
-				}
-
-				def results = gwasWebService.getSecureModelInfo(type,cUser)
-				renderDataSet(results)
-			}
-    def resultDataForFilteredByModelIdGeneAndRangeRev = { //TODO Negotiate this name into something more reasonable
-        def snpSource = params.snpSource
-        if (!snpSource) {snpSource = '19'}
-        def range = params.long('range') ?: 0
-        def analysisIds = params.modelId.split(',')
-        def sourceId = null
-        def geneName = params.geneName
-
-        def geneBounds = gwasWebService.computeGeneBounds(geneName, '0', snpSource)
-        def low = geneBounds[0]
-        def high = geneBounds[1]
-        def chrom = geneBounds[2]
-        def results = gwasWebService.getAnalysisDataBetween(analysisIds, low-range, high+range, chrom, snpSource)
-
-        renderDataSet(results)
+    def getSecureModelInfoByDataType(Long dataType) {
+	renderDataSet gwasWebService.getSecureModelInfo(typeIds[dataType] ?: 'NONE')
     }
 
-    def getSnpSources = {
+    //TODO Negotiate this name into something more reasonable
+    def resultDataForFilteredByModelIdGeneAndRangeRev(String snpSource, String modelId, String geneName) {
+	if (!snpSource) {
+	    snpSource = '19'
+	}
+	long range = params.long('range', 0)
+
+	List geneBounds = gwasWebService.computeGeneBounds(geneName, snpSource)[0]
+	long low = geneBounds[0]
+	long high = geneBounds[1]
+	String chrom = geneBounds[2]
+
+	renderDataSet gwasWebService.getAnalysisDataBetween(modelId.split(','), low - range, high + range, chrom, snpSource)
+    }
+
+    def getSnpSources() {
         renderDataSet([[18,'HG18',18,'03-2006','http://www.example.com'], [19,'HG19',19,'02-2009','http://www.example.com']])
     }
 
-    def getGeneSources = {
+    def getGeneSources() {
         renderDataSet([[0,'GRCh37',0,'01-2001','http://www.example.com']])
     }
 
-    def getRecombinationRatesForGene = {
-        def range = params.long('range') ?: 0
-        def geneName = params.geneName
-
-        def results = gwasWebService.getRecombinationRatesForGene(geneName, range)
-
-        renderDataSet(results)
+    def getRecombinationRatesForGene(Long range, String geneName) {
+	renderDataSet gwasWebService.getRecombinationRatesForGene(geneName, range ?: 0)
     }
 
-    def snpSearch = {
-        def range = params.long('range') ?: 0
-        def rsId = params.snp
-        def hgVersion = params.snpSource ?: '19'
-        def analysisIds = params.modelId.split(',')
-
-        def results = gwasWebService.snpSearch(analysisIds, range, rsId, hgVersion)
-
-        renderDataSet(results)
+    def snpSearch(Long range, String modelId, String snp, String snpSource) {
+	renderDataSet gwasWebService.snpSearch(modelId.split(','), range ?: 0, snp, snpSource ?: '19')
     }
 
-    def recombinationRateBySnp = {
-        def range = params.long('range') ?: 0
-        def snp = params.snp
-        def hgVersion = params.snpSource ?: '19'
-        def results = gwasWebService.getRecombinationRateBySnp(snp, range, hgVersion)
-
-        renderDataSet(results)
+    def recombinationRateBySnp(Long range, String snp, String snpSource) {
+	renderDataSet gwasWebService.getRecombinationRateBySnp(snp, range ?: 0, snpSource ?: '19')
     }
 
-    def renderDataSet(results) {
-
+    private renderDataSet(results) {
         render(contentType:'text/xml',encoding:'UTF-8') {
-            rows() {
+	    rows {
                 for (result in results) {
-                    row() {
+		    row {
                         for (dat in result) {
-                            data(dat)
+			    data dat
                         }
                     }
                 }
             }
         }
-
     }
 }

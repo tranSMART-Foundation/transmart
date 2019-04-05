@@ -16,30 +16,24 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class ContentReference {
-    Long id
-    String type
-    Content content
     Long bioDataId
+    Content content
+    String type
+
     static mapping = {
-        table 'BIO_CONTENT_REFERENCE'
+	table 'BIOMART.BIO_CONTENT_REFERENCE'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_CONTENT_REFERENCE_ID'
         version false
         cache usage: 'read-only'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_CONTENT_REFERENCE_ID'
-            type column: 'CONTENT_REFERENCE_TYPE'
-            content column: 'BIO_CONTENT_ID'
-            bioDataId column: 'BIO_DATA_ID'
-        }
+
+        content column: 'BIO_CONTENT_ID'
+	type column: 'CONTENT_REFERENCE_TYPE'
     }
 
     static constraints = {
-        type(maxSize: 400)
+	type maxSize: 400
     }
-
 }

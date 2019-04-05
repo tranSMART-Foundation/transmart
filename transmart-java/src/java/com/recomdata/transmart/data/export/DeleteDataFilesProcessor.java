@@ -15,68 +15,56 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.transmart.data.export;
 
-import com.recomdata.transmart.TransmartContextHolder;
 import com.recomdata.transmart.data.export.util.FTPUtil;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Map;
-
-
 
 public class DeleteDataFilesProcessor {
-	private static org.apache.log4j.Logger log = Logger
-			.getLogger(DeleteDataFilesProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeleteDataFilesProcessor.class);
 	
-	@SuppressWarnings("rawtypes")
-	private static final Map config = TransmartContextHolder.getGrailsApplication().getFlatConfig();
-	private static final String TEMP_DIR = (String) config.get("com.recomdata.plugins.tempFolderDirectory");
-	
-	public boolean deleteDataFile(String fileToDelete, String directoryToDelete){
-		boolean fileDeleted=false;
-		try{
-			if (StringUtils.isEmpty(fileToDelete)||StringUtils.isEmpty(directoryToDelete)){
-				throw new Exception("Invalid file or directory name. Both are needed to delete data for an export job");
-			}
-			String dirPath = TEMP_DIR + File.separator + directoryToDelete;
-			@SuppressWarnings("unused")
-			boolean directoryDeleted = deleteDirectoryStructure(new File(dirPath));
-			
-			fileDeleted = FTPUtil.deleteFile(fileToDelete);
-			//If the file was not found at the FTP location try to delete it from the server Temp dir
-			if (!fileDeleted) {
-				String filePath = TEMP_DIR + File.separator + fileToDelete;
-				File jobZipFile = new File(filePath);
-				if (jobZipFile.isFile()) {
-					jobZipFile.delete();
-					fileDeleted=true;
-				}
-			}
-		}catch(Exception e){
-			log.error("Failed to delete the data for job "+directoryToDelete);
-			log.error(e.getMessage());
-		}
-		return fileDeleted;
-	}
-	
-	private boolean deleteDirectoryStructure(File directory){
-		if (directory.exists()){
-			File[] dirChildren = directory.listFiles();
-			for(int i=0; i<dirChildren.length; i++){
-				if (dirChildren[i].isDirectory()){
-					deleteDirectoryStructure(dirChildren[i]);
-				}else{
-					dirChildren[i].delete();
-				}
-			}
-		}
-		return directory.delete();
-	}
+    public boolean deleteDataFile(String fileToDelete, String directoryToDelete, String tempFolderDirectory) {
+        if (StringUtils.isEmpty(fileToDelete)||StringUtils.isEmpty(directoryToDelete)){
+            logger.error("Invalid file or directory name. Both are needed to delete data for an export job");
+            return false;
+        }
 
+        boolean fileDeleted = false;
+        try {
+            deleteDirectoryStructure(new File(tempFolderDirectory, directoryToDelete));
+            fileDeleted = FTPUtil.deleteFile(fileToDelete);
+            //If the file was not found at the FTP location try to delete it from the server Temp dir
+            if (!fileDeleted) {
+                File jobZipFile = new File(tempFolderDirectory, fileToDelete);
+                if (jobZipFile.isFile()) {
+                    jobZipFile.delete();
+                    fileDeleted=true;
+                }
+            }
+        }
+        catch (RuntimeException e) {
+            logger.error("Failed to delete the data for job " + directoryToDelete + " : " + e.getMessage());
+        }
+        return fileDeleted;
+    }
+	
+    private boolean deleteDirectoryStructure(File directory){
+        if (directory.exists()){
+            for (File f : directory.listFiles()) {
+                if (f.isDirectory()) {
+                    deleteDirectoryStructure(f);
+                }
+                else {
+                    f.delete();
+                }
+            }
+        }
+        return directory.delete();
+    }
 }

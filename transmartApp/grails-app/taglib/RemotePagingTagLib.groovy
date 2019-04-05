@@ -11,12 +11,12 @@ class RemotePagingTagLib {
 
         def writer = out
         if (attrs.total == null)
-            throwTagError('Tag [paginate] is missing required attribute [total]')
-        def messageSource = grailsAttributes.getApplicationContext().getBean('messageSource')
+            throwTagError("Tag [paginate] is missing required attribute [total]")
+        def messageSource = grailsAttributes.getApplicationContext().getBean("messageSource")
         def locale = RCU.getLocale(request)
 
         def total = attrs.total.toInteger()
-        def action = (attrs.action ? attrs.action : (params.action ? params.action : 'search'))
+        def action = (attrs.action ? attrs.action : (params.action ? params.action : "search"))
         def offset = params.offset?.toInteger()
         def max = params.max?.toInteger()
         def maxsteps = (attrs.maxsteps ? attrs.maxsteps.toInteger() : 10)
@@ -31,7 +31,6 @@ class RemotePagingTagLib {
         if (params.searchStr) linkParams.searchStr = params.searchStr
         if (params.searchDate) linkParams.searchDate = params.searchDate
         if (params.searchField) linkParams.searchField = params.searchField
-
 
         def linkTagAttrs = [action: action, 'update': attrs.update]
         if (attrs.controller) {
@@ -86,9 +85,8 @@ class RemotePagingTagLib {
             // display paginate steps
             (beginstep..endstep).each { i ->
                 if (currentstep == i) {
-                    writer << '<span class=\'currentStep\'>' + i + '</span>'
-                }
-                else {
+                    writer << "<span class=\"currentStep\">${i}</span>"
+                } else {
                     linkParams.offset = (i - 1) * max
                     writer << remoteLink(linkTagAttrs.clone()) { i.toString() }
                 }
@@ -116,30 +114,26 @@ class RemotePagingTagLib {
     /**
      * A simple date picker modified to be used by the servicesSchedule UI.
      * The only difference is that we're dislpaying minutes as 0,15,30,45
-     * eg. <g:datePicker name='myDate' value='' + new Date() />
+     * eg. <g:datePicker name="myDate" value="${new Date()}" />
      */
     def datePickerServices = { attrs ->
         def xdefault = attrs['default']
         if (xdefault == null) {
             xdefault = new Date()
-        }
-        else if (xdefault.toString() != 'none') {
+        } else if (xdefault.toString() != 'none') {
             if (xdefault instanceof String) {
                 xdefault = DateFormat.getInstance().parse(xdefault)
+            } else if (!(xdefault instanceof Date)) {
+                throwTagError("Tag [datePicker] requires the default date to be a parseable String or a Date")
             }
-            else if (!(xdefault instanceof Date)) {
-                throwTagError('Tag [datePicker] requires the default date to be a parseable String or a Date')
-            }
-        }
-        else {
+        } else {
             xdefault = null
         }
 
         def value = attrs['value']
         if (value.toString() == 'none') {
             value = null
-        }
-        else if (!value) {
+        } else if (!value) {
             value = xdefault
         }
         def name = attrs['name']
@@ -152,7 +146,7 @@ class RemotePagingTagLib {
 
         def years = attrs['years']
 
-        final PRECISION_RANKINGS = ['year': 0, 'month': 10, 'day': 20, 'hour': 30, 'minute': 40]
+        final PRECISION_RANKINGS = ["year": 0, "month": 10, "day": 20, "hour": 30, "minute": 40]
         def precision = (attrs['precision'] ? PRECISION_RANKINGS[attrs['precision']] : PRECISION_RANKINGS["minute"])
 
         def day
@@ -165,9 +159,8 @@ class RemotePagingTagLib {
         def c = null
         if (value instanceof Calendar) {
             c = value
-        }
-        else if (value != null) {
-            c = new GregorianCalendar()
+        } else if (value != null) {
+            c = new GregorianCalendar();
             c.setTime(value)
         }
 
@@ -186,18 +179,17 @@ class RemotePagingTagLib {
                 def tempc = new GregorianCalendar()
                 tempc.setTime(new Date())
                 tempyear = tempc.get(GregorianCalendar.YEAR)
-            }
-            else {
+            } else {
                 tempyear = year
             }
             years = (tempyear - 100)..(tempyear + 100)
         }
 
-        out << '<input type=\'hidden\' name=\'${name}\' value=\'struct\' />'
+        out << "<input type=\"hidden\" name=\"${name}\" value=\"struct\" />"
 
         // create day select
-        if (precision >= PRECISION_RANKINGS['day']) {
-            out.println '<select name=\'${name}_day\' id=\'${id}_day\'>'
+        if (precision >= PRECISION_RANKINGS["day"]) {
+            out.println "<select name=\"${name}_day\" id=\"${id}_day\">"
 
             if (noSelection) {
                 renderNoSelectionOption(noSelection.key, noSelection.value, '')
@@ -205,9 +197,9 @@ class RemotePagingTagLib {
             }
 
             for (i in 1..31) {
-                out.println '<option value=\'${i}\''
+                out.println '<option value="' + i + '"'
                 if (i == day) {
-                    out.println ' selected=\'selected\''
+                    out.println ' selected="selected"'
                 }
                 out.println '>' + i + '</option>'
             }
@@ -215,8 +207,8 @@ class RemotePagingTagLib {
         }
 
         // create month select
-        if (precision >= PRECISION_RANKINGS['month']) {
-            out.println '<select name=\'${name}_month\' id=\'${id}_month\'>'
+        if (precision >= PRECISION_RANKINGS["month"]) {
+            out.println '<select name="' + name + '_month" id="' + id + '_month">'
 
             if (noSelection) {
                 renderNoSelectionOption(noSelection.key, noSelection.value, '')
@@ -226,8 +218,8 @@ class RemotePagingTagLib {
             dfs.months.eachWithIndex { m, i ->
                 if (m) {
                     def monthIndex = i + 1
-                    out << '<option value=\'${monthIndex}\''
-                    if (month == i) out << ' selected=\'selected\''
+                    out << '<option value="' + monthIndex + '"'
+                    if (month == i) out << ' selected="selected"'
                     out << '>'
                     out << m
                     out.println '</option>'
@@ -237,8 +229,8 @@ class RemotePagingTagLib {
         }
 
         // create year select
-        if (precision >= PRECISION_RANKINGS['year']) {
-            out.println '<select name=\'${name}_year\' id=\'${id}_year\'>'
+        if (precision >= PRECISION_RANKINGS["year"]) {
+            out.println '<select name="' + name + '_year" id="' + id + '_year">'
 
             if (noSelection) {
                 renderNoSelectionOption(noSelection.key, noSelection.value, '')
@@ -246,9 +238,9 @@ class RemotePagingTagLib {
             }
 
             for (i in years) {
-                out.println '<option value=\'${i}\''
+                out.println '<option value="' + i + '"'
                 if (i == year) {
-                    out.println ' selected=\'selected\''
+                    out.println ' selected="selected"'
                 }
                 out.println '>' + i + '</option>'
             }
@@ -256,8 +248,8 @@ class RemotePagingTagLib {
         }
 
         // do hour select
-        if (precision >= PRECISION_RANKINGS['hour']) {
-            out.println '<select name=\'${name}_hour\' id=\'${id}_hour\'>'
+        if (precision >= PRECISION_RANKINGS["hour"]) {
+            out.println '<select name="' + name + '_hour" id="' + id + '_hour">'
 
             if (noSelection) {
                 renderNoSelectionOption(noSelection.key, noSelection.value, '')
@@ -265,24 +257,24 @@ class RemotePagingTagLib {
             }
 
             for (i in 0..23) {
-                def h = '' + i
+                String h = i
                 if (i < 10) h = '0' + h
-                out << '<option value=\'${h}\' '
-                if (hour == h.toInteger()) out << 'selected=\'selected\''
+                out << "<option value=\"${h}\" "
+                if (hour == h.toInteger()) out << 'selected="selected"'
                 out << '>' << h << '</option>'
                 out.println()
             }
             out.println '</select> :'
 
             // If we're rendering the hour, but not the minutes, then display the minutes as 00 in read-only format
-            if (precision < PRECISION_RANKINGS['minute']) {
+            if (precision < PRECISION_RANKINGS["minute"]) {
                 out.println '00'
             }
         }
 
         // do minute select
-        if (precision >= PRECISION_RANKINGS['minute']) {
-            out.println '<select name=\'${name}_minute\' id=\'${id}_minute\'>'
+        if (precision >= PRECISION_RANKINGS["minute"]) {
+            out.println "<select name=\"${name}_minute\" id=\"${id}_minute\">"
 
             if (noSelection) {
                 renderNoSelectionOption(noSelection.key, noSelection.value, '')
@@ -290,10 +282,10 @@ class RemotePagingTagLib {
             }
 
             for (i in [0, 15, 30, 45]) {
-                def m = '' + i
+                String m = i
                 if (i < 10) m = '0' + m
-                out << '<option value=\'${m}\' '
-                if (minute == m.toInteger()) out << 'selected=\'selected\''
+                out << "<option value=\"${m}\" "
+                if (minute == m.toInteger()) out << 'selected="selected"'
                 out << '>' << m << '</option>'
                 out.println()
             }
@@ -307,13 +299,13 @@ class RemotePagingTagLib {
      */
     def remoteAlphaPaginate = { attrs ->
 
-        def steps = ['A-C', 'D-F', 'G-I', 'J-L', 'M-O', 'P-R', 'S-V', 'W-Z', 'Other']
+        def steps = ["A-C", "D-F", "G-I", "J-L", "M-O", "P-R", "S-V", "W-Z", "Other"]
         def writer = out
-        def messageSource = grailsAttributes.getApplicationContext().getBean('messageSource')
+        def messageSource = grailsAttributes.getApplicationContext().getBean("messageSource")
         def locale = RCU.getLocale(request)
-        def action = (attrs.action ? attrs.action : (params.action ? params.action : 'search'))
+        def action = (attrs.action ? attrs.action : (params.action ? params.action : "search"))
         def update = attrs.update
-        def currentstep = params.step ? params.step : 'A-C'
+        def currentstep = params.step ? params.step : "A-C"
 
         def linkParams = [currentstep: currentstep]
         if (attrs.params) linkParams.putAll(attrs.params)
@@ -337,9 +329,8 @@ class RemotePagingTagLib {
 
         for (step in steps) {
             if (currentstep == step) {
-                writer << '<span class=\'currentStep\'>' + step + '</span>'
-            }
-            else {
+                writer << "<span class=\"currentStep\">${step}</span>"
+            } else {
                 linkParams.step = step
                 writer << remoteLink(linkTagAttrs.clone()) { step }
             }
@@ -364,28 +355,25 @@ class RemotePagingTagLib {
      *
      * Examples:
      *
-     * <g:sortableColumn property='title' title='Title' />
-     * <g:sortableColumn property='title' title='Title' style='width: 200px' />
-     * <g:sortableColumn property='title' titleKey='book.title' />
-     * <g:sortableColumn property='releaseDate' defaultOrder='desc' title='Release Date' />
-     * <g:sortableColumn property='releaseDate' defaultOrder='desc' title='Release Date' titleKey='book.releaseDate' />
+     * <g:sortableColumn property="title" title="Title" />
+     * <g:sortableColumn property="title" title="Title" style="width: 200px" />
+     * <g:sortableColumn property="title" titleKey="book.title" />
+     * <g:sortableColumn property="releaseDate" defaultOrder="desc" title="Release Date" />
+     * <g:sortableColumn property="releaseDate" defaultOrder="desc" title="Release Date" titleKey="book.releaseDate" />
      */
     def remoteSortableColumn = { attrs ->
         def writer = out
         if (!attrs.property)
-            throwTagError('Tag [sortableColumn] is missing required attribute [property]')
+            throwTagError("Tag [sortableColumn] is missing required attribute [property]")
 
         if (!attrs.title && !attrs.titleKey)
-            throwTagError('Tag [sortableColumn] is missing required attribute [title] or [titleKey]')
+            throwTagError("Tag [sortableColumn] is missing required attribute [title] or [titleKey]")
 
-        //println 'sortable - > ' + attrs
-        //println 'params - > ' + params
+        def property = attrs.remove("property")
+        def action = attrs.action ? attrs.remove("action") : (params.action ? params.action : "list")
 
-        def property = attrs.remove('property')
-        def action = attrs.action ? attrs.remove('action') : (params.action ? params.action : 'list')
-
-        def defaultOrder = attrs.remove('defaultOrder')
-        if (defaultOrder != 'desc') defaultOrder = 'asc'
+        def defaultOrder = attrs.remove("defaultOrder")
+        if (defaultOrder != "desc") defaultOrder = "asc"
 
         // current sorting property and order
         def sort = params.sort
@@ -393,21 +381,19 @@ class RemotePagingTagLib {
 
         // add sorting property and params to link params
         def linkParams = [sort: property]
-        if (params.id) linkParams.put('id', params.id)
-        if (attrs.params) linkParams.putAll(attrs.remove('params'))
+        if (params.id) linkParams.put("id", params.id)
+        if (attrs.params) linkParams.putAll(attrs.remove("params"))
 
         // determine and add sorting order for this column to link params
-        attrs.class = 'sortable'
+        attrs.class = "sortable"
         if (property == sort) {
-            attrs.class = attrs.class + ' sorted ' + order
-            if (order == 'asc') {
-                linkParams.order = 'desc'
+            attrs.class = attrs.class + " sorted " + order
+            if (order == "asc") {
+                linkParams.order = "desc"
+            } else {
+                linkParams.order = "asc"
             }
-            else {
-                linkParams.order = 'asc'
-            }
-        }
-        else {
+        } else {
             linkParams.order = defaultOrder
         }
         if (params.auditSearchStr) {
@@ -423,19 +409,19 @@ class RemotePagingTagLib {
             linkParams.put('searchField', params.searchField)
         }
         // determine column title
-        def title = attrs.remove('title')
-        def titleKey = attrs.remove('titleKey')
+        def title = attrs.remove("title")
+        def titleKey = attrs.remove("titleKey")
         if (titleKey) {
             if (!title) title = titleKey
-            def messageSource = grailsAttributes.getApplicationContext().getBean('messageSource')
+            def messageSource = grailsAttributes.getApplicationContext().getBean("messageSource")
             def locale = RCU.getLocale(request)
             title = messageSource.getMessage(titleKey, null, title, locale)
         }
 
-        writer << '<th '
+        writer << "<th "
         // process remaining attributes
         attrs.each { k, v ->
-            writer << '' + k + '=\'${v.encodeAsHTML()}\' '
+            writer << "${k}=\"${v.encodeAsHTML()}\" "
         }
         writer << ">${remoteLink(action: action, 'update': attrs.update, params: linkParams) { title }}</th>"
     }

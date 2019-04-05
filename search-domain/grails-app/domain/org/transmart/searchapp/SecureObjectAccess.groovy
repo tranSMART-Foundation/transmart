@@ -1,5 +1,3 @@
-package org.transmart.searchapp
-
 /*************************************************************************
  * tranSMART - translational medicine data mart
  *
@@ -18,48 +16,31 @@ package org.transmart.searchapp
  *
  *
  ******************************************************************/
+package org.transmart.searchapp
+
 class SecureObjectAccess {
+    SecureAccessLevel accessLevel
+    Principal principal
+    SecureObject secureObject
+
+    static mapping = {
+	table 'SEARCHAPP.SEARCH_AUTH_SEC_OBJECT_ACCESS'
+	id generator: 'sequence', params: [sequence: 'SEARCHAPP.SEQ_SEARCH_DATA_ID'], column: 'AUTH_SEC_OBJ_ACCESS_ID'
+        version false
+
+	accessLevel column: 'SECURE_ACCESS_LEVEL_ID'
+	principal column: 'AUTH_PRINCIPAL_ID'
+    }
 
     static transients = ['objectAccessName', 'principalAccessName']
 
-    Long id
-    Principal principal
-    SecureObject secureObject
-    SecureAccessLevel accessLevel
+    String toString() { objectAccessName }
 
-    static mapping = {
-        table 'SEARCH_AUTH_SEC_OBJECT_ACCESS'
-        version false
-        id generator: 'sequence', params: [sequence: 'SEQ_SEARCH_DATA_ID']
-        columns {
-            id column: 'AUTH_SEC_OBJ_ACCESS_ID'
-            principal column: 'AUTH_PRINCIPAL_ID'
-            secureObject column: 'SECURE_OBJECT_ID'
-            accessLevel column: 'SECURE_ACCESS_LEVEL_ID'
-        }
+    String getObjectAccessName() {
+	secureObject.displayName + ' (' + accessLevel.accessLevelName + ')'
     }
 
-    static constraints = {
-        //principal(nullable:true)
-    }
-
-    public String toString() {
-        return objectAccessName
-    }
-
-    public String getObjectAccessName() {
-        return secureObject.displayName + ' (' + accessLevel.accessLevelName + ')'
-    }
-
-    public void setObjectAccessName(String s) {
-
-    }
-
-    public String getPrincipalAccessName() {
-        return principal.type + '-' + principal.name + ' (' + accessLevel.accessLevelName + ')'
-    }
-
-    public void setPrincipalAccessName(String s) {
-
+    String getPrincipalAccessName() {
+	principal.type.name() + '-' + principal.name + ' (' + accessLevel.accessLevelName + ')'
     }
 }

@@ -1,50 +1,46 @@
 package org.transmartproject.export
 
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
+import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
+import org.transmartproject.core.dataquery.highdim.projections.Projection
+import org.transmartproject.db.dataquery.highdim.tworegion.DeTwoRegionEventGene
 import org.transmartproject.db.dataquery.highdim.tworegion.DeTwoRegionJunction
 import org.transmartproject.db.dataquery.highdim.tworegion.DeTwoRegionJunctionEvent
 import org.transmartproject.db.dataquery.highdim.tworegion.JunctionRow
+
 import javax.annotation.PostConstruct
-import org.springframework.beans.factory.annotation.Autowired
-import org.transmartproject.core.dataquery.TabularResult
-import org.transmartproject.core.dataquery.highdim.projections.Projection
 
 @Slf4j('logger')
-public class TwoRegionExporter implements HighDimExporter {
-    @Autowired
-    private HighDimExporterRegistry highDimExporterRegistry
+class TwoRegionExporter implements HighDimExporter {
+    @Autowired private HighDimExporterRegistry highDimExporterRegistry
 
     @PostConstruct
-    public void init() {
-        this.highDimExporterRegistry.registerHighDimensionExporter(format, this)
+    void init() {
+	highDimExporterRegistry.registerHighDimensionExporter format, this
     }
 
-    public boolean isDataTypeSupported(String dataType) {
+    boolean isDataTypeSupported(String dataType) {
         dataType == 'two_region'
     }
 
-    public String getProjection() {
+    String getProjection() {
         Projection.ALL_DATA_PROJECTION
     }
 
-
-    @Override
     String getFormat() {
         'two region'
     }
 
-    public String getDescription() {
+    String getDescription() {
         'Exports two region data in junction and events file'
     }
 
-    public void export(TabularResult data, Projection projection, Closure<OutputStream> newOutputStream) {
-        export(data, projection, newOutputStream, null)
-    }
-
-    public void export(TabularResult data, Projection projection, Closure<OutputStream> newOutputStream, Closure<java.lang.Boolean> isCancelled) {
-        logger.info('started exporting to ' + format + ' ')
-        def startTime = System.currentTimeMillis()
+    void export(TabularResult data, Projection projection, Closure<OutputStream> newOutputStream,
+	        Closure<Boolean> isCancelled = null) {
+	logger.info 'started exporting to {}', format
+	long startTime = System.currentTimeMillis()
 
         if (isCancelled && isCancelled()) {
             return
@@ -56,68 +52,76 @@ public class TwoRegionExporter implements HighDimExporter {
         Map<String, Writer> eventStreamPerSample = [:]
 
         try {
-            for (JunctionRow datarow : data) {
+	    for (JunctionRow datarow in data) {
                 if (isCancelled && isCancelled()) {
                     return
                 }
 
-                for (AssayColumn assay : assayList) {
+		for (AssayColumn assay in assayList) {
                     if (isCancelled && isCancelled()) {
                         return
                     }
                     DeTwoRegionJunction junction = datarow[assay]
-                    if (junction == null)
-                        continue; //not all assays have all junctions
-                    def assaytag = '' + junction.assay.patientInTrialId + '_' + junction.assay.id
+		    if (junction == null) {
+			//not all assays have all junctions
+			continue
+		    }
 
-                    def junctionStream = junctionStreamPerSample[assaytag]
+		    String assaytag = junction.assay.patientInTrialId + "_" + junction.assay.id
+
+		    Writer junctionStream = junctionStreamPerSample[assaytag]
                     if (junctionStream == null) {
                         junctionStream = new BufferedWriter(new OutputStreamWriter(
-                                newOutputStream(assaytag + '_junctions', 'tsv'), 'UTF-8'))
-                        junctionStream << 'id\tup_chr\tup_pos\tup_strand\tup_end\tdown_chr\tdown_pos\tdown_strand\tdown_end\tis_in_frame\n'
+			    newOutputStream(assaytag + "_junctions", 'tsv'), 'UTF-8'))
+			junctionStream << "id\tup_chr\tup_pos\tup_strand\tup_end\tdown_chr\tdown_pos\tdown_strand\tdown_end\tis_in_frame\n"
                         junctionStreamPerSample[assaytag] = junctionStream
                     }
-                    def eventStream = eventStreamPerSample[assaytag]
+
+		    Writer eventStream = eventStreamPerSample[assaytag]
                     if (eventStream == null) {
                         eventStream = new BufferedWriter(new OutputStreamWriter(
-                                newOutputStream(assaytag + '_events', 'tsv'), 'UTF-8'))
-                        eventStream << 'reads_span\treads_junction\tpairs_span\tpairs_junction\tpairs_end\treads_counter\tbase_freq\tjunction_id\tcga_type\tsoap_class\tgene_ids\tgene_effect\n'
+			    newOutputStream(assaytag + "_events", 'tsv'), 'UTF-8'))
+			eventStream << "reads_span\treads_junction\tpairs_span\tpairs_junction\tpairs_end" +
+			    "\treads_counter\tbase_freq\tjunction_id\tcga_type\tsoap_class\tgene_ids\tgene_effect\n"
                         eventStreamPerSample[assaytag] = eventStream
                     }
 
                     junction.with {
-                        junctionStream << '' + id + '\t' + upChromosome + '\t' + upPos + '\t' + upStrand + '\t' + upEnd + '\t' + downChromosome + '\t' + downPos + '\t' + downStrand + '\t' + downEnd + '\t' + isInFrame + '\n'
+			junctionStream << "$id\t$upChromosome\t$upPos\t$upStrand\t$upEnd\t$downChromosome\t$downPos\t$downStrand\t$downEnd\t$isInFrame\n"
                     }
 
-                    for (DeTwoRegionJunctionEvent junctionEvent : junction.junctionEvents) {
+		    for (DeTwoRegionJunctionEvent junctionEvent in junction.junctionEvents) {
                         junctionEvent.with {
-                            eventStream << '' + readsSpan + '\t' + readsJunction + '\t' + pairsSpan + '\t' + pairsJunction + '\t' + pairsEnd + '\t' + pairsCounter + '\t' + baseFreq + '\t' + junction.id
+			    eventStream << "$readsSpan\t$readsJunction\t$pairsSpan\t$pairsJunction\t$pairsEnd\t$pairsCounter\t$baseFreq\t${junction.id}"
                         }
                         junctionEvent.event.with {
-                            eventStream << '\t' + cgaType + '\t' + soapClass + '\t'
+			    eventStream << "\t$cgaType\t$soapClass\t"
                         }
-                        StringBuilder sbGenes = new StringBuilder(), sbEffects = new StringBuilder()
-                        for (def gene : junctionEvent.event.eventGenes) {
-                            sbGenes.append(gene.geneId).append(';')
-                            sbEffects.append(gene.effect).append(';')
+			StringBuilder sbGenes = new StringBuilder()
+			StringBuilder sbEffects = new StringBuilder()
+			for (DeTwoRegionEventGene gene in junctionEvent.event.eventGenes) {
+			    sbGenes << gene.geneId << ';'
+			    sbEffects << gene.effect << ';'
                         }
-                        if (sbGenes.length() > 0)
+			if (sbGenes) {
                             eventStream << sbGenes << '\t' << sbEffects
-                        else
+			}
+			else {
                             eventStream << 'null\tnull'
+			}
                         eventStream << '\n'
                     }
                 }
             }
         }
         finally {
-            junctionStreamPerSample.values().each {
+	    for (it in junctionStreamPerSample.values()) {
                 it.close()
             }
-            eventStreamPerSample.values().each {
+	    for (it in eventStreamPerSample.values()) {
                 it.close()
             }
         }
-        logger.info('Exporting data took ' + System.currentTimeMillis() - startTime + ' ms')
+	logger.info 'Exporting data took {} ms', System.currentTimeMillis() - startTime
     }
 }

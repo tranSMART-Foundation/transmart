@@ -16,34 +16,27 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class ContentRepository {
-    Long id
-    String location
     String activeYN
-    String repositoryType
+    String location
     String locationType
+    String repositoryType
+
     static mapping = {
-        table 'BIO_CONTENT_REPOSITORY'
+	table 'BIOMART.BIO_CONTENT_REPOSITORY'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_CONTENT_REPO_ID'
         version false
         cache usage: 'read-only'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_CONTENT_REPO_ID'
-            location column: 'LOCATION'
-            activeYN column: 'ACTIVE_Y_N'
-            repositoryType column: 'REPOSITORY_TYPE'
-            locationType column: 'LOCATION_TYPE'
-        }
+
+        activeYN column: 'ACTIVE_Y_N'
     }
 
     static constraints = {
-        location(nullable: true, maxSize: 1020)
-        activeYN(nullable: true, maxSize: 1)
-        repositoryType(maxSize: 400)
-        locationType(nullable: true, maxSize: 400)
+	activeYN nullable: true, maxSize: 1
+	location nullable: true, maxSize: 1020
+	locationType nullable: true, maxSize: 400
+	repositoryType maxSize: 400
     }
 }

@@ -16,52 +16,37 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioAssay {
-
-    Long id
-    String study
-    String protocol
-    String description
-    String sampleType
-    Experiment experiment
-    Date testDate
-    Date sampleReceiveDate
-    String requestor
     Long assayPlatformId
-
+    String description
+    Experiment experiment
+    String protocol
+    String requestor
+    Date sampleReceiveDate
+    String sampleType
+    String study
+    Date testDate
     String type
+
     static mapping = {
-        table 'BIO_ASSAY'
+	table 'BIOMART.BIO_ASSAY'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASSAY_ID'
         version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_ASSAY_ID'
-            study column: 'STUDY'
-            protocol column: 'PROTOCOL'
-            description column: 'DESCRIPTION'
-            sampleType column: 'SAMPLE_TYPE'
-            experiment column: 'EXPERIMENT_ID'
-            testDate column: 'TEST_DATE'
-            sampleReceiveDate column: 'SAMPLE_RECEIVE_DATE'
-            requestor column: 'REQUESTOR'
-            type column: 'BIO_ASSAY_TYPE'
-            assayPlatformId: 'BIO_ASY_PLATFORM_ID'
-        }
+
+	assayPlatformId column: 'BIO_ASY_PLATFORM_ID'
+        type column: 'BIO_ASSAY_TYPE'
     }
 
     static constraints = {
-        study(nullable: true, maxSize: 400)
-        protocol(nullable: true, maxSize: 400)
-        description(nullable: true, maxSize: 4000)
-        sampleType(nullable: true, maxSize: 400)
-        testDate(nullable: true)
-        sampleReceiveDate(nullable: true)
-        requestor(nullable: true, maxSize: 400)
-        type(maxSize: 400)
+	description nullable: true, maxSize: 4000
+	protocol nullable: true, maxSize: 400
+	requestor nullable: true, maxSize: 400
+	sampleReceiveDate nullable: true
+	sampleType nullable: true, maxSize: 400
+	study nullable: true, maxSize: 400
+	testDate nullable: true
+	type maxSize: 400
     }
-
 }

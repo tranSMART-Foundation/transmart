@@ -1,46 +1,39 @@
-/**
- * $Id: RequestmapController.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * @author $Author: mmcduffie $
- * @version $Revision: 9178 $
- */
+import grails.plugin.springsecurity.SpringSecurityService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.transmart.searchapp.Requestmap
 
-/**
- * Requestmap controller.
- */
 class RequestmapController {
 
-    def springSecurityService
+    static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+    static defaultAction = 'list'
 
-    // the delete, save and update actions only accept POST requests
-    static Map allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+    @Autowired private SpringSecurityService springSecurityService
 
-    def index = {
-        redirect action: "list", params: params
-    }
+    @Value('${com.recomdata.admin.paginate.max:0}')
+    private int paginateMax
 
-    def list = {
-        if (!params.max) {
-            params.max = grailsApplication.config.com.recomdata.admin.paginate.max
+    def list(Integer max) {
+	if (!max) {
+	    params.max = paginateMax
         }
-        [requestmapList: Requestmap.list(params)]
+	[requestmaps: Requestmap.list(params), requestmapCount: Requestmap.count()]
     }
 
-    def show = {
-        def requestmap = Requestmap.get(params.id)
+    def show(Requestmap requestmap) {
+	if (requestmap) {
+	    [requestmap: requestmap]
+	}
+	else {
+            flash.message = "Requestmap not found with id $params.id"
+	    redirect action: 'list'
+        }
+    }
+
+    def delete(Requestmap requestmap) {
         if (!requestmap) {
             flash.message = "Requestmap not found with id $params.id"
-            redirect action: "list"
-            return
-        }
-        [requestmap: requestmap]
-    }
-
-    def delete = {
-        def requestmap = Requestmap.get(params.id)
-        if (!requestmap) {
-            flash.message = "Requestmap not found with id $params.id"
-            redirect action: "list"
+	    redirect action: 'list'
             return
         }
 
@@ -49,36 +42,30 @@ class RequestmapController {
         springSecurityService.clearCachedRequestmaps()
 
         flash.message = "Requestmap $params.id deleted."
-        redirect(action: "list")
+	redirect action: 'list'
     }
 
-    def edit = {
-        def requestmap = Requestmap.get(params.id)
+    def edit(Requestmap requestmap) {
+	if (requestmap) {
+	    [requestmap: requestmap]
+	}
+	else {
+            flash.message = "Requestmap not found with id $params.id"
+	    redirect action: 'list'
+        }
+    }
+
+    def update(Requestmap requestmap) {
         if (!requestmap) {
             flash.message = "Requestmap not found with id $params.id"
-            redirect(action: "list")
+	    redirect action: 'edit', id: params.id
             return
         }
 
-        [requestmap: requestmap]
-    }
-
-    /**
-     * Update action, called when an existing Requestmap is updated.
-     */
-    def update = {
-
-        def requestmap = Requestmap.get(params.id)
-        if (!requestmap) {
-            flash.message = "Requestmap not found with id $params.id"
-            redirect(action: "edit", id: params.id)
-            return
-        }
-
-        long version = params.version.toLong()
+	long version = params.long('version', 0)
         if (requestmap.version > version) {
-            requestmap.errors.rejectValue 'version', "requestmap.optimistic.locking.failure",
-                    "Another user has updated this Requestmap while you were editing."
+	    requestmap.errors.rejectValue 'version', 'requestmap.optimistic.locking.failure',
+		'Another user has updated this Requestmap while you were editing.'
             render view: 'edit', model: [requestmap: requestmap]
             return
         }
@@ -86,25 +73,24 @@ class RequestmapController {
         requestmap.properties = params
         if (requestmap.save()) {
             springSecurityService.clearCachedRequestmaps()
-            redirect action: "show", id: requestmap.id
-        } else {
+	    redirect action: 'show', id: requestmap.id
+	}
+	else {
             render view: 'edit', model: [requestmap: requestmap]
         }
     }
 
-    def create = {
+    def create() {
         [requestmap: new Requestmap(params)]
     }
 
-    /**
-     * Save action, called when a new Requestmap is created.
-     */
-    def save = {
-        def requestmap = new Requestmap(params)
+    def save() {
+	Requestmap requestmap = new Requestmap(params)
         if (requestmap.save()) {
             springSecurityService.clearCachedRequestmaps()
-            redirect action: "show", id: requestmap.id
-        } else {
+	    redirect action: 'show', id: requestmap.id
+	}
+	else {
             render view: 'create', model: [requestmap: requestmap]
         }
     }

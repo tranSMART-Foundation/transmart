@@ -1,10 +1,3 @@
-/**
- * @author $Author: mmcduffie $
- * $Id: ExpressionProfileController.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * $Revision: 9178 $
- *
- */
-
 import groovy.util.logging.Slf4j
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartRenderingInfo
@@ -15,49 +8,61 @@ import org.jfree.chart.entity.StandardEntityCollection
 import org.jfree.chart.plot.CategoryPlot
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer
-import org.jfree.chart.servlet.ChartDeleter
 import org.jfree.chart.servlet.ServletUtilities
 import org.jfree.data.statistics.BoxAndWhiskerItem
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset
+import org.springframework.beans.factory.annotation.Autowired
+import org.transmart.ExpressionProfileFilter
 import org.transmart.ExpressionProfileResult
+import org.transmart.SearchFilter
+import org.transmart.biomart.BioAssayDataStatistics
 import org.transmart.biomart.BioMarker
 import org.transmart.biomart.Disease
 
 import javax.servlet.ServletException
+import java.awt.*
+import java.util.List
 
+/**
+ * @author mmcduffie
+ */
 @Slf4j('logger')
-public class ExpressionProfileController {
+class ExpressionProfileController {
 
-    def expressionProfileQueryService
+    @Autowired private ExpressionProfileQueryService expressionProfileQueryService
 
-    def datasourceResult = {
+    def datasourceResult() {
 
         // reset profile filter
-        session.searchFilter.exprProfileFilter.reset()
+	sessionSearchFilter().exprProfileFilter.reset()
 
         // refresh experiment count
         logger.info '>> Count query:'
-        def profCount = expressionProfileQueryService.countExperiment(session.searchFilter)
+	int profCount = expressionProfileQueryService.countExperiment(sessionSearchFilter())
 
         // initialize session with profile results
         ExpressionProfileResult epr = new ExpressionProfileResult()
-        session.setAttribute('exprProfileResult', epr)
+	session.exprProfileResult = epr
 
         // load genes and cache
         logger.info '>> Gene Query:'
-        def genes = expressionProfileQueryService.listBioMarkers(session.searchFilter)
-        if (genes.size() > 0) session.searchFilter.exprProfileFilter.bioMarkerId = genes[0].id
-        logger.info '... number genes: ' + genes.size()
+	List<BioMarker> genes = expressionProfileQueryService.listBioMarkers(sessionSearchFilter())
+	if (genes) {
+	    sessionSearchFilter().exprProfileFilter.bioMarkerId = genes[0].id
+	}
+	logger.info '... number genes: {}', genes.size()
 
         logger.info '>> Diseases Query:'
-        def diseases = expressionProfileQueryService.listDiseases(session.searchFilter)
-        if (diseases != null && !diseases.isEmpty()) session.searchFilter.exprProfileFilter.bioDiseaseId = diseases[0].id
+	List<Disease> diseases = expressionProfileQueryService.listDiseases(sessionSearchFilter())
+	if (diseases) {
+	    sessionSearchFilter().exprProfileFilter.bioDiseaseId = diseases[0].id
+	}
 
-        def probesets = []
-        if (genes != null && !genes.isEmpty() && diseases != null && !diseases.isEmpty()) {
+	List<String> probesets = []
+	if (genes && diseases) {
             logger.info '>> Probesets Query:'
             probesets = expressionProfileQueryService.getProbesetsByBioMarker(genes[0], diseases[0])
-            session.searchFilter.exprProfileFilter.probeSet = probesets[0]
+	    sessionSearchFilter().exprProfileFilter.probeSet = probesets[0]
 
             // build graph results, stores in session
             createGraph()
@@ -72,169 +77,170 @@ public class ExpressionProfileController {
         renderProfileView()
     }
 
-    def selectGene = {
-        logger.info '>> selectGene:' + params.bioMarkerId
+    def selectGene() {
+	logger.info '>> selectGene:{}', params.bioMarkerId
 
         // get profile results
-        ExpressionProfileResult epr = session.exprProfileResult
+	ExpressionProfileResult epr = sessionExprProfileResult()
 
         // refresh filter selections
-        session.searchFilter.exprProfileFilter.reset()
+	sessionSearchFilter().exprProfileFilter.reset()
 
         // bind gene selection
-        bindData(session.searchFilter.exprProfileFilter, params)
-        BioMarker marker = BioMarker.get(session.searchFilter.exprProfileFilter.bioMarkerId)
+	bindData sessionSearchFilter().exprProfileFilter, params
+	BioMarker marker = BioMarker.get(sessionSearchFilter().exprProfileFilter.bioMarkerId)
 
         // refresh diseases
-        def diseases = expressionProfileQueryService.listDiseases(session.searchFilter)
-        session.searchFilter.exprProfileFilter.bioDiseaseId = diseases[0].id
+	List<Disease> diseases = expressionProfileQueryService.listDiseases(sessionSearchFilter())
+	sessionSearchFilter().exprProfileFilter.bioDiseaseId = diseases[0].id
         epr.diseases = diseases
 
         // refresh probesets using first disease
-        def probesets = expressionProfileQueryService.getProbesetsByBioMarker(marker, diseases[0])
-        session.searchFilter.exprProfileFilter.probeSet = probesets[0]
+	List<String> probesets = expressionProfileQueryService.getProbesetsByBioMarker(marker, diseases[0])
+	sessionSearchFilter().exprProfileFilter.probeSet = probesets[0]
         epr.probeSets = probesets
 
-        // build graph
         createGraph()
 
         renderProfileView()
     }
 
-    def selectDisease = {
-        logger.info 'select Disease:' + params.bioDiseaseId
-        bindData(session.searchFilter.exprProfileFilter, params)
+    def selectDisease() {
+	logger.info 'select Disease:{}', params.bioDiseaseId
+	bindData sessionSearchFilter().exprProfileFilter, params
 
         // get profile results
-        ExpressionProfileResult epr = session.exprProfileResult
+	ExpressionProfileResult epr = sessionExprProfileResult()
 
         // load selections
-        BioMarker marker = BioMarker.get(session.searchFilter.exprProfileFilter.bioMarkerId)
-        Disease disease = Disease.get(session.searchFilter.exprProfileFilter.bioDiseaseId)
+	BioMarker marker = BioMarker.get(sessionSearchFilter().exprProfileFilter.bioMarkerId)
+	Disease disease = Disease.get(sessionSearchFilter().exprProfileFilter.bioDiseaseId)
 
         // refresh probesets using first disease
-        def probesets = expressionProfileQueryService.getProbesetsByBioMarker(marker, disease)
+	List<String> probesets = expressionProfileQueryService.getProbesetsByBioMarker(marker, disease)
         epr.probeSets = probesets
-        session.searchFilter.exprProfileFilter.probeSet = probesets[0]
+	sessionSearchFilter().exprProfileFilter.probeSet = probesets[0]
 
-        // build graph and dataset info
         createGraph()
 
         renderProfileView()
     }
 
-    def selectProbeset = {
-        logger.info 'select Probeset:' + params.probeSet
-        bindData(session.searchFilter.exprProfileFilter, params)
+    def selectProbeset() {
+	logger.info 'select Probeset:{}', params.probeSet
+	bindData sessionSearchFilter().exprProfileFilter, params
 
         // only update graph
         createGraph()
-        render(template: 'graphView', model: [epr: session.exprProfileResult])
+	render template: 'graphView', model: [epr: sessionExprProfileResult()]
     }
 
     /**
      * render expression profile view for indicated model
      */
-    def renderProfileView = {
-        // grab model from session
-        render(view: 'expressionProfileView', model: [epr: session.exprProfileResult])
+    def renderProfileView() {
+	render view: 'expressionProfileView', model: [epr: sessionExprProfileResult()]
     }
 
     def createGraph() {
-        // session items
-        def eFilter = session.searchFilter.exprProfileFilter
-        def epr = session.exprProfileResult
+	ExpressionProfileFilter eFilter = sessionSearchFilter().exprProfileFilter
+	ExpressionProfileResult epr = sessionExprProfileResult()
 
-        //setup variables
         DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset()
-        BoxAndWhiskerItem boxitem
 
-        def height = 200
-        def offset = 10
-        def chartname = 'Box Plot'
+	int height = 200
+	int offset = 10
+	String chartname = 'Box Plot'
         if (eFilter.filterBioMarker()) {
             chartname = BioMarker.get(eFilter.bioMarkerId).name
         }
 
         logger.info '>> Boxplot query:'
-        def allData = expressionProfileQueryService.queryStatisticsDataExpField(session.searchFilter)
+	List<Object[]> allData = expressionProfileQueryService.queryStatisticsDataExpField(sessionSearchFilter())
         // don't create graph if no data
-        logger.info '... number boxplot filter records: ' + allData.size()
-        if (allData.size() == 0) {
+	logger.info '... number boxplot filter records: {}', allData.size()
+	if (!allData) {
             epr.graphURL = 'empty'
             epr.datasetItems = null
             return
         }
 
-        def seriesName = ''
-        def itemName = ''
-        def dsItems = []
-        def chartMinVal = null
-        def chartMaxVal = null
-        def statdata = null
+	List<BioAssayDataStatistics> dsItems = []
+	Double chartMinVal = null
+	Double chartMaxVal = null
+	BioAssayDataStatistics statdata
         int i = 0
 
         for (drow in allData) {
             // BioAssayDataStats record
             statdata = drow[0]
-            dsItems.add(statdata)
+	    dsItems << statdata
 
-            seriesName = drow[1]
-            itemName = statdata.dataset.name + '(' + statdata.sampleCount + ')'
+	    String seriesName = drow[1]
+	    String itemName = statdata.dataset.name + '(' + statdata.sampleCount + ')'
 
             // min, max outlier settings
-            def minOutlier
-            def maxOutlier
+	    Double minOutlier
+	    Double maxOutlier
             if (statdata.minValue != null) {
-                if (chartMinVal == null) chartMinVal = statdata.minValue
+		if (chartMinVal == null) {
+		    chartMinVal = statdata.minValue
+		}
                 minOutlier = Math.min(0, statdata.minValue - 2)
-                if (statdata.minValue < chartMinVal) chartMinVal = statdata.minValue
+		if (statdata.minValue < chartMinVal) {
+		    chartMinVal = statdata.minValue
+		}
             }
 
             if (statdata.maxValue != null) {
-                if (chartMaxVal == null) chartMaxVal = statdata.maxValue
+		if (chartMaxVal == null) {
+		    chartMaxVal = statdata.maxValue
+		}
                 maxOutlier = statdata.maxValue + 3
-                if (statdata.maxValue > chartMaxVal) chartMaxVal = statdata.maxValue
+		if (statdata.maxValue > chartMaxVal) {
+		    chartMaxVal = statdata.maxValue
+		}
             }
 
-            boxitem = new BoxAndWhiskerItem(statdata.meanValue,
-                    statdata.quartile2,
-                    statdata.quartile1,
-                    statdata.quartile3,
-                    statdata.minValue,
-                    statdata.maxValue,
-                    minOutlier,
-                    maxOutlier,
-                    null)
-            dataset.add(boxitem, seriesName, itemName)
-            height = height + offset
+	    BoxAndWhiskerItem boxitem = new BoxAndWhiskerItem(statdata.meanValue,
+							      statdata.quartile2,
+							      statdata.quartile1,
+							      statdata.quartile3,
+							      statdata.minValue,
+							      statdata.maxValue,
+							      minOutlier,
+							      maxOutlier,
+							      null)
+	    dataset.add boxitem, seriesName, itemName
+	    height += offset
         }
 
         //create the chart
-        JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(chartname, 'Samples', 'Log(2) Expression', dataset, true)
-        CategoryPlot plot = (CategoryPlot) chart.getPlot()
-        chart.setBackgroundPaint(java.awt.Color.white)
-        plot.setBackgroundPaint(new java.awt.Color(245, 250, 250))
-        plot.setDomainGridlinePaint(java.awt.Color.lightGray)
-        plot.setDomainGridlinesVisible(true)
-        plot.setRangeGridlinePaint(java.awt.Color.lightGray)
-        plot.setOrientation(PlotOrientation.HORIZONTAL)
+	JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(chartname,
+								 'Samples', 'Log(2) Expression', dataset, true)
+	CategoryPlot plot = chart.plot
+	chart.backgroundPaint = Color.white
+	plot.backgroundPaint = new Color(245, 250, 250)
+	plot.domainGridlinePaint = Color.lightGray
+	plot.domainGridlinesVisible = true
+	plot.rangeGridlinePaint = Color.lightGray
+	plot.orientation = PlotOrientation.HORIZONTAL
 
-        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis()
-        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits())
-        rangeAxis.setLowerBound(chartMinVal - 0.5)
-        rangeAxis.setUpperBound(chartMaxVal + 0.5)
-        logger.info 'INFO: calculated info ... lowest val: ' + chartMinVal + '; highest val: ' + chartMaxVal
+	NumberAxis rangeAxis = plot.rangeAxis
+	rangeAxis.standardTickUnits = NumberAxis.createIntegerTickUnits()
+	rangeAxis.lowerBound = chartMinVal - 0.5
+	rangeAxis.upperBound = chartMaxVal + 0.5
+	logger.info 'INFO: calculated info ... lowest val: {}; highest val: {}', chartMinVal, chartMaxVal
 
-        plot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_RIGHT)
-        BoxAndWhiskerRenderer rend = (BoxAndWhiskerRenderer) plot.getRenderer()
+	plot.rangeAxisLocation AxisLocation.BOTTOM_OR_RIGHT
+	BoxAndWhiskerRenderer rend = plot.renderer
 
-        rend.setMaximumBarWidth(0.2)
-        rend.setFillBox(true)
+	rend.maximumBarWidth = 0.2
+	rend.fillBox = true
 
         ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection())
         String filename = ServletUtilities.saveChartAsJPEG(chart, 800, height, info, session)
-        String graphURL = request.getContextPath() + '/expressionProfile/displayChart?filename=' + filename
+	String graphURL = request.contextPath + '/expressionProfile/displayChart?filename=' + filename
         logger.info graphURL
 
         // store results
@@ -242,55 +248,31 @@ public class ExpressionProfileController {
         epr.datasetItems = dsItems
     }
 
-    def displayChart = {
+    def displayChart(String filename) {
+	if (!filename) return
 
-        String filename = request.getParameter('filename')
-        // logger.info 'Trying to display:'+filename
-        if (filename != null) {
+        //  Replace '..' with ''
+        //  This is to prevent access to the rest of the file system
+        filename = ServletUtilities.searchReplace(filename, '..', '')
 
-            //  Replace '..' with ''
-            //  This is to prevent access to the rest of the file system
-            filename = ServletUtilities.searchReplace(filename, '..', '')
-
-            //  Check the file exists
-            File file = new File(System.getProperty('java.io.tmpdir'), filename)
-            if (!file.exists()) {
-                throw new ServletException("File '" + file.getAbsolutePath()
-                        + "' does not exist")
-            }
-
-            //  Check that the graph being served was created by the current user
-            //  or that it begins with 'public'
-            boolean isChartInUserList = false
-            ChartDeleter chartDeleter = (ChartDeleter) session.getAttribute(
-                    'JFreeChart_Deleter')
-            if (chartDeleter != null) {
-                isChartInUserList = chartDeleter.isChartAvailable(filename)
-            }
-
-            boolean isChartPublic = false
-            if (filename.length() >= 6) {
-                if (filename.substring(0, 6).equals('public')) {
-                    isChartPublic = true
-                }
-            }
-
-            boolean isOneTimeChart = false
-            if (filename.startsWith(ServletUtilities.getTempOneTimeFilePrefix())) {
-                isOneTimeChart = true
-            }
-
-            //if (isChartInUserList || isChartPublic || isOneTimeChart) {
-            /*Code change by Jeremy Isikoff, Recombinant Inc. to always serve up images*/
-
-            //  Serve it up
-            ServletUtilities.sendTempFile(file, response)
+        //  Check the file exists
+        File file = new File(System.getProperty('java.io.tmpdir'), filename)
+        if (!file.exists()) {
+	    throw new ServletException('File "' + file.absolutePath + '" does not exist')
         }
-        return
+
+	ServletUtilities.sendTempFile file, response
     }
 
-    def printChart = {
-        render(view: 'printView', model: [filename: params.filename])
+    def printChart() {
+	render view: 'printView', model: [filename: params.filename]
     }
 
+    private SearchFilter sessionSearchFilter() {
+	session.searchFilter
+    }
+
+    private ExpressionProfileResult sessionExprProfileResult() {
+	session.exprProfileResult
+    }
 }

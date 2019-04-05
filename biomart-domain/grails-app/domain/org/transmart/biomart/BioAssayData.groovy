@@ -16,44 +16,34 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioAssayData {
+    Long bioAssayDatasetId
+    Long bioAssayId
+    Long bioSampleId
+    Experiment experiment
+    String featureGroupName
+    Double floatValue
+    Double log10Value
+    Double log2Value
     Long numericValue
     String textValue
-    Double floatValue
-    String featureGroupName
-    Experiment experiment
-    Long bioSampleId
-    Long bioAssayId
-    Long id
-    Double log2Value
-    Double log10Value
-    Long bioAssayDatasetId
-    static hasMany = [diseases: Disease, compounds: Compound, markers: BioMarker]
+
+    static hasMany = [compounds: Compound,
+	              diseases: Disease,
+	              markers: BioMarker]
 
     static mapping = {
-        table 'BIO_ASSAY_DATA'
+	table 'BIOMART.BIO_ASSAY_DATA'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ASSAY_DATA_ID'
         version false
-        id column: 'BIO_ASSAY_DATA_ID'
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            numericValue column: 'NUMERIC_VALUE'
-            textValue column: 'TEXT_VALUE'
-            floatValue column: 'FLOAT_VALUE'
-            featureGroupName column: 'FEATURE_GROUP_NAME'
-            experiment column: 'BIO_EXPERIMENT_ID'
-            bioSampleId column: 'BIO_SAMPLE_ID'
-            bioAssayId column: 'BIO_ASSAY_ID'
-            log2Value column: 'LOG2_VALUE'
-            log10Value column: 'LOG10_VALUE'
-            bioAssayDatasetId column: 'BIO_ASSAY_DATASET_ID'
-            diseases joinTable: [name: 'BIO_DATA_DISEASE', key: 'BIO_DATA_ID', column: 'BIO_DISEASE_ID']
-            markers joinTable: [name: 'BIO_DATA_OMIC_MARKER', key: 'BIO_DATA_ID', column: 'BIO_MARKER_ID']
-            compounds joinTable: [name: 'BIO_DATA_COMPOUND', key: 'BIO_DATA_ID', column: 'BIO_COMPOUND_ID']
-        }
-    }
 
+	compounds joinTable: [name: 'BIOMART.BIO_DATA_COMPOUND', key: 'BIO_DATA_ID', column: 'BIO_COMPOUND_ID']
+	diseases joinTable: [name: 'BIOMART.BIO_DATA_DISEASE', key: 'BIO_DATA_ID', column: 'BIO_DISEASE_ID']
+        experiment column: 'BIO_EXPERIMENT_ID'
+        log10Value column: 'LOG10_VALUE'
+	log2Value column: 'LOG2_VALUE'
+	markers joinTable: [name: 'BIOMART.BIO_DATA_OMIC_MARKER', key: 'BIO_DATA_ID', column: 'BIO_MARKER_ID']
+    }
 }

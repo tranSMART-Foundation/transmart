@@ -1,61 +1,53 @@
 package com.recomdata.search.query
 
+import groovy.transform.CompileStatic
 import org.transmart.GlobalFilter
 
-
 /**
- * @author $Author: mmcduffie $
- * $Id: AssayAnalysisDataTeaQuery.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
- * $Version$
- *
+ * @author mmcduffie
  */
-public class AssayAnalysisDataTeaQuery extends Query {
+@CompileStatic
+class AssayAnalysisDataTeaQuery extends Query {
 
     /**
      * create biomarker table alias
      */
-    def String getBioMarkerTable() {
-        return mainTableAlias + '.featureGroup.markers '
+    String getBioMarkerTable() {
+	mainTableAlias + '.featureGroup.markers '
     }
     /**
      *  criteria builder for disease,override default
      */
-    def buildGlobalFilterDiseaseCriteria(GlobalFilter gfilter) {
-        if (!gfilter.getDiseaseFilters().isEmpty()) {
-            def dAlias = mainTableAlias + '_dis'
-            def dtable = mainTableAlias + '.experiment.diseases ' + dAlias
-            addTable('JOIN ' + dtable)
-            addCondition(dAlias + '.id IN (' + gfilter.getDiseaseFilters().getKeywordDataIdString() + ') ')
-        }
-
+    void buildGlobalFilterDiseaseCriteria(GlobalFilter gfilter) {
+	if (gfilter.diseaseFilters) {
+	    String dAlias = mainTableAlias + '_dis'
+	    String dtable = mainTableAlias + '.experiment.diseases ' + dAlias
+	    addTable 'JOIN ' + dtable
+	    addCondition dAlias + '.id IN (' + gfilter.diseaseFilters.keywordDataIdString + ') '
+	}
     }
 
     /**
      *  criteria builder for compound,override default
      */
-
-    def buildGlobalFilterCompoundCriteria(GlobalFilter gfilter) {
-        if (!gfilter.getCompoundFilters().isEmpty()) {
-            def dAlias = mainTableAlias + '_cpd'
-            def dtable = mainTableAlias + '.experiment.compounds ' + dAlias
-            addTable('JOIN ' + dtable)
-            addCondition(dAlias + '.id IN (' + gfilter.getCompoundFilters().getKeywordDataIdString() + ') ')
+    void buildGlobalFilterCompoundCriteria(GlobalFilter gfilter) {
+	if (gfilter.compoundFilters) {
+	    String dAlias = mainTableAlias + '_cpd'
+	    String dtable = mainTableAlias + '.experiment.compounds ' + dAlias
+	    addTable 'JOIN ' + dtable
+	    addCondition dAlias + '.id IN (' + gfilter.compoundFilters.keywordDataIdString + ') '
         }
-
     }
 
     /**
      *  criteria builder for experiment,override default
      */
-
-    def buildGlobalFilterExperimentCriteria(GlobalFilter gfilter) {
-        if (!gfilter.getTrialFilters().isEmpty()) {
-            addCondition(mainTableAlias + '.experiment.id IN (' + gfilter.getTrialFilters().getKeywordDataIdString() + ')')
+    void buildGlobalFilterExperimentCriteria(GlobalFilter gfilter) {
+	if (gfilter.trialFilters) {
+	    addCondition mainTableAlias + '.experiment.id IN (' + gfilter.trialFilters.keywordDataIdString + ')'
         }
-        if (!gfilter.getStudyFilters().isEmpty()) {
-            addCondition(mainTableAlias + '.experiment.id IN (' + gfilter.getStudyFilters().getKeywordDataIdString() + ')')
+	if (gfilter.studyFilters) {
+	    addCondition mainTableAlias + '.experiment.id IN (' + gfilter.studyFilters.keywordDataIdString + ')'
         }
     }
-
-
 }

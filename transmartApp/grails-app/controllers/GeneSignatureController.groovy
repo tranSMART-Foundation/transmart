@@ -2,25 +2,28 @@ import com.recomdata.genesignature.FileSchemaException
 import com.recomdata.genesignature.WizardModelDetails
 import com.recomdata.util.DomainObjectExcelHelper
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.multipart.MultipartFile
+import org.transmart.audit.AuditLogService
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.CellLine
 import org.transmart.biomart.Compound
 import org.transmart.biomart.ConceptCode
-import org.transmart.searchapp.AccessLog
+import org.transmart.plugin.shared.SecurityService
+import org.transmart.plugin.shared.UtilService
 import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.GeneSignature
 import org.transmart.searchapp.GeneSignatureFileSchema
+import org.transmart.searchapp.GeneSignatureItem
 import org.transmart.searchapp.SearchKeyword
 import org.transmart.searchapp.SearchKeywordTerm
 import org.transmartproject.core.users.User
-import com.recomdata.db.DBHelper
+import org.transmartproject.db.log.AccessLogService
 
 import javax.servlet.ServletOutputStream
 
 /**
- * Controller class for gene signature functionality
- * @author $Author: jliu $
- * @version $Revision: 11258 $
+ * @author jliu
  */
 @Slf4j('logger')
 class GeneSignatureController {
@@ -28,402 +31,365 @@ class GeneSignatureController {
     private static final String GENERIC_OTHER_BIO_CONCEPT_CODE = 'OTHER'
     private static final String GENERIC_OTHER_CODE_TYPE_NAME = 'OTHER'
 
-    // service injections
-    def geneSignatureService
-    def springSecurityService
-    def i2b2HelperService
-    def auditLogService
+    private @Autowired AccessLogService accessLogService
+    private @Autowired AuditLogService auditLogService
+    private @Autowired GeneSignatureService geneSignatureService
     User currentUserBean
+    private @Autowired SecurityService securityService
+    private @Autowired UtilService utilService
 
     // concept code categories
-    static def SOURCE_CATEGORY = 'GENE_SIG_SOURCE'
-    static def OWNER_CATEGORY = 'GENE_SIG_OWNER'
-    static def SPECIES_CATEGORY = 'SPECIES'
-    static def MOUSE_SOURCE_CATEGORY = 'MOUSE_SOURCE'
-    static def TISSUE_TYPE_CATEGORY = 'TISSUE_TYPE'
-    static def EXP_TYPE_CATEGORY = 'EXPERIMENT_TYPE'
-    static def ANALYTIC_TYPE_CATEGORY = 'ANALYTIC_CATEGORY'
-    static def NORM_METHOD_CATEGORY = 'NORMALIZATION_METHOD'
-    static def ANALYSIS_METHOD_CATEGORY = 'ANALYSIS_METHOD'
-    static def P_VAL_CUTOFF_CATEGORY = 'P_VAL_CUTOFF'
-    static def FOLD_CHG_METRIC_CATEGORY = 'FOLD_CHG_METRIC'
+    private static final String SOURCE_CATEGORY = 'GENE_SIG_SOURCE'
+    private static final String OWNER_CATEGORY = 'GENE_SIG_OWNER'
+    private static final String SPECIES_CATEGORY = 'SPECIES'
+    private static final String MOUSE_SOURCE_CATEGORY = 'MOUSE_SOURCE'
+    private static final String TISSUE_TYPE_CATEGORY = 'TISSUE_TYPE'
+    private static final String EXP_TYPE_CATEGORY = 'EXPERIMENT_TYPE'
+    private static final String ANALYTIC_TYPE_CATEGORY = 'ANALYTIC_CATEGORY'
+    private static final String NORM_METHOD_CATEGORY = 'NORMALIZATION_METHOD'
+    private static final String ANALYSIS_METHOD_CATEGORY = 'ANALYSIS_METHOD'
+    private static final String P_VAL_CUTOFF_CATEGORY = 'P_VAL_CUTOFF'
+    private static final String FOLD_CHG_METRIC_CATEGORY = 'FOLD_CHG_METRIC'
 
     // session attributes
-    static def WIZ_DETAILS_ATTRIBUTE = 'wizDetails'
-
-    //static def allowedMethods = [initWizard:'POST', create1:'POST', create2:'POST', create3:'POST', save:'POST', update:'POST']
+    private static final String WIZ_DETAILS_ATTRIBUTE = 'wizDetails'
 
     // map species param
     static mappings = {
-        '/' + species(controller: 'geneSignature', action: 'cellLineLookup')
+	"/$species"(controller: 'geneSignature', action: 'cellLineLookup')
     }
 
-    def index = {
-        // track usage
-        def al = new AccessLog(username: springSecurityService.getPrincipal().username, event: 'GeneSignature-Summary', eventmessage: 'Gene Signature summary page', accesstime: new Date())
-        //logger.info 'saving Gene Signature access log'
-        al.save()
-
-        redirect(action: 'list')
+    def index() {
+	accessLogService.report 'GeneSignature-Summary', 'Gene Signature summary page'
+	redirect action: 'list'
     }
 
     /**
      * reset flash object before showing summary
      */
-    def refreshSummary = {
+    def refreshSummary() {
         flash.message = null
-        redirect(action: 'list')
+	redirect action: 'list'
     }
 
     /**
      * summary page of permissioned gene signatures
      */
-    def list = {
-        // reset
-        session.setAttribute(WIZ_DETAILS_ATTRIBUTE, null)
+    def list() {
+	removeSessionWizard()
 
-        // logged in user
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-        def bAdmin = user.isAdmin()
-        logger.info 'Admin? ' + bAdmin
+	boolean admin = securityService.principal().isAdmin()
+	long userId = securityService.currentUserId()
 
         // summary view
-        def signatures = geneSignatureService.listPermissionedGeneSignatures(user.id, bAdmin)
-        def ctMap = geneSignatureService.getPermissionedCountMap(user.id, bAdmin)
+	List<GeneSignature> signatures = geneSignatureService.listPermissionedGeneSignatures(userId, admin)
+	Map ctMap = geneSignatureService.getPermissionedCountMap(userId, admin)
 
         // break into owned and public
-        def myItems = []
-        def pubItems = []
-        def myListItems = []
-        def pubListItems = []
+	List<GeneSignature> myItems = []
+	List<GeneSignature> pubItems = []
+	List<GeneSignature> myListItems = []
+	List<GeneSignature> pubListItems = []
 
-        signatures.each {
-            if(it.uniqueId?.startsWith('GENESIG') ) {
-                if (user.id == it.createdByAuthUser.id) {
-                    myItems.add(it)
+	for (GeneSignature geneSignature in signatures) {
+	    if (geneSignature.uniqueId?.startsWith('GENESIG')) {
+		if (userId == geneSignature.createdByAuthUserId) {
+		    myItems << geneSignature
                 }
                 else {
-                    pubItems.add(it)
+		    pubItems << geneSignature
                 }
             }
             else {
-                if(user.id==it.createdByAuthUser.id) {
-                    myListItems.add(it)
+		if (userId == geneSignature.createdByAuthUserId) {
+		    myListItems << geneSignature
                 }
                 else {
-                    pubListItems.add(it)
+		    pubListItems << geneSignature
                 }
             }
         }
 
-	render(view: 'list', model:[user: user, adminFlag: bAdmin, myItems: myItems, pubItems: pubItems,
-                                    myListItems: myListItems, pubListItems: pubListItems, ctMap: ctMap])
+	[user       : securityService.principal(), adminFlag: admin, myItems: myItems, pubItems: pubItems,
+	 myListItems: myListItems, pubListItems: pubListItems, ctMap: ctMap]
     }
 
     /**
      * initialize session for the create gs wizard
      */
-    def createWizard = {
-        // initialize session model data
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
+    def createWizard() {
+	AuthUser user = AuthUser.get(securityService.currentUserId())
+	GeneSignature geneSignature = new GeneSignature(createdByAuthUser: user, publicFlag: false, deletedFlag: false)
+	setSessionWizard new WizardModelDetails(loggedInUser: user, geneSigInst: geneSignature)
 
-        // initialize new gene signature instance
-        def geneSigInst = new GeneSignature()
-        geneSigInst.properties.createdByAuthUser = user
-        geneSigInst.properties.publicFlag = false
-        geneSigInst.properties.deletedFlag = false
-
-        // initialize session
-        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: geneSigInst)
-        session.setAttribute(WIZ_DETAILS_ATTRIBUTE, newWizard)
-
-        redirect(action: 'create1')
+	redirect action: 'create1'
     }
 
     /**
      * initialize session for the create gs wizard
      */
-    def createListWizard = {
-        // initialize session model data
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
+    def createListWizard() {
+	AuthUser user = AuthUser.get(securityService.currentUserId())
+	GeneSignature geneSig = new GeneSignature(
+	    createdByAuthUser: user, publicFlag: false,
+	    deletedFlag: false, list: true)
+	setSessionWizard new WizardModelDetails(loggedInUser: user, geneSigInst: geneSig)
 
-        // initialize new gene signature instance
-        def geneSigInst = new GeneSignature()
-        geneSigInst.properties.createdByAuthUser = user
-        geneSigInst.properties.publicFlag = false
-        geneSigInst.properties.deletedFlag = false
-        geneSigInst.properties.list = true
-
-        // initialize session
-        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: geneSigInst)
-        session.setAttribute(WIZ_DETAILS_ATTRIBUTE, newWizard)
-
-        redirect(action:'createList')
+	redirect action: 'createList'
     }
 
     /**
      * initialize session for the edit gs wizard
      */
-    def editWizard = {
-        // initialize session model data
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
+    def editWizard(GeneSignature geneSig) {
 
-        // load gs instance
-        def geneSigInst = GeneSignature.get(params.id)
-        def clone = geneSigInst.clone()
-        clone.modifiedByAuthUser = user
-        if (clone.experimentTypeCellLine?.id == null) clone.experimentTypeCellLine = null
+	GeneSignature clone = geneSig.clone()
+	clone.modifiedByAuthUser = AuthUser.load(securityService.currentUserId())
+	if (clone.experimentTypeCellLineId == null) {
+	    clone.experimentTypeCellLine = null
+	}
+
         // this is hack, don't know how to get around this!
+	logger.debug 'experimentTypeCellLine: {}; null? {}',
+	    clone.experimentTypeCellLine, clone.experimentTypeCellLine == null
 
-        logger.debug 'experimentTypeCellLine: ' + clone.experimentTypeCellLine + '; null? ' + (clone.experimentTypeCellLine == null)
-        // set onto session
-        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_EDIT, editId: geneSigInst.id)
-        session.setAttribute(WIZ_DETAILS_ATTRIBUTE, newWizard)
+	setSessionWizard new WizardModelDetails(
+	    loggedInUser: securityService.principal(),
+	    geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_EDIT,
+	    editId: geneSig.id)
 
-        redirect(action: 'edit1')
+	redirect action: 'edit1'
     }
 
     /**
      * initialize session for the clone (essentially edit) gs wizard
      */
-    def cloneWizard = {
-        // initialize session model data
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
+    def cloneWizard(GeneSignature geneSig) {
 
-        // load gs inst to clone
-        def geneSigInst = GeneSignature.get(params.id)
-        def clone = geneSigInst.clone()
-        clone.createdByAuthUser = user
+	GeneSignature clone = geneSig.clone()
+	clone.createdByAuthUser = AuthUser.load(securityService.currentUserId())
         clone.modifiedByAuthUser = null
-        clone.name = clone.name + ' (clone)'
-        clone.description = clone.description + ' (clone)'
+	clone.name += ' (clone)'
+	clone.description += ' (clone)'
         clone.publicFlag = false
         clone.deletedFlag = false
         clone.dateCreated = null
         clone.lastUpdated = null
         clone.versionNumber = null
         clone.uniqueId = null
-        if (clone.experimentTypeCellLine?.id == null) clone.experimentTypeCellLine = null
+	if (clone.experimentTypeCellLineId == null) {
+	    clone.experimentTypeCellLine = null
+	}
         // this is hack, don't know how to get around this!
 
-        // set onto session
-        def newWizard = new WizardModelDetails(loggedInUser: user, geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_CLONE, cloneId: geneSigInst.id)
-        session.setAttribute(WIZ_DETAILS_ATTRIBUTE, newWizard)
+	setSessionWizard new WizardModelDetails(
+	    loggedInUser: securityService.principal(),
+	    geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_CLONE,
+	    cloneId: geneSig.id)
 
-        // reset items
-        redirect(action: 'create1')
+	redirect action: 'create1'
     }
 
     /**
      * set the indicated gs public for access by everyone
      */
-    def makePublic = {
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-        def gsInst = GeneSignature.get(params.id)
-        gsInst.modifiedByAuthUser = user
-        geneSignatureService.makePublic(gsInst, true)
+    def makePublic(GeneSignature gs) {
+	gs.modifiedByAuthUser = AuthUser.load(securityService.currentUserId())
+	geneSignatureService.makePublic gs, true
 
-        flash.message = "GeneSignature '${gsInst.name}' was made public to everyone"
-        redirect(action: 'list')
+	flash.message = "GeneSignature '$gs.name' was made public to everyone"
+	redirect action: 'list'
     }
 
     /**
      * set the indicated gs private
      */
-    def makePrivate = {
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-        def gsInst = GeneSignature.get(params.id)
-        gsInst.modifiedByAuthUser = user
-        geneSignatureService.makePublic(gsInst, false)
+    def makePrivate(GeneSignature gs) {
+	gs.modifiedByAuthUser = AuthUser.load(securityService.currentUserId())
+	geneSignatureService.makePublic gs, false
 
-        flash.message = "GeneSignature '${gsInst.name}' was made private"
-        redirect(action: 'list')
+	flash.message = "GeneSignature '$gs.name' was made private"
+	redirect action: 'list'
     }
 
     /**
      * mark the indicated gs as deleted by setting deletedFlag as true
      */
-    def delete = {
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
-        def gsInst = GeneSignature.get(params.id)
-        gsInst.modifiedByAuthUser = user
-        geneSignatureService.delete(gsInst)
+    def delete(GeneSignature gs) {
+	gs.modifiedByAuthUser = AuthUser.load(securityService.currentUserId())
+	geneSignatureService.delete gs
 
-        flash.message = "GeneSignature '${gsInst.name}' was marked as deleted"
-        redirect(action: 'list')
+	flash.message = "GeneSignature '$gs.name' was marked as deleted"
+	redirect action: 'list'
     }
 
     /**
      * detail view
      */
-    def show = {
-        def gsInst = GeneSignature.read(params.id)
-        render(template: 'gene_sig_detail', model: [gs: gsInst])
+    def show(GeneSignature gs) {
+	render template: 'gene_sig_detail', model: [gs: gs]
     }
 
-    def showDetail = {
-        def gsInst = GeneSignature.read(params.id)
-        render(view: 'showDetail', model: [gs: gsInst])
+    def showDetail(GeneSignature gs) {
+	render view: 'showDetail', model: [gs: gs]
     }
 
-    def create1 = {
-        // get wizard
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
+    def create1() {
+	WizardModelDetails wizard = sessionWizard()
 
-        // bind params
-        bindGeneSigData(params, wizard.geneSigInst)
+	bindGeneSigData wizard.geneSigInst
 
         // load data for page 1
-        loadWizardItems(1, wizard)
+	loadWizardItems 1, wizard
 
-        render(view: 'wizard1', model: [wizard: wizard])
+	render view: 'wizard1', model: [wizard: wizard]
     }
 
-    def create2 = {
-        // get wizard
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
+    def create2() {
+	WizardModelDetails wizard = sessionWizard()
 
-        // bind params
-        bindGeneSigData(params, wizard.geneSigInst)
+	bindGeneSigData wizard.geneSigInst
 
         // load item data
-        loadWizardItems(2, wizard)
-        def existingValues = createExistingValues(2, wizard.geneSigInst)
+	loadWizardItems 2, wizard
+	Map existingValues = createExistingValues(2, wizard.geneSigInst)
 
-        render(view: 'wizard2', model: [wizard: wizard, existingValues: existingValues])
+	render view: 'wizard2', model: [
+	    wizard: wizard,
+	    existingValues: existingValues]
     }
 
-    def create3 = {
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
+    def create3() {
+	WizardModelDetails wizard = sessionWizard()
 
-        // bind params
-        bindGeneSigData(params, wizard.geneSigInst)
+	bindGeneSigData wizard.geneSigInst
 
         // load data for page 3
-        loadWizardItems(3, wizard)
-        def existingValues = createExistingValues(3, wizard.geneSigInst)
+	loadWizardItems 3, wizard
+	Map existingValues = createExistingValues(3, wizard.geneSigInst)
 
-        render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+	render view: 'wizard3', model: [
+	    wizard: wizard,
+	    existingValues: existingValues]
     }
 
-    def createList = {
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
+    def createList() {
+	WizardModelDetails wizard = sessionWizard()
 
-        // bind params
-        bindGeneSigData(params, wizard.geneSigInst)
+	bindGeneSigData wizard.geneSigInst
 
-        render(view: 'wizard_list', model:[wizard: wizard])
+	render view: 'wizard_list', model: [wizard: wizard]
     }
 
-    def editList = {
-        // initialize session model data
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
+    def editList(GeneSignature geneSig) {
+	WizardModelDetails wizard = new WizardModelDetails(
+	    loggedInUser: AuthUser.load(securityService.currentUserId()),
+	    geneSigInst: geneSig)
+	setSessionWizard wizard
 
-        // initialize new gs inst
-        def geneSigInst = GeneSignature.get(params.id)
-        // initialize session
-        def wizard = new WizardModelDetails(loggedInUser: user, geneSigInst: geneSigInst)
-        session.setAttribute(WIZ_DETAILS_ATTRIBUTE, wizard)
-
-        // bind params
-        bindGeneSigData(params, wizard.geneSigInst)
+	bindGeneSigData wizard.geneSigInst
         wizard.wizardType = 1
-        render(view: 'wizard_list', model:[wizard: wizard, gs: wizard.geneSigInst, isEdit: true])
+	render view: 'wizard_list', model: [wizard: wizard, gs: wizard.geneSigInst, isEdit: true]
     }
 
     /**
      * edit gs in page 1 of wizard
      */
-    def edit1 = {
-        // get wizard
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
-        bindGeneSigData(params, wizard.geneSigInst)
+    def edit1() {
+	WizardModelDetails wizard = sessionWizard()
+	bindGeneSigData wizard.geneSigInst
 
         // load data for page 1
-        loadWizardItems(1, wizard)
+	loadWizardItems 1, wizard
 
-        render(view: 'wizard1', model: [wizard: wizard])
+	render view: 'wizard1', model: [wizard: wizard]
     }
 
     /**
      * edit gs in page 2 of wizard
      */
-    def edit2 = {
-        // get wizard
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
+    def edit2() {
+	WizardModelDetails wizard = sessionWizard()
 
         // save original file until final save
-        def origFile = wizard.geneSigInst.uploadFile
-        bindGeneSigData(params, wizard.geneSigInst)
+	String origFile = wizard.geneSigInst.uploadFile
+	bindGeneSigData wizard.geneSigInst
         wizard.geneSigInst.uploadFile = origFile
 
         // load item data
-        loadWizardItems(2, wizard)
-        def existingValues = createExistingValues(2, wizard.geneSigInst)
+	loadWizardItems 2, wizard
+	Map existingValues = createExistingValues(2, wizard.geneSigInst)
 
-        render(view: 'wizard2', model: [wizard: wizard, existingValues: existingValues])
+	render view: 'wizard2', model: [
+	    wizard: wizard,
+	    existingValues: existingValues]
     }
 
     /**
      * edit gs in page 3 of wizard
      */
-    def edit3 = {
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
-        bindGeneSigData(params, wizard.geneSigInst)
+    def edit3() {
+	WizardModelDetails wizard = sessionWizard()
+	bindGeneSigData wizard.geneSigInst
 
         // load data for page 3
-        loadWizardItems(3, wizard)
-        def existingValues = createExistingValues(3, wizard.geneSigInst)
+	loadWizardItems 3, wizard
+	Map existingValues = createExistingValues(3, wizard.geneSigInst)
 
-        render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+	render view: 'wizard3', model: [
+	    wizard: wizard,
+	    existingValues: existingValues]
     }
 
     /**
      * save new gene signature domain and composition of gene signature items
      */
-    def save = {
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
-        def gs = wizard.geneSigInst
-        assert null == gs.properties.id
+    def save() {
+	WizardModelDetails wizard = sessionWizard()
+	GeneSignature gs = wizard.geneSigInst
+	assert null == gs.id
 
-        // bind params
-        bindGeneSigData(params, gs)
+	bindGeneSigData gs
 
         // get file
-        def file = request.getFile('uploadFile')
+	MultipartFile file = request.getFile('uploadFile')
 
         // load file contents, if clone check for file presence
-        boolean bLoadFile = (wizard.wizardType == WizardModelDetails.WIZ_TYPE_CREATE) || (wizard.wizardType == WizardModelDetails.WIZ_TYPE_CLONE && file != null && file.getOriginalFilename() != '')
-        if (!bLoadFile) file = null
-        if (bLoadFile) {
-            gs.properties.uploadFile = file.getOriginalFilename()
+	boolean loadFile = wizard.wizardType == WizardModelDetails.WIZ_TYPE_CREATE ||
+	    (wizard.wizardType == WizardModelDetails.WIZ_TYPE_CLONE && file?.originalFilename)
+	if (!loadFile) {
+	    file = null
+	}
+	if (loadFile) {
+	    gs.uploadFile = file.originalFilename
 
             // check for empty file
             if (file.empty) {
-                flash.message = "The file:'${gs.properties.uploadFile}' you uploaded is empty"
-                def existingValues = createExistingValues(3, wizard.geneSigInst)
-                return render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+		flash.message = "The file:'$gs.uploadFile' you uploaded is empty"
+		Map existingValues = createExistingValues(3, wizard.geneSigInst)
+		render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
+		return
             }
 
             // validate file format
-            def metricType = gs.foldChgMetricConceptCode?.bioConceptCode
-            def schemaColCt = gs.fileSchema?.numberColumns
+	    String metricType = gs.foldChgMetricConceptCode?.bioConceptCode
+	    long schemaColCt = gs.fileSchema?.numberColumns
 
             try {
-                geneSignatureService.verifyFileFormat(file, schemaColCt, metricType)
+		geneSignatureService.verifyFileFormat file, schemaColCt, metricType
             }
             catch (FileSchemaException e) {
-                flash.message = e.getMessage()
-                def existingValues = createExistingValues(3, wizard.geneSigInst)
-                return render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+		flash.message = e.message
+		Map existingValues = createExistingValues(3, wizard.geneSigInst)
+		render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
+		return
             }
-
         }
         else {
             // load items from cloned object
             GeneSignature parentGS = GeneSignature.get(wizard.cloneId)
-            gs.properties.uploadFile = parentGS.uploadFile
-            logger.info "INFO: loading parent of clone '" + parentGS.name + "'"
+	    gs.uploadFile = parentGS.uploadFile
+	    logger.info 'INFO: loading parent of clone "{}"', parentGS.name
             geneSignatureService.cloneGeneSigItems(parentGS, gs)
         }
 
@@ -432,124 +398,114 @@ class GeneSignatureController {
             gs = geneSignatureService.saveWizard(gs, file)
             if (gs.hasErrors()) {
                 flash.message = 'Could not save Gene Signature'
-                render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+		render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
                 return
             }
 
-            auditLogService.report('New Gene Signature', request,
+	    auditLogService.report 'New Gene Signature', request,
                 action: actionName,
                 user: currentUserBean,
                 filename: file?.originalFilename,
                 size: gs.geneSigItems.size()
-            )
 
-            // clean up session
-            wizard = null
-            session.setAttribute(WIZ_DETAILS_ATTRIBUTE, wizard)
+	    removeSessionWizard()
 
-            // send message to user
-            flash.message = "GeneSignature '${gs.name}' was created on: ${gs.dateCreated}"
-            redirect(action: 'list')
-
-        }
-        catch (FileSchemaException fse) {
-            flash.message = fse.getMessage()
-            def existingValues = createExistingValues(3, wizard.geneSigInst)
-            render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
-        }
-        catch (RuntimeException re) {
-            flash.message = 'Runtime exception ' + re.getClass().getName() + ':<br>' + re.getMessage()
-            def existingValues = createExistingValues(3, wizard.geneSigInst)
-            render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+	    flash.message = "GeneSignature '$gs.name' was created on: $gs.dateCreated"
+	    redirect action: 'list'
+	}
+	catch (FileSchemaException e) {
+	    flash.message = e.message
+	    Map existingValues = createExistingValues(3, wizard.geneSigInst)
+	    render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
+	}
+	catch (RuntimeException e) {
+	    flash.message = 'Runtime exception ' + e.getClass().name + ':<br>' + e.message
+	    Map existingValues = createExistingValues(3, wizard.geneSigInst)
+	    render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
         }
     }
 
     /**
      * save new gene list
      */
-    def saveList = {
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
-        def gs = wizard.geneSigInst
-        gs.properties.list = true
-
+    def saveList() {
+	WizardModelDetails wizard = sessionWizard()
+	GeneSignature gs = wizard.geneSigInst
+	gs.list = true
         if (!params.boolean('isEdit')) {
-            assert null == gs.properties.id
+	    assert null == gs.id
         }
         else {
-            def currentListItems = GeneSignatureItem.createCriteria().list {
-                eq('geneSignature', gs)
-            }
-            for (i in currentListItems) {
+	    for (i in GeneSignatureItem.findAllByGeneSignature(gs)) {
                 i.delete()
             }
             gs.geneSigItems.clear()
         }
         // species
-        gs.speciesConceptCode =  ConceptCode.findByCodeTypeNameAndBioConceptCode('OTHER', 'OTHER')
+	gs.speciesConceptCode = ConceptCode.findByCodeTypeNameAndBioConceptCode(
+	    'OTHER', 'OTHER')
 
         // technology platforms
-        gs.techPlatform = BioAssayPlatform.findByName('Other')
-        if(!gs.techPlatform) {gs.techPlatform = BioAssayPlatform.findByName('None')}
+	gs.techPlatform = BioAssayPlatform.findByName('Multiple or Unknown')
         
         // p value cutoffs
-        gs.pValueCutoffConceptCode =  ConceptCode.findByCodeTypeNameAndBioConceptCode(P_VAL_CUTOFF_CATEGORY, 'UNDEFINED')
+	gs.pValueCutoffConceptCode = ConceptCode.findByCodeTypeNameAndBioConceptCode(
+	    P_VAL_CUTOFF_CATEGORY, 'UNDEFINED')
 
         // file schemas
         gs.fileSchema =  GeneSignatureFileSchema.findByName('Gene Symbol <tab> Metric Indicator')
 
         // fold change metrics
-        gs.foldChgMetricConceptCode = ConceptCode.findByCodeTypeNameAndBioConceptCode(FOLD_CHG_METRIC_CATEGORY, 'NOT_USED')
+	gs.foldChgMetricConceptCode = ConceptCode.findByCodeTypeNameAndBioConceptCode(
+	    FOLD_CHG_METRIC_CATEGORY, 'NOT_USED')
 
-        // bind params
-        bindData(gs, params)
+	bindData gs, params
 
         // get file
-        def file = request.getFile('uploadFile')
-        gs.properties.name = request.getParameter('name')
+	MultipartFile file = request.getFile('uploadFile')
+	gs.name = params.name
 
         // load file contents, if clone check for file presence
-        boolean bLoadFile = (file!=null && file.getOriginalFilename().trim() !='')
-        if(!bLoadFile) file = null
-        if(bLoadFile) {
-            gs.properties.uploadFile = file.getOriginalFilename()
+	boolean loadFile = file?.originalFilename?.trim()
+	if (!loadFile) {
+	    file = null
+	}
+	if (loadFile) {
+	    gs.uploadFile = file.originalFilename
 
             // check for empty file
             if(file.empty) {
-                flash.message = "The file:'${gs.properties.uploadFile}' you uploaded is empty"
-                return render(view: 'wizard_list', model:[wizard: wizard])
+		flash.message = "The file:'$gs.uploadFile' you uploaded is empty"
+		render view: 'wizard_list', model: [wizard: wizard]
+		return
             }
 
             // validate file format
-            def metricType = 'NOT_USED'
-            def schemaColCt = 2
-
+	    String metricType = 'NOT_USED'
+	    int schemaColCt = 2
             try {
                 geneSignatureService.verifyFileFormat(file, schemaColCt, metricType)
             }
             catch (FileSchemaException e) {
-                flash.message = e.getMessage()
-                return render(view: 'wizard_list', model:[wizard: wizard])
+		flash.message = e.message
+		render view: 'wizard_list', model: [wizard: wizard]
+		return
             }
-
         }
         else {
-            gs.properties.uploadFile = 'Manual Item Entry'
+	    gs.uploadFile = 'Manual Item Entry'
             // load items from list rather than file
-            Iterator iter = params.entrySet().iterator()
-            SortedSet invalidSymbols = new TreeSet()
-            while(iter.hasNext()) {
-                def param = iter.next()
-                def key = param.getKey().trim()
-                def val = param.getValue()
+	    params.each { String key, val ->
+		key = key.trim()
                 List<String> markers = []
-                if(key.startsWith('biomarker_') && val != null && val != '') {
-                    markers.add(val.trim())
+		if (key.startsWith('biomarker_') && val) {
+		    markers << val.trim()
                 }
-                def gsItems = geneSignatureService.loadGeneSigItemsFromList(markers)
-                def geneSigUniqueIds = gs.geneSigItems*.bioDataUniqueId
-                gsItems.each {
-                    if (!geneSigUniqueIds?.contains(it.bioDataUniqueId)) {
-                        gs.addToGeneSigItems(it)
+		List<GeneSignatureItem> gsItems = geneSignatureService.loadGeneSigItemsFromList(markers)
+		List<String> geneSigUniqueIds = gs.geneSigItems*.bioDataUniqueId
+		for (GeneSignatureItem gsi in gsItems) {
+		    if (!geneSigUniqueIds?.contains(gsi.bioDataUniqueId)) {
+			gs.addToGeneSigItems gsi
                     }
                 }
             }
@@ -559,453 +515,395 @@ class GeneSignatureController {
         try {
             gs = geneSignatureService.saveWizard(gs, file)
 
-            auditLogService.report('New Gene_RSID List', request,
-                action: actionName,
-                user: currentUserBean,
+            auditLogService.report(
+		'New Gene_RSID List', request,
+		action: actionName,
+		user: currentUserBean,
                 filename: file?.originalFilename,
                 size: gs.geneSigItems.size()
             )
 
-            // clean up session
-            wizard = null
-            session.setAttribute(WIZ_DETAILS_ATTRIBUTE, wizard)
+	    removeSessionWizard()
 
-            // send message to user
-            flash.message = "GeneSignature '${gs.name}' was " + (params.boolean('isEdit') ? "edited" : "created") + " on: ${gs.dateCreated}"
-            redirect(action:'list')
+	    flash.message = "GeneSignature '$gs.name' was " +
+		(params.boolean('isEdit') ? 'edited' : 'created') + " on: $gs.dateCreated"
+	    redirect action: 'list'
 
-        }
-        catch (FileSchemaException fse) {
-            flash.message = fse.getMessage()
-            render(view: 'wizard_list', model:[wizard: wizard])
-        }
-        catch (RuntimeException re) {
-            flash.message = 'Runtime exception '+re.getClass().getName()+':<br>'+re.getMessage()
-            render(view: 'wizard_list', model:[wizard: wizard])
+	}
+	catch (FileSchemaException e) {
+	    flash.message = e.message
+	    render view: 'wizard_list', model: [wizard: wizard]
+	}
+	catch (RuntimeException e) {
+	    flash.message = 'Runtime exception ' + e.getClass().name + ':<br>' + e.message
+	    render view: 'wizard_list', model: [wizard: wizard]
         }
     }
-
 
     /**
      * update gene signature and the associated items (new file only)
      */
-    def update = {
-        def user = AuthUser.findByUsername(springSecurityService.getPrincipal().username)
+    def update() {
+	WizardModelDetails wizard = sessionWizard()
+	GeneSignature clone = wizard.geneSigInst
 
-        // retrieve clone
-        def wizard = session.getAttribute(WIZ_DETAILS_ATTRIBUTE)
-        def clone = wizard.geneSigInst
-
-        // bind params onto clone
-        bindGeneSigData(params, clone)
+	bindGeneSigData clone
 
         // load real domain object, apply edit params from clone
-        def gsReal = GeneSignature.get(wizard.editId)
-        def origFile = gsReal.uploadFile
-        clone.copyPropertiesTo(gsReal)
-        gsReal.modifiedByAuthUser = user
+	GeneSignature gsReal = GeneSignature.get(wizard.editId)
+	String origFile = gsReal.uploadFile
+	clone.copyPropertiesTo gsReal
+	gsReal.modifiedByAuthUser = AuthUser.load(securityService.currentUserId())
         gsReal.uploadFile = origFile
 
         // refresh items if new file uploaded
-        def file = request.getFile('uploadFile')
-        logger.debug " update wizard file:'" + file?.getOriginalFilename() + "'"
+	MultipartFile file = request.getFile('uploadFile')
+	logger.debug ' update wizard file:"{}"', file?.originalFilename
 
         // file validation
-        if (file != null && file.getOriginalFilename() != '') {
+	if (file?.originalFilename) {
             // empty?
             if (file.empty) {
-                flash.message = flash.message = "The file:'${file.getOriginalFilename()}' you uploaded is empty"
-                def existingValues = createExistingValues(3, wizard.geneSigInst)
-                return render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+		flash.message = flash.message = "The file:'$file.originalFilename' you uploaded is empty"
+		Map existingValues = createExistingValues(3, wizard.geneSigInst)
+		render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
+		return
             }
 
             // check schema errors
-            def metricType = gsReal.foldChgMetricConceptCode?.bioConceptCode
-            def schemaColCt = gsReal.fileSchema?.numberColumns
+	    String metricType = gsReal.foldChgMetricConceptCode?.bioConceptCode
+	    long schemaColCt = gsReal.fileSchema?.numberColumns
             try {
-                geneSignatureService.verifyFileFormat(file, schemaColCt, metricType)
-                gsReal.uploadFile = file.getOriginalFilename()
+		geneSignatureService.verifyFileFormat file, schemaColCt, metricType
+		gsReal.uploadFile = file.originalFilename
 
             }
             catch (FileSchemaException e) {
-                flash.message = e.getMessage()
-                def existingValues = createExistingValues(3, wizard.geneSigInst)
-                return render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+		flash.message = e.message
+		Map existingValues = createExistingValues(3, wizard.geneSigInst)
+		render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
+		return
             }
         }
 
         // good to go, call update service
         try {
-            geneSignatureService.updateWizard(gsReal, file)
+	    geneSignatureService.updateWizard gsReal, file
+	    removeSessionWizard()
 
-            // clean up session
-            wizard = null
-            session.setAttribute(WIZ_DETAILS_ATTRIBUTE, wizard)
-
-            // send message to user
-            flash.message = "GeneSignature '${gsReal.name}' was updated on: ${gsReal.lastUpdated}"
-            redirect(action: 'list')
-
-        }
-        catch (FileSchemaException fse) {
-            flash.message = fse.getMessage()
-            def existingValues = createExistingValues(3, wizard.geneSigInst)
-            render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
-        }
-        catch (RuntimeException re) {
-            flash.message = 'Runtime exception ' + re.getClass().getName() + ':<br>' + re.getMessage()
-            def existingValues = createExistingValues(3, wizard.geneSigInst)
-            render(view: 'wizard3', model: [wizard: wizard, existingValues: existingValues])
+	    flash.message = "GeneSignature '$gsReal.name' was updated on: $gsReal.lastUpdated"
+	    redirect action: 'list'
+	}
+	catch (FileSchemaException e) {
+	    flash.message = e.message
+	    Map existingValues = createExistingValues(3, wizard.geneSigInst)
+	    render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
+	}
+	catch (RuntimeException e) {
+	    flash.message = 'Runtime exception ' + e.getClass().name + ':<br>' + e.message
+	    Map existingValues = createExistingValues(3, wizard.geneSigInst)
+	    render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
         }
     }
 
     /**
      * edit screen for gs items
      */
-    def showEditItems = {
-        def gs = GeneSignature.get(params.id)
-
+    def showEditItems(GeneSignature gs) {
         if (params.errorFlag != null) {
-            render(view: 'edit_items', model: [gs: gs, errorFlag: true])
+	    render view: 'edit_items', model: [gs: gs, errorFlag: true]
         }
         else {
-            render(view: 'edit_items', model: [gs: gs])
+	    render view: 'edit_items', model: [gs: gs]
         }
     }
 
     /**
      * delete the indicated gs items
      */
-    def deleteItems = {
+    def deleteItems(GeneSignature gs) {
         def delParam = params.delete
-        def gs = GeneSignature.get(params.id)
-
-        if (delParam == null || delParam == '') {
-            flash.message = "<div class='warning'>You did not select any item(s) to delete</div>"
-            return render(view: 'edit_items', model: [gs: gs, errorFlag: true])
+	if (!delParam) {
+	    setFlashWarning 'You did not select any item(s) to delete'
+	    render view: 'edit_items', model: [gs: gs, errorFlag: true]
+	    return
         }
 
         // if one id, request is a string
-        def delItems = []
+	List<String> delItems = []
         if (delParam instanceof String) {
-            delItems.add(delParam)
+	    delItems << delParam
         }
         else {
-            delParam.each { delItems.add(it) }
+	    delItems.addAll delParam
         }
 
         // delete indicated ids
         gs = geneSignatureService.deleteGeneSigItems(gs, delItems)
 
-        // send user message
-        flash.message = "<div class='message'>deleted " + delItems.size() + " gene signature item(s)</div>"
-        render(view: 'edit_items', model: [gs: gs])
+	flash.message = '<div class="message">deleted ' + delItems.size() + ' gene signature item(s)</div>'
+	render view: 'edit_items', model: [gs: gs]
     }
 
     /**
      * add items to an existing gene signature
      */
-    def addItems = {
+    def addItems(GeneSignature gs) {
 
-        def gs = GeneSignature.get(params.id)
-        logger.debug ' adding items to gs: ' + gs.name
+	logger.debug ' adding items to gs: {}', gs.name
 
         // reset
         flash.message = null
 
         // extract symbols and value metrics
-        List<String> geneSymbols = new ArrayList()
-        List<Double> valueMetrics = new ArrayList()
-        List<String> probes = new ArrayList()
+	List<String> geneSymbols = []
+	List<Double> valueMetrics = []
+	List<String> probes = []
 
-        boolean bError = false
-        def key
-        def symbol
-        def itemNum
-        def valueMetric
-        def param
-        def probe
+	boolean error = false
 
-        // iterate through params
-        Iterator iter = params.entrySet().iterator()
-        while (iter.hasNext()) {
-            param = iter.next()
-            //logger.info ' eval param: '+param
-            //println 'PARAM: ' + param
-
-            key = param.getKey().trim()
-            symbol = param.getValue().trim()
+	// iterate through params
+	params.each { String key, String value ->
+	    key = key.trim()
+	    String symbol = value.trim()
 
             // parse gene symbols
-            if (key.startsWith('biomarker_') && symbol.length() > 0) {
-                itemNum = key.substring(10, key.length())
-                valueMetric = params.get('foldChgMetric_' + itemNum)
-                geneSymbols.add(symbol)
-                println 'Gene: ' + symbol + '   FC: ' + valueMetric
+	    if (key.startsWith('biomarker_') && symbol) {
+		String itemNum = key.substring(10, key.length())
+		String valueMetric = params['foldChgMetric_' + itemNum]
+		geneSymbols << symbol
 
-                logger.debug " parsing symbol: '" + symbol + "' with valueMetric: " + valueMetric
+		logger.debug ' parsing symbol: "{}" with valueMetric: {}', symbol, valueMetric
                 // parse fold chg metric
-                if (valueMetric != null && valueMetric.trim().length() > 0) {
+		if (valueMetric?.trim()) {
                     try {
-                        valueMetrics.add(Double.valueOf(valueMetric))
+			valueMetrics << Double.valueOf(valueMetric)
                     }
                     catch (RuntimeException e) {
-                        logger.error 'invalid valueMetric: ' + valueMetric + ' detected!', e
-                        flash.message = "<div class='warning'>The value metric '" + valueMetric + "' for symbol: '" + symbol + "' is not a valid number</div>"
-                        bError = true
+			logger.error 'invalid valueMetric: {} detected!', valueMetric, e
+			setFlashWarning 'The value metric "' + valueMetric +
+			    '" for symbol: "' + symbol + '" is not a valid number'
+			error = true
                     }
                 }
             }
 
             // parse probeset
-            if (key.startsWith('probeset_') && symbol.length() > 0) {
-                itemNum = key.substring(9, key.length())
-                valueMetric = params.get('foldChgMetric_' + itemNum)
-                probes.add(symbol)
+	    if (key.startsWith('probeset_') && symbol) {
+		String itemNum = key.substring(9, key.length())
+		String valueMetric = params['foldChgMetric_' + itemNum]
+		probes << symbol
 
-                logger.debug " parsing symbol: '" + symbol + "' with valueMetric: " + valueMetric
+		logger.debug ' parsing symbol: "{}" with valueMetric: {}', symbol, valueMetric
                 // parse fold chg metric
-                if (valueMetric != null && valueMetric.trim().length() > 0) {
+		if (valueMetric?.trim()) {
                     try {
-                        valueMetrics.add(Double.valueOf(valueMetric))
+			valueMetrics << Double.valueOf(valueMetric)
                     }
                     catch (RuntimeException e) {
-                        logger.error 'invalid valueMetric: ' + valueMetric + ' detected!', e
-                        flash.message = "<div class='warning'>The value metric '" + valueMetric + "' for symbol: '" + symbol + "' is not a valid number</div>"
-                        bError = true
+			logger.error 'invalid valueMetric: {} detected!', valueMetric, e
+			setFlashWarning 'The value metric "' + valueMetric +
+			    '" for symbol: "' + symbol + '" is not a valid number'
+			error = true
                     }
                 }
             }
         }
 
         // any symbols to add?
-        if (!bError && (geneSymbols.size() == 0) && (probes.size() == 0)) {
-            flash.message = "<div class='warning'>You did not enter any new item(s) to add</div>"
-            bError = true
+	if (!error && !geneSymbols && !probes) {
+	    setFlashWarning 'You did not enter any new item(s) to add'
+	    error = true
         }
 
         // valid fold chg for each gene or probeset?
-        if (!bError && gs.foldChgMetricConceptCode?.bioConceptCode != GeneSignatureService.METRIC_CODE_GENE_LIST) {
-            if ((gs.fileSchema?.id == 3) && probes.size() != valueMetrics.size()) {
-                flash.message = "<div class='warning'>You must enter a valid fold change metric for each new probeset</div>"
-                bError = true
+	if (!error && gs.foldChgMetricConceptCode?.bioConceptCode != GeneSignatureService.METRIC_CODE_GENE_LIST) {
+	    if (gs.fileSchemaId == 3 && probes.size() != valueMetrics.size()) {
+		setFlashWarning 'You must enter a valid fold change metric for each new probeset'
+		error = true
             }
 
-            if ((gs.fileSchema.id != 3) && geneSymbols.size() != valueMetrics.size()) {
-                flash.message = "<div class='warning'>You must enter a valid fold change metric for each new gene symbol</div>"
-                bError = true
+	    if (gs.fileSchemaId != 3 && geneSymbols.size() != valueMetrics.size()) {
+		setFlashWarning 'You must enter a valid fold change metric for each new gene symbol'
+		error = true
             }
         }
 
         // add indicated items
-        if (valueMetrics.size() == 0) valueMetrics = null
+	if (!valueMetrics) {
+	    valueMetrics = null
+	}
 
         // add new items if no error
-        if (!bError) {
+	if (!error) {
             try {
-                geneSignatureService.addGenSigItems(gs, geneSymbols, probes, valueMetrics)
-                flash.message = "<div class='message'>" + geneSymbols.size() + " gene signature item(s) were added to '" + gs.name + "'</div>"
-
+		geneSignatureService.addGenSigItems gs, geneSymbols, probes, valueMetrics
+		flash.message = '<div class="message">' + geneSymbols.size() +
+		    ' gene signature item(s) were added to "' + gs.name + '"</div>'
             }
-            catch (FileSchemaException fse) {
-                logger.error 'message>> ' + fse.getMessage(), fse
-                flash.message = "<div class='warning'>" + fse.getMessage() + "</div>"
-                bError = true
-            }
-            catch (RuntimeException re) {
-                logger.error 'RuntimeException>>' + re.getMessage(), re
-                flash.message = "<div class='warning'>Runtime exception " + re.getClass().getName() + ":<br>" + re.getMessage() + "</div"
-                bError = true
+	    catch (FileSchemaException e) {
+		logger.error 'message>> {}', e.message, e
+		setFlashWarning e.message
+		error = true
+	    }
+	    catch (RuntimeException e) {
+		logger.error 'RuntimeException>>{}', e.message, e
+		setFlashWarning 'Runtime exception ' + e.getClass().name + ':<br>' + e.message
+		error = true
             }
         }
 
         // handle error
-        if (bError) {
+	if (error) {
             // build params map from current params for redirect
-            Map newParams = new HashMap()
-            newParams.putAt('id', gs.id)
-            newParams.putAt('errorFlag', true)
+	    Map newParams = [id: gs.id, errorFlag: true]
 
             // add new gene params
-            def i = 1
-            geneSymbols.each {
-                newParams.putAt('biomarker_' + i, it)
+	    int i = 1
+	    for (it in geneSymbols) {
+		newParams['biomarker_' + i] = it
                 i++
             }
 
             // add new fold chg params
             i = 1
-            if (valueMetrics != null) {
-                valueMetrics.each {
-                    newParams.putAt('foldChgMetric_' + i, it)
-                    i++
-                }
+	    for (it in valueMetrics) {
+		newParams['foldChgMetric_' + i] = it
+                i++
             }
-            logger.debug ' redirect params>> ' + newParams
-            redirect(action: 'showEditItems', params: newParams)
+	    logger.debug ' redirect params>> {}', newParams
+	    redirect action: 'showEditItems', params: newParams
         }
         else {
-            redirect(action: 'showEditItems', params: ['id': gs.id])
+	    redirect action: 'showEditItems', params: [id: gs.id]
         }
     }
 
     /**
      * export gene signature to Excel
      */
-    def downloadExcel = {
-
-        // download domain object
-        def gs = GeneSignature.get(params.id)
-        DomainObjectExcelHelper downloadHelper = new DomainObjectExcelHelper(gs, 'gene_sig_' + gs.name + '.xls')
-        downloadHelper.downloadDomainObject(response)
+    def downloadExcel(GeneSignature gs) {
+	new DomainObjectExcelHelper(gs, 'gene_sig_' + gs.name + '.xls').downloadDomainObject response
     }
 
     /**
      * export GMT: Gene Matrix Transposed file format (*.gmt)
      */
-    def downloadGMT = {
-        def fileName = null
-        // send content to response
-        ServletOutputStream os = null
-        try {
-            def content = geneSignatureService.getGeneSigGMTContent(params.id)
-            fileName = 'gene_sig_' + content?.substring(0, content?.indexOf('\t'))?.replace('-', '') + '.gmt'
-            // setup headers for download
-            response.setContentType('application/vnd.gmt')
-            response.setCharacterEncoding('charset=utf-8')
-            response.setHeader('Content-Disposition', 'attachment; filename=\'' + fileName + '\'')
-            response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
-            response.setHeader('Pragma', 'public')
-            response.setHeader('Expires', '0')
-            os = response.getOutputStream()
-            os?.write(content.bytes)
-        }
-        finally {
-            os?.flush()
-        }
+    def downloadGMT(String id) {
+	String content = geneSignatureService.getGeneSigGMTContent(id)
+	String fileName = 'gene_sig_' + content?.substring(0, content?.indexOf('\t'))?.replace('-', '') + '.gmt'
+	utilService.sendDownload response, 'application/vnd.gmt', fileName, content.bytes
     }
 
     /**
      * show sample upload files to user
      */
-    def showUploadSamples = {
+    def showUploadSamples() {
 
         // set headers on output stream
         response.reset()
         response.setContentType('text/plain')
-        response.setCharacterEncoding('charset=utf-8')
-        response.setHeader('Content-Disposition', 'attachment; filename=\'gene_sig_samples.txt\'')
+	response.setCharacterEncoding('utf-8')
+	response.setHeader('Content-Disposition', 'attachment; filename="gene_sig_samples.txt"')
         response.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
         response.setHeader('Pragma', 'public')
         response.setHeader('Expires', '0')
 
         // send workbook to response
-        ServletOutputStream os = null
-        try {
-            os = response.outputStream
-            os.println('1) Gene List Example (no tab character, exclude fold change metric):')
-            os.println('')
-            os.println('TCN1')
-            os.println('IL1RN')
-            os.println('KIAA1199')
-            os.println('G0S2')
-            os.println('CXCL2')
-            os.println('IL1RN')
-            os.println('IL24')
-            os.println('APOBEC3A')
-            os.println('VNN3')
-            os.println('DSG3')
-            os.println('')
-            os.println('')
-            os.println('2) Gene Signature Example with actual fold change (separate columns with a tab):')
-            os.println('')
-            os.println('CXCL5\t-19.19385797')
-            os.println('IL8RB\t-18.21493625')
-            os.println('FPR1\t-17.6056338')
-            os.println('FCGR3A\t-15.69858713')
-            os.println('MMP3\t-15.31393568')
-            os.println('CXCL6\t-14.7275405')
-            os.println('BCL2A1\t-12.65822785')
-            os.println('CXCL2\t-12.300123')
-            os.println('SERPINB3\t-12.22493888')
-            os.println('KYNU\t-10.76426265')
-            os.println('')
-            os.println('')
-            os.println('3) Gene Signature Example for composite lists (separate columns with a tab):')
-            os.println('')
-            os.println('CXCL5\t-1')
-            os.println('IL8RB\t-1')
-            os.println('MMP3\t-1')
-            os.println('SOD2\t0')
-            os.println('PI3\t0')
-            os.println('CDH3\t0')
-            os.println('LAIR2\t1')
-            os.println('ZBP1\t1')
-            os.println('SPRR1B\t1')
-            os.println('APOL1\t1')
-        }
-        finally {
-            //os.flush()
-            //	response.flushBuffer()
-        }
+	ServletOutputStream os = response.outputStream
+	os.println '1) Gene List Example (no tab character, exclude fold change metric):'
+	os.println ''
+	os.println 'TCN1'
+	os.println 'IL1RN'
+	os.println 'KIAA1199'
+	os.println 'G0S2'
+	os.println 'CXCL2'
+	os.println 'IL1RN'
+	os.println 'IL24'
+	os.println 'APOBEC3A'
+	os.println 'VNN3'
+	os.println 'DSG3'
+	os.println ''
+	os.println ''
+	os.println '2) Gene Signature Example with actual fold change (separate columns with a tab):'
+	os.println ''
+	os.println 'CXCL5\t-19.19385797'
+	os.println 'IL8RB\t-18.21493625'
+	os.println 'FPR1\t-17.6056338'
+	os.println 'FCGR3A\t-15.69858713'
+	os.println 'MMP3\t-15.31393568'
+	os.println 'CXCL6\t-14.7275405'
+	os.println 'BCL2A1\t-12.65822785'
+	os.println 'CXCL2\t-12.300123'
+	os.println 'SERPINB3\t-12.22493888'
+	os.println 'KYNU\t-10.76426265'
+	os.println ''
+	os.println ''
+	os.println '3) Gene Signature Example for composite lists (separate columns with a tab):'
+	os.println ''
+	os.println 'CXCL5\t-1'
+	os.println 'IL8RB\t-1'
+	os.println 'MMP3\t-1'
+	os.println 'SOD2\t0'
+	os.println 'PI3\t0'
+	os.println 'CDH3\t0'
+	os.println 'LAIR2\t1'
+	os.println 'ZBP1\t1'
+	os.println 'SPRR1B\t1'
+	os.println 'APOL1\t1'
     }
 
     /**
      * retrieve cell lines for indicated species
      */
-    def cellLineLookup = {
-        logger.debug ' params ' + params
-        def speciesId = params.id
+    def cellLineLookup(String id) {
 
-        def cellLines = []
-        if (speciesId == null || speciesId == '') {
-            cellLines = CellLine.list([sort: 'cellLineName'])
+	List<CellLine> cellLines
+	if (!id) {
+	    cellLines = CellLine.list(sort: 'cellLineName')
         }
         else {
-            def species = ConceptCode.get(speciesId)
-            def speciesFilter = species.codeName
-            if (speciesFilter.indexOf('Mouse') != -1) speciesFilter = 'Mouse'
-            if (speciesFilter.indexOf('monkey') != -1) speciesFilter = 'Monkey'
+	    ConceptCode species = ConceptCode.get(id)
+	    String speciesFilter = species.codeName
+	    if (speciesFilter.contains('Mouse')) {
+		speciesFilter = 'Mouse'
+	    }
+	    if (speciesFilter.contains('monkey')) {
+		speciesFilter = 'Monkey'
+	    }
 
             // match on species
-            logger.debug ' speciesFilter ' + speciesFilter
+	    logger.debug ' speciesFilter {}', speciesFilter
             cellLines = CellLine.findAllBySpeciesIlike(speciesFilter + '%', [sort: 'cellLineName'])
         }
 
-        render(view: 'cell_line_lookup', model: [cellLines: cellLines])
+	render view: 'cell_line_lookup', model: [cellLines: cellLines]
     }
 
     /**
      * bind form parameters to GeneSignature domain instance
      */
-    void bindGeneSigData(Map params, GeneSignature gs) {
+    private void bindGeneSigData(GeneSignature gs) {
         // skip if page param not specified
-        if (params.page == null) return
+	long pageNum = params.long('page', -1)
+	if (pageNum == -1) {
+	    return
+	}
 
-        long pageNum = Long.parseLong(params.page)
-
-        switch (pageNum) {
-            case 1:
-                break
-
-            case 2:
-                break
-
-            case 3:
-                if (params.multipleTestingCorrection == null) params.multipleTestingCorrection = ''
-                break
+	if (pageNum == 3) {
+	    if (params.multipleTestingCorrection == null) {
+		params.multipleTestingCorrection = ''
+	    }
         }
 
-        // bind params
-        bindData(gs, params)
-        logger.info 'bound params from page ' + pageNum + ':\n' + params
+	bindData gs, params
+	logger.info 'bound params from page {}:\n{}', pageNum, params
     }
 
     /**
      * load required data for wizard page
      */
-    void loadWizardItems(int pageNum, WizardModelDetails wizard) {
-
+    private void loadWizardItems(int pageNum, WizardModelDetails wizard) {
         switch (pageNum) {
 
             case 1:
@@ -1013,59 +911,72 @@ class GeneSignatureController {
 
             case 2:
                 // sources
-                wizard.sources = ConceptCode.findAllByCodeTypeName(SOURCE_CATEGORY, [sort: 'bioConceptCode'])
-                wizard.sources.add(genericOtherConceptCode)
-                //WizardModelDetails.addOtherItem(wizard.sources, 'other')
+		wizard.sources = ConceptCode.findAllByCodeTypeName(
+		    SOURCE_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.sources << genericOtherConceptCode
 
                 // owners
-                wizard.owners = ConceptCode.findAllByCodeTypeName(OWNER_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.owners = ConceptCode.findAllByCodeTypeName(
+		    OWNER_CATEGORY, [sort: 'bioConceptCode'])
 
                 // species
-                wizard.species = ConceptCode.findAllByCodeTypeName(SPECIES_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.species = ConceptCode.findAllByCodeTypeName(
+		    SPECIES_CATEGORY, [sort: 'bioConceptCode'])
 
                 // mouse sources
-                wizard.mouseSources = ConceptCode.findAllByCodeTypeName(MOUSE_SOURCE_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.mouseSources = ConceptCode.findAllByCodeTypeName(
+		    MOUSE_SOURCE_CATEGORY, [sort: 'bioConceptCode'])
 
                 // tissue types
-                wizard.tissueTypes = ConceptCode.findAllByCodeTypeName(TISSUE_TYPE_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.tissueTypes = ConceptCode.findAllByCodeTypeName(
+		    TISSUE_TYPE_CATEGORY, [sort: 'bioConceptCode'])
 
                 // experiment types
-                wizard.expTypes = ConceptCode.findAllByCodeTypeName(EXP_TYPE_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.expTypes = ConceptCode.findAllByCodeTypeName(
+		    EXP_TYPE_CATEGORY, [sort: 'bioConceptCode'])
 
                 // technology platforms
-                def mrnaPlatforms = de.DeMrnaAnnotation.executeQuery('select DISTINCT gplId from de.DeMrnaAnnotation')
-                def platforms = BioAssayPlatform.findAll('from BioAssayPlatform as p where p.vendor is not null and p.accession in ('+DBHelper.listToInString(mrnaPlatforms)+') order by p.vendor, p.array')
-                BioAssayPlatform other = new BioAssayPlatform()
-                other.accession = 'other'
-                //platforms.add(other)
-                wizard.platforms = platforms
+		wizard.platforms = BioAssayPlatform.executeQuery('''
+					from BioAssayPlatform as p
+					where p.vendor is not null
+					order by p.vendor, p.array''')
 
                 // compounds
-                wizard.compounds = Compound.findAll('from Compound c where c.brandName is not null or c.genericName is not null order by codeName')
+		wizard.compounds = Compound.executeQuery('''
+					from Compound c
+					where c.brandName is not null
+					   or c.genericName is not null
+					order by codeName''')
 
                 break
 
             case 3:
                 // normalization methods
-                wizard.normMethods = ConceptCode.findAllByCodeTypeName(NORM_METHOD_CATEGORY, [sort: 'bioConceptCode'])
-                wizard.normMethods.add(genericOtherConceptCode)
+		wizard.normMethods = ConceptCode.findAllByCodeTypeName(
+		    NORM_METHOD_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.normMethods << genericOtherConceptCode
 
                 // analytic categories
-                wizard.analyticTypes = ConceptCode.findAllByCodeTypeName(ANALYTIC_TYPE_CATEGORY, [sort: 'bioConceptCode'])
-                wizard.analyticTypes.add(genericOtherConceptCode)
+		wizard.analyticTypes = ConceptCode.findAllByCodeTypeName(
+		    ANALYTIC_TYPE_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.analyticTypes << genericOtherConceptCode
 
                 // analysis methods
-                wizard.analysisMethods = ConceptCode.findAllByCodeTypeName(ANALYSIS_METHOD_CATEGORY, [sort: 'bioConceptCode'])
-                wizard.analysisMethods.add(genericOtherConceptCode)
+		wizard.analysisMethods = ConceptCode.findAllByCodeTypeName(
+		    ANALYSIS_METHOD_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.analysisMethods << genericOtherConceptCode
 
                 // file schemas
-                wizard.schemas = GeneSignatureFileSchema.findAllBySupported(true, [sort: 'name'])
+		wizard.schemas = GeneSignatureFileSchema.findAllBySupported(
+		    true, [sort: 'name'])
 
                 // p value cutoffs
-                wizard.pValCutoffs = ConceptCode.findAllByCodeTypeName(P_VAL_CUTOFF_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.pValCutoffs = ConceptCode.findAllByCodeTypeName(
+		    P_VAL_CUTOFF_CATEGORY, [sort: 'bioConceptCode'])
 
                 // fold change metrics
-                wizard.foldChgMetrics = ConceptCode.findAllByCodeTypeName(FOLD_CHG_METRIC_CATEGORY, [sort: 'bioConceptCode'])
+		wizard.foldChgMetrics = ConceptCode.findAllByCodeTypeName(
+		    FOLD_CHG_METRIC_CATEGORY, [sort: 'bioConceptCode'])
                 break
 
             default:
@@ -1074,11 +985,11 @@ class GeneSignatureController {
     }
 
     private ConceptCode getGenericOtherConceptCode() {
-        def res = ConceptCode.findByBioConceptCodeAndCodeTypeName(
-                GENERIC_OTHER_BIO_CONCEPT_CODE,
-                GENERIC_OTHER_CODE_TYPE_NAME)
+	ConceptCode res = ConceptCode.findByBioConceptCodeAndCodeTypeName(
+            GENERIC_OTHER_BIO_CONCEPT_CODE,
+            GENERIC_OTHER_CODE_TYPE_NAME)
         if (!res) {
-            throw new IllegalStateException('Database does not contain generic \'other\' concept')
+	    throw new IllegalStateException('Database does not contain generic "other" concept')
         }
         res
     }
@@ -1087,62 +998,73 @@ class GeneSignatureController {
      * testing this concept - attaches GeneSignature domain object to hibernate session between requests in the wizard
      */
     void mergeGeneSigInstToHibernate(WizardModelDetails wizard) {
-        def gs = wizard.geneSigInst
+	GeneSignature gs = wizard.geneSigInst
         // merge the current domain instance into the persistence context with the wizard changes
-        //if(!gs.isAttached()) wizard.geneSigInst = gs.merge()
         wizard.geneSigInst = gs.merge()
     }
 
-    def createExistingValues(int pageNum, GeneSignature gs) {
-        Map existingValues = new HashMap()
+    private Map createExistingValues(int pageNum, GeneSignature gs) {
         switch (pageNum) {
             case 1:
                 break
 
             case 2:
-                existingValues.put('experimentTypeConceptCode.bioConceptCode', gs.experimentTypeConceptCode?.bioConceptCode ?: '')
-                existingValues.put('sourceConceptCode.id', gs.sourceConceptCode?.id ?: '')
-                existingValues.put('sourceConceptCode.bioConceptCode', gs.sourceConceptCode?.bioConceptCode ?: '')
-                existingValues.put('ownerConceptCode.id', gs.ownerConceptCode?.id ?: '')
-                existingValues.put('treatmentCompound.id', gs.treatmentCompound?.id ?: '')
-                existingValues.put('speciesConceptCode.id', gs.speciesConceptCode?.id ?: '')
-                existingValues.put('speciesConceptCode.bioConceptCode', gs.speciesConceptCode?.bioConceptCode ?: '')
-                existingValues.put('techPlatform.id', gs.techPlatform?.id ?: '')
-                existingValues.put('experimentTypeCellLine.cellLineName', gs.experimentTypeCellLine?.cellLineName ?: '')
-                existingValues.put('experimentTypeCellLine.attcNumber', gs.experimentTypeCellLine?.attcNumber ?: '')
-                existingValues.put('speciesMouseSrcConceptCode.id', gs.speciesMouseSrcConceptCode?.id ?: '')
-                existingValues.put('tissueTypeConceptCode.id', gs.tissueTypeConceptCode?.id ?: '')
-                existingValues.put('experimentTypeConceptCode.id', gs.experimentTypeConceptCode?.id ?: '')
-                break
-
+		return ['experimentTypeConceptCode.bioConceptCode': gs.experimentTypeConceptCode?.bioConceptCode ?: '',
+			'sourceConceptCode.id': gs.sourceConceptCodeId ?: '',
+			'sourceConceptCode.bioConceptCode': gs.sourceConceptCode?.bioConceptCode ?: '',
+			'ownerConceptCode.id': gs.ownerConceptCodeId ?: '',
+			'treatmentCompound.id': gs.treatmentCompoundId ?: '',
+			'speciesConceptCode.id': gs.speciesConceptCodeId ?: '',
+			'speciesConceptCode.bioConceptCode': gs.speciesConceptCode?.bioConceptCode ?: '',
+			'techPlatform.id': gs.techPlatformId ?: '',
+			'experimentTypeCellLine.cellLineName': gs.experimentTypeCellLine?.cellLineName ?: '',
+			'experimentTypeCellLine.attcNumber': gs.experimentTypeCellLine?.attcNumber ?: '',
+			'speciesMouseSrcConceptCode.id': gs.speciesMouseSrcConceptCodeId ?: '',
+			'tissueTypeConceptCode.id': gs.tissueTypeConceptCodeId ?: '',
+			'experimentTypeConceptCode.id': gs.experimentTypeConceptCodeId ?: '']
+		
             case 3:
-                existingValues.put('normMethodConceptCode.id', gs.normMethodConceptCode?.id ?: '')
-                existingValues.put('normMethodConceptCode.bioConceptCode', gs.normMethodConceptCode?.bioConceptCode ?: '')
-                existingValues.put('analyticCatConceptCode.id', gs.analyticCatConceptCode?.id ?: '')
-                existingValues.put('analyticCatConceptCode.bioConceptCode', gs.analyticCatConceptCode?.bioConceptCode ?: '')
-                existingValues.put('analysisMethodConceptCode.id', gs.analysisMethodConceptCode?.id ?: '')
-                existingValues.put('analysisMethodConceptCode.bioConceptCode', gs.analysisMethodConceptCode?.bioConceptCode ?: '')
-                existingValues.put('pValueCutoffConceptCode.id', gs.pValueCutoffConceptCode?.id ?: '')
-                existingValues.put('fileSchema.id', gs.fileSchema?.id ?: '')
-                existingValues.put('foldChgMetricConceptCode.id', gs.foldChgMetricConceptCode?.id ?: '')
+		return ['normMethodConceptCode.id': gs.normMethodConceptCodeId ?: '',
+			'normMethodConceptCode.bioConceptCode': gs.normMethodConceptCode?.bioConceptCode ?: '',
+			'analyticCatConceptCode.id': gs.analyticCatConceptCodeId ?: '',
+			'analyticCatConceptCode.bioConceptCode': gs.analyticCatConceptCode?.bioConceptCode ?: '',
+			'analysisMethodConceptCode.id': gs.analysisMethodConceptCodeId ?: '',
+			'analysisMethodConceptCode.bioConceptCode': gs.analysisMethodConceptCode?.bioConceptCode ?: '',
+			'pValueCutoffConceptCode.id': gs.pValueCutoffConceptCodeId ?: '',
+			'fileSchema.id': gs.fileSchemaId ?: '',
+			'foldChgMetricConceptCode.id': gs.foldChgMetricConceptCodeId ?: '']
                 break
             default:
                 logger.warn 'invalid page requested!'
         }
-        return existingValues
+
+	[:]
     }
 
-    def checkGene = {
-        def paramMap = params
-        //SearchKeyword skt = SearchKeyword.findByKeyword(params.geneName?.toUpperCase())
-        SearchKeywordTerm skt = SearchKeywordTerm.findByKeywordTerm(params.geneName?.toUpperCase())
+    def checkGene(String geneName) {
+	SearchKeywordTerm skt = SearchKeywordTerm.findByKeywordTerm(geneName?.toUpperCase())
         SearchKeyword sk = skt.searchKeyword
-        if (sk && (sk?.dataCategory?.equals('GENE') || sk?.dataCategory?.equals('SNP'))) {
+	if (sk && (sk?.dataCategory == 'GENE' || sk?.dataCategory == 'SNP')) {
             render '{"found": "' + sk.dataCategory + '"}'
         }
         else {
             render '{"found": "none"}'
         }
     }
-}
 
+    private void setFlashWarning(String message) {
+	flash.message = '<div class="warning">' + message + '</div>'
+    }
+
+    private WizardModelDetails sessionWizard() {
+	session[WIZ_DETAILS_ATTRIBUTE]
+    }
+
+    private void setSessionWizard(WizardModelDetails wizardModelDetails) {
+	session.setAttribute WIZ_DETAILS_ATTRIBUTE, wizardModelDetails
+    }
+
+    private void removeSessionWizard() {
+	session.removeAttribute WIZ_DETAILS_ATTRIBUTE
+    }
+}

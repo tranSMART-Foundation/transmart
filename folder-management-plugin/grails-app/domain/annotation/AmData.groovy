@@ -1,15 +1,12 @@
 package annotation
 
 class AmData {
-
-    Long id
-    String uniqueId
     String amDataType
+    String uniqueId
 
     static mapping = {
-        table 'AM_DATA_UID'
-        version false
+	table 'AMAPP.AM_DATA_UID'
         id column: 'AM_DATA_ID', generator: 'assigned'
+	version false
     }
-
 }

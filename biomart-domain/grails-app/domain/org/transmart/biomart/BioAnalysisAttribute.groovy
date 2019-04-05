@@ -1,27 +1,25 @@
 package org.transmart.biomart
 
 class BioAnalysisAttribute {
-	String studyID
-	Long bioAssayAnalysisID
-	Long termID
-	String sourceCode
+    Long bioAssayAnalysisID
+    String sourceCode
+    String studyID
+    Long termID
 	
-	static mapping = {
-		table 'BIO_ANALYSIS_ATTRIBUTE'			   
-		version false
-		id column:'BIO_ANALYSIS_ATTRIBUTE_ID'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
-		columns {
-		   studyID column:'STUDY_ID'
-		   bioAssayAnalysisID column:'BIO_ASSAY_ANALYSIS_ID'
-		   termID column:'TERM_ID'
-		   sourceCode column:'SOURCE_CD'
-		}
-	}
+    static mapping = {
+	table 'BIOMART.BIO_ANALYSIS_ATTRIBUTE'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_ANALYSIS_ATTRIBUTE_ID'
+	version false
+
+	bioAssayAnalysisID column:'BIO_ASSAY_ANALYSIS_ID'
+	sourceCode column:'SOURCE_CD'
+	studyID column: 'STUDY_ID'
+	termID column: 'TERM_ID'
+    }
 	
-	static constraints = {
-		studyID(nullable:true, maxSize:255)
-		termID(nullable:true)
-		sourceCode(nullable:true, maxSize:255)		
-	}
+    static constraints = {
+	sourceCode nullable: true
+	studyID nullable: true
+	termID nullable: true
+    }
 }

@@ -1,130 +1,135 @@
 package com.recomdata.transmart.plugin
 
-import grails.converters.JSON
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 import org.json.JSONObject
+import org.springframework.dao.DataIntegrityViolationException
 
 class PluginModuleController {
 
-    def index = { redirect(action: 'list', params: params) }
-
-    // the delete, save and update actions only accept POST requests
     static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST', validateModuleParams: 'POST']
+    static defaultAction = 'list'
 
-    def list = {
-        params.max = Math.min(params.max ? params.max.toInteger() : 10, 100)
-        if (null == params.sort) params.sort = 'name'
-        if (null == params.order) params.order = 'asc'
-        [pluginModuleInstanceList: PluginModule.list(params), pluginModuleInstanceTotal: PluginModule.count()]
+    def list() {
+	params.max = Math.min(params.int('max', 10), 100)
+	if (null == params.sort) {
+	    params.sort = 'name'
+	}
+	if (null == params.order) {
+	    params.order = 'asc'
+	}
+	[pms: PluginModule.list(params), pmCount: PluginModule.count()]
     }
 
-    def show = {
-        def pluginModuleInstance = PluginModule.get(params.id)
-
-        if (!pluginModuleInstance) {
-            flash.message = 'PluginModule not found with id ' + params.id
-            redirect(action: 'list')
+    def show(PluginModule pluginModule) {
+	if (pluginModule) {
+	    [pm: pluginModule, paramsStr: pluginModule.paramsStr]
         }
         else {
-            return [pluginModuleInstance: pluginModuleInstance, 'paramsStr': pluginModuleInstance.getParamsStr()]
+	    flash.message = "PluginModule not found with id ${params.id}"
+	    redirect action: 'list'
         }
     }
 
-    def delete = {
-        def pluginModuleInstance = PluginModule.get(params.id)
-        if (pluginModuleInstance) {
+    def delete(PluginModule pluginModule) {
+	if (pluginModule) {
             try {
-                pluginModuleInstance.delete()
-                flash.message = 'PluginModule ' + params.id + ' deleted'
-                redirect(action: 'list')
+		pluginModule.delete()
+		flash.message = "PluginModule ${params.id} deleted"
+		redirect action: 'list'
             }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = 'PluginModule ' + params.id + ' could not be deleted'
-                redirect(action: 'show', id: params.id)
+	    catch (DataIntegrityViolationException e) {
+		flash.message = "PluginModule ${params.id} could not be deleted"
+		redirect action: 'show', id: params.id
             }
         }
         else {
-            flash.message = 'PluginModule not found with id ' + params.id
-            redirect(action: 'list')
+	    flash.message = "PluginModule not found with id ${params.id}"
+	    redirect action: 'list'
         }
     }
 
-    def edit = {
-        def pluginModuleInstance = PluginModule.get(params.id)
-
-        if (!pluginModuleInstance) {
-            flash.message = 'PluginModule not found with id ' + params.id
-            redirect(action: 'list')
+    def edit(PluginModule pluginModule) {
+	if (pluginModule) {
+	    createOrEditModel pluginModule
         }
         else {
-            return [pluginModuleInstance: pluginModuleInstance, 'paramsStr': pluginModuleInstance.getParamsStr()]
+	    flash.message = "PluginModule not found with id ${params.id}"
+	    redirect action: 'list'
         }
     }
 
-    def validateModuleParams = {
-        def jsonResponse = new JSONObject()
-
+    def validateModuleParams() {
+	JSONObject json = new JSONObject()
         try {
-            def jsonObject = JSON.parse(params.paramsStr)
-            jsonResponse.put('status', true)
-            jsonResponse.put('message', 'Plugin Module has valid parameters')
+	    json.put 'status', true
+	    json.put 'message', 'Plugin Module has valid parameters'
         }
         catch (ConverterException e) {
-            jsonResponse.put('status', false)
-            jsonResponse.put('message', 'Parameters should be a well formed JSON string : \n' + e.message)
+	    json.put 'status', false
+	    json.put 'message', 'Parameters should be a well formed JSON string : \n' + e.message
         }
 
-        return jsonResponse
+	json
     }
 
-    def update = {
-        def pluginModuleInstance = PluginModule.get(params.id)
-        if (pluginModuleInstance) {
+    def update(PluginModule pluginModule) {
+	if (pluginModule) {
             if (params.version) {
-                def version = params.version.toLong()
-                if (pluginModuleInstance.version > version) {
+		long version = params.long('version', 0)
+		if (pluginModule.version > version) {
+		    pluginModule.errors.rejectValue  'version',
+			'pluginModule.optimistic.locking.failure',
+			'Another user has updated this PluginModule while you were editing.'
+		    render view: 'edit', model: createOrEditModel(pluginModule)
 
-                    pluginModuleInstance.errors.rejectValue('version', 'pluginModule.optimistic.locking.failure', 'Another user has updated this PluginModule while you were editing.')
-                    render(view: 'edit', model: [pluginModuleInstance: pluginModuleInstance])
                     return
                 }
             }
-            pluginModuleInstance.properties = params
+
+	    pluginModule.properties = params
             try {
-                pluginModuleInstance.setParamsStr(params.paramsStr)
+		pluginModule.setParamsStr(params.paramsStr)
             }
             catch (ConverterException e) {
-                pluginModuleInstance.errors.rejectValue('params', 'Parameters should be a well formed JSON string : ' + e.message + ' : ' + e.cause?.message?.substring(0, 50) + '...')
+		pluginModule.errors.rejectValue  'params',
+		    'Parameters should be a well formed JSON string : ' + e.message +
+		    ' : ' + e.cause?.message?.substring(0, 50) + '...'
             }
-            if (!pluginModuleInstance.hasErrors() && pluginModuleInstance.save()) {
-                flash.message = 'PluginModule ' + params.id + ' updated'
-                redirect(action: 'show', id: pluginModuleInstance.id)
+	    if (!pluginModule.hasErrors() && pluginModule.save()) {
+		flash.message = "PluginModule ${params.id} updated"
+		redirect action: 'show', id: pluginModule.id
             }
             else {
-                render(view: 'edit', model: [pluginModuleInstance: pluginModuleInstance, paramsStr: params.paramsStr])
+		render view: 'edit', model: createOrEditModel(pluginModule)
             }
         }
         else {
-            flash.message = 'PluginModule not found with id ' + params.id
-            redirect(action: 'edit', id: params.id)
+	    flash.message = "PluginModule not found with id ${params.id}"
+	    redirect action: 'edit', id: params.id
         }
     }
 
-    def create = {
-        def pluginModuleInstance = new PluginModule()
-        pluginModuleInstance.properties = params
-        return ['pluginModuleInstance': pluginModuleInstance, 'paramsStr': pluginModuleInstance.getParamsStr()]
+    def create() {
+	PluginModule pluginModule = new PluginModule(params)
+	createOrEditModel pluginModule
     }
 
-    def save = {
-        def pluginModuleInstance = new PluginModule(params)
-        pluginModuleInstance.setParamsStr(params.paramsStr)
-        if (!pluginModuleInstance.hasErrors() && pluginModuleInstance.save()) {
-            flash.message = 'PluginModule ' + pluginModuleInstance.id + ' created'
-            redirect(action: 'show', id: pluginModuleInstance.id)
+    def save() {
+	PluginModule pluginModule = new PluginModule(params)
+	pluginModule.setParamsStr(params.paramsStr)
+	if (!pluginModule.hasErrors() && pluginModule.save()) {
+	    flash.message = "PluginModule ${pluginModule.id} created"
+	    redirect action: 'show', id: pluginModule.id
         }
         else {
-            render(view: 'create', model: [pluginModuleInstance: pluginModuleInstance])
+	    render view: 'create', model: createOrEditModel(pluginModule)
         }
+    }
+
+    private Map createOrEditModel(PluginModule pm) {
+	[pm: pm,
+	 paramsStr: pm.paramsStr,
+	 categories: PluginModuleCategory.values(),
+	 plugins: Plugin.list()]
     }
 }

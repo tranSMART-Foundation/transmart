@@ -15,56 +15,62 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package com.recomdata.export;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CSVGenerator {
 	
-	public static byte[] generateCSV(ArrayList<String> headers, ArrayList<List> values){
-		FileWriter csvWriter=null;
-		String columnNames="";
-		String rowValues="";
-		String export="";
-		try{
-			csvWriter=new FileWriter("export.csv");
+    private static final Logger logger = LoggerFactory.getLogger(CSVGenerator.class);
+
+    public static byte[] generateCSV(List<String> headers, List<List> values) {
+        FileWriter csvWriter=null;
+        StringBuilder export = new StringBuilder();
+        try{
+            csvWriter=new FileWriter("export.csv");
 			
-			for(int i=0;i<headers.size();i++)
-				columnNames=columnNames+headers.get(i)+",";
-			columnNames=columnNames.substring(0, columnNames.length()-1);
-			
-			//csvWriter.write(columnNames+"\n");
-				//System.out.print(headers.get(i)+",");
-			export=export+columnNames+"\n";	
-			
-			for(int i=0;i<values.size();i++){
-				rowValues="";
-				for(int j=0;j<values.get(i).size();j++)
-					rowValues=rowValues+"\""+values.get(i).get(j).toString().replace("\"","\"\"")+"\""+",";
-					//System.out.print(values.get(i).get(j)+",");
-				rowValues=rowValues.substring(0, rowValues.length()-1);
-				export=export+rowValues+"\n";
-				//csvWriter.write(rowValues+"\n");
-				//System.out.println();
-				
-				//csvWriter.flush();
-			}
-		
-		}catch(Exception e){
-			e.printStackTrace();
-		}finally{
-			try{
-				csvWriter.close();
-			}catch(IOException e){
-				e.printStackTrace();
-			}
-		}
-		return(export.getBytes());
-	}
+            StringBuilder columnNames = new StringBuilder();
+            for (int i = 0; i < headers.size(); i++) {
+                if (i > 0) {
+                    columnNames.append(',');
+                }
+                columnNames.append(headers.get(i));
+            }
+
+            export.append(columnNames).append('\n');
+
+            for(int i=0;i<values.size();i++){
+                StringBuilder rowValues = new StringBuilder();
+                for (int j = 0; j < values.get(i).size(); j++) {
+                    if (j > 0) {
+                        rowValues.append(',');
+                    }
+                    rowValues.append('"');
+                    rowValues.append(values.get(i).get(j).toString().replace("\"", "\"\""));
+                    rowValues.append('"');
+                }
+                export.append(rowValues).append('\n');
+            }
+        }
+        catch (IOException | RuntimeException e) {
+            logger.error(e.getMessage(), e);
+        }
+        finally {
+            try{
+                csvWriter.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return export.toString().getBytes();
+    }
 }

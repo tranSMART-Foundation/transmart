@@ -1,80 +1,64 @@
 package fm
 
-import grails.util.Holders
 import groovy.util.logging.Slf4j
+import org.transmart.biomart.BioData
 
-@Slf4j('logger')class FmFolderAssociation implements Serializable {
+@Slf4j('logger')
+class FmFolderAssociation implements Serializable {
+    private static final long serialVersionUID = 1
+
+    FmFolder fmFolder
+    String objectType
+    String objectUid
 
     static transients = ['bioObject']
 
-    String objectUid
-    String objectType
-    FmFolder fmFolder
-
     static mapping = {
-        table 'fm_folder_association'
+	table 'FMAPP.FM_FOLDER_ASSOCIATION'
+	id composite: ['objectUid', 'fmFolder']
         version false
         cache true
         sort 'objectUid'
-        id composite: ['objectUid', 'fmFolder']
-        fmFolder column: 'folder_id'
-    }
 
-    static constraints = {
-
-//		objectUid(unique: 'fmFolder')
-
+	fmFolder column: 'folder_id'
     }
 
     static FmFolderAssociation get(String objectUid, long fmFolderId) {
-        find 'from FmFolderAssociation where objectUid=:objectUid and fmFolder.id=:fmFolderId',
-                [objectUid: objectUid, fmFolderId: fmFolderId]
+	findByObjectUidAndFmFolder objectUid, FmFolder.load(fmFolderId)
     }
 
     static boolean remove(String objectUid, FmFolder fmFolder, boolean flush = false) {
-        FmFolderAssociation instance = FmFolderAssociation.findByObjectUidAndFmFolder(objectUid, fmFolder)
+	FmFolderAssociation instance = findByObjectUidAndFmFolder(objectUid, fmFolder)
         instance ? instance.delete(flush: flush) : false
     }
 
-    public getBioObject() {
-        logger.info 'ObjectUID=' + this.objectUid
-        def bioData = org.transmart.biomart.BioData.findByUniqueId(this.objectUid)
-        def clazz = lookupDomainClass()
-        if (!clazz || !bioData) {
-            return null
+    // TODO BB move this and lookupDomainClass() to a service and call that directly
+    def getBioObject() {
+	logger.info 'ObjectUID={}', objectUid
+	BioData bioData = BioData.findByUniqueId(objectUid)
+	if (bioData) {
+	    lookupDomainClass()?.get(bioData.id)
         }
-        else {
-//			return clazz.getObjectUid(this.objectUid)
-            return clazz.get(bioData.id)
-        }
-
     }
 
+    // TODO BB cache
     protected Class lookupDomainClass() {
-        //		def conf = SpringSecurityUtils.securityConfig
         // This probably should come from the config file
-
-        String domainClassName = this.objectType //conf.rememberMe.persistentToken.domainClassName ?: ''
-
- 	if (domainClassName == 'bio.Experiment' ) domainClassName='org.transmart.biomart.Experiment'       
- 		
-        def clazz = Holders.grailsApplication.getClassForName(domainClassName)
-        if (!clazz) {
-            logger.error "Persistent token class not found: '${domainClassName}'"
+	String domainClassName = objectType //conf.rememberMe.persistentToken.domainClassName ?: ''
+	if (domainClassName == 'bio.Experiment') {
+	    domainClassName = 'org.transmart.biomart.Experiment'
         }
 
-        return clazz
+	Class clazz = grails.util.Holders.grailsApplication.getClassForName(domainClassName)
+	if (clazz) {
+	    clazz
+	}
+	else {
+	    logger.error 'Class not found: "{}"', domainClassName
+	}
     }
 
-    /**
-     * override display
-     */
-    public String toString() {
-        StringBuffer sb = new StringBuffer()
-        sb.append('objectUid: ').append(this.objectUid).append(', objectType: ').append(this.objectType)
-        sb.append(', Folder: ').append(this.fmFolder.id)
-        return sb.toString()
+    String toString() {
+	'objectUid: ' + objectUid + ', objectType: ' + objectType + ', Folder: ' + fmFolder.id
     }
-
-
 }

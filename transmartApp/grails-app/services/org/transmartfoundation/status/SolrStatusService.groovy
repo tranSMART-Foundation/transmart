@@ -1,99 +1,81 @@
 package org.transmartfoundation.status
 
-import grails.util.Holders
-
-import java.util.Date
-//import org.apache.http.impl.client.HttpClientBuilder
-//import org.apache.http.impl.client.CloseableHttpClient
-//import org.apache.http.impl.client.DefaultHttpClient
-import org.apache.solr.common.SolrDocumentList
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.util.NamedList
+import groovy.transform.CompileStatic
 import org.apache.solr.client.solrj.SolrClient
 import org.apache.solr.client.solrj.SolrServerException
 import org.apache.solr.client.solrj.impl.HttpSolrClient
-import org.apache.solr.client.solrj.response.QueryResponse
+import org.apache.solr.common.params.SolrParams
+import org.apache.solr.common.util.NamedList
+import org.springframework.beans.factory.annotation.Value
 
+@CompileStatic
 class SolrStatusService {
 
-    def getStatus() {
+    static transactional = false
 		
-		// https://lucene.apache.org/solr/5_4_1/solr-solrj/index.html
+    private static final String solrQuery = '*:*'
 
-        def solrHost = Holders.config.com.rwg.solr.host
-		def urlString = 'http://'+ solrHost + '/solr/'
-		def solrQuery = '*:*'
+    @Value('${com.rwg.solr.host:}')
+    private String solrHost
 
-//        CloseableHttpClient httpClient = HttpClientBuilder.create().build()
-//                DefaultHttpClient httpClient = new HttpClientBuilder.create().build()
-		SolrClient solr = new HttpSolrClient(urlString)
+    SolrStatus getStatus() {
+
+	// https://lucene.apache.org/solr/5_4_1/solr-solrj/index.html
+	String urlString = 'http://' + solrHost + '/solr/'
+
+	SolrClient solr = new HttpSolrClient(urlString)
 		
-		NamedList nl = new NamedList()
-		nl.addAll(['q':solrQuery])
-		SolrParams p = SolrParams.toSolrParams(nl)
+	NamedList nl = new NamedList()
+	nl.addAll(q: solrQuery)
+	SolrParams p = SolrParams.toSolrParams(nl)
 		
-		boolean reachedServer = serverDoesRespond(solr)
+	boolean reachedServer = serverDoesRespond(solr)
 	
-		def nDocs = getDocumentCountForQuery(solr,'rwg',p)
-		def rwgAvailable = (nDocs > -1)
-		def rwgNumberOfRecords = (nDocs > -1)?nDocs:0
+	int nDocs = getDocumentCountForQuery(solr, 'rwg', p)
+	boolean rwgAvailable = nDocs > -1
+	int rwgNumberOfRecords = rwgAvailable ? nDocs : 0
 		
-		nDocs = getDocumentCountForQuery(solr,'browse',p)
-		def browseAvailable = (nDocs > -1)
-		def browseNumberOfRecords = (nDocs > -1)?nDocs:0
+	nDocs = getDocumentCountForQuery(solr,'browse',p)
+	boolean browseAvailable = nDocs > -1
+	int browseNumberOfRecords = browseAvailable ? nDocs : 0
 
-		nDocs = getDocumentCountForQuery(solr,'sample',p)
-		def sampleAvailable = (nDocs > -1)
-		def sampleNumberOfRecords = (nDocs > -1)?nDocs:0
-
-		def canConnect = reachedServer
+	nDocs = getDocumentCountForQuery(solr,'sample',p)
+	boolean sampleAvailable = nDocs > -1
+	int sampleNumberOfRecords = sampleAvailable ? nDocs : 0
 			
-		solr.close()
-//        httpClient from DefaultHttpClient does not have .close()
-//        httpClient.close()
+	solr.close()
 		
-		def settings = [
-            'url'                   : urlString,
-			'connected'             : canConnect,
-			'rwgAvailable'          : rwgAvailable,
-			'rwgNumberOfRecords'    : rwgNumberOfRecords,
-			'browseAvailable'       : browseAvailable,
-			'browseNumberOfRecords' : browseNumberOfRecords,
-			'sampleAvailable'       : sampleAvailable,
-			'sampleNumberOfRecords' : sampleNumberOfRecords,
-			'lastProbe'             : new Date()
-		]
-		
-		SolrStatus status = new SolrStatus(settings)
-		return status
+	new SolrStatus(
+	    url                  : urlString,
+	    connected            : reachedServer,
+	    rwgAvailable         : rwgAvailable,
+	    rwgNumberOfRecords   : rwgNumberOfRecords,
+	    browseAvailable      : browseAvailable,
+	    browseNumberOfRecords: browseNumberOfRecords,
+	    sampleAvailable      : sampleAvailable,
+	    sampleNumberOfRecords: sampleNumberOfRecords,
+	    lastProbe            : new Date())
     }
 
-	def serverDoesRespond(solr) {
-		try {
-			solr.ping()
-			return true
-		}
-		catch (SolrServerException ex) {
-            // print('server not responding')
-			return false
-		}
-		catch (Exception ex2) {
-            // print(ex2)
-            // print('server responding but does not handle ping')
-			return true
-		}
+    private boolean serverDoesRespond(SolrClient solr) {
+	try {
+	    solr.ping()
+	    true
 	}
+	catch (SolrServerException ignored) {
+	    false
+	}
+	catch (ignored) {
+	    true
+	}
+    }
 	
-	def getDocumentCountForQuery(client,coreName,sp) {
-		def n = -1
-		try {
-			QueryResponse queryResponse = client.query(coreName, sp)
-			n = queryResponse.results.numFound
-		}
-		catch (all) {
-			// print '' + coreName + ' not available'
-		}
-		return n
+    private int getDocumentCountForQuery(SolrClient client, String coreName, SolrParams sp) {
+	try {
+	    client.query(coreName, sp).results.numFound
 	}
+	catch (ignored) {
+	    -1
+	}
+    }
 }
-

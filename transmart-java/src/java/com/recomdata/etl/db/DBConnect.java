@@ -16,13 +16,12 @@
  * 
  *
  ******************************************************************/
-  
-
 package com.recomdata.etl.db;
 
+import java.sql.Connection;
+
 public interface DBConnect {
-	public java.sql.Connection getConnection();
+    Connection getConnection();
 
-	public void closeConnection();
-
+    void closeConnection();
 }

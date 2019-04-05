@@ -16,25 +16,19 @@
  *
  *
  ******************************************************************/
-
-
 package org.transmart.biomart
 
 class BioDataCorrelation {
-    Long bioDataId
     Long associatedBioDataId
+    Long bioDataId
     BioDataCorrelationDescr correlationDescr
-    Long id
-    static mapping = {
-        table 'BIO_DATA_CORRELATION'
-        version false
-        id generator: 'sequence', params: [sequence: 'SEQ_BIO_DATA_ID']
-        columns {
-            id column: 'BIO_DATA_CORREL_ID'
-            bioDataId column: 'BIO_DATA_ID'
-            associatedBioDataId column: 'ASSO_BIO_DATA_ID'
-            correlationDescr column: 'BIO_DATA_CORREL_DESCR_ID'
-        }
-    }
 
+    static mapping = {
+	table 'BIOMART.BIO_DATA_CORRELATION'
+	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_DATA_CORREL_ID'
+        version false
+
+        associatedBioDataId column: 'ASSO_BIO_DATA_ID'
+        correlationDescr column: 'BIO_DATA_CORREL_DESCR_ID'
+    }
 }
