@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<meta name="layout" content="admin"/>
@@ -53,7 +54,7 @@
 	    </g:form>
 	</div>
 
-	<r:script>
+	<script>
 var pageInfo = {
     basePath: '${jsContextPath}'
 };
@@ -76,6 +77,6 @@ createUserSearchBox(pageInfo.basePath +
                 params: "form.serialize()")};
 	return false;
   }
-	</r:script>
+	</script>
     </body>
 </html>

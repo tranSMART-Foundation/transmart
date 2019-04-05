@@ -49,9 +49,9 @@
 			<td colspan="3">Select the range for expression values:</td>
 		    </tr>
                     <tr id="highdimension-slider-row3" style="display: none;">
-			<td><input type="text" size="6" id="highdimension-amount-min" style="color:#548cff; font-weight:bold;"></td>
+			<td><input type="text" size="6" id="highdimension-amount-min" style="color:#548cff; font-weight:bold;"/></td>
 			<td align="center"><div id="highdimension-range"></div></td>
-			<td><input type="text" size="6" id="highdimension-amount-max" style="color:#548cff; font-weight:bold;"></td>
+			<td><input type="text" size="6" id="highdimension-amount-max" style="color:#548cff; font-weight:bold;"/></td>
                     </tr>
                     <tr id="highdimension-slider-row4">
 			<td colspan="3">Histogram:</td>

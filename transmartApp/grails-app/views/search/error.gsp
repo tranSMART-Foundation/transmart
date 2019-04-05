@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<title>${grailsApplication.config.com.recomdata.appTitle} - ${title}</title>

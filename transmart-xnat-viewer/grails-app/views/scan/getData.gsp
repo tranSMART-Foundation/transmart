@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <%--
   Created by IntelliJ IDEA.
   User: superkillball
@@ -7,11 +8,11 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
-<head>
-    <title><ABC/title>
-</head>
+    <head>
+	<title><ABC/title>
+    </head>
 
-<body>
+    <body>
 
-</body>
+    </body>
 </html>

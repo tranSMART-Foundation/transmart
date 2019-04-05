@@ -1,4 +1,4 @@
-<g:setProvider library='jquery'/>
+<asset:javascript src="jquery-plugin.js"/>
 
 <td>
     <g:select class='addremoveselect' name='userstoremove'

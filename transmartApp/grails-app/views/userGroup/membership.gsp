@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<meta name="layout" content="admin"/>
@@ -11,7 +12,7 @@
         position: static !important;
     }
 	</style>
-	<g:setProvider library='jquery'/>
+	<asset:javascript src="jquery-plugin.js"/>
     </head>
 
     <body>
@@ -25,7 +26,7 @@
 		<b>Search User</b><br/>
 		    <input type="text" size="80" id="searchUsers" autocomplete="off"/>
 	    </div>
-	    <r:script>
+	    <script>
         var pageInfo = { basePath: "${request.getContextPath()}" };
   
         createUserSearchBox2('${request.getContextPath()}/userGroup/ajaxGetUserSearchBoxData', 440);
@@ -42,7 +43,7 @@
 	                 params: 'jQuery(\'#searchtext\').serialize()+\'&id=\'+pid')};
             return false;
         }
-	    </r:script>
+	    </script>
 	    <table>
 		<tr>
 		    <td>&nbsp;</td>

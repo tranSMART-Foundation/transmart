@@ -1,4 +1,4 @@
-<g:javascript>
+<script type="text/javascript">
 
 jQuery(document).ready(function() {	
 	
@@ -73,7 +73,7 @@ jQuery(document).ready(function() {
 		return returnElement;
 	};
 });
-</g:javascript>
+</script>
 
 <%-- Visible input --%>
 <div style="width: 100%" id="genotypePlatform-tags" class="tagBox" name="genotypePlatform">

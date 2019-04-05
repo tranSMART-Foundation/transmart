@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <%@ page import="com.recomdata.transmart.plugin.Plugin" %>
 <html>
     <head>

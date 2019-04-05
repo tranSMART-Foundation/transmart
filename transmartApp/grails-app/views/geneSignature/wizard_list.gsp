@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!--
   tranSMART - translational medicine data mart
   
@@ -18,7 +19,7 @@
 -->
 
 <html>
-<head>
+    <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="genesigmain" />
 	<g:if test="${wizard.wizardType==1}">
@@ -28,9 +29,9 @@
 		<title>Gene List Create</title>
 	</g:else>
 
-    <r:script disposition="head">$j = jQuery.noConflict();</r:script>
+	<script disposition="head">$j = jQuery.noConflict();</script>
 
-    <r:script disposition="head">
+	<script disposition="head">
 
         jQuery(document).ready(function() {
             var pasteContent;
@@ -173,122 +174,122 @@
             }
 
         }
-	</r:script>
-</head>
+	</script>
+    </head>
 
-<body>
+    <body>
 
-<div class="body">
-	<!-- initialize -->
-    <g:set var="gs" value="${wizard.geneSigInst.properties}" />
+	<div class="body">
+	    <!-- initialize -->
+	    <g:set var="gs" value="${wizard.geneSigInst.properties}" />
 
-<!--  show message -->
-    <g:if test="${flash.message}">
-        <div class="warning">${flash.message}</div>
-        <g:hasErrors bean="${wizard.geneSigInst}"><div class="errors"><g:renderErrors bean="${wizard.geneSigInst}" as="list" /></div></g:hasErrors>
-        <br>
-    </g:if>
+	    <!--  show message -->
+	    <g:if test="${flash.message}">
+		<div class="warning">${flash.message}</div>
+		<g:hasErrors bean="${wizard.geneSigInst}"><div class="errors"><g:renderErrors bean="${wizard.geneSigInst}" as="list" /></div></g:hasErrors>
+		<br>
+	    </g:if>
 
-    <g:if test="${wizard.wizardType==1}">
-        <h1>Gene List Edit: ${gs?.name}</h1>
-    </g:if>
-    <g:else>
-        <h1>Gene/RSID List Create</h1>
-    </g:else>
-    <g:form name="geneSignatureFrm" enctype="multipart/form-data" method="post">
+	    <g:if test="${wizard.wizardType==1}">
+		<h1>Gene List Edit: ${gs?.name}</h1>
+	    </g:if>
+	    <g:else>
+		<h1>Gene/RSID List Create</h1>
+	    </g:else>
+	    <g:form name="geneSignatureFrm" enctype="multipart/form-data" method="post">
 
-     <table class="detail" style="width: 100%">
-        <tbody id="ListNameDetail">
-        <tr class="prop">
-            <td class="name">Signature/List Name<g:requiredIndicator/></td>
-            <td class="value"><g:textField name="name" value="${gs.name}" size="100%" maxlength="100" /></td>
-        </tr>
-        </tbody>
-     </table>
-     <br>
-     <table class="detail">
-         <tbody id="FileInfoDetail">
-        <tr class="prop">
-            <td class="name">Upload File
-                <br/>
-                <span class="infotext">Upload a tab-delimited text file.</span>
-            </td>
-            <td class="value"><input type="file" name="uploadFile" <g:if test="${wizard.wizardType==0}">value="${gs.uploadFile}"</g:if><g:else>value=""</g:else> size="100" /></td>
-        </tr>
+		<table class="detail" style="width: 100%">
+		    <tbody id="ListNameDetail">
+			<tr class="prop">
+			    <td class="name">Signature/List Name<g:requiredIndicator/></td>
+			    <td class="value"><g:textField name="name" value="${gs.name}" size="100%" maxlength="100" /></td>
+			</tr>
+		    </tbody>
+		</table>
+		<br>
+		<table class="detail">
+		    <tbody id="FileInfoDetail">
+			<tr class="prop">
+			    <td class="name">Upload File
+				<br/>
+				<span class="infotext">Upload a tab-delimited text file.</span>
+			    </td>
+			    <td class="value"><input type="file" name="uploadFile" <g:if test="${wizard.wizardType==0}">value="${gs.uploadFile}"</g:if><g:else>value=""</g:else> size="100" /></td>
+			</tr>
 
-        <tr>
-            <td class="name">Enter List Manually
-                <br/>
-                <span class="infotext">Type or copy and paste a list of genes and/or SNPs here. The form will expand as needed. Pasted lists should be comma or new line separated.</span>
-            </td>
-            <td>
-        <table class="detail" width="300" id="biomarkerList">
-        <tbody id="_new_items_detail" style="display: block;">
-        <tr id="new_header">
-            <%--<th style="text-align: center;">#</th>--%>
-            <th style="text-align: center;">Gene Symbol or rsID</th>
-            <th style="text-align: center;">&nbsp;</th>
-            <th style="text-align: center;">Remove</th>
-        </tr>
+			<tr>
+			    <td class="name">Enter List Manually
+				<br/>
+				<span class="infotext">Type or copy and paste a list of genes and/or SNPs here. The form will expand as needed. Pasted lists should be comma or new line separated.</span>
+			    </td>
+			    <td>
+				<table class="detail" width="300" id="biomarkerList">
+				    <tbody id="_new_items_detail" style="display: block;">
+					<tr id="new_header">
+					    <%--<th style="text-align: center;">#</th>--%>
+					    <th style="text-align: center;">Gene Symbol or rsID</th>
+					    <th style="text-align: center;">&nbsp;</th>
+					    <th style="text-align: center;">Remove</th>
+					</tr>
 
-        <g:set var="n" value="${0}"/>
-        <g:set var="geneSigItems" value="${gs?.geneSigItems}"/>
-        <g:set var="geneSigItemsIterator" value="${gs?.geneSigItems.iterator()}"/>
-        <g:while test="${n < 5 || geneSigItemsIterator?.hasNext()}">
+					<g:set var="n" value="${0}"/>
+					<g:set var="geneSigItems" value="${gs?.geneSigItems}"/>
+					<g:set var="geneSigItemsIterator" value="${gs?.geneSigItems.iterator()}"/>
+					<g:while test="${n < 5 || geneSigItemsIterator?.hasNext()}">
 
-            <tr id="new_item_${n}">
-                <%--<td style="color: gray;">${n}</td>--%>
+					    <tr id="new_item_${n}">
+						<%--<td style="color: gray;">${n}</td>--%>
 
-            <!-- check if coming from an error -->
-                <g:set var="bioMarkerValue" value=""/>
-                <g:if test="${geneSigItems}">
-                    <g:set var="nextItem" value="${geneSigItemsIterator.hasNext() ? geneSigItemsIterator.next(): null}"/>
-                    <g:if test="${nextItem?.bioMarker}">
-                        <g:set var="bioMarkerValue" value="${nextItem.bioMarker.name}"/>
-                    </g:if>
-                    <g:elseif test="${nextItem?.bioDataUniqueId}">
-                        <g:set var="bioMarkerValue" value="${nextItem.bioDataUniqueId?.substring(4)}"/> <%-- Substring to cut off SNP: --%>
-                    </g:elseif>
-                    <g:else>
-                        <g:set var="bioMarkerValue" value=""/>
-                    </g:else>
-                </g:if>
-                <td><g:textArea name="biomarker_${n}" class="biomarkerEntry" value="${bioMarkerValue}"/></td>
-                <td><div class="geneCheckIcon" id="geneCheckIcon${n}">&nbsp;</div></td>
-                <td style="text-align: center;"><img class="biomarkerDelete" name="biomarker_${n}" alt="remove item" src="${resource(dir:'images',file:'remove.png')}" /></td>
+						<!-- check if coming from an error -->
+						<g:set var="bioMarkerValue" value=""/>
+						<g:if test="${geneSigItems}">
+						    <g:set var="nextItem" value="${geneSigItemsIterator.hasNext() ? geneSigItemsIterator.next(): null}"/>
+						    <g:if test="${nextItem?.bioMarker}">
+							<g:set var="bioMarkerValue" value="${nextItem.bioMarker.name}"/>
+						    </g:if>
+						    <g:elseif test="${nextItem?.bioDataUniqueId}">
+							<g:set var="bioMarkerValue" value="${nextItem.bioDataUniqueId?.substring(4)}"/> <%-- Substring to cut off SNP: --%>
+						    </g:elseif>
+						    <g:else>
+							<g:set var="bioMarkerValue" value=""/>
+						    </g:else>
+						</g:if>
+						<td><g:textArea name="biomarker_${n}" class="biomarkerEntry" value="${bioMarkerValue}"/></td>
+						<td><div class="geneCheckIcon" id="geneCheckIcon${n}">&nbsp;</div></td>
+						<td style="text-align: center;"><img class="biomarkerDelete" name="biomarker_${n}" alt="remove item" src="${resource(dir:'images',file:'remove.png')}" /></td>
 
-            </tr>
-            <%n++%>
-        </g:while>
-        </tbody>
-    </table>
-            </td>
-        </tr>
-         <tr class="prop">
-             <td class="name">Flanking Region
-                 <br/>
-                 <span class="infotext">When searching on this gene list, include the gene regions +/- this number of chromosomal positions</span>
-             </td>
-             <td class="value"><input type="text" id="flankingRegion" name="flankingRegion" value="${gs?.flankingRegion ?: 0}"/></td>
-         </tr>
-         <tr class="prop">
-             <td class="name">Make List Public
-                 <br/>
-                 <span class="infotext">Allow others to view this gene list</span>
-             </td>
-             <td class="value"><g:checkBox name="publicFlag" value="${gs.publicFlag}" />
-         </tr>
-</tbody>
-      </table>
+					    </tr>
+					    <%n++%>
+					</g:while>
+				    </tbody>
+				</table>
+			    </td>
+			</tr>
+			<tr class="prop">
+			    <td class="name">Flanking Region
+				<br/>
+				<span class="infotext">When searching on this gene list, include the gene regions +/- this number of chromosomal positions</span>
+			    </td>
+			    <td class="value"><input type="text" id="flankingRegion" name="flankingRegion" value="${gs?.flankingRegion ?: 0}"/></td>
+			</tr>
+			<tr class="prop">
+			    <td class="name">Make List Public
+				<br/>
+				<span class="infotext">Allow others to view this gene list</span>
+			    </td>
+			    <td class="value"><g:checkBox name="publicFlag" value="${gs.publicFlag}" />
+			</tr>
+		    </tbody>
+		</table>
 
-        <div class="buttons">
-        <g:hiddenField name="isEdit" value="${wizard.wizardType==1}"/>
-        <g:actionSubmit class="save" action="saveList" value="Save" onclick="return validate();" />
-		<g:actionSubmit class="cancel" action="refreshSummary" onclick="return confirm('Are you sure you want to exit without saving this list?')" value="Cancel" />
-	</div>			
+		<div class="buttons">
+		    <g:hiddenField name="isEdit" value="${wizard.wizardType==1}"/>
+		    <g:actionSubmit class="save" action="saveList" value="Save" onclick="return validate();" />
+		    <g:actionSubmit class="cancel" action="refreshSummary" onclick="return confirm('Are you sure you want to exit without saving this list?')" value="Cancel" />
+		</div>			
 
-	<br>
-	</g:form>
-</div>
-</body>
+		<br>
+	    </g:form>
+	</div>
+    </body>
 </html>

@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <html>
     <head>
 	<meta name="layout" content="admin"/>
@@ -9,8 +10,8 @@
 	    <g:form name="form">
 		<table style="width: 700px;">
 		    <tr>
-			<td>Start Date&nbsp;&nbsp;<input id="startdate" name="startdate" type="text" value="${startdate}"></td>
-			<td>End Date&nbsp;&nbsp;<input id="enddate" name="enddate" type="text" value="${enddate}"></td>
+			<td>Start Date&nbsp;&nbsp;<input id="startdate" name="startdate" type="text" value="${startdate}"/></td>
+			<td>End Date&nbsp;&nbsp;<input id="enddate" name="enddate" type="text" value="${enddate}"/></td>
 			<td>
 			    <g:actionSubmit class="filter" value="Filter" action="list"/>
 			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -57,13 +58,13 @@
 		    max="${grailsApplication.config.com.recomdata.search.paginate.max}"/>
 	    </div>
 	</div>
-	<r:script>
+	<script>
 	    jQuery(function () {
 	    jQuery("#startdate").datepicker({ dateFormat: 'dd/mm/yy' });
 	    });
 	    jQuery(function () {
 	    jQuery("#enddate").datepicker({ dateFormat: 'dd/mm/yy' });
 	    });
-	</r:script>
+	</script>
     </body>
 </html>

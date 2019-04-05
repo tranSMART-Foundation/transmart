@@ -1,4 +1,4 @@
-<g:javascript>
+<script type="text/javascript">
 function addToPlatformField() {
 	var platformId = jQuery('#platform').val();
 	var platformText = jQuery('#platform option:selected').text();
@@ -36,7 +36,7 @@ function removeTag(fieldName, tag) {
 }
 //For all tags - when clicked, call the remove tag function (remove them from the DOM and underlying select list)
 jQuery('.tag').live('click', function(e) { removeTag(jQuery(this).parent().attr('name'), jQuery(this).attr('name')); });
-</g:javascript>
+</script>
 
 <%-- Tag box (visual display of tags) --%>
 <div id="${fieldName}-tags" class="tagBox" name="${fieldName}">

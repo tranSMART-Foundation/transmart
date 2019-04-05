@@ -1,4 +1,4 @@
-<g:javascript>
+<script type="text/javascript">
 
 jQuery(document).ready(function() {
 
@@ -74,7 +74,7 @@ jQuery(document).ready(function() {
 		  .appendTo(ul);
 	};
 });
-</g:javascript>
+</script>
 <%-- Tag box (visual display of tags) --%>
 <div id="${fieldName}-tags" class="tagBox">
 </div>

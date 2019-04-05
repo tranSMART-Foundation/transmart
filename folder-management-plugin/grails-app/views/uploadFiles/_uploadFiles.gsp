@@ -1,12 +1,12 @@
-<script src="${resource(dir:'js/fine-uploader', file:'iframe.xss.response-3.7.1.js')}"></script>
-<script src="${resource(dir:'js/fine-uploader', file:'jquery.fineuploader-3.7.1.js')}"></script>
-<script src="${resource(dir:'js/fine-uploader', file:'jquery.fineuploader-3.7.1.min.js')}"></script>
-<link rel="stylesheet" type="text/css" href="${resource(dir:'css', file:'fineuploader-3.5.0.css')}"/>
+<asset:javascript src="fine-uploader/iframe.xss.response-3.7.1.js"/>
+<asset:javascript src="fine-uploader/jquery.fineuploader-3.7.1.js"/>
+<asset:javascript src="fine-uploader/jquery.fineuploader-3.7.1.min.js"/>
+<asset:stylesheet href="fineuploader-3.5.0.css"/>
 
 <div id="uploadtitle"><p>Upload files in folder ${parentFolder?.folderName}</p></div>
 
 <div id="fine-uploader-basic" class="btn btn-success">
-    <i class="icon-upload icon-white"></i>
+    <i class="icon-upload icon-white"/>
     <p>To upload files, click or drag files in this zone.</p>
 </div>
 

@@ -8,19 +8,25 @@
 
         %{--jQuery JS libraries--}%
 
-        <r:require module="gwasTab"/>
-        <r:script disposition="head">window.jQuery = jQuery.noConflict();</r:script>
-        <r:layoutResources/><%-- XXX: Use template --%>
+        <asset:javascript src="jquery-plugin.js"/>
+        <asset:javascript src="jquery-ui.js"/>
+        <asset:javascript src="extjs.min.js"/>
+        <asset:javascript src="session_time.js"/>
+        <asset:javascript src="gwasTab.js"/>
+        <script type="text/javascript" disposition="head">window.jQuery = jQuery.noConflict();</script>
 
         <g:ifPlugin name='folder-management'>
             <g:render template='/folderManagementUrls' plugin='folderManagement'/>
-	    <script src="${resource(dir:'js', file:'folderManagement.js')}"/>
-	    <link rel="stylesheet" href="${resource(dir:'css', file:'folderManagement.css')}"/>
+	    <asset:javascript src="folderManagement.js"/>
+	    <asset:stylesheet href="folderManagement.css"/>
 	</g:ifPlugin>
 
-        <script src="${resource(dir:'js', file:'gwas.js', plugin:'transmart-gwas')}"/>
+	<asset:javascript src="browseTab.js"/>
+	<asset:stylesheet href="browseTab.css"/>
+        <asset:javascript src="gwas.js"/>
+	<asset:stylesheet href="gwasTab.css"/>
 
-        <script>
+        <script type="text/javascript">
 	    var gwasSearchResultsURL = "${createLink(action: 'loadSearchResults')}";
 	    var gwasFacetResultsURL = "${createLink(action: 'getFacetResults')}";
 	    var gwasFacetTableResultsURL = "${createLink(action: 'getFacetResultsForTable')}";
@@ -54,7 +60,7 @@
             <g:render template='/GWAS/gwasURLs' plugin='transmart-gwas'/>
         </g:ifPlugin>
 
-        <script>
+        <script type="text/javascript">
 	        var mouse_inside_options_div = false;
 		var popupWindowPropertiesMap = [];
 
@@ -132,20 +138,19 @@
             
         </script>
 
-        <script>
+        <script type="text/javascript">
 			jQuery(function ($) {
 				// Load dialog on click of Save link
 				$('#save-modal .basic').click(gwasOpenSaveSearchDialog);
 			});
 	</script>
-	<script>
+	<script type="text/javascript">
     			var sMailto = "mailto:${grailsApplication.config.com.recomdata.contactUs}?subject=tranSMART Bug/Feature Requests";
  
     			function doMailto() {
        				document.location.href = sMailto;
    			}
  	</script>
-
     </head>
     <body>
         <div id="header-div" class="header-div">
@@ -331,6 +336,5 @@
         <g:ifPlugin name='folder-management'>
             <div id="exportOverlay" class="overlay" style="display: none;">&nbsp;</div>
         </g:ifPlugin>
-        <r:layoutResources/><%-- XXX: Use template --%>
     </body>
 </html>

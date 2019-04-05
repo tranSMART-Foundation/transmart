@@ -1,16 +1,24 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<title><g:layoutTitle default="Gene Signature"/></title>
 
-	<link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="shortcut icon" />
-	<link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="icon" />
+	<asset:link rel="shortcut icon" href="transmart.ico" type="image/x-ico" />
+	<asset:link rel="icon" href="transmart.ico" type="image/x-ico" />
 
-	<g:javascript library='jquery' />
-	<r:require module='signatureTab' />
-	<r:layoutResources/>
+	<asset:stylesheet href="main.css"/>
+	<asset:stylesheet href="sanofi.css"/>
+	<asset:stylesheet href="genesignature.css"/>
+	<asset:stylesheet href="signatureTab.css" />
+
+	<asset:javascript src="jquery-plugin.js" />
+	<asset:javascript src="extjs.min.js" />
+	<asset:javascript src="session_time.js" />
+	<asset:javascript src="signatureTab.js" />
+	<asset:javascript src="toggle.js"/>
 
 	<script>
-            Ext.BLANK_IMAGE_URL = "${resource(dir:'js', file:'ext/resources/images/default/s.gif')}";
+            Ext.BLANK_IMAGE_URL = "${assetPath(src:'s.gif')}";
             Ext.Ajax.timeout = 180000;
             Ext.onReady(function () {
                 Ext.QuickTips.init()
@@ -27,6 +35,5 @@
 
 	    <div id="app"><g:layoutBody/></div>
 	</div>
-	<r:layoutResources/>
     </body>
 </html>

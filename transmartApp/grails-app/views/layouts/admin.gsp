@@ -1,12 +1,17 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<title>Transmart Administration</title>
 
-	<g:javascript library='jquery' />
-	<r:require module='adminTab' />
+	<asset:stylesheet href="adminTab.css"/>
 
-	<r:script>
-	    Ext.BLANK_IMAGE_URL = "${resource(dir: 'js', file: 'ext/resources/images/default/s.gif')}";
+	<asset:javascript src="jquery-plugin.js"/>
+	<asset:javascript src="extjs.min.js"/>
+	<asset:javascript src="session_time.js"/>
+	<asset:javascript src="adminTab.js"/>
+
+	<script type="text/javascript">
+	    Ext.BLANK_IMAGE_URL = "${assetPath(src: 's.gif')}";
 
 	    // set ajax to 180*1000 milliseconds
 	    Ext.Ajax.timeout = 180000;
@@ -34,8 +39,7 @@
 	            basePath :"${request.contextPath}"
 	        }
 	    });
-	</r:script>
-	<r:layoutResources/>
+	</script>
     </head>
 
     <body>
@@ -47,7 +51,6 @@
 	    <div id='navbar'><g:render template='/layouts/adminnavbar'/></div>
 
 	    <div id="content"><g:layoutBody/></div>
-	    <r:layoutResources/>
 	</div>
     </body>
 </html>

@@ -1,13 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <r:require module="jquery"/>
-    <r:layoutResources/>
+    <asset:javascript src="jquery-plugin.js"/>
 </head>
 <body>
-    <r:layoutResources/>
-</body>
-</html>
 
 <script type="text/javascript">
     %{--const matches = window.location.href.match(/\/fractalis\/state\/(.+)/)--}%
@@ -30,3 +26,6 @@
             %{--}, 100)--}%
         %{--})--}%
 </script>
+
+</body>
+</html>

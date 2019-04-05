@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<title>Centocor research subject data repository (Prototype) - Request Consult</title>

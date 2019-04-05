@@ -2,27 +2,29 @@
 <html>
     <head>
 	<!-- Force Internet Explorer 8 to override compatibility mode -->
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
-	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-	    <title>Sample Explorer :: ${grailsApplication.config.com.recomdata.appTitle}</title>
+	<title>Sample Explorer :: ${grailsApplication.config.com.recomdata.appTitle}</title>
 
-	    <link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="shortcut icon" />
-	    <link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="icon" />
+	<asset:image href="transmart.ico" rel="shortcut icon"/>
+	<asset:link href="images/transmart.ico" rel="icon"/>
 
-	    <g:javascript library='jquery'/>
-	    <r:require module='sampleTab'/>
-	    <r:layoutResources/>
+	<asset:stylesheet href="sampleTab.css"/>
 
-	    <r:script>
-        var $j = window.$j = jQuery.noConflict();
-	    </r:script>
+	<asset:javascript src="jquery-plugin.js"/>
+	<asset:javascript src="extjs.min.js"/>
+	<asset:javascript src="session_time.js"/>
+	<asset:javascript src="sampleTab.js"/>
 
+	<script type="text/javascript">
+            var $j = window.$j = jQuery.noConflict();
+	</script>
     </head>
 
     <body>
-	<script>
-    Ext.BLANK_IMAGE_URL = "${resource(dir:'js', file:'ext/resources/images/default/s.gif')}";
+	<script type="text/javascript">
+    Ext.BLANK_IMAGE_URL = "${assetPath(src:'s.gif')}";
 
     //set ajax to 600*1000 milliseconds
     Ext.Ajax.timeout = 1800000;
@@ -91,12 +93,10 @@
 
 	<!-- ************************************** -->
 	<!-- This implements the Help functionality -->
-	<script src="${resource(dir: 'js', file: 'help/D2H_ctxt.js')}"></script>
-	<script>
+	<asset:javascript src="help/D2H_ctxt.js"/>
+	<script type="text/javascript">
 	    helpURL = '${grailsApplication.config.com.recomdata.adminHelpURL}';
 	</script>
 	<!-- ************************************** -->
-
-	<r:layoutResources/>
     </body>
 </html>

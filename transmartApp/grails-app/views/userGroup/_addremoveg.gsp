@@ -20,7 +20,7 @@
     </div>
 </td>
 
-<r:script>
+<script>
     (function () {
         'use strict';
 
@@ -34,4 +34,4 @@
                     ['currentprincipalid', 'searchtext', 'groupstoremove'])
         }
     })()
-</r:script>
+</script>

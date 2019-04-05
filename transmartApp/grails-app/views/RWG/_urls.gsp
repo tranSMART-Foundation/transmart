@@ -1,5 +1,5 @@
 <%-- Set up URLs for AJAX --%>
-<script>
+<script type="text/javascript">
     var searchResultsURL = "${createLink([controller:'RWG', action:'loadSearchResults'])}";
     var facetResultsURL = "${createLink([controller:'RWG', action:'getFacetResults'])}";
     var clearSearchFilterURL = "${createLink([controller:'RWG', action:'clearSearchFilter'])}";

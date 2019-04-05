@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <% import org.codehaus.groovy.grails.orm.hibernate.support.ClosureEventTriggeringInterceptor as Events %>
 <%=packageName%>
 <html>

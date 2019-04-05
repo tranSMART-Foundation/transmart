@@ -93,7 +93,7 @@
     <p>You will be logged off in <span id="timeout-countdown"></span> seconds.</p>
     <p>Do you want to continue your session?</p>
 </div>
-<r:script>
+<script type="text/javascript">
     jQuery(document).ready(function() {
     addTimeoutDialog({
     sessionTimeout : ${config.com.recomdata.sessionTimeout},
@@ -102,7 +102,7 @@
     logoutURL : "${createLink([controller: 'login', action: 'forceAuth'])}"
     });
     });
-</r:script>
+</script>
 <g:if test="${!grailsApplication.config.ui.jirareport.hide}">
 %{--<!-- The below script fragment provided by JIRA to report bugs at jira.transmartfoundation.org -->--}%
 %{-- <script src="https://jira.transmartfoundation.org/s/8c444fcd9d47fdf56ca2f75ec1e9fd15-T/en_GBh7pwdp/70120/0cff1430a886a90ec539aa112db8aee1/2.0.8/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-GB&collectorId=8d56c6a7"></script> --}%

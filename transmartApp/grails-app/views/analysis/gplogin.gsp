@@ -1,4 +1,7 @@
+<!DOCTYPE html>
 <html>
+    <head>
+    </head>
     <body onload="submitForm();">
 
 	<!-- load an image to force browser to get a session cookie... -->

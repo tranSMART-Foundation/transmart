@@ -32,7 +32,7 @@
     </td>
 </g:else>
 
-<r:script>
+<script>
     (function () {
         'use strict';
 
@@ -46,4 +46,4 @@
                     ['sobjectstoremove', 'searchtext', 'currentprincipalid', 'accesslevelid'])
         };
     })()
-</r:script>
+</script>

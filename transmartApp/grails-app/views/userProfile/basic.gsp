@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="en">
     <head>
 	<title>User profile</title>
 	<meta name="layout" content="basic"/>
-	<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'userProfile.css')}">
+	<asset:stylesheet href="userProfile.css"/>
     </head>
 
     <body>

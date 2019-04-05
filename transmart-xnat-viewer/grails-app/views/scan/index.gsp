@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="${resource(dir: 'css/XNAT', file: 'ng-table.css')}"  />
-    <link rel="stylesheet" href="${resource(dir: 'css/XNAT', file: 'session.css')}" />
-    <link rel="stylesheet" href="${resource(dir: 'css/XNAT', file: 'bootstrap.min.css')}" />
+    <asset:stylesheet href="XNAT/ng-table.css"/>
+    <asset:stylesheet href="XNAT/session.css"/>
+    <asset:stylesheet href="XNAT/bootstrap.min.css"/>
     <title>Sessions</title>
 </head>
 
@@ -29,9 +29,9 @@
         </table>
     </div>
 </div>
-<script src="${resource(dir: 'js/XNAT', file: 'angular.min.js')}" type="text/javascript"></script>
-<script src="${resource(dir: 'js/XNAT', file: 'ng-table.min.js')}" type="text/javascript"></script>
-<script src="${resource(dir: 'js/XNAT', file: 'script.js')}"></script>
-<!--<script src="src/extern/jquery-2.1.0.min.js" type="text/javascript"></script>-->
+<asset:javascript src="XNAT/angular.min.js"/>
+<asset:javascript src="XNAT/ng-table.min.js"/>
+<asset:javascript src="XNAT/script.js"/>
+<!--<asset:javascript src="src/extern/jquery-2.1.0.min.js"/>-->
 </body>
 </html>

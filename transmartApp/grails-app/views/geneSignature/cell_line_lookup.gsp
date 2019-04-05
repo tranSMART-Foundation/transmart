@@ -1,4 +1,7 @@
+<!DOCTYPE html>
 <html>
+    <head>
+    </head>
     <body>
 	<div id="summary">
 	    <div id="SummaryHeader"><span class="SummaryHeader">Please Select A Cell Line</span></div>

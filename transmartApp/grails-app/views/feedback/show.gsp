@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<meta name="layout" content="main"/>
 	<title>Show Feedback</title>
-	<link rel="stylesheet" href="${resource(dir: 'css', file: 'feedback.css')}"/>
+	<asset:stylesheet href="feedback.css"/>
     </head>
 
     <body>

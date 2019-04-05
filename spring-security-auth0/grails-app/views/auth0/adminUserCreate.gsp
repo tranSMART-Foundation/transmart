@@ -1,3 +1,4 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
     <head>
 	<meta name="layout" content="admin"/>
@@ -71,7 +72,7 @@
 	    </g:form>
 
 	</div>
-	<script>
+	<script type="text/javascript">
 function updateToolip() {
 	var tooltip = '';
 	switch($('#auth0Provider').val()) {

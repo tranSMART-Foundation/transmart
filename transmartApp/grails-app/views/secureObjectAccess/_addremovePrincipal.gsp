@@ -25,7 +25,7 @@
     </div>
 </td>
 
-<r:script>
+<script>
     (function () {
         'use strict';
 
@@ -39,4 +39,4 @@
                     ['groupstoremove', 'searchtext', 'secureobjectid', 'accesslevelid'])
         };
     })()
-</r:script>
+</script>

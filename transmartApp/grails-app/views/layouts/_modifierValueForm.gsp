@@ -34,7 +34,8 @@
     <div id="divModifierEnum" style="text-align:left; padding: 20px;display:none;">
         <input id='chkEnableModifierValues' type='checkbox' onclick='toggleValueConstraint();'/>
 	Click here to constrain by value <br/><br/>
-        <select id='modifierValueList' multiple disabled/>
+        <select id='modifierValueList' multiple disabled>
+	</select>
      </div>
 
      <div id="divModifierFloat" style="text-align:left; padding: 20px;display:none;">
@@ -47,12 +48,12 @@
      
           <div id="divNumericMethod">
                <select id="valueOperator" onclick="valueOperatorChanged(this.value);">
-                    <option value="LT">LESS THAN(<)</option>
-                    <option value="LE">LESS THAN OR EQUAL TO(<=)</option>
+                    <option value="LT">LESS THAN(&lt;)</option>
+                    <option value="LE">LESS THAN OR EQUAL TO(&lt;=)</option>
                     <option value="EQ">EQUAL TO(=)</option>
                     <option value="BETWEEN">BETWEEN</option>
-                    <option value="GT">GREATER THAN(>)</option>
-                    <option value="GE">GREATER THAN OR EQUAL TO(>=)</option>
+                    <option value="GT">GREATER THAN(&gt;)</option>
+                    <option value="GE">GREATER THAN OR EQUAL TO(&gt;=)</option>
                </select><br/><br/>
                
                <input type="text" size="5" name="lowValueModifier" id="lowValueModifier" value=""/>
@@ -68,11 +69,12 @@
      <div id="divModifierString" style="text-align:left; padding: 20px;display:none;">
          <input id='chkEnableModifierValues' type='checkbox' onclick='toggleValueConstraint();'/>
 	 Click here to constrain by value <br/><br/>
-         <select id='modifierValueList' multiple disabled/>
+         <select id='modifierValueList' multiple disabled>
+	 </select>
      </div>
      
      <br/>
      
-     <input type='button' class="flatbutton" value='Apply Modifier' id="btnModifierValuesDone">
+     <input type='button' class="flatbutton" value='Apply Modifier' id="btnModifierValuesDone"/>
      
 </g:form>

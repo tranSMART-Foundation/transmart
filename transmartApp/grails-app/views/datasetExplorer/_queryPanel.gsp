@@ -35,20 +35,20 @@
         <div class="panelBoxList" id="panelBoxList_$n"></div>
 
         <div class="panelBoxDateSelector">
-            <input type="text" id="panelBoxDateFrom_$n" placeholder="From">
-            <input type="text" id="panelBoxDateTo_$n" placeholder="To">
+            <input type="text" id="panelBoxDateFrom_$n" placeholder="From"/>
+            <input type="text" id="panelBoxDateTo_$n" placeholder="To"/>
         </div>
 
         <div class="panelBoxBar">
             <span class="panelRadio">
-                <input type="radio" id="panelInclude_$n" name="panelRadio_$n" value="0" checked="checked">
+                <input type="radio" id="panelInclude_$n" name="panelRadio_$n" value="0" checked="checked"/>
 		<label for="panelInclude_$n">Include</label>
-                <input type="radio" id="panelExclude_$n" name="panelRadio_$n" value="1">
+                <input type="radio" id="panelExclude_$n" name="panelRadio_$n" value="1"/>
 		<label for="panelExclude_$n">Exclude</label>
             </span>
             <span class="panelButtons">
                 <!-- TODO This must be reactivated when support for dated query is proposed
-                     <input type="checkbox" id="panelDate_$n" class="panelDate" /><label for="panelDate_$n" class="flatbutton">By Dates</label>
+                     <input type="checkbox" id="panelDate_$n" class="panelDate" /><label for="panelDate_$n" class="flatbutton"/>By Dates</label>
                      -->
                 <button id="panelClear_$n" class="flatbutton clearbutton">Clear Panel</button>
             </span>

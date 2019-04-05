@@ -1,4 +1,7 @@
+<!DOCTYPE html>
 <html>
+    <head>
+    </head>
     <body>
 	<br><br><br>
 	<p style="text-align: center;">Unfortunately, there is no metadata for this experiment</p>

@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html>
     <head>
-	<link rel="stylesheet" type="text/css" href="${resource(dir: 'js/ext/resources/css', file: 'ext-all.css')}"/>
-	<link rel="stylesheet" type="text/css" href="${resource(dir: 'js/ext/resources/css', file: 'xtheme-gray.css')}"/>
-	<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'datasetExplorer.css')}"/>
+	<asset:stylesheet href="ext/resources/css/ext-all.css"/>
+	<asset:stylesheet href="ext/resources/css/xtheme-gray.css"/>
+	<asset:stylesheet href="datasetExplorer.css"/>
     </head>
 
     <body>

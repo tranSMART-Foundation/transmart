@@ -1,7 +1,8 @@
+<!DOCTYPE html>	    
 <html>
     <head>
 	<title>${grailsApplication.config.com.recomdata.appTitle}</title>
-	<link rel="stylesheet" href="${resource(dir: 'css', file: 'main.css')}"/>
+	<asset:stylesheet href="main.css"/>
     </head>
 
     <body>

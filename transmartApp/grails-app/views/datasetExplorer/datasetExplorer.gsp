@@ -2,28 +2,33 @@
 <html>
     <head>
 	<!-- Force Internet Explorer 8 to override compatibility mode -->
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
 	<title>Dataset Explorer</title>
 
-	<link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="shortcut icon" />
-	<link href="${resource(dir: 'images', file: 'transmart.ico')}" rel="icon" />
+	<asset:link href="transmart.ico" rel="shortcut icon" type="image/x-ico" />
+	<asset:link href="transmart.ico" rel="icon" type="image/x-ico" />
+
+	<!-- Include jQuery, Ext and app-specific scripts: -->
+	<asset:stylesheet href="folderManagement.css"/>
+
+	<asset:stylesheet href="analyseTab.css"/>
 
 	<%-- We do not have a central template, so this only works in the database explorer for now --%>
 	<g:if test="${['true', true]*.equals(grailsApplication.config.com.recomdata.debug.jsCallbacks).any()}">
-            <g:javascript src="long-stack-traces.js"/>
+            <asset:javascript src="long-stack-traces.js"/>
 	</g:if>
 
-	<!-- Include jQuery, Ext and app-specific scripts: -->
-	<g:javascript library="jquery" />
-	<r:require module="analyseTab" />
-	<r:layoutResources/>
-	<tmpl:/RWG/urls/>
-	<link rel="stylesheet" type="text/css" href="${resource(dir:'css', file:'folderManagement.css', plugin: 'folder-management')}">
-	<script src="${resource(dir:'js', file:'folderManagementDE.js', plugin: 'folder-management')}"></script>
+	<asset:javascript src="folderManagementDE.js"/>
+	<asset:javascript src="jquery-plugin.js"/>
+	<asset:javascript src="extjs.min.js"/>
+	<asset:javascript src="session_time.js"/>
+	<asset:javascript src="analyseTab.js"/>
 
-	<script>
+	<tmpl:/RWG/urls/>
+
+	<script type="text/javascript">
         var pageInfo = {
             basePath: "${request.contextPath}"
         }
@@ -111,7 +116,7 @@
         var dseClosedNodes = "${dseClosedNodes}";
         var helpURL = '${adminHelpUrl}';
 
-        Ext.BLANK_IMAGE_URL = "${resource(dir:'js/ext/resources/images/default', file:'s.gif')}";
+        Ext.BLANK_IMAGE_URL = "${assetPath(src:'s.gif')}";
         Ext.Ajax.timeout = 1800000;
         Ext.Updater.defaults.timeout = 1800000;
 
@@ -174,9 +179,6 @@
 	<span id="visualizerSpan1"></span>
 
 	<!-- This implements the Help functionality -->
-	<script type="text/javascript" src="${resource(dir: 'js/help', file: 'D2H_ctxt.js')}"></script>
-
-	<r:layoutResources/>
-
+	<asset:javascript src="help/D2H_ctxt.js"/>
     </body>
 </html>

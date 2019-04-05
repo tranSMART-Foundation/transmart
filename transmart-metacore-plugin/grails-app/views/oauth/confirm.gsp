@@ -1,8 +1,10 @@
+<!DOCTYPE html>
 <%@ page import="org.springframework.security.oauth2.common.exceptions.UnapprovedClientAuthenticationException" %>
-<head>
-<meta name='layout' content='main' />
-<title>Login</title>
-<style type='text/css' media='screen'>
+<html>
+    <head>
+	<meta name='layout' content='main' />
+	<title>Login</title>
+	<style type='text/css' media='screen'>
 #login {
 	margin:15px 0px; padding:0px;
 	text-align:center;
@@ -40,38 +42,39 @@
 #login .inner .login_message {color:red;}
 #login .inner .text_ {width:120px;}
 #login .inner .chk {height:12px;}
-</style>
-</head>
+	</style>
+    </head>
 
-<body>
+    <body>
 	<div id='login'>
-		<div class='inner'>
-			<g:if test="${lastException && !(lastException instanceof UnapprovedClientAuthenticationException)}">
-      <div class="error">
-        <h2>Woops!</h2>
+	    <div class='inner'>
+		<g:if test="${lastException && !(lastException instanceof UnapprovedClientAuthenticationException)}">
+		    <div class="error">
+			<h2>Woops!</h2>
 
-        <p>Access could not be granted. (${lastException?.message})</p>
-      </div>
-	</g:if>
+			<p>Access could not be granted. (${lastException?.message})</p>
+		    </div>
+		</g:if>
 		<g:else>
-			<g:if test='${flash.message}'>
+		    <g:if test='${flash.message}'>
 			<div class='login_message'>${flash.message}</div>
-			</g:if>
-			<div class='fheader'>Please Confirm</div>
-			<div>You hereby authorize <b>${applicationContext.getBean('clientDetailsService')?.loadClientByClientId(params.client_id)?.clientId ?: 'n/a'}</b> to access your protected resources.</div>
-			<form method='POST' id='confirmationForm' class='cssform'>
-				<p>
-					<input name='user_oauth_approval' type='hidden' value='true' />
-					<label><input name="authorize" value="Authorize" type="submit" /></label>
-				</p>
-			</form>
-			<form method='POST' id='denialForm' class='cssform'>
-				<p>
-					<input name='user_oauth_approval' type='hidden' value='false' />
-					<label><input name="deny" value="Deny" type="submit" /></label>
-				</p>
-			</form>
+		    </g:if>
+		    <div class='fheader'>Please Confirm</div>
+		    <div>You hereby authorize <b>${applicationContext.getBean('clientDetailsService')?.loadClientByClientId(params.client_id)?.clientId ?: 'n/a'}</b> to access your protected resources.</div>
+		    <form method='POST' id='confirmationForm' class='cssform'>
+			<p>
+			    <input name='user_oauth_approval' type='hidden' value='true' />
+			    <label><input name="authorize" value="Authorize" type="submit" /></label>
+			</p>
+		    </form>
+		    <form method='POST' id='denialForm' class='cssform'>
+			<p>
+			    <input name='user_oauth_approval' type='hidden' value='false' />
+			    <label><input name="deny" value="Deny" type="submit" /></label>
+			</p>
+		    </form>
 		</g:else>
-		</div>
+	    </div>
 	</div>
-</body>
+    </body>
+</html>

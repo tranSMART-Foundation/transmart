@@ -1,16 +1,16 @@
 <div class="form-section">
     <div class="col-lg-8">
 	<div class="checkbox">
-	    <label><input type="checkbox" name="is_funded_grant" ${user.is_funded_grant == 'on' ? 'checked' : ''}>
+	    <label><input type="checkbox" name="is_funded_grant" ${user.is_funded_grant == 'on' ? 'checked' : ''}/>
 		    Is this request related to a funded grant? </label>
 	</div>
 	<div class="checkbox">
-	    <label> <input type="checkbox" name="is_grant_proposal" ${user.is_grant_proposal == 'on' ? 'checked' : ''}>
+	    <label> <input type="checkbox" name="is_grant_proposal" ${user.is_grant_proposal == 'on' ? 'checked' : ''}/>
 		    Will the data be used to support a grant proposal?
 	    </label>
 	</div>
 	<div class="checkbox">
-	    <label> <input type="checkbox" name="is_personal_use" ${user.is_personal_use == 'on' ? 'checked' : ''}>
+	    <label> <input type="checkbox" name="is_personal_use" ${user.is_personal_use == 'on' ? 'checked' : ''}/>
 		    Will the data be used for teaching a class, or for personal use?
 	    </label>
 	</div>

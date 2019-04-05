@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <%@ page import="org.springframework.security.oauth2.common.exceptions.UnapprovedClientAuthenticationException" %>
 <html>
     <head>

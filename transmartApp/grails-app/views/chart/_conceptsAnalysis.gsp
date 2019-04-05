@@ -1,12 +1,14 @@
 <table width="100%" style="margin-bottom: 30px">
     <tbody>
-        <g:each in="${concepts}" var='concept'>
-            <tr>
+	<g:each in="${concepts}" var='concept'>
+	    <tr>
 		<td align="center">
 		    <g:if test="${concept.value}">
 			<hr style="margin-bottom: 30px"/>
 			<div class="analysistitle" title="${concept.value.commons.conceptPath}">Analysis of ${concept.value.commons.conceptName}</div>
-			<div class="analysissubtitle">${concept.value?.commons?.conceptTrimmed ?: ""}</div>
+			<g:if test="${concept.value?.commons?.omics_params != null}">
+			    <div class="analysissubtitle">${concept.value?.commons?.conceptKey ?: ""}</div>
+			</g:if>
 			<div style="margin-top: -15px; padding-bottom: 10px;">
 			    ${concept.value?.commons?.testmessage}<br/>
 			    <g:if test="${concept.value?.commons.pvalue != null}">
@@ -24,7 +26,7 @@
 			<g:render template="/chart/${concept.value.commons.type}Comparison" model="[subsets: concept.value]"/>
 		    </g:if>
 		</td>
-            </tr>
-        </g:each>
+	    </tr>
+	</g:each>
     </tbody>
 </table>

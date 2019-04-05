@@ -2,9 +2,9 @@
 <html>
     <head>
 	<title>workflow status</title>
-	<meta http-equiv="description" content="workflow status">
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<link rel="stylesheet" type="text/css" href="${resource(dir:'css', file: 'datasetExplorer.css')}">
+	<meta http-equiv="description" content="workflow status"/>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<asset:stylesheet href="datasetExplorer.css"/>
 	<style>
     p {
         width: 430px;

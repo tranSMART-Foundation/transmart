@@ -35,7 +35,7 @@
 
                                                 <div id="loading-div" style="visibility:hidden;display:none;">
                                                     <input type="text" id="loading-text"
-                                                           style="width:452px;color:background-image:url(js/ext/resources/images/default/grid/loading.gif);background-repeat:no-repeat;background-position:left center;padding-left:20px;"/>
+                                                           style="width:452px;color:background-image:url(images/loading.gif);background-repeat:no-repeat;background-position:left center;padding-left:20px;"/>
                                                 </div>
                                             </td>
                                             <td style="white-space:nowrap;" nowrap>

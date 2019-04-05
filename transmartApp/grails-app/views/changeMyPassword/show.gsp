@@ -1,8 +1,8 @@
+<!DOCTYPE html>
 <html>
     <head>
-	<r:require module="main_mod"/>
+	<asset:stylesheet href="main_mod.css"/>
 	<title>Change My Password</title>
-	<r:layoutResources/>
     </head>
 
     <body>
@@ -54,6 +54,5 @@
 		</div>
 	    </g:form>
 	</div>
-	<r:layoutResources/>
     </body>
 </html>

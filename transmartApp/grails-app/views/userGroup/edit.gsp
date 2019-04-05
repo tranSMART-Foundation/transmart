@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<meta name="layout" content="admin"/>
 	<title>Edit UserGroup</title>
-	<g:setProvider library='jquery'/>
+	<qsset:javascript src='jquery-plugin.js'/>
     </head>
 
     <body>

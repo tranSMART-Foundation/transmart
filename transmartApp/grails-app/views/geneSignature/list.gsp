@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
 	<meta name="layout" content="genesigmain" />
@@ -132,7 +133,7 @@
 	    </g:form>
 	</div>
 
-	<script src="${resource(dir:'js/help', file:'D2H_ctxt.js')}"></script>
+	<asset:javascript src="help/D2H_ctxt.js"/>
 
 	<script>
 	    helpURL = '${grailsApplication.config.com.recomdata.adminHelpURL}';

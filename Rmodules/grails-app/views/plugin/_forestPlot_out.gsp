@@ -1,3 +1,4 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <!--
     Copyright 2008-2012 Janssen Research & Development, LLC.
 
@@ -14,14 +15,13 @@
     limitations under the License.
   -->
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
     <head>
 	<title>subsetPanel.html</title>
 	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3"/>
 	<meta http-equiv="description" content="this is my page"/>
 	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
-	<link rel="stylesheet" type="text/css" href="${resource(dir:'css', file:'datasetExplorer.css')}"/>
+	<asset:stylesheet href="datasetExplorer.css"/>
     </head>
 
     <body>
@@ -36,8 +36,8 @@
 			    <span style="font-size : large;">Forest Plot</span>
 			    <!-- 
 				 <a href='JavaScript:D2H_ShowHelp(1272,helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP )'>
-				     <img src="${resource(dir:'images/help',file:'helpicon_white.jpg')}"
-					  alt="Help" border=0 width=18pt style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
+				     <asset:image src="help/helpicon_white.jpg"
+					  alt="Help" border="0" width="18pt" style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
 				 </a>
 				 -->						
 			</span>

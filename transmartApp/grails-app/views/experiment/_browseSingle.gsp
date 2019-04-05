@@ -18,7 +18,7 @@ table.studyBrowseTable > tbody > tr > td {
     font-size: 10px;
 }
 </style>
-<script src="${resource(dir: 'js', file: 'jquery/ui.multiselect.js')}"></script>
+<asset:javascript src="jquery/ui.multiselect.js"/>
 <script>
     $j(document).ready(function () {
         $j(".studyBrowseRow").click(function () {

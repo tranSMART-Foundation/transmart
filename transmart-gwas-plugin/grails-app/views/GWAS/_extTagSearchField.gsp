@@ -1,4 +1,4 @@
-<script>
+<script type="text/javascript">
 jQuery(document).ready(function() {	
 	
 	var escapedFieldName = '${fieldName}'.replace(".", "\\.");
@@ -40,6 +40,7 @@ jQuery('.tag').live('click', function(e) {
     removeTag(jQuery(this).parent().attr('name'), jQuery(this).attr('name'));
 });
 </script>
+
 <%-- Tag box (visual display of tags) --%>
 <div id="${fieldName}-tags" class="tagBox" name="${fieldName}">
     <g:each in="${values}" var='value'>

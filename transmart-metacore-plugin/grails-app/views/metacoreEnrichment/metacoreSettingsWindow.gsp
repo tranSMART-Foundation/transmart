@@ -1,4 +1,4 @@
-<script language="javascript">
+<asset:script type="text/javascript">
 	function onRadioChange() {
 		if ( !(typeof radioDemo === 'undefined') && radioDemo.checked ) {
 			jQuery('#settingsTable :input').prop('disabled', true);
@@ -10,7 +10,7 @@
 			jQuery('#settingsTable :input').prop('disabled', false);
 		}
 	}
-</script>
+</asset:script>
 
 <form style="padding: 5px 5px 5px 5px" id="metacoreSettingsForm">
 	<input type="hidden" name="accountType_original" value="${settingsMode}"/>
@@ -53,7 +53,7 @@
 		</div>
 	</g:else>
 	
-	<script language="javascript">
+	<asset:script typee="text/javascript">
 		if ("${settingsMode}" == 'user') { 
 			jQuery('#radioRegular').prop('checked', true);
 		}
@@ -65,5 +65,5 @@
 			jQuery('#radioDemo').prop('checked', true);
 			jQuery('#settingsTable :input').prop('disabled', true);
 		}
-	</script>
+	</asset:script>
 </form>

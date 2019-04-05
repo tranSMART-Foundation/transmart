@@ -1,4 +1,7 @@
+<!DOCTYPE html>
 <html>
+    <head>
+    </head>
     <body>
 	<div id="header-div" class="header-div">
 	    <g:render template='/layouts/commonheader' model="[app: 'customfilters']"/>

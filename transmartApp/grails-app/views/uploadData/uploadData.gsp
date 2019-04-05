@@ -3,15 +3,19 @@
     <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<link rel="shortcut icon" href="${resource(dir:'images', file:'transmart.ico')}"/>
-	<link rel="icon" href="${resource(dir:'images', file: 'transmart.ico')}"/>
-	<link rel="stylesheet" href="${resource(dir: 'js', file: 'ext/resources/css/ext-all.css')}"/>
-	<link rel="stylesheet" href="${resource(dir: 'js', file: 'ext/resources/css/xtheme-gray.css')}"/>
-	<link rel="stylesheet" href="${resource(dir: 'css', file: 'main.css')}"/>
-	<link rel="stylesheet" href="${resource(dir: 'css', file: '/jquery/cupertino/jquery-ui-1.8.18.custom.css')}"/>
-        <link rel="stylesheet" href="${resource(dir: 'css/jquery/skin', file: 'ui.dynatree.css')}"/>
-        <link rel="stylesheet" href="${resource(dir: 'css', file: 'rwg.css')}"/>
-        <link rel="stylesheet" href="${resource(dir: 'css', file: 'uploadData.css')}"/>
+
+	<asset:image rel="shortcut icon" href="transmart.ico"/>
+	<asset:link rel="icon" href="images/transmart.ico"/>
+
+	<asset:stylesheet href="ext/resources/css/ext-all.css"/>
+	<asset:stylesheet href="ext/resources/css/xtheme-gray.css"/>
+	<asset:stylesheet href="main.css"/>
+	<asset:stylesheet href="jquery-ui-1.10.4.custom.css"/>
+        <asset:stylesheet href="jquery/skin/ui.dynatree.css"/>
+        <asset:stylesheet href="rwg.css"/>
+        <asset:stylesheet href="adminTab.css"/>
+        <asset:stylesheet href="uploadDataTab.css"/>
+        <asset:stylesheet href="uploadData.css"/>
 
 	<!--[if IE 7]>
 		<style type="text/css">
@@ -21,12 +25,16 @@
 		</style>
 	<![endif]-->
 		
-	<g:javascript library="prototype" />
-	<g:javascript library="jquery" />
-	<r:require module="uploadDataTab" />
-	<r:layoutResources/>
-	<script>$j = jQuery.noConflict();</script>
-	<script src="${resource(dir:'js', file:'uploadData.js')}"></script>
+        <asset:javascript src="jquery-plugin.js"/>
+        <asset:javascript src="extjs.min.js"/>
+        <asset:javascript src="session_time.js"/>
+        <asset:javascript src="adminTab.js"/>
+
+	<asset:javascript src="ext-prototype-adapter.js"/>
+	<script type="text/javascript">$j = jQuery.noConflict();</script>
+	<asset:javascript src="uploadDataTab.js"/>
+	<asset:javascript src="uploadData.js"/>
+
 	<script charset="utf-8">
 	    var studyBrowseWindowUrl = '${createLink([controller: 'experiment', action: 'browseExperimentsSingleSelect'])}';
 	    var studyDetailUrl = '${createLink([controller: 'experimentAnalysis', action:'expDetail'])}';
@@ -53,7 +61,7 @@
 	<title>${grailsApplication.config.com.recomdata.dataUpload.appTitle}</title>
 	<!-- ************************************** -->
 	<!-- This implements the Help functionality -->
-	<script src="${resource(dir:'js', file:'help/D2H_ctxt.js')}"></script>
+	<asset:javascript src="help/D2H_ctxt.js"/>
 	<script>
 	    helpURL = '${grailsApplication.config.com.recomdata.adminHelpURL}';
 	</script>
@@ -65,7 +73,7 @@
 	</div>
 
 	<div id="mainUploadPane">
-	    <g:uploadForm name='dataUpload' action='upload'>
+	    <g:uploadForm name="dataUpload" action="upload">
 		<div id="formPage1" class="formPage">
 
 		    <div class="dataFormTitle" id="dataFormTitle1">
@@ -393,6 +401,5 @@
 <div id="divBrowseStudies" title="Studies" style="display: none;">
     <img src="${resource(file:'ajax-loader.gif', dir:'images')}"/>
 </div>
-<r:layoutResources/>
 </body>
 </html>

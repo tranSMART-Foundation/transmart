@@ -1,4 +1,3 @@
-<r:require modules="smartR_all"/>
+<asset:javascript src="smartR_all.js"/>
+<asset:stylesheet href="smartR_all.css"/>
 <g:layoutBody/>
-<r:layoutResources disposition="head"/>
-<r:layoutResources disposition="defer"/>
