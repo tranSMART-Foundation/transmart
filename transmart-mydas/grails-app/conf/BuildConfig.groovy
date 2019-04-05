@@ -1,16 +1,15 @@
-grails.project.class.dir = 'target/classes'
-grails.project.test.class.dir = 'target/test-classes'
-grails.project.test.reports.dir = 'target/test-reports'
+grails.project.work.dir = 'target'
+
+grails.project.source.level = 1.8
+grails.project.target.level = 1.8
 
 grails.project.dependency.resolver = 'maven'
 grails.project.dependency.resolution = {
-    // inherit Grails' default dependencies
-    inherits('global') {
-        // uncomment to disable ehcache
-        // excludes 'ehcache'
-    }
-    log 'warn' // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
-    legacyResolve false // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
+
+    inherits 'global'
+    log 'warn'
+    legacyResolve false
+
     repositories {
         grailsCentral()
         mavenLocal()
@@ -19,13 +18,14 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        compile 'uk.ac.ebi.mydas:mydas:1.7.0.transmart-16.4-SNAPSHOT'
         compile 'net.sf.opencsv:opencsv:2.3'
+        compile 'uk.ac.ebi.mydas:mydas:1.7.0.transmart-16.4-SNAPSHOT'
         compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
-    }
+	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
+   }
 
     plugins {
-        build ':tomcat:7.0.54',
+        build ':tomcat:8.0.50',
               ':release:3.1.2',
               ':rest-client-builder:2.1.1', {
             export = false

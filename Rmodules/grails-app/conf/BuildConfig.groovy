@@ -67,7 +67,8 @@ grails.project.dependency.resolution = {
 //        compile ':sendfile:0.2'
 
 	//not used in 18.1 beta
-        runtime ':resources:1.2.14'
+//        runtime ':resources:1.2.14'
+	compile ':asset-pipeline:2.14.1.1'
     }
 }
 

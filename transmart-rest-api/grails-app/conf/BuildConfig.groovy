@@ -22,7 +22,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-grails.servlet.version = '3.0'
 
 def defaultVMSettings = [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
 
@@ -43,6 +42,9 @@ if (dmClass) {
 grails.project.fork = [test: [*: defaultVMSettings, daemon: true], console: defaultVMSettings]
 grails.project.work.dir = 'target'
 grails.servlet.version = '3.0'
+
+grails.project.target.level = 1.8
+grails.project.source.level = 1.8
 
 grails.project.dependency.resolver = 'maven'
 
@@ -92,7 +94,7 @@ grails.project.dependency.resolution = {
         build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false
         }
-        build ':tomcat:7.0.54', {
+        build ':tomcat:8.0.50', {
             export = false
         }
 

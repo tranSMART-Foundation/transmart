@@ -1,7 +1,7 @@
 grails.project.work.dir = 'target'
 
-grails.project.source.level = 1.7
-grails.project.target.level = 1.7
+grails.project.source.level = 1.8
+grails.project.target.level = 1.8
 
 grails.project.dependency.resolver = 'maven'
 
@@ -32,25 +32,27 @@ grails.project.dependency.resolution = {
 	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
     }
     plugins {
-		compile ':cache:1.1.8'
-		compile ':hibernate:3.6.10.19', { export = false }
-		compile ':mail:1.0.7'
+	compile ':cache:1.1.8'
+	compile ':hibernate:3.6.10.19', { export = false }
+	compile ':mail:1.0.7'
+	compile ':asset-pipeline:2.14.1.1'
 
-		// these three not included in 18.1 beta
-		compile ':resources:1.2.14'
-		compile ':spring-security-core:2.0.0'
-		compile ':quartz:1.0.2'
+	compile ':folder-management:' + tmVersion
+	compile ':transmart-legacy-db:' + tmVersion
+
+	compile ':spring-security-core:2.0.0'
+	compile ':quartz:1.0.2'
 
 
-		compile ':folder-management:' + tmVersion
-		runtime ':search-domain:' + tmVersion
-		runtime ':transmart-core:' + tmVersion
-		runtime ':transmart-shared:' + tmVersion
+	build   ':release:3.1.2', ':rest-client-builder:2.1.1', {
+	    export = false
+	}
 
-		build   ':release:3.1.2', ':rest-client-builder:2.1.1', {
-			export = false
-		}
+	runtime ':search-domain:' + tmVersion
+	runtime ':transmart-core:' + tmVersion
+	runtime ':transmart-shared:' + tmVersion
 
+//	runtime ':resources:1.2.14'
 
     }
 }

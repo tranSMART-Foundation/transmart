@@ -1,5 +1,8 @@
 grails.project.work.dir = 'target'
 
+grails.project.target.level = 1.8
+grails.project.source.level = 1.8
+
 grails.project.dependency.resolver = 'maven'
 
 grails.project.dependency.resolution = {
@@ -34,9 +37,12 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
+	compile ':asset-pipeline:2.14.1.1'
+
         compile ':transmart-legacy-db:16.4-SNAPSHOT'
         compile ':transmart-shared:16.4-SNAPSHOT'
 
+        build ':tomcat:8.0.50'
 	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false
         }
@@ -44,9 +50,9 @@ grails.project.dependency.resolution = {
         runtime ':hibernate:3.6.10.19'
 
 	// not included in 18.1 beta
-	runtime ':resources:1.2.14'
+//	runtime ':resources:1.2.14'
+
         compile ':rdc-rmodules:16.4-SNAPSHOT'
-        build ':tomcat:7.0.54'
     }
 
 

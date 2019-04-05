@@ -17,6 +17,10 @@ grails.project.fork = [
 ]
 
 grails.project.dependency.resolver = 'maven' // or ivy
+
+grails.project.target.level = 1.8
+grails.project.source.level = 1.8
+
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits('global') {
@@ -42,11 +46,13 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build ':release:3.1.2',
-                ':rest-client-builder:2.1.1', {
-            export = false
-        }
         compile ':plugin-config:0.2.1'
         compile ':rdc-rmodules:16.4-SNAPSHOT'
+	compile ':asset-pipeline:2.14.1.1'
+
+        build ':release:3.1.2',
+            ':rest-client-builder:2.1.1', {
+            export = false
+        }
     }
 }

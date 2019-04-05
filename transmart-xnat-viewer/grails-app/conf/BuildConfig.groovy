@@ -2,6 +2,11 @@ grails.project.class.dir = 'target/classes'
 grails.project.test.class.dir = 'target/test-classes'
 grails.project.test.reports.dir = 'target/test-reports'
 
+grails.project.target.level = 1.8
+grails.project.source.level = 1.8
+
+tmVersion = '16.4-SNAPSHOT'
+
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
     //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
@@ -38,7 +43,7 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
+        compile 'org.transmartproject:transmart-core-api:' + tmVersion
         compile 'org.apache.httpcomponents:httpcore:4.4.1'
         compile 'org.apache.httpcomponents:httpclient:4.4.1'
         compile  'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1', {
@@ -47,7 +52,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        compile ':search-domain:16.4-SNAPSHOT'
+        compile ':transmart-core:' + tmVersion
+        compile ':search-domain:' + tmVersion
         build ':release:3.1.2',
               ':rest-client-builder:2.1.1', {
             export = false

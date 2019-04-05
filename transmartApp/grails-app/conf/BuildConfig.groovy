@@ -1,7 +1,33 @@
 import grails.util.Environment
 
 def forkSettingsRun   = [minMemory: 1536, maxMemory: 4096, maxPerm: 384, debug: false]
+def forkSettingsWar   = [minMemory: 1536, maxMemory: 8192, maxPerm: 2560, debug: false]
 def forkSettingsOther = [minMemory:  256, maxMemory: 1024, maxPerm: 384, debug: false]
+
+// grails.assets configuration
+
+// minify javascript files in war (true should be the default)
+grails.assets.minifyJs = true
+
+grails.assets.minifyOptions = [
+    languageMode: 'ES5', // tried ECMASCRIPT6
+    targetLanguage: 'ES5', //Can go from ES5 to ES6 for those bleeding edgers
+    optimizationLevel: 'SIMPLE', //Or ADVANCED or WHITESPACE_ONLY
+    excludes: ["**/fractalis.js","**/fractalis.unminified.js"]
+]
+
+//It is also possible to exclude files from minification
+//grails.assets.minifyOptions.excludes = ["**/*.min.js"]
+
+//Optionally, assets can be excluded from processing if included by your require tree.
+//This can dramatically reduce compile time for your assets.
+//To do so, simply leverage the excludes configuration option:
+//grails.assets.excludes = ["tiny_mce/src/*.js"]
+
+//Another piece of information to know is that files that are prefixed with _ are not compiled individually by the asset-pipeline.
+//These files are considered partials and should be required into another manifest file for compilation.
+//If, in the event, you need to add these files back to the precompile phase you can define a global includes property like so.
+//grails.assets.includes = ["**/_*.*"]
 
 def dm
 try {
@@ -12,7 +38,7 @@ try {
 catch (ignored) {}
 
 grails.project.dependency.resolver = 'maven'
-grails.project.fork = [test: forkSettingsOther, run: forkSettingsRun, war: false, console: forkSettingsOther]
+grails.project.fork = [test: forkSettingsOther, run: forkSettingsRun, war: forkSettingsWar, console: forkSettingsOther]
 
 grails.project.source.level = 1.8
 grails.project.target.level = 1.8
@@ -20,6 +46,35 @@ grails.project.target.level = 1.8
 grails.project.war.file = 'target/' + appName + '.war'
 grails.project.work.dir = 'target'
 grails.servlet.version = '3.0'
+
+// copying files into known locations in the deployed war file
+
+grails.war.resources = { stagingDir -> 
+    copy(todir: "${stagingDir}/WEB-INF/dataExportRscripts") {
+	fileset(dir: 'src/main/resources/dataExportRScripts')
+    }
+    copy(todir: "${stagingDir}/WEB-INF/Rscripts") {
+	fileset(dir: '../Rmodules/src/main/resources/Rscripts')
+    }
+    copy(todir: "${stagingDir}/WEB-INF/classes/public") {
+	fileset(dir: 'src/main/resources/public')
+    }
+    copy(todir: "${stagingDir}/WEB-INF/classes/public") {
+	fileset(dir: '../Rmodules/src/main/resources/public')
+    }
+    copy(todir: "${stagingDir}/WEB-INF/HeimScripts") {
+	fileset(dir: '../SmartR/src/main/resources/HeimScripts')
+    }
+
+    // to copy a single file
+    //copy(file: 'relative/path/to/file.ext', todir: "${stagingDir}/WEB-INF/destination")
+    // to copy a directory
+    //copy(todir: "${stagingDir}/WEB-INF/destination") {
+    //     fileset(dir: 'relative/path')
+    // }
+    // to delete unwanted files
+    // delete(verbose: true) { fileset(dir: stagingDir) { include name: '**/Thumbs.db' } }
+}
 
 grails.project.dependency.resolution = {
     inherits 'global'
@@ -42,8 +97,8 @@ grails.project.dependency.resolution = {
 
     dependencies {
 	compile 'axis:axis:1.4' // for GeneGo web services
-//	compile 'com.google.guava:guava:19.0'
-	compile 'com.google.guava:guava:16.0-dev-20140115-68c8348'
+	compile 'com.google.guava:guava:19.0'
+//	compile 'com.google.guava:guava:16.0-dev-20140115-68c8348'
 	compile 'commons-net:commons-net:3.3' // used for ftp transfers
 	compile 'net.sf.ehcache:ehcache:2.9.0'
 	compile 'net.sf.opencsv:opencsv:2.3'
@@ -107,9 +162,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-	build ':release:3.1.2'
-	build ':tomcat:8.0.50'
-
+	compile ':asset-pipeline:2.14.1.1'
 	compile ':cache-ehcache:1.0.5'
 	compile ':codenarc:0.21' // support for static code analysis - see codenarc.reports property below
 	compile ':hibernate:3.6.10.19'
@@ -121,16 +174,19 @@ grails.project.dependency.resolution = {
 	compile ':spring-security-ldap:2.0.0'
 	compile ':spring-security-oauth2-provider:2.0-RC5'
 
+	build ':release:3.1.2'
+	build ':tomcat:8.0.50'
+
 	runtime ':jquery-ui:1.10.4'
-	runtime ':jquery:1.11.1'
-	runtime ':prototype:1.0'
-	runtime ':resources:1.2.14'
+	runtime ':jquery:1.11.1'    // do we need this version?
+//	runtime ':prototype:1.0'    // requires  resources:1.0
+//	runtime ':resources:1.2.14'
 
 	//test ':code-coverage:1.2.6' // Doesn't work with forked tests yet
 
 	String tmVersion = '16.4-SNAPSHOT'
 	if (!dm) {
-//	    compile ':smart-r:'                   + tmVersion
+	    compile ':smart-r:'                   + tmVersion
 	    compile ':rdc-rmodules:'              + tmVersion
 	    compile ':transmart-core:'            + tmVersion
 	    compile ':transmart-gwas:'            + tmVersion
@@ -166,7 +222,7 @@ grails.project.dependency.resolution = {
 }
 
 dm?.with {
-//    configureInternalPlugin 'runtime', 'smart-r'
+    configureInternalPlugin 'runtime', 'smart-r'
     configureInternalPlugin 'compile', 'rdc-rmodules'
     configureInternalPlugin 'runtime', 'transmart-core'
     configureInternalPlugin 'compile', 'transmart-gwas'

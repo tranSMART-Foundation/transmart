@@ -32,6 +32,9 @@ if (dmClass) {
     dm = dmClass.newInstance()
 }
 
+grails.project.target.level = 1.8
+grails.project.source.level = 1.8
+
 grails.project.dependency.resolver = 'maven'
 grails.project.dependency.resolution = {
     log 'warn'
@@ -56,13 +59,16 @@ grails.project.dependency.resolution = {
         compile 'org.mapdb:mapdb:0.9.10'
         compile 'org.apache.commons:commons-lang3:3.4'
 
-        /* serializable ImmutableMap only on guava 16 */
-        compile group: 'com.google.guava', name: 'guava', version: '16.0-dev-20140115-68c8348'
+        compile 'com.google.guava:guava:19.0'
+//	compile 'com.google.guava:guava:16.0-dev-20140115-68c8348'
         compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
         //test 'com.jayway.restassured:rest-assured:2.4.1'
 
         runtime 'org.javassist:javassist:3.16.1-GA'
         runtime 'com.ittm_solutions.ipacore:IpaApi:16.4-SNAPSHOT'
+
+	test 'org.hamcrest:hamcrest-library:1.3'
+        test 'org.hamcrest:hamcrest-core:1.3'
 
         test 'org.gmock:gmock:0.9.0-r435-hyve2', {
             transitive = false /* don't bring groovy-all */
@@ -74,10 +80,10 @@ grails.project.dependency.resolution = {
         build 'org.grails.plugins:release:3.1.2'
 
         // FIXME: Advanced workflows gets buggy when updating resources plugin to 1.2.14
-        runtime ':resources:1.2.14'
+//        runtime ':resources:1.2.14'
 
         //compile ':sendfile:0.2'
-        build ':tomcat:7.0.54', {
+        build ':tomcat:8.0.50', {
             export = false
         }
         test ':functional-test:2.0.0'

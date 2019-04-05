@@ -2,6 +2,10 @@ grails.project.class.dir = 'target/classes'
 grails.project.test.class.dir = 'target/test-classes'
 grails.project.test.reports.dir = 'target/test-reports'
 //grails.project.war.file = 'target/' + appName + '-' + appVersion + '.war'
+
+grails.project.target.level = 1.8
+grails.project.source.level = 1.8
+
 grails.project.dependency.resolver = 'maven'
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
@@ -23,7 +27,10 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.13'
     }
     plugins {
-        compile ':transmart-java:16.4-SNAPSHOT'
+        String tmVersion = '16.4-SNAPSHOT'
+
+        compile ':transmart-java:' + tmVersion
+
         compile ':hibernate:3.6.10.19'
         build ':release:3.1.2',
               ':rest-client-builder:2.1.1', {
