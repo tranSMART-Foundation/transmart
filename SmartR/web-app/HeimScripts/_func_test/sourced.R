@@ -1,4 +1,0 @@
-
-testFun <- function() {
-    "test"
-}

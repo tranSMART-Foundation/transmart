@@ -1,0 +1,15 @@
+/*
+Original:
+    File: GlobalResources.groovy
+    Module: analyseTab
+
+
+*= require jquery/ui/jquery-ui.min.css
+*= require extjs.css
+*= require main_mod.css
+*= require session_timeout.css
+
+*= require datasetExplorer.css
+*= require querypanels.css
+*= require sanofi.css
+*/
