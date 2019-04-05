@@ -21,20 +21,22 @@ import org.transmartproject.db.test.H2Views
 
 class TransmartCoreDbTestsGrailsPlugin {
     def version = '16.4-SNAPSHOT'
-    def grailsVersion = '2.3 > *'
+    def grailsVersion = '2.5.4 > *'
 
     def title = 'Transmart Core Db Tests Plugin'
     def author = 'Transmart Foundation'
     def authorEmail = 'support@transmartfoundation.org'
     def description = 'Reuses logic for populating db with test data; also contains tests for core-db project to prevent circular plugin dependencies'
-    def documentation = 'http://github.com/tranSMART-Foundation/transmart'
-
-    def scm = [ url: 'http://github.com/tranSMART-Foundation/transmart' ]
-
+    def documentation = 'http://transmartproject.org'
+    def license = 'GPL3'
+    def organization = [name: 'TODO', url: 'TODO']
     def developers = [
-            [ name: 'Ruslan Forostianov', email: 'ruslan@thehyve.nl' ],
-            [ name: 'Peter Kok', email: 'peter@thehyve.nl' ]
+        [ name: 'Ruslan Forostianov', email: 'ruslan@thehyve.nl' ],
+	[name: 'Peter Kok', email: 'peter@thehyve.nl'],
+	[name: 'Burt Beckwith', email: 'burt_beckwith@hms.harvard.edu']
     ]
+    def issueManagement = [system: 'TODO', url: 'TODO']
+    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart-core-db']
 
     def doWithSpring = {
         h2Views(H2Views)

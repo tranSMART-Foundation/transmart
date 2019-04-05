@@ -1,9 +1,11 @@
 import grails.util.Environment
 import groovy.util.logging.Slf4j
+import heim.SmartRRuntimeConstants
 import heim.rserve.RScriptsSynchronizer
 import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
+import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
-import heim.SmartRRuntimeConstants
+
 
 @Slf4j('logger')
 class smartRGrailsPlugin {
@@ -22,11 +24,11 @@ class smartRGrailsPlugin {
 
     // TODO Fill in these fields
     def title = 'SmartR Plugin' // Headline display name of the plugin
-    def author = ''
-    def authorEmail = ''
+    def author = 'Sascha Herzinger'
+    def authorEmail = 'sascha.herzinger@uni.lu'
     def description =
             '''
-            Brief summary/description of the plugin.
+            SmartR is a grails plugin seeking to improve the visual analytics of the tranSMART platform by using recent web technologies such as d3 
             '''
 
     // URL to the plugin's documentation
@@ -35,7 +37,7 @@ class smartRGrailsPlugin {
     // Extra (optional) plugin metadata
 
     // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = 'APACHE'
+    def license = 'APACHE'
 
     // Details of company behind the plugin (if there is one)
 //    def organization = [ name: 'My Company', url: 'http://www.my-company.com/' ]
@@ -68,23 +70,30 @@ class smartRGrailsPlugin {
         def config = application.config
         SmartRRuntimeConstants constants = ctx.getBean(SmartRRuntimeConstants)
 
-        File smartRDir = GrailsPluginUtils.getPluginDirForName('smart-r')?.file
-        if (!smartRDir) {
-            String pluginPath = ctx.pluginManager.allPlugins.find {
-                it.name == 'smartR'
-            }.pluginPath
+	File smartRDir
 
-            smartRDir = ctx.getResource(pluginPath).file
-        }
-        else {
-            smartRDir = new File(smartRDir, 'web-app')
-        }
+	if (Environment.current == Environment.PRODUCTION) {
+            def resource = ctx.getResource("WEB-INF")
+	    smartRDir = resource.getFile()
+	} else {
+            smartRDir = GrailsPluginUtils.getPluginDirForName('smart-r')?.file
+            if (!smartRDir) {
+		String pluginPath = ctx.pluginManager.allPlugins.find {
+                    it.name == 'smartR'
+		}.pluginPath
+		
+		smartRDir = ctx.getResource(pluginPath).file
+            }
+            else {
+		smartRDir = new File(smartRDir, 'web-app')
+            }
+	}
         if (!smartRDir) {
             throw new RuntimeException('Could not determine directory for ' +
                     'smart-r plugin')
         }
 
-        constants.pluginScriptDirectory = new File(smartRDir.canonicalPath, 'HeimScripts')
+        constants.pluginScriptDirectory = new File(smartRDir.path, 'HeimScripts')
         logger.info('Directory for heim scripts is ' + constants.pluginScriptDirectory)
 
         if (!skipRScriptsTransfer(config)) {
