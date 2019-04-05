@@ -1,6 +1,5 @@
 package org.transmartproject.export
 
-import org.gmock.GMockController
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.dataquery.TabularResult
@@ -12,126 +11,65 @@ import org.transmartproject.core.dataquery.highdim.Platform
 
 class MockTabularResultHelper {
 
-    GMockController gMockController
-
     List<AssayColumn> createSampleAssays(int n) {
-        (1..n).collect {
-            createMockAssay(it, 'assay_' + it, 'sample_code_' + it,
-                    'patient_' + it + '_subject_id', 'sampletype_' + it,
-                    'timepoint_' + it, 'tissuetype_' + it, '' + it * 10)
-        }
+	(1..n).collect { long id ->
+	    new AssayColumn() {
+		String getLabel() { 'assay_' + id }
+		Long getId() { id }
+		Patient getPatient() {}
+		String getPatientInTrialId() { 'patient_' + id + '_subject_id' }
+		String getTrialName() {}
+		Timepoint getTimepoint() { new Timepoint(null, 'timepoint_' + id) }
+		String getSampleCode() { 'sample_code_' + id }
+		SampleType getSampleType() { new SampleType(null, 'sampletype_' + id) }
+		TissueType getTissueType() { new TissueType(null, 'tissuetype_' + id) }
+		Platform getPlatform() { [getId: { -> String.valueOf(id * 10) }] as Platform }
+		boolean equals(other) { is other }
+		String toString() { 'assay for ' + patientInTrialId }
+            }
+	}
     }
 
-    DataRow createRowForAssays(List<AssayColumn> assays,
-                               List data,
-                               String label) {
-        createMockRow(
-                dot(assays, data, { a, b -> [a, b] })
-                        .collectEntries(Closure.IDENTITY),
-                label)
+    private DataRow createRowForAssays(List<AssayColumn> assays, List data, String label) {
+	createMockRow dot(assays, data), label
     }
 
-    List dot(List list1, List list2, function) {
-        def res = []
-        for (int i = 0; i < list1.size(); i++) {
-            res << function(list1[i], list2[i])
-        }
-        res
-    }
+    Map<AssayColumn, Object> dot(List<AssayColumn> assays, List list2) {
+	assert assays.size() == list2.size()
 
-    List<Patient> createPatients(int n) {
-        (1..n).collect {
-            Patient p = mock(Patient)
-            p.inTrialId.returns('subject id #' + it.toString()).atLeastOnce()
-            p
+	Map<AssayColumn, Object> map = [:]
+	for (int i = 0; i < assays.size(); i++) {
+	    map[assays[i]] = list2[i]
         }
-    }
-
-    List<String> createPatientRowLabels(int n) {
-        (1..n).collect {
-            'patient #' + it as String
-        }
+	map
     }
 
     TabularResult<AssayColumn, DataRow> createMockTabularResult(Map params) {
         List<AssayColumn> sampleAssays = params.assays
         Map<String, List<Object>> labelToData = params.data
-        String columnsDimensionLabel = params.columnsLabel
-        String rowsDimensionLabel = params.rowsLabel
+	String columnsDimensionLabel = params.columnsLabel ?: null
+	String rowsDimensionLabel = params.rowsLabel ?: null
 
-        def iterator = labelToData.collect { String label, List data ->
-            createRowForAssays(sampleAssays, data, label)
+	Iterator<DataRow<AssayColumn, Object>> iterator = labelToData.collect { String label, List data ->
+	    createRowForAssays sampleAssays, data, label
         }.iterator()
 
-        TabularResult highDimResult = mock TabularResult
-        highDimResult.indicesList.returns(sampleAssays).stub()
-        highDimResult.getRows().returns(iterator).stub()
-        highDimResult.iterator().returns(iterator).stub()
-
-        if (columnsDimensionLabel) {
-            highDimResult.columnsDimensionLabel.returns columnsDimensionLabel
+	new TabularResult() {
+	    List getIndicesList() { sampleAssays }
+	    Iterator getRows() { iterator }
+	    String getColumnsDimensionLabel() { columnsDimensionLabel }
+	    String getRowsDimensionLabel() { rowsDimensionLabel }
+	    Iterator iterator() { iterator }
+	    void close() {}
         }
-        if (rowsDimensionLabel) {
-            highDimResult.rowsDimensionLabel.returns rowsDimensionLabel
-        }
-
-        highDimResult
     }
 
-
-    private AssayColumn createMockAssay(
-            Long id = null, String label = null, String sampleCode = null,
-            String patientInTrialId = null, String sampleTypeLabel = null,
-            String timepointLabel = null, String tissueTypeLabel = null,
-            String platformId = null
-    ) {
-        [
-                getId              : { -> id },
-                getLabel           : { -> label },
-                getSampleCode      : { -> sampleCode },
-                getPatientInTrialId: { -> patientInTrialId },
-                getSampleType      : { ->
-                    [
-                            getLabel: { -> sampleTypeLabel }
-                    ] as SampleType
-                },
-                getTimepoint       : { ->
-                    [
-                            getLabel: { -> timepointLabel }
-                    ] as Timepoint
-                },
-                getTissueType      : { ->
-                    [
-                            getLabel: { -> tissueTypeLabel }
-                    ] as TissueType
-                },
-                getPlatform        : { ->
-                    [
-                            getId: { -> platformId }
-                    ] as Platform
-                },
-                equals             : { other -> delegate.is(other) },
-                toString           : { -> 'assay for ' + patientInTrialId as String }
-        ] as AssayColumn
-    }
-
-    private DataRow<AssayColumn, Object> createMockRow(Map<AssayColumn, Object> values,
-                                                       String label) {
-        DataRow row = mock(DataRow)
-        row.label.returns(label).stub()
-
-        values.eachWithIndex { entry, i ->
-            row.getAt(i).returns(entry.value).stub()
-        }
-        values.keySet().each { column ->
-            row.getAt(column).returns(values[column]).stub()
-        }
-        row.iterator().returns(values.values().iterator()).stub()
-
-        row
-    }
-
-    private Object mock(Class clazz) {
-        gMockController.mock clazz
+    private DataRow<AssayColumn, Object> createMockRow(Map<AssayColumn, Object> values, String label) {
+	new DataRow<AssayColumn, Object>() {
+	    String getLabel() { label }
+	    Object getAt(int i) { values.values()[i] }
+	    Object getAt(AssayColumn assayColumn) { values[assayColumn] }
+	    Iterator<Object> iterator() { values.values().iterator() }
+	}
     }
 }

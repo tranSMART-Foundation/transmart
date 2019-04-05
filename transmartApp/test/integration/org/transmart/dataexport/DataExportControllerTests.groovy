@@ -52,7 +52,7 @@ class DataExportControllerTests {
         i2b2Data.saveAll()
         study2QueryResult = createQueryResult()
         dataExportController.request.parameters = [
-                result_instance_id1: study2QueryResult.id as String,
+            result_instance_id1: study2QueryResult.id as String,
         ]
     }
 
@@ -61,16 +61,16 @@ class DataExportControllerTests {
         List<PatientDimension> patients = createTestPatients(3, -100, trialName)
         List<PatientTrialCoreDb> patientTrials = createPatientTrialLinks(patients, trialName)
         new I2b2Data(
-                trialName: trialName,
-                patients: patients,
-                patientTrials: patientTrials)
+            trialName: trialName,
+            patients: patients,
+            patientTrials: patientTrials)
     }
 
     def createQueryResult() {
         def queryMaster = QueryResultData.createQueryResult i2b2Data.patients
         queryMaster.save(failOnError: true)
         study2QueryResult =
-                QueryResultData.getQueryResultFromMaster(queryMaster)
+            QueryResultData.getQueryResultFromMaster(queryMaster)
     }
 
     @Test
@@ -86,17 +86,17 @@ class DataExportControllerTests {
         def result = slurper.parseText(dataExportController.response.text)
 
         assertThat result, hasEntry(
-                equalTo('exportMetaData'),
-                contains(allOf(
-                        hasEntry('dataTypeId', 'CLINICAL'),
-                        hasEntry('isHighDimensional', false),
-                        hasEntry(equalTo('subset1'), allOf(
-                                hasEntry(equalTo('exporters'), contains(allOf(
-                                        hasEntry('format', 'TSV'),
-                                        hasEntry('description', 'Tab separated file.'),
-                                ))),
-                                hasEntry(equalTo('patientsNumber'), equalTo(3)),
-                        )))))
+            equalTo('exportMetaData'),
+            contains(allOf(
+                hasEntry('dataTypeId', 'CLINICAL'),
+                hasEntry('isHighDimensional', false),
+                hasEntry(equalTo('subset1'), allOf(
+                    hasEntry(equalTo('exporters'), contains(allOf(
+                        hasEntry('format', 'TSV'),
+                        hasEntry('description', 'Tab separated file.'),
+                    ))),
+                    hasEntry(equalTo('patientsNumber'), equalTo(3)),
+                )))))
     }
 
     @Test
@@ -111,7 +111,7 @@ class DataExportControllerTests {
         }
 
         assertThat exception.message, startsWith(
-                'User user_' + user.id + ' has no EXPORT permission on one of the result set')
+            "User user_${user.id} has no EXPORT permission on one of the result set")
     }
 
     @Test
@@ -127,9 +127,9 @@ class DataExportControllerTests {
         def result = slurper.parseText(dataExportController.response.text)
 
         assertThat result, hasEntry(
-                equalTo('exportMetaData'),
-                contains(
-                        hasEntry('dataTypeId', 'CLINICAL')))
+            equalTo('exportMetaData'),
+            contains(
+                hasEntry('dataTypeId', 'CLINICAL')))
     }
 
     @Test
@@ -145,7 +145,7 @@ class DataExportControllerTests {
         }
 
         assertThat exception.message, startsWith(
-                'User ' + accessLevelTestData.users[4].username + ' has no EXPORT permission on one of the result set')
+            "User ${accessLevelTestData.users[4].username} has no EXPORT permission on one of the result set")
     }
 
     @Test
@@ -161,15 +161,15 @@ class DataExportControllerTests {
             dataExportController.request.parameters = [analysis: 'DataExport']
             dataExportController.createnewjob()
             def jobName = new JsonSlurper().
-                    parseText(dataExportController.response.text).
-                    jobName
+            parseText(dataExportController.response.text).
+            jobName
             dataExportController.response.reset()
             [
-                    result_instance_id1        : study2QueryResult.id as String,
-                    analysis                   : 'DataExport',
-                    jobName                    : jobName,
-                    selectedSubsetDataTypeFiles: '{subset: subset1, dataTypeId: CLINICAL, fileType: .TXT}',
-                    selection                  : '{"subset1":{"clinical":{"selector":[]}}}',
+                result_instance_id1        : study2QueryResult.id as String,
+                analysis                   : 'DataExport',
+                jobName                    : jobName,
+                selectedSubsetDataTypeFiles: '{subset: subset1, dataTypeId: CLINICAL, fileType: .TXT}',
+                selection                  : '{"subset1":{"clinical":{"selector":[]}}}',
             ].each { k, v -> dataExportController.params[k] = v }
             dataExportController.runDataExport()
         }
@@ -181,7 +181,7 @@ class DataExportControllerTests {
 
         def proxyMetaClass = ProxyMetaClass.getInstance(SpringSecurityService)
         proxyMetaClass.interceptor =
-                new SpringSecurityProxyMetaClassInterceptor(username: username)
+            new SpringSecurityProxyMetaClassInterceptor(username: username)
         proxyMetaClass.use springSecurityService, closure
     }
 }

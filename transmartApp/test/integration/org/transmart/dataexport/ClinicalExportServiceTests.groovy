@@ -2,6 +2,7 @@ package org.transmart.dataexport
 
 import com.google.common.io.Files
 import com.recomdata.asynchronous.JobResultsService
+import com.recomdata.transmart.data.export.ClinicalExportService
 import grails.test.mixin.TestMixin
 import org.gmock.WithGMock
 import org.junit.Before
@@ -16,20 +17,25 @@ import org.transmartproject.db.i2b2data.PatientDimension
 import org.transmartproject.db.i2b2data.PatientTrialCoreDb
 import org.transmartproject.db.ontology.ConceptTestData
 import org.transmartproject.db.ontology.I2b2
+import org.transmartproject.db.querytool.QueriesResourceService
 import org.transmartproject.db.test.RuleBasedIntegrationTestMixin
 
-import static org.hamcrest.Matchers.*
+import static org.hamcrest.Matchers.contains
+import static org.hamcrest.Matchers.containsInAnyOrder
+import static org.hamcrest.Matchers.endsWith
+import static org.hamcrest.Matchers.greaterThan
+import static org.hamcrest.Matchers.hasProperty
 import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertTrue
-import static org.transmartproject.db.TestDataHelper.save
 import static org.transmart.dataexport.FileContentTestUtils.parseSepValTable
+import static org.transmartproject.db.TestDataHelper.save
 
 @TestMixin(RuleBasedIntegrationTestMixin)
 @WithGMock
 class ClinicalExportServiceTests {
 
-    def clinicalExportService
-    def queriesResourceService
+    ClinicalExportService clinicalExportService
+    QueriesResourceService queriesResourceService
 
     File tmpDir
     def queryResult
@@ -39,7 +45,6 @@ class ClinicalExportServiceTests {
     List<ObservationFact> facts
     I2b2 studyNode
     I2b2 sexNode
-
 
     @Before
     void setUp() {
@@ -51,12 +56,12 @@ class ClinicalExportServiceTests {
 
         conceptData = ConceptTestData.createDefault()
         conceptData.tableAccesses << ConceptTestData
-                .createTableAccess(
-                    level: 0,
-                    fullName: '\\foo\\',
-                    name: 'foo',
-                    tableCode: 'foo',
-                    tableName: 'i2b2')
+            .createTableAccess(
+            level: 0,
+            fullName: '\\foo\\',
+            name: 'foo',
+            tableCode: 'foo',
+            tableName: 'i2b2')
 
         List<I2b2> studyNodes = conceptData.i2b2List.findAll { it.cComment?.endsWith(trialId) }
 
@@ -70,9 +75,9 @@ class ClinicalExportServiceTests {
         List<PatientTrialCoreDb> patientTrials = I2b2Data.createPatientTrialLinks(patients, trialId)
         i2b2Data = new I2b2Data(trialName: trialId, patients: patients, patientTrials: patientTrials)
         facts = ClinicalTestData.createDiagonalCategoricalFacts(
-                3,
-                [femaleNode, maleNode],
-                i2b2Data.patients)
+            3,
+            [femaleNode, maleNode],
+            i2b2Data.patients)
         facts << ClinicalTestData.createObservationFact(charNode.code, i2b2Data.patients[0], -20000, 'test value')
         facts << ClinicalTestData.createObservationFact(study1SubNode.code, i2b2Data.patients[1], -20001, 'foo')
 
@@ -84,139 +89,106 @@ class ClinicalExportServiceTests {
 
         clinicalExportService.jobResultsService = new JobResultsService(jobResults: [test: [Status: 'In Progress']])
 
-        def definition = new QueryDefinition([
-                new Panel(
-                        items: [
-                                new Item(
-                                        conceptKey: studyNode.key.toString()
-                                )
-                        ]
-                )
-        ])
+	QueryDefinition definition = new QueryDefinition([new Panel(items: [new Item(conceptKey: studyNode.key)])])
 
         queryResult = queriesResourceService.runQuery(definition, 'test')
     }
 
     @Test
     void testDataWithConceptPathSpecified() {
-        def files = clinicalExportService.exportClinicalData(
-                jobName: 'test',
-                resultInstanceId: queryResult.id,
-                conceptKeys: [ sexNode.key.toString() ],
-                studyDir: tmpDir,
-                exportMetaData: false)
+	List<File> files = clinicalExportService.exportClinicalData(
+	    'test', queryResult.id,[sexNode.key], tmpDir, false)
 
         assertThat files, contains(
-                hasProperty('absolutePath', endsWith(File.separator + 'data_clinical.tsv')),
-        )
+	    hasProperty('absolutePath', endsWith(File.separator + 'data_clinical.tsv')))
 
-        def dataFile = files[0]
+	File dataFile = files[0]
 
-        def dataTable = parseSepValTable(dataFile)
+	List<List<String>> dataTable = parseSepValTable(dataFile)
         assertThat dataTable, contains(
-                contains('Subject ID', '\\foo\\study2\\sex\\'),
-                contains('SUBJ_ID_3', 'female'),
-                contains('SUBJ_ID_2', 'male'),
-                contains('SUBJ_ID_1', 'female'),
-        )
-
+            contains('Subject ID', '\\foo\\study2\\sex\\'),
+            contains('SUBJ_ID_3', 'female'),
+            contains('SUBJ_ID_2', 'male'),
+	    contains('SUBJ_ID_1', 'female'))
     }
 
     @Test
     void testMetaWithConceptPathSpecified() {
-        def files = clinicalExportService.exportClinicalData(
-                jobName: 'test',
-                resultInstanceId: queryResult.id,
-                conceptKeys: [ sexNode.key.toString() ],
-                studyDir: tmpDir,
-                exportMetaData: true)
+	List<File> files = clinicalExportService.exportClinicalData(
+	    'test', queryResult.id, [sexNode.key], tmpDir, true)
 
         assertThat files, containsInAnyOrder(
-                hasProperty('absolutePath', endsWith(File.separator + 'data_clinical.tsv')),
-                hasProperty('absolutePath', endsWith(File.separator + 'meta.tsv')),
-        )
+            hasProperty('absolutePath', endsWith(File.separator + 'data_clinical.tsv')),
+	    hasProperty('absolutePath', endsWith(File.separator + 'meta.tsv')))
 
-        files.each { file ->
-            assertTrue(file.exists())
+	for (file in files) {
+	    assertTrue file.exists()
             assertThat file.length(), greaterThan(0l)
         }
 
-        def metaFile = files.find { it.absolutePath.endsWith File.separator + 'meta.tsv' }
+	File metaFile = files.find { it.absolutePath.endsWith File.separator + 'meta.tsv' }
 
-        def metaTable = parseSepValTable(metaFile)
+	List<List<String>> metaTable = parseSepValTable(metaFile)
         assertThat metaTable, contains(
-                contains('Variable', 'Attribute', 'Description'),
-                contains('\\foo\\study2\\sex\\', '8 name 2', '8 description 2'),
-                contains('\\foo\\study2\\sex\\', '8 name 1', '8 description 1'),
-                contains('\\foo\\study2\\sex\\female\\', '10 name 2', '10 description 2'),
-                contains('\\foo\\study2\\sex\\female\\', '10 name 1', '10 description 1'),
-                contains('\\foo\\study2\\sex\\male\\', '9 name 2', '9 description 2'),
-                contains('\\foo\\study2\\sex\\male\\', '9 name 1', '9 description 1'),
-        )
+            contains('Variable', 'Attribute', 'Description'),
+            contains('\\foo\\study2\\sex\\', '8 name 2', '8 description 2'),
+            contains('\\foo\\study2\\sex\\', '8 name 1', '8 description 1'),
+            contains('\\foo\\study2\\sex\\female\\', '10 name 2', '10 description 2'),
+            contains('\\foo\\study2\\sex\\female\\', '10 name 1', '10 description 1'),
+            contains('\\foo\\study2\\sex\\male\\', '9 name 2', '9 description 2'),
+	    contains('\\foo\\study2\\sex\\male\\', '9 name 1', '9 description 1'))
     }
 
     @Test
     void testDataWithoutConceptPathSpecified() {
-        def files = clinicalExportService.exportClinicalData(
-                jobName: 'test',
-                resultInstanceId: queryResult.id,
-                studyDir: tmpDir,
-                exportMetaData: false)
+	List<File> files = clinicalExportService.exportClinicalData(
+	    'test', queryResult.id, null, tmpDir, false)
 
         assertThat files, contains(
-                hasProperty('absolutePath', endsWith(File.separator + 'data_clinical.tsv')),
-        )
+	    hasProperty('absolutePath', endsWith(File.separator + 'data_clinical.tsv')))
 
-        def dataFile = files.find { it.absolutePath.endsWith File.separator + 'data_clinical.tsv' }
-        def table = parseSepValTable(dataFile)
+	File dataFile = files.find { it.absolutePath.endsWith File.separator + 'data_clinical.tsv' }
+	List<List<String>> table = parseSepValTable(dataFile)
         assertThat table, contains(
-                contains('Subject ID', '\\foo\\study2\\long path\\with%some$characters_\\',
-                        '\\foo\\study2\\sex\\', '\\foo\\study2\\study1\\'),
-                contains('SUBJ_ID_3', '', 'female', ''),
-                contains('SUBJ_ID_2', '', 'male', 'foo'),
-                contains('SUBJ_ID_1', 'test value', 'female', ''),
-        )
-
+            contains('Subject ID', '\\foo\\study2\\long path\\with%some$characters_\\',
+                     '\\foo\\study2\\sex\\', '\\foo\\study2\\study1\\'),
+            contains('SUBJ_ID_3', '', 'female', ''),
+            contains('SUBJ_ID_2', '', 'male', 'foo'),
+	    contains('SUBJ_ID_1', 'test value', 'female', ''))
     }
 
     @Test
     void testMetaWithoutConceptPathSpecified() {
-        def files = clinicalExportService.exportClinicalData(
-                jobName: 'test',
-                resultInstanceId: queryResult.id,
-                studyDir: tmpDir,
-                exportMetaData: true)
+	List<File> files = clinicalExportService.exportClinicalData(
+	    'test', queryResult.id, null, tmpDir, true)
 
         assertThat files, containsInAnyOrder(
-                hasProperty('absolutePath', endsWith(File.separator + 'data_clinical.tsv')),
-                hasProperty('absolutePath', endsWith(File.separator + 'meta.tsv')),
-        )
+            hasProperty('absolutePath', endsWith(File.separator + 'data_clinical.tsv')),
+	    hasProperty('absolutePath', endsWith(File.separator + 'meta.tsv')))
 
-        files.each { file ->
-            assertTrue(file.exists())
+	for (file in files) {
+	    assertTrue file.exists()
             assertThat file.length(), greaterThan(0l)
         }
 
-        def metaFile = files.find { it.absolutePath.endsWith File.separator + 'meta.tsv' }
+	File metaFile = files.find { it.absolutePath.endsWith File.separator + 'meta.tsv' }
 
-        def metaTable = parseSepValTable(metaFile)
+	List<List<String>> metaTable = parseSepValTable(metaFile)
         assertThat metaTable, contains(
-                contains('Variable', 'Attribute', 'Description'),
-                contains('\\foo\\study2\\', '3 name 2', '3 description 2'),
-                contains('\\foo\\study2\\', '3 name 1', '3 description 1'),
-                contains('\\foo\\study2\\long path\\', '6 name 2', '6 description 2'),
-                contains('\\foo\\study2\\long path\\', '6 name 1', '6 description 1'),
-                contains('\\foo\\study2\\long path\\with%some$characters_\\', '7 name 2', '7 description 2'),
-                contains('\\foo\\study2\\long path\\with%some$characters_\\', '7 name 1', '7 description 1'),
-                contains('\\foo\\study2\\sex\\', '8 name 2', '8 description 2'),
-                contains('\\foo\\study2\\sex\\', '8 name 1', '8 description 1'),
-                contains('\\foo\\study2\\sex\\female\\', '10 name 2', '10 description 2'),
-                contains('\\foo\\study2\\sex\\female\\', '10 name 1', '10 description 1'),
-                contains('\\foo\\study2\\sex\\male\\', '9 name 2', '9 description 2'),
-                contains('\\foo\\study2\\sex\\male\\', '9 name 1', '9 description 1'),
-                contains('\\foo\\study2\\study1\\', '4 name 2', '4 description 2'),
-                contains('\\foo\\study2\\study1\\', '4 name 1', '4 description 1'),
-        )
+            contains('Variable', 'Attribute', 'Description'),
+            contains('\\foo\\study2\\', '3 name 2', '3 description 2'),
+            contains('\\foo\\study2\\', '3 name 1', '3 description 1'),
+            contains('\\foo\\study2\\long path\\', '6 name 2', '6 description 2'),
+            contains('\\foo\\study2\\long path\\', '6 name 1', '6 description 1'),
+            contains('\\foo\\study2\\long path\\with%some$characters_\\', '7 name 2', '7 description 2'),
+            contains('\\foo\\study2\\long path\\with%some$characters_\\', '7 name 1', '7 description 1'),
+            contains('\\foo\\study2\\sex\\', '8 name 2', '8 description 2'),
+            contains('\\foo\\study2\\sex\\', '8 name 1', '8 description 1'),
+            contains('\\foo\\study2\\sex\\female\\', '10 name 2', '10 description 2'),
+            contains('\\foo\\study2\\sex\\female\\', '10 name 1', '10 description 1'),
+            contains('\\foo\\study2\\sex\\male\\', '9 name 2', '9 description 2'),
+            contains('\\foo\\study2\\sex\\male\\', '9 name 1', '9 description 1'),
+            contains('\\foo\\study2\\study1\\', '4 name 2', '4 description 2'),
+	    contains('\\foo\\study2\\study1\\', '4 name 1', '4 description 1'))
     }
-
 }

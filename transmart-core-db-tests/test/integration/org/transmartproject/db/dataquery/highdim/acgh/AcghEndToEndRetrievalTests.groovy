@@ -89,25 +89,25 @@ class AcghEndToEndRetrievalTests {
     @Test
     void basicTest() {
         def assayConstraints = [
-                acghResource.createAssayConstraint(
-                        AssayConstraint.TRIAL_NAME_CONSTRAINT, name: TRIAL_NAME),
-                acghResource.createAssayConstraint(
-                        AssayConstraint.PATIENT_SET_CONSTRAINT,
-                        result_instance_id: testData.allPatientsQueryResult.id),
+            acghResource.createAssayConstraint(
+                AssayConstraint.TRIAL_NAME_CONSTRAINT, name: TRIAL_NAME),
+            acghResource.createAssayConstraint(
+                AssayConstraint.PATIENT_SET_CONSTRAINT,
+                result_instance_id: testData.allPatientsQueryResult.id),
         ]
         def dataConstraints = []
 
         dataQueryResult = acghResource.retrieveData assayConstraints, dataConstraints, projection
 
         assertThat dataQueryResult, allOf(
-                is(notNullValue()),
-                hasProperty('indicesList', contains(
-                        /* they're ordered by assay id */
-                        hasSameInterfaceProperties(Assay, testData.assays[1], ['platform']),
-                        hasSameInterfaceProperties(Assay, testData.assays[0], ['platform']),
-                )),
-                hasProperty('rowsDimensionLabel', equalTo('Regions')),
-                hasProperty('columnsDimensionLabel', equalTo('Sample codes')),
+            is(notNullValue()),
+            hasProperty('indicesList', contains(
+                /* they're ordered by assay id */
+                hasSameInterfaceProperties(Assay, testData.assays[1], ['platform']),
+                hasSameInterfaceProperties(Assay, testData.assays[0], ['platform']),
+            )),
+            hasProperty('rowsDimensionLabel', equalTo('Regions')),
+            hasProperty('columnsDimensionLabel', equalTo('Sample codes')),
         )
 
         List<AssayColumn> assayColumns = dataQueryResult.indicesList
@@ -118,56 +118,56 @@ class AcghEndToEndRetrievalTests {
         assertThat regionRows, hasSize(2)
         /* results are ordered (asc) by region id */
         assertThat regionRows[0], allOf(
-                hasSameInterfaceProperties(Region, testData.regions[1], ['platform']),
-                hasProperty('label', equalTo(testData.regions[1].name)),
-                hasProperty('bioMarker', equalTo(testData.regions[1].geneSymbol)),
-                hasProperty('platform', allOf(
-                        hasProperty('id', equalTo(testData.regionPlatform.id)),
-                        hasProperty('title', equalTo(testData.regionPlatform.title)),
-                        hasProperty('organism', equalTo(testData.regionPlatform.organism)),
-                        hasProperty('annotationDate', equalTo(testData.regionPlatform.annotationDate)),
-                        hasProperty('markerType', equalTo(testData.regionPlatform.markerType)),
-                        hasProperty('genomeReleaseId', equalTo(testData.regionPlatform.genomeReleaseId)),
-                )),
+            hasSameInterfaceProperties(Region, testData.regions[1], ['platform']),
+            hasProperty('label', equalTo(testData.regions[1].name)),
+            hasProperty('bioMarker', equalTo(testData.regions[1].geneSymbol)),
+            hasProperty('platform', allOf(
+                hasProperty('id', equalTo(testData.regionPlatform.id)),
+                hasProperty('title', equalTo(testData.regionPlatform.title)),
+                hasProperty('organism', equalTo(testData.regionPlatform.organism)),
+                hasProperty('annotationDate', equalTo(testData.regionPlatform.annotationDate)),
+                hasProperty('markerType', equalTo(testData.regionPlatform.markerType)),
+                hasProperty('genomeReleaseId', equalTo(testData.regionPlatform.genomeReleaseId)),
+            )),
         )
 
         assertThat regionRows[1], allOf(
-                hasSameInterfaceProperties(Region, testData.regions[0], ['platform']),
-                hasProperty('label', equalTo(testData.regions[0].name)),
-                hasProperty('bioMarker', equalTo(testData.regions[0].geneSymbol)),
-                hasProperty('platform', allOf(
-                        hasProperty('id', equalTo(testData.regionPlatform.id)),
-                        hasProperty('title', equalTo(testData.regionPlatform.title)),
-                        hasProperty('organism', equalTo(testData.regionPlatform.organism)),
-                        hasProperty('annotationDate', equalTo(testData.regionPlatform.annotationDate)),
-                        hasProperty('markerType', equalTo(testData.regionPlatform.markerType)),
-                        hasProperty('genomeReleaseId', equalTo(testData.regionPlatform.genomeReleaseId)),
-                )),
+            hasSameInterfaceProperties(Region, testData.regions[0], ['platform']),
+            hasProperty('label', equalTo(testData.regions[0].name)),
+            hasProperty('bioMarker', equalTo(testData.regions[0].geneSymbol)),
+            hasProperty('platform', allOf(
+                hasProperty('id', equalTo(testData.regionPlatform.id)),
+                hasProperty('title', equalTo(testData.regionPlatform.title)),
+                hasProperty('organism', equalTo(testData.regionPlatform.organism)),
+                hasProperty('annotationDate', equalTo(testData.regionPlatform.annotationDate)),
+                hasProperty('markerType', equalTo(testData.regionPlatform.markerType)),
+                hasProperty('genomeReleaseId', equalTo(testData.regionPlatform.genomeReleaseId)),
+            )),
         )
 
         assertThat regionRows[1][assayColumns[1]],
-                hasSameInterfaceProperties(AcghValues, testData.acghData[0])
+            hasSameInterfaceProperties(AcghValues, testData.acghData[0])
         assertThat regionRows[1][assayColumns[0]],
-                hasSameInterfaceProperties(AcghValues, testData.acghData[1])
+            hasSameInterfaceProperties(AcghValues, testData.acghData[1])
         assertThat regionRows[0][assayColumns[1]],
-                hasSameInterfaceProperties(AcghValues, testData.acghData[2])
+            hasSameInterfaceProperties(AcghValues, testData.acghData[2])
         assertThat regionRows[0][assayColumns[0]],
-                hasSameInterfaceProperties(AcghValues, testData.acghData[3])
+            hasSameInterfaceProperties(AcghValues, testData.acghData[3])
     }
 
     @Test
     void testSegments_meetOne() {
         def assayConstraints = [
-                acghResource.createAssayConstraint(
-                        AssayConstraint.PATIENT_SET_CONSTRAINT,
-                        result_instance_id: testData.allPatientsQueryResult.id),
+            acghResource.createAssayConstraint(
+                AssayConstraint.PATIENT_SET_CONSTRAINT,
+                result_instance_id: testData.allPatientsQueryResult.id),
         ]
         def dataConstraints = [
-                // start matches start of regions[0]
-                acghResource.createDataConstraint(
-                        DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT,
-                        chromosome: '1', start: 33, end: 44
-                )
+            // start matches start of regions[0]
+            acghResource.createDataConstraint(
+                DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT,
+                chromosome: '1', start: 33, end: 44
+            )
         ]
 
         dataQueryResult = acghResource.retrieveData assayConstraints, dataConstraints, projection
@@ -176,52 +176,50 @@ class AcghEndToEndRetrievalTests {
 
         assertThat regionRows, hasSize(1)
         assertThat regionRows[0], hasSameInterfaceProperties(
-                Region, testData.regions[0], [ 'platform' ])
+            Region, testData.regions[0], [ 'platform' ])
     }
 
     @Test
     void testSegments_meetBoth() {
         def assayConstraints = [
-                acghResource.createAssayConstraint(
-                        AssayConstraint.PATIENT_SET_CONSTRAINT,
-                        result_instance_id: testData.allPatientsQueryResult.id),
+            acghResource.createAssayConstraint(
+                AssayConstraint.PATIENT_SET_CONSTRAINT,
+                result_instance_id: testData.allPatientsQueryResult.id),
         ]
         def dataConstraints = [
-                // start matches start of regions[0]
-                acghResource.createDataConstraint(
-                        DataConstraint.DISJUNCTION_CONSTRAINT,
-                        subconstraints: [
-                                (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [
-                                        /* test region wider then the segment */
-                                        [ chromosome: '1', start: 44, end: 8888 ],
-                                        /* segment aligned at the end of test region;
-                                         *segment shorter than region */
-                                        [ chromosome: '2', start: 88, end: 99 ],
-                                ]
-                        ]
-                )
+            // start matches start of regions[0]
+            acghResource.createDataConstraint(
+                DataConstraint.DISJUNCTION_CONSTRAINT,
+                subconstraints: [
+                    (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [
+                        /* test region wider then the segment */
+                        [ chromosome: '1', start: 44, end: 8888 ],
+                        /* segment aligned at the end of test region;
+                         *segment shorter than region */
+                        [ chromosome: '2', start: 88, end: 99 ],
+                    ]
+                ]
+            )
         ]
 
         def anotherPlatform = new DeGplInfo(
-                title:          'Another Test Region Platform',
-                organism:       'Homo Sapiens',
-                annotationDate: Date.parse('yyyy-MM-dd', '2013-08-03'),
-                markerType:     'Chromosomal',
-                genomeReleaseId:'hg19',
-	    gplId: 'gpl_id'
+            title:          'Another Test Region Platform',
+            organism:       'Homo Sapiens',
+            annotationDate: Date.parse('yyyy-MM-dd', '2013-08-03'),
+            markerType:     'Chromosomal',
+            genomeReleaseId:'hg19',
         )
         anotherPlatform.id = 'test-another-platform'
         anotherPlatform.save failOnError: true, flush: true
 
         // this region should not appear in the result set
         def anotherRegion = new DeChromosomalRegion(
-                platform:       anotherPlatform,
-                chromosome:     '1',
-                start:          1,
-                end:            10,
-                numberOfProbes: 42,
-                name:           'region 1:1-10',
-	        gplId:          'gpl_id'
+            platform:       anotherPlatform,
+            chromosome:     '1',
+            start:          1,
+            end:            10,
+            numberOfProbes: 42,
+            name:           'region 1:1-10'
         )
         anotherRegion.id = -2000L
         anotherRegion.save failOnError: true, flush: true
@@ -232,31 +230,31 @@ class AcghEndToEndRetrievalTests {
 
         assertThat regionRows, hasSize(2)
         assertThat regionRows, contains(
-                hasSameInterfaceProperties(
-                        Region, testData.regions[1], [ 'platform' ]),
-                hasSameInterfaceProperties(
-                        Region, testData.regions[0], [ 'platform' ]))
+            hasSameInterfaceProperties(
+                Region, testData.regions[1], [ 'platform' ]),
+            hasSameInterfaceProperties(
+                Region, testData.regions[0], [ 'platform' ]))
     }
 
     @Test
     void testSegments_meetNone() {
         def assayConstraints = [
-                acghResource.createAssayConstraint(
-                        AssayConstraint.PATIENT_SET_CONSTRAINT,
-                        result_instance_id: testData.allPatientsQueryResult.id),
+            acghResource.createAssayConstraint(
+                AssayConstraint.PATIENT_SET_CONSTRAINT,
+                result_instance_id: testData.allPatientsQueryResult.id),
         ]
         def dataConstraints = [
-                // start matches start of regions[0]
-                acghResource.createDataConstraint(
-                        DataConstraint.DISJUNCTION_CONSTRAINT,
-                        subconstraints: [
-                                (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [
-                                        [ chromosome: 'X' ],
-                                        [ chromosome: '1', start: 1,   end: 32 ],
-                                        [ chromosome: '2', start: 100, end: 1000 ],
-                                ]
-                        ]
-                )
+            // start matches start of regions[0]
+            acghResource.createDataConstraint(
+                DataConstraint.DISJUNCTION_CONSTRAINT,
+                subconstraints: [
+                    (DataConstraint.CHROMOSOME_SEGMENT_CONSTRAINT): [
+                        [ chromosome: 'X' ],
+                        [ chromosome: '1', start: 1,   end: 32 ],
+                        [ chromosome: '2', start: 100, end: 1000 ],
+                    ]
+                ]
+            )
         ]
 
         dataQueryResult = acghResource.retrieveData assayConstraints, dataConstraints, projection
@@ -268,41 +266,42 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testResultRowsAreCoreApiRegionRows() {
         def assayConstraints = [
-                acghResource.createAssayConstraint(
-                        AssayConstraint.TRIAL_NAME_CONSTRAINT, name: TRIAL_NAME) ]
+            acghResource.createAssayConstraint(
+                AssayConstraint.TRIAL_NAME_CONSTRAINT, name: TRIAL_NAME) ]
 
         dataQueryResult = acghResource.retrieveData assayConstraints, [], projection
 
         assertThat Lists.newArrayList(dataQueryResult), everyItem(
-                isA(org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow))
+            isA(org.transmartproject.core.dataquery.highdim.chromoregion.RegionRow))
     }
 
     @Test
     void testWithGeneConstraint() {
         def assayConstraints = [
-                acghResource.createAssayConstraint(
-                        AssayConstraint.TRIAL_NAME_CONSTRAINT, name: TRIAL_NAME),
-                acghResource.createAssayConstraint(
-                        AssayConstraint.PATIENT_SET_CONSTRAINT,
-                        result_instance_id: testData.allPatientsQueryResult.id),
+            acghResource.createAssayConstraint(
+                AssayConstraint.TRIAL_NAME_CONSTRAINT, name: TRIAL_NAME),
+            acghResource.createAssayConstraint(
+                AssayConstraint.PATIENT_SET_CONSTRAINT,
+                result_instance_id: testData.allPatientsQueryResult.id),
         ]
         def dataConstraints = [
-                acghResource.createDataConstraint([keyword_ids: [testData.searchKeywords.
-                        find({ it.keyword == 'AURKA' }).id]],
-                        DataConstraint.SEARCH_KEYWORD_IDS_CONSTRAINT
-                )
+            acghResource.createDataConstraint([keyword_ids: [
+		testData.searchKeywords.
+		find({ it.keyword == 'AURKA' }).id]],
+                DataConstraint.SEARCH_KEYWORD_IDS_CONSTRAINT
+            )
         ]
         def projection = acghResource.createProjection([:], ACGH_VALUES_PROJECTION)
 
         dataQueryResult = acghResource.retrieveData(
-                assayConstraints, dataConstraints, projection)
+            assayConstraints, dataConstraints, projection)
 
         def resultList = Lists.newArrayList dataQueryResult
 
         assertThat resultList, allOf(
-                hasSize(1),
-                everyItem(hasProperty('data', hasSize(2))),
-                contains(hasProperty('bioMarker', equalTo('AURKA')))
+            hasSize(1),
+            everyItem(hasProperty('data', hasSize(2))),
+            contains(hasProperty('bioMarker', equalTo('AURKA')))
         )
     }
 
@@ -310,11 +309,11 @@ class AcghEndToEndRetrievalTests {
     void testSearchAnnotationGeneSymbol() {
         def symbols = acghResource.searchAnnotation(concept_code, 'A', 'geneSymbol')
         assertThat symbols, allOf(
-                hasSize(2),
-                contains(
-                        equalTo('ADIRF'),
-                        equalTo('AURKA')
-                )
+            hasSize(2),
+            contains(
+                equalTo('ADIRF'),
+                equalTo('AURKA')
+            )
         )
     }
 
@@ -322,11 +321,11 @@ class AcghEndToEndRetrievalTests {
     void testSearchAnnotationCytoband() {
         def cyto = acghResource.searchAnnotation(concept_code, 'cyto', 'cytoband')
         assertThat cyto, allOf(
-                hasSize(2),
-                contains(
-                        equalTo('cytoband1'),
-                        equalTo('cytoband2')
-                )
+            hasSize(2),
+            contains(
+                equalTo('cytoband1'),
+                equalTo('cytoband2')
+            )
         )
     }
 
@@ -334,10 +333,10 @@ class AcghEndToEndRetrievalTests {
     void testSearchAnnotationRegionName() {
         def names = acghResource.searchAnnotation(concept_code, 'region 1', 'name')
         assertThat names, allOf(
-                hasSize(1),
-                contains(
-                        equalTo('region 1:33-9999')
-                )
+            hasSize(1),
+            contains(
+                equalTo('region 1:33-9999')
+            )
         )
     }
 
@@ -355,10 +354,10 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testGeneSymbolAnnotationConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'geneSymbol',
-                selector: 'AURKA',
-                projectionType: Projection.PROB_GAIN
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'geneSymbol',
+            selector: 'AURKA',
+            projectionType: Projection.PROB_GAIN
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
@@ -370,10 +369,10 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testCytobandAnnotationConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'cytoband',
-                selector: 'cytoband1',
-                projectionType: Projection.PROB_GAIN
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'cytoband',
+            selector: 'cytoband1',
+            projectionType: Projection.PROB_GAIN
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
@@ -385,10 +384,10 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testNameAnnotationConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'name',
-                selector: 'region 1:33-9999',
-                projectionType: Projection.PROB_GAIN
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'name',
+            selector: 'region 1:33-9999',
+            projectionType: Projection.PROB_GAIN
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
@@ -400,17 +399,17 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testChipCopyNumberValueConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'cytoband',
-                selector: 'cytoband1',
-                projectionType: Projection.CHIP_COPYNUMBER_VALUE,
-                operator: 'BETWEEN',
-                constraint: '0.10:0.12'
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'cytoband',
+            selector: 'cytoband1',
+            projectionType: Projection.CHIP_COPYNUMBER_VALUE,
+            operator: 'BETWEEN',
+            constraint: '0.10:0.12'
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
         def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.chipCopyNumberValue && it.chipCopyNumberValue <= 0.12}
-                .collectEntries {[it.patient.id, it.chipCopyNumberValue]}
+            .collectEntries {[it.patient.id, it.chipCopyNumberValue]}
         assertThat distribution.size(), greaterThanOrEqualTo(1)
         assert distribution.equals(correctValues)
     }
@@ -418,17 +417,17 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testSegmentCopyNumberValueConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'cytoband',
-                selector: 'cytoband1',
-                projectionType: Projection.SEGMENT_COPY_NUMBER_VALUE,
-                operator: 'BETWEEN',
-                constraint: '0.10:0.15'
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'cytoband',
+            selector: 'cytoband1',
+            projectionType: Projection.SEGMENT_COPY_NUMBER_VALUE,
+            operator: 'BETWEEN',
+            constraint: '0.10:0.15'
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
         def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.segmentCopyNumberValue && it.segmentCopyNumberValue <= 0.15}
-                .collectEntries {[it.patient.id, it.segmentCopyNumberValue]}
+            .collectEntries {[it.patient.id, it.segmentCopyNumberValue]}
         assertThat distribution.size(), greaterThanOrEqualTo(1)
         assert distribution.equals(correctValues)
     }
@@ -436,17 +435,17 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testFlagConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'cytoband',
-                selector: 'cytoband1',
-                projectionType: Projection.FLAG,
-                operator: 'BETWEEN',
-                constraint: '-1:0'
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'cytoband',
+            selector: 'cytoband1',
+            projectionType: Projection.FLAG,
+            operator: 'BETWEEN',
+            constraint: '-1:0'
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
         def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && -1 <= it.flag && it.flag <= 0}
-                .collectEntries {[it.patient.id, it.flag]}
+            .collectEntries {[it.patient.id, it.flag]}
         assertThat distribution.size(), greaterThanOrEqualTo(1)
         assert distribution.equals(correctValues)
     }
@@ -454,17 +453,17 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testProbAmpConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'cytoband',
-                selector: 'cytoband1',
-                projectionType: Projection.PROB_AMP,
-                operator: 'BETWEEN',
-                constraint: '0.10:0.20'
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'cytoband',
+            selector: 'cytoband1',
+            projectionType: Projection.PROB_AMP,
+            operator: 'BETWEEN',
+            constraint: '0.10:0.20'
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
         def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.probabilityOfAmplification && it.probabilityOfAmplification <= 0.20}
-                .collectEntries {[it.patient.id, it.probabilityOfAmplification]}
+            .collectEntries {[it.patient.id, it.probabilityOfAmplification]}
         assertThat distribution.size(), greaterThanOrEqualTo(1)
         assert distribution.equals(correctValues)
     }
@@ -472,17 +471,17 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testProbGainConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'cytoband',
-                selector: 'cytoband1',
-                projectionType: Projection.PROB_GAIN,
-                operator: 'BETWEEN',
-                constraint: '0.10:0.15'
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'cytoband',
+            selector: 'cytoband1',
+            projectionType: Projection.PROB_GAIN,
+            operator: 'BETWEEN',
+            constraint: '0.10:0.15'
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
         def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.probabilityOfGain && it.probabilityOfGain <= 0.15}
-                .collectEntries {[it.patient.id, it.probabilityOfGain]}
+            .collectEntries {[it.patient.id, it.probabilityOfGain]}
         assertThat distribution.size(), greaterThanOrEqualTo(1)
         assert distribution.equals(correctValues)
     }
@@ -490,17 +489,17 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testProbLossConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'cytoband',
-                selector: 'cytoband1',
-                projectionType: Projection.PROB_LOSS,
-                operator: 'BETWEEN',
-                constraint: '0.10:0.15'
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'cytoband',
+            selector: 'cytoband1',
+            projectionType: Projection.PROB_LOSS,
+            operator: 'BETWEEN',
+            constraint: '0.10:0.15'
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
         def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.probabilityOfLoss && it.probabilityOfLoss <= 0.15}
-                .collectEntries {[it.patient.id, it.probabilityOfLoss]}
+            .collectEntries {[it.patient.id, it.probabilityOfLoss]}
         assertThat distribution.size(), greaterThanOrEqualTo(1)
         assert distribution.equals(correctValues)
     }
@@ -508,17 +507,17 @@ class AcghEndToEndRetrievalTests {
     @Test
     void testProbNormConstraint() {
         def constraint = new ConstraintByOmicsValue(
-                omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
-                property: 'cytoband',
-                selector: 'cytoband1',
-                projectionType: Projection.PROB_NORM,
-                operator: 'BETWEEN',
-                constraint: '0.10:0.13'
+            omicsType: ConstraintByOmicsValue.OmicsType.CHROMOSOMAL,
+            property: 'cytoband',
+            selector: 'cytoband1',
+            projectionType: Projection.PROB_NORM,
+            operator: 'BETWEEN',
+            constraint: '0.10:0.13'
         )
 
         def distribution = acghResource.getDistribution(constraint, conceptKey, null)
         def correctValues = testData.acghData.findAll {it.region.cytoband == 'cytoband1' && 0.10 <= it.probabilityOfNormal && it.probabilityOfNormal <= 0.13}
-                .collectEntries {[it.patient.id, it.probabilityOfNormal]}
+            .collectEntries {[it.patient.id, it.probabilityOfNormal]}
         assertThat distribution.size(), greaterThanOrEqualTo(1)
         assert distribution.equals(correctValues)
     }
