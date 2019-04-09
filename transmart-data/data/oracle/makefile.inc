@@ -19,7 +19,7 @@ dump_%:
 	  -t $(THIS_SCHEMA).$* \
 	  -o $(OUTDIR)/$*.tsv
 
-# see the commend on override/
+# see the comment in override/README
 ifndef USE_POOL_PROCESS
 load_%:
 	[ -f $(OVERDIR)/$*.skip ] || \
