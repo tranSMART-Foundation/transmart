@@ -229,13 +229,6 @@
     "parents" : [ ]
   }, {
     "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_MRNA_ANNOTATION_BKP"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
       "name" : "DE_MRNA_ANNOTATION_IDX1"
@@ -524,13 +517,6 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
-      "name" : "DE_SNP_DATA_DATASET_LOC_BK"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
       "name" : "DE_SNP_GENE_MAP"
     },
     "parents" : [ {
@@ -567,21 +553,7 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
-      "name" : "DE_SNP_PROBE_SORTED_DEF_BK"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
       "name" : "DE_SNP_SUBJECT_SORTED_DEF"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SNP_SUBJECT_SORTED_DEF_BK"
     },
     "parents" : [ ]
   }, {
@@ -788,13 +760,6 @@
     "parents" : [ ]
   }, {
     "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SUBJECT_SAMPLE_MAPPING_BK"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
       "name" : "DE_SUBJECT_SMPL_MPNG_IDX1"
@@ -831,20 +796,6 @@
       "type" : "TABLE",
       "owner" : "DEAPP",
       "name" : "DE_SUBJECT_SNP_DATASET"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SUBJECT_SNP_DATASET_BK"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SUBJECT_SNP_DATASET_GSK"
     },
     "parents" : [ ]
   }, {
@@ -2328,13 +2279,6 @@
     "file" : "deapp/de_mrna_annotation.sql"
   }, {
     "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_MRNA_ANNOTATION_BKP"
-    },
-    "file" : "deapp/de_mrna_annotation_bkp.sql"
-  }, {
-    "item" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
       "name" : "DE_MRNA_ANNOTATION_IDX1"
@@ -2547,13 +2491,6 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
-      "name" : "DE_SNP_DATA_DATASET_LOC_BK"
-    },
-    "file" : "deapp/de_snp_data_dataset_loc_bk.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
       "name" : "DE_SNP_GENE_MAP"
     },
     "file" : "deapp/de_snp_gene_map.sql"
@@ -2582,23 +2519,9 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
-      "name" : "DE_SNP_PROBE_SORTED_DEF_BK"
-    },
-    "file" : "deapp/de_snp_probe_sorted_def_bk.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
       "name" : "DE_SNP_SUBJECT_SORTED_DEF"
     },
     "file" : "deapp/de_snp_subject_sorted_def.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SNP_SUBJECT_SORTED_DEF_BK"
-    },
-    "file" : "deapp/de_snp_subject_sorted_def_bk.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -2755,13 +2678,6 @@
     "file" : "deapp/de_subject_sample_mapping.sql"
   }, {
     "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SUBJECT_SAMPLE_MAPPING_BK"
-    },
-    "file" : "deapp/de_subject_sample_mapping_bk.sql"
-  }, {
-    "item" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
       "name" : "DE_SUBJECT_SMPL_MPNG_IDX1"
@@ -2788,20 +2704,6 @@
       "name" : "DE_SUBJECT_SNP_DATASET"
     },
     "file" : "deapp/de_subject_snp_dataset.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SUBJECT_SNP_DATASET_BK"
-    },
-    "file" : "deapp/de_subject_snp_dataset_bk.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SUBJECT_SNP_DATASET_GSK"
-    },
-    "file" : "deapp/de_subject_snp_dataset_gsk.sql"
   }, {
     "item" : {
       "type" : "REF_CONSTRAINT",
