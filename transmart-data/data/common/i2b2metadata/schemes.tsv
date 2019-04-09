@@ -3,6 +3,7 @@
 "UMLS:"	"UMLS"	"United Medical Language System"
 "LCS-I2B2:"	"LCS-I2B2"	
 "ICD9:"	"ICD9"	"ICD9 code for diagnoses and procedures"
+"ICD10:"	"ICD10"	"ICD10 code for diagnoses"
 "LOINC:"	"LOINC"	"Lab codes"
 "DEM|AGE:"	"DEM|AGE"	"Age of patient from demographics data"
 "DEM|DATE:"	"DEM|DATE"	"Patient date of birth from demographics data"
@@ -13,3 +14,4 @@
 "DEM|SEX:"	"DEM|SEX"	"Gender of patient"
 "DEM|VITAL:"	"DEM|VITAL"	"Vital status of patient"
 "DEM|ZIPCODE:"	"DEM|ZIPCODE"	
+"(null)"	"None"	"No scheme"
