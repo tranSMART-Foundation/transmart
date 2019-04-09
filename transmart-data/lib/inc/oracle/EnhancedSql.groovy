@@ -42,7 +42,7 @@ class EnhancedSql extends Sql {
     }
 
     void setCurrentSchema(String newSchema) {
-        execute ('ALTER SESSION SET current_schema = $newSchema' as String)
+        execute ("ALTER SESSION SET current_schema = $newSchema" as String)
     }
 
     void restoreCurrentSchema() {
@@ -51,7 +51,7 @@ class EnhancedSql extends Sql {
 
     Boolean executeAndDoWithStatement(String sqlStatement, Closure closure) {
         Connection conn = createConnection()
-        Statement statement = null
+        Statement statement = null;
         try {
             Method method = Sql.getDeclaredMethod('getStatement', Connection, String)
             method.accessible = true
@@ -65,8 +65,7 @@ class EnhancedSql extends Sql {
 
             closure.call(statement)
             return isResultSet
-        }
-        finally {
+        } finally {
             closeResources(conn, statement)
         }
     }
@@ -83,10 +82,10 @@ class EnhancedSql extends Sql {
             abbreviatedStatement += '...'
         }
         if (warning) {
-            Log.warn 'Warnings for statement $abbreviatedStatement'
+            Log.warn "Warnings for statement $abbreviatedStatement"
             while (warning) {
                 Log.warn warning.message
-                Log.warn '' + warning.getErrorCode() + ': ' + warning.getSQLState() + ''
+                Log.warn "${warning.getErrorCode()}: ${warning.getSQLState()}"
                 warning = warning.nextWarning
             }
         }

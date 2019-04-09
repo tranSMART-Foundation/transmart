@@ -54,11 +54,10 @@ if (!options) {
 }
 def nConn = options.j ?: '1'
 if (!nConn.isInteger() || nConn.toInteger() < 1) {
-    Log.err 'Invalid number of connections: $nConn'
+    Log.err "Invalid number of connections: $nConn"
     System.exit 1
-}
-else if (options.g && options.c) {
-    Log.err 'The options -g and -c cannot be combined'
+} else if (options.g && options.c) {
+    Log.err "The options -g and -c cannot be combined"
     System.exit 1
 }
 nConn = nConn.toInteger()
@@ -70,14 +69,13 @@ Integer loadFile(Sql sql, File file) {
             i++
             try {
                 sql.executeAndPrintWarnings statement
-            }
-            catch (SQLException exception) {
-                Log.err 'Failed loading statement $statement from $file'
+            } catch (SQLException exception) {
+                Log.err "Failed loading statement $statement from $file"
                 throw exception
             }
         }
     }
-    Log.out 'Loaded $file ($i)'
+    Log.out "Loaded $file ($i)"
 
     i
 }
@@ -86,8 +84,7 @@ def takeSql(BlockingQueue<Sql> sqls, Closure closure) {
     def sql = sqls.take()
     try {
         closure.call(sql)
-    }
-    finally {
+    } finally {
         sqls.offer sql
     }
 
@@ -106,9 +103,8 @@ Integer loadFileParallel(ForkJoinPool pool, BlockingQueue<Sql> sqls, File file) 
                 takeSql(sqls) { Sql sql ->
                     try {
                         sql.executeAndPrintWarnings statement
-                    }
-                    catch (SQLException exception) {
-                        Log.err 'Failed loading statement $statement from $file'
+                    } catch (SQLException exception) {
+                        Log.err "Failed loading statement $statement from $file"
                         throw exception
                     }
                 }
@@ -116,7 +112,7 @@ Integer loadFileParallel(ForkJoinPool pool, BlockingQueue<Sql> sqls, File file) 
             }
         }
     }
-    System.out.println ' Loaded $file ($i)'
+    System.out.println " Loaded $file ($i)"
 
     i.toInteger()
 }
@@ -132,18 +128,15 @@ Closure createLoadFileInTransactionClosure(BlockingQueue<Sql> sqls) {
             loadFile sql, f
             sql.commit()
             return true
-        }
-        catch (exception) {
-            Log.err 'Error loading file $f: $exception'
+        } catch (exception) {
+            Log.err "Error loading file $f: $exception"
             try {
                 sql.rollback()
-            }
-            catch (Exception rollbackException) {
-                Log.err 'Error rolling back transaction: $rollbackException'
+            } catch (Exception rollbackException) {
+                Log.err "Error rolling back transaction: $rollbackException"
             }
             return false
-        }
-        finally {
+        } finally {
             if (schemaToUse) {
                 sql.restoreCurrentSchema()
             }
@@ -159,7 +152,7 @@ Map<File, DataflowVariable> loadMultiSchemaObjects(BlockingQueue<Sql> sqls,
 
     def loadFileInTransaction = createLoadFileInTransactionClosure(sqls).asyncFun()
 
-    Map<File, DataflowVariable> filePromiseMap = [:]
+    Map<File, DataflowVariable> filePromiseMap = [:];
 
     fileDependencies.traverseDepthFirst { File curFile ->
 
@@ -176,7 +169,7 @@ Map<File, DataflowVariable> loadMultiSchemaObjects(BlockingQueue<Sql> sqls,
         DataflowVariable promise = whenAllBound parentPromises, { List results ->
             def success = results.every()
             if (!success) {
-                Log.warn 'Skipping file $curFile because of dependency failure'
+                Log.warn "Skipping file $curFile because of dependency failure"
                 return false
             }
 
@@ -184,7 +177,7 @@ Map<File, DataflowVariable> loadMultiSchemaObjects(BlockingQueue<Sql> sqls,
             loadFileInTransaction curFile, user
         }, { Throwable exception ->
             //failure
-            Log.warn 'Skipping file $curFile because of uncaught exception in dependency'
+            Log.warn "Skipping file $curFile because of uncaught exception in dependency"
             return false
         }
 
@@ -209,11 +202,9 @@ List<File> loadPerUserFile(BlockingQueue<Sql>sqls, List<String> users, String fi
                 file: file,
                 result: loadFileInTransaction(file)
         ]
-    }
-    .findAll {
+    }.findAll {
         !it.result
-    }
-    .collect {
+    }.collect {
         it.file
     }
 }
@@ -278,7 +269,7 @@ withPool nConn, { pool ->
 
 
     /* 1. all elements without cross-schema dependencies; no procedures */
-    if (!options.'no-regular') {
+    if (!options."no-regular") {
         List<File> failed = getFailedFiles(
                 loadMultiSchemaObjects(sqls,
                         joinedFileDependencies,
@@ -289,7 +280,7 @@ withPool nConn, { pool ->
                             if (sqlFile.name == '_cross.sql') {
                                 if (joinedFileDependencies.getChildrenFor(sqlFile)) {
                                     Log.warn "$sqlFile won't be loaded but apparently it has dependent objects!"
-                                    Log.warn 'This should not happen. Things may very well fail!'
+                                    Log.warn "This should not happen. Things may very well fail!"
                                 }
                                 return false
                             }
@@ -297,74 +288,72 @@ withPool nConn, { pool ->
                         }))
 
         if (failed) {
-            Log.err 'Failed loading files: $failed'
+            Log.err "Failed loading files: $failed"
             System.exit 1
         }
     }
 
     /* 2. load synonyms */
-    if (!options.'no-synonyms') {
+    if (!options."no-synonyms") {
         def failedFiles = loadPerUserFile sqls, users, '_synonyms.sql'
         if (failedFiles) {
-            Log.err 'Failed loading one or more synonyms files: $failedFiles'
+            Log.err "Failed loading one or more synonyms files: $failedFiles"
             System.exit 1
         }
     }
 
     /* 3. load cross grants */
-    if (!options.'no-grants') {
+    if (!options."no-grants") {
         def file = new File('cross_grants.sql')
         try {
             generateCrossGrantsFile(joinedRepository, file)
-            Log.out('Generated $file')
+            Log.out("Generated $file")
             def n = loadFileParallel(pool, sqls, file)
-        }
-        catch (SQLException sqlException) {
-            Log.err 'Failed loading cross grants file: $sqlException.message'
+        } catch (SQLException sqlException) {
+            Log.err "Failed loading cross grants file: $sqlException.message"
             System.exit 1
         }
     }
 
     /* 4. load procedures and cross */
-    if (!(options.'no-procedures' && options.'no-cross')) {
+    if (!(options."no-procedures" && options."no-cross")) {
         Map<File, DataflowVariable> filePromiseMap =
             loadMultiSchemaObjects(sqls,
                     joinedFileDependencies,
                     { File sqlFile ->
-                        !options.'no-procedures' && sqlFile.parentFile.name == 'procedures' ||
-                                !options.'no-cross' && sqlFile.name == '_cross.sql'
+                        !options."no-procedures" && sqlFile.parentFile.name == 'procedures' ||
+                                !options."no-cross" && sqlFile.name == '_cross.sql'
                     })
 
         List failedFiles = getFailedFiles filePromiseMap
 
         if (failedFiles) {
-            Log.err 'Failed loading one or more procedure or _cross.sql files: $failedFiles'
+            Log.err "Failed loading one or more procedure or _cross.sql files: $failedFiles"
             System.exit 1
         }
     }
 
     /* 5. load explicit grants */
-    if (!options.'no-grants') {
+    if (!options."no-grants") {
         def failedFiles = loadPerUserFile sqls, users, '_grants.sql'
         if (failedFiles) {
-            Log.err 'Failed loading one or more grant files: $failedFiles'
+            Log.err "Failed loading one or more grant files: $failedFiles"
             System.exit 1
         }
     }
 
     /* 6. recompile schemas */
-    if (!options.'no-compile') {
+    if (!options."no-compile") {
         Log.print 'Compiling schemas'
         // eachParallel causes errors sometimes:
         // ORA-20000: Unable to set values for index UTL_RECOMP_SORT_IDX1: does not exist or insufficient privileges
         users.each { String user ->
             takeSql(sqls) { Sql sql ->
                 try {
-                    sql.call '{call dbms_utility.compile_schema($user)}'
+                    sql.call "{call dbms_utility.compile_schema($user)}"
                     Log.print '.'
-                }
-                catch (SQLException exception) {
-                    Log.err 'Failed compiling schema for $user'
+                } catch (SQLException exception) {
+                    Log.err "Failed compiling schema for $user"
                     throw exception
                 }
             }
@@ -373,8 +362,8 @@ withPool nConn, { pool ->
     }
 
     /* 7. refresh views */
-    if (!options.'no-refresh-views') {
-        def statement = "''
+    if (!options."no-refresh-views") {
+        def statement = """
             BEGIN
                 FOR the_view IN
                   (SELECT owner, mview_name
@@ -383,9 +372,9 @@ withPool nConn, { pool ->
                      AND staleness <> 'FRESH')
                 LOOP
                   DBMS_MVIEW.REFRESH(
-                    the_view.owner || '.' || the_view.mview_name, method => '?')
-                END LOOP
-            END;"''
+                    the_view.owner || '.' || the_view.mview_name, method => '?');
+                END LOOP;
+            END;"""
         Log.print 'Refreshing views...'
         takeSql(sqls) { Sql sql ->
             sql.executeAndPrintWarnings statement.toString()
@@ -394,8 +383,8 @@ withPool nConn, { pool ->
     }
 
     /* 8. Report objects with errors */
-    if (!options.'no-final-error-check') {
-        def statement = "''
+    if (!options."no-final-error-check") {
+        def statement = """
             SELECT DISTINCT type, owner, name
             FROM DBA_ERRORS
             WHERE owner IN (${users.collect { "'$it'" }.join(', ')})
@@ -404,8 +393,8 @@ withPool nConn, { pool ->
         Log.out 'Checking for errors...'
         takeSql(sqls) { Sql sql ->
             sql.eachRow(statement) { ResultSet rs ->
-                Log.warn '' + rs.getString(1) + ' ' +
-                        '' + rs.getString(2) + '.' + rs.getString(3) + ' has errors'
+                Log.warn "${rs.getString(1)} " +
+                        "${rs.getString(2)}.${rs.getString(3)} has errors"
             }
         }
     }

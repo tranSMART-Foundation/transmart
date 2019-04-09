@@ -42,27 +42,26 @@ if (cols < 80) {
 
 if (rdbms == 'oracle') {
     driver = 'oracle.jdbc.driver.OracleDriver'
-    jdbcUrl = 'jdbc:oracle:thin:@' + e.ORAHOST + ':' + e.ORAPORT + ':' + e.ORASID + ''
-}
-else {
+    jdbcUrl = "jdbc:oracle:thin:@${e.ORAHOST}:${e.ORAPORT}:${e.ORASID}"
+} else {
     driver = 'org.postgresql.Driver'
     def host = 'localhost'
     if (e.PGHOST && e.PGHOST[0] != '/') {
         host = e.PGHOST
     }
-    jdbcUrl = 'jdbc:postgresql://' + host + ':' + e.PGPORT + '/' + e.PGDATABASE + ''
+    jdbcUrl = "jdbc:postgresql://${host}:${e.PGPORT}/${e.PGDATABASE}"
 }
 
 Sql sql = Sql.newInstance jdbcUrl, username, password, driver
 
-def row = sql.firstRow 'SELECT MAX(job_id) AS job_id FROM cz_job_audit'
+def row = sql.firstRow "SELECT MAX(job_id) AS job_id FROM cz_job_audit"
 if (!row) {
-    err 'Could not find latest job id'
+    err "Could not find latest job id"
     System.exit 1
 }
 def jobId = row['JOB_ID']
 
-def separator = new String(new char[cols]).replace('\0', '-')
+def separator = new String(new char[cols]).replace('\0', '-');
 
 def cross(List l1, List l2, Closure op) {
     if (l1.size() != l2.size()) {
@@ -77,14 +76,14 @@ def cross(List l1, List l2, Closure op) {
 def colSize =  [ 30, 0, 4, 8, 19, 10]
 def colAlign = [ '-', '-', '-', '', '', '']
 colSize[1] = cols - colSize.sum() - (colSize.size() - 1) * 3
-def printfSpec = cross(colSize, colAlign, { a, b -> '%' + b + '' + a + '.' + a + 's' }).join(' | ') + '\n'
+def printfSpec = cross(colSize, colAlign, { a, b -> "%${b}${a}.${a}s" }).join(' | ') + '\n'
 
 printf printfSpec,
         'Procedure', 'Description', 'Stat', 'Records', 'Date', 'Time spent'
 println separator
 
-sql.eachRow 'SELECT procedure_name, step_desc, step_status, records_manipulated, job_date, time_elapsed_secs ' +
-        'FROM cz_job_audit WHERE job_id = $jobId ORDER BY seq_id ASC', {
+sql.eachRow "SELECT procedure_name, step_desc, step_status, records_manipulated, job_date, time_elapsed_secs " +
+        "FROM cz_job_audit WHERE job_id = $jobId ORDER BY seq_id ASC", {
     def itCop = (0..5).collect { n -> it[n] }
     if (!(itCop[4] instanceof Date)) {
         /* for Oracle it's an oracle.sql.TIMESTAMPLTZ */
@@ -99,13 +98,13 @@ sql.eachRow 'SELECT procedure_name, step_desc, step_status, records_manipulated,
 }
 
 def firstRow = true
-sql.eachRow 'SELECT error_message, error_backtrace FROM cz_job_error WHERE job_id = $jobId', {
+sql.eachRow "SELECT error_message, error_backtrace FROM cz_job_error WHERE job_id = $jobId", {
     def colSizes = [ (int)(cols / 2) - 2,  (int)(cols / 2) - 1 ]
     if (firstRow) {
         println ''
-        printf '%-' + colSizes[0] + 's | %-' + colSizes[1] + 's\n', 'Message', 'Location'
+        printf "%-${colSizes[0]}s | %-${colSizes[1]}s\n", 'Message', 'Location'
         println separator
         firstRow = false
     }
-    printf '%-' + colSizes[0] + 's | %-' + colSizes[1] + 's\n', it[0], it[1]
+    printf "%-${colSizes[0]}s | %-${colSizes[1]}s\n", it[0], it[1]
 }
