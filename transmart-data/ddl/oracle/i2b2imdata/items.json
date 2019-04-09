@@ -1,0 +1,88 @@
+{
+  "dependencies" : [ {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_AUDIT"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_MPI_DEMOGRAPHICS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_MPI_MAPPING"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_PROJECT_PATIENTS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_PROJECT_SITES"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_TEMP_SITE"
+    },
+    "parents" : [ ]
+  } ],
+  "fileAssignments" : [ {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_AUDIT"
+    },
+    "file" : "i2b2imdata/im_audit.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_MPI_DEMOGRAPHICS"
+    },
+    "file" : "i2b2imdata/im_mpi_demographics.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_MPI_MAPPING"
+    },
+    "file" : "i2b2imdata/im_mpi_mapping.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_PROJECT_PATIENTS"
+    },
+    "file" : "i2b2imdata/im_project_patients.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_PROJECT_SITES"
+    },
+    "file" : "i2b2imdata/im_project_sites.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2IMDATA",
+      "name" : "IM_TEMP_SITE"
+    },
+    "file" : "i2b2imdata/im_temp_site.sql"
+  } ]
+}

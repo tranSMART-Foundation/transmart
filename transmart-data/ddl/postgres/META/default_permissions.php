@@ -38,6 +38,22 @@ $permissions = [
 		'tm_cz' => 'full',
 		'biomart_user' => 'read',
 	],
+	'i2b2hive' => [
+		'tm_cz' => 'full',
+		'biomart_user' => 'read',
+	],
+	'i2b2imdata' => [
+		'tm_cz' => 'full',
+		'biomart_user' => 'read',
+	],
+	'i2b2pm' => [
+		'tm_cz' => 'full',
+		'biomart_user' => 'read',
+	],
+	'i2b2workdata' => [
+		'tm_cz' => 'full',
+		'biomart_user' => 'read',
+	],
 	'biomart' => [
 		'tm_cz' => 'full',
 		'biomart_user' => 'read',

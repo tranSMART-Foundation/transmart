@@ -1,0 +1,92 @@
+{
+  "dependencies" : [ {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "CRC_ANALYSIS_JOB"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "CRC_DB_LOOKUP"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2HIVE",
+      "name" : "CRC_IDX_AJ_QNSTID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "CRC_ANALYSIS_JOB"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "IM_DB_LOOKUP"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "ONT_DB_LOOKUP"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "WORK_DB_LOOKUP"
+    },
+    "parents" : [ ]
+  } ],
+  "fileAssignments" : [ {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "CRC_ANALYSIS_JOB"
+    },
+    "file" : "i2b2hive/crc_analysis_job.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "CRC_DB_LOOKUP"
+    },
+    "file" : "i2b2hive/crc_db_lookup.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2HIVE",
+      "name" : "CRC_IDX_AJ_QNSTID"
+    },
+    "file" : "i2b2hive/crc_analysis_job.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "IM_DB_LOOKUP"
+    },
+    "file" : "i2b2hive/im_db_lookup.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "ONT_DB_LOOKUP"
+    },
+    "file" : "i2b2hive/ont_db_lookup.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "WORK_DB_LOOKUP"
+    },
+    "file" : "i2b2hive/work_db_lookup.sql"
+  } ]
+}

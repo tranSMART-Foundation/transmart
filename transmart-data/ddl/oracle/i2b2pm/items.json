@@ -1,0 +1,410 @@
+{
+  "dependencies" : [ {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_APPROVALS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_APPROVALS_PARAMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_CELL_DATA"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_CELL_PARAMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_CELL_PARAMS_INC"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_CELL_PARAMS"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PARAMS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_GLOBAL_PARAMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_GLOBAL_PARAMS_INC"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_GLOBAL_PARAMS"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PARAMS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_HIVE_DATA"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_HIVE_PARAMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_HIVE_PARAMS_INC"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_HIVE_PARAMS"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PARAMS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PARAMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_DATA"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_PARAMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_PARAMS_INC"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PARAMS"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_PARAMS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_REQUEST"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_REQUEST_INC"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PARAMS"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_REQUEST"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_USER_PARAMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_USER_PARAMS_INC"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PARAMS"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_USER_PARAMS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_USER_ROLES"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_ROLE_REQUIREMENT"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_DATA"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_LOGIN"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_PARAMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_PARAMS_INC"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PARAMS"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_PARAMS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_SESSION"
+    },
+    "parents" : [ ]
+  } ],
+  "fileAssignments" : [ {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_APPROVALS"
+    },
+    "file" : "i2b2pm/pm_approvals.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_APPROVALS_PARAMS"
+    },
+    "file" : "i2b2pm/pm_approvals_params.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_CELL_DATA"
+    },
+    "file" : "i2b2pm/pm_cell_data.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_CELL_PARAMS"
+    },
+    "file" : "i2b2pm/pm_cell_params.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_CELL_PARAMS_INC"
+    },
+    "file" : "i2b2pm/pm_cell_params.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_GLOBAL_PARAMS"
+    },
+    "file" : "i2b2pm/pm_global_params.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_GLOBAL_PARAMS_INC"
+    },
+    "file" : "i2b2pm/pm_global_params.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_HIVE_DATA"
+    },
+    "file" : "i2b2pm/pm_hive_data.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_HIVE_PARAMS"
+    },
+    "file" : "i2b2pm/pm_hive_params.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_HIVE_PARAMS_INC"
+    },
+    "file" : "i2b2pm/pm_hive_params.sql"
+  }, {
+    "item" : {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PARAMS"
+    },
+    "file" : "i2b2pm/_misc.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_DATA"
+    },
+    "file" : "i2b2pm/pm_project_data.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_PARAMS"
+    },
+    "file" : "i2b2pm/pm_project_params.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_PARAMS_INC"
+    },
+    "file" : "i2b2pm/pm_project_params.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_REQUEST"
+    },
+    "file" : "i2b2pm/pm_project_request.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_REQUEST_INC"
+    },
+    "file" : "i2b2pm/pm_project_request.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_USER_PARAMS"
+    },
+    "file" : "i2b2pm/pm_project_user_params.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_USER_PARAMS_INC"
+    },
+    "file" : "i2b2pm/pm_project_user_params.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_PROJECT_USER_ROLES"
+    },
+    "file" : "i2b2pm/pm_project_user_roles.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_ROLE_REQUIREMENT"
+    },
+    "file" : "i2b2pm/pm_role_requirement.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_DATA"
+    },
+    "file" : "i2b2pm/pm_user_data.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_LOGIN"
+    },
+    "file" : "i2b2pm/pm_user_login.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_PARAMS"
+    },
+    "file" : "i2b2pm/pm_user_params.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_PARAMS_INC"
+    },
+    "file" : "i2b2pm/pm_user_params.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_SESSION"
+    },
+    "file" : "i2b2pm/pm_user_session.sql"
+  } ]
+}

@@ -1,0 +1,32 @@
+{
+  "dependencies" : [ {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2WORKDATA",
+      "name" : "WORKPLACE"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2WORKDATA",
+      "name" : "WORKPLACE_ACCESS"
+    },
+    "parents" : [ ]
+  } ],
+  "fileAssignments" : [ {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2WORKDATA",
+      "name" : "WORKPLACE"
+    },
+    "file" : "i2b2workdata/workplace.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2WORKDATA",
+      "name" : "WORKPLACE_ACCESS"
+    },
+    "file" : "i2b2workdata/workplace_access.sql"
+  } ]
+}

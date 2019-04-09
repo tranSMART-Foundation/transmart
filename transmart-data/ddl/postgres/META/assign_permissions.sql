@@ -66,6 +66,7 @@ $$ LANGUAGE plpgsql;
 -- Assign read/usage permissions on all tables, views, sequences and
 -- functions to biomart_user, except if:
 -- 1) it's an ETL schema, in which case no permissions should be granted
+--    (tm_cz, tm_lz, tm_wz, ts_batch)
 -- 2) the schema is searchapp, in which case deletes, inserts and updates
 --    should be allowed on all tables
 -- 3) it's one of the exception tables for which biomart_user should be granted
@@ -75,8 +76,8 @@ CREATE OR REPLACE FUNCTION public.assign_permissions_3(name text, schema_name te
 DECLARE
     dummy record;
 BEGIN
-    IF NOT schema_name = ANY(ARRAY['i2b2demodata', 'i2b2metadata', 'deapp',
-            'searchapp', 'galaxy', 'gwas_plink', 'biomart', 'amapp', 'fmapp', 'biomart_user']) THEN
+    IF NOT schema_name = ANY(ARRAY['i2b2demodata', 'i2b2metadata', 'i2b2hive', 'i2b2imdata', 'i2b2pm', 'i2b2workdata',
+            'searchapp', 'galaxy', 'gwas_plink', 'biomart', 'deapp', 'amapp', 'fmapp', 'biomart_user']) THEN
         RETURN NULL;
     END IF;
 
@@ -270,6 +271,10 @@ BEGIN
     schemas := ARRAY[
             'i2b2demodata',
             'i2b2metadata',
+            'i2b2hive',
+            'i2b2imdata',
+            'i2b2pm',
+            'i2b2workdata',
             'amapp',
             'fmapp',
             'deapp',
