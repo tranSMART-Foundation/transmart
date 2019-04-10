@@ -16,6 +16,7 @@ i2b2demodata/dr$of_ctx_blob$i.sql
 i2b2demodata/dr$of_ctx_blob$k.sql
 i2b2demodata/dr$of_ctx_blob$n.sql
 i2b2demodata/dr$of_ctx_blob$r.sql
+i2b2demodata/dr$of_ctx_blob$u.sql
 i2b2metadata/i2b2_secure_bk.sql
 i2b2metadata/i2b2_secure_bk1.sql
 i2b2metadata/i2b2_bk.sql
