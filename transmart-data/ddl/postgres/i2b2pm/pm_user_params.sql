@@ -32,5 +32,5 @@ CREATE TRIGGER trg_pm_user_params_inc BEFORE INSERT ON pm_user_params FOR EACH R
 --
 -- Name: pm_user_params_pk; Type: CONSTRAINT; Schema: i2b2pm; Owner: -
 --
-ALTER TABLE ONLY pm_user_params_inc
+ALTER TABLE ONLY pm_user_params
     ADD CONSTRAINT pm_user_params_pk PRIMARY KEY (id);

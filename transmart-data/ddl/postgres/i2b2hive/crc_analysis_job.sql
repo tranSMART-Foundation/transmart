@@ -15,9 +15,9 @@ CREATE TABLE crc_analysis_job (
 --
 -- Name: crc_idx_aj_qnstid; Type: INDEX; Schema: i2b2hive; Owner: -
 --
-CREATE INDEX crc_idx_aj_qnstid ON crc_analysis_job USING btree (queue_name, status_type_id)
+CREATE INDEX crc_idx_aj_qnstid ON crc_analysis_job USING btree (queue_name, status_type_id);
 --
 -- Name: analsis_job_pk; Type: CONSTRAINT; Schema: i2b2hive; Owner: -
 --
-ALTER TABLE ONLY crc_idx_aj_qnstid
+ALTER TABLE ONLY crc_analysis_job
     ADD CONSTRAINT analsis_job_pk PRIMARY KEY (job_id);
