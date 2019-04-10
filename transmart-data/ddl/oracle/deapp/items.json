@@ -1249,34 +1249,6 @@
     } ]
   }, {
     "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "GPL2004_5"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "GPL2004_5_MAP"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "GPL3718_20"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "GPL3718_20_MAP"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
       "type" : "REF_CONSTRAINT",
       "owner" : "DEAPP",
       "name" : "GPL_ID"
@@ -3026,34 +2998,6 @@
       "name" : "FK_SNP_PROBE_SNP_ID"
     },
     "file" : "deapp/de_snp_probe.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "GPL2004_5"
-    },
-    "file" : "deapp/gpl2004_5.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "GPL2004_5_MAP"
-    },
-    "file" : "deapp/gpl2004_5_map.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "GPL3718_20"
-    },
-    "file" : "deapp/gpl3718_20.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "GPL3718_20_MAP"
-    },
-    "file" : "deapp/gpl3718_20_map.sql"
   }, {
     "item" : {
       "type" : "REF_CONSTRAINT",

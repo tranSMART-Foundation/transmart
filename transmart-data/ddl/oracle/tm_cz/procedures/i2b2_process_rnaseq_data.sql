@@ -1,7 +1,7 @@
 --
 -- Type: PROCEDURE; Owner: TM_CZ; Name: I2B2_PROCESS_RNASEQ_DATA
 --
-  CREATE OR REPLACE PROCEDURE "TM_CZ"."I2B2_PROCESS_RNASEQ_DATA" 
+  CREATE OR REPLACE PROCEDURE "TM_CZ"."I2B2_PROCESS_RNASEQ_DATA"
 (
   trial_id 	VARCHAR2
  ,top_node	varchar2
@@ -11,21 +11,6 @@
  ,rtn_code	OUT	NUMBER
 )
 AS
-/*************************************************************************
-* Copyright 2008-2012 Janssen Research BIOMART_USER, LLC.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-******************************************************************/
 --	***  NOTE ***
 --	The input file columns are mapped to the following table columns.  This is done so that the javascript for the advanced workflows
 --	selects the correct data for the dropdowns.
@@ -73,8 +58,6 @@ AS
   multiple_platform	exception;
   no_probeset_recs	exception;
 
-
-
   CURSOR addNodes is
     select distinct t.leaf_node,t.node_name
       from  wt_mrna_nodes t
@@ -90,7 +73,6 @@ AS
     select category_cd,display_value,display_label,display_unit
       from tm_lz.lt_src_display_mapping
         group by category_cd,display_value,display_label,display_unit;
-
 
 BEGIN
 
@@ -945,5 +927,4 @@ BEGIN
 		cz_end_audit (jobID, 'FAIL');
 		select 166 into rtn_code from dual;
 END;
-
 /

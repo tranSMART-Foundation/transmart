@@ -140,6 +140,13 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "TM_LZ",
+      "name" : "LT_SRC_METABOL_DISPLAY_MAPPING"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TM_LZ",
       "name" : "LT_SRC_METABOLOMIC_MAP"
     },
     "parents" : [ ]
@@ -643,6 +650,13 @@
       "name" : "LT_SRC_DISPLAY_MAPPING"
     },
     "file" : "tm_lz/lt_src_display_mapping.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TM_LZ",
+      "name" : "LT_SRC_METABOL_DISPLAY_MAPPING"
+    },
+    "file" : "tm_lz/lt_src_metabol_display_mapping.sql"
   }, {
     "item" : {
       "type" : "TABLE",

@@ -113,9 +113,9 @@ commit;
     	where  temp.patient_id_source = ''HIVE'' and temp.process_status_flag is null  and
         nvl(patient_mapping.update_date,to_date(''01-JAN-1900'',''DD-MON-YYYY''))<= nvl(temp.update_date,to_date(''01-JAN-1900'',''DD-MON-YYYY'')) ' ;
 
--- insert new mapping records i.e flagged P
-execute immediate ' insert into patient_mapping (patient_ide,patient_ide_source,patient_ide_status,patient_num,update_date,download_date,import_date,sourcesystem_cd,upload_id)
-    select patient_map_id,patient_map_id_source,patient_map_id_status,patient_num,update_date,download_date,sysdate,sourcesystem_cd,' || upload_id ||' from '|| tempPidTableName || '
+-- insert new mapping records i.e flagged P - jk: added project id
+execute immediate ' insert into patient_mapping (patient_ide,patient_ide_source,patient_ide_status,patient_num,update_date,download_date,import_date,sourcesystem_cd,project_id,upload_id)
+    select patient_map_id,patient_map_id_source,patient_map_id_status,patient_num,update_date,download_date,sysdate,sourcesystem_cd,''@'' project_id,' || upload_id ||' from '|| tempPidTableName || '
     where process_status_flag = ''P'' ' ;
 commit;
 EXCEPTION
@@ -127,4 +127,3 @@ EXCEPTION
       raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
 end;
 /
- 

@@ -3172,6 +3172,13 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "BIOMART_USER",
+      "name" : "APPLICATION_SETTINGS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "BIOMART_USER",
       "name" : "GENE_ONTOLOGY"
     },
     "parents" : [ ]
@@ -5428,6 +5435,13 @@
       "name" : "CONCEPT_CD_TAB"
     },
     "file" : "biomart_user/_misc.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "BIOMART_USER",
+      "name" : "APPLICATION_SETTINGS"
+    },
+    "file" : "biomart_user/application_settings.sql"
   }, {
     "item" : {
       "type" : "TABLE",

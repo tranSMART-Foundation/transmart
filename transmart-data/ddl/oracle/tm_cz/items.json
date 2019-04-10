@@ -291,6 +291,105 @@
     "child" : {
       "type" : "SYNONYM",
       "owner" : "TM_CZ",
+      "name" : "BATCH_JOB_EXECUTION"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SYNONYM",
+      "owner" : "TM_CZ",
+      "name" : "BATCH_JOB_EXECUTION_CONTEXT"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_CONTEXT"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SYNONYM",
+      "owner" : "TM_CZ",
+      "name" : "BATCH_JOB_EXECUTION_PARAMS"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_PARAMS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SYNONYM",
+      "owner" : "TM_CZ",
+      "name" : "BATCH_JOB_EXECUTION_SEQ"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_SEQ"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SYNONYM",
+      "owner" : "TM_CZ",
+      "name" : "BATCH_JOB_INSTANCE"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_INSTANCE"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SYNONYM",
+      "owner" : "TM_CZ",
+      "name" : "BATCH_JOB_SEQ"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_SEQ"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SYNONYM",
+      "owner" : "TM_CZ",
+      "name" : "BATCH_STEP_EXECUTION"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SYNONYM",
+      "owner" : "TM_CZ",
+      "name" : "BATCH_STEP_EXECUTION_CONTEXT"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION_CONTEXT"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SYNONYM",
+      "owner" : "TM_CZ",
+      "name" : "BATCH_STEP_EXECUTION_SEQ"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION_SEQ"
+    } ]
+  }, {
+    "child" : {
+      "type" : "SYNONYM",
+      "owner" : "TM_CZ",
       "name" : "BIOBANK_SAMPLE"
     },
     "parents" : [ {
@@ -2027,6 +2126,27 @@
       "type" : "TABLE",
       "owner" : "TM_CZ",
       "name" : "CZ_DW_VERSION"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_DATA_PROFILE_COLUMN_EXCLUSI"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_DATA_PROFILE_COLUMN_SAMPLE"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_DATA_PROFILE_STATS"
     },
     "parents" : [ ]
   }, {
@@ -10990,6 +11110,13 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "TM_CZ",
+      "name" : "RWG_INVALID_TERMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
       "name" : "SAMPLE_CATEGORIES_RELEASE"
     },
     "parents" : [ ]
@@ -13284,6 +13411,27 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "TM_CZ",
+      "name" : "CZ_DATA_PROFILE_COLUMN_EXCLUSI"
+    },
+    "file" : "tm_cz/cz_data_profile_column_exclusi.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_DATA_PROFILE_COLUMN_SAMPLE"
+    },
+    "file" : "tm_cz/cz_data_profile_column_sample.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_DATA_PROFILE_STATS"
+    },
+    "file" : "tm_cz/cz_data_profile_stats.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
       "name" : "CZ_DW_VERSION"
     },
     "file" : "tm_cz/cz_dw_version.sql"
@@ -14393,6 +14541,13 @@
       "name" : "RTQASTATSLIST_TESTID_SEQ"
     },
     "file" : "tm_cz/_misc.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
+	"name" : "CZ_RWG_INVALID_TERMS"
+    },
+    "file" : "tm_cz/cz_rwg_invalid_terms.sql"
   }, {
     "item" : {
       "type" : "TABLE",

@@ -18,6 +18,13 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
+      "name" : "BIRN"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
       "name" : "CUSTOM_META"
     },
     "parents" : [ ]
@@ -26,13 +33,6 @@
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
       "name" : "I2B2"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_BK"
     },
     "parents" : [ ]
   }, {
@@ -75,21 +75,14 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "I2B2_SECURE_BK"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_SECURE_BK1"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
       "name" : "I2B2_TAGS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "ICD9_ICD10"
     },
     "parents" : [ ]
   }, {
@@ -113,6 +106,28 @@
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
       "name" : "I2B2"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_FULLNAME_BIRN_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "BIRN"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_APPLIED_PATH_BIRN_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "BIRN"
     } ]
   }, {
     "child" : {
@@ -221,61 +236,9 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "TABLE_ACCESS_20111030"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
       "name" : "TMP_SECURE_TOKEN"
     },
     "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TRIGGER",
-      "owner" : "I2B2METADATA",
-      "name" : "TRG_I2B2_ID"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_ID_SEQ"
-    } ]
-  }, {
-    "child" : {
-      "type" : "TRIGGER",
-      "owner" : "I2B2METADATA",
-      "name" : "TRG_I2B2_TAG_ID"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_TAGS"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "SEQ_I2B2_DATA_ID"
-    } ]
-  }, {
-    "child" : {
-      "type" : "TRIGGER",
-      "owner" : "I2B2METADATA",
-      "name" : "TRG_ONT_PS_PROCESS_ID"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
-      "name" : "ONT_PROCESS_STATUS"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "ONT_SQ_PS_PRID"
-    } ]
   } ],
   "fileAssignments" : [ {
     "item" : {
@@ -285,6 +248,13 @@
     },
     "file" : "i2b2metadata/procedures/add_ontology_node.sql"
   }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "BIRN"
+    },
+    "file" : "i2b2metadata/birn.sql"
+ }, {
     "item" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
@@ -298,13 +268,6 @@
       "name" : "I2B2"
     },
     "file" : "i2b2metadata/i2b2.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_BK"
-    },
-    "file" : "i2b2metadata/i2b2_bk.sql"
   }, {
     "item" : {
       "type" : "SEQUENCE",
@@ -337,23 +300,16 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "I2B2_SECURE_BK"
-    },
-    "file" : "i2b2metadata/i2b2_secure_bk.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_SECURE_BK1"
-    },
-    "file" : "i2b2metadata/i2b2_secure_bk1.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
       "name" : "I2B2_TAGS"
     },
     "file" : "i2b2metadata/i2b2_tags.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "ICD9_ICD10"
+    },
+    "file" : "i2b2metadata/icd9_icd10.sql"
   }, {
     "item" : {
       "type" : "VIEW",
@@ -463,36 +419,8 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "TABLE_ACCESS_20111030"
-    },
-    "file" : "i2b2metadata/table_access_20111030.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
       "name" : "TMP_SECURE_TOKEN"
     },
     "file" : "i2b2metadata/tmp_secure_token.sql"
-  }, {
-    "item" : {
-      "type" : "TRIGGER",
-      "owner" : "I2B2METADATA",
-      "name" : "TRG_I2B2_ID"
-    },
-    "file" : "i2b2metadata/i2b2.sql"
-  }, {
-    "item" : {
-      "type" : "TRIGGER",
-      "owner" : "I2B2METADATA",
-      "name" : "TRG_I2B2_TAG_ID"
-    },
-    "file" : "i2b2metadata/i2b2_tags.sql"
-  }, {
-    "item" : {
-      "type" : "TRIGGER",
-      "owner" : "I2B2METADATA",
-      "name" : "TRG_ONT_PS_PROCESS_ID"
-    },
-    "file" : "i2b2metadata/ont_process_status.sql"
   } ]
 }

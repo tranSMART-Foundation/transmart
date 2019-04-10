@@ -535,6 +535,42 @@
     "parents" : [ ]
   }, {
     "child" : {
+      "type" : "INDEX",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_CALCS_I1"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_CALCS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_CALCS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_LOGS_I1"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_LOGS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_LOGS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
       "type" : "TABLE",
       "owner" : "TM_WZ",
       "name" : "WT_SUBJECT_SAMPLE_MAPPING"
@@ -1052,6 +1088,34 @@
       "name" : "WT_SUBJECT_RNA_PROBESET"
     },
     "file" : "tm_wz/wt_subject_rna_probeset.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_CALCS"
+    },
+    "file" : "tm_wz/wt_subject_rnaseq_calcs.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_CALCS_I1"
+    },
+    "file" : "tm_wz/wt_subject_rnaseq_calcs.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_LOGS"
+    },
+    "file" : "tm_wz/wt_subject_rnaseq_logs.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "TM_WZ",
+      "name" : "WT_SUBJECT_RNASEQ_LOGS_I1"
+    },
+    "file" : "tm_wz/wt_subject_rnaseq_logs.sql"
   }, {
     "item" : {
       "type" : "TABLE",
