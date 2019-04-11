@@ -2,7 +2,7 @@
 -- Name: probeset_deapp; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE probeset_deapp (
-    probeset_id bigint NOT NULL,
+    probeset_id int NOT NULL,
     probeset character varying(100) NOT NULL,
     platform character varying(100) NOT NULL,
     organism character varying(200)

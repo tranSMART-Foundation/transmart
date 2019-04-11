@@ -2,12 +2,12 @@
 -- Name: batch_job_execution_params; Type: TABLE; Schema: ts_batch; Owner: -
 --
 CREATE TABLE batch_job_execution_params (
-    job_execution_id bigint NOT NULL,
+    job_execution_id int NOT NULL,
     type_cd character varying(6) NOT NULL,
     key_name character varying(100) NOT NULL,
     string_val character varying(250),
-    date_val timestamp without time zone,
-    long_val bigint,
+    date_val timestamp,
+    long_val int,
     double_val double precision,
     identifying character(1) NOT NULL
 );

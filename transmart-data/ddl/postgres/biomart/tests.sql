@@ -4,7 +4,7 @@
 CREATE TABLE tests (
     name character varying(100),
     platform character varying(100),
-    id bigint,
+    id int,
     test character varying(1000),
     probeset character varying(100),
     raw_pvalue double precision,

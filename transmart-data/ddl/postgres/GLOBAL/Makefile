@@ -40,14 +40,14 @@ tablespace_%:
 	test `$(PSQL_COMMAND) -c "select exists (select spcname from pg_tablespace where spcname = '$*')" -tA` \
 			= 't' || { \
 			$(MAKE) $(TABLESPACES)$*; \
-			$(PSQL_COMMAND_NO_TRANSACTION) -c "CREATE TABLESPACE $* LOCATION '$(TABLESPACES)$*'"; }
+			$(PSQL_COMMAND_NOTRANS) -c "CREATE TABLESPACE $* LOCATION '$(TABLESPACES)$*'"; }
 
 tablespaces: $(TB_TARGETS)
 
 createdb:
 	test `$(PSQL_COMMAND) -d template1 -c "select exists (select datname from pg_database where datname = '$(PGDATABASE)')" -tA` \
 			= 'f' || (echo -e "\e[31mERROR\e[m: Database $(PGDATABASE) already exists or connection error"; false)
-	$(PSQL_COMMAND_NO_TRANSACTION) -d template1 -c "CREATE DATABASE $(PGDATABASE) TEMPLATE template0 \
+	$(PSQL_COMMAND_NOTRANS) -d template1 -c "CREATE DATABASE $(PGDATABASE) TEMPLATE template0 \
 			ENCODING='UTF-8' LC_COLLATE='en_US.UTF-8'"
 
 # Don't depend on the SQL file, otherwise make'll try to create it
@@ -64,19 +64,17 @@ drop_roles:
 	$(PSQL_COMMAND) -d template1 -f drop_roles.sql
 
 drop_database:
-	$(PSQL_COMMAND_NO_TRANSACTION) -d template1 -c "DROP DATABASE IF EXISTS $(PGDATABASE)"
+	$(PSQL_COMMAND_NOTRANS) -d template1 -c "DROP DATABASE IF EXISTS $(PGDATABASE)"
 
 $(TBDROP_TARGETS):
-	$(PSQL_COMMAND_NO_TRANSACTION) -d template1 -c "DROP TABLESPACE IF EXISTS $(subst drop_tb_,,$@)"
+	$(PSQL_COMMAND_NOTRANS) -d template1 -c "DROP TABLESPACE IF EXISTS $(subst drop_tb_,,$@)"
 
 drop_tablespaces: $(TBDROP_TARGETS)
 
 drop: drop_database drop_tablespaces drop_roles
 
 clean:
-	rm -f cluster_dump.sql general_db_dump.sql
-
-clean_generated: clean
+	rm -f cluster_dump.sql general_db_dump.sql_generated: clean
 	rm -f roles.sql
 
 .PHONY: $(TBDROP_TARGETS)

@@ -4,14 +4,14 @@
 CREATE TABLE de_subject_rnaseq_data (
     trial_source character varying(200),
     trial_name character varying(50),
-    region_id bigint NOT NULL,
-    assay_id bigint NOT NULL,
-    patient_id bigint,
-    readcount bigint,
+    region_id int NOT NULL,
+    assay_id int NOT NULL,
+    patient_id int,
+    readcount int,
     normalized_readcount double precision,
     log_normalized_readcount double precision,
     zscore double precision,
-    partition_id bigint
+    partition_id int
 );
 
 --

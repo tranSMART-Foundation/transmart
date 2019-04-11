@@ -2,7 +2,7 @@
 -- Name: de_metabolite_annotation; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_metabolite_annotation (
-    id bigint NOT NULL,
+    id int NOT NULL,
     gpl_id character varying(50) NOT NULL,
     biochemical_name character varying(200) NOT NULL,
     biomarker_id character varying(200),

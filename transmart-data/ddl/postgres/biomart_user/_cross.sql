@@ -41,7 +41,7 @@ CREATE VIEW browse_folders_view AS
 --
 -- Name: browse_assays_view; Type: VIEW; Schema: biomart_user; Owner: -
 --
-CREATE VIEW biomart_user.browse_assays_view AS
+CREATE VIEW browse_assays_view AS
   SELECT DISTINCT fd.unique_id AS id,
     f.folder_name AS title,
     f.description,

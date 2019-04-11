@@ -2,7 +2,7 @@
 -- Name: cz_person; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE cz_person (
-    person_id bigint NOT NULL,
+    person_id int NOT NULL,
     f_name character varying(200),
     l_name character varying(200),
     m_name character varying(200),

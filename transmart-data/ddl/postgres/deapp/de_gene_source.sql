@@ -2,10 +2,10 @@
 -- Name: de_gene_SOURCE; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_gene_source (
-    gene_source_id integer NOT NULL,
+    gene_source_id int NOT NULL,
     gene_source_name character varying(255) NOT NULL,
     version character varying(32),
-    release_date timestamp without time zone,
+    release_date timestamp,
     url character varying(255)
 );
 

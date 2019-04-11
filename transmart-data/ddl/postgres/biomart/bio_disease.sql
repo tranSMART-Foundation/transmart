@@ -2,14 +2,14 @@
 -- Name: bio_disease; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_disease (
-    bio_disease_id bigint NOT NULL,
+    bio_disease_id int NOT NULL,
     disease character varying(510) NOT NULL,
     ccs_category character varying(510),
     icd10_code character varying(510),
     mesh_code character varying(510),
     icd9_code character varying(510),
     prefered_name character varying(510),
-    etl_id_retired bigint,
+    etl_id_retired int,
     primary_source_cd character varying(30),
     etl_id character varying(50)
 );

@@ -2,10 +2,10 @@
 -- Name: bio_analysis_attribute_lineage; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_analysis_attribute_lineage (
-    bio_analysis_att_lineage_id bigint NOT NULL,
-    bio_analysis_attribute_id bigint NOT NULL,
-    ancestor_term_id bigint NOT NULL,
-    ancestor_search_keyword_id bigint NOT NULL
+    bio_analysis_att_lineage_id int NOT NULL,
+    bio_analysis_attribute_id int NOT NULL,
+    ancestor_term_id int NOT NULL,
+    ancestor_search_keyword_id int NOT NULL
 );
 
 --

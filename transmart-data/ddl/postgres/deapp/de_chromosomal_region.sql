@@ -12,16 +12,16 @@ CREATE SEQUENCE de_chromo_region_id_seq
 -- Name: de_chromosomal_region; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_chromosomal_region (
-    region_id bigint DEFAULT nextval('de_chromo_region_id_seq'::regclass) NOT NULL,
+    region_id int DEFAULT nextval('de_chromo_region_id_seq'::regclass) NOT NULL,
     gpl_id character varying(50),
     chromosome character varying(2),
-    start_bp bigint,
-    end_bp bigint,
-    num_probes integer,
+    start_bp int,
+    end_bp int,
+    num_probes int,
     region_name character varying(100),
     cytoband character varying(100),
     gene_symbol character varying(100),
-    gene_id bigint,
+    gene_id int,
     organism character varying(200)
 );
 

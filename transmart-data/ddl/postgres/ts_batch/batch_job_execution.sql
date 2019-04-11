@@ -2,16 +2,16 @@
 -- Name: batch_job_execution; Type: TABLE; Schema: ts_batch; Owner: -
 --
 CREATE TABLE batch_job_execution (
-    job_execution_id bigint NOT NULL,
-    version bigint,
-    job_instance_id bigint NOT NULL,
-    create_time timestamp without time zone NOT NULL,
-    start_time timestamp without time zone,
-    end_time timestamp without time zone,
+    job_execution_id int NOT NULL,
+    version int,
+    job_instance_id int NOT NULL,
+    create_time timestamp NOT NULL,
+    start_time timestamp,
+    end_time timestamp,
     status character varying(10),
     exit_code character varying(2500),
     exit_message character varying(2500),
-    last_updated timestamp without time zone,
+    last_updated timestamp,
     job_configuration_location character varying(2500)
 );
 

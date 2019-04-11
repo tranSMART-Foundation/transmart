@@ -4,9 +4,9 @@
 CREATE TABLE bio_curated_data (
     statement text,
     statement_status character varying(200),
-    bio_data_id bigint NOT NULL,
-    bio_curation_dataset_id bigint NOT NULL,
-    reference_id bigint,
+    bio_data_id int NOT NULL,
+    bio_curation_dataset_id int NOT NULL,
+    reference_id int,
     data_type character varying(200)
 );
 

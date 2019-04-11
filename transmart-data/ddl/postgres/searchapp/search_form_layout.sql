@@ -2,12 +2,12 @@
 -- Name: search_form_layout; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_form_layout (
-    form_layout_id bigint NOT NULL,
+    form_layout_id int NOT NULL,
     form_key character varying(50),
     form_column character varying(50),
     display_name character varying(50),
     data_type character varying(50),
-    sequence bigint,
+    sequence int,
     display character(1)
 );
 

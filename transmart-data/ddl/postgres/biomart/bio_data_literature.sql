@@ -2,9 +2,9 @@
 -- Name: bio_data_literature; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_data_literature (
-    bio_data_id bigint NOT NULL,
-    bio_lit_ref_data_id bigint,
-    bio_curation_dataset_id bigint NOT NULL,
+    bio_data_id int NOT NULL,
+    bio_lit_ref_data_id int,
+    bio_curation_dataset_id int NOT NULL,
     statement text,
     statement_status character varying(200),
     data_type character varying(200)

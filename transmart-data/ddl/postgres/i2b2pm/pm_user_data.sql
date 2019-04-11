@@ -6,8 +6,8 @@ CREATE TABLE pm_user_data (
     full_name character varying(255),
     password character varying(255),
     email character varying(255),
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

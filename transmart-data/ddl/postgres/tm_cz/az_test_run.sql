@@ -2,16 +2,16 @@
 -- Name: az_test_run; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE az_test_run (
-    test_run_id bigint NOT NULL,
-    dw_version_id bigint,
-    start_date timestamp without time zone,
-    end_date timestamp without time zone,
+    test_run_id int NOT NULL,
+    dw_version_id int,
+    start_date timestamp,
+    end_date timestamp,
     status character varying(20),
     return_code character varying(30),
     return_message character varying(4000),
     test_run_name character varying(200),
     param1 character varying(4000),
-    test_category_id bigint
+    test_category_id int
 );
 
 --

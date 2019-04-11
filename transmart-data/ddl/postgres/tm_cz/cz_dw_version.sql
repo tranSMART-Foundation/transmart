@@ -2,11 +2,11 @@
 -- Name: cz_dw_version; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE cz_dw_version (
-    dw_version_id bigint NOT NULL,
+    dw_version_id int NOT NULL,
     version_name character varying(200),
-    release_date timestamp without time zone,
-    create_date timestamp without time zone,
-    created_by bigint,
+    release_date timestamp,
+    create_date timestamp,
+    created_by int,
     is_current character(1)
 );
 

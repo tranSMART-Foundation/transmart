@@ -1,7 +1,7 @@
 --
--- Name: de_snp_gene_map; Type: VIEW; Schema: deapp; Owner: -
+-- Name: de_snp_gene_map_view; Type: VIEW; Schema: deapp; Owner: -
 --
-CREATE VIEW de_snp_gene_map AS
+CREATE VIEW de_snp_gene_map_view AS
  SELECT de_rc_snp_info.snp_info_id AS snp_id,
     de_rc_snp_info.rs_id AS snp_name,
     de_rc_snp_info.entrez_id AS entrez_gene_id,

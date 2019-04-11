@@ -3,7 +3,7 @@ set search_path = amapp, pg_catalog;
 -- Name: am_tag_value; Type: TABLE; Schema: amapp; Owner: -
 --
 CREATE TABLE am_tag_value (
-    tag_value_id bigint NOT NULL,
+    tag_value_id int NOT NULL,
     value character varying(2000)
 );
 
@@ -35,11 +35,11 @@ CREATE TRIGGER trg_am_tag_value_id BEFORE INSERT ON am_tag_value FOR EACH ROW EX
 --
 -- Name: tf_trg_am_tag_value_uid(); Type: FUNCTION; Schema: amapp; Owner: -
 --
-CREATE OR REPLACE FUNCTION tf_trg_am_tag_value_uid() RETURNS trigger
+CREATE FUNCTION tf_trg_am_tag_value_uid() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-  rec_count bigint;
+  rec_count int;
 BEGIN
   SELECT COUNT(*) INTO rec_count 
   FROM amapp.am_data_uid 
@@ -59,5 +59,5 @@ SET default_with_oids = false;
 --
 -- Name: trg_am_tag_value_uid; Type: TRIGGER; Schema: amapp; Owner: -
 --
-CREATE TRIGGER trg_am_tag_value_uid BEFORE INSERT ON am_tag_value FOR EACH ROW EXECUTE PROCEDURE tf_trg_am_tag_value_uid();
+CREATE TRIGGER trg_am_tag_value_uid AFTER INSERT ON am_tag_value FOR EACH ROW EXECUTE PROCEDURE tf_trg_am_tag_value_uid();
 

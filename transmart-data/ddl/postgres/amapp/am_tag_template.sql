@@ -2,7 +2,7 @@
 -- Name: am_tag_template; Type: TABLE; Schema: amapp; Owner: -
 --
 CREATE TABLE am_tag_template (
-    tag_template_id bigint NOT NULL,
+    tag_template_id int NOT NULL,
     tag_template_name character varying(200) NOT NULL,
     tag_template_type character varying(50) NOT NULL,
     tag_template_subtype character varying(50),

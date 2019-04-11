@@ -6,7 +6,7 @@ CREATE TABLE annotation_deapp (
     probe_id character varying(100),
     gene_symbol character varying(100),
     gene_id character varying(100),
-    probeset_id bigint,
+    probeset_id int,
     organism character varying(200)
 );
 

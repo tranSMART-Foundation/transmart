@@ -2,9 +2,9 @@
 -- Name: am_tag_template_association; Type: TABLE; Schema: amapp; Owner: -
 --
 CREATE TABLE am_tag_template_association (
-    tag_template_id bigint NOT NULL,
+    tag_template_id int NOT NULL,
     object_uid character varying(300) NOT NULL,
-    id bigint
+    id int
 );
 
 --

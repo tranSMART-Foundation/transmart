@@ -2,11 +2,11 @@
 -- Name: bio_asy_analysis_data_idx; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_asy_analysis_data_idx (
-    bio_asy_analysis_data_idx_id bigint NOT NULL,
+    bio_asy_analysis_data_idx_id int NOT NULL,
     ext_type character varying(255) NOT NULL,
-    field_idx numeric(10,0) NOT NULL,
+    field_idx int NOT NULL,
     field_name character varying(255) NOT NULL,
-    display_idx numeric(10,0) NOT NULL,
+    display_idx int NOT NULL,
     display_name character varying(255) NOT NULL
 );
 

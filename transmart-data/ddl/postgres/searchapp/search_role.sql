@@ -2,8 +2,8 @@
 -- Name: search_role; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_role (
-    id bigint NOT NULL,
-    version bigint,
+    id int NOT NULL,
+    version int,
     authority character varying(255),
     description character varying(255)
 );

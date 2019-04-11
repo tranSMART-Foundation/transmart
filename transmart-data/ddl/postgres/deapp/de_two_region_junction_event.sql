@@ -12,15 +12,15 @@ CREATE SEQUENCE de_two_rgn_junction_event_seq
 -- Name: de_two_region_junction_event; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_two_region_junction_event (
-    two_region_junction_event_id bigint DEFAULT nextval('de_two_rgn_junction_event_seq'::regclass) NOT NULL,
-    junction_id bigint,
-    event_id bigint,
-    reads_span integer,
-    reads_junction integer,
-    pairs_span integer,
-    pairs_junction integer,
-    pairs_end integer,
-    reads_counter integer,
+    two_region_junction_event_id int DEFAULT nextval('de_two_rgn_junction_event_seq'::regclass) NOT NULL,
+    junction_id int,
+    event_id int,
+    reads_span int,
+    reads_junction int,
+    pairs_span int,
+    pairs_junction int,
+    pairs_end int,
+    reads_counter int,
     base_freq double precision
 );
 

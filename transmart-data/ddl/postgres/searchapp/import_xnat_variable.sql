@@ -3,8 +3,8 @@
 --
 CREATE TABLE import_xnat_variable
 (
-  id bigint NOT NULL,
-  configuration_id bigint NOT NULL,
+  id int NOT NULL,
+  configuration_id int NOT NULL,
   name character varying(255) NOT NULL,
   datatype character varying(255) NOT NULL,
   url character varying(255) NOT NULL

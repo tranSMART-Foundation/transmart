@@ -2,11 +2,11 @@
 -- Name: bio_content_reference; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_content_reference (
-    bio_content_reference_id bigint NOT NULL,
-    bio_content_id bigint NOT NULL,
-    bio_data_id bigint NOT NULL,
+    bio_content_reference_id int NOT NULL,
+    bio_content_id int NOT NULL,
+    bio_data_id int NOT NULL,
     content_reference_type character varying(200) NOT NULL,
-    etl_id bigint,
+    etl_id int,
     etl_id_c character varying(30)
 );
 

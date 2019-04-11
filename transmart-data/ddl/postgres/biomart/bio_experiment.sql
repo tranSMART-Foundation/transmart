@@ -2,21 +2,21 @@
 -- Name: bio_experiment; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_experiment (
-    bio_experiment_id bigint NOT NULL,
+    bio_experiment_id int NOT NULL,
     bio_experiment_type character varying(200),
     title character varying(1000),
     description character varying(4000),
     design character varying(2000),
-    start_date timestamp without time zone,
-    completion_date timestamp without time zone,
+    start_date timestamp,
+    completion_date timestamp,
     primary_investigator character varying(400),
     contact_field character varying(400),
     etl_id character varying(100),
     status character varying(100),
     overall_design character varying(2000),
     accession character varying(100),
-    entrydt timestamp without time zone,
-    updated timestamp without time zone,
+    entrydt timestamp,
+    updated timestamp,
     institution character varying(400),
     country character varying(1000),
     biomarker_type character varying(255),
@@ -71,7 +71,7 @@ CREATE FUNCTION tf_trg_bio_experiment_uid() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-  rec_count bigint;
+  rec_count int;
 BEGIN
   SELECT COUNT(*) INTO rec_count 
   FROM biomart.bio_data_uid 

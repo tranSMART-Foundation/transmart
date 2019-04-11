@@ -2,12 +2,12 @@
 -- Name: bio_data_ext_code; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_data_ext_code (
-    bio_data_id bigint NOT NULL,
+    bio_data_id int NOT NULL,
     code character varying(500) NOT NULL,
     code_source character varying(200),
     code_type character varying(200),
     bio_data_type character varying(100),
-    bio_data_ext_code_id bigint NOT NULL,
+    bio_data_ext_code_id int NOT NULL,
     etl_id character varying(50)
 );
 

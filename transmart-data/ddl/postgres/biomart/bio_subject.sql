@@ -2,8 +2,8 @@
 -- Name: bio_subject; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_subject (
-    bio_subject_id bigint NOT NULL,
-    site_subject_id bigint,
+    bio_subject_id int NOT NULL,
+    site_subject_id int,
     source character varying(200),
     source_code character varying(200),
     status character varying(200),

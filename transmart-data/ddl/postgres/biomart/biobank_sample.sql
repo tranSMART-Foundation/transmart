@@ -6,7 +6,7 @@ CREATE TABLE biobank_sample (
     accession_number character varying(255) NOT NULL,
     client_sample_tube_id character varying(255) NOT NULL,
     container_id character varying(255) NOT NULL,
-    import_date timestamp without time zone,
+    import_date timestamp,
     source_type character varying(255) NOT NULL
 );
 

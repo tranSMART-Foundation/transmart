@@ -2,7 +2,7 @@
 -- Name: bio_taxonomy; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_taxonomy (
-    bio_taxonomy_id bigint NOT NULL,
+    bio_taxonomy_id int NOT NULL,
     taxon_name character varying(200) NOT NULL,
     taxon_label character varying(200) NOT NULL,
     ncbi_tax_id character varying(200)

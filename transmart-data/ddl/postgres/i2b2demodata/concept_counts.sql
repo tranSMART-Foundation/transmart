@@ -4,7 +4,7 @@
 CREATE TABLE concept_counts (
     concept_path character varying(500),
     parent_concept_path character varying(500),
-    patient_count bigint
+    patient_count int
 );
 
 --

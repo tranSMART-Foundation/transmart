@@ -2,7 +2,7 @@
 -- Name: de_rbm_annotation; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_rbm_annotation (
-    id bigint NOT NULL,
+    id int NOT NULL,
     gpl_id character varying(50) NOT NULL,
     antigen_name character varying(200) NOT NULL,
     uniprot_id character varying(50),

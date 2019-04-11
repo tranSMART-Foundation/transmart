@@ -4,8 +4,8 @@
 CREATE TABLE timers (
     timerid character varying(80) NOT NULL,
     targetid character varying(250) NOT NULL,
-    initialdate timestamp(6) without time zone NOT NULL,
-    timerinterval bigint,
+    initialdate timestamp NOT NULL,
+    timerinterval int,
     instancepk text,
     info text
 );

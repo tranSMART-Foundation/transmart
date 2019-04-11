@@ -2,7 +2,7 @@
 -- Name: bio_lit_model_data; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_lit_model_data (
-    bio_lit_model_data_id bigint NOT NULL,
+    bio_lit_model_data_id int NOT NULL,
     etl_id character varying(50),
     model_type character varying(50),
     description character varying(1000),

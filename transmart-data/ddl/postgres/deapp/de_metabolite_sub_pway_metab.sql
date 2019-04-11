@@ -2,8 +2,8 @@
 -- Name: de_metabolite_sub_pway_metab; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_metabolite_sub_pway_metab (
-    metabolite_id bigint NOT NULL,
-    sub_pathway_id bigint NOT NULL
+    metabolite_id int NOT NULL,
+    sub_pathway_id int NOT NULL
 );
 
 --

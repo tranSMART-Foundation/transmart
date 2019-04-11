@@ -2,12 +2,12 @@
 -- Name: de_subject_sample_mapping; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_subject_sample_mapping (
-    patient_id bigint,
+    patient_id int,
     site_id character varying(100),
     subject_id character varying(100),
     subject_type character varying(100),
     concept_code character varying(1000),
-    assay_id bigint NOT NULL,
+    assay_id int NOT NULL,
     patient_uid character varying(50),
     sample_type character varying(100),
     assay_uid character varying(100),
@@ -22,14 +22,14 @@ CREATE TABLE de_subject_sample_mapping (
     data_uid character varying(100),
     gpl_id character varying(50),
     rbm_panel character varying(50),
-    sample_id bigint,
+    sample_id int,
     sample_cd character varying(200),
     category_cd character varying(1000),
     source_cd character varying(200),
     omic_source_study character varying(200),
-    omic_patient_num bigint,
-    omic_patient_id bigint,
-    partition_id numeric
+    omic_patient_num int,
+    omic_patient_id int,
+    partition_id int
 );
 
 --

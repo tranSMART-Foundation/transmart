@@ -6,11 +6,11 @@ CREATE TABLE provider_dimension (
     provider_path character varying(700) NOT NULL,
     name_char character varying(850),
     provider_blob text,
-    update_date timestamp without time zone,
-    download_date timestamp without time zone,
-    import_date timestamp without time zone,
+    update_date timestamp,
+    download_date timestamp,
+    import_date timestamp,
     sourcesystem_cd character varying(50),
-    upload_id numeric(38,0)
+    upload_id int
 );
 
 --
@@ -20,12 +20,12 @@ ALTER TABLE ONLY provider_dimension
     ADD CONSTRAINT provider_dimension_pk PRIMARY KEY (provider_path, provider_id);
 
 --
--- Name: pd_idx_name_char; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: PD_IDX_NAME_CHAR; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
 CREATE INDEX pd_idx_name_char ON provider_dimension USING btree (provider_id, name_char);
 
 --
--- Name: prod_uploadid_idx; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: PD_IDX_UPLOADID; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX prod_uploadid_idx ON provider_dimension USING btree (upload_id);
+CREATE INDEX PD_IDX_UPLOADID ON provider_dimension USING btree (upload_id);
 

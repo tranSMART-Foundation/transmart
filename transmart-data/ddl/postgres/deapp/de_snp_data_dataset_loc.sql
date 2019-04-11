@@ -2,10 +2,10 @@
 -- Name: de_snp_data_dataset_loc; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_snp_data_dataset_loc (
-    snp_data_dataset_loc_id bigint NOT NULL,
+    snp_data_dataset_loc_id int NOT NULL,
     trial_name character varying(255),
-    snp_dataset_id bigint,
-    location bigint
+    snp_dataset_id int,
+    location int
 );
 
 --

@@ -2,9 +2,9 @@
 -- Name: bio_stats_exp_marker; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_stats_exp_marker (
-    bio_marker_id bigint NOT NULL,
-    bio_experiment_id bigint NOT NULL,
-    bio_stats_exp_marker_id bigint
+    bio_marker_id int NOT NULL,
+    bio_experiment_id int NOT NULL,
+    bio_stats_exp_marker_id int
 );
 
 --

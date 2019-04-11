@@ -2,13 +2,13 @@
 -- Name: wt_subject_microarray_logs; Type: TABLE; Schema: tm_wz; Owner: -
 --
 CREATE TABLE wt_subject_microarray_logs (
-    probeset_id bigint,
+    probeset_id int,
     intensity_value double precision,
-    pvalue double precision,	-- was set to numeric on test server but is float in oracle
-    num_calls numeric,
-    assay_id bigint,
-    patient_id bigint,
-    sample_id bigint,
+    pvalue double precision,
+    num_calls int,
+    assay_id int,
+    patient_id int,
+    sample_id int,
     subject_id character varying(100),
     trial_name character varying(50),
     timepoint character varying(100),

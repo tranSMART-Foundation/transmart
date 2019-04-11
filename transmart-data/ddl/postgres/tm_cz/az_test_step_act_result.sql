@@ -2,8 +2,8 @@
 -- Name: az_test_step_act_result; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE az_test_step_act_result (
-    test_step_act_result_id bigint NOT NULL,
-    test_step_run_id bigint NOT NULL,
+    test_step_act_result_id int NOT NULL,
+    test_step_run_id int NOT NULL,
     act_record_cnt double precision,
     return_code character varying(30),
     return_message character varying(4000),

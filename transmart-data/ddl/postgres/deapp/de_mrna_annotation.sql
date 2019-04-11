@@ -5,10 +5,10 @@ CREATE TABLE de_mrna_annotation (
     gpl_id character varying(100),
     probe_id character varying(100),
     gene_symbol character varying(100),
-    probeset_id bigint,
-    gene_id bigint,
+    probeset_id int,
+    gene_id int,
     organism character varying(200),
-    de_mrna_annotation_id bigint NOT NULL
+    de_mrna_annotation_id int NOT NULL
 );
 
 --

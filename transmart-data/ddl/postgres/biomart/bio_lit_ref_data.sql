@@ -2,7 +2,7 @@
 -- Name: bio_lit_ref_data; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_lit_ref_data (
-    bio_lit_ref_data_id bigint NOT NULL,
+    bio_lit_ref_data_id int NOT NULL,
     etl_id character varying(50),
     component character varying(100),
     component_class character varying(250),

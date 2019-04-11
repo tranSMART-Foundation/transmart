@@ -23,9 +23,9 @@ function standard_vars() {
 newJobFlag    smallint;
 	databaseName  varchar(100);
 	procedureName varchar(100);
-	jobID         bigint;
-	stepCt        bigint;
-	rowCt         bigint;
+	jobID         int;
+	stepCt        int;
+	rowCt         int;
 	errorNumber   varchar;
 	errorMessage  varchar;
 

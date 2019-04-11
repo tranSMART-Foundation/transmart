@@ -3,13 +3,13 @@
 --
 CREATE TABLE search_keyword (
     keyword character varying(400),
-    bio_data_id bigint,
+    bio_data_id int,
     unique_id character varying(500) NOT NULL,
-    search_keyword_id bigint NOT NULL,
+    search_keyword_id int NOT NULL,
     data_category character varying(200) NOT NULL,
     source_code character varying(100),
     display_data_category character varying(200),
-    owner_auth_user_id bigint
+    owner_auth_user_id int
 );
 
 --

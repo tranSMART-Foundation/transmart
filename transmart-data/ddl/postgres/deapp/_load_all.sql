@@ -14,8 +14,8 @@
 \i deapp/de_concept_visit.sql
 \i deapp/de_encounter_level.sql
 \i deapp/de_encounter_type.sql
-\i deapp/de_gene_info.sql
 \i deapp/de_gene_source.sql
+\i deapp/de_gene_info.sql
 \i deapp/de_mrna_annotation.sql
 \i deapp/de_obs_enroll_days.sql
 \i deapp/de_pathway.sql
@@ -33,10 +33,11 @@
 \i deapp/de_subject_snp_dataset.sql
 \i deapp/de_snp_data_by_patient.sql
 \i deapp/de_snp_info.sql
+\i deapp/de_snp_gene_map.sql
 \i deapp/de_snp_probe.sql
 \i deapp/de_snp_data_by_probe.sql
 \i deapp/de_snp_data_dataset_loc.sql
-\i deapp/views/de_snp_gene_map.sql
+\i deapp/views/de_snp_gene_map_view.sql
 \i deapp/views/de_snp_info_hg19_mv.sql
 \i deapp/de_snp_probe_sorted_def.sql
 \i deapp/de_snp_subject_sorted_def.sql

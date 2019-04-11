@@ -4,15 +4,15 @@
 CREATE TABLE cz_data_file (
     file_name character varying(200),
     provider character varying(200),
-    extraction_date timestamp without time zone,
+    extraction_date timestamp,
     location character varying(500),
-    data_id bigint NOT NULL,
-    contact_id bigint,
-    exp_record_cnt bigint,
-    act_record_cnt bigint,
+    data_id int NOT NULL,
+    contact_id int,
+    exp_record_cnt int,
+    act_record_cnt int,
     url character varying(500),
     description character varying(2000),
-    data_file_id bigint NOT NULL
+    data_file_id int NOT NULL
 );
 
 --

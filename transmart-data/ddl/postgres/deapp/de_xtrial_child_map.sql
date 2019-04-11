@@ -3,8 +3,8 @@
 --
 CREATE TABLE de_xtrial_child_map (
     concept_cd character varying(50) NOT NULL,
-    parent_cd bigint NOT NULL,
-    manually_mapped bigint,
+    parent_cd int NOT NULL,
+    manually_mapped int,
     study_id character varying(50)
 );
 

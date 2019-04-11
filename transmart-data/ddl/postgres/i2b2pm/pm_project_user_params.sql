@@ -2,14 +2,14 @@
 -- Name: pm_project_user_params; Type: TABLE; Schema: i2b2pm; Owner: -
 --
 CREATE TABLE pm_project_user_params (
-    id bigint,
+    id int,
     datatype_cd character varying(50),
     project_id character varying(50) NOT NULL,
     user_id character varying(50) NOT NULL,
     param_name_cd character varying(50) NOT NULL,
     value text,
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

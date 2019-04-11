@@ -3,18 +3,18 @@
 --
 CREATE TABLE de_subject_protein_data (
     trial_name character varying(50),
-    protein_annotation_id bigint,
+    protein_annotation_id int,
     component character varying(100),
-    patient_id numeric(38,0),
+    patient_id int,
     gene_symbol character varying(100),
     gene_id character varying(200), --defined as NUMBER(10,0) in oracle
-    assay_id numeric,
+    assay_id int,
     subject_id character varying(100),
-    intensity numeric,
-    zscore numeric,
-    log_intensity numeric,
+    intensity double precision,
+    zscore double precision,
+    log_intensity double precision,
     timepoint character varying(100),
-    partition_id numeric
+    partition_id int
 );
 
 --

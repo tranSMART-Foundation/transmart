@@ -325,7 +325,7 @@
     </step>
 
   <step>
-    <name>Insert to lt_src_display_mapping</name>
+    <name>Insert to lt_src_metabol_display_mapping</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
@@ -336,7 +336,7 @@
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_METABOLOMIC_DISPLAY_MAPPING</table>
+    <table>LT_SRC_METABOL_DISPLAY_MAPPING</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

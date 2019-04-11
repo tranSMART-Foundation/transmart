@@ -10,7 +10,7 @@ CREATE TABLE lt_src_omicsoft_data (
     estimate double precision,
     fold_change double precision,
     max_l_s_mean double precision,
-    bio_assay_analysis_id bigint,
+    bio_assay_analysis_id int,
     mean_fold_change double precision,
     std_dev_fold_change double precision,
     tea_normal_pvalue double precision,

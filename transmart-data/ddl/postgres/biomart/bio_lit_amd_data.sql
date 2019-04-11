@@ -2,8 +2,8 @@
 -- Name: bio_lit_amd_data; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_lit_amd_data (
-    bio_lit_amd_data_id bigint NOT NULL,
-    bio_lit_alt_data_id bigint NOT NULL,
+    bio_lit_amd_data_id int NOT NULL,
+    bio_lit_alt_data_id int NOT NULL,
     etl_id character varying(50),
     molecule character varying(50),
     molecule_type character varying(50),

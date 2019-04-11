@@ -1,15 +1,15 @@
 --
 -- Name: wt_subject_rnaseq_logs; Type: TABLE; Schema: tm_wz; Owner: -
 --
-CREATE TABLE tm_wz.wt_subject_rnaseq_logs
+CREATE TABLE wt_subject_rnaseq_logs
 (
-  region_id bigint,
-  readcount bigint,
-  assay_id bigint,
-  patient_id bigint,
+  region_id int,
+  readcount int,
+  assay_id int,
+  patient_id int,
   trial_name character varying(200),
-  log_readcount numeric,
-  raw_readcount numeric
+  log_readcount int,
+  raw_readcount int
 );
 
 --

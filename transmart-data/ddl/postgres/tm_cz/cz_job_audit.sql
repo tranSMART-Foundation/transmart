@@ -2,15 +2,15 @@
 -- Name: cz_job_audit; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE cz_job_audit (
-    seq_id bigint NOT NULL,
-    job_id bigint NOT NULL,
+    seq_id int NOT NULL,
+    job_id int NOT NULL,
     database_name character varying(50),
     procedure_name character varying(100),
     step_desc character varying(1000),
     step_status character varying(50),
-    records_manipulated bigint,
-    step_number bigint,
-    job_date timestamp without time zone,
+    records_manipulated int,
+    step_number int,
+    job_date timestamp,
     time_elapsed_secs double precision DEFAULT 0
 );
 

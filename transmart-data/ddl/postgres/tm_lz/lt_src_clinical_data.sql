@@ -22,7 +22,7 @@ CREATE TABLE lt_src_clinical_data (
     date_ind character(1),
     obs_string character varying(100),
     valuetype_cd character varying(50),
-    date_timestamp timestamp without time zone,
+    date_timestamp timestamp,
     ctrl_vocab_code character varying(200),
     modifier_cd character varying(100),
     sample_cd character varying(200)

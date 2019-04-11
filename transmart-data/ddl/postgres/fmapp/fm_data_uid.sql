@@ -2,7 +2,7 @@
 -- Name: fm_data_uid; Type: TABLE; Schema: fmapp; Owner: -
 --
 CREATE TABLE fm_data_uid (
-    fm_data_id bigint NOT NULL,
+    fm_data_id int NOT NULL,
     unique_id character varying(300) NOT NULL,
     fm_data_type character varying(100) NOT NULL
 );

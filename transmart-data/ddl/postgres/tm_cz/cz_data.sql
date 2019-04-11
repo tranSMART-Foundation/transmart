@@ -2,13 +2,13 @@
 -- Name: cz_data; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE cz_data (
-    data_id bigint NOT NULL,
+    data_id int NOT NULL,
     data_name character varying(200),
     technical_desc character varying(1000),
     business_desc character varying(1000),
-    create_date timestamp without time zone,
-    custodian_id bigint,
-    owner_id bigint,
+    create_date timestamp,
+    custodian_id int,
+    owner_id int,
     load_freq character varying(20)
 );
 

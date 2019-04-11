@@ -2,7 +2,7 @@
 -- Name: plugin; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE plugin (
-    plugin_seq bigint NOT NULL,
+    plugin_seq int NOT NULL,
     name character varying(200) NOT NULL,
     plugin_name character varying(90) NOT NULL,
     has_modules character(1) DEFAULT 'N'::bpchar NOT NULL,

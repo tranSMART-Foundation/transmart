@@ -4,8 +4,8 @@
 CREATE TABLE wt_subject_proteomics_calcs (
     trial_name character varying(50),
     probeset_id character varying(500),
-    mean_intensity numeric,
-    median_intensity numeric,
-    stddev_intensity numeric
+    mean_intensity double precision,
+    median_intensity double precision,
+    stddev_intensity double precision
 );
 

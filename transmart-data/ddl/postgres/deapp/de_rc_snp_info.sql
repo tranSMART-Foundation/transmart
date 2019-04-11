@@ -12,10 +12,10 @@ CREATE SEQUENCE de_rc_snp_info_seq
 -- Name: de_rc_snp_info; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_rc_snp_info (
-    snp_info_id bigint DEFAULT nextval('de_rc_snp_info_seq'::regclass) NOT NULL,
+    snp_info_id int DEFAULT nextval('de_rc_snp_info_seq'::regclass) NOT NULL,
     rs_id character varying(50),
     chrom character varying(4),
-    pos bigint,
+    pos int,
     ref character varying(1000),
     alt character varying(1000),
     gene_info character varying(1000),
@@ -35,8 +35,8 @@ CREATE TABLE de_rc_snp_info (
     hg_version character varying(10),
     gene_name character varying(50),
     entrez_id character varying(50),
-    recombination_rate numeric(18,6),
-    recombination_map numeric(18,6),
+    recombination_rate decimal(18,6),
+    recombination_map decimal(18,6),
     regulome_score character varying(10),
     exon_intron character varying(50)
 );

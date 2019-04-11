@@ -155,7 +155,6 @@
 \i tm_cz/bio_experiment_release.sql
 \i tm_cz/category_path_excluded_words.sql
 \i tm_cz/concept_dimension_release.sql
-\i tm_cz/currtime.sql
 \i tm_cz/cz_data.sql
 \i tm_cz/cz_data_file.sql
 \i tm_cz/cz_data_profile_column_exclusi.sql
@@ -198,8 +197,12 @@
 \i tm_cz/probeset_deapp_20120206.sql
 \i tm_cz/sample_categories_release.sql
 \i tm_cz/search_secure_object_release.sql
+\i tm_cz/stg_rbm_antigen_gene.sql
+\i tm_cz/stg_subject_rbm_data.sql
+\i tm_cz/stg_subject_rbm_data_raw.sql
 \i tm_cz/tmp_num_data_types.sql
 \i tm_cz/tmp_subject_info.sql
 \i tm_cz/tmp_trial_data.sql
 \i tm_cz/tmp_trial_nodes.sql
+\i tm_cz/updatezscore_proteomics.sql
 \i tm_cz/_misc.sql

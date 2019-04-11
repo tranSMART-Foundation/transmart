@@ -357,7 +357,7 @@ BEGIN
 	  and sm.partition_id is not null;
 
 	-- take new partition regardless of partExists, but we need the partExists value later
-	select nextval('deapp.seq_mrna_partition_id') into partitionId;
+	select nextval('deapp.seq_acgh_partition_id') into partitionId;
 
 	partitionName := 'deapp.de_subject_acgh_data_' || partitionId::text;
 	partitionIndx := 'de_subject_acgh_data_' || partitionId::text;

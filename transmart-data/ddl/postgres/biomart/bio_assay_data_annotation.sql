@@ -2,8 +2,8 @@
 -- Name: bio_assay_data_annotation; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_assay_data_annotation (
-    bio_assay_feature_group_id bigint,
-    bio_marker_id bigint NOT NULL,
+    bio_assay_feature_group_id int,
+    bio_marker_id int NOT NULL,
     data_table character(5)
 );
 

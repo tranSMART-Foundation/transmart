@@ -2,8 +2,8 @@
 -- Name: bio_data_omic_marker; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_data_omic_marker (
-    bio_data_id bigint,
-    bio_marker_id bigint NOT NULL,
+    bio_data_id int,
+    bio_marker_id int NOT NULL,
     data_table character varying(5)
 );
 

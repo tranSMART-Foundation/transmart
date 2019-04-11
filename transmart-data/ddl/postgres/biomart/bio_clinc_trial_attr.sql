@@ -2,10 +2,10 @@
 -- Name: bio_clinc_trial_attr; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_clinc_trial_attr (
-    bio_clinc_trial_attr_id bigint NOT NULL,
+    bio_clinc_trial_attr_id int NOT NULL,
     property_code character varying(200) NOT NULL,
     property_value character varying(200),
-    bio_experiment_id bigint NOT NULL
+    bio_experiment_id int NOT NULL
 );
 
 --

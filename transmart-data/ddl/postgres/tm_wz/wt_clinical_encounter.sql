@@ -4,6 +4,6 @@
 CREATE TABLE wt_clinical_encounter (
     link_type character varying(20),
     link_value character varying(500),
-    encounter_num numeric
+    encounter_num int
 );
 

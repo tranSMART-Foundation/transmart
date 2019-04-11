@@ -2,10 +2,10 @@
 -- Name: search_gene_sig_file_schema; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_gene_sig_file_schema (
-    search_gene_sig_file_schema_id bigint NOT NULL,
+    search_gene_sig_file_schema_id int NOT NULL,
     name character varying(100) NOT NULL,
     description character varying(255),
-    number_columns bigint DEFAULT 2 NOT NULL,
+    number_columns int DEFAULT 2 NOT NULL,
     supported boolean DEFAULT false
 );
 

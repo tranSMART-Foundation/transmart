@@ -3,8 +3,8 @@
 --
 CREATE TABLE bio_recombination_rates (
     chromosome character varying(20),
-    "position" numeric(18,0),
-    rate numeric(18,6),
-    map numeric(18,6)
+    "position" int,
+    rate decimal(18,6),
+    map decimal(18,6)
 );
 

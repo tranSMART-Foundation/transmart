@@ -2,12 +2,12 @@
 -- Name: news_updates; Type: TABLE; Schema: i2b2demodata; Owner: -
 --
 CREATE TABLE news_updates (
-    newsid integer,
+    newsid int,
     ranbyuser character varying(200),
-    rowsaffected integer,
+    rowsaffected int,
     operation character varying(200),
     datasetname character varying(200),
-    updatedate timestamp(6) without time zone,
+    updatedate timestamp,
     commentfield character varying(200)
 );
 

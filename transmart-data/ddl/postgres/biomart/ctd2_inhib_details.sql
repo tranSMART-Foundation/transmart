@@ -2,8 +2,8 @@
 -- Name: ctd2_inhib_details; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE ctd2_inhib_details (
-    ctd_inhib_seq bigint,
-    ctd_study_id bigint,
+    ctd_inhib_seq int,
+    ctd_study_id int,
     common_name_name character varying(500),
     standard_name_name character varying(500),
     experimental_detail_dose character varying(4000),

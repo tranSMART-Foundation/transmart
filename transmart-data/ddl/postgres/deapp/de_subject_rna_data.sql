@@ -5,12 +5,12 @@ CREATE TABLE de_subject_rna_data (
     trial_source character varying(200),
     trial_name character varying(50),
     probeset_id character varying(200),
-    assay_id bigint,
-    patient_id bigint,
+    assay_id int,
+    patient_id int,
     raw_intensity double precision,
     log_intensity double precision,
     zscore double precision,
-    partition_id numeric
+    partition_id int
 );
 
 --

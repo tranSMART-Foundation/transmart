@@ -2,7 +2,7 @@
 -- Name: de_obs_enroll_days; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_obs_enroll_days (
-    encounter_num bigint,
+    encounter_num int,
     days_since_enroll double precision,
     study_id character varying(200)
 );

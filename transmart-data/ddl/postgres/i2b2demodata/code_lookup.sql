@@ -7,12 +7,12 @@ CREATE TABLE code_lookup (
     code_cd character varying(50) NOT NULL,
     name_char character varying(650),
     lookup_blob text,
-    upload_date timestamp without time zone,
-    update_date timestamp without time zone,
-    download_date timestamp without time zone,
-    import_date timestamp without time zone,
+    upload_date timestamp,
+    update_date timestamp,
+    download_date timestamp,
+    import_date timestamp,
     sourcesystem_cd character varying(50),
-    upload_id numeric(38,0)
+    upload_id int
 );
 
 --

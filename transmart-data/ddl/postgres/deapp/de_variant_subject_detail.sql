@@ -12,10 +12,10 @@ CREATE SEQUENCE de_variant_subject_detail_seq
 -- Name: de_variant_subject_detail; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_variant_subject_detail (
-    variant_subject_detail_id bigint DEFAULT nextval('de_variant_subject_detail_seq'::regclass) NOT NULL,
+    variant_subject_detail_id int DEFAULT nextval('de_variant_subject_detail_seq'::regclass) NOT NULL,
     dataset_id character varying(50),
     chr character varying(50),
-    pos bigint,
+    pos int,
     rs_id character varying(50),
     ref character varying(500),
     alt character varying(500),
@@ -50,7 +50,7 @@ CREATE INDEX gen_variant_subj_det_chr_pos ON de_variant_subject_detail USING btr
 --
 -- Name: variant_subject_detail_uk; Type: INDEX; Schema: deapp; Owner: -
 --
-CREATE UNIQUE INDEX variant_subject_detail_uk ON de_variant_subject_detail USING btree (dataset_id, chr, pos, rs_id);
+CREATE UNIQUE INDEX variant_subject_detail_uk ON de_variant_subject_detail USING btree (dataset_id, rs_id, chr, pos);
 
 --
 -- Name: variant_subject_detail_fk; Type: FK CONSTRAINT; Schema: deapp; Owner: -

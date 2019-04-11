@@ -2,18 +2,18 @@
 -- Name: fm_file; Type: TABLE; Schema: fmapp; Owner: -
 --
 CREATE TABLE fm_file (
-    file_id bigint NOT NULL,
+    file_id int NOT NULL,
     display_name character varying(1000) NOT NULL,
     original_name character varying(1000) NOT NULL,
-    file_version numeric,
+    file_version int,
     file_type character varying(100),
-    file_size numeric,
+    file_size int,
     filestore_location character varying(1000),
     filestore_name character varying(1000),
     link_url character varying(1000),
     active_ind boolean NOT NULL,
-    create_date timestamp without time zone NOT NULL,
-    update_date timestamp without time zone NOT NULL
+    create_date timestamp NOT NULL,
+    update_date timestamp NOT NULL
 );
 
 --
@@ -48,7 +48,7 @@ CREATE FUNCTION tf_trg_fm_file_uid() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-  rec_count bigint;
+  rec_count int;
 BEGIN
   SELECT COUNT(*) INTO rec_count 
   FROM fmapp.fm_data_uid 

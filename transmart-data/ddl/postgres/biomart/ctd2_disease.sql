@@ -2,8 +2,8 @@
 -- Name: ctd2_disease; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE ctd2_disease (
-    ctd_disease_seq bigint,
-    ctd_study_id bigint,
+    ctd_disease_seq int,
+    ctd_study_id int,
     disease_type_name character varying(500),
     disease_common_name character varying(500),
     icd10_name character varying(250),

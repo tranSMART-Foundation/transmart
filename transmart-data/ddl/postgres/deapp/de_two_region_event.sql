@@ -12,7 +12,7 @@ CREATE SEQUENCE de_two_region_event_seq
 -- Name: de_two_region_event; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_two_region_event (
-    two_region_event_id bigint DEFAULT nextval('de_two_region_event_seq'::regclass) NOT NULL,
+    two_region_event_id int DEFAULT nextval('de_two_region_event_seq'::regclass) NOT NULL,
     cga_type character varying(500),
     soap_class character varying(500)
 );

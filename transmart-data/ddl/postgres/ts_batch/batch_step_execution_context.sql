@@ -2,7 +2,7 @@
 -- Name: batch_step_execution_context; Type: TABLE; Schema: ts_batch; Owner: -
 --
 CREATE TABLE batch_step_execution_context (
-    step_execution_id bigint NOT NULL,
+    step_execution_id int NOT NULL,
     short_context character varying(2500) NOT NULL,
     serialized_context text
 );

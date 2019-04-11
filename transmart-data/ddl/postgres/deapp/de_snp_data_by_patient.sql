@@ -2,10 +2,10 @@
 -- Name: de_snp_data_by_patient; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_snp_data_by_patient (
-    snp_data_by_patient_id bigint NOT NULL,
-    snp_dataset_id bigint,
+    snp_data_by_patient_id int NOT NULL,
+    snp_dataset_id int,
     trial_name character varying(255),
-    patient_num bigint,
+    patient_num int,
     chrom character varying(16),
     data_by_patient_chr text,
     ped_by_patient_chr text

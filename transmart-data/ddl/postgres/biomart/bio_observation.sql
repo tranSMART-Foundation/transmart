@@ -2,7 +2,7 @@
 -- Name: bio_observation; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_observation (
-    bio_observation_id bigint NOT NULL,
+    bio_observation_id int NOT NULL,
     obs_name character varying(200),
     obs_code character varying(50),
     obs_descr character varying(1000),

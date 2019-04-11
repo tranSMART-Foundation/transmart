@@ -2,9 +2,9 @@
 -- Name: de_snp_probe; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_snp_probe (
-    snp_probe_id bigint NOT NULL,
+    snp_probe_id int NOT NULL,
     probe_name character varying(255),
-    snp_id bigint,
+    snp_id int,
     snp_name character varying(255),
     vendor_name character varying(255)
 );

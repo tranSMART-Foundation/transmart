@@ -4,11 +4,11 @@
 CREATE TABLE bio_cgdcp_data (
     evidence_code character varying(200),
     negation_indicator character(1),
-    cell_line_id bigint,
+    cell_line_id int,
     nci_disease_concept_code character varying(200),
     nci_role_code character varying(200),
     nci_drug_concept_code character varying(200),
-    bio_data_id bigint NOT NULL
+    bio_data_id int NOT NULL
 );
 
 --

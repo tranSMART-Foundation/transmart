@@ -2,11 +2,11 @@
 -- Name: search_taxonomy; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_taxonomy (
-    term_id bigint NOT NULL,
+    term_id int NOT NULL,
     term_name character varying(900) NOT NULL,
     source_cd character varying(900),
-    import_date timestamp(1) without time zone DEFAULT now(),
-    search_keyword_id bigint
+    import_date timestamp DEFAULT now(),
+    search_keyword_id int
 );
 
 --

@@ -2,8 +2,8 @@
 -- Name: search_custom_filter_item; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_custom_filter_item (
-    search_custom_filter_item_id bigint NOT NULL,
-    search_custom_filter_id bigint NOT NULL,
+    search_custom_filter_item_id int NOT NULL,
+    search_custom_filter_id int NOT NULL,
     unique_id character varying(200) NOT NULL,
     bio_data_type character varying(100) NOT NULL
 );

@@ -2,8 +2,8 @@
 -- Name: search_role_auth_user; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_role_auth_user (
-    people_id bigint,
-    authorities_id bigint
+    people_id int,
+    authorities_id int
 );
 
 --

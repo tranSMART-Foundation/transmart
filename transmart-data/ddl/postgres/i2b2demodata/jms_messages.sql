@@ -2,9 +2,9 @@
 -- Name: jms_messages; Type: TABLE; Schema: i2b2demodata; Owner: -
 --
 CREATE TABLE jms_messages (
-    messageid bigint NOT NULL,
+    messageid int NOT NULL,
     destination character varying(255) NOT NULL,
-    txid bigint,
+    txid int,
     txop character(1),
     messageblob text
 );

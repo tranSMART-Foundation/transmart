@@ -12,13 +12,13 @@ CREATE SEQUENCE de_variant_population_data_seq
 -- Name: de_variant_population_data; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_variant_population_data (
-    variant_population_data_id bigint DEFAULT nextval('de_variant_population_data_seq'::regclass) NOT NULL,
+    variant_population_data_id int DEFAULT nextval('de_variant_population_data_seq'::regclass) NOT NULL,
     dataset_id character varying(50),
     chr character varying(50),
-    pos bigint,
+    pos int,
     info_name character varying(100),
-    info_index integer DEFAULT 0,
-    integer_value bigint,
+    info_index int DEFAULT 0,
+    integer_value int,
     float_value double precision,
     text_value character varying(4000)
 );

@@ -2,10 +2,10 @@
 -- Name: search_auth_sec_object_access; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_auth_sec_object_access (
-    auth_sec_obj_access_id bigint NOT NULL,
-    auth_principal_id bigint,
-    secure_object_id bigint,
-    secure_access_level_id bigint
+    auth_sec_obj_access_id int NOT NULL,
+    auth_principal_id int,
+    secure_object_id int,
+    secure_access_level_id int
 );
 
 --

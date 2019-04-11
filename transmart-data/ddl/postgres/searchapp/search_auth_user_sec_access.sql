@@ -2,10 +2,10 @@
 -- Name: search_auth_user_sec_access; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_auth_user_sec_access (
-    search_auth_user_sec_access_id bigint NOT NULL,
-    search_auth_user_id bigint,
-    search_secure_object_id bigint,
-    search_sec_access_level_id bigint
+    search_auth_user_sec_access_id int NOT NULL,
+    search_auth_user_id int,
+    search_secure_object_id int,
+    search_sec_access_level_id int
 );
 
 --
@@ -55,7 +55,7 @@ ALTER TABLE ONLY search_auth_user_sec_access
 -- Name: seq_search_data_id; Type: SEQUENCE; Schema: searchapp; Owner: -
 --
 CREATE SEQUENCE seq_search_data_id
-    START WITH 977987
+    START WITH 977417
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE

@@ -5,7 +5,7 @@ CREATE TABLE de_variant_dataset (
     dataset_id character varying(50) NOT NULL,
     datasource_id character varying(200),
     etl_id character varying(20),
-    etl_date date,
+    etl_date timestamp,
     genome character varying(50) NOT NULL,
     metadata_comment text,
     variant_dataset_type character varying(50),

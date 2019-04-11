@@ -2,7 +2,7 @@
 -- Name: fm_folder_association; Type: TABLE; Schema: fmapp; Owner: -
 --
 CREATE TABLE fm_folder_association (
-    folder_id bigint NOT NULL,
+    folder_id int NOT NULL,
     object_uid character varying(300) NOT NULL,
     object_type character varying(100) NOT NULL
 );

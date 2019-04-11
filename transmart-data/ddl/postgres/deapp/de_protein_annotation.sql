@@ -12,7 +12,7 @@ CREATE SEQUENCE protein_annotation_id
 -- Name: de_protein_annotation; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_protein_annotation (
-    id bigint DEFAULT nextval('protein_annotation_id'::regclass) NOT NULL,
+    id int DEFAULT nextval('protein_annotation_id'::regclass) NOT NULL,
     gpl_id character varying(50) NOT NULL,
     peptide character varying(200) NOT NULL,
     uniprot_id character varying(200),
@@ -20,8 +20,8 @@ CREATE TABLE de_protein_annotation (
     organism character varying(200),
     uniprot_name character varying(200),
     chromosome character varying(5),
-    start_bp bigint,
-    end_bp bigint
+    start_bp int,
+    end_bp int
 );
 
 --

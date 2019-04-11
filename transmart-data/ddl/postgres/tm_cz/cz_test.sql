@@ -2,7 +2,7 @@
 -- Name: cz_test; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE cz_test (
-    test_id bigint NOT NULL,
+    test_id int NOT NULL,
     test_name character varying(200),
     test_desc character varying(1000),
     test_schema character varying(255),
@@ -15,7 +15,7 @@ CREATE TABLE cz_test (
     test_param3 character varying(2000),
     test_min_value double precision,
     test_max_value double precision,
-    test_category_id bigint,
+    test_category_id int,
     test_severity_cd character varying(20),
     table_type character varying(100)
 );

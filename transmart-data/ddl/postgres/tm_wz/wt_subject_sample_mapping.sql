@@ -2,7 +2,7 @@
 -- Name: wt_subject_sample_mapping; Type: TABLE; Schema: tm_wz; Owner: -
 --
 CREATE TABLE wt_subject_sample_mapping (
-    patient_num numeric(38,0),
+    patient_num int,
     site_id character varying(100),
     subject_id character varying(100),
     concept_code character varying(50),

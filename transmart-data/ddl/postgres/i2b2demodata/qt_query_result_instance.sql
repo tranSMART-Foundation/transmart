@@ -12,17 +12,17 @@ CREATE SEQUENCE qt_sq_qri_qriid
 -- Name: qt_query_result_instance; Type: TABLE; Schema: i2b2demodata; Owner: -
 --
 CREATE TABLE qt_query_result_instance (
-    result_instance_id numeric(5,0) DEFAULT nextval('qt_sq_qri_qriid'::regclass) NOT NULL,
-    query_instance_id numeric(5,0),
-    result_type_id numeric(3,0) NOT NULL,
-    set_size numeric(10,0),
-    start_date timestamp without time zone NOT NULL,
-    end_date timestamp without time zone,
+    result_instance_id serial NOT NULL,
+    query_instance_id int,
+    result_type_id int NOT NULL,
+    set_size int,
+    start_date timestamp NOT NULL,
+    end_date timestamp,
     delete_flag character varying(3),
-    status_type_id numeric(3,0) NOT NULL,
+    status_type_id int NOT NULL,
     message text,
     description character varying(200),
-    real_set_size numeric(10,0),
+    real_set_size int,
     obfusc_method character varying(500)
 );
 

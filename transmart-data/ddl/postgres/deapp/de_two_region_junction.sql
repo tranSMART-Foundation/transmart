@@ -12,18 +12,18 @@ CREATE SEQUENCE de_two_region_junction_seq
 -- Name: de_two_region_junction; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_two_region_junction (
-    two_region_junction_id bigint DEFAULT nextval('de_two_region_junction_seq'::regclass) NOT NULL,
-    up_end bigint NOT NULL,
+    two_region_junction_id int DEFAULT nextval('de_two_region_junction_seq'::regclass) NOT NULL,
+    up_end int NOT NULL,
     up_chr character varying(50) NOT NULL,
-    up_pos bigint NOT NULL,
+    up_pos int NOT NULL,
     up_strand character(1),
-    down_end bigint NOT NULL,
+    down_end int NOT NULL,
     down_chr character varying(50) NOT NULL,
-    down_pos bigint NOT NULL,
+    down_pos int NOT NULL,
     down_strand character(1),
     is_in_frame boolean,
-    external_id bigint,
-    assay_id bigint
+    external_id int,
+    assay_id int
 );
 
 --

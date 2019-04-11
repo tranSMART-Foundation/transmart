@@ -2,13 +2,13 @@
 -- Name: search_gene_signature_item; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_gene_signature_item (
-    search_gene_signature_id bigint NOT NULL,
-    bio_marker_id bigint,
-    fold_chg_metric bigint,
+    search_gene_signature_id int NOT NULL,
+    bio_marker_id int,
+    fold_chg_metric int,
     bio_data_unique_id character varying(200),
-    id bigint NOT NULL,
-    bio_assay_feature_group_id bigint,
-    probeset_id bigint
+    id int NOT NULL,
+    bio_assay_feature_group_id int,
+    probeset_id int
 );
 
 --

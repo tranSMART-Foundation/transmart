@@ -2,7 +2,7 @@
 -- Name: bio_assay_feature_group; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_assay_feature_group (
-    bio_assay_feature_group_id bigint NOT NULL,
+    bio_assay_feature_group_id int NOT NULL,
     feature_group_name character varying(100) NOT NULL,
     feature_group_type character varying(50) NOT NULL
 );

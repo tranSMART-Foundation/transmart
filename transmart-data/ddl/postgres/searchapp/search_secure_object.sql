@@ -2,8 +2,8 @@
 -- Name: search_secure_object; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_secure_object (
-    search_secure_object_id bigint NOT NULL,
-    bio_data_id bigint,
+    search_secure_object_id int NOT NULL,
+    bio_data_id int,
     display_name character varying(100),
     data_type character varying(200),
     bio_data_unique_id character varying(200)

@@ -4,7 +4,7 @@
 CREATE TABLE source_master (
     source_cd character varying(50) NOT NULL,
     description character varying(300),
-    create_date timestamp without time zone
+    create_date timestamp
 );
 
 --

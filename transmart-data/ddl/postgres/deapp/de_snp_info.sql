@@ -2,10 +2,10 @@
 -- Name: de_snp_info; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_snp_info (
-    snp_info_id bigint NOT NULL,
+    snp_info_id int NOT NULL,
     name character varying(255),
     chrom character varying(16),
-    chrom_pos bigint
+    chrom_pos int
 );
 
 --

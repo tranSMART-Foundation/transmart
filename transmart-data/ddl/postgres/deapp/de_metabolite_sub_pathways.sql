@@ -2,10 +2,10 @@
 -- Name: de_metabolite_sub_pathways; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_metabolite_sub_pathways (
-    id bigint NOT NULL,
+    id int NOT NULL,
     gpl_id character varying(50) NOT NULL,
     sub_pathway_name character varying(200) NOT NULL,
-    super_pathway_id bigint
+    super_pathway_id int
 );
 
 --

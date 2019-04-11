@@ -10,7 +10,7 @@ CREATE TABLE rwg_analysis_data (
     min_lsmean double precision,
     max_lsmean double precision,
     analysis_cd character varying(100),
-    bio_assay_analysis_id bigint,
+    bio_assay_analysis_id int,
     adjusted_pvalue double precision
 );
 

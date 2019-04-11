@@ -4,14 +4,14 @@
 CREATE TABLE de_subject_metabolomics_data (
     trial_source character varying(200),
     trial_name character varying(200),
-    metabolite_annotation_id bigint,
-    assay_id bigint,
+    metabolite_annotation_id int,
+    assay_id int,
     subject_id character varying(100),
-    patient_id bigint,
+    patient_id int,
     raw_intensity double precision,
     log_intensity double precision,
     zscore double precision,
-    partition_id numeric
+    partition_id int
 );
 
 --

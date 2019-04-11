@@ -3,10 +3,10 @@
 --
 CREATE TABLE bio_analysis_attribute (
     study_id character varying(255),
-    bio_assay_analysis_id bigint NOT NULL,
-    term_id bigint,
+    bio_assay_analysis_id int NOT NULL,
+    term_id int,
     source_cd character varying(255),
-    bio_analysis_attribute_id bigint NOT NULL
+    bio_analysis_attribute_id int NOT NULL
 );
 
 --

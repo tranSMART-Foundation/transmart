@@ -12,9 +12,9 @@ CREATE SEQUENCE qt_sq_qxr_xrid
 -- Name: qt_xml_result; Type: TABLE; Schema: i2b2demodata; Owner: -
 --
 CREATE TABLE qt_xml_result (
-    xml_result_id numeric(5,0) DEFAULT nextval('qt_sq_qxr_xrid'::regclass) NOT NULL,
-    result_instance_id numeric(5,0),
-    xml_value character varying(4000)
+    xml_result_id serial NOT NULL,
+    result_instance_id int,
+    xml_value text
 );
 
 --

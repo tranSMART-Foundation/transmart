@@ -2,8 +2,8 @@
 -- Name: fm_folder_file_association; Type: TABLE; Schema: fmapp; Owner: -
 --
 CREATE TABLE fm_folder_file_association (
-    folder_id bigint NOT NULL,
-    file_id bigint NOT NULL
+    folder_id int NOT NULL,
+    file_id int NOT NULL
 );
 
 --

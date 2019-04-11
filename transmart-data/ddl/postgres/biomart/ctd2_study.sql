@@ -2,9 +2,9 @@
 -- Name: ctd2_study; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE ctd2_study (
-    ctd_study_id bigint,
+    ctd_study_id int,
     ref_article_protocol_id character varying(1000),
-    reference_id integer NOT NULL,
+    reference_id int NOT NULL,
     pubmed_id character varying(250),
     pubmed_title character varying(2000),
     protocol_id character varying(1000),

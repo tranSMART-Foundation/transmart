@@ -17,15 +17,15 @@ CREATE TABLE lz_src_analysis_metadata (
     sample_size character varying(500),
     cell_type character varying(500),
     pvalue_cutoff character varying(50),
-    etl_date timestamp without time zone,
+    etl_date timestamp,
     filename character varying(500),
     status character varying(50),
-    process_date timestamp without time zone,
-    etl_id numeric(38,0),
+    process_date timestamp,
+    etl_id int,
     analysis_name_archived character varying(500),
     model_name character varying(500),
     model_desc character varying(500),
-    sensitive_flag numeric(18,0),
+    sensitive_flag int,
     sensitive_desc character varying(500)
 );
 

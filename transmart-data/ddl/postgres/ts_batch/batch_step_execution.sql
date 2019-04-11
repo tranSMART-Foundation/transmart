@@ -2,24 +2,24 @@
 -- Name: batch_step_execution; Type: TABLE; Schema: ts_batch; Owner: -
 --
 CREATE TABLE batch_step_execution (
-    step_execution_id bigint NOT NULL,
-    version bigint NOT NULL,
+    step_execution_id int NOT NULL,
+    version int NOT NULL,
     step_name character varying(100) NOT NULL,
-    job_execution_id bigint NOT NULL,
-    start_time timestamp without time zone NOT NULL,
-    end_time timestamp without time zone,
+    job_execution_id int NOT NULL,
+    start_time timestamp NOT NULL,
+    end_time timestamp,
     status character varying(10),
-    commit_count bigint,
-    read_count bigint,
-    filter_count bigint,
-    write_count bigint,
-    read_skip_count bigint,
-    write_skip_count bigint,
-    process_skip_count bigint,
-    rollback_count bigint,
+    commit_count int,
+    read_count int,
+    filter_count int,
+    write_count int,
+    read_skip_count int,
+    write_skip_count int,
+    process_skip_count int,
+    rollback_count int,
     exit_code character varying(2500),
     exit_message character varying(2500),
-    last_updated timestamp without time zone
+    last_updated timestamp
 );
 
 --

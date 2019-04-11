@@ -2,7 +2,7 @@
 -- Name: ctd_allowed_meds_treatment; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE ctd_allowed_meds_treatment (
-    ctd_study_id bigint,
+    ctd_study_id int,
     trtmt_ocs character varying(4000),
     trtmt_ics character varying(4000),
     trtmt_laba character varying(4000),

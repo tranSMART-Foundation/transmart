@@ -9,8 +9,8 @@ CREATE TABLE lz_src_clinical_data (
     data_label character varying(500),
     data_value character varying(500),
     category_cd character varying(250),
-    etl_job_id numeric(22,0),
-    etl_date timestamp without time zone,
+    etl_job_id int,
+    etl_date timestamp,
     data_label_ctrl_vocab_code character varying(200),
     data_value_ctrl_vocab_code character varying(500),
     data_label_components character varying(1000),
@@ -24,7 +24,7 @@ CREATE TABLE lz_src_clinical_data (
     obs_string character varying(100),
     valuetype_cd character varying(50),
     modifier_cd character varying(100),
-    date_timestamp timestamp without time zone,
+    date_timestamp timestamp,
     ctrl_vocab_code character varying(200),
     sample_type character varying(100)
 );

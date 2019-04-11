@@ -2,10 +2,10 @@
 -- Name: bio_data_correlation; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_data_correlation (
-    bio_data_id bigint NOT NULL,
-    asso_bio_data_id bigint NOT NULL,
-    bio_data_correl_descr_id bigint NOT NULL,
-    bio_data_correl_id bigint NOT NULL
+    bio_data_id int NOT NULL,
+    asso_bio_data_id int NOT NULL,
+    bio_data_correl_descr_id int NOT NULL,
+    bio_data_correl_id int NOT NULL
 );
 
 --

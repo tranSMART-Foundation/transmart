@@ -12,23 +12,23 @@ CREATE SEQUENCE ont_sq_ps_prid
 -- Name: ont_process_status; Type: TABLE; Schema: i2b2metadata; Owner: -
 --
 CREATE TABLE ont_process_status (
-    process_id numeric(5,0) DEFAULT nextval('ont_sq_ps_prid'::regclass) NOT NULL,
+    process_id serial NOT NULL,
     process_type_cd character varying(50),
-    start_date timestamp without time zone,
-    end_date timestamp without time zone,
+    start_date timestamp,
+    end_date timestamp,
     process_step_cd character varying(50),
     process_status_cd character varying(50),
-    crc_upload_id character varying(5),
+    crc_upload_id int,
     status_cd character varying(50),
     message character varying(2000),
-    entry_date timestamp without time zone,
-    change_date timestamp without time zone,
+    entry_date timestamp,
+    change_date timestamp,
     changedby_char character(50)
 );
 
 --
--- Name: ont_process_status_pkey; Type: CONSTRAINT; Schema: i2b2metadata; Owner: -
+-- Name: ont_process_status_pk; Type: CONSTRAINT; Schema: i2b2metadata; Owner: -
 --
 ALTER TABLE ONLY ont_process_status
-    ADD CONSTRAINT ont_process_status_pkey PRIMARY KEY (process_id);
+    ADD CONSTRAINT ont_process_status_pk PRIMARY KEY (process_id);
 

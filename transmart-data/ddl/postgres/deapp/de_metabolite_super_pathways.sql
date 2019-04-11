@@ -2,7 +2,7 @@
 -- Name: de_metabolite_super_pathways; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_metabolite_super_pathways (
-    id bigint NOT NULL,
+    id int NOT NULL,
     gpl_id character varying(50) NOT NULL,
     super_pathway_name character varying(200)
 );

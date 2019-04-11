@@ -2,8 +2,8 @@
 -- Name: search_auth_group_member; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_auth_group_member (
-    auth_user_id bigint,
-    auth_group_id bigint
+    auth_user_id int,
+    auth_group_id int
 );
 
 --

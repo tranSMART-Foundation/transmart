@@ -2,7 +2,7 @@
 -- Name: antigen_deapp; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE antigen_deapp (
-    antigen_id bigint NOT NULL,
+    antigen_id int NOT NULL,
     antigen_name character varying(100) NOT NULL,
     platform character varying(100) NOT NULL
 );

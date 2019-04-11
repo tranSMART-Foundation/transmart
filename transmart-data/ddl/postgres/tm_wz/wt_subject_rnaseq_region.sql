@@ -1,15 +1,15 @@
 --
 -- Name: wt_subject_rnaseq_region; Type: TABLE; Schema: tm_wz; Owner: -
 --
-CREATE TABLE tm_wz.wt_subject_rnaseq_region
+CREATE TABLE wt_subject_rnaseq_region
 (
-    region_id bigint,
+    region_id int,
     expr_id character varying(500),
-    readcount bigint,
+    readcount int,
     normalized_readcount double precision,
-    assay_id bigint,
-    patient_id bigint,
-    sample_id bigint,
+    assay_id int,
+    patient_id int,
+    sample_id int,
     subject_id character varying(100),
     trial_name character varying(200),
     timepoint character varying(200),

@@ -2,7 +2,7 @@
 -- Name: bio_asy_analysis_data_ext; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_asy_analysis_data_ext (
-    bio_asy_analysis_data_id bigint NOT NULL,
+    bio_asy_analysis_data_id int NOT NULL,
     ext_type character varying(20) NOT NULL,
     ext_data character varying(4000) NOT NULL
 );

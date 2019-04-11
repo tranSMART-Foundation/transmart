@@ -10,7 +10,7 @@ CREATE TABLE node_curation (
     global_flag character(1),
     study_id character varying(30),
     curator_name character varying(250),
-    curation_date timestamp without time zone,
+    curation_date timestamp,
     active_flag character(1)
 );
 

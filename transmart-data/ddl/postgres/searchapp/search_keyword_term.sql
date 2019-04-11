@@ -3,11 +3,11 @@
 --
 CREATE TABLE search_keyword_term (
     keyword_term character varying(200),
-    search_keyword_id bigint,
-    rank bigint,
-    search_keyword_term_id bigint NOT NULL,
-    term_length bigint,
-    owner_auth_user_id bigint
+    search_keyword_id int,
+    rank int,
+    search_keyword_term_id int NOT NULL,
+    term_length int,
+    owner_auth_user_id int
 );
 
 --

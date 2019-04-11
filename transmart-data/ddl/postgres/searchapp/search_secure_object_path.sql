@@ -2,9 +2,9 @@
 -- Name: search_secure_object_path; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_secure_object_path (
-    search_secure_object_id bigint,
+    search_secure_object_id int,
     i2b2_concept_path character varying(2000),
-    search_secure_obj_path_id bigint NOT NULL
+    search_secure_obj_path_id int NOT NULL
 );
 
 --

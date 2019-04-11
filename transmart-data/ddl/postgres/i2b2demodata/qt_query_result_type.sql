@@ -12,16 +12,17 @@ CREATE SEQUENCE qt_sq_qr_qrid
 -- Name: qt_query_result_type; Type: TABLE; Schema: i2b2demodata; Owner: -
 --
 CREATE TABLE qt_query_result_type (
-    result_type_id numeric(3,0) DEFAULT nextval('qt_sq_qr_qrid'::regclass) NOT NULL,
+    result_type_id int NOT NULL,
     name character varying(100),
     description character varying(200),
     display_type_id character varying(500),
-    visual_attribute_type_id character varying(3)
+    visual_attribute_type_id character varying(3),
+    user_role_cd character varying(255)
 );
 
 --
--- Name: qt_query_result_type_pkey; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: qt_query_result_type_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY qt_query_result_type
-    ADD CONSTRAINT qt_query_result_type_pkey PRIMARY KEY (result_type_id);
+    ADD CONSTRAINT qt_query_result_type_pk PRIMARY KEY (result_type_id);
 

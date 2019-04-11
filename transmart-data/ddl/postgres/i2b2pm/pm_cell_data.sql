@@ -7,9 +7,9 @@ CREATE TABLE pm_cell_data (
     name character varying(255),
     method_cd character varying(255),
     url character varying(255),
-    can_override numeric(1,0),
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    can_override int,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

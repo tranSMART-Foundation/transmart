@@ -12,7 +12,7 @@ CREATE SEQUENCE qt_sq_qs_qsid
 -- Name: qt_query_status_type; Type: TABLE; Schema: i2b2demodata; Owner: -
 --
 CREATE TABLE qt_query_status_type (
-    status_type_id numeric(3,0) DEFAULT nextval('qt_sq_qs_qsid'::regclass) NOT NULL,
+    status_type_id int NOT NULL,
     name character varying(100),
     description character varying(200)
 );

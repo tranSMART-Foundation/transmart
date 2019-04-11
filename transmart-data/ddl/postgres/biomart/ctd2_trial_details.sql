@@ -2,8 +2,8 @@
 -- Name: ctd2_trial_details; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE ctd2_trial_details (
-    ctd_td_seq bigint,
-    ctd_study_id bigint,
+    ctd_td_seq int,
+    ctd_study_id int,
     control character varying(2000),
     blinding_procedure character varying(2000),
     no_of_arms character varying(2000),

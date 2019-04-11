@@ -2,7 +2,7 @@
 -- Name: bio_data_uid; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_data_uid (
-    bio_data_id bigint NOT NULL,
+    bio_data_id int NOT NULL,
     unique_id character varying(300) NOT NULL,
     bio_data_type character varying(100) NOT NULL
 );

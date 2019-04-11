@@ -2,11 +2,11 @@
 -- Name: bio_clinc_trial_pt_group; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_clinc_trial_pt_group (
-    bio_experiment_id bigint NOT NULL,
-    bio_clinical_trial_p_group_id bigint NOT NULL,
+    bio_experiment_id int NOT NULL,
+    bio_clinical_trial_p_group_id int NOT NULL,
     name character varying(510),
     description character varying(1000),
-    number_of_patients integer,
+    number_of_patients int,
     patient_group_type_code character varying(200)
 );
 

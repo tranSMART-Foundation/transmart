@@ -2,20 +2,20 @@
 -- Name: bio_asy_data_stats_all; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_asy_data_stats_all (
-    bio_assay_data_stats_id bigint NOT NULL,
-    bio_sample_count bigint,
+    bio_assay_data_stats_id int NOT NULL,
+    bio_sample_count int,
     quartile_1 double precision,
     quartile_2 double precision,
     quartile_3 double precision,
     max_value double precision,
     min_value double precision,
-    bio_sample_id bigint,
+    bio_sample_id int,
     feature_group_name character varying(120),
     value_normalize_method character varying(50),
-    bio_experiment_id bigint,
+    bio_experiment_id int,
     mean_value double precision,
     std_dev_value double precision,
-    bio_assay_dataset_id bigint
+    bio_assay_dataset_id int
 );
 
 --

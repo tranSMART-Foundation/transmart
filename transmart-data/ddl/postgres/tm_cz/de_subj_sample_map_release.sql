@@ -2,12 +2,12 @@
 -- Name: de_subj_sample_map_release; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE de_subj_sample_map_release (
-    patient_id bigint,
+    patient_id int,
     site_id character varying(100),
     subject_id character varying(100),
     subject_type character varying(100),
     concept_code character varying(1000),
-    assay_id bigint,
+    assay_id int,
     patient_uid character varying(50),
     sample_type character varying(100),
     assay_uid character varying(100),
@@ -22,7 +22,7 @@ CREATE TABLE de_subj_sample_map_release (
     data_uid character varying(100),
     gpl_id character varying(20),
     rbm_panel character varying(50),
-    sample_id bigint,
+    sample_id int,
     sample_cd character varying(200),
     category_cd character varying(1000),
     release_study character varying(30)

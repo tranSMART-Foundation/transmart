@@ -2,8 +2,8 @@
 -- Name: ctd2_clin_inhib_effect; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE ctd2_clin_inhib_effect (
-    ctd_cie_seq bigint,
-    ctd_study_id bigint,
+    ctd_cie_seq int,
+    ctd_study_id int,
     event_description_name character varying(4000),
     event_definition_name character varying(4000),
     adverse_effect_name character varying(4000),

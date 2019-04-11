@@ -11,8 +11,8 @@ CREATE TABLE ont_db_lookup (
     c_db_nicename character varying(255),
     c_db_tooltip character varying(255),
     c_comment text,
-    c_entry_date timestamp without time zone,
-    c_change_date timestamp without time zone,
+    c_entry_date timestamp,
+    c_change_date timestamp,
     c_status_cd character(1)
 );
 

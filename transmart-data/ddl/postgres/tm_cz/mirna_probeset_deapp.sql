@@ -12,7 +12,7 @@ CREATE SEQUENCE seq_probeset_id
 -- Name: mirna_probeset_deapp; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE mirna_probeset_deapp (
-    probeset_id numeric(38,0) DEFAULT nextval('seq_probeset_id'::regclass) NOT NULL,
+    probeset_id int DEFAULT nextval('seq_probeset_id'::regclass) NOT NULL,
     probeset character varying(100),
     platform character varying(100),
     organism character varying(200)

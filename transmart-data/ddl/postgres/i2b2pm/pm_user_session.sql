@@ -4,9 +4,9 @@
 CREATE TABLE pm_user_session (
     user_id character varying(50) NOT NULL,
     session_id character varying(50) NOT NULL,
-    expired_date timestamp without time zone,
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    expired_date timestamp,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

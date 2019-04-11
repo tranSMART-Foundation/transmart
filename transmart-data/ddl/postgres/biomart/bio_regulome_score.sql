@@ -3,7 +3,7 @@
 --
 CREATE TABLE bio_regulome_score (
     chromosome character varying(20),
-    "position" numeric(18,0),
+    "position" int,
     rs_id character varying(100),
     score character varying(10)
 );

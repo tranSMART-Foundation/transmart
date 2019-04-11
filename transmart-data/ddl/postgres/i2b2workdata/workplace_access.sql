@@ -5,7 +5,7 @@ CREATE TABLE workplace_access (
     c_table_cd character varying(255) NOT NULL,
     c_table_name character varying(255) NOT NULL,
     c_protected_access character(1),
-    c_hlevel integer NOT NULL,
+    c_hlevel int NOT NULL,
     c_name character varying(255) NOT NULL,
     c_user_id character varying(255) NOT NULL,
     c_group_id character varying(255) NOT NULL,
@@ -14,8 +14,8 @@ CREATE TABLE workplace_access (
     c_parent_index character varying(255),
     c_visualattributes character(3) NOT NULL,
     c_tooltip character varying(255),
-    c_entry_date timestamp without time zone,
-    c_change_date timestamp without time zone,
+    c_entry_date timestamp,
+    c_change_date timestamp,
     c_status_cd character(1)
 );
 --

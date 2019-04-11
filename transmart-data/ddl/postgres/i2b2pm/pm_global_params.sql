@@ -2,14 +2,14 @@
 -- Name: pm_global_params; Type: TABLE; Schema: i2b2pm; Owner: -
 --
 CREATE TABLE pm_global_params (
-    id bigint,
+    id int,
     datatype_cd character varying(50),
     param_name_cd character varying(50) NOT NULL,
     project_path character varying(255) NOT NULL,
     value text,
-    can_override numeric(1,0),
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    can_override int,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

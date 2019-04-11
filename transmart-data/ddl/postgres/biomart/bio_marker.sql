@@ -2,7 +2,7 @@
 -- Name: bio_marker; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_marker (
-    bio_marker_id bigint NOT NULL,
+    bio_marker_id int NOT NULL,
     bio_marker_name character varying(200),
     bio_marker_description character varying(1000),
     organism character varying(200),

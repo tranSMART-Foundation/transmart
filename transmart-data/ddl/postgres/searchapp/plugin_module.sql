@@ -2,8 +2,8 @@
 -- Name: plugin_module; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE plugin_module (
-    module_seq bigint NOT NULL,
-    plugin_seq bigint NOT NULL,
+    module_seq int NOT NULL,
+    plugin_seq int NOT NULL,
     name character varying(70) NOT NULL,
     params text NOT NULL,
     version character varying(10) DEFAULT 0.1 NOT NULL,

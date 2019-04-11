@@ -3,10 +3,10 @@
 --
 CREATE TABLE de_subject_microarray_data (
     trial_name character varying(50),
-    probeset_id bigint,
-    assay_id bigint,
-    patient_id bigint,
-    sample_id bigint,
+    probeset_id int,
+    assay_id int,
+    patient_id int,
+    sample_id int,
     subject_id character varying(100),
     raw_intensity double precision,
     log_intensity double precision,
@@ -15,7 +15,7 @@ CREATE TABLE de_subject_microarray_data (
     new_log double precision,
     new_zscore double precision,
     trial_source character varying(200),
-    partition_id numeric
+    partition_id int
 );
 
 --

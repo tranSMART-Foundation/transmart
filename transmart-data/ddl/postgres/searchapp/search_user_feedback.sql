@@ -2,9 +2,9 @@
 -- Name: search_user_feedback; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_user_feedback (
-    search_user_feedback_id bigint NOT NULL,
-    search_user_id bigint,
-    create_date timestamp without time zone,
+    search_user_feedback_id int NOT NULL,
+    search_user_id int,
+    create_date timestamp,
     feedback_text character varying(2000),
     app_version character varying(100)
 );

@@ -2,7 +2,7 @@
 -- Name: bio_asy_analysis_pltfm; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_asy_analysis_pltfm (
-    bio_asy_analysis_pltfm_id bigint NOT NULL,
+    bio_asy_analysis_pltfm_id int NOT NULL,
     platform_name character varying(200),
     platform_version character varying(200),
     platform_description character varying(1000)

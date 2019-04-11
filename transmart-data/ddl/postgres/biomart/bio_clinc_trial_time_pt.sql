@@ -2,12 +2,12 @@
 -- Name: bio_clinc_trial_time_pt; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_clinc_trial_time_pt (
-    bio_clinc_trial_tm_pt_id bigint NOT NULL,
+    bio_clinc_trial_tm_pt_id int NOT NULL,
     time_point character varying(200),
     time_point_code character varying(200),
-    start_date timestamp without time zone,
-    end_date timestamp without time zone,
-    bio_experiment_id bigint NOT NULL
+    start_date timestamp,
+    end_date timestamp,
+    bio_experiment_id int NOT NULL
 );
 
 --

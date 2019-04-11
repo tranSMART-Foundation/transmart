@@ -2,18 +2,18 @@
 -- Name: bio_assay; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_assay (
-    bio_assay_id bigint NOT NULL,
+    bio_assay_id int NOT NULL,
     etl_id character varying(100) NOT NULL,
     study character varying(200),
     protocol character varying(200),
     description text,
     sample_type character varying(200),
-    experiment_id bigint NOT NULL,
-    test_date timestamp without time zone,
-    sample_receive_date timestamp without time zone,
+    experiment_id int NOT NULL,
+    test_date timestamp,
+    sample_receive_date timestamp,
     requestor character varying(200),
     bio_assay_type character varying(200) NOT NULL,
-    bio_assay_platform_id bigint,
+    bio_assay_platform_id int,
     biosource character varying(200),
     measurement_type character varying(200),
     technology character varying(200),

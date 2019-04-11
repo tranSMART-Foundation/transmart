@@ -5,7 +5,7 @@ CREATE TABLE cz_xtrial_ctrl_vocab (
     ctrl_vocab_code character varying(200) NOT NULL,
     ctrl_vocab_name character varying(200) NOT NULL,
     ctrl_vocab_category character varying(200),
-    ctrl_vocab_id bigint NOT NULL
+    ctrl_vocab_id int NOT NULL
 );
 
 --

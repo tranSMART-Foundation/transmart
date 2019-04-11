@@ -2,9 +2,9 @@
 -- Name: search_sec_access_level; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_sec_access_level (
-    search_sec_access_level_id bigint NOT NULL,
+    search_sec_access_level_id int NOT NULL,
     access_level_name character varying(200),
-    access_level_value bigint
+    access_level_value int
 );
 
 --

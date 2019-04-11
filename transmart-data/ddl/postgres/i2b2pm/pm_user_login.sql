@@ -4,7 +4,7 @@
 CREATE TABLE pm_user_login (
     user_id character varying(50) NOT NULL,
     attempt_cd character varying(50) NOT NULL,
-    entry_date timestamp without time zone NOT NULL,
+    entry_date timestamp NOT NULL,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

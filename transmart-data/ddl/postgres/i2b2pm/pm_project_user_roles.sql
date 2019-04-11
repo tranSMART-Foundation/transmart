@@ -5,8 +5,8 @@ CREATE TABLE pm_project_user_roles (
     project_id character varying(50) NOT NULL,
     user_id character varying(50) NOT NULL,
     user_role_cd character varying(255) NOT NULL,
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

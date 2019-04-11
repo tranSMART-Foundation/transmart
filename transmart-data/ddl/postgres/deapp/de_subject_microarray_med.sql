@@ -3,19 +3,19 @@
 --
 CREATE TABLE de_subject_microarray_med (
     probeset character varying(50),
-    raw_intensity numeric,
-    log_intensity numeric,
+    raw_intensity double precision,
+    log_intensity double precision,
     gene_symbol character varying(50),
-    assay_id bigint,
-    patient_id bigint,
+    assay_id int,
+    patient_id int,
     subject_id character varying(100),
     trial_name character varying(15),
     timepoint character varying(30),
     pvalue double precision,
     refseq character varying(50),
-    mean_intensity numeric,
-    stddev_intensity numeric,
-    median_intensity numeric,
+    mean_intensity double precision,
+    stddev_intensity double precision,
+    median_intensity double precision,
     zscore double precision
 );
 

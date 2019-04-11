@@ -2,7 +2,7 @@
 -- Name: bio_lit_sum_data; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_lit_sum_data (
-    bio_lit_sum_data_id bigint NOT NULL,
+    bio_lit_sum_data_id int NOT NULL,
     etl_id character varying(50),
     disease_site character varying(250),
     target character varying(50),

@@ -8,8 +8,8 @@ CREATE TABLE pm_project_data (
     project_key character varying(255),
     project_path character varying(255),
     project_description character varying(2000),
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

@@ -6,7 +6,7 @@ CREATE TABLE status_of_export_job (
     last_export_name character varying(200),
     last_export_time date,
     job_name_id character varying(200),
-    id bigint NOT NULL
+    id int NOT NULL
 );
 
 --

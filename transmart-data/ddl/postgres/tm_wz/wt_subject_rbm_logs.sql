@@ -3,12 +3,12 @@
 --
 CREATE TABLE wt_subject_rbm_logs (
     probeset_id character varying(1000),
-    intensity_value bigint,
+    intensity_value double precision,
     pvalue double precision,
-    num_calls bigint,
-    assay_id bigint,
-    patient_id bigint,
-    sample_id bigint,
+    num_calls int,
+    assay_id int,
+    patient_id int,
+    sample_id int,
     subject_id character varying(100),
     trial_name character varying(50),
     timepoint character varying(100),

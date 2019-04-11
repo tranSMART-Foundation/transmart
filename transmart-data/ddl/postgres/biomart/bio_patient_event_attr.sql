@@ -5,9 +5,9 @@ CREATE TABLE bio_patient_event_attr (
     bio_patient_attr_code character varying(200) NOT NULL,
     attribute_text_value character varying(200),
     attribute_numeric_value character varying(200),
-    bio_clinic_trial_attr_id bigint NOT NULL,
-    bio_patient_attribute_id bigint NOT NULL,
-    bio_patient_event_id bigint NOT NULL
+    bio_clinic_trial_attr_id int NOT NULL,
+    bio_patient_attribute_id int NOT NULL,
+    bio_patient_event_id int NOT NULL
 );
 
 --

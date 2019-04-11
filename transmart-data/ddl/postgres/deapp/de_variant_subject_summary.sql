@@ -12,9 +12,9 @@ CREATE SEQUENCE de_variant_subject_summary_seq
 -- Name: de_variant_subject_summary; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_variant_subject_summary (
-    variant_subject_summary_id bigint DEFAULT nextval('de_variant_subject_summary_seq'::regclass) NOT NULL,
+    variant_subject_summary_id int DEFAULT nextval('de_variant_subject_summary_seq'::regclass) NOT NULL,
     chr character varying(50),
-    pos bigint,
+    pos int,
     dataset_id character varying(50) NOT NULL,
     subject_id character varying(100) NOT NULL,
     rs_id character varying(500),
@@ -22,9 +22,9 @@ CREATE TABLE de_variant_subject_summary (
     variant_format character varying(100),
     variant_type character varying(100),
     reference boolean,
-    allele1 integer,
-    allele2 integer,
-    assay_id bigint
+    allele1 int,
+    allele2 int,
+    assay_id int
 );
 
 --
@@ -52,6 +52,11 @@ CREATE INDEX gen_variant_subj_summ_chr_pos ON de_variant_subject_summary USING b
 -- Name: variant_subject_summary_uk; Type: INDEX; Schema: deapp; Owner: -
 --
 CREATE UNIQUE INDEX variant_subject_summary_uk ON de_variant_subject_summary USING btree (dataset_id, chr, pos, rs_id, subject_id);
+
+--
+-- Name: variant_subject_sumds_uk; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE UNIQUE INDEX variant_subject_sumds_uk ON de_variant_subject_summary USING btree (dataset_id, subject_id);
 
 --
 -- Name: variant_subject_summary_fk; Type: FK CONSTRAINT; Schema: deapp; Owner: -

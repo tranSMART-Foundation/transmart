@@ -2,9 +2,9 @@
 -- Name: de_snp_probe_sorted_def; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_snp_probe_sorted_def (
-    snp_probe_sorted_def_id bigint NOT NULL,
+    snp_probe_sorted_def_id int NOT NULL,
     platform_name character varying(255),
-    num_probe bigint,
+    num_probe int,
     chrom character varying(16),
     probe_def text,
     snp_id_def text

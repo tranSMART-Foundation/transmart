@@ -1,13 +1,13 @@
 --
 -- Name: wt_subject_rnaseq_calcs; Type: TABLE; Schema: tm_wz; Owner: -
 --
-CREATE TABLE tm_wz.wt_subject_rnaseq_calcs
+CREATE TABLE wt_subject_rnaseq_calcs
 (
   --WL--trial_name character varying(200),
-  region_id bigint,
-  mean_readcount numeric,
-  median_readcount numeric,
-  stddev_readcount numeric
+  region_id int,
+  mean_readcount double precision,
+  median_readcount double precision,
+  stddev_readcount double precision
 );
 
 --

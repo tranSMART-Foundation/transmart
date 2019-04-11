@@ -6,6 +6,6 @@ CREATE TABLE de_mrna_annotation_release (
     probe_id character varying(100),
     gene_symbol character varying(100),
     gene_id character varying(100),
-    probeset_id bigint
+    probeset_id int
 );
 

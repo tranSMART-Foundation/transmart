@@ -144,11 +144,13 @@
 \i biomart/views/ctd_td_status_view.sql
 \i biomart/views/ctd_treatment_phases_view.sql
 \i biomart/dd.sql
+\i biomart/faceted_search.sql
 \i biomart/gene_info_test.sql
 \i biomart/gene_synonym_test.sql
 \i biomart/genego_gene_map.sql
 \i biomart/gse_analysis.sql
 \i biomart/gse_probeset.sql
+\i biomart/gwas_partition.sql
 \i biomart/heat_map_results.sql
 \i biomart/mesh.sql
 \i biomart/mesh_descriptor.sql
@@ -159,6 +161,8 @@
 \i biomart/mirna_bio_marker.sql
 \i biomart/project_info.sql
 \i biomart/tests.sql
+\i biomart/tmp_analysis_eqtl_top500.sql
+\i biomart/tmp_analysis_gwas_top500.sql
 \i biomart/tmp_bio_marker.sql
 \i biomart/tmp_omicsoft_compound.sql
 \i biomart/tmp_omicsoft_disease_m1.sql

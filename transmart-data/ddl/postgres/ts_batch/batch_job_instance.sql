@@ -2,8 +2,8 @@
 -- Name: batch_job_instance; Type: TABLE; Schema: ts_batch; Owner: -
 --
 CREATE TABLE batch_job_instance (
-    job_instance_id bigint NOT NULL,
-    version bigint,
+    job_instance_id int NOT NULL,
+    version int,
     job_name character varying(100) NOT NULL,
     job_key character varying(32) NOT NULL
 );

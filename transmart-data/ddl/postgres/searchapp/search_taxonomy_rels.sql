@@ -2,9 +2,9 @@
 -- Name: search_taxonomy_rels; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_taxonomy_rels (
-    search_taxonomy_rels_id bigint NOT NULL,
-    child_id bigint NOT NULL,
-    parent_id bigint
+    search_taxonomy_rels_id int NOT NULL,
+    child_id int NOT NULL,
+    parent_id int
 );
 
 --

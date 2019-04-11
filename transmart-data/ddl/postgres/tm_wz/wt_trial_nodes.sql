@@ -16,6 +16,6 @@ CREATE TABLE wt_trial_nodes (
     link_type character varying(50),
     obs_string character varying(100),
     valuetype_cd character varying(50),
-    rec_num numeric
+    rec_num int
 );
 

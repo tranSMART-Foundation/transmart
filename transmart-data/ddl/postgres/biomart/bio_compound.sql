@@ -2,7 +2,7 @@
 -- Name: bio_compound; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_compound (
-    bio_compound_id bigint NOT NULL,
+    bio_compound_id int NOT NULL,
     cnto_number character varying(200),
     jnj_number character varying(200),
     cas_registry character varying(400),
@@ -13,7 +13,7 @@ CREATE TABLE bio_compound (
     mechanism character varying(400),
     product_category character varying(200),
     description character varying(1000),
-    etl_id_retired bigint,
+    etl_id_retired int,
     etl_id character varying(50),
     source_cd character varying(100)
 );

@@ -4,15 +4,15 @@
 CREATE TABLE bio_assay_analysis (
     analysis_name character varying(500),
     short_description character varying(510),
-    analysis_create_date timestamp without time zone,
+    analysis_create_date timestamp,
     analyst_id character varying(510),
-    bio_assay_analysis_id bigint NOT NULL,
+    bio_assay_analysis_id int NOT NULL,
     analysis_version character varying(200),
     fold_change_cutoff double precision,
     pvalue_cutoff double precision,
     rvalue_cutoff double precision,
-    bio_asy_analysis_pltfm_id bigint,
-    bio_source_import_id bigint,
+    bio_asy_analysis_pltfm_id int,
+    bio_source_import_id int,
     analysis_type character varying(200),
     analyst_name character varying(250),
     analysis_method_cd character varying(50),
@@ -20,11 +20,11 @@ CREATE TABLE bio_assay_analysis (
     etl_id character varying(100),
     long_description character varying(4000),
     qa_criteria character varying(4000),
-    data_count bigint,
-    tea_data_count bigint,
+    data_count int,
+    tea_data_count int,
     analysis_update_date date,
     lsmean_cutoff double precision,
-    etl_id_source bigint
+    etl_id_source int
 );
 
 --
@@ -64,7 +64,7 @@ CREATE FUNCTION tf_trg_bio_assay_analysis_uid() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-  rec_count bigint;
+  rec_count int;
 BEGIN
   SELECT COUNT(*) INTO rec_count 
   FROM biomart.bio_data_uid 

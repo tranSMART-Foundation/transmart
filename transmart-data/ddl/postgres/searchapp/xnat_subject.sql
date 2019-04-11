@@ -6,7 +6,7 @@ CREATE TABLE xnat_subject
     tsmart_subjectid character varying(100),
     xnat_subjectid character varying(100),
     xnat_project character varying(80),
-    id bigint NOT NULL
+    id int NOT NULL
 );
 
 --

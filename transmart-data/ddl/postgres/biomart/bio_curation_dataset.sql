@@ -2,12 +2,12 @@
 -- Name: bio_curation_dataset; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_curation_dataset (
-    bio_curation_dataset_id bigint NOT NULL,
-    bio_asy_analysis_pltfm_id bigint,
-    bio_source_import_id bigint,
+    bio_curation_dataset_id int NOT NULL,
+    bio_asy_analysis_pltfm_id int,
+    bio_source_import_id int,
     bio_curation_type character varying(200) NOT NULL,
-    create_date timestamp without time zone,
-    creator bigint,
+    create_date timestamp,
+    creator int,
     bio_curation_name character varying(500),
     data_type character varying(100)
 );

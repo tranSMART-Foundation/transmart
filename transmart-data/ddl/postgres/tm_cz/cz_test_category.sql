@@ -2,11 +2,11 @@
 -- Name: cz_test_category; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE cz_test_category (
-    test_category_id bigint NOT NULL,
+    test_category_id int NOT NULL,
     test_category character varying(255),
     test_sub_category1 character varying(255),
     test_sub_category2 character varying(255),
-    person_id bigint
+    person_id int
 );
 
 --

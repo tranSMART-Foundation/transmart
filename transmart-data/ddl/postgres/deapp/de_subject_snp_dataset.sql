@@ -2,16 +2,16 @@
 -- Name: de_subject_snp_dataset; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_subject_snp_dataset (
-    subject_snp_dataset_id bigint NOT NULL,
+    subject_snp_dataset_id int NOT NULL,
     dataset_name character varying(255),
     concept_cd character varying(255),
     platform_name character varying(255),
     trial_name character varying(255),
-    patient_num bigint,
+    patient_num int,
     timepoint character varying(255),
     subject_id character varying(255),
     sample_type character varying(255),
-    paired_dataset_id bigint,
+    paired_dataset_id int,
     patient_gender character varying(1)
 );
 

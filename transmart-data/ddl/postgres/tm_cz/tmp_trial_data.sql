@@ -12,7 +12,7 @@ CREATE TABLE tmp_trial_data (
     category_path character varying(250),
     sub_category_path_1 character varying(250),
     sub_category_path_2 character varying(250),
-    patient_num bigint,
+    patient_num int,
     sourcesystem_cd character varying(50),
     base_path character varying(1250)
 );

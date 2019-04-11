@@ -371,7 +371,7 @@ BEGIN
 	  and sm.partition_id is not null;
 
 	if partExists = 0 then
-		select nextval('deapp.seq_mrna_partition_id') into partitionId;
+		select nextval('deapp.seq_rnaseq_partition_id') into partitionId;
 	else
 		select distinct partition_id into partitionId
 		from deapp.de_subject_sample_mapping sm

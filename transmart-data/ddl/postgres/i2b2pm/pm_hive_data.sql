@@ -6,9 +6,9 @@ CREATE TABLE pm_hive_data (
     helpurl character varying(255),
     domain_name character varying(255),
     environment_cd character varying(255),
-    active numeric(1,0),
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    active int,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

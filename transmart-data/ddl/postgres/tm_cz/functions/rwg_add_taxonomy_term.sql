@@ -7,7 +7,7 @@
 -- DATASOURCE: dbi:Oracle:host=mydb.mydom.fr;sid=SIDNAME
 
 
-CREATE FUNCTION tm_cz.rwg_add_taxonomy_term (
+CREATE FUNCTION rwg_add_taxonomy_term (
 	New_Term_in text,
 	parent_term_in text,
 	category_term_in text,

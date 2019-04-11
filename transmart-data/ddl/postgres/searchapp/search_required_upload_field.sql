@@ -3,7 +3,7 @@ set search_path = searchapp, pg_catalog;
 -- Name: search_required_upload_field; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_required_upload_field (
-    required_upload_field_id bigint NOT NULL,
+    required_upload_field_id int NOT NULL,
     type character varying(50),
     field character varying(50)
 );

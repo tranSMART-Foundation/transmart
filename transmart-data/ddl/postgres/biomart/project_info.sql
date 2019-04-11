@@ -2,7 +2,7 @@
 -- Name: project_info; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE project_info (
-    file_id integer NOT NULL,
+    file_id int NOT NULL,
     id character varying(100),
     name character varying(100),
     file_name character varying(100),
@@ -44,7 +44,7 @@ CREATE TABLE project_info (
     project_editors character varying(100),
     project_isprivate character varying(100),
     project_publishdate character varying(100),
-    entrydt timestamp without time zone
+    entrydt timestamp
 );
 
 --

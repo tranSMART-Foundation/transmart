@@ -2,22 +2,22 @@
 -- Name: am_tag_item; Type: TABLE; Schema: amapp; Owner: -
 --
 CREATE TABLE am_tag_item (
-    tag_template_id bigint NOT NULL,
-    tag_item_id bigint NOT NULL,
+    tag_template_id int NOT NULL,
+    tag_item_id int NOT NULL,
     required character varying(1),
-    display_order bigint,
+    display_order int,
     display_name character varying(200) NOT NULL,
     gui_handler character varying(200) NOT NULL,
-    max_values bigint,
+    max_values int,
     code_type_name character varying(200),
     editable character varying(1),
     active_ind boolean NOT NULL,
     tag_item_uid character varying(300) NOT NULL,
     tag_item_attr character varying(300),
     tag_item_type character varying(200),
-    view_in_grid smallint,
+    view_in_grid int,
     tag_item_subtype character varying(200),
-    view_in_child_grid smallint
+    view_in_child_grid int
 );
 
 --

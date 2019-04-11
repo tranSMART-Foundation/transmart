@@ -2,10 +2,10 @@
 -- Name: tmp_assay_analysis_metrics; Type: TABLE; Schema: tm_wz; Owner: -
 --
 CREATE TABLE tmp_assay_analysis_metrics (
-    bio_assay_analysis_id bigint NOT NULL,
-    data_ct bigint,
-    fc_mean bigint,
-    fc_stddev bigint
+    bio_assay_analysis_id int NOT NULL,
+    data_ct int,
+    fc_mean int,
+    fc_stddev int
 );
 
 --

@@ -3,20 +3,20 @@
 --
 CREATE TABLE de_subject_mrna_data_release (
     trial_name character varying(50),
-    probeset_id bigint,
-    assay_id bigint,
-    patient_id bigint,
+    probeset_id int,
+    assay_id int,
+    patient_id int,
     timepoint character varying(100),
     pvalue double precision,
     refseq character varying(50),
     subject_id character varying(100),
-    raw_intensity bigint,
+    raw_intensity int,
     mean_intensity double precision,
     stddev_intensity double precision,
     median_intensity double precision,
     log_intensity double precision,
     zscore double precision,
-    sample_id bigint,
+    sample_id int,
     release_study character varying(50)
 );
 

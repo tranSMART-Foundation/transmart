@@ -2,9 +2,9 @@
 -- Name: de_xtrial_parent_names; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_xtrial_parent_names (
-    parent_cd bigint NOT NULL,
+    parent_cd int NOT NULL,
     across_path character varying(500),
-    manually_created bigint
+    manually_created int
 );
 
 --

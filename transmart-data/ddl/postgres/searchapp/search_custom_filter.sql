@@ -2,8 +2,8 @@
 -- Name: search_custom_filter; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_custom_filter (
-    search_custom_filter_id bigint NOT NULL,
-    search_user_id bigint NOT NULL,
+    search_custom_filter_id int NOT NULL,
+    search_user_id int NOT NULL,
     name character varying(200) NOT NULL,
     description character varying(2000),
     private character(1) DEFAULT 'N'::bpchar NOT NULL

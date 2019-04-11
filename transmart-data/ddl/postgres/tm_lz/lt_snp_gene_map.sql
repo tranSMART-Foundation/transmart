@@ -3,6 +3,6 @@
 --
 CREATE TABLE lt_snp_gene_map ( -- UNLOGGED
     snp_name character varying(256),
-    entrez_gene_id bigint
+    entrez_gene_id int
 );
 

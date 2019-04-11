@@ -4,6 +4,6 @@
 CREATE TABLE wt_mrna_data (
     probeset character varying(100),
     expr_id character varying(100),
-    intensity_value character varying(50)
+    intensity_value character varying(50) -- unclear why this is not double precision
 );
 

@@ -2,18 +2,18 @@
 -- Name: bio_assay_data; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_assay_data (
-    bio_sample_id bigint,
-    bio_assay_data_id bigint NOT NULL,
+    bio_sample_id int,
+    bio_assay_data_id int NOT NULL,
     log2_value double precision,
     log10_value double precision,
-    numeric_value bigint,
+    numeric_value int,
     text_value character varying(200),
     float_value double precision,
     feature_group_name character varying(100) NOT NULL,
-    bio_experiment_id bigint,
-    bio_assay_dataset_id bigint,
-    bio_assay_id bigint,
-    etl_id bigint
+    bio_experiment_id int,
+    bio_assay_dataset_id int,
+    bio_assay_id int,
+    etl_id int
 );
 
 --

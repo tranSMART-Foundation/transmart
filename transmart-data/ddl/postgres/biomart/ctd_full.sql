@@ -2,7 +2,7 @@
 -- Name: ctd_full; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE ctd_full (
-    clinical_trial_design_id bigint,
+    clinical_trial_design_id int,
     ref_article_protocol_id character varying(4000),
     ref_record_id character varying(4000),
     ref_back_reference character varying(4000),

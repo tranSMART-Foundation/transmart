@@ -5,7 +5,7 @@ CREATE TABLE lt_snp_copy_number ( --UNLOGGED
     gsm_num character varying(10),
     snp_name character varying(50),
     chrom character varying(2),
-    chrom_pos numeric(20,0),
+    chrom_pos int,
     copy_number double precision
 );
 

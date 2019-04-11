@@ -2,12 +2,12 @@
 -- Name: saved_faceted_search; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE saved_faceted_search (
-    saved_faceted_search_id bigint NOT NULL,
-    user_id bigint NOT NULL,
+    saved_faceted_search_id int NOT NULL,
+    user_id int NOT NULL,
     name character varying(100) NOT NULL,
     keywords character varying(4000) NOT NULL,
-    create_dt date DEFAULT now(),
-    modified_dt date,
+    create_dt timestamp DEFAULT now(),
+    modified_dt timestamp,
     search_type character varying(50) DEFAULT 'FACETED_SEARCH'::character varying NOT NULL,
     analysis_ids character varying(4000)
 );

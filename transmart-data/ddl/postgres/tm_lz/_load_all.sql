@@ -19,7 +19,7 @@
 \i tm_lz/lt_src_display_mapping.sql
 \i tm_lz/lt_src_metabolomic_data.sql
 \i tm_lz/lt_src_metabolomic_map.sql
-\i tm_lz/lt_src_metabolomics_display_mapping.sql
+\i tm_lz/lt_src_metabol_display_mapping.sql
 \i tm_lz/lt_src_mirna_deapp_annot.sql
 \i tm_lz/lt_src_mirna_display_mapping.sql
 \i tm_lz/lt_src_mirna_subj_samp_map.sql

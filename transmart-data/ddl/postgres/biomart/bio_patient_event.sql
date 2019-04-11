@@ -2,13 +2,13 @@
 -- Name: bio_patient_event; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_patient_event (
-    bio_patient_event_id bigint NOT NULL,
-    bio_patient_id bigint NOT NULL,
+    bio_patient_event_id int NOT NULL,
+    bio_patient_id int NOT NULL,
     event_code character varying(200),
     event_type_code character varying(200),
-    event_date timestamp without time zone,
+    event_date timestamp,
     site character varying(400),
-    bio_clinic_trial_timepoint_id bigint NOT NULL
+    bio_clinic_trial_timepoint_id int NOT NULL
 );
 
 --

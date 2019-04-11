@@ -2,7 +2,7 @@
 -- Name: am_data_uid; Type: TABLE; Schema: amapp; Owner: -
 --
 CREATE TABLE am_data_uid (
-    am_data_id bigint NOT NULL,
+    am_data_id int NOT NULL,
     unique_id character varying(300) NOT NULL,
     am_data_type character varying(100) NOT NULL
 );

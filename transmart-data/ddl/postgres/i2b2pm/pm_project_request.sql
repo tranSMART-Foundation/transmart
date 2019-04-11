@@ -2,11 +2,11 @@
 -- Name: pm_project_request; Type: TABLE; Schema: i2b2pm; Owner: -
 --
 CREATE TABLE pm_project_request (
-    id bigint,
+    id int,
     title character varying(255),
     request_xml text NOT NULL,
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50),
     project_id character varying(50),

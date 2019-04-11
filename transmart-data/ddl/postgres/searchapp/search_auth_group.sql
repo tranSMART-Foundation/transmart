@@ -2,7 +2,7 @@
 -- Name: search_auth_group; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_auth_group (
-    id bigint NOT NULL,
+    id int NOT NULL,
     group_category character varying(255)
 );
 

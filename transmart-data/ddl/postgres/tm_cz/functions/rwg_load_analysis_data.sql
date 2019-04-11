@@ -7,7 +7,7 @@
 -- DATASOURCE: dbi:Oracle:host=mydb.mydom.fr;sid=SIDNAME
 
 
-CREATE OR REPLACE FUNCTION tm_cz.rwg_load_analysis_data (
+CREATE OR REPLACE FUNCTION rwg_load_analysis_data (
   trialID text
  ,currentJobID bigint DEFAULT null
  ,inPlatformID bigint DEFAULT null

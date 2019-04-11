@@ -14,8 +14,8 @@ CREATE TABLE workplace (
     c_work_xml text,
     c_work_xml_schema text,
     c_work_xml_i2b2_type character varying(255),
-    c_entry_date timestamp without time zone,
-    c_change_date timestamp without time zone,
+    c_entry_date timestamp,
+    c_change_date timestamp,
     c_status_cd character(1)
 );
 --

@@ -2,12 +2,12 @@
 -- Name: async_job; Type: TABLE; Schema: i2b2demodata; Owner: -
 --
 CREATE TABLE async_job (
-    id integer NOT NULL,
+    id int NOT NULL,
     job_name character varying(200),
     job_status character varying(200),
     run_time character varying(200),
-    job_status_time timestamp(6) without time zone,
-    last_run_on timestamp(6) without time zone,
+    job_status_time timestamp,
+    last_run_on timestamp,
     viewer_url character varying(4000),
     alt_viewer_url character varying(4000),
     job_results text,

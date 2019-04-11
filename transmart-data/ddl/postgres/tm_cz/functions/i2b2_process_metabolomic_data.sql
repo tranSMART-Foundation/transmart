@@ -85,7 +85,7 @@ Declare
 
      uploadI2b2 cursor for
     select category_cd,display_value,display_label,display_unit from
-    tm_lz.lt_src_METABOLOMICS_display_mapping;
+    tm_lz.lt_src_metabol_display_mapping;
     
 
 

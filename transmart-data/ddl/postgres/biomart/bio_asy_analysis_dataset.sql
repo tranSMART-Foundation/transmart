@@ -2,8 +2,8 @@
 -- Name: bio_asy_analysis_dataset; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_asy_analysis_dataset (
-    bio_assay_dataset_id bigint NOT NULL,
-    bio_assay_analysis_id bigint NOT NULL
+    bio_assay_dataset_id int NOT NULL,
+    bio_assay_analysis_id int NOT NULL
 );
 
 --

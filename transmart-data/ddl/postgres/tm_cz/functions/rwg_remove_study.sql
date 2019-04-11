@@ -7,7 +7,7 @@
 -- DATASOURCE: dbi:Oracle:host=mydb.mydom.fr;sid=SIDNAME
 
 
-CREATE OR REPLACE FUNCTION tm_cz.rwg_remove_study (
+CREATE OR REPLACE FUNCTION rwg_remove_study (
   trialID text,
   currentJobID bigint DEFAULT null
 )

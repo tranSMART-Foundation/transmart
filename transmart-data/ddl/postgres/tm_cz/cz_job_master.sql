@@ -2,13 +2,13 @@
 -- Name: cz_job_master; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE cz_job_master (
-    job_id bigint DEFAULT NULL NOT NULL,
-    start_date timestamp without time zone,
-    end_date timestamp without time zone,
+    job_id int DEFAULT NULL NOT NULL,
+    start_date timestamp,
+    end_date timestamp,
     active character varying(1),
     time_elapsed_secs double precision DEFAULT 0,
-    build_id bigint,
-    session_id bigint,
+    build_id int,
+    session_id int,
     database_name character varying(50),
     job_status character varying(50),
     job_name character varying(500)

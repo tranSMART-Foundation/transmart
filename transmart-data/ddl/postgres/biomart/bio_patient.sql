@@ -2,11 +2,11 @@
 -- Name: bio_patient; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_patient (
-    bio_patient_id bigint NOT NULL,
+    bio_patient_id int NOT NULL,
     first_name character varying(200),
     last_name character varying(200),
     middle_name character varying(200),
-    birth_date timestamp without time zone,
+    birth_date timestamp,
     birth_date_orig character varying(200),
     gender_code character varying(200),
     race_code character varying(200),
@@ -14,8 +14,8 @@ CREATE TABLE bio_patient (
     address_zip_code character varying(200),
     country_code character varying(200),
     informed_consent_code character varying(200),
-    bio_experiment_id bigint,
-    bio_clinical_trial_p_group_id bigint
+    bio_experiment_id int,
+    bio_clinical_trial_p_group_id int
 );
 
 --

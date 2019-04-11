@@ -2,8 +2,8 @@
 -- Name: bio_data_disease; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_data_disease (
-    bio_data_id bigint NOT NULL,
-    bio_disease_id bigint NOT NULL,
+    bio_data_id int NOT NULL,
+    bio_disease_id int NOT NULL,
     etl_source character varying(100)
 );
 

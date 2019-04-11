@@ -2,10 +2,10 @@
 -- Name: de_snp_subject_sorted_def; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_snp_subject_sorted_def (
-    snp_subject_sorted_def_id bigint NOT NULL,
+    snp_subject_sorted_def_id int NOT NULL,
     trial_name character varying(255),
-    patient_position integer,
-    patient_num bigint,
+    patient_position int,
+    patient_num int,
     subject_id character varying(255)
 );
 

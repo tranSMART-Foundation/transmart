@@ -2,11 +2,11 @@
 -- Name: search_auth_principal; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_auth_principal (
-    id bigint NOT NULL,
+    id int NOT NULL,
     principal_type character varying(255),
-    date_created timestamp without time zone NOT NULL,
-    description character varying(255),
-    last_updated timestamp without time zone NOT NULL,
+    date_created timestamp,
+    description character varying(4000),
+    last_updated timestamp,
     name character varying(255),
     unique_id character varying(255),
     enabled boolean

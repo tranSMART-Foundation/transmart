@@ -13,7 +13,7 @@ CREATE TABLE rwg_analysis (
     platform character varying(500),
     long_desc character varying(500),
     short_desc character varying(500),
-    import_date timestamp(6) without time zone DEFAULT now() NOT NULL,
-    bio_assay_analysis_id bigint
+    import_date timestamp DEFAULT now() NOT NULL,
+    bio_assay_analysis_id int
 );
 

@@ -2,7 +2,7 @@
 -- Name: bio_data_correl_descr; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_data_correl_descr (
-    bio_data_correl_descr_id bigint NOT NULL,
+    bio_data_correl_descr_id int NOT NULL,
     correlation character varying(510),
     description character varying(1000),
     type_name character varying(200),

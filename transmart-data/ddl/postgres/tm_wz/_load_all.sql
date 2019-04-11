@@ -1,6 +1,12 @@
 \i tm_wz/prelude.sql
 \i tm_wz/bio_assay_analysis_data_new.sql
+\i tm_wz/de_subject_rbm_data.sql
+\i tm_wz/i2b2_load_path.sql
+\i tm_wz/i2b2_load_path_with_count.sql
 \i tm_wz/tmp_assay_analysis_metrics.sql
+\i tm_wz/tmp_subject_rbm_calcs.sql
+\i tm_wz/tmp_subject_rbm_logs.sql
+\i tm_wz/tmp_subject_rbm_med.sql
 \i tm_wz/wrk_clinical_data.sql
 \i tm_wz/wrk_mrna_data.sql
 \i tm_wz/wt_clinical_data_dups.sql

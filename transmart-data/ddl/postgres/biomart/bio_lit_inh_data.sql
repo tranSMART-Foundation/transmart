@@ -2,8 +2,8 @@
 -- Name: bio_lit_inh_data; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_lit_inh_data (
-    bio_lit_inh_data_id bigint NOT NULL,
-    bio_lit_ref_data_id bigint NOT NULL,
+    bio_lit_inh_data_id int NOT NULL,
+    bio_lit_ref_data_id int NOT NULL,
     etl_id character varying(50),
     trial_type character varying(250),
     trial_phase character varying(250),

@@ -4,13 +4,13 @@
 CREATE TABLE de_subject_mirna_data (
     trial_source character varying(200),
     trial_name character varying(50),
-    assay_id numeric(18,0) NOT NULL,
-    patient_id numeric(18,0),
-    raw_intensity numeric,
-    log_intensity numeric,
-    probeset_id numeric(38,0) NOT NULL,
-    zscore numeric(18,9),
-    partition_id numeric
+    assay_id int NOT NULL,
+    patient_id int,
+    raw_intensity double precision,
+    log_intensity double precision,
+    probeset_id int NOT NULL,
+    zscore double precision,
+    partition_id int
 );
 
 --

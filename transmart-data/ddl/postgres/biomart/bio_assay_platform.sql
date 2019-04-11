@@ -2,7 +2,7 @@
 -- Name: bio_assay_platform; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_assay_platform (
-    bio_assay_platform_id bigint NOT NULL,
+    bio_assay_platform_id int NOT NULL,
     platform_name character varying(200),
     platform_version character varying(200),
     platform_description character varying(2000),

@@ -2,14 +2,15 @@
 -- Name: search_auth_user; Type: TABLE; Schema: searchapp; Owner: -
 --
 CREATE TABLE search_auth_user (
-    id bigint NOT NULL,
+    id int NOT NULL,
     email character varying(255),
     email_show boolean,
     passwd character varying(255),
     user_real_name character varying(255),
     username character varying(255),
     federated_id character varying(255),
-    change_passwd boolean
+    change_passwd boolean,
+    login_attempt_count int DEFAULT 0
 );
 
 --

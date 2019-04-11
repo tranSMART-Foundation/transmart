@@ -12,6 +12,6 @@ CREATE TABLE rwg_cohorts (
     cohort_title character varying(500),
     short_desc character varying(500),
     long_desc character varying(500),
-    import_date timestamp(6) without time zone DEFAULT now() NOT NULL
+    import_date timestamp DEFAULT now() NOT NULL
 );
 

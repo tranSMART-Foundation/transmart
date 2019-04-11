@@ -12,8 +12,8 @@ CREATE TABLE bio_assay_cohort (
     cohort_title character varying(500),
     short_desc character varying(500),
     long_desc character varying(500),
-    import_date timestamp(6) without time zone NOT NULL,
-    bio_assay_cohort_id bigint NOT NULL
+    import_date timestamp NOT NULL,
+    bio_assay_cohort_id int NOT NULL
 );
 
 --

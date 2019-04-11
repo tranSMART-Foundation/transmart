@@ -2,8 +2,8 @@
 -- Name: qt_analysis_plugin_result_type; Type: TABLE; Schema: i2b2demodata; Owner: -
 --
 CREATE TABLE qt_analysis_plugin_result_type (
-    plugin_id numeric(10,0) NOT NULL,
-    result_type_id numeric(10,0) NOT NULL
+    plugin_id int NOT NULL,
+    result_type_id int NOT NULL
 );
 
 --

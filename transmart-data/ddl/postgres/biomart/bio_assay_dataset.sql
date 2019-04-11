@@ -2,13 +2,13 @@
 -- Name: bio_assay_dataset; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_assay_dataset (
-    bio_assay_dataset_id bigint NOT NULL,
+    bio_assay_dataset_id int NOT NULL,
     dataset_name character varying(400),
     dataset_description character varying(1000),
     dataset_criteria character varying(1000),
-    create_date timestamp without time zone,
-    bio_experiment_id bigint NOT NULL,
-    bio_assay_id bigint,
+    create_date timestamp,
+    bio_experiment_id int NOT NULL,
+    bio_assay_id int,
     etl_id character varying(100),
     accession character varying(50)
 );

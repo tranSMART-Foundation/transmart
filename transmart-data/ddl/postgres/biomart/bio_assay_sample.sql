@@ -2,9 +2,9 @@
 -- Name: bio_assay_sample; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_assay_sample (
-    bio_assay_id bigint NOT NULL,
-    bio_sample_id bigint NOT NULL,
-    bio_clinic_trial_timepoint_id bigint NOT NULL
+    bio_assay_id int NOT NULL,
+    bio_sample_id int NOT NULL,
+    bio_clinic_trial_timepoint_id int NOT NULL
 );
 
 --

@@ -2,16 +2,16 @@
 -- Name: bio_sample; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_sample (
-    bio_sample_id bigint NOT NULL,
+    bio_sample_id int NOT NULL,
     bio_sample_type character varying(200) NOT NULL,
     characteristics character varying(1000),
     source_code character varying(200),
-    experiment_id bigint,
-    bio_subject_id bigint,
+    experiment_id int,
+    bio_subject_id int,
     source character varying(200),
-    bio_bank_id bigint,
-    bio_patient_event_id bigint,
-    bio_cell_line_id bigint,
+    bio_bank_id int,
+    bio_patient_event_id int,
+    bio_cell_line_id int,
     bio_sample_name character varying(100)
 );
 

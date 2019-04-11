@@ -2,10 +2,10 @@
 -- Name: bio_lit_alt_data; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_lit_alt_data (
-    bio_lit_alt_data_id bigint NOT NULL,
-    bio_lit_ref_data_id bigint NOT NULL,
-    in_vivo_model_id bigint,
-    in_vitro_model_id bigint,
+    bio_lit_alt_data_id int NOT NULL,
+    bio_lit_ref_data_id int NOT NULL,
+    in_vivo_model_id int,
+    in_vitro_model_id int,
     etl_id character varying(50),
     alteration_type character varying(50),
     control character varying(1000),

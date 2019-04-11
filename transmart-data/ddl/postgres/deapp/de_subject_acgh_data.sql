@@ -3,19 +3,19 @@
 --
 CREATE TABLE de_subject_acgh_data (
     trial_name character varying(50),
-    region_id bigint NOT NULL,
-    assay_id bigint NOT NULL,
-    patient_id bigint,
+    region_id int NOT NULL,
+    assay_id int NOT NULL,
+    patient_id int,
     chip double precision,
     segmented double precision,
-    flag smallint,
+    flag int,
     probhomloss double precision,
     probloss double precision,
     probnorm double precision,
     probgain double precision,
     probamp double precision,
     trial_source character varying(200),
-    partition_id numeric
+    partition_id int
 );
 
 --

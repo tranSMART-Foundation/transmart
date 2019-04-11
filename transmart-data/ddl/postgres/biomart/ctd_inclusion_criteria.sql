@@ -2,7 +2,7 @@
 -- Name: ctd_inclusion_criteria; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE ctd_inclusion_criteria (
-    ctd_study_id bigint,
+    ctd_study_id int,
     inhaled_steroid_dose character varying(4000),
     laba character varying(4000),
     ocs character varying(4000),

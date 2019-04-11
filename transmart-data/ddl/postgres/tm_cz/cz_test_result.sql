@@ -2,13 +2,13 @@
 -- Name: cz_test_result; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE cz_test_result (
-    test_id bigint NOT NULL,
-    test_result_id bigint NOT NULL,
+    test_id int NOT NULL,
+    test_result_id int NOT NULL,
     test_result_text character varying(2000),
-    test_result_nbr bigint,
-    test_run_id bigint,
+    test_result_nbr int,
+    test_run_id int,
     external_location character varying(2000),
-    run_date timestamp without time zone,
+    run_date timestamp,
     study_id character varying(2000)
 );
 

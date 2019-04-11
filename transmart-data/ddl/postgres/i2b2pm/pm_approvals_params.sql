@@ -2,16 +2,16 @@
 -- Name: pm_approvals_params; Type: TABLE; Schema: i2b2pm; Owner: -
 --
 CREATE TABLE pm_approvals_params (
-    id bigint,
+    id int,
     approval_id character varying(50) NOT NULL,
     param_name_cd character varying(50) NOT NULL,
     value text,
-    activation_date timestamp without time zone,
-    expiration_date timestamp without time zone,
+    activation_date timestamp,
+    expiration_date timestamp,
     datatype_cd character varying(50),
     object_cd character varying(50),
-    change_date timestamp without time zone,
-    entry_date timestamp without time zone,
+    change_date timestamp,
+    entry_date timestamp,
     changeby_char character varying(50),
     status_cd character varying(50)
 );

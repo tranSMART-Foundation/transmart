@@ -9,8 +9,8 @@ CREATE TABLE wrk_clinical_data (
     data_label character varying(500),
     data_value character varying(500),
     category_cd character varying(250),
-    etl_job_id numeric(22,0),
-    etl_date timestamp without time zone,
+    etl_job_id int,
+    etl_date timestamp,
     usubjid character varying(200),
     category_path character varying(1000),
     data_type character varying(10),
@@ -26,12 +26,12 @@ CREATE TABLE wrk_clinical_data (
     visit_reference character varying(100),
     date_ind character(1),
     obs_string character varying(100),
-    rec_num numeric(18,0),
+    rec_num int,
     valuetype_cd character varying(50),
     leaf_node character varying(2000),
     modifier_cd character varying(100),
     ctrl_vocab_code character varying(200),
-    date_timestamp timestamp without time zone,
+    date_timestamp timestamp,
     sample_cd character varying(200)
 );
 

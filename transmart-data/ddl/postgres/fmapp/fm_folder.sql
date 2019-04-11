@@ -2,14 +2,14 @@
 -- Name: fm_folder; Type: TABLE; Schema: fmapp; Owner: -
 --
 CREATE TABLE fm_folder (
-    folder_id bigint NOT NULL,
+    folder_id int NOT NULL,
     folder_name character varying(1000) NOT NULL,
     folder_full_name character varying(1000) NOT NULL,
-    folder_level bigint NOT NULL,
+    folder_level int NOT NULL,
     folder_type character varying(100) NOT NULL,
     folder_tag character varying(50),
     active_ind boolean NOT NULL,
-    parent_id bigint,
+    parent_id int,
     description character varying(2000)
 );
 
@@ -54,7 +54,7 @@ CREATE FUNCTION tf_trg_fm_folder_uid() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 DECLARE
-  rec_count bigint;
+  rec_count int;
 BEGIN
   SELECT COUNT(*) INTO rec_count 
   FROM fmapp.fm_data_uid 

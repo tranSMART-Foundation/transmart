@@ -2,7 +2,7 @@
 -- Name: batch_job_execution_context; Type: TABLE; Schema: ts_batch; Owner: -
 --
 CREATE TABLE batch_job_execution_context (
-    job_execution_id bigint NOT NULL,
+    job_execution_id int NOT NULL,
     short_context character varying(2500) NOT NULL,
     serialized_context text
 );

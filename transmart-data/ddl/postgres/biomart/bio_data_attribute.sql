@@ -2,10 +2,10 @@
 -- Name: bio_data_attribute; Type: TABLE; Schema: biomart; Owner: -
 --
 CREATE TABLE bio_data_attribute (
-    bio_data_attribute_id bigint NOT NULL,
+    bio_data_attribute_id int NOT NULL,
     property_code character varying(200) NOT NULL,
     property_value character varying(200),
-    bio_data_id bigint NOT NULL,
+    bio_data_id int NOT NULL,
     property_unit character varying(100)
 );
 

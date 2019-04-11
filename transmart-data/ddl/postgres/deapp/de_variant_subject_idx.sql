@@ -14,14 +14,14 @@ CREATE SEQUENCE de_variant_subject_idx_seq
 CREATE TABLE de_variant_subject_idx (
     dataset_id character varying(50),
     subject_id character varying(100),
-    "position" bigint,
-    variant_subject_idx_id bigint DEFAULT nextval('de_variant_subject_idx_seq'::regclass) NOT NULL
+    "position" int,
+    variant_subject_idx_id int DEFAULT nextval('de_variant_subject_idx_seq'::regclass) NOT NULL
 );
 
 --
 -- Name: variant_subject_idx_uk; Type: INDEX; Schema: deapp; Owner: -
 --
-CREATE UNIQUE INDEX variant_subject_idx_uk ON de_variant_subject_idx USING btree (dataset_id, subject_id, "position");
+CREATE UNIQUE INDEX variant_subject_idx_uk ON de_variant_subject_idx USING btree (dataset_id, subject_id);
 
 --
 -- Name: variant_subject_idx_fk; Type: FK CONSTRAINT; Schema: deapp; Owner: -
