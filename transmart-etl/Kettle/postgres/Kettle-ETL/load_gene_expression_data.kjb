@@ -14,17 +14,17 @@
         <parameter>
             <name>BULK_LOADER_PATH</name>
             <default_value>$ORACLE_HOME/bin</default_value>
-            <description>path to executable for bulk loads</description>
+            <description>Path to executable for bulk loads</description>
         </parameter>
         <parameter>
             <name>DATA_FILE_PREFIX</name>
             <default_value>x</default_value>
-            <description>gene expression data file prefix, usually STUDY_somechars used to search for all gene expression data files</description>
+            <description>Gene expression data file prefix, usually STUDY_somechars used to search for all gene expression data files</description>
         </parameter>
         <parameter>
             <name>DATA_LOCATION</name>
             <default_value>x</default_value>
-            <description>directory where gene expression data file and subject-sample map file are located</description>
+            <description>Directory where gene expression data file and subject-sample map file are located</description>
         </parameter>
         <parameter>
             <name>DATA_TYPE</name>
@@ -34,12 +34,12 @@
         <parameter>
             <name>FilePivot_LOCATION</name>
             <default_value>C:\Users\javitabile\Documents\tranSMART\Pivoter</default_value>
-            <description>fully-qualified path to FilePivot.jar file</description>
+            <description>Fully-qualified path to FilePivot.jar file</description>
         </parameter>
         <parameter>
             <name>JAVA_LOCATION</name>
             <default_value/>
-            <description>use this if JAVA_HOME is not 1.6+, used for FilePivot.jar</description>
+            <description>Used if JAVA_HOME is not 1.6+, used for FilePivot.jar</description>
         </parameter>
         <parameter>
             <name>LOAD_TYPE</name>
@@ -49,12 +49,12 @@
         <parameter>
             <name>LOG_BASE</name>
             <default_value>2</default_value>
-            <description>base of log-transformed data</description>
+            <description>Base of log-transformed data</description>
         </parameter>
         <parameter>
             <name>MAP_FILENAME</name>
             <default_value>x</default_value>
-            <description>subject-sample map filename</description>
+            <description>Subject-sample map filename</description>
         </parameter>
         <parameter>
             <name>SAMPLE_REMAP_FILENAME</name>
@@ -64,7 +64,7 @@
         <parameter>
             <name>SAMPLE_SUFFIX</name>
             <default_value/>
-            <description>Identified a string to be removed from the sample_cds in the column headers</description>
+            <description>Defines a string to be removed from the sample_cds in the column headers</description>
         </parameter>
         <parameter>
             <name>SECURITY_REQUIRED</name>
@@ -79,7 +79,7 @@
         <parameter>
             <name>SOURCE_CD</name>
             <default_value>STD</default_value>
-            <description>unique code to identify multiple sets of gene expression data for a study, default is STD</description>
+            <description>Unique code to identify multiple sets of gene expression data for a study, default is STD</description>
         </parameter>
         <parameter>
             <name>STUDY_ID</name>
