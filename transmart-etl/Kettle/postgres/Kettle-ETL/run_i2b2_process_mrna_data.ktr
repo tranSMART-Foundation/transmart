@@ -321,7 +321,7 @@
     </lookup>
     <result>
       <name>rtnCd</name>
-      <type>Bigint</type>
+      <type>Integer</type>
     </result>
     <auto_commit>Y</auto_commit>
      <cluster_schema/>
@@ -395,11 +395,11 @@
         <name>log_base</name>
         <variable>${LOG_BASE}</variable>
         <type>Integer</type>
-        <format/>
+	<format>#</format>
         <currency/>
         <decimal/>
         <group/>
-        <length>8</length>
+        <length>-1</length>
         <precision>-1</precision>
         <trim_type>both</trim_type>
       </field>
@@ -419,7 +419,7 @@
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Integer</type>
-        <format/>
+	<format>#</format>
         <currency/>
         <decimal/>
         <group/>
