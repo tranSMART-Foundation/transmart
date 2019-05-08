@@ -14,15 +14,14 @@ CREATE OR REPLACE FUNCTION i2b2_process_metabolomic_data(trial_id character vary
 * This store procedure is for ETL for Sanofi to load metabolomics data
 * Date: 1/2/2014
 
-******************************************************************
+******************************************************************/
 --	***  NOTE ***
---	The input file columns are mapped to the following table columns.  This is done so that the javascript for the advanced workflows
---	selects the correct data for the dropdowns.
-
---		tissue_type	=>	sample_type
---		attribute_1	=>	tissue_type
---		atrribute_2	=>	timepoint
-*************************************/
+--	The input file columns are mapped to the following table columns.
+--	This is a change from the swapping in tranSMART up to 16.3
+--
+--		tissue_type	=>	tissue_type
+--		attribute_1	=>	sample_type
+--		attribute_2	=>	timepoint	
 
 Declare
   TrialID		varchar(100);
@@ -377,7 +376,7 @@ BEGIN
 	,platform
 	,tissue_type
 	,attribute_1
-    ,attribute_2
+	,attribute_2
 	,node_type
 	)
 	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
@@ -386,7 +385,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,platform as platform
 		  ,tissue_type
 		  ,attribute_1 as attribute_1
-          ,attribute_2 as attribute_2
+		  ,attribute_2 as attribute_2
 		  ,'LEAF'
 	from  WT_METABOLOMIC_NODE_VALUES;
 	get diagnostics rowCt := ROW_COUNT;
@@ -412,7 +411,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,platform
 	,tissue_type
 	,attribute_1
-    ,attribute_2
+	,attribute_2
 	,node_type
 	)
 	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
@@ -440,14 +439,14 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
     stepCt := stepCt + 1;
 	perform cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
 
-	--	insert for ATTR1 node so ATTR1 concept can be populated in tissue_type_cd
+	--	insert for ATTR1 node so ATTR1 concept can be populated in sample_type_cd
 	begin
 	insert into WT_METABOLOMIC_NODES
 	(leaf_node
 	,category_cd
 	,platform
 	,tissue_type
-    ,attribute_1
+	,attribute_1
 	,attribute_2
 	,node_type
 	)
@@ -485,7 +484,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,category_cd
 	,platform
 	,tissue_type
-    ,attribute_1
+	,attribute_1
 	,attribute_2
 	,node_type
 	)
@@ -516,7 +515,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
     stepCt := stepCt + 1;
 	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
 	
-	--	insert for tissue_type node so sample_type_cd can be populated
+	--	insert for tissue_type node so tissue_type_cd can be populated
 	begin
 	insert into WT_METABOLOMIC_NODES
 	(leaf_node
@@ -524,7 +523,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,platform
 	,tissue_type
 	,attribute_1
-    ,attribute_2
+	,attribute_2
 	,node_type
 	)
 	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
@@ -631,13 +630,13 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
   --SUBJECT_ID      = subject_id
   --SUBJECT_TYPE    = NULL
   --CONCEPT_CODE    = from LEAF records in WT_METABOLOMIC_NODES
-  --SAMPLE_TYPE    	= TISSUE_TYPE
-  --SAMPLE_TYPE_CD  = concept_cd from TISSUETYPE records in WT_METABOLOMIC_NODES
+  --SAMPLE_TYPE    	= attribute_1
+  --SAMPLE_TYPE_CD  = concept_cd from ATTR1 records in WT_METABOLOMIC_NODES
   --TRIAL_NAME      = TRIAL_NAME
   --TIMEPOINT		= attribute_2
   --TIMEPOINT_CD	= concept_cd from ATTR2 records in WT_METABOLOMIC_NODES
-  --TISSUE_TYPE     = attribute_1
-  --TISSUE_TYPE_CD  = concept_cd from ATTR1 records in WT_METABOLOMIC_NODES
+  --TISSUE_TYPE     = TISSUE_TYPE
+  --TISSUE_TYPE_CD  = concept_cd from TISSUETYPE records in WT_METABOLOMIC_NODES
   --PLATFORM        = metabolomics - this is required by ui code
   --PLATFORM_CD     = concept_cd from PLATFORM records in WT_METABOLOMIC_NODES
   --DATA_UID		= concatenation of concept_cd-patient_num
@@ -704,13 +703,13 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 			  ,a.subject_id
 			  ,null as subject_type
 			  ,ln.concept_cd as concept_code
-			  ,a.tissue_type as sample_type
-			  ,ttp.concept_cd as sample_type_cd
+			  ,a.tissue_type as tissue_type
+			  ,ttp.concept_cd as tissue_type_cd
 			  ,a.trial_name
 			  ,a.attribute_2 as timepoint
 			  ,a2.concept_cd as timepoint_cd
-			  ,a.attribute_1 as tissue_type
-			  ,a1.concept_cd as tissue_type_cd
+			  ,a.attribute_1 as sample_type
+			  ,a1.concept_cd as sample_type_cd
 			  ,'METABOLOMICS' as platform
 			  ,pn.concept_cd as platform_cd
 			  ,ln.concept_cd || '-' || b.patient_num::text as data_uid
@@ -783,6 +782,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,valtype_cd
 	,tval_char
 	,sourcesystem_cd
+	,start_date
 	,import_date
 	,valueflag_cd
 	,provider_id
@@ -796,6 +796,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,'T' -- Text data type
 		  ,'E'  --Stands for Equals for Text Types
 		  ,m.trial_name
+		  ,'infinity'::timestamp
 		  ,LOCALTIMESTAMP
 		  ,'@'
 		  ,'@'
@@ -830,6 +831,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,valtype_cd
 	,tval_char
 	,sourcesystem_cd
+	,start_date
 	,import_date
 	,valueflag_cd
 	,provider_id
@@ -842,6 +844,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,'T' -- Text data type
 		  ,'E'  --Stands for Equals for Text Types
 		  ,m.trial_name
+		  ,'infinity'::timestamp
 		  ,LOCALTIMESTAMP
 		  ,'@'
 		  ,'@'
@@ -908,12 +911,12 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
     stepCt := stepCt + 1;
 	perform cz_write_audit(jobId,databaseName,procedureName,'insert distinct sample_cd in sample_dimension from de_subject_sample_mapping',rowCt,stepCt,'Done');
 
-    ---- update c_metedataxml in i2b2
+    ---- update c_metadataxml in i2b2
 	begin
        for ul in uploadI2b2
         loop
 	 update i2b2 n
-	SET n.c_columndatatype = 'N',
+	SET c_columndatatype = 'N',
       --Static XML String
 		c_metadataxml =  ('<?xml version="1.0"?><ValueMetadata><Version>3.02</Version><CreationDateTime>08/14/2008 01:22:59</CreationDateTime><TestID></TestID><TestName></TestName><DataType>PosFloat</DataType><CodeType></CodeType><Loinc></Loinc><Flagstouse></Flagstouse><Oktousevalues>Y</Oktousevalues><MaxStringLength></MaxStringLength><LowofLowValue>0</LowofLowValue>
                 <HighofLowValue>0</HighofLowValue><LowofHighValue>100</LowofHighValue>100<HighofHighValue>100</HighofHighValue>

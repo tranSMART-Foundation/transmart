@@ -3,7 +3,7 @@
 --
 CREATE TABLE lz_src_study_metadata (
     study_title character varying(500),
-    study_date character varying(50),
+    study_date timestamp,
     study_owner character varying(500),
     study_institution character varying(500),
     study_country character varying(500),

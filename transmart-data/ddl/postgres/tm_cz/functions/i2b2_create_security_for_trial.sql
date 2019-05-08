@@ -97,7 +97,7 @@ BEGIN
 	select patient_num
                   ,patient_num
 		  ,'SECURITY'
-                  ,current_timestamp
+                  ,'infinity'::timestamp
 		  ,'@'
 		  ,TrialId
 		  ,'T'

@@ -14,12 +14,12 @@ DECLARE
 
 ******************************************************************/
 --	***  NOTE ***
---	The input file columns are mapped to the following table columns.  This is done so that the javascript for the advanced workflows
---	selects the correct data for the dropdowns.
-
---		tissue_type	=>	sample_type
---		attribute_1	=>	tissue_type
---		atrribute_2	=>	timepoint	
+--	The input file columns are mapped to the following table columns.
+--	This is a change from the swapping in tranSMART up to 16.3
+--
+--		tissue_type	=>	tissue_type
+--		attribute_1	=>	sample_type
+--		attribute_2	=>	timepoint	
 
   TrialID		varchar(100);
   RootNode		varchar(2000);
@@ -413,7 +413,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,platform as platform
 		  ,tissue_type
 		  ,attribute_1 as attribute_1
-          ,attribute_2 as attribute_2
+		  ,attribute_2 as attribute_2
 		  ,'LEAF'
 	from  tm_wz.WT_RBM_NODE_VALUES;
 		   	get diagnostics rowCt := ROW_COUNT;
@@ -468,7 +468,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in wt_rbm_nodes',rowCt,stepCt,'Done') into rtnCd;
 
 	
-	--	insert for ATTR1 node so ATTR1 concept can be populated in tissue_type_cd
+	--	insert for ATTR1 node so ATTR1 concept can be populated in sample_type_cd
 
 	begin
 	insert into tm_wz.WT_RBM_NODES
@@ -476,7 +476,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,category_cd
 	,platform
 	,tissue_type
-    ,attribute_1
+	,attribute_1
 	,attribute_2
 	,node_type
 	)
@@ -515,7 +515,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,category_cd
 	,platform
 	,tissue_type
-    ,attribute_1
+	,attribute_1
 	,attribute_2
 	,node_type
 	)
@@ -547,7 +547,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_RBM_NODES',rowCt,stepCt,'Done') into rtnCd;
 
 	
-	--	insert for tissue_type node so sample_type_cd can be populated
+	--	insert for tissue_type node so tissue_type_cd can be populated
 	begin
 	insert into tm_wz.WT_RBM_NODES
 	(leaf_node
@@ -555,7 +555,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,platform
 	,tissue_type
 	,attribute_1
-    ,attribute_2
+	,attribute_2
 	,node_type
 	)
 	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
@@ -664,13 +664,13 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
   --SUBJECT_ID      = subject_id
   --SUBJECT_TYPE    = NULL
   --CONCEPT_CODE    = from LEAF records in wt_rbm_nodes
-  --SAMPLE_TYPE    	= TISSUE_TYPE
-  --SAMPLE_TYPE_CD  = concept_cd from TISSUETYPE records in wt_rbm_nodes
+  --SAMPLE_TYPE    	= attribute_1
+  --SAMPLE_TYPE_CD  = concept_cd from ATTR1 records in wt_rbm_nodes
   --TRIAL_NAME      = TRIAL_NAME
   --TIMEPOINT		= attribute_2
   --TIMEPOINT_CD	= concept_cd from ATTR2 records in wt_rbm_nodes
-  --TISSUE_TYPE     = attribute_1
-  --TISSUE_TYPE_CD  = concept_cd from ATTR1 records in wt_rbm_nodes
+  --TISSUE_TYPE     = TISSUE_TYPE
+  --TISSUE_TYPE_CD  = concept_cd from TISSUETYPE records in wt_rbm_nodes
   --PLATFORM        = RBM - this is required by ui code
   --PLATFORM_CD     = concept_cd from PLATFORM records in wt_rbm_nodes
   --DATA_UID		= concatenation of concept_cd-patient_num
@@ -737,13 +737,13 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 			  ,a.subject_id
 			  ,null as subject_type
 			  ,ln.concept_cd as concept_code
-			  ,a.tissue_type as sample_type
-			  ,ttp.concept_cd as sample_type_cd
+			  ,a.tissue_type as tissue_type
+			  ,ttp.concept_cd as tissue_type_cd
 			  ,a.trial_name
 			  ,a.attribute_2 as timepoint
 			  ,a2.concept_cd as timepoint_cd
-			  ,a.attribute_1 as tissue_type
-			  ,a1.concept_cd as tissue_type_cd
+			  ,a.attribute_1 as sample_type
+			  ,a1.concept_cd as sample_type_cd
 			  ,'RBM' as platform
 			  ,pn.concept_cd as platform_cd
 			  ,ln.concept_cd || '-' || b.patient_num::text as data_uid
@@ -816,6 +816,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,valtype_cd
 	,tval_char
 	,sourcesystem_cd
+	,start_date
 	,import_date
 	,valueflag_cd
 	,provider_id
@@ -829,6 +830,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,'T' -- Text data type
 		  ,'E'  --Stands for Equals for Text Types
 		  ,m.trial_name
+		  ,'infinity'::timestamp
 		  ,LOCALTIMESTAMP
 		  ,'@'
 		  ,'@'
@@ -865,6 +867,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,valtype_cd
 	,tval_char
 	,sourcesystem_cd
+	,start_date
 	,import_date
 	,valueflag_cd
 	,provider_id
@@ -877,6 +880,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,'T' -- Text data type
 		  ,'E'  --Stands for Equals for Text Types
 		  ,m.trial_name
+		  ,'infinity'::timestamp
 		  ,LOCALTIMESTAMP
 		  ,'@'
 		  ,'@'
@@ -1068,8 +1072,8 @@ begin
         ,assay_id
         ,patient_id
         ,sample_id
-    ,subject_id
-    ,trial_name
+	,subject_id
+	,trial_name
         ,timepoint
         ,sample_type
         ,platform

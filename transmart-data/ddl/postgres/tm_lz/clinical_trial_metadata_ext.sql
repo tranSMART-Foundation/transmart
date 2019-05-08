@@ -23,7 +23,7 @@ CREATE TABLE clinical_trial_metadata_ext (
     group_assignment character varying(4000),
     type_of_control character varying(4000),
     study_design character varying(4000),
-    completion_date character varying(4000),
+    completion_date timestamp,
     primary_endpoints character varying(4000),
     secondary_endpoints character varying(4000),
     inclusion_criteria character varying(4000),

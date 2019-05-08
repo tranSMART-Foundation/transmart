@@ -161,6 +161,7 @@ BEGIN
 	,tval_char
 	,nval_num
 	,sourcesystem_cd
+	,start_date
 	,import_date
 	,valueflag_cd
 	,provider_id
@@ -174,6 +175,7 @@ BEGIN
 		  ,'E'  --Stands for Equals for Text Types
 		  ,null	--	not numeric for Proteomics
 		  ,t.sourcesystem_cd
+		  ,'infinity'::timestamp
 		  ,LOCALTIMESTAMP
 		  ,'@'
 		  ,'@'

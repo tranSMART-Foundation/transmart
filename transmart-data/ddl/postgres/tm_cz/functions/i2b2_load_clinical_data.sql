@@ -52,7 +52,7 @@ Declare
 	r_update                record;  
 	thisName                varchar(700);
 	nChildren               integer;
-  
+
 	--	cursor to define the path for delete_one_node  this will delete any nodes that are hidden after i2b2_create_concept_counts
 
 	delNodes CURSOR is
@@ -91,7 +91,7 @@ Declare
 	    ORDER BY patient_num;
 
     BEGIN
-  
+
 	TrialID := upper(trial_id);
 	secureStudy := upper(secure_study);
 	--Set Audit Parameters
