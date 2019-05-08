@@ -1,9 +1,11 @@
 JDBC_DL_PSQL     := https://jdbc.postgresql.org/download
-# JDBC_DRIVER_PSQL := postgresql-9.2-1003.jdbc4.jar
-JDBC_DRIVER_PSQL := postgresql-42.2.2.jre7.jar
-JDBC_DL_ORA      := http://files.thehyve.net
-JDBC_DRIVER_ORA  := ojdbc6-12.1.0.2.jar
+JDBC_DRIVER_PSQL := postgresql-42.2.5.jar
+JDBC_DL_ORA      := http://maven.in2p3.fr/com/oracle/ojdbc7/12.1.0.1
+JDBC_DRIVER_ORA  := ojdbc7-12.1.0.1.jar
 JDBC_XDB_ORA     := xdb.jar
+
+# Official Oracle driver is from:
+#http://download.oracle.com/otn/utilities_drivers/jdbc/121020/ojdbc7.jar
 
 LIB_DIR          := $(dir $(lastword $(MAKEFILE_LIST)))
 CP_ORA           := $(LIB_DIR)$(JDBC_DRIVER_ORA):$(LIB_DIR)$(JDBC_XDB_ORA):$(LIB_DIR)

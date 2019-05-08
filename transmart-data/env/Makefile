@@ -1,4 +1,6 @@
-KETTLE_VERSION=4.4.0
+KETTLE_VERSION=8.2
+KETTLE_ZIP=8.2.0.0-342
+
 TRANSMART_RELEASE_BRANCH=release-16.4
 
 UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
@@ -125,9 +127,9 @@ update_etl_git:
 	$(call update_repos,tranSMART-ETL,https://github.com/tranSMART-Foundation/tranSMART-ETL.git,$(TRANSMART_RELEASE_BRANCH))
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 
-KETTLE_ARCHIVE=pdi-ce-$(KETTLE_VERSION)-stable.tar.gz
+KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip 
 $(KETTLE_ARCHIVE):
-	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Data%20Integration/4.4.0-stable/$@" > $@
+	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
 KETTLE_ORACLE_DRIVER=data-integration/libext/JDBC/$(JDBC_DRIVER_ORA)
 $(KETTLE_ORACLE_DRIVER): $(JDBC_DRIVER_ORA_PATH) data-integration/.keep
@@ -136,10 +138,11 @@ $(KETTLE_ORACLE_DRIVER): $(JDBC_DRIVER_ORA_PATH) data-integration/.keep
 data-integration: data-integration/.keep $(KETTLE_ORACLE_DRIVER)
 .PHONY: data-integration
 data-integration/.keep: $(KETTLE_ARCHIVE)
-	 tar -xzf $<
-	 touch '$@'
+	unzip $<
+	touch '$@'
 
 /var/lib/postgresql/tablespaces:
+
 	/bin/bash -c 'mkdir -p $@/{indx,transmart}'
 	chown -R postgres:postgres $@
 
