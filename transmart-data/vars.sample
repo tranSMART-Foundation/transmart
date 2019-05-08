@@ -54,13 +54,14 @@ ORACLE_TABLESPACES_DIR=/home/oracle/app/oracle/oradata
 
 # Only needed for ETL
 # End with /
-KETTLE_JOBS_PSQL=/path/to/transmart-ETL/Postgres/GPL-1.0/Kettle/Kettle-ETL/
+KETTLE_JOBS_PSQL=/path/to/transmart-etl/Kettle/postgres/Kettle-ETL/
 # End with /
-KETTLE_JOBS_ORA=/path/to/transmart-ETL/Kettle-GPL/Kettle-ETL/
-
-R_JOBS_PSQL=/path/to/tranSMART-ETL/Kettle/postgres/R/
+KETTLE_JOBS_ORA=/path/to/transmart-etl/Kettle/oracle/Kettle-ETL/
 
 KITCHEN=/path/to/data-integration/kitchen.sh
+
+R_JOBS_PSQL=/path/to/tranSMART-ETL/Kettle/postgres/R/
+KETTLE_JOBS=$KETTLE_JOBS_PSQL
 
 #only needed for configuration
 #end with /
@@ -103,10 +104,12 @@ TSUSER_HOME=$HOME/
 # }}}
 
 # If your distro uses an old version of groovy, do make -C env groovy,
-# and uncomment this. Version 2.1.9 is known to work, versions before 2
-# are known not to work
+# Also if you use the ETL scripts with study.param as provided by the Cell-line use case
+# (depends on samples/postgres being in the PATH)
+# Uncomment these 2 lines. Groovy version 2.1.9 is known to work,
+# Groovy versions before 2 are known not to work
 #DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-#export PATH=$DIR/env:$PATH
+#export PATH=$DIR/env:$PATH:$DIR/samples/postgres:$PATH
 #
 
 # To use transmart-batch where supported
@@ -121,7 +124,7 @@ TSUSER_HOME=$HOME/
 # export _JAVA_OPTIONS="-Dhttp.proxyHost=$proxy_host -Dhttp.proxyPort=$proxy_port"
 
 export PGHOST PGPORT PGDATABASE PGUSER PGPASSWORD TABLESPACES PGSQL_BIN \
-	R_JOBS_PSQL KETTLE_JOBS_PSQL KETTLE_JOBS_ORA KITCHEN TSUSER_HOME ORAHOST ORAPORT \
+	R_JOBS_PSQL KETTLE_JOBS KETTLE_JOBS_PSQL KETTLE_JOBS_ORA KITCHEN TSUSER_HOME ORAHOST ORAPORT \
 	ORASID ORASVC ORAUSER ORAPASSWORD ORACLE_MANAGE_TABLESPACES \
 	ORACLE_TABLESPACES_DIR ORACLE
 
