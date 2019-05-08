@@ -839,7 +839,7 @@ BEGIN
 	cz_write_audit(jobId,databaseName,procedureName,'Updated name and data type in i2b2 if changed',SQL%ROWCOUNT,stepCt,'Done');
     commit;
 			   
---modified for performace
+--modified for performance
 	insert /*+ parallel(i2b2, 8) */ into I2B2
     (c_hlevel
 	,c_fullname
