@@ -1,5 +1,4 @@
 \i tm_lz/prelude.sql
-\i tm_lz/functions/i2b2_process_qpcr_mirna_data.sql
 \i tm_lz/lz_src_sample_categories.sql
 \i tm_lz/clinical_trial_metadata_ext.sql
 \i tm_lz/lt_chromosomal_region.sql
