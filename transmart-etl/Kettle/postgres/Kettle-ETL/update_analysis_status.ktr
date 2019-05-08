@@ -141,7 +141,7 @@
         <name>ETL_ID</name>
         <variable>${ETL_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

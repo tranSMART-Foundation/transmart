@@ -164,7 +164,7 @@
     <accept_field/>
     <accept_stepname/>
     <separator>	</separator>
-    <enclosure>">
+    <enclosure>"</enclosure>
     <enclosure_breaks>N</enclosure_breaks>
     <escapechar/>
     <header>Y</header>
@@ -186,7 +186,7 @@
     <encoding/>
     <add_to_result_filenames>Y</add_to_result_filenames>
     <file>
-      <name>${DATA_LOCATION}/{GPL_ID}_annotation.txt</name>
+      <name>${DATA_LOCATION}/${GPL_ID}_annotation.txt</name>
       <filemask/>
       <exclude_filemask/>
       <file_required>Y</file_required>

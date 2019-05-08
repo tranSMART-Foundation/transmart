@@ -283,30 +283,37 @@
         <precision>-1</precision>
         </field>      <field>        <name>Lines input</name>
         <type>Integer</type>
+	<format>#</format>
         <length>-1</length>
         <precision>-1</precision>
         </field>      <field>        <name>Lines output</name>
         <type>Integer</type>
+	<format>#</format>
         <length>-1</length>
         <precision>-1</precision>
         </field>      <field>        <name>Lines read</name>
         <type>Integer</type>
+	<format>#</format>
         <length>-1</length>
         <precision>-1</precision>
         </field>      <field>        <name>Lines updated</name>
         <type>Integer</type>
+	<format>#</format>
         <length>-1</length>
         <precision>-1</precision>
         </field>      <field>        <name>Lines written</name>
         <type>Integer</type>
+	<format>#</format>
         <length>-1</length>
         <precision>-1</precision>
         </field>      <field>        <name>Lines rejected</name>
         <type>Integer</type>
+	<format>#</format>
         <length>-1</length>
         <precision>-1</precision>
         </field>      <field>        <name>Duration</name>
         <type>Integer</type>
+	<format>#</format>
         <length>-1</length>
         <precision>-1</precision>
         </field>      </fields>     <cluster_schema/>
@@ -332,7 +339,7 @@
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

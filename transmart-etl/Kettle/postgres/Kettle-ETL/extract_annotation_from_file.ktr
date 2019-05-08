@@ -617,7 +617,7 @@
         <name>probe_col</name>
         <variable>${PROBE_COL}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -629,7 +629,7 @@
         <name>skip_rows</name>
         <variable>${SKIP_ROWS}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -641,7 +641,7 @@
         <name>gene_id_col</name>
         <variable>${GENE_ID_COL}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -653,7 +653,7 @@
         <name>gene_symbol_col</name>
         <variable>${GENE_SYMBOL_COL}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -665,7 +665,7 @@
         <name>organism_col</name>
         <variable>${ORGANISM_COL}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -856,7 +856,7 @@
         <name>genetab_id_col</name>
         <variable>${GENETAB_ID_COL}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -868,7 +868,7 @@
         <name>genetab_symbol_col</name>
         <variable>${GENETAB_SYMBOL_COL}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

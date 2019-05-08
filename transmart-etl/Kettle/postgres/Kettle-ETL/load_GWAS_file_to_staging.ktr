@@ -663,7 +663,7 @@
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <variable>${BIO_ASSAY_ANALYSIS_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -699,7 +699,7 @@
         <name>etl_id</name>
         <variable>${ETL_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -731,7 +731,7 @@
         <name>d_baa_id</name>
         <variable>${BIO_ASSAY_ANALYSIS_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -763,7 +763,7 @@
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -1584,8 +1584,9 @@
       <meta>        <name>step_number</name>
         <rename>step_number</rename>
         <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
+	<format>#</format>
+        <length>-1</length>
+        <precision>-1</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <encoding/>

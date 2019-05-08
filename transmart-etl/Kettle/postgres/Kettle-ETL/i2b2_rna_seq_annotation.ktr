@@ -204,7 +204,7 @@
       <field>
         <name>jobId</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

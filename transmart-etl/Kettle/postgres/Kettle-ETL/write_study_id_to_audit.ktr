@@ -140,7 +140,7 @@
       <field>
         <name>step_number</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -151,7 +151,7 @@
       <field>
         <name>step_count</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -325,8 +325,8 @@
       <field>
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
-        <type>BigNumber</type>
-        <format/>
+        <type>Integer</type>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

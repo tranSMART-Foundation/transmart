@@ -279,7 +279,7 @@ than one field with the same field_idx.
       <field>
         <name>step_number</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -967,7 +967,7 @@ var log_p_value=Math.log(P_VALUE)/Math.LN10;
         <name>d_baa_id</name>
         <variable>${BIO_ASSAY_ANALYSIS_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -1056,7 +1056,7 @@ FROM LZ_SRC_GWAS
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

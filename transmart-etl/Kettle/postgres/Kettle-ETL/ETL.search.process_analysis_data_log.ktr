@@ -276,7 +276,7 @@ where study_id = '${STUDY_ID}'
       <field>
         <name>JOB_ID</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -288,7 +288,7 @@ where study_id = '${STUDY_ID}'
       <field>
         <name>ERROR_NUMBER</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -324,7 +324,7 @@ where study_id = '${STUDY_ID}'
       <field>
         <name>SEQ_ID</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -498,7 +498,7 @@ where study_id = '${STUDY_ID}'
       <field>
         <name>JOB_ID</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -558,7 +558,7 @@ where study_id = '${STUDY_ID}'
       <field>
         <name>RECORDS_MANIPULATED</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -570,7 +570,7 @@ where study_id = '${STUDY_ID}'
       <field>
         <name>STEP_NUMBER</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

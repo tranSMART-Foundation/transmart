@@ -632,8 +632,9 @@
       <meta>        <name>BIO_ASSAY_ANALYSIS_ID</name>
         <rename>BIO_ASSAY_ANALYSIS_ID</rename>
         <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
+	<format>#</format>
+        <length>-1</length>
+        <precision>-1</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <encoding/>
@@ -644,8 +645,9 @@
       </meta>      <meta>        <name>BIO_ASY_ANALYSIS_GWAS_ID</name>
         <rename>BIO_ASY_ANALYSIS_GWAS_ID</rename>
         <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
+	<format>#</format>
+        <length>-1</length>
+        <precision>-1</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <encoding/>
@@ -1073,7 +1075,7 @@
         <name>etl_id</name>
         <variable>${ETL_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -1137,7 +1139,7 @@
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -2737,8 +2739,9 @@
       <meta>        <name>step_number</name>
         <rename>step_number</rename>
         <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
+	<format>#</format>
+        <length>-1</length>
+        <precision>-1</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <encoding/>

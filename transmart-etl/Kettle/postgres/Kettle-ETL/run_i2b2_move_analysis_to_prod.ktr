@@ -137,7 +137,7 @@
       <field>
         <name>job_id</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
