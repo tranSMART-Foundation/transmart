@@ -42,3 +42,8 @@ I2B2DEMODATA_DB_PORT=<?= $_ENV['PGPORT'] , "\n" ?>
 I2B2DEMODATA_DB_SERVER=<?= $host, "\n" ?>
 I2B2DEMODATA_DB_PWD=<?= get('I2B2DEMODATA_PWD', 'i2b2demodata'), "\n" ?>
 I2B2DEMODATA_DB_USER=i2b2demodata
+SQLLDR_STAGE_DB_NAME=<?= $_ENV['PGDATABASE'] , "\n" ?>
+SQLLDR_STAGE_DB_PORT=<?= $_ENV['PGPORT'] , "\n" ?>
+SQLLDR_STAGE_DB_SERVER=<?= $host, "\n" ?>
+SQLLDR_STAGE_DB_PWD=<?= get('SQLLDR_STAGE_PWD', 'sqlldr_stage'), "\n" ?>
+SQLLDR_STAGE_DB_USER=sqlldr_stage
