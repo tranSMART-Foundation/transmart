@@ -23,6 +23,7 @@ PGPASSWORD=
 # them to the postgres user. For instance:
 #     mkdir -p $TABLESPACES/{indx,transmart,i2b2,i2b2_index}
 #     chown -R postgres:postgres $TABLESPACES
+#     chmod -R 700 $TABLESPACES
 # end with /
 TABLESPACES=$HOME/pg/tablespaces/
 
@@ -111,7 +112,6 @@ TSUSER_HOME=$HOME/
 # Groovy versions before 2 are known not to work
 #DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 #export PATH=$DIR/env:$PATH:$DIR/samples/postgres
-#
 
 # To use transmart-batch where supported
 #export USE_TRANSMART_BATCH=1
