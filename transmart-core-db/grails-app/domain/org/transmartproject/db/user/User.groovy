@@ -22,6 +22,7 @@ package org.transmartproject.db.user
 import groovy.util.logging.Slf4j
 import org.hibernate.FetchMode
 import org.springframework.beans.factory.annotation.Autowired
+import org.transmart.plugin.shared.security.Roles
 import org.transmartproject.core.ontology.Study
 import org.transmartproject.core.users.ProtectedOperation
 import org.transmartproject.core.users.ProtectedResource
