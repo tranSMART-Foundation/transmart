@@ -14,7 +14,7 @@ blend4j-plugin \
 transmart-metacore-plugin \
 transmartApp \
 transmart-data \
-tranSMART-ETL \
+transmart-etl \
 transmart-batch \
 transmart-ICE \
 transmart-rest-api \
@@ -33,11 +33,11 @@ foreach dir ($dirs)
 		echo "++ $dir ++"
 # -------------- actual commands
 		git checkout master >> $out
-#		git checkout release-16.2 >> $out
+#		git checkout release-16.4 >> $out
 #		git checkout for-testing-changes >> $out
 #		git fetch -p >> $out
 #		git fetch -p transmart >> $out
-#		git log --since="Jan 4, 2016" --pretty=fuller >> $out
+#		git log --since="Jan 4, 2018" --pretty=fuller >> $out
 #		git merge master >> $out
 #		git merge transmart/master >> $out
 #		git merge transmart >> $out
@@ -45,8 +45,8 @@ foreach dir ($dirs)
 #		git remote -v >> $out
 #		git diff --name-only transmart/master >> $out
 #		git branch -a >> $out
-#		git checkout -b release-16.2 >> $out
-#		git push -u origin release-16.2 >> $out
+#		git checkout -b release-16.4 >> $out
+#		git push -u origin release-16.4 >> $out
 #		git branch >> $out
 #		git push >> $out
 #		git pull >> $out
@@ -64,9 +64,9 @@ echo "DONE!"
 # git checkout for-testing-changes >> $out
 
 # various log options
-# git log --pretty=oneline release-16.2...HEAD >> $out
-# git log --pretty=full release-16.2...HEAD >> $out
-# git shortlog -s -n --all release-16.2...HEAD >> $out
+# git log --pretty=oneline release-16.4...HEAD >> $out
+# git log --pretty=full release-16.4...HEAD >> $out
+# git shortlog -s -n --all release-16.4...HEAD >> $out
 
 # various checking commands
 # git status >> $out
@@ -82,20 +82,20 @@ echo "DONE!"
 #		git diff --name-only transmart/master >> $out
 
 # create release branch (original)
-#		git checkout -b release-16.2
-#		git push -u origin release-16.2
+#		git checkout -b release-16.4
+#		git push -u origin release-16.4
 
 # commit/push version update changes
-#		git commit -a -m "update version number to 16.2" >> $out
+#		git commit -a -m "update version number to 16.4" >> $out
 #		git push >> $out
 #		git status >> $out
 
 # create release branch (incremental)
 #		git fetch origin
-#		git checkout -b release-16.2 origin/release-16.2
+#		git checkout -b release-16.4 origin/release-16.4
 
 # update refs 
-#        git checkout release-16.2 >> $out
+#        git checkout release-16.4 >> $out
 #		git commit -a -m "created tags for release" >> $out
 #        git push >> $out
 #		git status >> $out

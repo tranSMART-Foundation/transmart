@@ -5,10 +5,9 @@ https://wiki.transmartfoundation.org/display/transmartwiki/Install+the+current+o
     sudo apt-get update
     sudo apt-get install -y git
     git clone https://github.com/tranSMART-Foundation/transmart.git
-    cd transmart/Scripts
+    cd transmart
     git checkout -b release-16.4
-    cd ..
-    Scripts/install-ubuntu16/InstallTransmart.sh 2>&1 | tee install.log
-    cd Scripts/install-ubuntu16/checks/
+    Scripts/install-ubuntu18/InstallTransmart.sh 2>&1 | tee install.log
+    cd Scripts/install-ubuntu18/checks/
     ./checkAll.sh 2>&1 2>&1 | tee ~/checks.log
 

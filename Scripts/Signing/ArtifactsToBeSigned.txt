@@ -3,4 +3,4 @@ Scripts
 RInterface
 transmart-batch
 transmart-data
-tranSMART-ETL
+transmart-etl

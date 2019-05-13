@@ -2,7 +2,7 @@
 
 #todo check database path. Surely ~transmart/transmart?
 
-TRANSMART_RELEASE="release-16.2"
+TRANSMART_RELEASE="release-16.4"
 #TRANSMART_DATABASE="oracle"
 TRANSMART_DATABASE="postgres"
 TRANSMART_LOGDIR="~transmart/transmart/log"

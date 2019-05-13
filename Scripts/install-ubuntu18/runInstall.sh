@@ -1,6 +1,6 @@
 #!/bin/bash
-sudo yum -q update
-sudo yum -q install -y git
+sudo apt-get -q update
+sudo apt-get -q install -y git
 
 # The location of the install directories
 INSTALL_BASE="$HOME/transmart"
@@ -18,5 +18,5 @@ git clone https://github.com/tranSMART-Foundation/transmart.git
 cd transmart/Scripts
 git checkout release-16.4
 cd ..
-Scripts/install-ubuntu14/InstallTransmart.sh 2>&1 | tee install.log
+Scripts/install-ubuntu18/InstallTransmart.sh 2>&1 | tee install.log
 

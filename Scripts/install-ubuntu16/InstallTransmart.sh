@@ -354,10 +354,10 @@ fi
 
 cd war-files
 if ! [ -e transmart.war ]; then
-    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/transmart.war --output transmart.war
+    curl http://library.transmartfoundation.org/release/release16_4_0_artifacts/transmart.war --output transmart.war
 fi
 if ! [ -e gwava.war ]; then
-    curl http://library.transmartfoundation.org/release/release16_2_0_artifacts/gwava.war --output gwava.war
+    curl http://library.transmartfoundation.org/release/release16_4_0_artifacts/gwava.war --output gwava.war
 fi
 sudo cp *.war /var/lib/tomcat7/webapps/
 

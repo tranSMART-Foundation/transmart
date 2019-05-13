@@ -3,7 +3,7 @@
 #todo check database path. Surely ~transmart/transmart?
 # copying a vars file from somewhere that surely does not exist yet
 
-TRANSMART_RELEASE="release-16.2"
+TRANSMART_RELEASE="release-16.4"
 #TRANSMART_DATABASE="oracle"
 TRANSMART_DATABASE="postgres"
 
@@ -13,8 +13,8 @@ mkdir -p release
 
 cd release
 
-git clone https://github.com/tranSMART-Foundation/tranSMART-ETL.git
-cd tranSMART-ETL/
+git clone https://github.com/tranSMART-Foundation/transmart.git
+cd transmart/transmart-etl/
 git checkout $TRANSMART_RELEASE
 
 # build the loader target

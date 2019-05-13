@@ -1,62 +1,26 @@
 #!/bin/bash
 
-# Version: Wed Mar  9 21:27:31 EST 2016
+# Version: Mon Nov  13 05:30:00 EST 2017
 # 
-#**********************************************************************************
-#  Script to load all that is needed to run an example/demo version of tranSMART 16.4 on RHEL 7.2
-#**********************************************************************************
+#************************************************************************************
+#  Script to load all that is needed to run an example/demo
+#  version of tranSMART 16.4
+#************************************************************************************
 
 # set up with 
-#   sudo yum update
-#   sudo yum install -y git
-#   git clone https://github.com/tranSMART-Foundation/Scripts.git
-#   cd Scripts
-#   git checkout release-16.4
-#   cd ..
+#   sudo apt-get update
+#   sudo apt-get install -y git
+#   git clone https://github.com/tranSMART-Foundation/transmart.git
 #
 # to run the install scripts
 #   cd $HOME
-#   ./Scripts/install-rhel/InstallTransmart.sh
+#   ./transmart/Scripts/install-ubuntu18/InstallTransmart.sh
 #
 # to run the checking scripts
-#   Scripts/install-rhel/checks/checkAll.sh
-
-# Script Parameters
-TRANSMART_DATA_NAME="transmart-data-release-16.4"
-TRANSMART_DATA_ZIP="$TRANSMART_DATA_NAME.zip"
-TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_DATA_ZIP"
-TRANSMART_DATA_SIG_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_DATA_ZIP.sig"
-TRANSMART_DATA_MD5_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_DATA_ZIP.md5"
-
-TRANSMART_ETL_NAME="tranSMART-ETL-release-16.4"
-TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
-TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_ETL_ZIP"
-TRANSMART_ETL_SIG_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_ETL_ZIP.sig"
-TRANSMART_ETL_MD5_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_ETL_ZIP.md5"
-
-TRANSMART_WAR_NAME="transmart.war"
-TRANSMART_WAR_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_WAR_NAME"
-TRANSMART_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_WAR_NAME.sig"
-TRANSMART_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_WAR_NAME.md5"
-
-TRANSMART_GWAVA_WAR_NAME="gwava.war"
-TRANSMART_GWAVA_WAR_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_GWAVA_WAR_NAME"
-TRANSMART_GWAVA_WAR_SIG_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.sig"
-TRANSMART_GWAVA_WAR_MD5_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_GWAVA_WAR_NAME.md5"
+#   ./transmart/Scripts/install-ubuntu18/checks/checkAll.sh
 
 # on error; stop/exit
 set -e
-
-# Helper function: use md5 to verify downaload
-# This assumes <name> is downloaded file and <name>.md5 is signature file
-# on current directory
-function verifyWithMd5 {
-	filename=$1
-	check1=$( gpg --default-key ACC50501 --print-md MD5 $filename )
-	check2=$( cut -d* -f1 $filename.md5 )
-	echo "MD5 hash from file:    $check1"
-	echo "MD5 hash from Library: $check2"
-}
 
 # Helper function: check and quit on error
 function checkInstallError {
@@ -70,15 +34,7 @@ function checkInstallError {
 	return $returnValue
 }
 
-if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
-export INSTALL_BASE
-
-if ! [ -d "$INSTALL_BASE" ] ; then
-	mkdir -p "$INSTALL_BASE"
-fi
-echo "tranSMART will be installed at this location: $INSTALL_BASE"
-
-if [ -z "$SCRIPTS_BASE" ] ; then SCRIPTS_BASE="$HOME" ; fi
+if [ -z "$SCRIPTS_BASE" ] ; then SCRIPTS_BASE="$HOME/transmart" ; fi
 
 echo "Starting at $(date)"
 echo "++++++++++++++++++++++++++++"
@@ -87,8 +43,11 @@ echo "++++++++++++++++++++++++++++"
 if ! [ -d "$SCRIPTS_BASE/Scripts" ] ; then
 	echo "This script assumes that the Scripts directory is installed at $SCRIPTS_BASE/Scripts"
 	echo "It does not appear to be there. Please fix that and restart this script."
-	echo "Either set \$SCRIPTS_BASE to be the directory of the location of this script"
-	echo "which appears to be $HERE; OR, copy the that directory to this location: $SCRIPTS_BASE/Scripts"
+	echo "  cd $SCRIPTS_BASE"
+	echo "  sudo apt-get update"
+	echo "  sudo apt-get install -y git"
+	echo "  git clone https://github.com/tranSMART-Foundation/transmart.git"
+	echo "  git checkout -b release-16.4"
 	exit 1
 else
 	echo "Script directory found: $SCRIPTS_BASE/Scripts"
@@ -99,8 +58,16 @@ echo "++++++++++++++++++++++++++++"
 echo "+  set up working dir (tranSMART install base) "
 echo "++++++++++++++++++++++++++++"
 
+if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
+export INSTALL_BASE
+
+if ! [ -d "$INSTALL_BASE" ] ; then
+	mkdir -p "$INSTALL_BASE"
+fi
+echo "tranSMART will be installed at this location: $INSTALL_BASE"
+
 # give user option to suppress sudo timeout (see welcome.sh)
-cd $SCRIPTS_BASE/Scripts/install-rhel
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18
 source welcome.sh
 
 # set up sudo early
@@ -108,20 +75,9 @@ sudo -k
 sudo -v
 
 echo "++++++++++++++++++++++++++++"
-echo "+  install make, curl, unzip, tar "
+echo "+  install make "
 echo "++++++++++++++++++++++++++++"
-sudo yum update
-sudo yum -q install -y make
-sudo yum -q install -y curl
-sudo yum -q install -y unzip
-sudo yum -q install -y tar
-
-echo "++++++++++++++++++++++++++++"
-echo "+ install ant and maven"
-echo "++++++++++++++++++++++++++++"
-sudo yum -q install -y ant
-sudo yum -q install -y maven
-echo "Finished install of ant and maven at $(date)"
+sudo apt-get -q install -y make
 
 echo "++++++++++++++++++++++++++++"
 echo "+  set up the transmart-data folder"
@@ -129,111 +85,62 @@ echo "++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE
 sudo -v
-if ! [ -e $TRANSMART_DATA_ZIP ] ; then
-	curl $TRANSMART_DATA_URL -o $TRANSMART_DATA_ZIP
-	curl $TRANSMART_DATA_MD5_URL -o $TRANSMART_DATA_ZIP.md5
+sudo apt-get -q install -y curl
+sudo apt-get -q install -y unzip
+if ! [ -e transmart-data-release-16.4.zip ] ; then
+    curl http://library.transmartfoundation.org/release/release16_4_0_artifacts/transmart-data-release-16.4.zip --output transmart-data-release-16.4.zip
 fi
-verifyWithMd5 "$TRANSMART_DATA_ZIP"
-
 if ! [ -e transmart-data ] ; then
-	echo "unzipping $TRANSMART_DATA_ZIP"
-	unzip $TRANSMART_DATA_ZIP
-	mv $TRANSMART_DATA_NAME transmart-data
+	unzip transmart-data-release-16.4.zip
+	mv transmart-data-release-16.4 transmart-data
 fi
 
 echo "Finished setting up the transmart-date folder at $(date)"
 
 echo "++++++++++++++++++++++++++++"
-echo "+  set up the tranSMART-ETL folder"
-echo "++++++++++++++++++++++++++++"
-
-cd $INSTALL_BASE/transmart-data/env
-sudo -v
-if ! [ -e $TRANSMART_ETL_ZIP ] ; then
-	curl $TRANSMART_ETL_URL -o $TRANSMART_ETL_ZIP
-	curl $TRANSMART_ETL_MD5_URL -o $TRANSMART_ETL_ZIP.md5
-fi
-verifyWithMd5 "$TRANSMART_ETL_ZIP"
-
-if ! [ -e tranSMART-ETL ] ; then
-	echo "unzipping $TRANSMART_ETL_ZIP"
-	unzip $TRANSMART_ETL_ZIP
-	mv $TRANSMART_ETL_NAME tranSMART-ETL
-fi
-echo "Finished setting up the tranSMART-ETL folder at $(date)"
-
-echo "++++++++++++++++++++++++++++"
-echo "+  Download and verify war files"
-echo "++++++++++++++++++++++++++++"
-
-cd $INSTALL_BASE
-sudo -v
-if ! [ -d war-files ]; then
-	mkdir war-files
-fi
-
-cd war-files
-if ! [ -e transmart.war ]; then
-	curl $TRANSMART_WAR_URL --output transmart.war
-	curl $TRANSMART_WAR_MD5_URL --output transmart.war.md5
-fi
-verifyWithMd5 "transmart.war"
-
-if ! [ -e gwava.war ]; then
-	curl $TRANSMART_GWAVA_WAR_URL --output gwava.war
-	curl $TRANSMART_GWAVA_WAR_MD5_URL --output gwava.war.md5
-fi
-verifyWithMd5 "gwava.war"
-
-cd ..
-echo "War files as downloaded"
-ls -la war-files
-
-echo "Finished downloading and verifying war files at $(date)"
-
-echo "++++++++++++++++++++++++++++"
 echo "+  Install of basic tools and dependencies "
 echo "++++++++++++++++++++++++++++"
 
-# sudo make -C env rhel_deps_root
-#   In the makefile target, rhel_deps_root, causes a
+# sudo make -C env ubuntu_deps_root
+#   In the makefile target, ubuntu_deps_root, causes a
 #   make of these two steps: 
 # (1)
 sudo -v
 cd $INSTALL_BASE/transmart-data
-sudo make -C env install_rhel_packages 
+sudo make -C env install_ubuntu_packages18 
+sudo make -C env install_ubuntu_packages
 # verify these packages
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkMakefilePackages.sh
-if [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_rhel_packages' is missing; redo install" )" ] ; then exit -1; fi
-echo "sudo make -C env install_rhel_packages - finished at $(date)"
+if [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
+echo "sudo make -C env install_ubuntu_packages - finished at $(date)"
 
 # (2)
 sudo -v
 cd $INSTALL_BASE/transmart-data
 sudo make -C env /var/lib/postgresql/tablespaces
 # verify tablespaces
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesTablespace.sh
 if [ "$( checkInstallError "TABLESPACE files (/var/lib/postgresql/tablespaces) not set up properly; redo install" )" ] ; then exit -1; fi
 echo "sudo make -C env /var/lib/postgresql/tablespaces - finished at $(date)"
 echo " "
 
-echo "Finished setting RHEL dependencies (with root) at $(date)"
+echo "Finished setting ubuntu dependencies (with root) at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Dependency: Install of tranSMART-ETL"
 echo "++++++++++++++++++++++++++++"
 
-# make -C env rhel_deps_regular
-#   In the makefile target, rhel_deps_regular, causes a
+# make -C env ubuntu_deps_regular
+#   In the makefile target, ubuntu_deps_regular, causes a
 #   make of these four steps: 
 # (1)
 sudo -v
 cd $INSTALL_BASE/transmart-data
-make -C env update_etl
+make -C env update_etl_git
 # verify ETL folder
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesETLFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/tranSMART-ETL was not installed properly; redo install" )" ] ; then exit -1; fi
 
@@ -248,7 +155,7 @@ sudo -v
 cd $INSTALL_BASE/transmart-data
 make -C env data-integration 
 # verify data-integration folder
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesDataIntegrationFolder.sh
 if [ "$( checkInstallError "The directory transmart-data/data-integration was not installed properly; redo install" )" ] ; then exit -1; fi
 
@@ -263,7 +170,7 @@ sudo -v
 cd $INSTALL_BASE/transmart-data
 make -C env ../vars
 # verify setup of vars file
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesVars.sh
 if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
 
@@ -277,7 +184,11 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Dependency: Install of grails, groovy"
 echo "++++++++++++++++++++++++++++"
 
-echo "Finished setting RHEL dependencies (without root) at $(date)"
+echo "Finished setting ubuntu dependencies (without root) at $(date)"
+sudo -v
+sudo apt-get -q install -y ant
+sudo apt-get -q install -y maven
+echo "Finished install of ant and maven at $(date)"
 
 # No longer need to remove this as the make step that creates it is not skipped!
 # rm $INSTALL_BASE/transmart-data/env/groovy
@@ -287,7 +198,7 @@ echo "Y" > AnswerYes.txt
 source $HOME/.sdkman/bin/sdkman-init.sh
 sdk install grails 2.3.11 < AnswerYes.txt
 sdk install groovy 2.4.5 < AnswerYes.txt
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkSdkmanApps.sh
 if [ "$( checkInstallError "groovy and/or grails not installed correctly; redo install" )" ] ; then exit -1; fi
 
@@ -305,7 +216,7 @@ cd $INSTALL_BASE/transmart-data
 sudo chmod 700 $TABLESPACES/*
 
 echo "Checks on basic load"
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./basics.sh
 if [ "$( checkInstallError "Some Basic Command-Line Tool is missing; redo install" )" ] ; then exit -1; fi
 ./checkVersions.sh
@@ -327,12 +238,12 @@ echo "++++++++++++++++++++++++++++"
 
 sudo -v 
 cd $HOME
-sudo yum -q install -y tomcat7 
-sudo service tomcat7 stop
-$SCRIPTS_BASE/Scripts/install-rhel/updateTomcatConfig.sh
+sudo apt-get -q install -y tomcat8 
+sudo service tomcat8 stop
+$SCRIPTS_BASE/Scripts/install-ubuntu18/updateTomcatConfig.sh
 
 echo "+  Checks on tomcat install"
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkTomcatInstall.sh
 if [ "$( checkInstallError "Tomcat install failed; redo install" )" ] ; then exit -1; fi
 
@@ -342,12 +253,12 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
 echo "++++++++++++++++++++++++++++"
 
-# could be installed from yum when version 3.1+ becomes available
+# could be install from apt-get when version 3.1+ becomes available
 # as of Dec 23 2015 - current install is 3.0.2 - >=3.1.0 required
 # Specifically: https://cran.r-project.org/web/packages/plyr/plyr.pdf
 
 #sudo -v
-#sudo yum install -y r-base=3.0.2-1ubuntu1
+#sudo apt-get install -y r-base=3.0.2-1ubuntu1
 #cd $INSTALL_BASE/transmart-data/R
 #R_MIRROR="http://cran.utstat.utoronto.ca/"
 #R_EXEC=$(which R)
@@ -378,9 +289,9 @@ source /etc/profile.d/Rpath.sh
 sudo -v
 cd $INSTALL_BASE/transmart-data
 source ./vars
-sudo TABLESPACES=$TABLESPACES TRANSMART_USER="tomcat7" make -C R install_rserve_init
+sudo TABLESPACES=$TABLESPACES TRANSMART_USER="tomcat8" make -C R install_rserve_init
 
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesR.sh
 if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
 ./checkR.sh
@@ -394,7 +305,7 @@ echo "++++++++++++++++++++++++++++"
 
 # only load database if not already loaded
 set +e
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkPsqlDataLoad.sh quiet
 returnCode=$?
 set -e
@@ -407,7 +318,7 @@ else
 	source ./vars
 	make -j4 postgres
 fi
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkPsqlDataLoad.sh
 if [ "$( checkInstallError "Loading database failed; clear database and run install again" )" ] ; then exit -1; fi
 
@@ -422,11 +333,11 @@ cd $INSTALL_BASE/transmart-data
 sudo -v
 source ./vars
 make -C config install
-sudo mkdir -p /usr/share/tomcat7/.grails/transmartConfig/
-sudo cp $HOME/.grails/transmartConfig/*.groovy /usr/share/tomcat7/.grails/transmartConfig/
-sudo chown -R tomcat7:tomcat7 /usr/share/tomcat7/.grails
+sudo mkdir -p /usr/share/tomcat8/.grails/transmartConfig/
+sudo cp $HOME/.grails/transmartConfig/*.groovy /usr/share/tomcat8/.grails/transmartConfig/
+sudo chown -R tomcat8:tomcat8 /usr/share/tomcat8/.grails
 
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesConfig.sh
 if [ "$( checkInstallError "configuration files not set up correctly, see install script and redo" )" ] ; then exit -1; fi
 
@@ -436,11 +347,23 @@ echo "++++++++++++++++++++++++++++"
 echo "+  Install war files"
 echo "++++++++++++++++++++++++++++"
 
-cd $INSTALL_BASE/war-files
-sudo cp *.war /var/lib/tomcat7/webapps/
+cd $INSTALL_BASE
+sudo -v
+if ! [ -d war-files ]; then
+	mkdir war-files
+fi
 
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
-./checkFilesTomcatWar.sh
+cd war-files
+if ! [ -e transmart.war ]; then
+    curl http://library.transmartfoundation.org/release/release16_4_0_artifacts/transmart.war --output transmart.war
+fi
+if ! [ -e gwava.war ]; then
+    curl http://library.transmartfoundation.org/release/release16_4_0_artifacts/gwava.war --output gwava.war
+fi
+sudo cp *.war /var/lib/tomcat8/webapps/
+
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
+sudo ./checkFilesTomcatWar.sh
 if [ "$( checkInstallError "transmart war file not set up correctly, see install script and redo" )" ] ; then exit -1; fi
 
 echo "Finished installing war files at $(date)"
@@ -454,8 +377,8 @@ sudo -v
 source ./vars
 #  (TODO)  Should check to see if it is already running
 make -C solr start > $INSTALL_BASE/transmart-data/solr.log 2>&1 & 
-echo "Sleeping - waiting for SOLR to start (2 minutes)"
-sleep 2m
+echo "Sleeping - waiting for SOLR to start (10 minutes)"
+sleep 10m
 make -C solr rwg_full_import sample_full_import
 echo "Finished loading, configuring and starting SOLR at $(date)"
 
@@ -467,9 +390,10 @@ echo "++++++++++++++++++++++++++++"
 # and unfortunately, this does not work either.
 #  (TODO)  Should check to see if it is already running
 sudo -v
-cd $SCRIPTS_BASE/Scripts/install-rhel
-sudo -u tomcat7 bash -c "INSTALL_BASE=\"$INSTALL_BASE\" ./runRServe.sh"
-#sudo service rserve start - is not working - not sure why
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18
+# rserve runs as user transmart
+# using /etc/init.d/rserve
+sudo systemctl start rserve
 echo "Finished starting RServe at $(date)"
 
 echo "++++++++++++++++++++++++++++"
@@ -477,8 +401,8 @@ echo "+  start Tomcat"
 echo "++++++++++++++++++++++++++++"
 
 #  (TODO)  Should check to see if it is already running
-sudo service tomcat7 restart
-echo "Finished starting Tomcat7 at $(date)"
+sudo service tomcat8 restart
+echo "Finished starting Tomcat8 at $(date)"
 echo "Sleeping - waiting for tomcat/transmart to start (3 minutes)"
 sleep 3m
 
@@ -487,14 +411,14 @@ echo "+ Done with install - making final checks - (may take a while)"
 echo "++++++++++++++++++++++++++++"
 
 set e+
-cd $SCRIPTS_BASE/Scripts/install-rhel/checks
-./checkFilesTomcat.sh
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
+sudo ./checkFilesTomcat.sh
 ./checkTools.sh
 ./checkWeb.sh
 
 echo "++++++++++++++++++++++++++++"
 echo "+ To redo all checks"
-echo "cd $SCRIPTS_BASE/Scripts/install-rhel/checks"
+echo "cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks"
 echo "./checkAll.sh"
 echo "++++++++++++++++++++++++++++"
 echo "+ Done with final checks"
@@ -505,7 +429,7 @@ echo "Finished install of basic transmart system at $(date)"
 
 echo "--------------------------------------------"
 echo "To load datasets, use the these two files in the Scripts directory: "
-echo "    datasetsList.txt - the list of possible datasets to load, and"
+echo "    datasetsList.txt - the list of posible datasets to load, and"
 echo "    load_datasets.sh - the script to load the datasets. "
 echo ""
 echo "First, in the file datasetsList.txt, un-comment the lines that "
@@ -513,7 +437,7 @@ echo "corresponding to the data sets you wish to load. "
 echo ""
 echo "Then run the file load_datasets.sh with:"
 echo "    cd $SCRIPTS_BASE"
-echo "    ./Scripts/install-rhel/load_datasets.sh"
+echo "    ./Scripts/install-ubuntu18/load_datasets.sh"
 echo ""
 echo "-- Note that loading the same dataset twice is not recommended" 
 echo "   and may produce unpredictable results"
