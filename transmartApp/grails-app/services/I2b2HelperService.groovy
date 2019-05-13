@@ -21,6 +21,7 @@ import i2b2.SnpInfo
 import i2b2.SnpProbeSortedDef
 import i2b2.StringLineReader
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.runtime.NullObject
 import org.hibernate.SessionFactory
 import org.hibernate.Transaction
 import org.hibernate.classic.Session
@@ -558,6 +559,9 @@ class I2b2HelperService implements InitializingBean {
         if (clob == null) {
 	    ''
         }
+        else if (clob instanceof NullObject) {
+	    ''
+        }
 	else if (clob instanceof String) {
             // postgres schema uses strings in some places oracle uses clobs
 	    clob
@@ -780,7 +784,7 @@ class I2b2HelperService implements InitializingBean {
 				from I2B2DEMODATA.qt_patient_set_collection
 				where result_instance_id = ?
 			)
-		)'''
+		) subjectList'''
 
 	int i = 0
 	eachRow(sql, [fullnameLike, resultInstanceId]) { row ->
