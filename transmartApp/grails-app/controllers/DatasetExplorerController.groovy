@@ -46,6 +46,9 @@ class DatasetExplorerController {
     @Value('${com.recomdata.datasetExplorer.hideAcrossTrialsPanel:false}')
     private boolean hideAcrossTrialsPanel
 
+    @Value('${ui.tabs.datasetExplorer.allData.hide:false}')
+    private boolean hideAllData
+
     @Value('${ui.tabs.datasetExplorer.gridView.hide:false}')
     private boolean hideGridView
 
@@ -94,7 +97,7 @@ class DatasetExplorerController {
 
 	String tokens = i2b2HelperService.getSecureTokensCommaSeparated()
 	String initialaccess = new JSON(i2b2HelperService.getAccess(i2b2HelperService.getRootPathsWithTokens())).toString()
-	boolean canSeeData = securityService.principal().isAdminOrDseAdmin()
+	boolean canSeeData = !hideAllData || securityService.principal().isAdminOrDseAdmin()
 
 	render view: 'datasetExplorer', model: [
 	    pathToExpand            : pathToExpand ?: path,
