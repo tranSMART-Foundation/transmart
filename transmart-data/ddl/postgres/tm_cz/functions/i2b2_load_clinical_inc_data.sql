@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_clinical_inc_data(character varying, character varying, character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_clinical_inc_data(trial_id character varying, top_node character varying, secure_study character varying DEFAULT 'N'::character varying, highlight_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_clinical_inc_data(trial_id character varying, top_node character varying, secure_study character varying DEFAULT 'N'::character varying, highlight_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 /*
@@ -33,7 +33,8 @@ Declare
 	pExists			integer;
 	rtnCode			integer;
 	tText			varchar(2000);
-  
+  	tExplain text;
+
 	addNodes CURSOR is
 	select DISTINCT leaf_node, node_name
 	from  tm_wz.wt_trial_nodes a;
@@ -1101,28 +1102,32 @@ for ul in uploadI2b2
 	--	delete from observation_fact all concept_cds for trial that are clinical data, exclude concept_cds from biomarker data
 	
 	begin
+
+--	for tExplain in
+--	explain (analyze, verbose, buffers)
 	delete from i2b2demodata.observation_fact f
 	where f.sourcesystem_cd = TrialId
-        and (patient_num||concept_cd) in (  select (c.patient_num||i.c_basecode) from wrk_clinical_data a
-                                ,patient_dimension c
-                                ,wt_trial_nodes t
-                                ,i2b2 i
-                where a.usubjid = c.sourcesystem_cd
+        and (f.patient_num||f.concept_cd) in (  select (c.patient_num||i.c_basecode) from tm_wz.wrk_clinical_data a
+                                ,i2b2demodata.patient_dimension c
+                                ,tm_wz.wt_trial_nodes t
+                                ,i2b2metadata.i2b2 i
+                where c.sourcesystem_cd = TrialId
+		  and a.usubjid = c.sourcesystem_cd
                   and coalesce(a.category_cd,'@') = coalesce(t.category_cd,'@')
                   and coalesce(a.data_label,'**NULL**') = coalesce(t.data_label,'**NULL**')
                   and coalesce(a.visit_name,'**NULL**') = coalesce(t.visit_name,'**NULL**')
---                  and decode(a.data_type,'T',a.data_value,'**NULL**') = coalesce(t.data_value,'**NULL**')
                   and CASE when a.data_type = 'T' THEN a.data_value ELSE '**NULL**' END = coalesce(t.data_value,'**NULL**')
                   and t.leaf_node = i.c_fullname
-                  --and c.patient_num not in (select distinct patient_num from observation_fact)
-                  and not exists                  -- don't insert if lower level node exists
-                                (select 1 from wt_trial_nodes x
+                  and not exists                  -- don't delete if lower level node exists
+                                (select 1 from tm_wz.wt_trial_nodes x
                                   --where x.leaf_node like t.leaf_node || '%_'
-                                  --Jule 2013. Performance fix by TR. Find if any leaf parent node is current
-                                   where (SUBSTR(x.leaf_node, 1, INSTR(x.leaf_node, '\', -2))) = t.leaf_node
-                                  
-                                  )
-                  and a.data_value is not null );
+                                  --July 2013. Performance fix by TR. Find if any leaf parent node is current
+                                   where (SUBSTR(x.leaf_node, 1, tm_cz.INSTR(x.leaf_node, '\', -2))) = t.leaf_node)
+				     and a.data_value is not null )
+--	LOOP
+--		raise NOTICE 'explain: %', tExplain;
+--	END LOOP
+	;
 
 	get diagnostics rowCt := ROW_COUNT;
 	exception
@@ -1141,6 +1146,8 @@ for ul in uploadI2b2
     --Insert into observation_fact
 	
 	begin
+	for tExplain in
+	explain (analyze, verbose, buffers)
 	insert into i2b2demodata.observation_fact
 	(encounter_num,
      patient_num,
@@ -1190,7 +1197,11 @@ for ul in uploadI2b2
 	  and not exists		-- don't insert if lower level node exists
 		 (select 1 from tm_wz.wt_trial_nodes x
 		  where x.leaf_node like t.leaf_node || '%_' escape '`')
-	  and a.data_value is not null;
+	  and a.data_value is not null
+	LOOP
+		raise NOTICE 'explain: %', tExplain;
+	END LOOP
+	;
 	get diagnostics rowCt := ROW_COUNT; 
 	exception
 	when others then
