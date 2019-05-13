@@ -952,11 +952,12 @@ BEGIN
    probeset,
    platform 
    )select distinct s.probeset
-               ,m.platform               
+               ,m.platform
             from tm_lz.lt_src_rna_seq_data s,
-                 tm_lz.lt_src_RNA_SEQ_subj_samp_map m  
-                 where s.trial_name=m.trial_name  
-                   and not exists
+                 tm_lz.lt_src_RNA_SEQ_subj_samp_map m
+                 where s.trial_name=m.trial_name
+                 and s.expr_id=m.sample_cd
+		 and not exists
 		 (select 1 from probeset_deapp x
 		  where m.platform = x.platform
 		    and s.probeset = x.probeset);
