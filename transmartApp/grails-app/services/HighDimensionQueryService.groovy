@@ -5,6 +5,7 @@ import groovy.sql.Sql
 import groovy.util.logging.Slf4j
 import groovy.util.slurpersupport.GPathResult
 import org.apache.commons.io.IOUtils
+import org.codehaus.groovy.runtime.NullObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.exceptions.InvalidRequestException
@@ -51,9 +52,7 @@ class HighDimensionQueryService {
 	new Sql(dataSource).eachRow sqlt, [resultInstanceId], { row ->
 	    GPathResult xml
             try {
-		StringWriter w = new StringWriter()
-		IOUtils.copy row.request_xml.characterStream, w
-		xml = new XmlSlurper().parseText(w.toString())
+                xml = new XmlSlurper().parse(new StringReader(clobToString(row.request_xml)))
 	    }
 	    catch (e) {
 		throw new InvalidRequestException('Malformed XML document: ' + e.message, e)
@@ -134,5 +133,31 @@ class HighDimensionQueryService {
 	}
 
 	tablein
+    }
+
+    /**
+     * Converts a clob to a string for returned Oracle columns
+     */
+    def String clobToString(clob) {
+        if (clob == null) {
+            '.'
+        }
+        else if (clob instanceof NullObject) {
+            ''
+        }
+        else if (clob instanceof String) {
+            // postgres schema uses strings in some places oracle uses clobs
+            clob
+        }
+	else {
+            def buffer = new byte[1000];
+            def num = 0;
+            def inStream = clob.asciiStream;
+            def out = new ByteArrayOutputStream();
+            while ((num = inStream.read(buffer)) > 0) {
+		out.write(buffer, 0, num);
+            }
+            new String(out.toByteArray());
+	}
     }
 }
