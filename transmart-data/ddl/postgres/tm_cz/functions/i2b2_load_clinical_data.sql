@@ -561,7 +561,7 @@ Declare
 		return -16;
 	end;
 
-  --Trim trailing and leadling spaces as well as remove any double spaces, remove space from before comma, remove trailing comma
+  --Trim trailing and leading spaces as well as remove any double spaces, remove space from before comma, remove trailing comma
 
 	begin
 	update tm_wz.wrk_clinical_data
