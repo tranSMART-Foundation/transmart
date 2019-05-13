@@ -71,6 +71,13 @@ class ChartService {
 	StringWriter output = new StringWriter()
 	PrintWriter writer = new PrintWriter(output)
 
+        // We want to automatically clear the output buffer as we go
+        output.metaClass.toStringAndFlush = {
+            def tmp = buf.toString()
+            buf.setLength(0)
+            tmp
+        }
+
 	// We need to run some common statistics first
 	// This must be changed for multiple (>2) cohort selection
 	// We grab the intersection count for our two cohort
@@ -88,7 +95,7 @@ class ChartService {
 	    // First we get the Query Definition
 	    i2b2HelperService.renderQueryDefinition p.instance,
 		'Query Summary for Subset ' + n, writer
-	    p.query = output.toString()
+	    p.query = output.toStringAndFlush()
 
 	    // Let's fetch the patient count
 	    p.patientCount = i2b2HelperService.getPatientSetSize(p.instance)
