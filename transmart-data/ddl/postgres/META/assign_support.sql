@@ -150,7 +150,7 @@ BEGIN
                         ) AS Y
                 ),
                 ', ') || ')',
-            CASE proisagg
+            CASE prokind = 'a'
                 WHEN FALSE THEN 'f'
                 ELSE 'a'
             END::"char",
