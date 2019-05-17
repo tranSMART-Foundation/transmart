@@ -131,11 +131,17 @@ KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip
 $(KETTLE_ARCHIVE):
 	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
-KETTLE_ORACLE_DRIVER=data-integration/libext/JDBC/$(JDBC_DRIVER_ORA)
+KETTLE_ORACLE_DRIVER=data-integration/lib/$(JDBC_DRIVER_ORA)
 $(KETTLE_ORACLE_DRIVER): $(JDBC_DRIVER_ORA_PATH) data-integration/.keep
 	cp --reflink=auto "$<" "$@"
 
-data-integration: data-integration/.keep $(KETTLE_ORACLE_DRIVER)
+data-integration-oracle: data-integration/.keep $(KETTLE_ORACLE_DRIVER)
+.PHONY: data-integration-oracle
+data-integration-oracle/.keep: $(KETTLE_ARCHIVE)
+	unzip $<
+	touch '$@'
+
+data-integration: data-integration/.keep
 .PHONY: data-integration
 data-integration/.keep: $(KETTLE_ARCHIVE)
 	unzip $<
