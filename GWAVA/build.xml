@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- This is version 16.4-SNAPSHOT -->
+<!-- This is version 16.4 -->
 
 <project name="ManhattanViz" default="run" basedir=".">
     <description>
