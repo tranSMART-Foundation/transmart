@@ -48,12 +48,12 @@ CREATE TABLE ctd2_clin_inhib_effect (
 CREATE FUNCTION tf_trg_ctd2_clin_inhib_effect() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
-BEGIN     
- 	IF NEW.CTD_CIE_SEQ IS NULL THEN 
-		select nextval('biomart.SEQ_CLINICAL_TRIAL_DESIGN_ID') INTO NEW.CTD_CIE_SEQ ;  
-	END IF;  
-	RETURN NEW;  
-END;
+begin     
+    if new.ctd_cie_seq is null then 
+	select nextval('biomart.seq_clinical_trial_design_id') into new.ctd_cie_seq ;  
+    end if;  
+    return new;  
+end;
 $$;
 
 --

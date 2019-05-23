@@ -25,12 +25,12 @@ ALTER TABLE ONLY de_snp_info
 --
 CREATE FUNCTION tf_trg_de_snp_info_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-      if NEW.SNP_INFO_ID is null then
-         select nextval('deapp.SEQ_DATA_ID') into NEW.SNP_INFO_ID ;
-      end if;
-RETURN NEW;
+    if new.snp_info_id is null then
+        select nextval('deapp.seq_data_id') into new.snp_info_id ;
+    end if;
+    return new;
 end;
 $$;
 

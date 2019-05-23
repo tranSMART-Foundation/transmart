@@ -3,13 +3,12 @@
 --
 CREATE FUNCTION bio_curation_dataset_uid(bio_curation_type character varying) RETURNS character varying
     LANGUAGE plpgsql
-    AS $_$
-BEGIN
-  -- $Id$
-  -- Creates uid for bio_curation_dataset.
+AS $$
+begin
+    -- Creates uid for bio_curation_dataset.
 
-  RETURN 'BCD:' || coalesce(BIO_CURATION_TYPE, 'ERROR');
-END;
- 
-$_$;
+    return 'BCD:' || coalesce(bio_curation_type, 'ERROR');
+end;
+
+$$;
 

@@ -13,10 +13,13 @@ CREATE TABLE cz_xtrial_ctrl_vocab (
 --
 CREATE FUNCTION tf_trg_cz_xtrial_ctrl_vocab_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin     
-if NEW.CTRL_VOCAB_ID is null then          
-select nextval('tm_cz.SEQ_CZ') into NEW.CTRL_VOCAB_ID ;       end if;       RETURN NEW;
+    if new.ctrl_vocab_id is null then          
+	select nextval('tm_cz.seq_cz') into new.ctrl_vocab_id ;
+    end if;
+
+    return new;
 end;
 $$;
 

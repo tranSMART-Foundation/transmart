@@ -36,12 +36,12 @@ ALTER TABLE ONLY de_subject_rbm_data
 --
 CREATE FUNCTION tf_trg_de_subj_rbm_data_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.ID is null then
- select nextval('deapp.DE_SUBJECT_RBM_DATA_SEQ') into NEW.ID ;
-end if;
-       RETURN NEW;
+    if new.id is null then
+	select nextval('deapp.de_subject_rbm_data_seq') into new.id ;
+    end if;
+    return new;
 end;
 $$;
 

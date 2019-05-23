@@ -103,13 +103,13 @@ CREATE TABLE ctd2_trial_details (
 --
 CREATE FUNCTION tf_trg_ctd2_trial_details() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN     
-	IF NEW.CTD_TD_SEQ IS NULL THEN 
-		select nextval('biomart.SEQ_CLINICAL_TRIAL_DESIGN_ID') INTO NEW.CTD_TD_SEQ ;  
-	END IF;   
-	RETURN NEW; 
-END;
+AS $$
+begin     
+    if new.ctd_td_seq is null then 
+	select nextval('biomart.seq_clinical_trial_design_id') into new.ctd_td_seq ;  
+    end if;   
+    return new; 
+end;
 $$;
 
 --

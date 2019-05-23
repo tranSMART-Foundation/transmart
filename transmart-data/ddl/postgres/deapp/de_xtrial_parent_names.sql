@@ -24,13 +24,13 @@ ALTER TABLE ONLY de_xtrial_parent_names
 --
 CREATE FUNCTION tf_de_parent_cd_trg() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN
-  SELECT nextval('deapp.de_parent_cd_seq')
-  INTO new.parent_cd
-  ;
-RETURN NEW;
-END;
+AS $$
+begin
+    select nextval('deapp.de_parent_cd_seq')
+      into new.parent_cd;
+
+    return new;
+end;
 $$;
 
 --

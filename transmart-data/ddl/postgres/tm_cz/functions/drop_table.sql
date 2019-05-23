@@ -3,34 +3,30 @@
 --
 CREATE FUNCTION drop_table(tabowner character varying, tabname character varying) RETURNS void
     LANGUAGE plpgsql
-    AS $$
-DECLARE
+AS $$
+    DECLARE
 
     temp integer:=0;
     drp_stmt varchar(200):=null;
 
     
 BEGIN
-      select
-        count(*)
-      into
+    select count(*) into
         temp
-      from
-        all_tables
-      where
-        upper(TABLE_NAME) = upper(TabName)
-      and
-        upper(OWNER) = upper(TabOwner);
+      from pg_tables
+     where tablename = lower(tabname)
+    and
+        tableschema = lower(tabowner);
 
-      if temp = 1 then
-        drp_stmt := 'Drop Table ' || TabOwner || '.' || TabName;
-        EXECUTE drp_stmt;
+    if temp = 1 then
+        drp_stmt := 'Drop Table ' || lower(tabowner) || '.' || lower(tabname);
+        execute drp_stmt;
         commit;
-      end if;
+    end if;
 
-    EXCEPTION
-      WHEN OTHERS THEN
-      RAISE EXCEPTION 'An error was encountered - % -ERROR- %',SQLSTATE,SQLERRM;
+exception
+    when others then
+	raise exception 'An error was encountered - % -ERROR- %',SQLSTATE,SQLERRM;
 
 END;
 

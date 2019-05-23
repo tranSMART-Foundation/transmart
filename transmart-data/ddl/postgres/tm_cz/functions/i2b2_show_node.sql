@@ -3,30 +3,31 @@
 --
 CREATE FUNCTION i2b2_show_node(path character varying) RETURNS void
     LANGUAGE plpgsql
-    AS $$
-BEGIN
+AS $$
+begin
 
-  -------------------------------------------------------------
-  -- Shows a tree node in I2b2
-  -- KCR@20090519 - First Rev
-  -------------------------------------------------------------
-  if path != ''  or path != '%'
-  then
+    -------------------------------------------------------------
+    -- Shows a tree node in i2b2
+    -- updates node c_visualattributes (sets to FA, LA)
+    -- KCR@20090519 - First Rev
+    -------------------------------------------------------------
+    if path != ''  or path != '%'
+    then
 
-      --I2B2
-    UPDATE i2b2
-      SET c_visualattributes = 'FA'
-    WHERE c_visualattributes LIKE 'F%'
-      AND C_FULLNAME LIKE PATH || '%';
+	--i2b2
+	update i2b2
+	set c_visualattributes = 'FA'
+	where c_visualattributes like 'F%'
+	and c_fullname like path || '%';
 
-     UPDATE i2b2
-      SET c_visualattributes = 'LA'
-    WHERE c_visualattributes LIKE 'L%'
-      AND C_FULLNAME LIKE PATH || '%';
-    COMMIT;
-  END IF;
+	update i2b2
+	   set c_visualattributes = 'LA'
+	 where c_visualattributes like 'L%'
+	       and c_fullname like path || '%';
+	commit;
+	end if;
 
-END;
- 
+end;
+
 $$;
 

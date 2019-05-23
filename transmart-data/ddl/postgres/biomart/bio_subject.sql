@@ -24,10 +24,10 @@ CREATE FUNCTION tf_trg_bio_subject_id() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 begin
-    if NEW.BIO_SUBJECT_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_SUBJECT_ID ;
+    if new.bio_subject_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_subject_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

@@ -20,12 +20,12 @@ ALTER TABLE ONLY xnat_subject
 --
 CREATE FUNCTION tf_trg_xnat_subject_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.ID is null then
-          select nextval('searchapp.SEQ_SEARCH_DATA_ID') into NEW.ID ;
+    if new.id is null then
+        select nextval('searchapp.seq_search_data_id') into new.id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

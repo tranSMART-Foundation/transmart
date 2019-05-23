@@ -27,12 +27,12 @@ ALTER TABLE ONLY fm_file
 --
 CREATE FUNCTION tf_trg_fm_file_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.FILE_ID is null then
- select nextval('fmapp.SEQ_FM_ID') into NEW.FILE_ID ;
-end if;
-       RETURN NEW;
+    if new.file_id is null then
+	select nextval('fmapp.seq_fm_id') into new.file_id ;
+    end if;
+    return new;
 end;
 $$;
 
@@ -46,19 +46,19 @@ CREATE TRIGGER trg_fm_file_id BEFORE INSERT ON fm_file FOR EACH ROW EXECUTE PROC
 --
 CREATE FUNCTION tf_trg_fm_file_uid() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-DECLARE
-  rec_count int;
-BEGIN
-  SELECT COUNT(*) INTO rec_count 
-  FROM fmapp.fm_data_uid 
-  WHERE fm_data_id = new.file_id;
-  
-  if rec_count = 0 then
-    insert into fmapp.fm_data_uid (fm_data_id, unique_id, fm_data_type)
-    values (NEW.file_id, fm_file_uid(NEW.file_id::text), 'FM_FILE');
-  end if;
-RETURN NEW;
+AS $$
+    declare
+    rec_count int;
+begin
+    select count(*) into rec_count 
+      from fmapp.fm_data_uid 
+     where fm_data_id = new.file_id;
+    
+    if rec_count = 0 then
+	insert into fmapp.fm_data_uid (fm_data_id, unique_id, fm_data_type)
+	values (new.file_id, fm_file_uid(new.file_id::text), 'FM_FILE');
+    end if;
+    return new;
 end;
 $$;
 

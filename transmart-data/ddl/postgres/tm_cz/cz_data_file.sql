@@ -26,12 +26,13 @@ ALTER TABLE ONLY cz_data_file
 --
 CREATE FUNCTION tf_trg_cz_data_file_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.DATA_FILE_ID is null then
- select nextval('tm_cz.SEQ_CZ_DATA_FILE') into NEW.DATA_FILE_ID ;
-end if;
-       RETURN NEW;
+    if new.data_file_id is null then
+	select nextval('tm_cz.seq_cz_data_file') into new.data_file_id ;
+    end if;
+
+    return new;
 end;
 $$;
 

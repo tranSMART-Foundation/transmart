@@ -1,147 +1,121 @@
 --
 -- Name: util_create_synonym_all(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION util_create_synonym_all(v_fromzone character varying DEFAULT NULL::character varying, v_whattype character varying DEFAULT 'PROCEDURES,FUNCTIONS,TABLES,VIEWS'::character varying) RETURNS void
+CREATE FUNCTION util_create_synonym_all(v_fromzone character varying DEFAULT NULL::character varying, v_whattype character varying DEFAULT 'FUNCTIONS,TABLES,VIEWS'::character varying) RETURNS void
     LANGUAGE plpgsql
-    AS $$
-DECLARE
+AS $$
+    declare
 
--------------------------------------------------------------------------------------
--- NAME: UTIL_CREATE or REPLACE _SYNONYM_ALL
---
--- Copyright c 2011 Recombinant Data Corp.
---
+    -------------------------------------------------------------------------------------
+    -- NAME: UTIL_CREATE or REPLACE _SYNONYM_ALL
+    --
+    -- Copyright c 2011 Recombinant Data Corp.
+    --
 
---------------------------------------------------------------------------------------
-	--The name of the table, proc, function or view.
-	V_OBJNAME varchar(50);
+    --------------------------------------------------------------------------------------
+    --The name of the table, proc, function or view.
+    V_OBJNAME varchar(50);
+    
+    --Dynamic SQL line
+    V_CMDLINE varchar(200);
+    
+    --Table list
+    L_TABLE cursor for
+		       select table_name
+		       from information_schema.tables
+		       where table_schema = lower(v_fromzone);
+    --View List
+    L_VIEW cursor for
+		      select table_name
+		      from information_schema.views
+		      where table_schema = lower(v_fromzone);
 
-	--Dynamic SQL line
-	V_CMDLINE varchar(200);
+    --function list (FUNCTION)
+    L_FUNCTION cursor for
+			  select distinct routine_name from information_schema.routines
+			  where routine_schema = lower(v_fromzone)
+			  and routine_name not like 'util%';
 
-	--Table list
-	L_TABLE CURSOR FOR
-		SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = UPPER(V_FROMZONE);
-	--View List
-	L_VIEW CURSOR FOR
-		SELECT VIEW_NAME FROM ALL_VIEWS WHERE OWNER = UPPER(V_FROMZONE);
-	--Procedure and function list (OBJTYPE are PROCEDURE, FUNCTION, TRIGGER)
-	L_PROCEDURE CURSOR (OBJTYPE character varying) FOR
-		SELECT DISTINCT OBJECT_NAME FROM ALL_PROCEDURES
-			WHERE OWNER = UPPER(V_FROMZONE) AND OBJECT_TYPE = OBJTYPE
-      AND UPPER(OBJECT_NAME) NOT LIKE 'UTIL%';
+begin
 
+    -- Create synonyms for Tables
+    if upper(V_WHATTYPE) like '%TABLE%' then
 
-BEGIN
+	open L_TABLE;
+	fetch L_TABLE into V_OBJNAME;
+	while L_TABLE%FOUND loop
+	    begin
 
-	-- Create synonyms for Tables
-	IF UPPER(V_WHATTYPE) LIKE '%TABLE%' THEN
+		V_CMDLINE := 'create or replace synonym ' || V_OBJNAME || ' for ' || UPPER(V_FROMZONE) || '.' || V_OBJNAME ;
 
-		OPEN L_TABLE;
-			FETCH L_TABLE INTO V_OBJNAME;
-		WHILE L_TABLE%FOUND
-			LOOP
-			BEGIN
+		execute V_CMDLINE;
+		--DBMS_OUTPUT.PUT_LINE('SUCCESS ' || V_CMDLINE);
 
-				V_CMDLINE := 'create or replace synonym ' || V_OBJNAME || ' for ' || UPPER(V_FROMZONE) || '.' || V_OBJNAME ;
+		fetch L_TABLE  into V_OBJNAME;
 
-				EXECUTE V_CMDLINE;
-				--DBMS_OUTPUT.PUT_LINE('SUCCESS ' || V_CMDLINE);
+	    exception
+		when others then
+		    begin
+			raise notice '%%', 'ERROR ' ,  V_CMDLINE;
+			raise notice '%', SQLERRM;
+		    end;
+	    end;
+	end loop;
+	close L_TABLE;
+    end if;
 
-				FETCH L_TABLE  INTO V_OBJNAME;
+    --CREATE or REPLACE  SYNONYMS FOR VIEWS
+    if upper(V_WHATTYPE) like '%VIEW%' then
 
-			EXCEPTION
-			WHEN OTHERS THEN
-			BEGIN
-				RAISE NOTICE '%%', 'ERROR ' ,  V_CMDLINE;
-				RAISE NOTICE '%', SQLERRM;
-			END;
-		END;
-       END LOOP;
-       CLOSE L_TABLE;
-   end if;
+	open L_VIEW;
+	fetch L_VIEW into V_OBJNAME;
+	while L_VIEW%FOUND loop
+	    begin
 
-	--CREATE or REPLACE  SYNONYMS FOR VIEWS
-	IF UPPER(V_WHATTYPE) LIKE '%VIEW%' THEN
+		V_CMDLINE := 'create or replace synonym ' || V_OBJNAME || ' for ' || UPPER(V_FROMZONE) || '.' || V_OBJNAME ;
 
-		OPEN L_VIEW;
-			FETCH L_VIEW INTO V_OBJNAME;
-		WHILE L_VIEW%FOUND
-			LOOP
-			BEGIN
+		execute V_CMDLINE;
+		--DBMS_OUTPUT.PUT_LINE('SUCCESS ' || V_CMDLINE);
 
-				V_CMDLINE := 'create or replace synonym ' || V_OBJNAME || ' for ' || UPPER(V_FROMZONE) || '.' || V_OBJNAME ;
+		fetch L_VIEW into V_OBJNAME;
 
-				EXECUTE V_CMDLINE;
-				--DBMS_OUTPUT.PUT_LINE('SUCCESS ' || V_CMDLINE);
+	    exception
+		when others then
+		    begin
+			raise notice '%%', 'ERROR ' ,  V_CMDLINE;
+			raise notice '%', SQLERRM;
+		    end;
+	    end;
+	end loop;
+	close L_VIEW;
+    end if;
 
-				FETCH L_VIEW INTO V_OBJNAME;
+    -- CREATE or REPLACE  SYNONYMS FOR FUNCTIONS
+    if upper(V_WHATTYPE) like '%FUNCTION%' then
 
-			EXCEPTION
-			WHEN OTHERS THEN
-			BEGIN
-				RAISE NOTICE '%%', 'ERROR ' ,  V_CMDLINE;
-				RAISE NOTICE '%', SQLERRM;
-			END;
-		END;
-		END LOOP;
-		CLOSE L_VIEW;
-   END IF;
+	open l_function('FUNCTION');
+	fetch l_function into V_OBJNAME;
+	while l_function%FOUND loop
+	    begin
 
--- CREATE or REPLACE  SYNONYMS FOR PROCEDURES
-	IF UPPER(V_WHATTYPE) LIKE '%FUNCTION%' THEN
+		V_CMDLINE := 'create synonym ' || V_OBJNAME || ' for ' || UPPER(V_FROMZONE) || '.' || V_OBJNAME ;
 
-		OPEN L_PROCEDURE('FUNCTION');
-			FETCH L_PROCEDURE INTO V_OBJNAME;
-		WHILE L_PROCEDURE%FOUND
-			LOOP
-			BEGIN
+		execute V_CMDLINE;
+		--DBMS_OUTPUT.PUT_LINE('SUCCESS ' || V_CMDLINE);
 
-				V_CMDLINE := 'create or replace synonym ' || V_OBJNAME || ' for ' || UPPER(V_FROMZONE) || '.' || V_OBJNAME ;
+		fetch L_FUNCTION into V_OBJNAME;
 
-				EXECUTE V_CMDLINE;
-				--DBMS_OUTPUT.PUT_LINE('SUCCESS ' || V_CMDLINE);
+	    exception
+		when others then
+		    begin
+			raise notice '%%', 'ERROR ' ,  V_CMDLINE;
+			raise notice '%', SQLERRM;
+		    end;
+	    end;
+	end loop;
+	close L_FUNCTION;
+    end if;
+end;
 
-				FETCH l_procedure INTO V_OBJNAME;
-
-			EXCEPTION
-			WHEN OTHERS THEN
-			BEGIN
-				RAISE NOTICE '%%', 'ERROR ' ,  V_CMDLINE;
-				RAISE NOTICE '%', SQLERRM;
-			END;
-		END;
-		END LOOP;
-		CLOSE l_procedure;
-   end if;
-
--- CREATE or REPLACE  SYNONYMS FOR FUNCTIONS
-	IF UPPER(V_WHATTYPE) LIKE '%FUNCTION%' THEN
-
-		OPEN l_procedure('FUNCTION');
-			FETCH l_procedure INTO V_OBJNAME;
-		WHILE l_procedure%FOUND
-			LOOP
-			BEGIN
-
-				V_CMDLINE := 'create synonym ' || V_OBJNAME || ' for ' || UPPER(V_FROMZONE) || '.' || V_OBJNAME ;
-
-				EXECUTE V_CMDLINE;
-				--DBMS_OUTPUT.PUT_LINE('SUCCESS ' || V_CMDLINE);
-
-				FETCH L_PROCEDURE INTO V_OBJNAME;
-
-			EXCEPTION
-			WHEN OTHERS THEN
-			BEGIN
-				RAISE NOTICE '%%', 'ERROR ' ,  V_CMDLINE;
-				RAISE NOTICE '%', SQLERRM;
-			END;
-		END;
-		END LOOP;
-		CLOSE L_PROCEDURE;
-   END IF;
-END;
- 
 $$;
 

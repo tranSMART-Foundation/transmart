@@ -32,12 +32,12 @@ ALTER TABLE ONLY bio_lit_model_data
 --
 CREATE FUNCTION tf_trg_bio_lit_model_data_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.BIO_LIT_MODEL_DATA_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_LIT_MODEL_DATA_ID ;
-       end if;
-       RETURN NEW;
+    if new.bio_lit_model_data_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_lit_model_data_id ;
+    end if;
+    return new;
 end;
 $$;
 

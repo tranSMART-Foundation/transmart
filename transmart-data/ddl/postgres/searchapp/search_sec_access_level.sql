@@ -18,12 +18,12 @@ ALTER TABLE ONLY search_sec_access_level
 --
 CREATE FUNCTION tf_trg_search_sec_acc_level_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.SEARCH_SEC_ACCESS_LEVEL_ID is null then
-          select nextval('searchapp.SEQ_SEARCH_DATA_ID') into NEW.SEARCH_SEC_ACCESS_LEVEL_ID ;
+    if new.search_sec_access_level_id is null then
+        select nextval('searchapp.seq_search_data_id') into new.search_sec_access_level_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

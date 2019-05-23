@@ -19,12 +19,12 @@ ALTER TABLE ONLY search_auth_user_sec_access
 --
 CREATE FUNCTION tf_trg_search_a_u_sec_access_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.SEARCH_AUTH_USER_SEC_ACCESS_ID is null then
-          select nextval('searchapp.SEQ_SEARCH_DATA_ID') into NEW.SEARCH_AUTH_USER_SEC_ACCESS_ID ;
+    if new.search_auth_user_sec_access_id is null then
+        select nextval('searchapp.seq_search_data_id') into new.search_auth_user_sec_access_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

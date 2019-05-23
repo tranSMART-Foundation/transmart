@@ -3,49 +3,48 @@
 --
 CREATE FUNCTION util_drop_synonym(v_objname character varying DEFAULT NULL::character varying) RETURNS void
     LANGUAGE plpgsql
-    AS $$
-DECLARE
+AS $$
+    declare
 
--------------------------------------------------------------------------------------
--- NAME: UTIL_DROP_SYNONYM
---
--- Copyright c 2011 Recombinant Data Corp.
---
+    -------------------------------------------------------------------------------------
+    -- NAME: UTIL_DROP_SYNONYM
+    --
+    -- Copyright c 2011 Recombinant Data Corp.
+    --
 
---------------------------------------------------------------------------------------
-   v_cmdline varchar(100);
+    --------------------------------------------------------------------------------------
+    v_cmdline varchar(100);
 
-   ts CURSOR FOR
-     SELECT 'drop synonym ' || synonym_name || ' ' from user_synonyms;
+    ts CURSOR FOR
+		  SELECT 'drop synonym ' || synonym_name || ' ' from user_synonyms;
 
 
 
-BEGIN
+begin
 
-  OPEN ts;
-   FETCH ts INTO v_cmdline;
-   WHILE ts%FOUND
-   LOOP
+    open ts;
+    fetchl ts into v_cmdline;
+    while ts%FOUND
+	loop
 
-      BEGIN
-         BEGIN
+	begin
+            begin
 
-            BEGIN
-               EXECUTE v_cmdline;
-               RAISE NOTICE '%%', 'SUCCESS ' ,  v_cmdline;
-            END;
-         EXCEPTION
-            WHEN OTHERS THEN
+		begin
+		    execute v_cmdline;
+		    raise notice '%%', 'SUCCESS ' ,  v_cmdline;
+		end;
+            exception
+		when others then
 
-               BEGIN
-                  RAISE NOTICE '%%', 'ERROR ' ,  v_cmdline;
-               END;
-         END;
-         FETCH ts INTO v_cmdline;
-      END;
-   END LOOP;
-   CLOSE ts;
-END;
- 
+		    begin
+			raise notice '%%', 'ERROR ' ,  v_cmdline;
+		    end;
+            end;
+            fetch ts into v_cmdline;
+	end;
+    end loop;
+    close ts;
+end;
+
 $$;
-

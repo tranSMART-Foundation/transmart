@@ -3,18 +3,20 @@
 --
 CREATE FUNCTION isnumeric(p_string character varying) RETURNS numeric
     LANGUAGE plpgsql
-    AS $$
-DECLARE
+AS $$
+    declare
 
-      l_number numeric;
-  
-BEGIN
-      l_number := p_string;
-      return 1;
-  exception
-      when others then
-          return 0;
-  end;
+    l_number numeric;
+
+begin
+    l_number := p_string;
+    return 1;
+
+exception
+    when others then
+        return 0;
+
+end;
 
 $$;
 

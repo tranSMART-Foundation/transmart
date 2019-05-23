@@ -3,12 +3,11 @@
 --
 CREATE FUNCTION biomarker_gene_uid(gene_id character varying) RETURNS character varying
     LANGUAGE plpgsql
-    AS $_$
-BEGIN
-  -- $Id$
-  -- Creates uid for biomarker_gene
+AS $$
+begin
+    -- Creates uid for biomarker_gene
 
-  RETURN 'GENE:' || coalesce(GENE_ID, 'ERROR');
-END;
-$_$;
+    return 'GENE:' || coalesce(gene_id, 'ERROR');
+end;
+$$;
 

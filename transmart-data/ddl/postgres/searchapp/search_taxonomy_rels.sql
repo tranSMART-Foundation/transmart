@@ -24,12 +24,12 @@ ALTER TABLE ONLY search_taxonomy_rels
 --
 CREATE FUNCTION tf_trg_search_taxonomy_rels_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN
-	IF NEW.SEARCH_TAXONOMY_RELS_ID IS NULL THEN
-		SELECT nextval('SEARCHAPP.SEQ_SEARCH_DATA_ID') INTO NEW.SEARCH_TAXONOMY_RELS_ID;
-	END IF;
-	RETURN NEW;
+AS $$
+begin
+    if new.search_taxonomy_rels_id is null then
+	select nextval('searchapp.seq_search_data_id') into new.search_taxonomy_rels_id;
+    end if;
+    return new;
 end;
 $$;
 

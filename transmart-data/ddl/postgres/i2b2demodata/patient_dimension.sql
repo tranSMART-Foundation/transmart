@@ -55,12 +55,12 @@ CREATE INDEX PA_IDX_UPLOADID ON patient_dimension USING btree (upload_id);
 --
 CREATE FUNCTION tf_trg_patient_dimension() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.PATIENT_NUM is null then
- select nextval('i2b2demodata.SEQ_PATIENT_NUM') into NEW.PATIENT_NUM ;
-end if;
-       RETURN NEW;
+    if new.patient_num is null then
+	select nextval('i2b2demodata.seq_patient_num') into new.patient_num ;
+    end if;
+    return new;
 end;
 $$;
 

@@ -24,12 +24,12 @@ CREATE INDEX bdc_index1 ON bio_data_correlation USING btree (asso_bio_data_id);
 --
 CREATE FUNCTION tf_trg_bio_data_correl_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_DATA_CORREL_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_DATA_CORREL_ID ;
+    if new.bio_data_correl_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_data_correl_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

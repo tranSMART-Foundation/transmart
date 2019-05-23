@@ -23,12 +23,13 @@ CREATE INDEX probeset_deapp_i2 ON probeset_deapp USING btree (probeset, platform
 --
 CREATE FUNCTION tf_trg_probeset_deapp() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin     
-			if NEW.PROBESET_ID is null then
-				select nextval('tm_cz.SEQ_PROBESET_ID') into NEW.PROBESET_ID ;       
-			end if;   
-	RETURN NEW;
+    if new.probeset_id is null then
+	select nextval('tm_cz.seq_probeset_id') into new.probeset_id ;       
+    end if;   
+
+    return new;
 end;
 $$;
 

@@ -4,7 +4,7 @@
 CREATE FUNCTION sf_xtab(v_variable character varying, v_protocol numeric, v_subject character varying, v_rowid bigint) RETURNS character varying
     LANGUAGE plpgsql
     AS $$
-DECLARE
+declare
 
 
 /******************************************************************************
@@ -27,32 +27,33 @@ DECLARE
       Table Name:       (set in the "New PL/SQL Object" dialog)
 
 ******************************************************************************/
-sqlstmt varchar(1000);
-tmpVar varchar(500);
+    sqlstmt varchar(1000);
+    tmpVar varchar(500);
 
-BEGIN
-   
-   tmpVar := null;
-   EXECUTE 'select distinct value into STRICT  tmpVar
-     from sideshow_eav a,
-          protocol b,
-          variable c
-    where a.protocol_id=b.protocol_id
-      and a.protocol_id=c.protocol_id
-      and a.protocol_id=2 
-      and a.variable_id=c.variable_id
-      and a.subject_id=3
-      and c.variable_name in (4)
-      and a.row_id =5' USING v_protocol,v_subject,v_variable,v_rowid;
+begin
     
-    --EXECUTE IMMEDIATE sqlstmt USING v_protocol,v_subject,v_variable;
-  
-   RETURN tmpVar;
-    EXCEPTION
-     WHEN NO_DATA_FOUND THEN
-       NULL;
-     
-END;
- 
+    tmpVar := null;
+    execute 'select distinct value into strict  tmpVar
+	    from sideshow_eav a,
+            protocol b,
+            variable c
+	    where a.protocol_id=b.protocol_id
+	    and a.protocol_id=c.protocol_id
+	    and a.protocol_id=2 
+	    and a.variable_id=c.variable_id
+	    and a.subject_id=3
+	    and c.variable_name in (4)
+	    and a.row_id =5' using v_protocol,v_subject,v_variable,v_rowid;
+    
+    --execute immediate sqlstmt using v_protocol,v_subject,v_variable;
+    
+    return tmpVar;
+
+exception
+    when no_data_found then
+	null;
+
+end;
+
 $$;
 

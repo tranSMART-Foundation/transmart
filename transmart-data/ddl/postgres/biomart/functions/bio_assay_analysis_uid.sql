@@ -3,12 +3,11 @@
 --
 CREATE FUNCTION bio_assay_analysis_uid(analysis_name character varying) RETURNS character varying
     LANGUAGE plpgsql
-    AS $_$
-BEGIN
-  -- $Id$
-  -- Creates uid for bio_experiment.
+AS $$
+begin
+    -- Creates uid for bio_experiment.
 
-  RETURN 'BAA:' || coalesce(ANALYSIS_NAME, 'ERROR');
-END;
-$_$;
+    return 'BAA:' || coalesce(analysis_name, 'ERROR');
+end;
+$$;
 

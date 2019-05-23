@@ -21,10 +21,10 @@ CREATE FUNCTION tf_trg_bio_ad_hoc_prop_id() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 begin
-       if NEW.AD_HOC_PROPERTY_ID is null then
- select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.AD_HOC_PROPERTY_ID ;
-end if;
-       RETURN NEW;
+    if new.ad_hoc_property_id is null then
+	select nextval('biomart.seq_bio_data_id') into new.ad_hoc_property_id ;
+    end if;
+    return new;
 end;
 $$;
 

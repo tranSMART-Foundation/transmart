@@ -32,12 +32,12 @@ CREATE UNIQUE INDEX bio_content_pk ON bio_content USING btree (bio_file_content_
 --
 CREATE FUNCTION tf_trg_bio_file_content_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_FILE_CONTENT_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_FILE_CONTENT_ID ;
+    if new.bio_file_content_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_file_content_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

@@ -26,12 +26,12 @@ CREATE INDEX search_kw_term_skid_idx ON search_keyword_term USING btree (search_
 --
 CREATE FUNCTION tf_trg_search_keyword_term_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.SEARCH_KEYWORD_TERM_ID is null then
-          select nextval('searchapp.SEQ_SEARCH_DATA_ID') into NEW.SEARCH_KEYWORD_TERM_ID ;
+    if new.search_keyword_term_id is null then
+        select nextval('searchapp.seq_search_data_id') into new.search_keyword_term_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

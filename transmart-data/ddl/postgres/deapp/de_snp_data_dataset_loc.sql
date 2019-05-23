@@ -19,12 +19,12 @@ ALTER TABLE ONLY de_snp_data_dataset_loc
 --
 CREATE FUNCTION tf_trg_snp_data_dataset_loc_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.SNP_DATA_DATASET_LOC_ID is null then
- select nextval('deapp.SEQ_DATA_ID') into NEW.SNP_DATA_DATASET_LOC_ID ;
-end if;
-       RETURN NEW;
+    if new.snp_data_dataset_loc_id is null then
+	select nextval('deapp.seq_data_id') into new.snp_data_dataset_loc_id ;
+    end if;
+    return new;
 end;
 $$;
 

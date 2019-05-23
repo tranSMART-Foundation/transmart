@@ -20,14 +20,13 @@ ALTER TABLE ONLY bio_analysis_attribute
 --
 CREATE FUNCTION tf_trg_bio_analysis_attribute_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-	BEGIN
-		if NEW.BIO_ANALYSIS_ATTRIBUTE_ID IS NULL
-			THEN
-			SELECT nextval('BIOMART.SEQ_BIO_DATA_ID') INTO NEW.BIO_ANALYSIS_ATTRIBUTE_ID;
-  		END IF;
-	RETURN NEW;
-END;
+AS $$
+begin
+    if new.bio_analysis_attribute_id is null then
+	select nextval('biomart.seq_bio_data_id') into new.bio_analysis_attribute_id;
+    end if;
+    return new;
+end;
 $$;
 
 --

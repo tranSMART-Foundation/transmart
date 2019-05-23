@@ -28,12 +28,12 @@ ALTER TABLE ONLY de_gene_source
 --
 CREATE FUNCTION tf_trg_de_gene_source_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-      if NEW.GENE_SOURCE_ID is null then
-         select nextval('deapp.SEQ_DATA_ID') into NEW.GENE_SOURCE_ID ;
-      end if;
-RETURN NEW;
+    if new.gene_source_id is null then
+        select nextval('deapp.seq_data_id') into new.gene_source_id ;
+    end if;
+    return new;
 end;
 $$;
 

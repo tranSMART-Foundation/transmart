@@ -23,12 +23,12 @@ CREATE INDEX bio_asy_feature_grp_name_idx ON bio_assay_feature_group USING btree
 --
 CREATE FUNCTION tf_trg_bio_assay_f_g_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_ASSAY_FEATURE_GROUP_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_ASSAY_FEATURE_GROUP_ID ;
+    if new.bio_assay_feature_group_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_assay_feature_group_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

@@ -3,29 +3,27 @@
 --
 CREATE FUNCTION bio_assay_analysis_uid(analysis_name character varying) RETURNS character varying
     LANGUAGE plpgsql
-    AS $_$
-BEGIN
-  -- $Id$
-  -- Creates uid for bio_experiment.
+AS $$
+begin
+    -- Creates uid for bio_experiment.
 
-  RETURN 'BAA:' || coalesce(ANALYSIS_NAME, 'ERROR');
-END;
+    return 'BAA:' || coalesce(analysis_name, 'ERROR');
+end;
 
-$_$;
+$$;
 
 --
 -- Name: bio_assay_analysis_uid(bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
 CREATE FUNCTION bio_assay_analysis_uid(analysis_id bigint) RETURNS character varying
     LANGUAGE plpgsql
-    AS $_$
-BEGIN
+AS $$
+begin
 
-  -- $Id$
-  -- Creates uid for bio_assay_analysis.
+    -- Creates uid for bio_assay_analysis.
 
-  RETURN 'BAA:' || coalesce(ANALYSIS_ID, -1);
-END;
+    return 'BAA:' || coalesce(analysis_id, -1);
+end;
 
-$_$;
+$$;
 

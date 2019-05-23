@@ -3,34 +3,39 @@
 --
 CREATE FUNCTION util_drop_table(v_tabname character varying DEFAULT NULL::character varying) RETURNS void
     LANGUAGE plpgsql
-    AS $$
-DECLARE
+AS $$
 
--------------------------------------------------------------------------------------
--- NAME: UTIL_DROP_TABLE
---
--- Copyright c 2011 Recombinant Data Corp.
---
+    -- Attention:
+    -- Oracle procedure
+    -- can postgres check for user tables (oracle had a user_tables directory)
 
---------------------------------------------------------------------------------------
-  v_exists integer;
-  v_cmdline varchar(200);
+    declare
+
+    -------------------------------------------------------------------------------------
+    -- NAME: UTIL_DROP_TABLE
+    --
+    -- Copyright c 2011 Recombinant Data Corp.
+    --
+
+    --------------------------------------------------------------------------------------
+    v_exists integer;
+    v_cmdline varchar(200);
 
 
-BEGIN
+begin
 
-  --Check if table exists
-  select count(*)
-  into v_exists
-  from user_tables
-  where table_name = v_tabname;
+    --Check if table exists
+    select count(*)
+      into v_exists
+      from pg_tables
+     where tablename = v_tabname;
 
-  if v_exists > 0 then
-     v_cmdline := 'drop table ' || v_tabname;
-     EXECUTE v_cmdline;
-  end if;
+    if v_exists > 0 then
+	v_cmdline := 'drop table ' || v_tabname;
+	execute v_cmdline;
+    end if;
 
-END;
- 
+end;
+
 $$;
 

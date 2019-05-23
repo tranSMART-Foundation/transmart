@@ -25,10 +25,14 @@ ALTER TABLE ONLY cz_person
 --
 CREATE FUNCTION tf_trg_cz_personid() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin            
-if NEW.PERSON_ID is null then          
-select nextval('tm_cz.SEQ_CZ_PERSON_ID') into NEW.PERSON_ID ;       end if;      RETURN NEW; end;
+    if new.person_id is null then          
+	select nextval('tm_cz.seq_cz_person_id') into new.person_id ;
+    end if;
+
+    return new;
+end;
 $$;
 
 --

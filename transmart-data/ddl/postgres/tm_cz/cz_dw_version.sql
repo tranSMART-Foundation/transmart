@@ -21,12 +21,13 @@ ALTER TABLE ONLY cz_dw_version
 --
 CREATE FUNCTION tf_trg_cz_dw_version_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.DW_VERSION_ID is null then
- select nextval('tm_cz.SEQ_CZ_DW_VERSION_ID') into NEW.DW_VERSION_ID ;
-end if;
-       RETURN NEW;
+    if new.dw_version_id is null then
+	select nextval('tm_cz.seq_cz_dw_version_id') into new.dw_version_id ;
+    end if;
+
+    return new;
 end;
 $$;
 

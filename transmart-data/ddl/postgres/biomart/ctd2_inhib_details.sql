@@ -24,13 +24,13 @@ CREATE TABLE ctd2_inhib_details (
 --
 CREATE FUNCTION tf_trg_ctd2_inhib_details() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN     
-	IF NEW.CTD_INHIB_SEQ IS NULL THEN 
-		select nextval('biomart.SEQ_CLINICAL_TRIAL_DESIGN_ID') INTO NEW.CTD_INHIB_SEQ ;  
-	END IF;    
-	RETURN NEW;
-END;
+AS $$
+begin     
+    if new.ctd_inhib_seq is null then 
+	select nextval('biomart.seq_clinical_trial_design_id') into new.ctd_inhib_seq ;  
+    end if;    
+    return new;
+end;
 $$;
 
 --

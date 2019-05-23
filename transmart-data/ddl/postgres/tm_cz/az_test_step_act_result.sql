@@ -22,12 +22,13 @@ ALTER TABLE ONLY az_test_step_act_result
 --
 CREATE FUNCTION tf_trg_az_test_step_act_result() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.TEST_STEP_ACT_RESULT_ID is null then
- select nextval('tm_cz.SEQ_CZ_TEST') into NEW.TEST_STEP_ACT_RESULT_ID ;
-end if;
-       RETURN NEW;
+    if new.test_step_act_result_id is null then
+	select nextval('tm_cz.seq_cz_test') into new.test_step_act_result_id ;
+    end if;
+
+    return new;
 end;
 $$;
 

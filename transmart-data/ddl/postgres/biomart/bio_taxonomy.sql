@@ -19,12 +19,12 @@ ALTER TABLE ONLY bio_taxonomy
 --
 CREATE FUNCTION tf_trg_bio_taxon_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN IF NEW.BIO_TAXONOMY_ID IS NULL THEN
-  select nextval('biomart.SEQ_BIO_DATA_ID') INTO NEW.BIO_TAXONOMY_ID ;
-END IF;
-RETURN NEW;
-END;
+AS $$
+begin if new.bio_taxonomy_id is null then
+	  select nextval('biomart.seq_bio_data_id') into new.bio_taxonomy_id ;
+      end if;
+    return new;
+end;
 $$;
 
 --

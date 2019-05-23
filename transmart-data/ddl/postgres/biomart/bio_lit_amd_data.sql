@@ -54,11 +54,11 @@ CREATE FUNCTION tf_trg_bio_lit_amd_data_id() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 begin
-       if NEW.BIO_LIT_AMD_DATA_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_LIT_AMD_DATA_ID ;
-       end if;
-       RETURN NEW;
-    end;
+    if new.bio_lit_amd_data_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_lit_amd_data_id ;
+    end if;
+    return new;
+end;
 $$;
 
 --

@@ -26,12 +26,12 @@ ALTER TABLE ONLY de_subject_snp_dataset
 --
 CREATE FUNCTION tf_trg_de_subject_snp_dataset_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-      if NEW.SUBJECT_SNP_DATASET_ID is null then
-         select nextval('deapp.SEQ_DATA_ID') into NEW.SUBJECT_SNP_DATASET_ID ;
-      end if;
-RETURN NEW;
+    if new.subject_snp_dataset_id is null then
+        select nextval('deapp.seq_data_id') into new.subject_snp_dataset_id ;
+    end if;
+    return new;
 end;
 $$;
 

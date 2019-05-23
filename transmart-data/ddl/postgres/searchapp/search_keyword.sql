@@ -44,12 +44,12 @@ CREATE INDEX search_keyword_index3 ON search_keyword USING btree (owner_auth_use
 --
 CREATE FUNCTION tf_trg_search_keyword_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.SEARCH_KEYWORD_ID is null then
-          select nextval('searchapp.SEQ_SEARCH_DATA_ID') into NEW.SEARCH_KEYWORD_ID ;
+    if new.search_keyword_id is null then
+        select nextval('searchapp.seq_search_data_id') into new.search_keyword_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

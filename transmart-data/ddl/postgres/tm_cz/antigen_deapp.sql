@@ -12,12 +12,13 @@ CREATE TABLE antigen_deapp (
 --
 CREATE FUNCTION tf_trg_antigen_deapp() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.ANTIGEN_ID is null then
- select nextval('tm_cz.SEQ_ANTIGEN_ID') into NEW.ANTIGEN_ID ;
-end if;
-       RETURN NEW;
+    if new.antigen_id is null then
+	select nextval('tm_cz.seq_antigen_id') into new.antigen_id ;
+    end if;
+
+    return new;
 end;
 $$;
 

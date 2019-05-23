@@ -25,12 +25,12 @@ CREATE UNIQUE INDEX bio_content_repository_pk ON bio_content_repository USING bt
 --
 CREATE FUNCTION tf_trg_bio_content_repo_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_CONTENT_REPO_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_CONTENT_REPO_ID ;
+    if new.bio_content_repo_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_content_repo_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

@@ -27,12 +27,12 @@ CREATE UNIQUE INDEX bio_data_correl_descr_pk ON bio_data_correl_descr USING btre
 --
 CREATE FUNCTION tf_trg_bio_mkr_correl_descr_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_DATA_CORREL_DESCR_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_DATA_CORREL_DESCR_ID ;
+    if new.bio_data_correl_descr_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_data_correl_descr_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 
 $$;

@@ -189,12 +189,12 @@ CREATE TABLE ctd_full (
 --
 CREATE FUNCTION tf_trig_clinical_trial_design_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin     
-    if NEW.CLINICAL_TRIAL_DESIGN_ID is null then          
-      select nextval('biomart.SEQ_CLINICAL_TRIAL_DESIGN_ID') into NEW.CLINICAL_TRIAL_DESIGN_ID ;  
+    if new.clinical_trial_design_id is null then          
+	select nextval('biomart.seq_clinical_trial_design_id') into new.clinical_trial_design_id ;  
     end if; 
-    RETURN NEW;
+    return new;
 end;
 $$;
 

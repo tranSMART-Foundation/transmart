@@ -16,13 +16,13 @@ CREATE TABLE ctd2_study (
 --
 CREATE FUNCTION tf_trg_ctd2_study_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN     
-	IF NEW.CTD_STUDY_ID IS NULL THEN 
-		select nextval('biomart.SEQ_CLINICAL_TRIAL_DESIGN_ID') INTO NEW.CTD_STUDY_ID ;  
-	END IF;    
-	RETURN NEW;
-END;
+AS $$
+begin     
+    if new.ctd_study_id is null then 
+	select nextval('biomart.seq_clinical_trial_design_id') into new.ctd_study_id ;  
+    end if;    
+    return new;
+end;
 $$;
 
 --

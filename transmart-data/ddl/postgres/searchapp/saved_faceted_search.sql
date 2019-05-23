@@ -29,16 +29,18 @@ ALTER TABLE ONLY saved_faceted_search
 --
 CREATE FUNCTION tf_trg_saved_faceted_search_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN
-	IF NEW.saved_faceted_search_id IS NULL THEN
-		SELECT nextval('SEARCHAPP.SEQ_saved_faceted_search_id') INTO NEW.saved_faceted_search_id;
-	END IF;
-	IF NEW.create_dt IS NULL THEN
-		NEW.create_dt := now();
-	END IF;
-	RETURN NEW;
-END;
+AS $$
+begin
+    if new.saved_faceted_search_id is null then
+	select nextval('searchapp.seq_saved_faceted_search_id') into new.saved_faceted_search_id;
+    end if;
+
+    if new.create_dt is null then
+	new.create_dt := now();
+    end if;
+
+    return new;
+end;
 $$;
 
 --
@@ -51,13 +53,14 @@ CREATE TRIGGER trg_saved_faceted_search_id BEFORE INSERT ON saved_faceted_search
 --
 CREATE FUNCTION tf_trg_upd_saved_faceted_search() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN
-	IF NEW.modified_dt IS NULL THEN
-		NEW.modified_dt := now();
-	END IF;
-	RETURN NEW;
-END;
+AS $$
+begin
+    if new.modified_dt is null then
+	new.modified_dt := now();
+    end if;
+
+    return new;
+end;
 $$;
 
 --

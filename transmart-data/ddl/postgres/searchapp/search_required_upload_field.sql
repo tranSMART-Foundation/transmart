@@ -19,12 +19,12 @@ ALTER TABLE ONLY search_required_upload_field
 --
 CREATE FUNCTION tf_trg_srch_req_up_field_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.REQUIRED_UPLOAD_FIELD_ID is null then
- select nextval('searchapp.SEQ_REQ_UPLOAD_FIELD_ID') into NEW.REQUIRED_UPLOAD_FIELD_ID ;
- end if;
-       RETURN NEW;
+    if new.required_upload_field_id is null then
+	select nextval('searchapp.seq_req_upload_field_id') into new.required_upload_field_id ;
+    end if;
+    return new;
 end;
 $$;
 

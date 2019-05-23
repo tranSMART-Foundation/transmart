@@ -3,24 +3,29 @@
 --
 CREATE FUNCTION dropsyn() RETURNS void
     LANGUAGE plpgsql
-    AS $$
-DECLARE
+AS $$
 
- s_cur CURSOR FOR
- SELECT synonym_name
- FROM user_synonyms;
+    -- Attention:
+    -- Oracle procedure
+    -- Rewrite for permissions for postgresql
 
- RetVal  bigint;
- sqlstr  varchar(200);
+    declare
 
-BEGIN
-  FOR s_rec IN s_cur LOOP
-    sqlstr := 'DROP SYNONYM ' || s_rec.synonym_name;
+    s_cur cursor for
+		     select synonym_name
+		     from pg_tables;
 
-    EXECUTE sqlstr;
-    COMMIT;
-  END LOOP;
-END;
+    RetVal  bigint;
+    sqlstr  varchar(200);
+
+begin
+    for s_rec in s_cur loop
+	sqlstr := 'DROP SYNONYM ' || s_rec.synonym_name;
+
+	execute sqlstr;
+	commit;
+    end loop;
+end;
 
 $$;
 

@@ -34,12 +34,12 @@ CREATE UNIQUE INDEX bio_compound_pk ON bio_compound USING btree (bio_compound_id
 --
 CREATE FUNCTION tf_trg_bio_compound_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_COMPOUND_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_COMPOUND_ID ;
+    if new.bio_compound_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_compound_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

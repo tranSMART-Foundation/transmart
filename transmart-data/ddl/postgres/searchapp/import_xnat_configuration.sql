@@ -24,12 +24,12 @@ ALTER TABLE ONLY import_xnat_configuration
 --
 CREATE FUNCTION tf_trg_import_xnat_config_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.ID is null then
-          select nextval('searchapp.SEQ_SEARCH_DATA_ID') into NEW.ID ;
+    if new.id is null then
+        select nextval('searchapp.seq_search_data_id') into new.id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

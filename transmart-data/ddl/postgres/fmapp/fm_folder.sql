@@ -24,22 +24,22 @@ ALTER TABLE ONLY fm_folder
 --
 CREATE FUNCTION tf_trg_fm_folder_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-	begin
-      if coalesce(NEW.FOLDER_ID::text, '') = '' then
-        select nextval('FMAPP.SEQ_FM_ID') into NEW.FOLDER_ID ;
-      end if;
-	  if coalesce(NEW.FOLDER_FULL_NAME::text, '') = '' then
-		if coalesce(NEW.PARENT_ID::text, '') = '' then
-			select '\' || fm_folder_uid(NEW.folder_id) || '\' into NEW.FOLDER_FULL_NAME ;
-		else
-			select folder_full_name || fm_folder_uid(NEW.folder_id) || '\' into NEW.FOLDER_FULL_NAME 
-      from fmapp.fm_folder
-      where folder_id = NEW.parent_id;
-		end if;
-      end if;
-      RETURN NEW;
-  end;
+AS $$
+begin
+    if coalesce(new.folder_id::text, '') = '' then
+        select nextval('fmapp.seq_fm_id') into new.folder_id ;
+    end if;
+    if coalesce(new.folder_full_name::text, '') = '' then
+	if coalesce(new.parent_id::text, '') = '' then
+	    select '\' || fm_folder_uid(new.folder_id) || '\' into new.folder_full_name ;
+	else
+	    select folder_full_name || fm_folder_uid(new.folder_id) || '\' into new.folder_full_name 
+	      from fmapp.fm_folder
+	     where folder_id = new.parent_id;
+	end if;
+    end if;
+    return new;
+end;
 $$;
 
 --
@@ -52,19 +52,19 @@ CREATE TRIGGER trg_fm_folder_id BEFORE INSERT ON fm_folder FOR EACH ROW EXECUTE 
 --
 CREATE FUNCTION tf_trg_fm_folder_uid() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-DECLARE
-  rec_count int;
-BEGIN
-  SELECT COUNT(*) INTO rec_count 
-  FROM fmapp.fm_data_uid 
-  WHERE fm_data_id = new.folder_id;
-  
-  if rec_count = 0 then
-    insert into fmapp.fm_data_uid (fm_data_id, unique_id, fm_data_type)
-    values (NEW.folder_id, fm_folder_uid(NEW.folder_id), 'FM_FOLDER');
-  end if;
-RETURN NEW;
+AS $$
+    declare
+    rec_count int;
+begin
+    select count(*) into rec_count 
+      from fmapp.fm_data_uid 
+     where fm_data_id = new.folder_id;
+    
+    if rec_count = 0 then
+	insert into fmapp.fm_data_uid (fm_data_id, unique_id, fm_data_type)
+	values (new.folder_id, fm_folder_uid(new.folder_id), 'FM_FOLDER');
+    end if;
+    return new;
 end;
 $$;
 

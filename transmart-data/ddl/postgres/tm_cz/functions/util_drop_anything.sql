@@ -3,35 +3,36 @@
 --
 CREATE FUNCTION util_drop_anything(v_objname character varying DEFAULT NULL::character varying, v_objtype character varying DEFAULT NULL::character varying) RETURNS void
     LANGUAGE plpgsql
-    AS $$
-DECLARE
+AS $$
+    declare
 
--------------------------------------------------------------------------------------
--- NAME: UTIL_DROP_ANYTHING
---
--- Copyright c 2011 Recombinant Data Corp.
---
+    -------------------------------------------------------------------------------------
+    -- NAME: UTIL_DROP_ANYTHING
+    --
+    -- Copyright c 2011 Recombinant Data Corp.
+    --
 
---------------------------------------------------------------------------------------
-   v_cmdline varchar(100);
+    --------------------------------------------------------------------------------------
+    v_cmdline varchar(100);
 
 
-BEGIN
+begin
 
-   if upper(v_objtype) like 'TABLE%' then
-       v_cmdline := 'drop '|| v_objtype || ' '|| v_objname || ' cascade constraint';
-   else
-       v_cmdline := 'drop '|| v_objtype || ' '|| v_objname;
-   end if;
+    if upper(v_objtype) like 'TABLE%' then
+	v_cmdline := 'drop '|| v_objtype || ' '|| v_objname || ' cascade constraint';
+    else
+	v_cmdline := 'drop '|| v_objtype || ' '|| v_objname;
+    end if;
 
-   BEGIN
-      EXECUTE v_cmdline;
-      RAISE NOTICE '%%', 'SUCCESS ' ,  v_cmdline;
-   EXCEPTION
-      WHEN OTHERS THEN
-         RAISE NOTICE '%%', 'ERROR ' ,  v_cmdline;
-   END;
-END;
- 
+    begin
+	execute v_cmdline;
+	raise notice '%%', 'SUCCESS ' ,  v_cmdline;
+    exception
+	when others then
+            raise notice '%%', 'ERROR ' ,  v_cmdline;
+    end;
+
+end;
+
 $$;
 

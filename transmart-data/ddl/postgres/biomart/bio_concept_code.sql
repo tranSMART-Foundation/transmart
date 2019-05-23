@@ -32,12 +32,12 @@ CREATE INDEX bio_concept_code_type_index ON bio_concept_code USING btree (code_t
 --
 CREATE FUNCTION tf_trg_bio_concept_code_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_CONCEPT_CODE_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_CONCEPT_CODE_ID ;
+    if new.bio_concept_code_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_concept_code_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

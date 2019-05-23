@@ -18,12 +18,12 @@ ALTER TABLE ONLY am_tag_template_association
 --
 CREATE FUNCTION tf_trg_am_tag_temp_assoc_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.ID is null then
- select nextval('amapp.SEQ_AMAPP_DATA_ID') into NEW.ID ;
-end if;
-       RETURN NEW;
+    if new.id is null then
+	select nextval('amapp.seq_amapp_data_id') into new.id ;
+    end if;
+    return new;
 end;
 $$;
 

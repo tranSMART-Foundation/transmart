@@ -3,36 +3,32 @@
 --
 CREATE FUNCTION cz_write_info(jobid numeric, messageid numeric, messageline numeric, messageprocedure character varying, infomessage character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
-    AS $$
+AS $$
 
-BEGIN
+begin
     begin
 	insert into tm_cz.cz_job_message
-    (
-      job_id,
-      message_id,
-      message_line,
-      message_procedure,
-      info_message,
-      seq_id
-    )
+		    (job_id
+		    ,message_id
+		    ,message_line
+		    ,message_procedure
+		    ,info_message
+		    ,seq_id)
 	select
-      jobID,
-      messageID,
-      messageLine,
-      messageProcedure,
-      infoMessage,
-      max(seq_id)
-  from
-    tm_cz.cz_job_audit
-  where
-    job_id = jobID;
+	    jobID
+	    ,messageID
+	    ,messageLine
+	    ,messageProcedure
+	    ,infoMessage
+	    ,max(seq_id)
+	  from tm_cz.cz_job_audit
+	 where job_id = jobID;
     end;
-  
-  COMMIT;
-  return 1;
+    
+    commit;
+    return 1;
 
-END;
+end;
 
 $$;
 

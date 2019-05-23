@@ -50,12 +50,12 @@ CREATE INDEX idx_concept_dim3 ON concept_dimension USING btree (concept_path,con
 --
 CREATE FUNCTION tf_trg_concept_dimension_cd() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.concept_cd is null then
-        select nextval('i2b2demodata.concept_id') into NEW.concept_cd ;
+    if new.concept_cd is null then
+        select nextval('i2b2demodata.concept_id') into new.concept_cd ;
     end if;
-    RETURN NEW;
+    return new;
 end;
 $$;
 

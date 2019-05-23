@@ -19,14 +19,15 @@ CREATE TABLE pm_cell_params (
 --
 CREATE FUNCTION tf_trg_pm_cell_params_inc() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.ID is null then
- select nextval('i2b2pm.PM_PARAMS') into NEW.ID ;
-end if;
-       RETURN NEW;
+    if new.id is null then
+	select nextval('i2b2pm.pm_params') into new.id ;
+    end if;
+    return new;
 end;
 $$;
+
 --
 -- Name: trg_pm_cell_params_inc; Type: TRIGGER; Schema: i2b2pm; Owner: -
 --

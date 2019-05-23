@@ -15,13 +15,13 @@ CREATE TABLE bio_asy_analysis_data_idx (
 --
 CREATE FUNCTION tf_trg_bio_asy_adi_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin     
-      if coalesce(NEW.bio_asy_analysis_data_idx_id::text, '') = '' then          
-        select nextval('biomart.seq_bio_data_id') into NEW.bio_asy_analysis_data_idx_id;       
-      end if;       
-       RETURN NEW;
-  end;
+    if coalesce(new.bio_asy_analysis_data_idx_id::text, '') = '' then          
+        select nextval('biomart.seq_bio_data_id') into new.bio_asy_analysis_data_idx_id;       
+    end if;       
+    return new;
+end;
 $$;
 
 --

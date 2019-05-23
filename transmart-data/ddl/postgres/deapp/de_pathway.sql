@@ -23,12 +23,12 @@ ALTER TABLE ONLY de_pathway
 --
 CREATE FUNCTION tf_trg_de_pathway_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.ID is null then
- select nextval('deapp.SEQ_DATA_ID') into NEW.ID ;
-end if;
-       RETURN NEW;
+    if new.id is null then
+	select nextval('deapp.seq_data_id') into new.id ;
+    end if;
+    return new;
 end;
 $$;
 

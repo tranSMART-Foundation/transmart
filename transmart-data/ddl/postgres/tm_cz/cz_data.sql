@@ -23,12 +23,13 @@ ALTER TABLE ONLY cz_data
 --
 CREATE FUNCTION tf_trg_cz_data_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.DATA_ID is null then
- select nextval('tm_cz.SEQ_CZ_DATA') into NEW.DATA_ID ;
-end if;
-       RETURN NEW;
+    if new.data_id is null then
+	select nextval('tm_cz.seq_cz_data') into new.data_id ;
+    end if;
+
+    return new;
 end;
 $$;
 

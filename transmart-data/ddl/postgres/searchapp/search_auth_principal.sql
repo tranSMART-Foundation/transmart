@@ -23,11 +23,13 @@ ALTER TABLE ONLY search_auth_principal
 --
 CREATE FUNCTION tf_trg_search_au_prcpl_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin     
- if(coalesce(NEW.ID::text, '') = '' or NEW.ID = -2000) then       
- select nextval('searchapp.SEQ_SEARCH_DATA_ID') into NEW.ID ;      
- end if;     RETURN NEW;
+    if(coalesce(new.id::text, '') = '') then       
+	select nextval('searchapp.seq_search_data_id') into new.id ;      
+    end if;
+
+    return new;
 end;
 $$;
 

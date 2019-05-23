@@ -85,12 +85,12 @@ CREATE INDEX OF_TEXT_SEARCH_UNIQUE ON observation_fact USING btree (text_search_
 --
 CREATE FUNCTION tf_trg_encounter_num() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.ENCOUNTER_NUM is null then
- select nextval('i2b2demodata.SEQ_ENCOUNTER_NUM') into NEW.ENCOUNTER_NUM ;
-end if;
-       RETURN NEW;
+    if new.encounter_num is null then
+	select nextval('i2b2demodata.seq_encounter_num') into new.encounter_num ;
+    end if;
+    return new;
 end;
 $$;
 

@@ -3,18 +3,19 @@
 --
 CREATE FUNCTION refresh_bio_marker_correl_mv() RETURNS character varying
     LANGUAGE plpgsql
-    AS $$
+AS $$
 BEGIN
 
-  -- populate the fake "materialized view" (i.e. actually a table) by deleting everything from it and then re-populating
-  -- eventually we need a smarter algorithm for doing this
+    -- populate the fake "materialized view" (i.e. actually a table) by deleting everything from it and then re-populating
+    -- eventually we need a smarter algorithm for doing this
 
     delete from biomart.bio_marker_correl_mv;
 
     insert into biomart.bio_marker_correl_mv
-    (BIO_MARKER_ID, ASSO_BIO_MARKER_ID, CORREL_TYPE, mv_id)    
+		(BIO_MARKER_ID, ASSO_BIO_MARKER_ID, CORREL_TYPE, mv_id)    
+
     select BIO_MARKER_ID, ASSO_BIO_MARKER_ID, CORREL_TYPE, mv_id
-       from biomart.bio_marker_correl_view;  
+      from biomart.bio_marker_correl_view;  
 
     return true;
 END;

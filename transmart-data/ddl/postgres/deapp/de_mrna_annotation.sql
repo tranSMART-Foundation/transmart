@@ -32,12 +32,12 @@ CREATE INDEX de_mrna_annotation_idx2 ON de_mrna_annotation USING btree (gene_id,
 --
 CREATE FUNCTION tf_trg_de_mrna_annotation_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.DE_MRNA_ANNOTATION_ID is null then
- select nextval('deapp.SEQ_DE_MRNA_ANNOTATION_ID') into NEW.DE_MRNA_ANNOTATION_ID ;
-end if;
-       RETURN NEW;
+    if new.de_mrna_annotation_id is null then
+	select nextval('deapp.seq_de_mrna_annotation_id') into new.de_mrna_annotation_id ;
+    end if;
+    return new;
 end;
 $$;
 

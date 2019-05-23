@@ -17,10 +17,13 @@ CREATE TABLE cz_test_result (
 --
 CREATE FUNCTION tf_trg_cz_test_result_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin     
-if NEW.TEST_RESULT_ID is null then          
-select nextval('tm_cz.SEQ_CZ') into NEW.TEST_RESULT_ID ;       end if;       RETURN NEW;
+    if new.test_result_id is null then          
+	select nextval('tm_cz.seq_cz') into new.test_result_id ;
+    end if;
+
+    return new;
 end;
 $$;
 

@@ -18,12 +18,12 @@ ALTER TABLE ONLY search_secure_object_path
 --
 CREATE FUNCTION tf_trg_search_sec_obj_path_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.SEARCH_SECURE_OBJ_PATH_ID is null then
-          select nextval('searchapp.SEQ_SEARCH_DATA_ID') into NEW.SEARCH_SECURE_OBJ_PATH_ID ;
+    if new.search_secure_obj_path_id is null then
+        select nextval('searchapp.seq_search_data_id') into new.search_secure_obj_path_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

@@ -15,12 +15,13 @@ CREATE TABLE cz_job_message (
 --
 CREATE FUNCTION tf_trg_cz_message_seq_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.SEQ_ID is null then
- select nextval('tm_cz.SEQ_CZ_JOB_MESSAGE') into NEW.SEQ_ID ;
-end if;
-       RETURN NEW;
+    if new.seq_id is null then
+	select nextval('tm_cz.seq_cz_job_message') into new.seq_id ;
+    end if;
+
+    return new;
 end;
 $$;
 

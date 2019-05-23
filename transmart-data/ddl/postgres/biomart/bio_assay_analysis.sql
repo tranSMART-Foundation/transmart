@@ -43,12 +43,12 @@ CREATE UNIQUE INDEX bio_assay_analysis_pk ON bio_assay_analysis USING btree (bio
 --
 CREATE FUNCTION tf_trg_bio_assay_analysis_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_ASSAY_ANALYSIS_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_ASSAY_ANALYSIS_ID ;
+    if new.bio_assay_analysis_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_assay_analysis_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 
@@ -62,19 +62,19 @@ CREATE TRIGGER trg_bio_assay_analysis_id BEFORE INSERT ON bio_assay_analysis FOR
 --
 CREATE FUNCTION tf_trg_bio_assay_analysis_uid() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-DECLARE
-  rec_count int;
-BEGIN
-  SELECT COUNT(*) INTO rec_count 
-  FROM biomart.bio_data_uid 
-  WHERE bio_data_id = new.bio_assay_analysis_id;
-  
-  if rec_count = 0 then
-    insert into biomart.bio_data_uid (bio_data_id, unique_id, bio_data_type)
-    values (NEW.bio_assay_analysis_id, biomart.bio_assay_analysis_uid(NEW.bio_assay_analysis_id::text), 'BIO_ASSAY_ANALYSIS');
-  end if;
-RETURN NEW;
+AS $$
+    declare
+    rec_count int;
+begin
+    select count(*) into rec_count 
+      from biomart.bio_data_uid 
+     where bio_data_id = new.bio_assay_analysis_id;
+    
+    if rec_count = 0 then
+	insert into biomart.bio_data_uid (bio_data_id, unique_id, bio_data_type)
+	values (new.bio_assay_analysis_id, biomart.bio_assay_analysis_uid(new.bio_assay_analysis_id::text), 'BIO_ASSAY_ANALYSIS');
+    end if;
+    return new;
 end;
 $$;
 

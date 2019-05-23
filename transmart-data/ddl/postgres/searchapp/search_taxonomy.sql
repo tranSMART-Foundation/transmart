@@ -20,13 +20,13 @@ ALTER TABLE ONLY search_taxonomy
 --
 CREATE FUNCTION tf_trg_search_taxonomy_term_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN
-	IF NEW.TERM_ID IS NULL THEN
-		SELECT nextval('SEARCHAPP.SEQ_SEARCH_DATA_ID') INTO NEW.TERM_ID;
-	END IF;
-	RETURN NEW;
-END;
+AS $$
+begin
+    if new.term_id is null then
+	select nextval('searchapp.seq_search_data_id') into new.term_id;
+    end if;
+    return new;
+end;
 $$;
 
 --

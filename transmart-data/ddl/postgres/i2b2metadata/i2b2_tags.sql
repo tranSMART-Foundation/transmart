@@ -20,12 +20,12 @@ ALTER TABLE ONLY i2b2_tags
 --
 CREATE FUNCTION tf_trg_i2b2_tag_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.TAG_ID is null then
- select nextval('i2b2metadata.SEQ_I2B2_DATA_ID') into NEW.TAG_ID ;
-end if;
-       RETURN NEW;
+    if new.tag_id is null then
+	select nextval('i2b2metadata.seq_i2b2_data_id') into new.tag_id ;
+    end if;
+    return new;
 end;
 $$;
 

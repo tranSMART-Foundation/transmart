@@ -20,10 +20,13 @@ ALTER TABLE ONLY cz_test_category
 --
 CREATE FUNCTION tf_trg_cz_test_category_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin            
-if NEW.TEST_CATEGORY_ID is null then          
-select nextval('tm_cz.SEQ_CZ') into NEW.TEST_CATEGORY_ID ;       end if;       RETURN NEW;
+    if new.test_category_id is null then          
+	select nextval('tm_cz.seq_cz') into new.test_category_id ;
+    end if;
+
+    return new;
 end;
 $$;
 

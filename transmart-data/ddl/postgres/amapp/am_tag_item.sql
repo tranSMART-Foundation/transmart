@@ -31,12 +31,12 @@ ALTER TABLE ONLY am_tag_item
 --
 CREATE FUNCTION tf_trg_am_tag_item_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.TAG_ITEM_ID is null then
- select nextval('amapp.SEQ_AMAPP_DATA_ID') into NEW.TAG_ITEM_ID ;
-end if;
-       RETURN NEW;
+    if new.tag_item_id is null then
+	select nextval('amapp.seq_amapp_data_id') into new.tag_item_id ;
+    end if;
+    return new;
 end;
 $$;
 

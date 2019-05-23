@@ -34,12 +34,13 @@ CREATE TABLE lz_src_analysis_metadata (
 --
 CREATE FUNCTION tf_trg_lz_src_analysis_meta_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin     
-      if NEW.ETL_ID is null then
-        select nextval('tm_lz.seq_etl_id') into NEW.ETL_ID ;       
-      end if;       
-    RETURN NEW;
+    if new.etl_id is null then
+        select nextval('tm_lz.seq_etl_id') into new.etl_id ;       
+    end if;       
+
+    return new;
 end;
 $$;
 

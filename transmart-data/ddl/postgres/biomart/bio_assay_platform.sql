@@ -25,12 +25,12 @@ ALTER TABLE ONLY bio_assay_platform
 --
 CREATE FUNCTION tf_trg_bio_assay_platform_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_ASSAY_PLATFORM_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_ASSAY_PLATFORM_ID ;
+    if new.bio_assay_platform_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_assay_platform_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

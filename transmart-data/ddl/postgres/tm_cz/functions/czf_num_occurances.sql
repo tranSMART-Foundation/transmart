@@ -3,18 +3,19 @@
 --
 CREATE FUNCTION czf_num_occurances(input_str character varying, search_str character varying) RETURNS integer
     LANGUAGE plpgsql
-    AS $$
-DECLARE
+AS $$
+    declare
 
-  num integer;
+    num integer;
 
-BEGIN
-  num := 0;
-  while instr(input_str, search_str, 1, num + 1) > 0 loop
-    num := num + 1;
-  end loop;
-  return num;
+begin
+    num := 0;
+    while instr(input_str, search_str, 1, num + 1) > 0 loop
+	num := num + 1;
+    end loop;
+
+    return num;
 end;
- 
+
 $$;
 

@@ -81,13 +81,13 @@ CREATE UNIQUE INDEX pk_baad ON bio_assay_analysis_data USING btree (bio_asy_anal
 --
 CREATE FUNCTION tf_trg_bio_asy_analysis_data_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN
-	IF NEW.BIO_ASY_ANALYSIS_DATA_ID IS NULL
-		THEN  select nextval('SEQ_BIO_DATA_ID') INTO NEW.BIO_ASY_ANALYSIS_DATA_ID;
-	END IF;
-	RETURN NEW;
-END
+AS $$
+begin
+    if new.bio_asy_analysis_data_id is null then
+	select nextval('seq_bio_data_id') into new.bio_asy_analysis_data_id;
+    end if;
+    return new;
+end
 $$;
 
 --

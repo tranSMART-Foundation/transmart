@@ -18,12 +18,12 @@ ALTER TABLE ONLY am_tag_value
 --
 CREATE FUNCTION tf_trg_am_tag_value_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.TAG_VALUE_ID is null then
- select nextval('amapp.SEQ_AMAPP_DATA_ID') into NEW.TAG_VALUE_ID ;
-end if;
-       RETURN NEW;
+    if new.tag_value_id is null then
+	select nextval('amapp.seq_amapp_data_id') into new.tag_value_id ;
+    end if;
+    return new;
 end;
 $$;
 
@@ -37,19 +37,19 @@ CREATE TRIGGER trg_am_tag_value_id BEFORE INSERT ON am_tag_value FOR EACH ROW EX
 --
 CREATE FUNCTION tf_trg_am_tag_value_uid() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-DECLARE
-  rec_count int;
-BEGIN
-  SELECT COUNT(*) INTO rec_count 
-  FROM amapp.am_data_uid 
-  WHERE am_data_id = new.tag_value_id;
-  
-  if rec_count = 0 then
-    insert into amapp.am_data_uid (am_data_id, unique_id, am_data_type)
-    values (NEW.tag_value_id, amapp.am_tag_value_uid(NEW.tag_value_id), 'AM_TAG_VALUE');
-  end if;
-RETURN NEW;
+AS $$
+    declare
+    rec_count int;
+begin
+    select count(*) into rec_count 
+      from amapp.am_data_uid 
+     where am_data_id = new.tag_value_id;
+
+    if (rec_count = 0) then
+	insert into amapp.am_data_uid (am_data_id, unique_id, am_data_type)
+	values (new.tag_value_id, amapp.am_tag_value_uid(new.tag_value_id), 'AM_TAG_VALUE');
+    end if;
+    return new;
 end;
 $$;
 

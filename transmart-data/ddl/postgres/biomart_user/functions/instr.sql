@@ -3,7 +3,7 @@
 --
 CREATE FUNCTION instr(character varying, character varying, character varying) RETURNS integer
     LANGUAGE plpgsql
-    AS $_$
+    AS $$
 DECLARE
     string ALIAS FOR $1;
     string_to_search ALIAS FOR $2;
@@ -11,7 +11,7 @@ DECLARE
 BEGIN	
 	return biomart_user.instr($1,$2,CAST($3 as int4));
 END;
-$_$;
+$$;
 
 --
 -- Name: instr(character varying, character varying, integer, integer); Type: FUNCTION; Schema: biomart_user; Owner: -

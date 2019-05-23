@@ -22,12 +22,12 @@ ALTER TABLE ONLY search_form_layout
 --
 CREATE FUNCTION tf_trg_search_form_layout_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.FORM_LAYOUT_ID is null then
- select nextval('searchapp.SEQ_SEARCH_FORM_LAYOUT_ID') into NEW.FORM_LAYOUT_ID ;
- end if;
-       RETURN NEW;
+    if new.form_layout_id is null then
+	select nextval('searchapp.seq_search_form_layout_id') into new.form_layout_id ;
+    end if;
+    return new;
 end;
 $$;
 

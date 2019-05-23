@@ -25,12 +25,12 @@ ALTER TABLE ONLY az_test_run
 --
 CREATE FUNCTION tf_trg_az_test_run_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.TEST_RUN_ID is null then
- select nextval('tm_cz.SEQ_CZ_TEST') into NEW.TEST_RUN_ID ;
-end if;
-       RETURN NEW;
+    if new.test_run_id is null then
+	select nextval('tm_cz.seq_cz_test') into new.test_run_id ;
+    end if;
+    return new;
 end;
 $$;
 

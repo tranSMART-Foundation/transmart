@@ -28,12 +28,12 @@ CREATE UNIQUE INDEX bio_curation_dataset_pk ON bio_curation_dataset USING btree 
 --
 CREATE FUNCTION tf_trg_bio_curation_dataset_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-      if NEW.BIO_CURATION_DATASET_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_CURATION_DATASET_ID ;
-      end if;
-RETURN NEW;
+    if new.bio_curation_dataset_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_curation_dataset_id ;
+    end if;
+    return new;
 end;
 $$;
 

@@ -20,12 +20,12 @@ ALTER TABLE ONLY search_secure_object
 --
 CREATE FUNCTION tf_trg_search_sec_obj_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.SEARCH_SECURE_OBJECT_ID is null then
-          select nextval('searchapp.SEQ_SEARCH_DATA_ID') into NEW.SEARCH_SECURE_OBJECT_ID ;
+    if new.search_secure_object_id is null then
+        select nextval('searchapp.seq_search_data_id') into new.search_secure_object_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

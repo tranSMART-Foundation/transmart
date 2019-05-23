@@ -22,12 +22,12 @@ ALTER TABLE ONLY de_rbm_annotation
 --
 CREATE FUNCTION tf_rbm_id_trigger() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-       if NEW.ID is null then
- select nextval('deapp.RBM_ANNOTATION_ID') into NEW.ID ;
-end if;
-       RETURN NEW;
+    if new.id is null then
+	select nextval('deapp.rbm_annotation_id') into new.id ;
+    end if;
+    return new;
 end;
 $$;
 

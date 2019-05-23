@@ -31,12 +31,12 @@ CREATE UNIQUE INDEX bio_sample_pk ON bio_sample USING btree (bio_sample_id);
 --
 CREATE FUNCTION tf_trg_bio_sample_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_SAMPLE_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_SAMPLE_ID ;
+    if new.bio_sample_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_sample_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

@@ -18,17 +18,17 @@ DECLARE
    v_cmdline varchar(200);
 
    l_table CURSOR FOR
-        SELECT table_name from all_tables where owner = v_to_zone;
+        SELECT table_name from information_schema.tables where table_schema = v_to_zone;
 
    l_view CURSOR FOR
-        SELECT view_name from all_views where owner = v_to_zone;
+        SELECT view_name from information_schema.views where table_schema = v_to_zone;
 
 
 BEGIN
 
    if upper(v_type) like '%TABLE%' then
-       OPEN l_table;
-       FETCH l_table INTO v_object_name;
+       open l_table;
+       fetch l_table INTO v_object_name;
        WHILE l_table%FOUND
        LOOP
           BEGIN

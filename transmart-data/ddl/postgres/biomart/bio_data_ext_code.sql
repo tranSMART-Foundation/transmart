@@ -37,12 +37,12 @@ CREATE INDEX bio_data_e_c_t_idx ON bio_data_ext_code USING btree (code_type);
 --
 CREATE FUNCTION tf_trg_bio_data_ext_code_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin
-    if NEW.BIO_DATA_EXT_CODE_ID is null then
-          select nextval('biomart.SEQ_BIO_DATA_ID') into NEW.BIO_DATA_EXT_CODE_ID ;
+    if new.bio_data_ext_code_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_data_ext_code_id ;
     end if;
-RETURN NEW;
+    return new;
 end;
 $$;
 

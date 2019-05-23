@@ -25,13 +25,14 @@ ALTER TABLE ONLY cz_job_audit
 --
 CREATE FUNCTION tf_trg_cz_seq_id() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
+AS $$
 begin     
-      if NEW.SEQ_ID is null then
-        select nextval('tm_cz.SEQ_CZ_JOB_AUDIT') into NEW.SEQ_ID ;       
-      end if;       
-       RETURN NEW;
-  end;
+    if new.seq_id is null then
+        select nextval('tm_cz.seq_cz_job_audit') into new.seq_id ;       
+    end if;       
+
+    return new;
+end;
 $$;
 
 --
