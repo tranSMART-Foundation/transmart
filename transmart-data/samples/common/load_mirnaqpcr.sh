@@ -40,23 +40,24 @@ LOG_BASE=${LOG_BASE:-2}
 
 if [ ! -d logs ] ; then mkdir logs; fi
 
-$KITCHEN -norep=Y					  \
--file="$KETTLE_JOBS/load_QPCR_MIRNA_data.kjb"		  \
--log="logs/load_mirnaqpcr_data_$(date +"%Y%m%d%H%M").log" \
--param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"		  \
--param:DATA_LOCATION="$DATA_LOCATION"			  \
--param:DATA_TYPE="$DATA_TYPE"				  \
--param:FilePivot_LOCATION="${KETTLE_JOBS}/.."             \
--param:INC_LOAD="$INC_LOAD"				  \
--param:LOAD_TYPE=I					  \
--param:LOG_BASE="$LOG_BASE"			          \
--param:MAP_FILENAME="$MAP_FILENAME"			  \
--param:MIRNA_TYPE="$MIRNA_TYPE"			 	  \
--param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"	  \
--param:SAMPLE_REMAP_FILENAME=NOSAMPLEREMAP	          \
--param:SAMPLE_SUFFIX=	                                  \
--param:SECURITY_REQUIRED="$SECURITY_REQUIRED"		  \
--param:SORT_DIR=/tmp					  \
--param:SOURCE_CD="$SOURCE_CD"				  \
--param:STUDY_ID="$STUDY_ID"				  \
--param:TOP_NODE="$TOP_NODE"
+$KITCHEN -norep -version                                                    \
+	 -file="$KETTLE_JOBS/load_QPCR_MIRNA_data.kjb"                      \
+         -level="$KETTLE_LOG_LEVEL"                                         \
+	 -logfile="$PWD"/logs/load_mirnaqpcr_data_$(date +"%Y%m%d%H%M").log \
+	 -param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"                        \
+	 -param:DATA_LOCATION="$DATA_LOCATION"                              \
+	 -param:DATA_TYPE="$DATA_TYPE"                                      \
+	 -param:FilePivot_LOCATION="${KETTLE_JOBS}/.."                      \
+	 -param:INC_LOAD="$INC_LOAD"                                        \
+	 -param:LOAD_TYPE=I                                                 \
+	 -param:LOG_BASE="$LOG_BASE"                                        \
+	 -param:MAP_FILENAME="$MAP_FILENAME"                                \
+	 -param:MIRNA_TYPE="$MIRNA_TYPE"                                    \
+	 -param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"                  \
+	 -param:SAMPLE_REMAP_FILENAME=NOSAMPLEREMAP                         \
+	 -param:SAMPLE_SUFFIX=                                              \
+	 -param:SECURITY_REQUIRED="$SECURITY_REQUIRED"                      \
+	 -param:SORT_DIR=/tmp                                               \
+	 -param:SOURCE_CD="$SOURCE_CD"                                      \
+	 -param:STUDY_ID="$STUDY_ID"                                        \
+	 -param:TOP_NODE="$TOP_NODE"

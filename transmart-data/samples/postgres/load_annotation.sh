@@ -18,46 +18,46 @@ source "$UPLOAD_SCRIPTS_DIRECTORY/process_params.inc"
 
 if [ ! -z "$PLATFORM_DATA_TYPE" ]; then
     case $PLATFORM_DATA_TYPE in
-	"expression") echo "expression platform"
-		      source $LOAD_SCRIPTS_DIRECTORY/load_expression_annotation.sh ${1:+${PARAMS_FILENAME}}
-		      exit
-		      ;;
-	"mirna") echo "mirna platform"
-		 $LOAD_SCRIPTS_DIRECTORY/load_mirna_annotation.sh ${1:+${PARAMS_FILENAME}}
-		 exit
-		 ;;
-	"mirnaqpcr") echo "mirnaqpcr platform"
-		 $LOAD_SCRIPTS_DIRECTORY/load_mirnaqpcr_annotation.sh ${1:+${PARAMS_FILENAME}}
-		 exit
-		 ;;
-	"mirnaseq") echo "mirnaseq platform"
-		 $LOAD_SCRIPTS_DIRECTORY/load_mirnaseq_annotation.sh ${1:+${PARAMS_FILENAME}}
-		 exit
-		 ;;
-	"rnaseq") echo "rnaseq platform"
-		  $LOAD_SCRIPTS_DIRECTORY/load_rnaseq_annotation.sh ${1:+${PARAMS_FILENAME}}
-		  exit
-		  ;;
-	"rbm") echo "rbm platform"
-		 $LOAD_SCRIPTS_DIRECTORY/load_rbm_annotation.sh ${1:+${PARAMS_FILENAME}}
-		 exit
-	       ;;
-	"metabolomics") echo "metabolomics platform"
-			$LOAD_SCRIPTS_DIRECTORY/load_metabolomics_annotation.sh ${1:+${PARAMS_FILENAME}}
-			exit
-			;;
-	"msproteomics") echo "msproteomics platform"
-		      $LOAD_SCRIPTS_DIRECTORY/load_msproteomics_annotation.sh ${1:+${PARAMS_FILENAME}}
-		      exit
-		      ;;
-	"proteomics") echo "proteomics platform"
-		      $LOAD_SCRIPTS_DIRECTORY/load_proteomics_annotation.sh ${1:+${PARAMS_FILENAME}}
-		      exit
-		      ;;
-	"Chromosomal") echo "chromosomal region platform"
+	"Chromosomal") echo "chromosomal region platform: load_chromosomal_region_annotation.sh"
 		      $LOAD_SCRIPTS_DIRECTORY/load_chromosomal_region_annotation.sh ${1:+${PARAMS_FILENAME}}
 		      exit
 		      ;;
+	"expression") echo "expression platform: load_expression_annotation.sh"
+		      source $LOAD_SCRIPTS_DIRECTORY/load_expression_annotation.sh ${1:+${PARAMS_FILENAME}}
+		      exit
+		      ;;
+	"metabolomics") echo "metabolomics platform: load_metabolomics_annotation.sh"
+			$LOAD_SCRIPTS_DIRECTORY/load_metabolomics_annotation.sh ${1:+${PARAMS_FILENAME}}
+			exit
+			;;
+	"mirna") echo "mirna platform: load_mirna_annotation.sh"
+		 $LOAD_SCRIPTS_DIRECTORY/load_mirna_annotation.sh ${1:+${PARAMS_FILENAME}}
+		 exit
+		 ;;
+	"mirnaqpcr") echo "mirnaqpcr platform: load_mirnaqpcr_annotation.sh"
+		 $LOAD_SCRIPTS_DIRECTORY/load_mirnaqpcr_annotation.sh ${1:+${PARAMS_FILENAME}}
+		 exit
+		 ;;
+	"mirnaseq") echo "mirnaseq platform: load_mirnaseq_annotation.sh"
+		 $LOAD_SCRIPTS_DIRECTORY/load_mirnaseq_annotation.sh ${1:+${PARAMS_FILENAME}}
+		 exit
+		 ;;
+	"msproteomics") echo "msproteomics platform: load_msproteomics_annotation.sh"
+		      $LOAD_SCRIPTS_DIRECTORY/load_msproteomics_annotation.sh ${1:+${PARAMS_FILENAME}}
+		      exit
+		      ;;
+	"proteomics") echo "proteomics platform: load_proteomics_annotation.sh"
+		      $LOAD_SCRIPTS_DIRECTORY/load_proteomics_annotation.sh ${1:+${PARAMS_FILENAME}}
+		      exit
+		      ;;
+	"rbm") echo "rbm platform: load_rbm_annotation.sh"
+		 $LOAD_SCRIPTS_DIRECTORY/load_rbm_annotation.sh ${1:+${PARAMS_FILENAME}}
+		 exit
+	       ;;
+	"rnaseq") echo "rnaseq platform: load_rnaseq_annotation.sh"
+		  $LOAD_SCRIPTS_DIRECTORY/load_rnaseq_annotation.sh ${1:+${PARAMS_FILENAME}}
+		  exit
+		  ;;
 	*) echo "Unsupported PLATFORM_DATA_TYPE $PLATFORM_DATA_TYPE"
 	   exit
 	   ;;

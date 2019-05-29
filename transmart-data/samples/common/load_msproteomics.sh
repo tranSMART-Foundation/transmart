@@ -32,18 +32,19 @@ trap 'rm -rf $TEMPDIR' EXIT
 
 if [ ! -d logs ] ; then mkdir logs; fi
 
-$KITCHEN -norep=Y						\
--file="$KETTLE_JOBS/load_proteomics_data.kjb"			\
--log="logs/load_msproteomics_data_$(date +"%Y%m%d%H%M").log"	\
--param:COLUMN_MAPPING_FILE="$COLUMN_MAPPING_FILE"		\
--param:DATA_LOCATION="$DATA_LOCATION"				\
--param:MAP_FILENAME="$MAP_FILENAME"				\
--param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"		\
--param:DATA_TYPE="$DATA_TYPE"					\
--param:INC_LOAD="$INC_LOAD"					\
--param:SORT_DIR=/tmp						\
--param:LOAD_TYPE=I						\
--param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"			\
--param:SECURITY_REQUIRED="$SECURITY_REQUIRED"			\
--param:STUDY_ID="$STUDY_ID"					\
--param:TOP_NODE="$TOP_NODE"
+$KITCHEN -norep -version                                                       \
+	 -file="$KETTLE_JOBS/load_proteomics_data.kjb"                         \
+         -level="$KETTLE_LOG_LEVEL"                                            \
+	 -logfile="$PWD"/logs/load_msproteomics_data_$(date +"%Y%m%d%H%M").log \
+	 -param:COLUMN_MAPPING_FILE="$COLUMN_MAPPING_FILE"                     \
+	 -param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"                           \
+	 -param:DATA_LOCATION="$DATA_LOCATION"                                 \
+	 -param:DATA_TYPE="$DATA_TYPE"                                         \
+	 -param:INC_LOAD="$INC_LOAD"                                           \
+	 -param:LOAD_TYPE=I                                                    \
+	 -param:MAP_FILENAME="$MAP_FILENAME"                                   \
+	 -param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"                     \
+	 -param:SECURITY_REQUIRED="$SECURITY_REQUIRED"                         \
+	 -param:SORT_DIR=/tmp                                                  \
+	 -param:STUDY_ID="$STUDY_ID"                                           \
+	 -param:TOP_NODE="$TOP_NODE"

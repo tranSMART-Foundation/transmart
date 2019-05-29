@@ -57,25 +57,26 @@ LOG_BASE=${LOG_BASE:-2}
 
 if [ ! -d logs ] ; then mkdir logs; fi
 
-$KITCHEN -norep=Y                                                  \
-	 -file=$KETTLE_JOBS/load_metabolomic_data.kjb              \
-	 -log=logs/load_metabolomic_data_$(date +"%Y%m%d%H%M").log \
-	 /param:COLUMN_MAPPING_FILE="$COLUMN_MAPPING_FILE"         \
-	 /param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"               \
-	 /param:DATA_LOCATION="$DATA_LOCATION"                     \
-	 /param:DATA_TYPE="$DATA_TYPE"                             \
-         /param:FilePivot_LOCATION="${KETTLE_JOBS}/.."             \
-	 /param:INC_LOAD="$INC_LOAD"                               \
-	 /param:LOAD_TYPE=I                                        \
-	 /param:LOG_BASE="$LOG_BASE"                               \
-	 /param:MAP_FILENAME="$SUBJECT_SAMPLE_MAPPING"             \
-	 /param:SAMPLE_MAP_FILENAME="$SUBJECT_SAMPLE_MAPPING"      \
-	 /param:SAMPLE_REMAP_FILENAME="NOSAMPLEREMAP"              \
-	 /param:SAMPLE_SUFFIX=                                     \
-	 /param:SECURITY_REQUIRED="$SECURITY_REQUIRED"             \
-	 /param:SORT_DIR=/tmp                                      \
-	 /param:SOURCE_CD="${SOURCE_CD}"                           \
-	 /param:STUDY_ID="$STUDY_ID"                               \
-	 /param:TOP_NODE="$TOP_NODE"
+$KITCHEN -norep -version                                                      \
+	 -file=$KETTLE_JOBS/load_metabolomic_data.kjb                         \
+	 -level="$KETTLE_LOG_LEVEL"                                           \
+	 -logfile="$PWD"/logs/load_metabolomic_data_$(date +"%Y%m%d%H%M").log \
+	 -param:COLUMN_MAPPING_FILE="$COLUMN_MAPPING_FILE"                    \
+	 -param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"                          \
+	 -param:DATA_LOCATION="$DATA_LOCATION"                                \
+	 -param:DATA_TYPE="$DATA_TYPE"                                        \
+         -param:FilePivot_LOCATION="${KETTLE_JOBS}/.."                        \
+	 -param:INC_LOAD="$INC_LOAD"                                          \
+	 -param:LOAD_TYPE=I                                                   \
+	 -param:LOG_BASE="$LOG_BASE"                                          \
+	 -param:MAP_FILENAME="$SUBJECT_SAMPLE_MAPPING"                        \
+	 -param:SAMPLE_MAP_FILENAME="$SUBJECT_SAMPLE_MAPPING"                 \
+	 -param:SAMPLE_REMAP_FILENAME="NOSAMPLEREMAP"                         \
+	 -param:SAMPLE_SUFFIX=                                                \
+	 -param:SECURITY_REQUIRED="$SECURITY_REQUIRED"                        \
+	 -param:SORT_DIR=/tmp                                                 \
+	 -param:SOURCE_CD="${SOURCE_CD}"                                      \
+	 -param:STUDY_ID="$STUDY_ID"                                          \
+	 -param:TOP_NODE="$TOP_NODE"
 
 echo "All done"

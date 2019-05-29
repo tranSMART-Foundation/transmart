@@ -146,9 +146,22 @@ if [ "$ORACLE" == "1" ] ; then DBTYPE="oracle" ; fi
 if [ -z "$KETTLE_HOME" ] ; then
     KETTLE_HOME=${PATH_TO_TRANSMARTDATA}/samples/${DBTYPE}
     echo "Info $(basename $0): KETTLE_HOME parameter set to ${KETTLE_HOME}"
-
+else
+    echo "Info $(basename $0): Using KETTLE_HOME parameter set to ${KETTLE_HOME}"
 fi
 
+# Set KETTLE_LOG_LEVEL parameter
+if [ -z "$KETTLE_LOG_LEVEL" ] ; then
+    KETTLE_LOG_LEVEL="BASIC"
+fi
+
+# Check KETTLE_LOG_LEVEL parameter
+KETTLE_LOG_TEST="BASIC DETAILED DEBUG ROWLEVEL ERROR NOTHING"
+
+if [ $(echo "$KETTLE_LOG_TEST" | grep -c -w $KETTLE_LOG_LEVEL) -ne 1 ] ; then
+    echo "Error process_params.inc: KETTLE_LOG_LEVEL '$KETTLE_LOG_LEVEL' is not supported ($KETTLE_LOG_TEST)"
+    exit 1
+fi
 # Set KETTLE_JOBS parameter
 if [ -z "$KETTLE_JOBS" ] ; then
     if [ $DBTYPE == "postgres" ] ; then

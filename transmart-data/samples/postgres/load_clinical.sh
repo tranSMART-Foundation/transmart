@@ -51,19 +51,20 @@ if [ $USE_R_UPLOAD = 'N' ]; then
 	fi
     fi
 
-    $KITCHEN -norep=Y                                               \
-             -file=$KETTLE_JOBS_PSQL/$CLINICAL_JOB                  \
-             -log=logs/load_clinical_data_$(date +"%Y%m%d%H%M").log \
-             -param:COLUMN_MAP_FILE="$COLUMN_MAP_FILE"              \
-             -param:DATA_LOCATION="$DATA_LOCATION"                  \
-             -param:LOAD_TYPE=I                                     \
-             -param:SECURITY_REQUIRED="$SECURITY_REQUIRED"          \
-             -param:SORT_DIR=/tmp                                   \
-             -param:STUDY_ID="$STUDY_ID"                            \
-             -param:TOP_NODE="$TOP_NODE"                             \
-             -param:WORD_MAP_FILE="$WORD_MAP_FILE"                  \
-             -param:RECORD_EXCLUSION_FILE="$RECORD_EXCLUSION_FILE"
-             #-param:SQLLDR_PATH=/spin/pg/master/bin/psql \
+    $KITCHEN -norep -version                                                   \
+             -file=$KETTLE_JOBS_PSQL/$CLINICAL_JOB                             \
+	     -level="$KETTLE_LOG_LEVEL"                                        \
+             -logfile="$PWD"/logs/load_clinical_data_$(date +"%Y%m%d%H%M").log \
+             -param:COLUMN_MAP_FILE="$COLUMN_MAP_FILE"                         \
+             -param:DATA_LOCATION="$DATA_LOCATION"                             \
+             -param:LOAD_TYPE=I                                                \
+             -param:RECORD_EXCLUSION_FILE="$RECORD_EXCLUSION_FILE"             \
+             -param:SECURITY_REQUIRED="$SECURITY_REQUIRED"                     \
+             -param:SORT_DIR=/tmp                                              \
+             -param:STUDY_ID="$STUDY_ID"                                       \
+             -param:TOP_NODE="$TOP_NODE"                                       \
+             -param:WORD_MAP_FILE="$WORD_MAP_FILE"
+            #-param:SQLLDR_PATH=/spin/pg/master/bin/psql                       \
 
 else
 

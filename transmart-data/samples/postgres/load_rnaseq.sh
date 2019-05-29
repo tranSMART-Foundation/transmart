@@ -78,24 +78,25 @@ LOG_BASE=${LOG_BASE:-2}
 if [ "$RNASEQ_TYPE" = "RNASEQ" ]; then
     if [ ! -d logs ] ; then mkdir logs; fi
 
-    $KITCHEN -norep=Y                                        \
-	     -file=$KETTLE_JOBS/load_RNA_sequencing_data.kjb          \
-	     -log=logs/load_rnaseq_data_$(date +"%Y%m%d%H%M").log     \
-	     /param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"              \
-	     /param:DATA_LOCATION="$DATA_LOCATION"                    \
-	     /param:DATA_TYPE="$DATA_TYPE"                            \
-	     /param:FilePivot_LOCATION="${KETTLE_JOBS}/.."            \
-	     /param:INC_LOAD="$INC_LOAD"                              \
-	     /param:LOAD_TYPE=I                                       \
-	     /param:LOG_BASE="$LOG_BASE"                              \
-	     /param:MAP_FILENAME="$SUBJECT_SAMPLE_MAPPING"            \
-	     /param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"        \
-	     /param:SAMPLE_SUFFIX=                                    \
-	     /param:SECURITY_REQUIRED="$SECURITY_REQUIRED"            \
-	     /param:SORT_DIR=/tmp                                     \
-	     /param:SOURCE_CD="${SOURCE_CD}"                          \
-	     /param:STUDY_ID="$STUDY_ID"                              \
-	     /param:TOP_NODE="$TOP_NODE"
+    $KITCHEN -norep -version                                                 \
+	     -file=$KETTLE_JOBS/load_RNA_sequencing_data.kjb                 \
+	     -level="$KETTLE_LOG_LEVEL"                                      \
+	     -logfile="$PWD"/logs/load_rnaseq_data_$(date +"%Y%m%d%H%M").log \
+	     -param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"                     \
+	     -param:DATA_LOCATION="$DATA_LOCATION"                           \
+	     -param:DATA_TYPE="$DATA_TYPE"                                   \
+	     -param:FilePivot_LOCATION="${KETTLE_JOBS}/.."                   \
+	     -param:INC_LOAD="$INC_LOAD"                                     \
+	     -param:LOAD_TYPE=I                                              \
+	     -param:LOG_BASE="$LOG_BASE"                                     \
+	     -param:MAP_FILENAME="$SUBJECT_SAMPLE_MAPPING"                   \
+	     -param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"               \
+	     -param:SAMPLE_SUFFIX=                                           \
+	     -param:SECURITY_REQUIRED="$SECURITY_REQUIRED"                   \
+	     -param:SORT_DIR=/tmp                                            \
+	     -param:SOURCE_CD="${SOURCE_CD}"                                 \
+	     -param:STUDY_ID="$STUDY_ID"                                     \
+	     -param:TOP_NODE="$TOP_NODE"
 
     echo "All done."
     exit 0

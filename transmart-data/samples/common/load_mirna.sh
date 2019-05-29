@@ -30,18 +30,19 @@ TOP_NODE="\\${TOP_NODE_PREFIX}\\${STUDY_NAME}\\"
 
 if [ ! -d logs ] ; then mkdir logs; fi
 
-$KITCHEN -norep=Y					\
--file="$KETTLE_JOBS/load_QPCR_MIRNA_data.kjb"		\
--log="logs/load_mirna_data_$(date +"%Y%m%d%H%M").log"	\
--param:DATA_LOCATION="$DATA_LOCATION"			\
--param:STUDY_ID="$STUDY_ID"				\
--param:MAP_FILENAME="$MAP_FILENAME"			\
--param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"	\
--param:DATA_TYPE="$DATA_TYPE"				\
--param:INC_LOAD="$INC_LOAD"				\
--param:SORT_DIR=/tmp					\
--param:TOP_NODE="$TOP_NODE"				\
--param:LOAD_TYPE=I					\
--param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"		\
--param:MIRNA_TYPE="$MIRNA_TYPE"				\
--param:SECURITY_REQUIRED="$SECURITY_REQUIRED"
+$KITCHEN -norep -version                                                \
+	 -file="$KETTLE_JOBS/load_QPCR_MIRNA_data.kjb"                  \
+         -level="$KETTLE_LOG_LEVEL"                                     \
+	 -logfile="$PWD"/logs/load_mirna_data_$(date +"%Y%m%d%H%M").log \
+	 -param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"                    \
+	 -param:DATA_LOCATION="$DATA_LOCATION"                          \
+	 -param:DATA_TYPE="$DATA_TYPE"                                  \
+	 -param:INC_LOAD="$INC_LOAD"                                    \
+	 -param:LOAD_TYPE=I                                             \
+	 -param:MAP_FILENAME="$MAP_FILENAME"                            \
+	 -param:MIRNA_TYPE="$MIRNA_TYPE"                                \
+	 -param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"              \
+	 -param:SECURITY_REQUIRED="$SECURITY_REQUIRED"                  \
+	 -param:SORT_DIR=/tmp                                           \
+	 -param:STUDY_ID="$STUDY_ID"                                    \
+	 -param:TOP_NODE="$TOP_NODE"
