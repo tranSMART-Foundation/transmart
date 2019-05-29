@@ -185,7 +185,7 @@
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
-      <table>LZ_SRC_ANALYSIS_METADATA</table>
+      <table>lz_src_analysis_metadata</table>
       <key>
         <name>ETL_ID</name>
         <field>ETL_ID</field>

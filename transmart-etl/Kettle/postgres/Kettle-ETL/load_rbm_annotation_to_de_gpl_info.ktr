@@ -149,7 +149,7 @@
     <cache_load_all>N</cache_load_all>
     <cache_size>0</cache_size>
     <lookup>
-      <schema>DEAPP</schema>
+      <schema>deapp</schema>
       <table>de_gpl_info</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
@@ -304,7 +304,7 @@
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
-      <table>DE_GPL_INFO</table>
+      <table>de_gpl_info</table>
       <key>
         <name>gpl_id</name>
         <field>PLATFORM</field>
@@ -373,7 +373,7 @@
            </partitioning>
     <connection>DEAPP</connection>
     <schema/>
-    <table>DE_GPL_INFO</table>
+    <table>de_gpl_info</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>

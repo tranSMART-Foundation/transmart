@@ -517,7 +517,7 @@
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_SRC_RBM_DATA</table>
+    <table>lt_src_rbm_data</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

@@ -178,7 +178,7 @@ FROM LZ_SRC_ANALYSIS_METADATA
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_EXPERIMENT</table>
+      <table>bio_experiment</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
@@ -346,7 +346,7 @@ FROM LZ_SRC_ANALYSIS_METADATA
            </partitioning>
     <connection>BIOMART</connection>
     <schema/>
-    <table>BIO_EXPERIMENT</table>
+    <table>bio_experiment</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
@@ -494,7 +494,7 @@ FROM LZ_SRC_ANALYSIS_METADATA
            </partitioning>
     <connection>BIOMART</connection>
     <schema/>
-    <table>BIO_DATA_UID</table>
+    <table>bio_data_uid</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>

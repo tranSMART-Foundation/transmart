@@ -165,7 +165,7 @@
     <read_size>0</read_size>
     <errors>50</errors>
     <schema/>
-    <table>LT_SRC_RNA_SEQ_DATA</table>
+    <table>lt_src_rna_seq_data</table>
     <load_method>AUTO_END</load_method>
     <load_action>APPEND</load_action>
     <sqlldr>${SQLLDR_PATH}</sqlldr>
@@ -867,7 +867,7 @@ Alert(isNum(str2));
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>lt_src_RNA_SEQ_data</table>
+    <table>lt_src_rna_seq_data</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

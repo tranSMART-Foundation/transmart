@@ -535,7 +535,7 @@
     <commit>100</commit>
     <lookup>
       <schema/>
-      <table>LZ_SRC_GWAS</table>
+      <table>lz_src_gwas</table>
       <key>
         <name>d_etl_id</name>
         <field>ETL_ID</field>
@@ -1098,7 +1098,7 @@
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LZ_SRC_GWAS</table>
+    <table>lz_src_gwas</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
@@ -1324,7 +1324,7 @@
     <read_size>0</read_size>
     <errors>50</errors>
     <schema/>
-    <table>LZ_SRC_GWAS</table>
+    <table>lz_src_gwas</table>
     <load_method>AUTO_END</load_method>
     <load_action>APPEND</load_action>
     <sqlldr>${LOADER_PATH}</sqlldr>
@@ -2135,7 +2135,7 @@
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
-      <table>LZ_SRC_ANALYSIS_METADATA</table>
+      <table>lz_src_analysis_metadata</table>
       <key>
         <name>etl_id</name>
         <field>ETL_ID</field>

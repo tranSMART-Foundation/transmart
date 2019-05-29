@@ -1028,7 +1028,7 @@
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_SRC_STUDY_METADATA</table>
+    <table>lt_src_study_metadata</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -1237,7 +1237,7 @@
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_SRC_STUDY_METADATA_AD_HOC</table>
+    <table>lt_src_study_metadata_ad_hoc</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

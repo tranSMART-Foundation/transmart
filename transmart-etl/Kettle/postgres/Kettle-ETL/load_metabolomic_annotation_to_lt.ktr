@@ -136,7 +136,7 @@
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_METABOLOMIC_ANNOTATION</table>
+    <table>lt_metabolomic_annotation</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

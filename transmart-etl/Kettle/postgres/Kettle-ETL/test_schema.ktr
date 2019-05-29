@@ -135,7 +135,7 @@
            </partitioning>
     <connection>TM_CZ</connection>
     <schema/>
-    <table>TMP_TRIAL_NODES</table>
+    <table>tmp_trial_nodes</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

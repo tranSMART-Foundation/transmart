@@ -531,7 +531,7 @@ in biomart.bio_assay_analysis</note>
     <commit>1000</commit>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_ANALYSIS_DATA</table>
+      <table>bio_assay_analysis_data</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_ASSAY_ANALYSIS_ID</field>
@@ -561,7 +561,7 @@ in biomart.bio_assay_analysis</note>
     <commit>100</commit>
     <lookup>
       <schema/>
-      <table>CTA_RESULTS</table>
+      <table>cta_results</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_ASSAY_ANALYSIS_ID</field>
@@ -591,7 +591,7 @@ in biomart.bio_assay_analysis</note>
     <commit>1000</commit>
     <lookup>
       <schema/>
-      <table>RWG_ANALYSIS_DATA</table>
+      <table>rwg_analysis_data</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_ASSAY_ANALYSIS_ID</field>
@@ -851,7 +851,7 @@ in biomart.bio_assay_analysis</note>
     <update_bypassed>Y</update_bypassed>
     <lookup>
       <schema/>
-      <table>BIO_EXPERIMENT</table>
+      <table>bio_experiment</table>
       <key>
         <name>STUDY_ID</name>
         <field>ACCESSION</field>
@@ -961,7 +961,7 @@ in biomart.bio_assay_analysis</note>
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_EXPERIMENT</table>
+      <table>bio_experiment</table>
       <orderby/>
       <fail_on_multiple>Y</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
@@ -1363,7 +1363,7 @@ order by analysis_name
     <order_delete>deleted</order_delete>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_ANALYSIS</table>
+      <table>bio_assay_analysis</table>
       <key>
         <name>ANALYSIS_NAME</name>
         <field>ANALYSIS_NAME</field>

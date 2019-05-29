@@ -350,7 +350,7 @@
     <read_size>0</read_size>
     <errors>50</errors>
     <schema/>
-    <table>BIO_ASSAY_ANALYSIS_GWAS</table>
+    <table>bio_assay_analysis_gwas</table>
     <load_method>AUTO_END</load_method>
     <load_action>APPEND</load_action>
     <sqlldr>/app/oracle/product/11.2/bin/sqlldr</sqlldr>
@@ -677,7 +677,7 @@
     <commit>100</commit>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_ANALYSIS_GWAS</table>
+      <table>bio_assay_analysis_gwas</table>
       <key>
         <name>d_baa_id</name>
         <field>BIO_ASSAY_ANALYSIS_ID</field>
@@ -1279,7 +1279,7 @@
            </partitioning>
     <connection>BIOMART_STAGE</connection>
     <schema/>
-    <table>BIO_ASSAY_ANALYSIS_GWAS</table>
+    <table>bio_assay_analysis_gwas</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>

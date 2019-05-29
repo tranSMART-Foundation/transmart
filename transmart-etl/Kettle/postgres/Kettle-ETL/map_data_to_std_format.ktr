@@ -4657,7 +4657,7 @@
     </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_SRC_CLINICAL_DATA</table>
+    <table>lt_src_clinical_data</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>

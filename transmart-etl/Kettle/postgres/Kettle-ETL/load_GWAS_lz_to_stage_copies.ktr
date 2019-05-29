@@ -472,7 +472,7 @@ than one field with the same field_idx.
     <read_size>0</read_size>
     <errors>50</errors>
     <schema/>
-    <table>BIO_ASSAY_ANALYSIS_GWAS</table>
+    <table>bio_assay_analysis_gwas</table>
     <load_method>AUTO_END</load_method>
     <load_action>INSERT</load_action>
     <sqlldr>${LOADER_PATH}</sqlldr>
@@ -828,7 +828,7 @@ var log_p_value=Math.log(P_VALUE)/Math.LN10;
     <commit>100</commit>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_ANALYSIS_GWAS</table>
+      <table>bio_assay_analysis_gwas</table>
       <key>
         <name>d_baa_id</name>
         <field>BIO_ASSAY_ANALYSIS_ID</field>
@@ -1172,7 +1172,7 @@ FROM LZ_SRC_GWAS
            </partitioning>
     <connection>BIOMART_STAGE</connection>
     <schema/>
-    <table>BIO_ASSAY_ANALYSIS_GWAS</table>
+    <table>bio_assay_analysis_gwas</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
@@ -1241,7 +1241,7 @@ FROM LZ_SRC_GWAS
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_ASY_ANALYSIS_DATA_IDX</table>
+      <table>bio_asy_analysis_data_idx</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>Y</eat_row_on_failure>

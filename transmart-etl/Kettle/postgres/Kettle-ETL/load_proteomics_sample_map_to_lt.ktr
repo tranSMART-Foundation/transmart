@@ -854,7 +854,7 @@
     </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_SRC_PROTEOMICS_SUB_SAM_MAP</table>
+    <table>lt_src_proteomics_sub_sam_map</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

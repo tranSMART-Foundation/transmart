@@ -2165,7 +2165,7 @@ study_id in cohorts file does not match STUDY_ID parameter
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>RWG_ANALYSIS_DATA_EXT</table>
+    <table>rwg_analysis_data_ext</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -2234,7 +2234,7 @@ study_id in cohorts file does not match STUDY_ID parameter
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>RWG_ANALYSIS_EXT</table>
+    <table>rwg_analysis_ext</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -2315,7 +2315,7 @@ study_id in cohorts file does not match STUDY_ID parameter
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>RWG_COHORTS_EXT</table>
+    <table>rwg_cohorts_ext</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -2384,7 +2384,7 @@ study_id in cohorts file does not match STUDY_ID parameter
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>RWG_SAMPLES_EXT</table>
+    <table>rwg_samples_ext</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

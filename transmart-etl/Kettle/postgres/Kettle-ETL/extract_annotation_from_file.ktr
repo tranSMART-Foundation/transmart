@@ -897,7 +897,7 @@
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_SRC_DEAPP_ANNOT</table>
+    <table>lt_src_deapp_annot</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

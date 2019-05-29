@@ -218,7 +218,7 @@
            </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_SRC_RNA_SEQ_SUBJ_SAMP_MAP</table>
+    <table>lt_src_rna_seq_subj_samp_map</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

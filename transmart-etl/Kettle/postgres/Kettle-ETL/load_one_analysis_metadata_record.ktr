@@ -979,7 +979,7 @@ var new_analysis_name=ANALYSIS_NAME;
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
-      <table>LZ_SRC_ANALYSIS_METADATA</table>
+      <table>lz_src_analysis_metadata</table>
       <key>
         <name>ETL_ID</name>
         <field>ETL_ID</field>
@@ -1193,7 +1193,7 @@ var new_analysis_name=ANALYSIS_NAME;
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>LZ_SRC_ANALYSIS_METADATA</table>
+      <table>lz_src_analysis_metadata</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>

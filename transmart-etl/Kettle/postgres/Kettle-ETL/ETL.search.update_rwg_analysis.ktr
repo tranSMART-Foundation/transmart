@@ -229,7 +229,7 @@ where etl_id = '${STUDY_ID}:RWG'
     <ignore_flag_field/>
     <lookup>
       <schema/>
-      <table>RWG_ANALYSIS</table>
+      <table>rwg_analysis</table>
       <key>
         <name>study_id</name>
         <field>STUDY_ID</field>

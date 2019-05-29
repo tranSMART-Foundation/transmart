@@ -787,7 +787,7 @@
     </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_SRC_METABOL_DISPLAY_MAPPING</table>
+    <table>lt_src_metabol_display_mapping</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -844,7 +844,7 @@
     </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>LT_SRC_METABOLOMIC_MAP</table>
+    <table>lt_src_metabolomic_map</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>

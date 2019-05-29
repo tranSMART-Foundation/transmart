@@ -335,7 +335,7 @@ order by study_id, analysis_cd, cohort_id
     <order_delete>deleted</order_delete>
     <lookup>
       <schema/>
-      <table>BIO_ANALYSIS_COHORT_XREF</table>
+      <table>bio_analysis_cohort_xref</table>
       <key>
         <name>STUDY_ID</name>
         <field>STUDY_ID</field>
