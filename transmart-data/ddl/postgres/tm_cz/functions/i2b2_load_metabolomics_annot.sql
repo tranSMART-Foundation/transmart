@@ -252,7 +252,7 @@ begin
 
     get diagnostics rowCt := ROW_COUNT;
     
-    perform cz_write_audit(jobId,databaseName,procedureName,'Updated missing uniprotid in de_protien_annotation',rowCt,stepCt,'Done');
+    perform cz_write_audit(jobId,databaseName,procedureName,'Updated missing metabolite in de_metabolomics_annotation',rowCt,stepCt,'Done');
     
     --    insert probesets into biomart.bio_assay_feature_group
     begin
