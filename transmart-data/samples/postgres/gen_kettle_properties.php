@@ -23,15 +23,11 @@ DEAPP_DB_PORT=<?= $_ENV['PGPORT'] , "\n" ?>
 DEAPP_DB_SERVER=<?= $host, "\n" ?>
 DEAPP_DB_PWD=<?= get('DEAPP_PWD', 'deapp'), "\n" ?>
 DEAPP_DB_USER=deapp
-DEAPP_PWD=<?= get('DEAPP_PWD', 'deapp'), "\n" ?>
-DEAPP_USER=deapp
 BIOMART_DB_NAME=<?= $_ENV['PGDATABASE'] , "\n" ?>
 BIOMART_DB_PORT=<?= $_ENV['PGPORT'] , "\n" ?>
 BIOMART_DB_SERVER=<?= $host, "\n" ?>
 BIOMART_DB_PWD=<?= get('BIOMART_PWD', 'biomart'), "\n" ?>
 BIOMART_DB_USER=biomart
-BIOMART_PWD=<?= get('BIOMART_PWD', 'biomart'), "\n" ?>
-BIOMART_USER=biomart
 BIOMART_STAGE_DB_NAME=<?= $_ENV['PGDATABASE'] , "\n" ?>
 BIOMART_STAGE_DB_PORT=<?= $_ENV['PGPORT'] , "\n" ?>
 BIOMART_STAGE_DB_SERVER=<?= $host, "\n" ?>

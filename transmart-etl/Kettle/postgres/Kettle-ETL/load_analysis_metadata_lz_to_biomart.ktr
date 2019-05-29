@@ -119,8 +119,8 @@
     <access>Native</access>
     <database>${DEAPP_DB_NAME}</database>
     <port>${DEAPP_DB_PORT}</port>
-    <username>${DEAPP_USER}</username>
-    <password>${DEAPP_PWD}</password>
+    <username>${DEAPP_DB_USER}</username>
+    <password>${DEAPP_DB_PWD}</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -751,7 +751,7 @@
     <commit>100</commit>
     <lookup>
       <schema/>
-      <table>BIO_DATA_DISEASE</table>
+      <table>bio_data_disease</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_DATA_ID</field>
@@ -781,7 +781,7 @@
     <commit>100</commit>
     <lookup>
       <schema/>
-      <table>BIO_DATA_OBSERVATION</table>
+      <table>bio_data_observation</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_DATA_ID</field>
@@ -811,7 +811,7 @@
     <commit>100</commit>
     <lookup>
       <schema/>
-      <table>BIO_DATA_PLATFORM</table>
+      <table>bio_data_platform</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_DATA_ID</field>
@@ -1372,7 +1372,7 @@ where etl_id = ${ETL_ID}
     <update_bypassed>Y</update_bypassed>
     <lookup>
       <schema/>
-      <table>BIO_EXPERIMENT</table>
+      <table>bio_experiment</table>
       <key>
         <name>STUDY_ID</name>
         <field>ACCESSION</field>
@@ -1423,7 +1423,7 @@ where etl_id = ${ETL_ID}
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_ANALYSIS</table>
+      <table>bio_assay_analysis</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_ASSAY_ANALYSIS_ID</field>
@@ -1504,7 +1504,7 @@ where etl_id = ${ETL_ID}
     <update_bypassed>Y</update_bypassed>
     <lookup>
       <schema/>
-      <table>BIO_DATA_DISEASE</table>
+      <table>bio_data_disease</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_DATA_ID</field>
@@ -1556,7 +1556,7 @@ where etl_id = ${ETL_ID}
     <update_bypassed>Y</update_bypassed>
     <lookup>
       <schema/>
-      <table>BIO_DATA_OBSERVATION</table>
+      <table>bio_data_observation</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_DATA_ID</field>
@@ -1608,7 +1608,7 @@ where etl_id = ${ETL_ID}
     <update_bypassed>Y</update_bypassed>
     <lookup>
       <schema/>
-      <table>BIO_DATA_PLATFORM</table>
+      <table>bio_data_platform</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_DATA_ID</field>
@@ -1660,7 +1660,7 @@ where etl_id = ${ETL_ID}
     <update_bypassed>Y</update_bypassed>
     <lookup>
       <schema/>
-      <table>BIO_DATA_PLATFORM</table>
+      <table>bio_data_platform</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <field>BIO_DATA_ID</field>
@@ -1712,7 +1712,7 @@ where etl_id = ${ETL_ID}
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_ANALYSIS_EXT</table>
+      <table>bio_assay_analysis_ext</table>
       <key>
         <name>BIO_ASSAY_ANALYSIS_EXT_ID</name>
         <field>BIO_ASSAY_ANALYSIS_EXT_ID</field>
@@ -1824,7 +1824,7 @@ where etl_id = ${ETL_ID}
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_ANALYSIS</table>
+      <table>bio_assay_analysis</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
@@ -1877,7 +1877,7 @@ where etl_id = ${ETL_ID}
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_PLATFORM</table>
+      <table>bio_assay_platform</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
@@ -1924,7 +1924,7 @@ where etl_id = ${ETL_ID}
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_ANALYSIS_EXT</table>
+      <table>bio_assay_analysis_ext</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
@@ -1965,7 +1965,7 @@ where etl_id = ${ETL_ID}
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_EXPERIMENT</table>
+      <table>bio_experiment</table>
       <orderby/>
       <fail_on_multiple>Y</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
@@ -2006,7 +2006,7 @@ where etl_id = ${ETL_ID}
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_DISEASE</table>
+      <table>bio_disease</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
@@ -2047,7 +2047,7 @@ where etl_id = ${ETL_ID}
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_ASSAY_PLATFORM</table>
+      <table>bio_assay_platform</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
@@ -2094,7 +2094,7 @@ where etl_id = ${ETL_ID}
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>BIO_OBSERVATION</table>
+      <table>bio_observation</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
