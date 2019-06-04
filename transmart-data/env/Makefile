@@ -12,7 +12,8 @@ UBUNTU14_PACKAGES=php5-cli php5-json openjdk-7-jdk
 UBUNTU16_PACKAGES=php7.0-cli php7.0-json
 UBUNTU18_PACKAGES=php7.2-cli php7.2-json
 
-GROOVY_VERSION=2.1.9
+# Latest version of groovy-binary
+GROOVY_VERSION=2.4.3
 
 ONDREJ_KEY=E5267A6C
 
@@ -118,24 +119,25 @@ update_repos = if [ ! -d $(1) ]; then \
 	git clone -b $(3) '$(2)' $(1); \
 	else cd $(1) && git pull; fi
 
-# Note: in the release case - we are making a strong assumption that tranSMART-ETL
+# Note: in the release case - we are making a strong assumption that transmart-etl
 #   already exists, is NOT a git archive, and can not be updated
 update_etl:
-	echo "for release build tranSMART-ETL is not automatically updated from git, because it is assumed to be already loaded from a zip file"
+	echo "for release build transmart-etl is not automatically updated from git, because it is assumed to be already loaded from a zip file"
 
 update_etl_git:
-	$(call update_repos,tranSMART-ETL,https://github.com/tranSMART-Foundation/tranSMART-ETL.git,$(TRANSMART_RELEASE_BRANCH))
+	curl -L -f "http://library.transmartfoundation.org/beta/beta16_4_0_artifacts/transmart-etl-release-16.4.zip" > transmart-etl-release-16.4.zip
+	unzip -u transmart-etl-release-16.4.zip
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 
 KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip 
 $(KETTLE_ARCHIVE):
 	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
-KETTLE_ORACLE_DRIVER=data-integration/lib/$(JDBC_DRIVER_ORA)
+KETTLE_ORACLE_DRIVER=data-integration/libext/JDBC/$(JDBC_DRIVER_ORA)
 $(KETTLE_ORACLE_DRIVER): $(JDBC_DRIVER_ORA_PATH) data-integration/.keep
 	cp --reflink=auto "$<" "$@"
 
-data-integration-oracle: data-integration/.keep $(KETTLE_ORACLE_DRIVER)
+data-integration-oracle: data-integration-oracle/.keep $(KETTLE_ORACLE_DRIVER)
 .PHONY: data-integration-oracle
 data-integration-oracle/.keep: $(KETTLE_ARCHIVE)
 	unzip $<
@@ -149,7 +151,7 @@ data-integration/.keep: $(KETTLE_ARCHIVE)
 
 /var/lib/postgresql/tablespaces:
 
-	/bin/bash -c 'mkdir -p $@/{indx,transmart}'
+	/bin/bash -c 'mkdir -p $@/{indx,transmart,i2b2,i2b2_index}'
 	chown -R postgres:postgres $@
 
 ../vars: vars-ubuntu.php
@@ -163,7 +165,7 @@ ubuntu_deps_root16: install_ubuntu_packages install_ubuntu_packages16 /var/lib/p
 
 ubuntu_deps_root18: install_ubuntu_packages install_ubuntu_packages18 /var/lib/postgresql/tablespaces
 
-# Note: in the release case - we are making a strong assumption that tranSMART-ETL
+# Note: in the release case - we are making a strong assumption that transmart-etlx
 #   already exists, is NOT a git archive, and can not be updated
 # ubuntu_deps_regular: update_etl data-integration ../vars groovy
 ubuntu_deps_regular: data-integration ../vars groovy
