@@ -11,7 +11,7 @@ if (length(new.packages)) {
 }
 
 if (length(intersect(new.packages, c("Rserve")))) {
-	install.packages'"Rserve',,'http://www.rforge.net/')
+	install.packages('Rserve',,'http://www.rforge.net/')
 }
 
 if (length(missing.packages(required.packages))) {
