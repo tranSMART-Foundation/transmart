@@ -34,66 +34,64 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class PlinkFamGenerator {
 
-	Map patientMap, samples
-	File plinkFamFile
-	String outputDirectory, studyName
+    Map patientMap, samples
+    File plinkFamFile
+    String outputDirectory, studyName
 
-	/**
-	 * create .fam for PLINK to use
-	 */
-	void createPlinkFamFile(){
+    /**
+     * create .fam for PLINK to use
+     */
+    void createPlinkFamFile(){
 
-		//Util.printMap(patientMap)
-		//Util.printMap(samples)
-		
-		plinkFamFile = getPlinkFamFile()
-		if(plinkFamFile.size() > 0) {
-			logger.info("Delete and re-create " + plinkFamFile.toString())
-			plinkFamFile.delete()
-			plinkFamFile.createNewFile()
-		}
+	//Util.printMap(patientMap)
+	//Util.printMap(samples)
 
-		logger.info "Start creating .fam file: " + plinkFamFile.toString()
-
-		if(isPatientUnique()){
-			samples.each{key, val ->
-				//plinkFamFile.append(key + "\t" + patientMap[key] + "\t0\t0\t0\t-9\n")
-				plinkFamFile.append(patientMap[key] + "\t" + patientMap[key] + "\t0\t0\t0\t-9\n")
-			}
-		}else{
-			logger.error("Duplicated Patient id fount")
-		}
-		logger.info "End creating .fam file: " + plinkFamFile.toString()
+	plinkFamFile = getPlinkFamFile()
+	if(plinkFamFile.size() > 0) {
+	    logger.info("Delete and re-create " + plinkFamFile.toString())
+	    plinkFamFile.delete()
+	    plinkFamFile.createNewFile()
 	}
 
+	logger.info "Start creating .fam file: " + plinkFamFile.toString()
 
-	// TODO: patient uniqueness checking here
-	boolean isPatientUnique(){
-		return true
+	if(isPatientUnique()){
+	    samples.each{key, val ->
+		//plinkFamFile.append(key + "\t" + patientMap[key] + "\t0\t0\t0\t-9\n")
+		plinkFamFile.append(patientMap[key] + "\t" + patientMap[key] + "\t0\t0\t0\t-9\n")
+	    }
+	}else{
+	    logger.error("Duplicated Patient id fount")
 	}
+	logger.info "End creating .fam file: " + plinkFamFile.toString()
+    }
 
-	File getPlinkFamFile(){
-		return new File(outputDirectory + File.separator + studyName + ".fam")
-	}
+    // TODO: patient uniqueness checking here
+    boolean isPatientUnique(){
+	return true
+    }
 
-	void setStudyName(String studyName){
-		this.studyName = studyName
-	}
+    File getPlinkFamFile(){
+	return new File(outputDirectory + File.separator + studyName + ".fam")
+    }
 
-	void setOutputDirectory(String outputDirectory){
-		this.outputDirectory = outputDirectory
-	}
+    void setStudyName(String studyName){
+	this.studyName = studyName
+    }
 
-	void setPlinkFamFile(File plinkFamFile){
-		this.plinkFamFile = plinkFamFile
-	}
+    void setOutputDirectory(String outputDirectory){
+	this.outputDirectory = outputDirectory
+    }
 
-	void setPateitMap(Map patientMap){
-		this.pateitMap = patientMap
-	}
+    void setPlinkFamFile(File plinkFamFile){
+	this.plinkFamFile = plinkFamFile
+    }
 
-	
-	void setSamples(Map samples){
-		this.samples = samples
-	}
+    void setPateitMap(Map patientMap){
+	this.pateitMap = patientMap
+    }
+
+    void setSamples(Map samples){
+	this.samples = samples
+    }
 }

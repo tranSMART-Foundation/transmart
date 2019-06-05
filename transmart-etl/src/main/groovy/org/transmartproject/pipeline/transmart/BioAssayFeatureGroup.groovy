@@ -34,27 +34,26 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioAssayFeatureGroup {
 
-	Sql biomart
-	String testsDataTable
+    Sql biomart
+    String testsDataTable
 
-	void loadBioAssayFeatureGroup(){
-		logger.info "Start loading new probes into BIO_ASSAY_FEATURE_GROUP ..."
-		String qry = """ insert into bio_assay_feature_group(feature_group_name, feature_group_type)
+    void loadBioAssayFeatureGroup(){
+	logger.info "Start loading new probes into BIO_ASSAY_FEATURE_GROUP ..."
+	String qry = """ insert into bio_assay_feature_group(feature_group_name, feature_group_type)
                          select probeset, 'PROBESET' from ${testsDataTable} 
                          minus
-					     select to_char(feature_group_name), to_char(feature_group_type) 
-						 from bio_assay_feature_group """
+			 select to_char(feature_group_name), to_char(feature_group_type) 
+			 from bio_assay_feature_group """
 
-		biomart.execute(qry)
-		logger.info "End loading new probes into BIO_ASSAY_FEATURE_GROUP ..."
-	}
+	biomart.execute(qry)
+	logger.info "End loading new probes into BIO_ASSAY_FEATURE_GROUP ..."
+    }
 
+    void setTestsDataTable(String testsDataTable){
+	this.testsDataTable = testsDataTable
+    }
 
-	void setTestsDataTable(String testsDataTable){
-		this.testsDataTable = testsDataTable
-	}
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

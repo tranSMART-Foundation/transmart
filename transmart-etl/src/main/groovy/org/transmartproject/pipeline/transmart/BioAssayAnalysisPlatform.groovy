@@ -34,49 +34,48 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioAssayAnalysisPlatform {
 
-	Sql biomart
+    Sql biomart
 
-	void loadBioAssayAnalysisPlatform(String analysisPlatformName){
+    void loadBioAssayAnalysisPlatform(String analysisPlatformName){
 
-		if(isBioAssayAnalysisPlatformExist(analysisPlatformName)){
-                    //logger.info "$analysisPlatformName already exists in BIO_ASY_ANALYSIS_PLTFM ..."
-		}else{
-			logger.info "Start loading $analysisPlatformName into BIO_ASY_ANALYSIS_PLTFM ..."
+	if(isBioAssayAnalysisPlatformExist(analysisPlatformName)){
+            //logger.info "$analysisPlatformName already exists in BIO_ASY_ANALYSIS_PLTFM ..."
+	}else{
+	    logger.info "Start loading $analysisPlatformName into BIO_ASY_ANALYSIS_PLTFM ..."
 
-			String qry = """ insert into bio_asy_analysis_pltfm(platform_name) values(?) """
-			biomart.execute(qry, [analysisPlatformName])
+	    String qry = """ insert into bio_asy_analysis_pltfm(platform_name) values(?) """
+	    biomart.execute(qry, [analysisPlatformName])
 
-			logger.info "End loading $analysisPlatformName into BIO_ASY_ANALYSIS_PLTFM ..."
-		}
+	    logger.info "End loading $analysisPlatformName into BIO_ASY_ANALYSIS_PLTFM ..."
 	}
+    }
 
-
-	boolean isBioAssayAnalysisPlatformExist(String analysisPlatformName){
-		String qry = "select count(1) from bio_asy_analysis_pltfm where platform_name in (?,?)"
-		if(biomart.firstRow(qry, [
-                        analysisPlatformName,
-			analysisPlatformName.toUpperCase()
-		])[0] > 0){
-			return true
-		}else{
-			return false
-		}
+    boolean isBioAssayAnalysisPlatformExist(String analysisPlatformName){
+	String qry = "select count(1) from bio_asy_analysis_pltfm where platform_name in (?,?)"
+	if(biomart.firstRow(qry, [
+            analysisPlatformName,
+	    analysisPlatformName.toUpperCase()
+	])[0] > 0){
+	    return true
+	}else{
+	    return false
 	}
+    }
 
-	long getBioAssayAnalysisPlatformId(String analysisPlatformName){
-		String qry = "select bio_asy_analysis_pltfm_id from bio_asy_analysis_pltfm where platform_name in (?,?)"
-		def rs = biomart.firstRow(qry, [
-                        analysisPlatformName,
-			analysisPlatformName.toUpperCase()
-		])
-		if(rs.equals(null)){
-			return 0
-		}else{
-			return rs[0]
-		}
+    long getBioAssayAnalysisPlatformId(String analysisPlatformName){
+	String qry = "select bio_asy_analysis_pltfm_id from bio_asy_analysis_pltfm where platform_name in (?,?)"
+	def rs = biomart.firstRow(qry, [
+            analysisPlatformName,
+	    analysisPlatformName.toUpperCase()
+	])
+	if(rs.equals(null)){
+	    return 0
+	}else{
+	    return rs[0]
 	}
+    }
 
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

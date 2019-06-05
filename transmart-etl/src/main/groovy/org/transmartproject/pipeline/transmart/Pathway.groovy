@@ -52,11 +52,11 @@ class Pathway {
         logger.info "Start loading ${source} pathway data into DE_PATHWAY..."
 
         qry1 = """ select t1.descr, t1.pathway
-			      from biomart_user.${pathwayTable} t1
-			  """
+		   from biomart_user.${pathwayTable} t1
+	       """
         qry2 = """ select count(*) from de_pathway where source=? and name=? and externalid=? """
         qry3 = """ insert into de_pathway(name, description, source, externalid, pathway_uid) values(?,?,?,?,?)"""
-                
+
         deapp.withTransaction {
             deapp.withBatch(1000, qry3, { ps ->
                 biomartuser.eachRow(qry1)
@@ -73,128 +73,118 @@ class Pathway {
                 }
             })
         }
-        
+
         logger.info "End loading ${source} pathway data into DE_PATHWAY ..."
     }
 
-
     void loadPathway(File pathwayDefinition){
+        String qry;
+        String qry1;
+        String qry2;
 
-            String qry;
-            String qry1;
-            String qry2;
+        qry = "insert into de_pathway(name, description, source, externalid, pathway_uid) values(?, ?, ?, ?, ?)"
+        qry1 = """ delete from de_pathway_gene 
+		   where pathway_id in (select id from de_pathway where source=?) """
+        qry2 = """ delete from de_pathway where source=? """
 
-            qry = "insert into de_pathway(name, description, source, externalid, pathway_uid) values(?, ?, ?, ?, ?)"
-            qry1 = """ delete from de_pathway_gene 
-					where pathway_id in (select id from de_pathway where source=?) """
-            qry2 = """ delete from de_pathway where source=? """
+	if(pathwayDefinition.exists()){
 
-		if(pathwayDefinition.exists()){
+	    if(isPathwaySourceExist()){
+		logger.warn("Pathway from $source already loaded into de_pathway and will be deleted before loading ...")
 
-			if(isPathwaySourceExist()){
-				logger.warn("Pathway from $source already loaded into de_pathway and will be deleted before loading ...")
+		logger.info("Start deleting data for ${source} in DE_PATHWAY and DE_PATHWAY_GENE ...")
 
-				logger.info("Start deleting data for ${source} in DE_PATHWAY and DE_PATHWAY_GENE ...")
+		deapp.execute(qry1, [source])
 
-				deapp.execute(qry1, [source])
+		deapp.execute(qry2, [source])
+	    }
 
-				deapp.execute(qry2, [source])
-			}
-
-			logger.info("Start loading " + pathwayDefinition.toString() + " into de_pathway")
-			deapp.withTransaction {
-                        	deapp.withBatch(1000, qry, { ps ->
-					pathwayDefinition.eachLine{
-						String [] str = it.split("\t")
-						ps.addBatch([
-							str[1],
-							str[1],
-							source,
-							str[0],
-							"PATHWAY:" + str[0]
-						])
-					}
-				})
-			}
-		}else{
-			throw new RuntimeException("Cannot find file: " + pathwayDefinition.toString())
-		}
+	    logger.info("Start loading " + pathwayDefinition.toString() + " into de_pathway")
+	    deapp.withTransaction {
+                deapp.withBatch(1000, qry, { ps ->
+		    pathwayDefinition.eachLine{
+			String [] str = it.split("\t")
+			ps.addBatch([
+			    str[1],
+			    str[1],
+			    source,
+			    str[0],
+			    "PATHWAY:" + str[0]
+			])
+		    }
+		})
+	    }
+	}else{
+	    throw new RuntimeException("Cannot find file: " + pathwayDefinition.toString())
 	}
-
+    }
 
     void loadPathwayDefinition(File pathwayDef){
 
-		String [] str = []
-		Map rec = [:]
-		if(pathwayDef.exists()){
-			pathwayDef.eachLine{
-				str = it.split("\t")
-				insertPathway(str[0], str[1])
-			}
-		}else{
-			logger.error("Cannot find Pathway Definition file: " + pathwayDef.toString())
-			throw new RuntimeException("Cannot find Pathway Definition file: " + pathwayDef.toString())
-		}
+	String [] str = []
+	Map rec = [:]
+	if(pathwayDef.exists()){
+	    pathwayDef.eachLine{
+		str = it.split("\t")
+		insertPathway(str[0], str[1])
+	    }
+	}else{
+	    logger.error("Cannot find Pathway Definition file: " + pathwayDef.toString())
+	    throw new RuntimeException("Cannot find Pathway Definition file: " + pathwayDef.toString())
 	}
+    }
 
+    boolean isPathwaySourceExist(){
+        String qry = "select count(1) from de_pathway where source =?"
 
-
-	boolean isPathwaySourceExist(){
-            String qry = "select count(1) from de_pathway where source =?"
-    
-		if(deapp.firstRow(qry, [source])[0] > 0) return true
-		else return false
-	}
-
+	if(deapp.firstRow(qry, [source])[0] > 0) return true
+	else return false
+    }
 
     boolean isPathwayExist(String pathwayId){
-            String qry = "select count(1) from de_pathway where pathway_uid =?"
+        String qry = "select count(1) from de_pathway where pathway_uid =?"
 
-            if(deapp.firstRow(qry, [
-                                  "PATHWAY:" + source + ":" + pathwayId
-                              ])[0] > 0) return true
-            else return false
-	}
-
+        if(deapp.firstRow(qry, [
+            "PATHWAY:" + source + ":" + pathwayId
+        ])[0] > 0) return true
+        else return false
+    }
 
     void insertPathway(String pathwayId, String pathwayName){
-            String qry = "insert into de_pathway(name, description, source, externalid, pathway_uid) values(?,?,?,?,?)"
+        String qry = "insert into de_pathway(name, description, source, externalid, pathway_uid) values(?,?,?,?,?)"
             
-            if(isPathwayExist(pathwayId)){
-                //logger.info "Pathway \"$pathwayId - $pathwayName\" already exists ..."
-		} else {
-			logger.info "Loading the pathway \"$pathwayId - $pathwayName\" source '${source}' ..."
-			deapp.execute(qry, [
-				pathwayName,
-				pathwayName,
-				source,
-				pathwayId,
-				"PATHWAY:" + source + ":" + pathwayId
-			])
-		}
+        if(isPathwayExist(pathwayId)){
+            //logger.info "Pathway \"$pathwayId - $pathwayName\" already exists ..."
+	} else {
+	    logger.info "Loading the pathway \"$pathwayId - $pathwayName\" source '${source}' ..."
+	    deapp.execute(qry, [
+		pathwayName,
+		pathwayName,
+		source,
+		pathwayId,
+		"PATHWAY:" + source + ":" + pathwayId
+	    ])
 	}
+    }
 
+    Map getPathwayId(){
+        Map pathway = [:]
+        String qry = "select id, externalid from de_pathway where source=?"
 
-	Map getPathwayId(){
-            Map pathway = [:]
-            String qry = "select id, externalid from de_pathway where source=?"
+        deapp.eachRow(qry,[source]) {
+            pathway[it.externalId] = it.id
+        }
+    }
 
-            deapp.eachRow(qry,[source]) {
-                pathway[it.externalId] = it.id
-            }
-	}
+    void setSource(String source){
+	this.source = source
+    }
 
+    void setDeapp(Sql deapp){
+	this.deapp = deapp
+    }
 
-	void setSource(String source){
-		this.source = source
-	}
-
-
-	void setDeapp(Sql deapp){
-		this.deapp = deapp
-	}
-
-	void setBiomartuser(Sql biomartuser){
-		this.biomartuser = biomartuser
-	}
+    void setBiomartuser(Sql biomartuser){
+	this.biomartuser = biomartuser
+    }
 }

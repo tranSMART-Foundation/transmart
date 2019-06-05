@@ -34,74 +34,69 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioAssayAnalysis {
 
-	Sql biomart
-	long bioAssayAnalysisPlatformId
+    Sql biomart
+    long bioAssayAnalysisPlatformId
 
-	/**
-	 * Insert a single analysis into BIO_ASSAY_ANALYSIS table
-	 * 
-	 * @param analysisName
-	 * @param gseName
-	 */
-	void loadBioAssayAnalysis(String analysisName, String studyName){
+    /**
+     * Insert a single analysis into BIO_ASSAY_ANALYSIS table
+     * 
+     * @param analysisName
+     * @param gseName
+     */
+    void loadBioAssayAnalysis(String analysisName, String studyName){
 
-		String qry = """ INSERT INTO BIO_ASSAY_ANALYSIS (ANALYSIS_NAME, QA_CRITERIA, 
-								BIO_ASY_ANALYSIS_PLTFM_ID, SHORT_DESCRIPTION, LONG_DESCRIPTION, 
-								ANALYSIS_METHOD_CD, BIO_ASSAY_DATA_TYPE, ETL_ID, ANALYSIS_CREATE_DATE) 
-						 VALUES(?, ?, ?, ?, ?, 'comparison', 'Gene Expression', ?, sysdate) """
+	String qry = """ INSERT INTO BIO_ASSAY_ANALYSIS (ANALYSIS_NAME, QA_CRITERIA, 
+							 BIO_ASY_ANALYSIS_PLTFM_ID, SHORT_DESCRIPTION, LONG_DESCRIPTION, 
+							 ANALYSIS_METHOD_CD, BIO_ASSAY_DATA_TYPE, ETL_ID, ANALYSIS_CREATE_DATE) 
+				VALUES(?, ?, ?, ?, ?, 'comparison', 'Gene Expression', ?, sysdate) """
 
-		if(isBioAssayAnalysisExist(analysisName, studyName)){
-                    //logger.info "$analysisName($studyName) already exists in BIO_ASSAY_ANALYSIS ..."
-		}else{
-			logger.info "Start inserting $analysisName($studyName) into BIO_ASSAY_ANALYSIS ..."
+	if(isBioAssayAnalysisExist(analysisName, studyName)){
+            //logger.info "$analysisName($studyName) already exists in BIO_ASSAY_ANALYSIS ..."
+	}else{
+	    logger.info "Start inserting $analysisName($studyName) into BIO_ASSAY_ANALYSIS ..."
 
-			biomart.execute(qry, [
-				analysisName,
-				analysisName,
-				bioAssayAnalysisPlatformId,
-				analysisName,
-				analysisName,
-				studyName
-			])
+	    biomart.execute(qry, [
+		analysisName,
+		analysisName,
+		bioAssayAnalysisPlatformId,
+		analysisName,
+		analysisName,
+		studyName
+	    ])
 
-			logger.info "End inserting $analysisName($studyName) into BIO_ASY_ANALYSIS_PLTFM ..."
-		}
+	    logger.info "End inserting $analysisName($studyName) into BIO_ASY_ANALYSIS_PLTFM ..."
 	}
-
+    }
 	
-	void updateTeaDataCount(long bioAssayAnalysisId, int teaDataCount){
-		String qry = " update bio_assay_analysis set tea_data_count=? where bio_assay_analysis_id=? "
-		biomart.execute(qry, [teaDataCount, bioAssayAnalysisId])
-	}
-
+    void updateTeaDataCount(long bioAssayAnalysisId, int teaDataCount){
+	String qry = " update bio_assay_analysis set tea_data_count=? where bio_assay_analysis_id=? "
+	biomart.execute(qry, [teaDataCount, bioAssayAnalysisId])
+    }
 	
-	void updateDataCount(long bioAssayAnalysisId, int dataCount){
-		String qry = "update bio_assay_analysis set data_count=? where bio_assay_analysis_id=?"
-		biomart.execute(qry, [dataCount, bioAssayAnalysisId])
-	}
-
+    void updateDataCount(long bioAssayAnalysisId, int dataCount){
+	String qry = "update bio_assay_analysis set data_count=? where bio_assay_analysis_id=?"
+	biomart.execute(qry, [dataCount, bioAssayAnalysisId])
+    }
 	
-	boolean isBioAssayAnalysisExist(String analysisName, String studyName){
+    boolean isBioAssayAnalysisExist(String analysisName, String studyName){
 
-		String qry = """ select count(1) from bio_assay_analysis 
+	String qry = """ select count(1) from bio_assay_analysis 
                          where analysis_name=? and etl_id=? """
-		if(biomart.firstRow(qry, [
-			analysisName,
-			studyName
-		])[0] > 0){
-			return true
-		}else{
-			return false
-		}
+	if(biomart.firstRow(qry, [
+	    analysisName,
+	    studyName
+	])[0] > 0){
+	    return true
+	}else{
+	    return false
 	}
-	
+    }
 
-	void setBioAssayAnalysisPlatformId(long bioAssayAnalysisPlatformId){
-		this.bioAssayAnalysisPlatformId = bioAssayAnalysisPlatformId
-	}
-	
+    void setBioAssayAnalysisPlatformId(long bioAssayAnalysisPlatformId){
+	this.bioAssayAnalysisPlatformId = bioAssayAnalysisPlatformId
+    }
 
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

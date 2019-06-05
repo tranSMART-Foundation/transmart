@@ -64,5 +64,4 @@ class BioMarkerEntry {
     public String setDescription(String value) {
         description = value.take(1000)
     }
-
 }

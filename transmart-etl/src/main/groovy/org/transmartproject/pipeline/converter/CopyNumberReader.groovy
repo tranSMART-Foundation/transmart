@@ -32,25 +32,24 @@ import groovy.util.logging.Slf4j
 
 @Slf4j('logger')class CopyNumberReader {
 
-	File copyNumberFile
+    File copyNumberFile
 	
-	Map copyNumberReader(String chr){
+    Map copyNumberReader(String chr){
 		
-		logger.info "Start reading Copy Number file: " + copyNumberFile.toString()
+	logger.info "Start reading Copy Number file: " + copyNumberFile.toString()
 		
-		Map cnMap = [:]
-		copyNumberFile.eachLine{
-			String [] str = it.split("\t")
-			cnMap[str[0] + ":" + str[1]] = str[4]
-		}
-		
-		logger.info "End reading Copy Number file: " + copyNumberFile.toString()
-		
-		return cnMap
+	Map cnMap = [:]
+	copyNumberFile.eachLine{
+	    String [] str = it.split("\t")
+	    cnMap[str[0] + ":" + str[1]] = str[4]
 	}
+		
+	logger.info "End reading Copy Number file: " + copyNumberFile.toString()
+		
+	return cnMap
+    }
 	
-	
-	void setCopyNumberFile(copyNumberFile){
-		this.copyNumberFile = copyNumberFile
-	}
+    void setCopyNumberFile(copyNumberFile){
+	this.copyNumberFile = copyNumberFile
+    }
 }

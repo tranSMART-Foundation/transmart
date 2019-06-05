@@ -34,40 +34,38 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioCompound {
 
-	Sql biomart
+    Sql biomart
 
-	void loadBioCompound(String codeName, String casRegistry){
+    void loadBioCompound(String codeName, String casRegistry){
 
-		if(isBioCompoundExist(codeName, casRegistry)){
-                    //logger.info "($codeName, $casRegistry) already exists in BIO_COMPOUND ..."
-		}else{
-			logger.info "Start loading ($codeName, $casRegistry) into BIO_COMPOUND ..."
+	if(isBioCompoundExist(codeName, casRegistry)){
+            //logger.info "($codeName, $casRegistry) already exists in BIO_COMPOUND ..."
+	}else{
+	    logger.info "Start loading ($codeName, $casRegistry) into BIO_COMPOUND ..."
 
-			String qry = """ insert into bio_compound(codeName, casRegistry) values(?, ?) """
-			biomart.execute(qry, [
-				codeName,
-				casRegistry
-			])
+	    String qry = """ insert into bio_compound(codeName, casRegistry) values(?, ?) """
+	    biomart.execute(qry, [
+		codeName,
+		casRegistry
+	    ])
 
-			logger.info "End loading ($codeName, $casRegistry) into BIO_COMPOUND ..."
-		}
+	    logger.info "End loading ($codeName, $casRegistry) into BIO_COMPOUND ..."
 	}
+    }
 
-
-	boolean isBioCompoundExist(String coeName, String casRegistry){
-		String qry = "select count(1) from bio_compound where code_name=? and cas_registry=?"
-		if(biomart.firstRow(qry, [
-			coeName,
-			casRegistry
-		])[0] > 0){
-			return true
-		}else{
-			return false
-		}
+    boolean isBioCompoundExist(String coeName, String casRegistry){
+	String qry = "select count(1) from bio_compound where code_name=? and cas_registry=?"
+	if(biomart.firstRow(qry, [
+	    coeName,
+	    casRegistry
+	])[0] > 0){
+	    return true
+	}else{
+	    return false
 	}
+    }
 
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

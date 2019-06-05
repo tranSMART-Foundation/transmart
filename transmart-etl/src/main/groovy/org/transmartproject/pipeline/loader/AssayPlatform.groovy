@@ -41,70 +41,66 @@ import org.transmartproject.pipeline.transmart.BioObservation
 @Slf4j('logger')
 class AssayPlatform {
 
-	static main(args) {
+    static main(args) {
 
-//		PropertyConfigurator.configure("conf/log4j.properties");
-		
-		logger.info("Start loading property file AssayPlatform.properties ...")
-		Properties props = Util.loadConfiguration("conf/AssayPlatform.properties");
+//	PropertyConfigurator.configure("conf/log4j.properties");
 
-		Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
+	logger.info("Start loading property file AssayPlatform.properties ...")
+	Properties props = Util.loadConfiguration("conf/AssayPlatform.properties");
 
-		AssayPlatform ap = new AssayPlatform()
-		
-		ArrayList platform = new ArrayList()
-		platform = ap.readBioAssayPlatform(props)
-		
-		BioAssayPlatform bap = ap.getBioAssayPlatform(biomart)
-		ap.loadBioAssayPlatform(biomart,  platform, bap)
+	Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
+
+	AssayPlatform ap = new AssayPlatform()
+
+	ArrayList platform = new ArrayList()
+	platform = ap.readBioAssayPlatform(props)
+
+	BioAssayPlatform bap = ap.getBioAssayPlatform(biomart)
+	ap.loadBioAssayPlatform(biomart,  platform, bap)
+    }
+
+    void loadBioAssayPlatform(Sql sql, ArrayList platform, BioAssayPlatform bap){
+	for(int i=0; i<platform.size(); i++){
+	    println platform[i]
+	    bap.loadBioAssayPlatform2(platform[i])
 	}
+    }
 
-	
-	void loadBioAssayPlatform(Sql sql, ArrayList platform, BioAssayPlatform bap){
-		
-		for(int i=0; i<platform.size(); i++){
-			println platform[i]
-			bap.loadBioAssayPlatform2(platform[i])
-		}
-	}
+    ArrayList readBioAssayPlatform(Properties props){
 
+	ArrayList alPlatform = new ArrayList()
 
-	ArrayList readBioAssayPlatform(Properties props){
+	Map columnMap = [:]
+	Map platform = [:]
 
-		ArrayList alPlatform = new ArrayList()
-
-		Map columnMap = [:]
-		Map platform = [:]
-
-		File f = new File(props.get("platform_source_file"))
-		if(f.size() > 0){
-			f.eachLine{
-				String [] str = it.split(",")
-				if(it.toUpperCase().indexOf("BIO_ASSAY_PLATFORM") != -1){
-					println it
-					for(int i=0; i<str.size(); i++){
-						columnMap[i] = str[i].trim().toLowerCase()
-					}
-				} else{
-					println it
-					for(int i=0; i<str.size(); i++){
-						platform[columnMap[i]] = str[i].trim()
-					}
-					alPlatform.add(platform)
-					platform = [:]
-				}
-			}
+	File f = new File(props.get("platform_source_file"))
+	if(f.size() > 0){
+	    f.eachLine{
+		String [] str = it.split(",")
+		if(it.toUpperCase().indexOf("BIO_ASSAY_PLATFORM") != -1){
+		    println it
+		    for(int i=0; i<str.size(); i++){
+			columnMap[i] = str[i].trim().toLowerCase()
+		    }
 		} else{
-			logger.info "the file: ${f.toString()} is empty or not exist ..."
+		    println it
+		    for(int i=0; i<str.size(); i++){
+			platform[columnMap[i]] = str[i].trim()
+		    }
+		    alPlatform.add(platform)
+		    platform = [:]
 		}
+	    }
+	} else{
+	    logger.info "the file: ${f.toString()} is empty or not exist ..."
+	}
 
-		return alPlatform
-	}
-	
-	
-	BioAssayPlatform getBioAssayPlatform(Sql biomart){
-		BioAssayPlatform bap = new BioAssayPlatform()
-		bap.setBiomart(biomart)
-		return bap
-	}
+	return alPlatform
+    }
+
+    BioAssayPlatform getBioAssayPlatform(Sql biomart){
+	BioAssayPlatform bap = new BioAssayPlatform()
+	bap.setBiomart(biomart)
+	return bap
+    }
 }

@@ -43,248 +43,231 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class Ingenuity {
 
-	static main(args) {
+    static main(args) {
 
-//		PropertyConfigurator.configure("conf/log4j.properties");
+//	PropertyConfigurator.configure("conf/log4j.properties");
 
-		logger.info("Start loading property file loader.properties ...")
-		Properties props = Util.loadConfiguration("conf/loader.properties");
+	logger.info("Start loading property file loader.properties ...")
+	Properties props = Util.loadConfiguration("conf/loader.properties");
 
-		Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
-		Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
-		Sql searchapp = Util.createSqlFromPropertyFile(props, "searchapp")
+	Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
+	Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
+	Sql searchapp = Util.createSqlFromPropertyFile(props, "searchapp")
 
-		Ingenuity ingenuity = new Ingenuity()
+	Ingenuity ingenuity = new Ingenuity()
 
-		File input = new File(props.get("ingenuity_source"))
-		File ipaDef = new File(input.getParent() + "/IngenuityDef.tsv")
-		File ipaData = new File(input.getParent() + "/IngenuityData.tsv")
-		File ipaDataReject = new File(input.getParent() + "/IngenuityDataReject.tsv")
+	File input = new File(props.get("ingenuity_source"))
+	File ipaDef = new File(input.getParent() + "/IngenuityDef.tsv")
+	File ipaData = new File(input.getParent() + "/IngenuityData.tsv")
+	File ipaDataReject = new File(input.getParent() + "/IngenuityDataReject.tsv")
 
-		// 9606 -- Homo sapiens
-		Map entrez = ingenuity.getGeneId(biomart, "9606")
-		ingenuity.readIngenuity(input, ipaDef, ipaData, ipaDataReject, entrez)
-		ingenuity.loadIngenuity(biomart, ipaData, props.get("pathway_data_table"), "Homo sapiens")
+	// 9606 -- Homo sapiens
+	Map entrez = ingenuity.getGeneId(biomart, "9606")
+	ingenuity.readIngenuity(input, ipaDef, ipaData, ipaDataReject, entrez)
+	ingenuity.loadIngenuity(biomart, ipaData, props.get("pathway_data_table"), "Homo sapiens")
 
+	// populate DE_PATHWAY
+	if(props.get("skip_de_pathway").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading Ingenuity pathway into DE_PATHWAY ..."
+	}else{
+	    Pathway p = new Pathway()
+	    p.setSource("Ingenuity")
+	    p.setDeapp(deapp)
+	    p.loadPathway(ipaDef)
+	}
 
-		// populate DE_PATHWAY
-		if(props.get("skip_de_pathway").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading Ingenuity pathway into DE_PATHWAY ..."
+	Map pathwayId = ingenuity.getPathwayId(deapp, "Ingenuity")
+
+	// populate DE_PATHWAY_GENE
+	if(props.get("skip_de_pathway_gene").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading new records into DE_PATHWAY_GENE ..."
+	}else{
+	    PathwayGene pg = new PathwayGene()
+	    pg.setSource("Ingenuity")
+	    pg.setDeapp(deapp)
+
+	    logger.info "Start loading DE_PATHWAY_GENE for Ingenuity ..."
+	    pg.loadPathwayGene(ipaData, pathwayId)
+	}
+
+	// populate BIO_MARKER
+	if(props.get("skip_bio_marker").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading new records into BIO_MARKER ..."
+	}else{
+	    BioMarker bm = new BioMarker()
+	    bm.setBiomart(biomart)
+	    bm.setOrganism("Homo sapiens")
+	    //bm.loadGenes(ipaData)
+	    bm.loadPathways(ipaDef, "Ingenuity")
+	}
+
+	// populate BIO_DATA_CORREL_DESCR
+	BioDataCorrelDescr bdcd = new BioDataCorrelDescr()
+	bdcd.setBiomart(biomart)
+	bdcd.insertBioDataCorrelDescr("PATHWAY GENE", "PATHWAY GENE", "PATHWAY")
+	long bioDataCorrelDescrId = bdcd.getBioDataCorrelId("PATHWAY GENE", "PATHWAY")
+
+	// populate BIO_DATA_CORRELATION
+	if(props.get("skip_bio_data_correlation").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading new records into BIO_DATA_CORRELATION ..."
+	}else{
+	    BioDataCorrelation bdc = new BioDataCorrelation()
+	    bdc.setBiomart(biomart)
+	    bdc.setSource("Ingenuity")
+	    bdc.setBioDataCorrelDescrId(bioDataCorrelDescrId)
+	    bdc.setOrganism("Homo sapiens")
+	    //bdc.loadBioDataCorrelation(ipaData)
+	    bdc.loadBioDataCorrelation(biomart,props.get("pathway_data_table"))
+	}
+
+	// populate SEARCH_KEYWORD
+	if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading new records into SEARCH_KEYWORD ..."
+	}else{
+	    SearchKeyword sk = new SearchKeyword()
+	    sk.setSearchapp(searchapp)
+	    sk.loadPathwaySearchKeyword("Ingenuity")
+	    sk.loadGeneSearchKeyword()
+	    sk.closeGeneSearchKeyword()
+	}
+
+	// populate SEARCH_KEYWORD_TERM
+	if(props.get("skip_search_keyword_term").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading new records into SEARCH_KEYWORD_TERM  ..."
+	}else{
+	    SearchKeywordTerm skt = new SearchKeywordTerm()
+	    skt.setSearchapp(searchapp)
+	    skt.loadSearchKeywordTerm()
+	    skt.closeSearchKeywordTerm()
+	}
+
+        print new Date()
+        println " Ingenuity pathways load completed successfully"
+    }
+
+    void readIngenuity(File input, File ipaDef, File ipaData, File ipaDataReject, Map entrez){
+
+	println "Entrez: " + entrez.size() + "\t" + entrez["207"]
+
+	if(input.size() >0){
+	    logger.info ("Start processing " + input.toString())
+	}else{
+	    throw new RuntimeException(input.toString() + " is empty")
+	}
+
+	StringBuffer sbDef = new StringBuffer()
+	StringBuffer sbData = new StringBuffer()
+	StringBuffer sbReject = new StringBuffer()
+
+	int lineNo = 0
+	Map line = [:]
+	input.eachLine {
+	    if(it.indexOf("ING:") == 0){
+		lineNo++
+		line[lineNo] = it
+	    }else{
+		line[lineNo] += it
+	    }
+	}
+
+	line.each{ k, v ->
+
+	    String [] str =  v.split(/\t/)
+
+	    // extract Ingenuity definition
+	    sbDef.append(str[0] + "\t" + str[1].replace(",", "").trim() + "\n")
+
+	    String [] geneList = str[4].replace("\t", " ").replace('"', '').split(/ +/)
+	    for(int i in 0..geneList.size()-1) {
+		String  geneId =  geneList[i].replace(",", "").trim()
+		if(entrez[geneId].equals(null)){
+		    // if no gene symbol for this gene_id from Entrez, then reject it
+		    sbReject.append(str[0] + "\t" + geneId + "\n")
 		}else{
-			Pathway p = new Pathway()
-			p.setSource("Ingenuity")
-			p.setDeapp(deapp)
-			p.loadPathway(ipaDef)
+		    sbData.append(str[0] + "\t" + geneId + "\t" + entrez[geneId] + "\n")
 		}
+	    }
+	}
 
+	if(ipaDef.size() >0){
+	    ipaDef.delete()
+	    ipaDef.createNewFile()
+	}
+	ipaDef.append(sbDef.toString())
 
-		Map pathwayId = ingenuity.getPathwayId(deapp, "Ingenuity")
+	if(ipaData.size() >0){
+	    ipaData.delete()
+	    ipaData.createNewFile()
+	}
+	ipaData.append(sbData.toString())
 
+	if(ipaDataReject.size() >0){
+	    ipaDataReject.delete()
+	    ipaDataReject.createNewFile()
+	}
+	ipaDataReject.append(sbReject.toString())
+    }
 
-		// populate DE_PATHWAY_GENE
-		if(props.get("skip_de_pathway_gene").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading new records into DE_PATHWAY_GENE ..."
-		}else{
-			PathwayGene pg = new PathwayGene()
-			pg.setSource("Ingenuity")
-			pg.setDeapp(deapp)
-
-			logger.info "Start loading DE_PATHWAY_GENE for Ingenuity ..."
-			pg.loadPathwayGene(ipaData, pathwayId)
-		}
-
+    void loadIngenuity(Sql biomart, File ipaData, String pathwayDataTable, String organism){
 		
-		// populate BIO_MARKER
-		if(props.get("skip_bio_marker").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading new records into BIO_MARKER ..."
-		}else{
-			BioMarker bm = new BioMarker()
-			bm.setBiomart(biomart)
-			bm.setOrganism("Homo sapiens")
-			//bm.loadGenes(ipaData)
-			bm.loadPathways(ipaDef, "Ingenuity")
-		}
+	createPathwayDataTable(biomart, pathwayDataTable)
 
-
-		// populate BIO_DATA_CORREL_DESCR
-		BioDataCorrelDescr bdcd = new BioDataCorrelDescr()
-		bdcd.setBiomart(biomart)
-		bdcd.insertBioDataCorrelDescr("PATHWAY GENE", "PATHWAY GENE", "PATHWAY")
-		long bioDataCorrelDescrId = bdcd.getBioDataCorrelId("PATHWAY GENE", "PATHWAY")
-
-
-		// populate BIO_DATA_CORRELATION
-		if(props.get("skip_bio_data_correlation").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading new records into BIO_DATA_CORRELATION ..."
-		}else{
-			BioDataCorrelation bdc = new BioDataCorrelation()
-			bdc.setBiomart(biomart)
-			bdc.setSource("Ingenuity")
-			bdc.setBioDataCorrelDescrId(bioDataCorrelDescrId)
-			bdc.setOrganism("Homo sapiens")
-			//bdc.loadBioDataCorrelation(ipaData)
-			bdc.loadBioDataCorrelation(biomart,props.get("pathway_data_table"))
-		}
-
-
-		// populate SEARCH_KEYWORD
-		if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading new records into SEARCH_KEYWORD ..."
-		}else{
-			SearchKeyword sk = new SearchKeyword()
-			sk.setSearchapp(searchapp)
-			sk.loadPathwaySearchKeyword("Ingenuity")
-			sk.loadGeneSearchKeyword()
-			sk.closeGeneSearchKeyword()
-		}
-
-		
-		// populate SEARCH_KEYWORD_TERM
-		if(props.get("skip_search_keyword_term").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading new records into SEARCH_KEYWORD_TERM  ..."
-		}else{
-			SearchKeywordTerm skt = new SearchKeywordTerm()
-			skt.setSearchapp(searchapp)
-			skt.loadSearchKeywordTerm()
-			skt.closeSearchKeywordTerm()
-		}
-
-                print new Date()
-                println " Ingenuity pathways load completed successfully"
+	if(ipaData.size() > 0){
+	    logger.info ("Start loading " + ipaData.toString())
+	}else{
+	    throw new RuntimeException(ipaData.toString() + " is empty")
 	}
 
+	String qry = " insert into ${pathwayDataTable}(pathway, gene_id, gene_symbol, organism) values(?, ?, ?, ?)"
 
-	void readIngenuity(File input, File ipaDef, File ipaData, File ipaDataReject, Map entrez){
-
-		println "Entrez: " + entrez.size() + "\t" + entrez["207"]
-
-		if(input.size() >0){
-			logger.info ("Start processing " + input.toString())
-		}else{
-			throw new RuntimeException(input.toString() + " is empty")
+	biomart.withTransaction {
+	    biomart.withBatch(qry, {stmt ->
+		ipaData.eachLine {
+		    String [] str = it.split("\t")
+		    stmt.addBatch([str[0], str[1], str[2], organism])
 		}
+	    }
+	    ) }
+    }
 
-		StringBuffer sbDef = new StringBuffer()
-		StringBuffer sbData = new StringBuffer()
-		StringBuffer sbReject = new StringBuffer()
+    void createPathwayDataTable(Sql biomart, String pathwayDataTable){
 
-		int lineNo = 0
-		Map line = [:]
-		input.eachLine {
-			if(it.indexOf("ING:") == 0){
-				lineNo++
-				line[lineNo] = it
-			}else{
-				line[lineNo] += it
-			}
-		}
+	String qry = """ create table ${pathwayDataTable} (
+				pathway  		varchar2(100),
+				gene_id			varchar2(20),
+				gene_symbol		varchar2(200),
+				organism		varchar2(100)
+			)
+		    """
 
-
-		line.each{ k, v ->
-
-			String [] str =  v.split(/\t/)
-
-			// extract Ingenuity definition
-			sbDef.append(str[0] + "\t" + str[1].replace(",", "").trim() + "\n")
-
-			String [] geneList = str[4].replace("\t", " ").replace('"', '').split(/ +/)
-			for(int i in 0..geneList.size()-1) {
-				String  geneId =  geneList[i].replace(",", "").trim()
-				if(entrez[geneId].equals(null)){
-					// if no gene symbol for this gene_id from Entrez, then reject it
-					sbReject.append(str[0] + "\t" + geneId + "\n")
-				}else{
-					sbData.append(str[0] + "\t" + geneId + "\t" + entrez[geneId] + "\n")
-				}
-			}
-		}
-
-
-		if(ipaDef.size() >0){
-			ipaDef.delete()
-			ipaDef.createNewFile()
-		}
-		ipaDef.append(sbDef.toString())
-
-
-		if(ipaData.size() >0){
-			ipaData.delete()
-			ipaData.createNewFile()
-		}
-		ipaData.append(sbData.toString())
-
-
-		if(ipaDataReject.size() >0){
-			ipaDataReject.delete()
-			ipaDataReject.createNewFile()
-		}
-		ipaDataReject.append(sbReject.toString())
+	String qry1 = "select count(*)  from user_tables where table_name=?"
+	if(biomart.firstRow(qry1, [pathwayDataTable.toUpperCase()])[0] > 0){
+	    qry1 = "drop table ${pathwayDataTable} purge"
+	    biomart.execute(qry1)
 	}
 
+	biomart.execute(qry)
+    }
 
-	void loadIngenuity(Sql biomart, File ipaData, String pathwayDataTable, String organism){
-		
-		createPathwayDataTable(biomart, pathwayDataTable)
+    Map getGeneId(Sql biomart, String taxId){
 
-		if(ipaData.size() > 0){
-			logger.info ("Start loading " + ipaData.toString())
-		}else{
-			throw new RuntimeException(ipaData.toString() + " is empty")
-		}
-
-		String qry = " insert into ${pathwayDataTable}(pathway, gene_id, gene_symbol, organism) values(?, ?, ?, ?)"
-
-		biomart.withTransaction {
-			biomart.withBatch(qry, {stmt ->
-				ipaData.eachLine {
-					String [] str = it.split("\t")
-					stmt.addBatch([str[0], str[1], str[2], organism])
-				}
-			}
-			) }
+	Map geneList = [:]
+	String qry = "select gene_symbol, gene_id from gene_info where tax_id=?"
+	biomart.eachRow(qry, [taxId]) {
+	    String geneId = it.gene_id
+	    String geneSymbol = it.gene_symbol
+	    geneList[geneId] = geneSymbol
 	}
+	return geneList
+    }
 
+    Map getPathwayId(Sql deapp, String source){
 
-	void createPathwayDataTable(Sql biomart, String pathwayDataTable){
-
-		String qry = """ create table ${pathwayDataTable} (
-							pathway  		varchar2(100),
-							gene_id			varchar2(20),
-							gene_symbol		varchar2(200),
-							organism		varchar2(100)
-						 )
-					"""
-
-		String qry1 = "select count(*)  from user_tables where table_name=?"
-		if(biomart.firstRow(qry1, [pathwayDataTable.toUpperCase()])[0] > 0){
-			qry1 = "drop table ${pathwayDataTable} purge"
-			biomart.execute(qry1)
-		}
-
-		biomart.execute(qry)
+	Map pathwayId = [:]
+	String qry = "select externalid, id from de_pathway where source=?"
+	deapp.eachRow(qry, [source]) {
+	    pathwayId[it.externalid] = it.id
 	}
-
-
-	Map getGeneId(Sql biomart, String taxId){
-
-		Map geneList = [:]
-		String qry = "select gene_symbol, gene_id from gene_info where tax_id=?"
-		biomart.eachRow(qry, [taxId]) {
-			String geneId = it.gene_id
-			String geneSymbol = it.gene_symbol
-			geneList[geneId] = geneSymbol
-		}
-		return geneList
-	}
-
-
-	Map getPathwayId(Sql deapp, String source){
-
-		Map pathwayId = [:]
-		String qry = "select externalid, id from de_pathway where source=?"
-		deapp.eachRow(qry, [source]) {
-			pathwayId[it.externalid] = it.id
-		}
-		return pathwayId
-	}
+	return pathwayId
+    }
 }

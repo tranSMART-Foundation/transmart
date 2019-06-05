@@ -36,43 +36,40 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class BioDataCorrelDescr {
 
-	Sql biomart
+    Sql biomart
 
-	void insertBioDataCorrelDescr(String correlation, String description, String type){
+    void insertBioDataCorrelDescr(String correlation, String description, String type){
 
-		String qry = """ insert into bio_data_correl_descr(correlation, description, type_name) values(?, ?, ?) """
+	String qry = """ insert into bio_data_correl_descr(correlation, description, type_name) values(?, ?, ?) """
 
-		if(isBioDataCorrelDescrExist(correlation, type)){
-                    //logger.info "$correlation:$type already exists in BIO_DATA_CORREL_DESCR ..."
-		}else{
-			logger.info "Insert $correlation:$type into BIO_DATA_CORREL_DESCR ..."
-			biomart.execute(qry, [
-				correlation,
-				description,
-				type
-			])
-		}
+	if(isBioDataCorrelDescrExist(correlation, type)){
+            //logger.info "$correlation:$type already exists in BIO_DATA_CORREL_DESCR ..."
+	}else{
+	    logger.info "Insert $correlation:$type into BIO_DATA_CORREL_DESCR ..."
+	    biomart.execute(qry, [
+		correlation,
+		description,
+		type
+	    ])
 	}
+    }
 
-
-	boolean isBioDataCorrelDescrExist(String correlation, String type){
-		String qry = "select count(*) from bio_data_correl_descr where correlation=? and type_name=?"
-		def res = biomart.firstRow(qry, [correlation, type])
-		if(res[0] > 0) return true
-		else return false
-	}
-
+    boolean isBioDataCorrelDescrExist(String correlation, String type){
+	String qry = "select count(*) from bio_data_correl_descr where correlation=? and type_name=?"
+	def res = biomart.firstRow(qry, [correlation, type])
+	if(res[0] > 0) return true
+	else return false
+    }
 	
-	long getBioDataCorrelId(String correlation, String type){
-		String qry = """ select bio_data_correl_descr_id from bio_data_correl_descr 
-					     where correlation=? and type_name=?"""
-		def res = biomart.firstRow(qry, [correlation, type])
-		if(res.equals(null)) return 0
-		else return res[0] 
-	}
+    long getBioDataCorrelId(String correlation, String type){
+	String qry = """ select bio_data_correl_descr_id from bio_data_correl_descr 
+			 where correlation=? and type_name=?"""
+	def res = biomart.firstRow(qry, [correlation, type])
+	if(res.equals(null)) return 0
+	else return res[0] 
+    }
 
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

@@ -66,7 +66,7 @@ class HighDimImport {
 
     protected static void initDB() {
 
-//        PropertyConfigurator.configure("conf/log4j.properties");
+//      PropertyConfigurator.configure("conf/log4j.properties");
 
         logger.info("Start loading property file Common.properties ...")
         Properties props = Util.loadConfiguration("conf/Common.properties");
@@ -96,7 +96,6 @@ class HighDimImport {
             tm_cz.execute("select tm_cz.cz_write_audit($jobId,'TM_CZ',$procedureName,$desc,$step,$recordsaffected,$status)");
         }
     }
-
 
     protected static void cleanupOptions() {
         datasetId = options.studyId;
@@ -192,7 +191,6 @@ class HighDimImport {
                 writeAudit('Inserted sample_dimension, metadata done', 1, stepCt, 'Done');
         }
         stepCt++;
-
     }
 
     private static void insertObservationFact() {
@@ -331,27 +329,27 @@ class HighDimImport {
                     "       on (c.sourcesystem_cd=d.sourceSystem) " +
                     "when not matched then " +
                     "insert  \
-                                                 (sex_cd, \
-                                                         age_in_years_num, \
-                                                         race_cd, \
-                                                         update_date, \
-                                                         download_date, \
-                                                         import_date, \
-                                                         sourcesystem_cd \
-                                                 ) \
-                                           VALUES ('Unknown', \
-                                                         0, \
-                                                         null, \
-                                                         current_timestamp, \
-                                                         current_timestamp, \
-                                                         current_timestamp, \
-                                                         '$sourceSystem')");
+                         (sex_cd, \
+                          age_in_years_num, \
+                          race_cd, \
+                          update_date, \
+                          download_date, \
+                          import_date, \
+                          sourcesystem_cd \
+                         ) \
+                     VALUES ('Unknown', \
+                              0, \
+                              null, \
+                              current_timestamp, \
+                              current_timestamp, \
+                              current_timestamp, \
+                              '$sourceSystem')");
             patientNum = new BigDecimal(i2b2demodata.firstRow("SELECT patient_num FROM i2b2demodata.patient_dimension WHERE sourcesystem_cd = $sourceSystem ")[0]);
             stepCt++;
             writeAudit('Merged patient ' + sourceSystem, 0, stepCt, 'Done');
         } else {
             def inserted = i2b2demodata.executeInsert("insert into i2b2demodata.patient_dimension \
-                                                 (patient_num, \
+                                                       (patient_num, \
                                                          sex_cd, \
                                                          age_in_years_num, \
                                                          race_cd, \
@@ -359,16 +357,19 @@ class HighDimImport {
                                                          download_date, \
                                                          import_date, \
                                                          sourcesystem_cd \
-                                                 ) \
-                                           select nextval('i2b2demodata.seq_patient_num'), \
-                                                         'Unknown', \
-                                                         0, \
-                                                         null, \
-                                                         current_timestamp, \
-                                                         current_timestamp, \
-                                                         current_timestamp, \
-                                                         $sourceSystem\
-                                            WHERE NOT EXISTS ( SELECT NULL FROM i2b2demodata.patient_dimension WHERE sourcesystem_cd = $sourceSystem  );\n")
+                                                       ) \
+                                                       select nextval('i2b2demodata.seq_patient_num'), \
+                                                              'Unknown', \
+                                                              0, \
+                                                              null, \
+                                                              current_timestamp, \
+                                                              current_timestamp, \
+                                                              current_timestamp, \
+                                                              $sourceSystem \
+                                                       WHERE NOT EXISTS ( \
+                                                           SELECT NULL \
+                                                           FROM i2b2demodata.patient_dimension \
+                                                           WHERE sourcesystem_cd = $sourceSystem  );\n")
             if (inserted.empty) {
                 patientNum = new BigDecimal(i2b2demodata.firstRow("SELECT patient_num FROM i2b2demodata.patient_dimension WHERE sourcesystem_cd = $sourceSystem ")[0]);
             } else {

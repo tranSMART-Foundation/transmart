@@ -34,40 +34,38 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioDisease {
 
-	Sql biomart
+    Sql biomart
 
-	void loadMeshBioDisease(String disease, String meshCode){
+    void loadMeshBioDisease(String disease, String meshCode){
 
-		if(isMeshBioDiseaseExist(disease, meshCode)){
-                    //logger.info "($disease, $meshCode) already exists in BIO_DISEASE ..."
-		}else{
-			logger.info "Start loading ($disease, $meshCode) into BIO_DISEASE ..."
+	if(isMeshBioDiseaseExist(disease, meshCode)){
+            //logger.info "($disease, $meshCode) already exists in BIO_DISEASE ..."
+	}else{
+	    logger.info "Start loading ($disease, $meshCode) into BIO_DISEASE ..."
 
-			String qry = """ insert into bio_disease(disease, mesh_code) values(?, ?) """
-			biomart.execute(qry, [
-				disease,
-				meshCode
-			])
+	    String qry = """ insert into bio_disease(disease, mesh_code) values(?, ?) """
+	    biomart.execute(qry, [
+		disease,
+		meshCode
+	    ])
 
-			logger.info "End loading ($disease, $meshCode) into BIO_DISEASE ..."
-		}
+	    logger.info "End loading ($disease, $meshCode) into BIO_DISEASE ..."
 	}
+    }
 
-
-	boolean isMeshBioDiseaseExist(String disease, String meshCode){
-		String qry = "select count(1) from bio_disease where disease=? and mesh_code=?"
-		if(biomart.firstRow(qry, [
-			disease,
-			meshCode
-		])[0] > 0){
-			return true
-		}else{
-			return false
-		}
+    boolean isMeshBioDiseaseExist(String disease, String meshCode){
+	String qry = "select count(1) from bio_disease where disease=? and mesh_code=?"
+	if(biomart.firstRow(qry, [
+	    disease,
+	    meshCode
+	])[0] > 0){
+	    return true
+	}else{
+	    return false
 	}
+    }
 
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

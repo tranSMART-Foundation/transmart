@@ -34,94 +34,88 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioDataUid {
 
-	Sql biomart
+    Sql biomart
 
-	void loadBioDataUid(){
-		loadExperimentBioDataUid()
-		loadAnalysisBioDataUid()
-		loadDiseaseBioDataUid()
+    void loadBioDataUid(){
+	loadExperimentBioDataUid()
+	loadAnalysisBioDataUid()
+	loadDiseaseBioDataUid()
+    }
+
+    void loadExperimentBioDataUid(){
+
+	logger.info "Start inserting BIO_DATA_UID for BIO_EXPERIMENT ... "
+
+	String qry = """ INSERT INTO BIO_DATA_UID(BIO_DATA_ID, UNIQUE_ID, BIO_DATA_TYPE)
+			      select bio_experiment_id, 'Omicsoft: '||accession, 'EXP'
+			      from bio_experiment 
+			      where bio_experiment_id not in
+                                  (select bio_data_id from bio_data_uid)
+		 """
+	biomart.execute(qry)
+
+	logger.info "Stop inserting BIO_DATA_UID for BIO_EXPERIMENT ... "
+    }
+
+    void loadAnalysisBioDataUid(){
+	logger.info "Start inserting BIO_DATA_UID for BIO_ASSAY_ANALYSIS ... "
+
+	String qry = """ INSERT INTO BIO_DATA_UID(BIO_DATA_ID, UNIQUE_ID, BIO_DATA_TYPE)
+			         SELECT bio_assay_analysis_id, etl_id||':'||analysis_name, 'BAA'
+				 from bio_assay_analysis
+				 where bio_assay_analysis_id not in
+                                    (select bio_data_id from bio_data_uid)
+	            """
+	biomart.execute(qry)
+
+	logger.info "Stop inserting into BIO_DATA_UID for BIO_ASSAY_ANALYSIS ... "
+    }
+
+    void loadDiseaseBioDataUid(){
+	logger.info "Start inserting BIO_DATA_UID for BIO_DISEASE ... "
+
+	String qry = """ insert into bio_data_uid (bio_data_id, unique_id, bio_data_type)
+				select BIO_DISEASE_ID, 'DIS:'||MESH_CODE, 'BIO_DISEASE'
+				from bio_disease
+				where BIO_DISEASE_ID not in
+                                   (select bio_data_id from bio_data_uid)
+		     """
+	biomart.execute(qry)
+
+	logger.info "Stop inserting BIO_DATA_UID for BIO_DISEASE ... "
+    }
+
+    void loadBioDataUid(long bioDataId, String uniqueId, String dataType){
+	if(isBioDataUidExist(bioDataId, uniqueId, dataType)){
+            //logger.info "($bioDataId, $uniqueId, $dataType) already exists in BIO_DATA_UID ..."
+	}else{
+	    logger.info "Start loading ($bioDataId, $uniqueId, $dataType) into BIO_DATA_UID ..."
+
+	    String qry = """ insert into bio_data_uid(bio_data_id, unique_id, bio_data_type) values(?, ?, ?) """
+	    biomart.execute(qry, [
+		bioDataId,
+		uniqueId,
+		dataType
+	    ])
+
+	    logger.info "End loading ($bioDataId, $uniqueId, $dataType) into BIO_DATA_UID ..."
 	}
+    }
 
-
-	void loadExperimentBioDataUid(){
-
-		logger.info "Start inserting BIO_DATA_UID for BIO_EXPERIMENT ... "
-
-		String qry = """ INSERT INTO BIO_DATA_UID(BIO_DATA_ID, UNIQUE_ID, BIO_DATA_TYPE)
-						 select bio_experiment_id, 'Omicsoft: '||accession, 'EXP'
-						 from bio_experiment 
-						 where bio_experiment_id not in (select bio_data_id from bio_data_uid)
-					 """
-		biomart.execute(qry)
-
-		logger.info "Stop inserting BIO_DATA_UID for BIO_EXPERIMENT ... "
+    boolean isBioDataUidExist(long bioDataId, String uniqueId, String dataType){
+	String qry = "select count(1) from bio_data_uid where bio_data_id=? and unique_id=? and data_type=?"
+	if(biomart.firstRow(qry, [
+	    bioDataId,
+	    uniqueId,
+	    dataType
+	])[0] > 0){
+	    return true
+	}else{
+	    return false
 	}
+    }
 
-
-	void loadAnalysisBioDataUid(){
-
-		logger.info "Start inserting BIO_DATA_UID for BIO_ASSAY_ANALYSIS ... "
-
-		String qry = """ INSERT INTO BIO_DATA_UID(BIO_DATA_ID, UNIQUE_ID, BIO_DATA_TYPE)
-						 SELECT bio_assay_analysis_id, etl_id||':'||analysis_name, 'BAA'
-						 from bio_assay_analysis
-						 where bio_assay_analysis_id not in (select bio_data_id from bio_data_uid)
-					 """
-		biomart.execute(qry)
-
-		logger.info "Stop inserting into BIO_DATA_UID for BIO_ASSAY_ANALYSIS ... "
-	}
-
-	
-	void loadDiseaseBioDataUid(){
-
-		logger.info "Start inserting BIO_DATA_UID for BIO_DISEASE ... "
-
-		String qry = """ insert into bio_data_uid (bio_data_id, unique_id, bio_data_type)
-					     select BIO_DISEASE_ID, 'DIS:'||MESH_CODE, 'BIO_DISEASE'
-						 from bio_disease
-						 where BIO_DISEASE_ID not in (select bio_data_id from bio_data_uid)
-					"""
-		biomart.execute(qry)
-
-		logger.info "Stop inserting BIO_DATA_UID for BIO_DISEASE ... "
-	}
-
-	
-	void loadBioDataUid(long bioDataId, String uniqueId, String dataType){
-
-		if(isBioDataUidExist(bioDataId, uniqueId, dataType)){
-                    //logger.info "($bioDataId, $uniqueId, $dataType) already exists in BIO_DATA_UID ..."
-		}else{
-			logger.info "Start loading ($bioDataId, $uniqueId, $dataType) into BIO_DATA_UID ..."
-
-			String qry = """ insert into bio_data_uid(bio_data_id, unique_id, bio_data_type) values(?, ?, ?) """
-			biomart.execute(qry, [
-				bioDataId,
-				uniqueId,
-				dataType
-			])
-
-			logger.info "End loading ($bioDataId, $uniqueId, $dataType) into BIO_DATA_UID ..."
-		}
-	}
-
-
-	boolean isBioDataUidExist(long bioDataId, String uniqueId, String dataType){
-		String qry = "select count(1) from bio_data_uid where bio_data_id=? and unique_id=? and data_type=?"
-		if(biomart.firstRow(qry, [
-			bioDataId,
-			uniqueId,
-			dataType
-		])[0] > 0){
-			return true
-		}else{
-			return false
-		}
-	}
-
-	
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

@@ -59,29 +59,27 @@ class SearchKeyword {
         logger.info("Start loading search keyword for pathways '${primarySourceCode}'...")
 
         String qry = """ select distinct bio_marker_name, bio_marker_id, 
-					 primary_source_code, organism,
-                                         primary_external_id
-			      from biomart.bio_marker
-			      where bio_marker_type='PATHWAY'
-                                and primary_source_code=?
-			  """
+				primary_source_code, organism,
+                                primary_external_id
+			 from biomart.bio_marker
+			 where bio_marker_type='PATHWAY'
+                             and primary_source_code=?
+		     """
 
-        biomart.eachRow(qry,[primarySourceCode])
-        {
+        biomart.eachRow(qry,[primarySourceCode]) {
             long bioMarkerId = it.bio_marker_id
             /* uniqueId is PATHWAY:KEGG:genus species:keggid */
             insertSearchKeyword(it.bio_marker_name, bioMarkerId,
                                 'PATHWAY:'+it.primary_source_code+':'+it.organism+':'+it.primary_external_id,
                                 it.primary_source_code, 'PATHWAY', 'Pathway')
 /* version without organism if loading human only */
-//            insertSearchKeyword(it.bio_marker_name, bioMarkerId,
-//                                'PATHWAY:'+it.primary_source_code+':'+it.primary_external_id, // e.g. KEGG:hsa00000
-//                                it.primary_source_code, 'PATHWAY', 'Pathway')
+//          insertSearchKeyword(it.bio_marker_name, bioMarkerId,
+//                              'PATHWAY:'+it.primary_source_code+':'+it.primary_external_id, // e.g. KEGG:hsa00000
+//                              it.primary_source_code, 'PATHWAY', 'Pathway')
         }
 
         logger.info "End loading search keyword for pathways '${primarySourceCode}'... "
     }
-
 
     void loadGeneSearchKeyword() {
         logger.info "Start loading search keyword for all human genes ... "
@@ -95,24 +93,23 @@ class SearchKeyword {
 ** whichever is loaded first.
  */
 
-        //String qry = "delete from search_keyword where data_category='GENE'"
-        //searchapp.execute(qry)
+//      String qry = "delete from search_keyword where data_category='GENE'"
+//      searchapp.execute(qry)
         String qry;
 
         Boolean isPostgres = Util.isPostgres()
 
         if(isPostgres) {
             qry = """ select distinct bio_marker_name, bio_marker_id, primary_external_id
-				  from biomart.bio_marker
-				  where bio_marker_type='GENE' and organism='HOMO SAPIENS'"""
-        } else 
-        {
-            qry = """ select distinct bio_marker_name, bio_marker_id, primary_external_id
-				  from biomart.bio_marker
-				  where bio_marker_type='GENE' and organism='HOMO SAPIENS'"""
+		      from biomart.bio_marker
+		      where bio_marker_type='GENE' and organism='HOMO SAPIENS'"""
         }
-        
-    
+	else {
+            qry = """ select distinct bio_marker_name, bio_marker_id, primary_external_id
+		      from biomart.bio_marker
+		      where bio_marker_type='GENE' and organism='HOMO SAPIENS'"""
+        }
+
         biomart.eachRow(qry)
         {
             long bioMarkerId = it.bio_marker_id
@@ -121,116 +118,108 @@ class SearchKeyword {
                                 null, 'GENE', 'Gene')
         }
 
-
         logger.info "End loading search keyword for all human genes ... "
     }
-
 
     void loadOmicsoftGSESearchKeyword(String biomart) {
 
         logger.info "Start deleting search keyword for Omicsoft GSEs ... "
 
-        String qry = """ delete from search_keyword where data_category='STUDY' and
-									display_data_category='GEO' and  keyword like 'GSE%' """
-        //searchapp.execute(qry)
-
+        String qry = """ delete from search_keyword
+                         where data_category='STUDY'
+			     and display_data_category='GEO'
+                             and  keyword like 'GSE%' """
+//      searchapp.execute(qry)
 
         logger.info "Start inserting search keyword for Omicsoft GSEs ... "
 
         qry = """ insert into search_keyword (keyword, bio_data_id, unique_id, data_category, display_data_category)
-				  select distinct accession, bio_experiment_id, 'Omicsoft: '||accession, 'STUDY', 'GEO'
-				  from ${biomart}.bio_experiment
-				  where accession not in (select keyword from search_keyword)
-			  """
+			select distinct accession, bio_experiment_id, 'Omicsoft: '||accession, 'STUDY', 'GEO'
+			from ${biomart}.bio_experiment
+			where accession not in (select keyword from search_keyword)
+	      """
         searchapp.execute(qry)
 
         logger.info "Start loading search keyword for Omicsoft GSEs ... "
     }
-
 
     void loadOmicsoftCompoundSearchKeyword() {
 
         logger.info "Start deleting search keyword for Omicsoft compounds ... "
 
         String qry = """ delete from search_keyword where data_category='COMPOUND' and source_code='Omicsoft' """
-        //searchapp.execute(qry)
-
+//	searchapp.execute(qry)
 
         logger.info "Start inserting search keyword for Omicsoft compounds ... "
 
         qry = """ insert into search_keyword (bio_data_id, keyword, unique_id, data_category, display_data_category, source_code)
-				  select t2.bio_compound_id, t1.code_name, 'COM:'||t1.cas_registry, 'COMPOUND', 'Compound', 'Omicsoft'
-				  from ${biomart}.bio_compound t1, ${biomart}.bio_data_compound t2
-				  where t1.bio_compound_id=t2.bio_compound_id and t2.etl_source='OMICSOFT'
-					   and t1.code_name not in (select keyword from search_keyword)
-			  """
+			select t2.bio_compound_id, t1.code_name, 'COM:'||t1.cas_registry, 'COMPOUND', 'Compound', 'Omicsoft'
+			from ${biomart}.bio_compound t1, ${biomart}.bio_data_compound t2
+			where t1.bio_compound_id=t2.bio_compound_id
+                            and t2.etl_source='OMICSOFT'
+			    and t1.code_name not in (select keyword from search_keyword)
+	      """
         searchapp.execute(qry)
 
         logger.info "Start loading search keyword for Omicsoft compounds ... "
     }
-
 
     void loadOmicsoftDiseaseSearchKeyword(String biomart) {
 
         logger.info "Start deleting search keyword for Omicsoft diseases ... "
 
         String qry = """ delete from search_keyword where data_category='DISEASE' and source_code='Omicsoft' """
-        //searchapp.execute(qry)
-
+//      searchapp.execute(qry)
 
         logger.info "Start inserting search keyword for Omicsoft diseases ... "
 
         qry = """ insert into search_keyword (bio_data_id, keyword, unique_id, data_category, display_data_category, source_code)
-				  select distinct t2.bio_disease_id, t1.disease, 'DIS:'||t1.mesh_code, 'DISEASE', 'Disease', ''
-				  from ${biomart}.bio_disease t1, ${biomart}.bio_data_disease t2
-				  where t1.bio_disease_id=t2.bio_disease_id and t2.etl_source='OMICSOFT'
-						and t1.disease not in (select keyword from search_keyword where data_category='DISEASE')
-			  """
+			select distinct t2.bio_disease_id, t1.disease, 'DIS:'||t1.mesh_code, 'DISEASE', 'Disease', ''
+			from ${biomart}.bio_disease t1, ${biomart}.bio_data_disease t2
+			where t1.bio_disease_id=t2.bio_disease_id
+                            and t2.etl_source='OMICSOFT'
+			    and t1.disease not in (select keyword from search_keyword where data_category='DISEASE')
+	      """
         searchapp.execute(qry)
 
         logger.info "End loading search keyword for Omicsoft diseases ... "
     }
 
-
     void loadOmicsoftCompoundSearchKeyword(String biomart) {
-
         logger.info "Start deleting search keyword for Omicsoft diseases ... "
-        //searchapp.execute(qry)
+//      searchapp.execute(qry)
 
         logger.info "End loading search keyword for Omicsoft diseases ... "
     }
 
-
     void insertSearchKeyword(String keyword, long bioDataId, String uniqueId,
                              String sourceCode, String dataCategory,
                              String displayDataCategory) {
-
         if (isSearchKeywordExist(keyword, dataCategory) || isSearchKeywordExistById(uniqueId, dataCategory) ) {
             //logger.info "$keyword:$dataCategory:$bioDataId already exists in SEARCH_KEYWORD ..."
         } else {
             logger.info "Save $keyword:$dataCategory:$bioDataId into SEARCH_KEYWORD ..."
             savedKeys.add([
-                    keyword,
-                    bioDataId,
-                    uniqueId,
-                    dataCategory,
-                    sourceCode,
-                    displayDataCategory
+                keyword,
+                bioDataId,
+                uniqueId,
+                dataCategory,
+                sourceCode,
+                displayDataCategory
             ])
-//            logger.info "savedKeys "+savedKeys.size()
+//          logger.info "savedKeys "+savedKeys.size()
             if(savedKeys.size() >= 1) {
                 doInsertSearchKeyword()
             }
         }
     }
 
-
     void doInsertSearchKeyword() {
-
-        String qry = """ insert into search_keyword (keyword, bio_data_id,
-                                           unique_id, data_category,
-					   source_code, display_data_category)
-                                     values(?, ?, ?, ?, ?, ?) """
+        String qry = """ insert into search_keyword
+                             (keyword, bio_data_id,
+                              unique_id, data_category,
+			      source_code, display_data_category)
+                           values(?, ?, ?, ?, ?, ?) """
 
         logger.info "doInsertSearchKeyword list size: "+savedKeys.size()
         searchapp.withTransaction {
@@ -245,14 +234,12 @@ class SearchKeyword {
         savedKeys = []
     }
 
-
     boolean isSearchKeywordExistById(String uniqueId, String dataCategory) {
         String qry = "select count(*) from search_keyword where unique_id=? and data_category=?"
         GroovyRowResult rowResult = searchapp.firstRow(qry, [uniqueId, dataCategory])
         int count = rowResult[0]
         return count > 0
     }
-
 
     boolean isSearchKeywordExist(String keyword, String dataCategory) {
         String qry = "select count(*) from search_keyword where keyword=? and data_category=?"
@@ -261,7 +248,6 @@ class SearchKeyword {
         return count > 0
     }
 
-
     boolean isSearchKeywordExist(String keyword, String dataCategory, long bioMarkerID) {
         String qry = "select count(*) from search_keyword where keyword=? and data_category=? and bio_data_id=?"
         GroovyRowResult rowResult = searchapp.firstRow(qry, [keyword, dataCategory, bioMarkerID])
@@ -269,10 +255,9 @@ class SearchKeyword {
         return count > 0
     }
 
-
     long getSearchKeywordId(String keyword, String dataCategory) {
         String qry = """ select search_keyword_id from search_keyword
-						 where keyword=? and data_category=? """
+			 where keyword=? and data_category=? """
         def res = searchapp.firstRow(qry, [keyword, dataCategory])
         if (res.equals(null)) {
             return 0
@@ -296,5 +281,4 @@ class SearchKeyword {
             doInsertSearchKeyword()
         }
     }
-    
 }

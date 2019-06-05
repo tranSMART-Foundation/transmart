@@ -42,5 +42,4 @@ class CorrelationEntry {
 
     public CorrelationEntry() {
     }
-
 }

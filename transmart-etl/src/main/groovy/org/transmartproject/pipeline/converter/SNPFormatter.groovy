@@ -43,255 +43,245 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class SNPFormatter {
 
-	static main(args) {
+    static main(args) {
 
-//		PropertyConfigurator.configure("conf/log4j.properties");
+//	PropertyConfigurator.configure("conf/log4j.properties");
 
-		logger.info(new Date())
-		logger.info("Start processing SNP data ...")
+	logger.info(new Date())
+	logger.info("Start processing SNP data ...")
 
-		Properties props = Util.loadConfiguration("conf/SNP.properties");
+	Properties props = Util.loadConfiguration("conf/SNP.properties");
 
-		Sql i2b2demodata = Util.createSqlFromPropertyFile(props, "i2b2demodata")
-		Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
+	Sql i2b2demodata = Util.createSqlFromPropertyFile(props, "i2b2demodata")
+	Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
 
-		SNPFormatter formatter = new SNPFormatter()
+	SNPFormatter formatter = new SNPFormatter()
 
-		String studyName = props.get("study_name")
-		Map samplePatientMap = formatter.getSamplePatientMap(deapp, studyName)
-		logger.info "Print out sample-patient map from $studyName ..."
-		Util.printMap(samplePatientMap)
+	String studyName = props.get("study_name")
+	Map samplePatientMap = formatter.getSamplePatientMap(deapp, studyName)
+	logger.info "Print out sample-patient map from $studyName ..."
+	Util.printMap(samplePatientMap)
 
-		formatter.formatCopyNumber(samplePatientMap, props)
-		formatter.formatCNCopyNumber(samplePatientMap, props)
-		formatter.formatGenotype(samplePatientMap, props)
+	formatter.formatCopyNumber(samplePatientMap, props)
+	formatter.formatCNCopyNumber(samplePatientMap, props)
+	formatter.formatGenotype(samplePatientMap, props)
 
-		PatientDimension pd = new PatientDimension()
-		pd.setI2b2demodata(i2b2demodata)
-		pd.setSourceSystemPrefix(studyName)
+	PatientDimension pd = new PatientDimension()
+	pd.setI2b2demodata(i2b2demodata)
+	pd.setSourceSystemPrefix(studyName)
 
-		// create PLINK .fam file
-		formatter.createPlinkFamFile(props, pd, samplePatientMap)
+	// create PLINK .fam file
+	formatter.createPlinkFamFile(props, pd, samplePatientMap)
 
-		// convert PLINK Long-format to Binary format
-		formatter.createPlinkFile(props)
+	// convert PLINK Long-format to Binary format
+	formatter.createPlinkFile(props)
+    }
 
+    void formatGenotype(Map samplePatientMap, Properties props){
+
+	if(props.get("skip_reformat_genetype").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip converting genotype file's sample id to patient number ..."
+	} else{
+	    logger.info("Start converting genotype file's sample id to patient number ...")
+
+	    GenotypeFormatter f = new GenotypeFormatter()
+	    f.setSamplePatientMap(samplePatientMap)
+
+	    File genotype = new File(props.get("output_directory") + File.separator + props.get("study_name") + ".genotype")
+	    f.setGenotypeFile(genotype)
+	    f.format()
+
+	    logger.info("End converting genotype file's sample id to patient number ...")
 	}
+    }
 
+    void formatCopyNumber(Map samplePatientMap, Properties props){
 
-	void formatGenotype(Map samplePatientMap, Properties props){
+	if(props.get("skip_reformat_copy_number").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip converting Copy Number file's sample id to patient number ..."
+	} else{
+	    logger.info("Start converting Copy Number file's sample id to patient number ...")
+	    CopyNumberFormatter f = new CopyNumberFormatter()
 
-		if(props.get("skip_reformat_genetype").toString().toLowerCase().equals("yes")){
-			logger.info "Skip converting genotype file's sample id to patient number ..."
-		} else{
-			logger.info("Start converting genotype file's sample id to patient number ...")
+	    f.setSamplePatientMap(samplePatientMap)
 
-			GenotypeFormatter f = new GenotypeFormatter()
-			f.setSamplePatientMap(samplePatientMap)
-
-			File genotype = new File(props.get("output_directory") + File.separator + props.get("study_name") + ".genotype")
-			f.setGenotypeFile(genotype)
-			f.format()
-
-			logger.info("End converting genotype file's sample id to patient number ...")
+	    Pattern p = Pattern.compile("chr*\\.cn")
+	    File srcDir = new File(props.get("output_directory"))
+	    srcDir.eachFile {
+		if(it.toString() =~ /chr.*\.cn/) {
+		    f.setCopyNumberFile(it)
+		    f.format()
 		}
+	    }
+	    logger.info("End converting Copy Number file's sample id to patient number ...")
 	}
+    }
 
+    /**
+     *  replace CN probe's sample id or GSM# with i2b2's patient number
+     *  
+     * @param samplePatientMap
+     * @param props
+     */
+    void formatCNCopyNumber(Map samplePatientMap, Properties props){
 
-	void formatCopyNumber(Map samplePatientMap, Properties props){
+	if(props.get("skip_reformat_cn_copy_number").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip converting CN Copy Number file's sample id to patient number ..."
+	} else{
+	    logger.info("Start converting CN Copy Number file's sample id to patient number ...")
+	    CopyNumberFormatter f = new CopyNumberFormatter()
+	    f.setSamplePatientMap(samplePatientMap)
 
-		if(props.get("skip_reformat_copy_number").toString().toLowerCase().equals("yes")){
-			logger.info "Skip converting Copy Number file's sample id to patient number ..."
-		} else{
-			logger.info("Start converting Copy Number file's sample id to patient number ...")
-			CopyNumberFormatter f = new CopyNumberFormatter()
+	    File cn = new File(props.get("output_directory") + File.separator + props.get("cn_copy_number_output"))
+	    f.setCopyNumberFile(cn)
+	    f.format()
+	    logger.info("End converting CN Copy Number file's sample id to patient number ...")
+	}
+    }
 
-			f.setSamplePatientMap(samplePatientMap)
+    Map getSamplePatientMap(Sql sql, String studyName){
+	SubjectSampleMapping ssm = new SubjectSampleMapping()
+	ssm.setDeapp(sql)
+	// only extract a map for SNP samples
+	Map samplePatientMap = ssm.getSamplePatientMap(studyName, "SNP")
+	return samplePatientMap
+    }
 
-			Pattern p = Pattern.compile("chr*\\.cn")
-			File srcDir = new File(props.get("output_directory"))
-			srcDir.eachFile {
-				if(it.toString() =~ /chr.*\.cn/) {
-					f.setCopyNumberFile(it)
-					f.format()
-				}
-			}
-			logger.info("End converting Copy Number file's sample id to patient number ...")
+    /**
+     *  Create *.fam for PLINK to use and its columns are in the following order:
+     *  
+     *    Column 1: Family Id
+     *    Column 2: Individual ID
+     *    Column 3: Paternal ID 
+     *    Column 4: Maternal ID 
+     *    Column 5: Sex ( 1=male; 2=female; other=unknown)
+     *    Column 6: Phenotype
+     *    
+     * @param props
+     */
+    void createPlinkFamFile(Properties props, PatientDimension pd, Map samplePatientMap){
+
+	if(props.get("skip_plink_fam").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip creating PLINK FAM file ..."
+	} else{
+
+	    Map snpPatient = [:]
+	    samplePatientMap.each{k, v ->
+		snpPatient[v] = 1
+	    }
+
+	    File plinkFamFile = new File(props.get("output_directory") + File.separator + props.get("study_name") + ".fam")
+	    if(plinkFamFile.size() > 0) {
+		logger.info("Delete the existing FAM file: " + plinkFamFile.toString())
+		plinkFamFile.delete()
+	    }
+	    logger.info("Start creating FAM file: " + plinkFamFile.toString())
+	    plinkFamFile.createNewFile()
+
+	    Map patientGenderMap = pd.getPatientGenderMap()
+
+	    StringBuffer sb = new StringBuffer()
+	    patientGenderMap.each{ k, v ->
+		if(snpPatient[k]) sb.append(k + "\t" + k + "\t0\t0\t" + patientGenderMap[k] + "\t0\n")
+	    }
+
+	    plinkFamFile.append(sb.toString())
+	    sb.setLength(0)
+
+	    logger.info "End creating FAM file: " + plinkFamFile.toString()
+	}
+    }
+
+    void reformatCopyNumberFile(Properties props){
+
+	if(props.get("skip_copy_number_process").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip processing Copy Number files ..."
+	} else{
+	    AffymetrixCopyNumberFormatter cnf = new AffymetrixCopyNumberFormatter()
+	    cnf.setCopyNumberFileDirectory(props.get("source_directory") + "/" + props.get("cn_directory"))
+	    cnf.setStudyName(props.get("study_name"))
+	    cnf.setOutputDirectory(props.get("output_directory"))
+	    cnf.setExperimentPatientMap(experimentPatientMap)
+	    cnf.setSourceCopyNumberFilePattern(props.get("source_cn_file_pattern"))
+	    cnf.createCopyNumberFile()
+	}
+    }
+
+    void createLongFormatPlinkFile(Properties props){
+
+	if(props.get("skip_lgen_file_creation").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip creating PLINK format files ..."
+	} else{
+
+	    AffymetrixGenotypingDataFormatter gtdf = new AffymetrixGenotypingDataFormatter()
+	    gtdf.setGenotypingFileDirectory(props.get("source_directory") + File.separator + props.get("gt_directory"))
+	    gtdf.setStudyName(props.get("study_name"))
+	    gtdf.setOutputDirectory(props.get("output_directory"))
+	    gtdf.setSourceGenotypingFilePattern(props.get("source_gt_file_pattern"))
+	    gtdf.setCelPatientMap(celPatientMap)
+	    gtdf.setCelSampleCdMap(celSampleCdMap)
+
+	    logger.info "Creating PLINK format files ..."
+	    logger.info new Date()
+	    gtdf.createGenotypingFile()
+	    logger.info  new Date()
+	}
+    }
+
+    void createPlinkFile(Properties props){
+
+	if(props.get("skip_plink_file_creation").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip creating PLINK format files ..."
+	} else{
+	    String outputDir = props.get("output_directory")
+
+	    PlinkConverter pc = new PlinkConverter()
+	    pc.setPlinkSourceDirectory(outputDir)
+	    pc.setPlinkDestinationDirectory(outputDir)
+	    pc.setPlink(props.get("plink"))
+	    pc.setStudyName(props.get("study_name"))
+
+	    logger.info "Creating Binary PLINK format file ..."
+	    logger.info new Date()
+	    pc.createBinaryFromLongPlink()
+	    logger.info new Date()
+
+	    logger.info "Creating PLINK format files for each Chromosome ..."
+	    pc.recodePlinkFileByChrs()
+	    logger.info new Date()
+
+	    logger.info "Recoding Binary PLINK format file ..."
+	    pc.recodePlinkFile()
+	    logger.info new Date()
+	}
+    }
+
+    Map loadSubjectSampleMappingFile(File subjectSampleMapping){
+
+	Map sampleCdSubjectMap = [:]
+	String [] str
+	if(subjectSampleMapping.size() > 0){
+	    logger.info("Start reading subject-sample mapping file: " + subjectSampleMapping.toString())
+	    int index = 1
+	    subjectSampleMapping.eachLine{
+		if(it.indexOf("study_id") == -1){
+		    if(it.indexOf("\t") != -1) str = it.split("\t")
+		    else str = it.split(" +")
+
+		    if(str.size() != 9){
+			logger.warn("Line: " + index + " missing column(s) in: " + subjectSampleMapping.toString())
+			logger.info index + ":  " + str.size() + ":  " + it
+		    } else{
+			sampleCdSubjectMap[str[3].trim()] = str[2].trim()
+		    }
 		}
+		index++
+	    }
+	}else{
+	    logger.error(subjectSampleMapping.toString() + " is empty ...")
+	    throw new RuntimeException(subjectSampleMapping.toString() + " is empty ...")
 	}
 
-
-	/**
-	 *  replace CN probe's sample id or GSM# with i2b2's patient number
-	 *  
-	 * @param samplePatientMap
-	 * @param props
-	 */
-	void formatCNCopyNumber(Map samplePatientMap, Properties props){
-
-		if(props.get("skip_reformat_cn_copy_number").toString().toLowerCase().equals("yes")){
-			logger.info "Skip converting CN Copy Number file's sample id to patient number ..."
-		} else{
-			logger.info("Start converting CN Copy Number file's sample id to patient number ...")
-			CopyNumberFormatter f = new CopyNumberFormatter()
-			f.setSamplePatientMap(samplePatientMap)
-
-			File cn = new File(props.get("output_directory") + File.separator + props.get("cn_copy_number_output"))
-			f.setCopyNumberFile(cn)
-			f.format()
-			logger.info("End converting CN Copy Number file's sample id to patient number ...")
-		}
-	}
-
-
-	Map getSamplePatientMap(Sql sql, String studyName){
-		SubjectSampleMapping ssm = new SubjectSampleMapping()
-		ssm.setDeapp(sql)
-		// only extract a map for SNP samples
-		Map samplePatientMap = ssm.getSamplePatientMap(studyName, "SNP")
-		return samplePatientMap
-	}
-
-
-	/**
-	 *  Create *.fam for PLINK to use and its columns are in the following order:
-	 *  
-	 *    Column 1: Family Id
-	 *    Column 2: Individual ID
-	 *    Column 3: Paternal ID 
-	 *    Column 4: Maternal ID 
-	 *    Column 5: Sex ( 1=male; 2=female; other=unknown)
-	 *    Column 6: Phenotype
-	 *    
-	 * @param props
-	 */
-	void createPlinkFamFile(Properties props, PatientDimension pd, Map samplePatientMap){
-
-		if(props.get("skip_plink_fam").toString().toLowerCase().equals("yes")){
-			logger.info "Skip creating PLINK FAM file ..."
-		} else{
-
-			Map snpPatient = [:]
-			samplePatientMap.each{k, v ->
-				snpPatient[v] = 1
-			}
-
-			File plinkFamFile = new File(props.get("output_directory") + File.separator + props.get("study_name") + ".fam")
-			if(plinkFamFile.size() > 0) {
-				logger.info("Delete the existing FAM file: " + plinkFamFile.toString())
-				plinkFamFile.delete()
-			}
-			logger.info("Start creating FAM file: " + plinkFamFile.toString())
-			plinkFamFile.createNewFile()
-
-			Map patientGenderMap = pd.getPatientGenderMap()
-
-			StringBuffer sb = new StringBuffer()
-			patientGenderMap.each{ k, v ->
-				if(snpPatient[k]) sb.append(k + "\t" + k + "\t0\t0\t" + patientGenderMap[k] + "\t0\n")
-			}
-
-			plinkFamFile.append(sb.toString())
-			sb.setLength(0)
-
-			logger.info "End creating FAM file: " + plinkFamFile.toString()
-		}
-	}
-
-
-	void reformatCopyNumberFile(Properties props){
-
-		if(props.get("skip_copy_number_process").toString().toLowerCase().equals("yes")){
-			logger.info "Skip processing Copy Number files ..."
-		} else{
-			AffymetrixCopyNumberFormatter cnf = new AffymetrixCopyNumberFormatter()
-			cnf.setCopyNumberFileDirectory(props.get("source_directory") + "/" + props.get("cn_directory"))
-			cnf.setStudyName(props.get("study_name"))
-			cnf.setOutputDirectory(props.get("output_directory"))
-			cnf.setExperimentPatientMap(experimentPatientMap)
-			cnf.setSourceCopyNumberFilePattern(props.get("source_cn_file_pattern"))
-			cnf.createCopyNumberFile()
-		}
-	}
-
-
-	void createLongFormatPlinkFile(Properties props){
-
-		if(props.get("skip_lgen_file_creation").toString().toLowerCase().equals("yes")){
-			logger.info "Skip creating PLINK format files ..."
-		} else{
-
-			AffymetrixGenotypingDataFormatter gtdf = new AffymetrixGenotypingDataFormatter()
-			gtdf.setGenotypingFileDirectory(props.get("source_directory") + File.separator + props.get("gt_directory"))
-			gtdf.setStudyName(props.get("study_name"))
-			gtdf.setOutputDirectory(props.get("output_directory"))
-			gtdf.setSourceGenotypingFilePattern(props.get("source_gt_file_pattern"))
-			gtdf.setCelPatientMap(celPatientMap)
-			gtdf.setCelSampleCdMap(celSampleCdMap)
-
-			logger.info "Creating PLINK format files ..."
-			logger.info new Date()
-			gtdf.createGenotypingFile()
-			logger.info  new Date()
-		}
-	}
-
-
-	void createPlinkFile(Properties props){
-
-		if(props.get("skip_plink_file_creation").toString().toLowerCase().equals("yes")){
-			logger.info "Skip creating PLINK format files ..."
-		} else{
-			String outputDir = props.get("output_directory")
-
-			PlinkConverter pc = new PlinkConverter()
-			pc.setPlinkSourceDirectory(outputDir)
-			pc.setPlinkDestinationDirectory(outputDir)
-			pc.setPlink(props.get("plink"))
-			pc.setStudyName(props.get("study_name"))
-
-			logger.info "Creating Binary PLINK format file ..."
-			logger.info new Date()
-			pc.createBinaryFromLongPlink()
-			logger.info new Date()
-
-			logger.info "Creating PLINK format files for each Chromosome ..."
-			pc.recodePlinkFileByChrs()
-			logger.info new Date()
-
-			logger.info "Recoding Binary PLINK format file ..."
-			pc.recodePlinkFile()
-			logger.info new Date()
-		}
-	}
-
-
-	Map loadSubjectSampleMappingFile(File subjectSampleMapping){
-
-		Map sampleCdSubjectMap = [:]
-		String [] str
-		if(subjectSampleMapping.size() > 0){
-			logger.info("Start reading subject-sample mapping file: " + subjectSampleMapping.toString())
-			int index = 1
-			subjectSampleMapping.eachLine{
-				if(it.indexOf("study_id") == -1){
-					if(it.indexOf("\t") != -1) str = it.split("\t")
-					else str = it.split(" +")
-
-					if(str.size() != 9){
-						logger.warn("Line: " + index + " missing column(s) in: " + subjectSampleMapping.toString())
-						logger.info index + ":  " + str.size() + ":  " + it
-					} else{
-						sampleCdSubjectMap[str[3].trim()] = str[2].trim()
-					}
-				}
-				index++
-			}
-		}else{
-			logger.error(subjectSampleMapping.toString() + " is empty ...")
-			throw new RuntimeException(subjectSampleMapping.toString() + " is empty ...")
-		}
-
-		return sampleCdSubjectMap
-	}
+	return sampleCdSubjectMap
+    }
 }

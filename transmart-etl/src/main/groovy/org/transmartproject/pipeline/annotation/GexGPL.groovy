@@ -43,7 +43,7 @@ class GexGPL {
 
     static main(args) {
 
-//	PropertyConfigurator.configure("conf/log4j.properties")
+//  PropertyConfigurator.configure("conf/log4j.properties")
 
 	Util util = new Util()
 
@@ -55,7 +55,6 @@ class GexGPL {
 
 	gpl.loadGexGPL(props, biomart)
     }
-
 
     void loadGexGPL(Properties props, Sql biomart){
 	if(props.get("skip_annotation_loader").toString().toLowerCase().equals("yes")){
@@ -76,8 +75,6 @@ class GexGPL {
 	    }
 	}
     }
-
-
 
     /**
      * Process GPL Gene Expression annotation files
@@ -113,7 +110,6 @@ class GexGPL {
 	}
     }
 
-
     void loadGPL(Properties props, File input){
 
 	Map columnMap = Util.convertStringToMap(props.get("column_map"))
@@ -130,28 +126,27 @@ class GexGPL {
 	input.eachLine {
 	    if((it.indexOf("#")!=0) && (it.indexOf("ID")!=0)){
 		String [] str = it.split(props.get("field_separator"))
-		
+
 		if(!str[idxProbeId].equals(null)) sb.append(str[idxProbeId] + "|")
 		else sb.append("|")
-		
+
 		if(!str[idxSpecies].equals(null)) sb.append(str[idxSpecies] + "|")
 		else sb.append("|")
-		
+
 		if(str.size() > idxGeneId && !str[idxGeneId].equals(null)) sb.append(str[idxGeneId] + "|")
 		else sb.append("|")
-		
+
 		if(str.size() > idxGeneSymbol && !str[idxGeneSymbol].equals(null)) sb.append(str[idxGeneSymbol] + "|")
 		else sb.append("|")
-		
+
 		if(str.size() > idxGeneTitle && !str[idxGeneTitle].equals(null)) sb.append(str[idxGeneTitle] + "\n")
 		else sb.append("\n")
-		
+
 		//println str[idxProbeId] + "\t" + str[idxSpecies] + "\t" + str[idxGeneId] + "\t" + str[idxGeneSymbol] + "\t" + str[idxGeneTitle]
 	    }
 	}
 	println sb.toString()
     }
-
 
     /**
      * Process GPL annotation file
@@ -199,11 +194,11 @@ class GexGPL {
 			println i + "\t" + str[i]
 			if(str[i].toUpperCase().equals("ID")) columnMap["ID"] = i
 			if(str[i].toUpperCase().equals("GENE_SYMBOL") ||
-			str[i].toUpperCase().equals("SYMBOL")) columnMap["GENE_SYMBOL"] = i
+			   str[i].toUpperCase().equals("SYMBOL")) columnMap["GENE_SYMBOL"] = i
 			if(str[i].toUpperCase().equals("GENE_NAME") ||
-			str[i].toUpperCase().equals("")) columnMap["GENE_NAME"] = i
+			   str[i].toUpperCase().equals("")) columnMap["GENE_NAME"] = i
 			if(str[i].toUpperCase().equals("GENE ID") ||
-			str[i].toUpperCase().equals("GENE")) columnMap["GENE_ID"] = i
+			   str[i].toUpperCase().equals("GENE")) columnMap["GENE_ID"] = i
 		    }
 		} else{
 		    String id = "", geneName = "", geneSymbol = "", geneId = ""
@@ -254,39 +249,36 @@ class GexGPL {
 	insertGexGPL(output)
     }
 
-
     /**
      *  Load processed Affymetrix annotation data into database
      *
      * @param input
      */
-     void insertGexGPL(File input){
-         if(input.size() >0){
-             logger.info "Start loading GPL annotation data ..." 
-             biomart.withTransaction {
-                 biomart.withBatch("insert into $annotationTable (platform,probe_id,gene_symbol,gene_descr,gene_id) values (?,?,?,?,?)",
-                     { ps -> input.eachLine{
-			 String [] str = it.split(/\t/)
-			 ps.addBatch([str[0], str[1], str[2], str[3], str[4]])
-                     	}
-                     }) 
-             }
-         }else{
-             logger.error("Empty file: " + input.toString())
-         }
-     }
-     
+    void insertGexGPL(File input){
+        if(input.size() >0){
+            logger.info "Start loading GPL annotation data ..." 
+            biomart.withTransaction {
+                biomart.withBatch("insert into $annotationTable (platform,probe_id,gene_symbol,gene_descr,gene_id) values (?,?,?,?,?)",
+				  { ps -> input.eachLine{
+			String [] str = it.split(/\t/)
+			ps.addBatch([str[0], str[1], str[2], str[3], str[4]])
+                    }
+                    }) 
+            }
+        }else{
+            logger.error("Empty file: " + input.toString())
+        }
+    }
     
-     boolean isGexGPLAnnotationExist(String platform){
-	 String qry = "select count(*) from $annotationTable where upper(platform)=?"
-	 if(biomart.firstRow(qry, [platform.toUpperCase()])[0] > 0){
-	     return true
-	 } else {
-	     return false
-	 }
-     }
-     
-     
+    boolean isGexGPLAnnotationExist(String platform){
+	String qry = "select count(*) from $annotationTable where upper(platform)=?"
+	if(biomart.firstRow(qry, [platform.toUpperCase()])[0] > 0){
+	    return true
+	} else {
+	    return false
+	}
+    }
+
     /**
      *  The format for Affymetrix GeX Annotation file should be as the following:
      *
@@ -351,36 +343,32 @@ class GexGPL {
 	}
     }
 
-
-     void createAnnotationTable(){
-         String qry = "select count(*) from user_tables where table_name=?"
-         if(biomart.firstRow(qry, [annotationTable.toUpperCase()])[0] > 0){
-             logger.info "The existing table $annotationTable will be dropped ... "
-             qry = "drop table $annotationTable purge"
-             biomart.execute(qry)
-         }
-         logger.info "Start creating table $annotationTable ..."
-         qry = """ create table $annotationTable(
+    void createAnnotationTable(){
+        String qry = "select count(*) from user_tables where table_name=?"
+        if(biomart.firstRow(qry, [annotationTable.toUpperCase()])[0] > 0){
+            logger.info "The existing table $annotationTable will be dropped ... "
+            qry = "drop table $annotationTable purge"
+            biomart.execute(qry)
+        }
+        logger.info "Start creating table $annotationTable ..."
+        qry = """ create table $annotationTable(
                      platform 	varchar2(100),
                      species  	varchar2(100),
                      probe_id 	varchar2(100),
                      gene_symbol varchar2(100),
                      gene_descr  varchar2(1000),
                      gene_id    	varchar2(20)
-                     )"""
-         biomart.execute(qry)
-     }
-
+             )"""
+        biomart.execute(qry)
+    }
 
     void setAnnotationTable(String annotationTable){
 	this.annotationTable = annotationTable
     }
 
-
     void setGPLFilePattern(String gplFilePattern){
 	this.gplFilePattern = gplFilePattern
     }
-
 
     void setSql(Sql biomart){
 	this.biomart = biomart

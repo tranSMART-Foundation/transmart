@@ -34,49 +34,46 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class PlinkMapGenerator {
 
-	Sql sql
-	File mapFile
+    Sql sql
+    File mapFile
 
-	void createPlinkMapFromSampleMapping(Map sampleMapping){
-		sampleMapping.each{key, val ->
-			println key + ":" + val
-		}
+    void createPlinkMapFromSampleMapping(Map sampleMapping){
+	sampleMapping.each{key, val ->
+	    println key + ":" + val
+	}
+    }
+
+    long getPatientNumberByGSMNumber(String gsmNumber){
+    }
+
+    void createMapforGPL13314(){
+	StringBuffer mapData = new StringBuffer()
+	if(mapFile.exists()){
+	    mapFile.delete()
+	    mapFile.createNewFile()
+	} else {
+	    logger.info("Create the file: " + mapFile.toString())
+	    mapFile.createNewFile()
 	}
 
-
-	long getPatientNumberByGSMNumber(String gsmNumber){
+	String qry = "select decode(chr,'X','23','Y','24','XY','25','MT','26', chr) chr, id, mapinfo from GPL13314"
+	int index = 1
+	sql.eachRow(qry) {
+	    mapData.append(it.chr + "\t")
+	    mapData.append(it.id + "\t")
+	    mapData.append("0\t")
+	    mapData.append(it.mapinfo + "\t\n")
+	    index++
 	}
+	logger.info "Write to MAP file: " + mapFile.toString() + " and total SNPs: " + index
+	mapFile.append(mapData.toString())
+    }
 
+    void setMapFile(File mapFile){
+	this.mapFile = mapFile
+    }
 
-	void createMapforGPL13314(){
-		StringBuffer mapData = new StringBuffer()
-		if(mapFile.exists()){
-			mapFile.delete()
-			mapFile.createNewFile()
-		} else {
-			logger.info("Create the file: " + mapFile.toString())
-			mapFile.createNewFile()
-		}
-
-		String qry = "select decode(chr,'X','23','Y','24','XY','25','MT','26', chr) chr, id, mapinfo from GPL13314"
-		int index = 1
-		sql.eachRow(qry) {
-			mapData.append(it.chr + "\t")
-			mapData.append(it.id + "\t")
-			mapData.append("0\t")
-			mapData.append(it.mapinfo + "\t\n")
-			index++
-		}
-		logger.info "Write to MAP file: " + mapFile.toString() + " and total SNPs: " + index
-		mapFile.append(mapData.toString())
-	}
-
-
-	void setMapFile(File mapFile){
-		this.mapFile = mapFile
-	}
-
-	void setSql(Sql sql){
-		this.sql = sql
-	}
+    void setSql(Sql sql){
+	this.sql = sql
+    }
 }

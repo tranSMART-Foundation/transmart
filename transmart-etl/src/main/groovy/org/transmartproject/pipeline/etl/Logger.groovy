@@ -34,61 +34,58 @@ enum LogType { MESSAGE, WARNING, ERROR, DEBUG, PROGRESS }
 
 class Logger {
 	
-	def config
-	File logFile 
+    def config
+    File logFile 
 	
-	Logger(conf) {
-		config = conf
-		if (! config?.log?.fileName) 
-			logFile = new File("tm_clinical_load.log")
-		else
-		logFile = new File( config?.log?.fileName) 
-		
-	}
+    Logger(conf) {
+	config = conf
+	if (! config?.log?.fileName) 
+	    logFile = new File("tm_clinical_load.log")
+	else
+	    logFile = new File( config?.log?.fileName) 
+    }
 	
-	private String timestamp(LogType ltype) {
-		def tm = new Date()
-		def str = String.format('%tm/%<td %<tT ', tm)
-		
-		switch (ltype) {
-			case LogType.DEBUG:
-				str += 'DBG '
-				break
-			case LogType.WARNING: 
-				str += 'WAR '
-				break
-			case LogType.ERROR: 
-				str += 'ERR '
-				break
-			case LogType.MESSAGE: 
-			default:
-				str += 'MSG '
-		}
-		
-		return str
-	}
-	//modified to write to a file instead of console
-	void log(LogType ltype, str) {
-		if (ltype != LogType.PROGRESS) {
-			str = timestamp(ltype) + str
-			if (ltype == LogType.ERROR)
-				System.err.println(str)
-				
-			else
-				{
-				println str 
-				logFile<< str+System.getProperty('line.separator')
-				}
-		}
-		else if (config.isInteractiveMode)
-			{
-				print '\r'+str
-			logFile<< str+System.getProperty('line.separator')
-			}
-	}
-	
-	void log(str) {
-		log(LogType.MESSAGE, str)
+    private String timestamp(LogType ltype) {
+	def tm = new Date()
+	def str = String.format('%tm/%<td %<tT ', tm)
+
+	switch (ltype) {
+	    case LogType.DEBUG:
+		str += 'DBG '
+		break
+	    case LogType.WARNING: 
+		str += 'WAR '
+		break
+	    case LogType.ERROR: 
+		str += 'ERR '
+		break
+	    case LogType.MESSAGE: 
+	    default:
+		str += 'MSG '
 	}
 
+	return str
+    }
+
+    //modified to write to a file instead of console
+    void log(LogType ltype, str) {
+	if (ltype != LogType.PROGRESS) {
+	    str = timestamp(ltype) + str
+	    if (ltype == LogType.ERROR)
+		System.err.println(str)
+
+	    else {
+		println str 
+		logFile<< str+System.getProperty('line.separator')
+	    }
+	}
+	else if (config.isInteractiveMode) {
+	    print '\r'+str
+	    logFile<< str+System.getProperty('line.separator')
+	}
+    }
+	
+    void log(str) {
+	log(LogType.MESSAGE, str)
+    }
 }

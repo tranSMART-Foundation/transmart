@@ -36,145 +36,142 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class PatientMapper {
 
-	Sql sql
-	String studyName
-	Map gsmMap = [:], gsmToGsmMapping
-	PatientDimension patientDimension 
+    Sql sql
+    String studyName
+    Map gsmMap = [:], gsmToGsmMapping
+    PatientDimension patientDimension 
 
-	Map getPatientMapFromSampleMap(Map sampleMapping){
-		Map patientMap = [:]
-		long patientNumber
+    Map getPatientMapFromSampleMap(Map sampleMapping){
+	Map patientMap = [:]
+	long patientNumber
 
-		sampleMapping.each{key, val ->
+	sampleMapping.each{key, val ->
 
-			if(key.indexOf("experiment_id") == -1){
+	    if(key.indexOf("experiment_id") == -1){
 
-				String [] str = val.split(":")
-				long patientNum1 = getPatientNumberBySubjectId(str[0])
-				long patientNum2 = getPatientNumberBySubjectId(str[1])
-				if(patientNum1 == 0 && patientNum2 == 0){
+		String [] str = val.split(":")
+		long patientNum1 = getPatientNumberBySubjectId(str[0])
+		long patientNum2 = getPatientNumberBySubjectId(str[1])
+		if(patientNum1 == 0 && patientNum2 == 0){
 
-					addPatient(val)
+		    addPatient(val)
 
-					patientNumber = getPatientNumberBySubjectId(val)
-					patientMap[key] = patientNumber
-					gsmMap[str[0]] = patientNumber
-					gsmMap[str[1]] = patientNumber
+		    patientNumber = getPatientNumberBySubjectId(val)
+		    patientMap[key] = patientNumber
+		    gsmMap[str[0]] = patientNumber
+		    gsmMap[str[1]] = patientNumber
 
-					logger.info("Add patient record for sample: " + val)
-				}else{
-					if(patientNum1 != patientNum2) {
-						String errMsg = "Inconsistent patient number for " + str[0] + "(" + patientNum1 + ") and " + str[1] + "(" + patientNum2 + ")"
-						logger.error(errMsg)
-						throw new RuntimeException(errMsg)
-					}else{
-						patientMap[key] = patientNum1
-						gsmMap[str[0]] = patientNum1
-						gsmMap[str[1]] = patientNum1
-						logger.info(key + " --> " + val + " --> " + patientNum1)
-					}
-				}
-			}
+		    logger.info("Add patient record for sample: " + val)
+		}else{
+		    if(patientNum1 != patientNum2) {
+			String errMsg = "Inconsistent patient number for " + str[0] + "(" + patientNum1 + ") and " + str[1] + "(" + patientNum2 + ")"
+			logger.error(errMsg)
+			throw new RuntimeException(errMsg)
+		    }else{
+			patientMap[key] = patientNum1
+			gsmMap[str[0]] = patientNum1
+			gsmMap[str[1]] = patientNum1
+			logger.info(key + " --> " + val + " --> " + patientNum1)
+		    }
 		}
-
-		return patientMap
+	    }
 	}
 
+	return patientMap
+    }
 	
-	Map getPatientMapFromGsmMap(Map gsmToGsmMapping){
-		Map patientGsmMap = [:]
-		long patientNumber
+    Map getPatientMapFromGsmMap(Map gsmToGsmMapping){
+	Map patientGsmMap = [:]
+	long patientNumber
 
-		File update = new File("C:/SNP/GSE14860/update.sql")
+	File update = new File("C:/SNP/GSE14860/update.sql")
 		
-		gsmToGsmMapping.each{key, val ->
+	gsmToGsmMapping.each{key, val ->
 
-			if(val.indexOf("SubjectId") == -1){
+	    if(val.indexOf("SubjectId") == -1){
 
-				String [] str = val.split(":")
-				long patientNum1 = getPatientNumberBySubjectId(str[0])
-				long patientNum2 = getPatientNumberBySubjectId(str[1])
-				long patientNum3 = getPatientNumberBySubjectId(str[2])
-				if(patientNum1 == 0 && patientNum2 == 0){
+		String [] str = val.split(":")
+		long patientNum1 = getPatientNumberBySubjectId(str[0])
+		long patientNum2 = getPatientNumberBySubjectId(str[1])
+		long patientNum3 = getPatientNumberBySubjectId(str[2])
+		if(patientNum1 == 0 && patientNum2 == 0){
 
-					//addPatient(val)
+		    //addPatient(val)
 
-					patientNumber = getPatientNumberBySubjectId(val)
-					patientGsmMap[key] = patientNumber
-					gsmMap[str[0]] = patientNumber
-					gsmMap[str[1]] = patientNumber
+		    patientNumber = getPatientNumberBySubjectId(val)
+		    patientGsmMap[key] = patientNumber
+		    gsmMap[str[0]] = patientNumber
+		    gsmMap[str[1]] = patientNumber
 
-					logger.info("Add patient record for sample: " + val)
-				}else{
-					if(patientNum1 != patientNum2) {
-						String errMsg = "Inconsistent patient number for " + str[0] + "(" + patientNum1 + ") and " + str[1] + "(" + patientNum2 + ")"
-						logger.error(errMsg)
-						throw new RuntimeException(errMsg)
-					}else{
-						patientGsmMap[key] = patientNum1
-						gsmMap[str[0]] = patientNum1
-						gsmMap[str[1]] = patientNum1
-						logger.info(key + " --> " + val + " --> " + patientNum1 + ":" + patientNum3)
-						StringBuffer line = new StringBuffer()
-						line.append("update pt set sample_id='" + key + "' where patient_num=" + patientNum1 + ";\n")
-						line.append("update pt set sample_id='" + key + "' where patient_num=" + patientNum3 + ";\n")
-						
-						//line.append "update DE_SNP_DATA_BY_PATIENT set patient_num=" + patientNum3 + " where patient_num = " + patientNum1 + ";\n" 
-						//line.append "update DE_SNP_SUBJECT_SORTED_DEF set patient_num=" + patientNum3 + " where patient_num = " + patientNum1 + ";\n"
-						//line.append "update DE_SUBJECT_SNP_DATASET set patient_num=" + patientNum3 + " where patient_num = " + patientNum1 + ";\n"
-						update.append(line.toString())
-					}
-				}
-			}
-		}
-
-		return patientGsmMap
-	}
-
-	
-	long getPatientNumberByIndividual(String individualId){
-		String qry = "select patient_num from patient_dimension where sourcesystem_cd ='" + individualId + "'"
-		def v = sql.firstRow(qry)
-
-		if(v.equals(null)) {
-			logger.warn("No patient number found for " + individualId)
-			return 0
+		    logger.info("Add patient record for sample: " + val)
 		}else{
-			return v[0]
+		    if(patientNum1 != patientNum2) {
+			String errMsg = "Inconsistent patient number for " + str[0] + "(" + patientNum1 + ") and " + str[1] + "(" + patientNum2 + ")"
+			logger.error(errMsg)
+			throw new RuntimeException(errMsg)
+		    }else{
+			patientGsmMap[key] = patientNum1
+			gsmMap[str[0]] = patientNum1
+			gsmMap[str[1]] = patientNum1
+			logger.info(key + " --> " + val + " --> " + patientNum1 + ":" + patientNum3)
+			StringBuffer line = new StringBuffer()
+			line.append("update pt set sample_id='" + key + "' where patient_num=" + patientNum1 + ";\n")
+			line.append("update pt set sample_id='" + key + "' where patient_num=" + patientNum3 + ";\n")
+
+			//line.append "update DE_SNP_DATA_BY_PATIENT set patient_num=" + patientNum3 + " where patient_num = " + patientNum1 + ";\n" 
+			//line.append "update DE_SNP_SUBJECT_SORTED_DEF set patient_num=" + patientNum3 + " where patient_num = " + patientNum1 + ";\n"
+			//line.append "update DE_SUBJECT_SNP_DATASET set patient_num=" + patientNum3 + " where patient_num = " + patientNum1 + ";\n"
+			update.append(line.toString())
+		    }
 		}
+	    }
 	}
 
-	long getPatientNumberBySubjectId(String subjectId){
-		String qry = "select patient_num from patient_dimension where sourcesystem_cd like '%" + subjectId + "%'"
-		def v = sql.firstRow(qry)
+	return patientGsmMap
+    }
 
-		if(v.equals(null)) {
-			logger.warn("No patient number found for " + subjectId)
-			return 0
-		}else{
-			return v[0]
-		}
-	}
+    long getPatientNumberByIndividual(String individualId){
+	String qry = "select patient_num from patient_dimension where sourcesystem_cd ='" + individualId + "'"
+	def v = sql.firstRow(qry)
 
-	void addPatient(String subjectId){
-		String qry = "insert into patient_dimension(sourcesystem_cd) values(?)"
-		sql.execute(qry, [studyName + ":" + subjectId])
+	if(v.equals(null)) {
+	    logger.warn("No patient number found for " + individualId)
+	    return 0
+	}else{
+	    return v[0]
 	}
+    }
 
-	
-	void setPatientDimension(PatientDimension patientDimension){
-		this.patientDimension = patientDimension
-	}
+    long getPatientNumberBySubjectId(String subjectId){
+	String qry = "select patient_num from patient_dimension where sourcesystem_cd like '%" + subjectId + "%'"
+	def v = sql.firstRow(qry)
 
-	void setStudyName(String studyName){
-		this.studyName = studyName
+	if(v.equals(null)) {
+	    logger.warn("No patient number found for " + subjectId)
+	    return 0
+	}else{
+	    return v[0]
 	}
+    }
 
-	void setSql(Sql sql){
-		this.sql = sql
-	}
+    void addPatient(String subjectId){
+	String qry = "insert into patient_dimension(sourcesystem_cd) values(?)"
+	sql.execute(qry, [studyName + ":" + subjectId])
+    }
 
-	Map getGsmMap(){
-		return this.gsmMap
-	}
+    void setPatientDimension(PatientDimension patientDimension){
+	this.patientDimension = patientDimension
+    }
+
+    void setStudyName(String studyName){
+	this.studyName = studyName
+    }
+
+    void setSql(Sql sql){
+	this.sql = sql
+    }
+
+    Map getGsmMap(){
+	return this.gsmMap
+    }
 }

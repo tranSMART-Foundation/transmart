@@ -23,8 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- ******************************************************************/
-  
+ ******************************************************************/  
 
 package org.transmartproject.pipeline.converter
 
@@ -33,57 +32,55 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class CopyNumberFormatter {
 
-	File copyNumberFile
-	Map samplePatientMap
+    File copyNumberFile
+    Map samplePatientMap
 
-	void format(){
+    void format(){
 
-		logger.info "Start formatting Copy Number file: " + copyNumberFile.toString()
+	logger.info "Start formatting Copy Number file: " + copyNumberFile.toString()
 
-		File f = new File(copyNumberFile.toString() + ".final")
-		if(f.size() > 0){
-			f.delete()
-		}
-		f.createNewFile()
+	File f = new File(copyNumberFile.toString() + ".final")
+	if(f.size() > 0){
+	    f.delete()
+	}
+	f.createNewFile()
 
-		StringBuffer sb = new StringBuffer()
+	StringBuffer sb = new StringBuffer()
 
-		int lineNum = 0
-		copyNumberFile.eachLine{
-			lineNum++
-			String [] str = it.split("\t")
-			sb.append(samplePatientMap[str[0]] + "\t")
-			for(int i=1; i<str.size(); i++){
-				sb.append(str[i] + "\t")
-			}
-			sb.append("\n")
+	int lineNum = 0
+	copyNumberFile.eachLine{
+	    lineNum++
+	    String [] str = it.split("\t")
+	    sb.append(samplePatientMap[str[0]] + "\t")
+	    for(int i=1; i<str.size(); i++){
+		sb.append(str[i] + "\t")
+	    }
+	    sb.append("\n")
 
-			if((lineNum % 10000) == 0){
-				f.append(sb.toString())
-				sb.setLength(0)
-			}
-		}
-
+	    if((lineNum % 10000) == 0){
 		f.append(sb.toString())
 		sb.setLength(0)
-		
-		// add the suffix ".raw" to the original copy number file
-		File raw = new File(copyNumberFile.toString() + ".raw")
-		copyNumberFile.renameTo(raw)
-		
-		// remove the suffix ".final" from the new copy number file
-		f.renameTo(copyNumberFile)
-		
-		logger.info "End formatting Copy Number file: " + copyNumberFile.toString()
+	    }
 	}
 
+	f.append(sb.toString())
+	sb.setLength(0)
 
-	void setCopyNumberFile(File copyNumberFile){
-		this.copyNumberFile = copyNumberFile
-	}
+	// add the suffix ".raw" to the original copy number file
+	File raw = new File(copyNumberFile.toString() + ".raw")
+	copyNumberFile.renameTo(raw)
 
+	// remove the suffix ".final" from the new copy number file
+	f.renameTo(copyNumberFile)
 
-	void setSamplePatientMap(Map samplePatientMap){
-		this.samplePatientMap = samplePatientMap
-	}
+	logger.info "End formatting Copy Number file: " + copyNumberFile.toString()
+    }
+
+    void setCopyNumberFile(File copyNumberFile){
+	this.copyNumberFile = copyNumberFile
+    }
+
+    void setSamplePatientMap(Map samplePatientMap){
+	this.samplePatientMap = samplePatientMap
+    }
 }

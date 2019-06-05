@@ -34,29 +34,33 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioDataOmicMarker {
 
-	Sql biomart
-	String testsDataTable, gxAnnotationTable
+    Sql biomart
+    String testsDataTable, gxAnnotationTable
 
-	void loadBioDataOmicMarker(String gseAnalysis){
+    void loadBioDataOmicMarker(String gseAnalysis){
 		
-		logger.info "Start loading data into Bio_Data_Omic_Marker ..."
+	logger.info "Start loading data into Bio_Data_Omic_Marker ..."
 		
-		String qry = """ insert into bio_data_omic_marker nologging
-								(bio_data_id, bio_marker_id, data_table)
-						 select a.bio_asy_analysis_data_id, c.bio_marker_id, 'BAAD' 
-						 from bio_assay_analysis_data a, bio_assay_data_annotation c, $gseAnalysis t 
-						 where a.BIO_ASSAY_FEATURE_GROUP_ID = c.BIO_ASSAY_FEATURE_GROUP_ID 
-						   		and a.bio_experiment_id=t.bio_experiment_id
-						 minus
-						 select bio_data_id, bio_marker_id, data_table from bio_data_omic_marker """
+	String qry = """ insert into bio_data_omic_marker nologging
+			     (bio_data_id,
+                              bio_marker_id,
+                              data_table)
+			 select a.bio_asy_analysis_data_id,
+                                c.bio_marker_id,
+                                'BAAD' 
+			 from bio_assay_analysis_data a, bio_assay_data_annotation c, $gseAnalysis t 
+			 where a.BIO_ASSAY_FEATURE_GROUP_ID = c.BIO_ASSAY_FEATURE_GROUP_ID 
+			     and a.bio_experiment_id=t.bio_experiment_id
+			 minus
+			 select bio_data_id, bio_marker_id, data_table
+                         from bio_data_omic_marker """
 
-		biomart.execute(qry)
+	biomart.execute(qry)
 		
-		logger.info "End loading data into Bio_Data_Omic_Marker ..."
-	}
+	logger.info "End loading data into Bio_Data_Omic_Marker ..."
+    }
 
-	
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

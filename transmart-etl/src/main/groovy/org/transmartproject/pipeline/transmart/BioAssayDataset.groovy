@@ -34,69 +34,68 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioAssayDataset {
 
-	Sql biomart
-	String testsDataTable
+    Sql biomart
+    String testsDataTable
 
-	void loadBioAssayDataset(){
+    void loadBioAssayDataset(){
 
-		String qry = """ select distinct name, test, platform, bio_experiment_id 
-						 from $testsDataTable t1, bio_experiment t2
-						 where t1.name=t2.accession """
-		biomart.eachRow(qry) {
-			String [] analysis = it.test.split (/=>/)[1].trim().split(/ vs /)
+	String qry = """ select distinct name, test, platform, bio_experiment_id 
+			 from $testsDataTable t1, bio_experiment t2
+			 where t1.name=t2.accession """
+	biomart.eachRow(qry) {
+	    String [] analysis = it.test.split (/=>/)[1].trim().split(/ vs /)
 
-			String analysis1 = analysis[0].trim()
-			String analysis2 = analysis[1].trim()
-			String accession = it.name
-			String platform = it.platform
-			long bioExperimentId = it.bio_experiment_id
-			loadBioAssayDataset(analysis1, accession, platform, bioExperimentId)
-			loadBioAssayDataset(analysis2, accession, platform, bioExperimentId)
-		}
+	    String analysis1 = analysis[0].trim()
+	    String analysis2 = analysis[1].trim()
+	    String accession = it.name
+	    String platform = it.platform
+	    long bioExperimentId = it.bio_experiment_id
+	    loadBioAssayDataset(analysis1, accession, platform, bioExperimentId)
+	    loadBioAssayDataset(analysis2, accession, platform, bioExperimentId)
 	}
+    }
 
+    void loadBioAssayDataset(String datasetName, String accession, String platform, long bioExperimentId){
+	if(isBioAssayDatasetExist(datasetName, bioExperimentId)){
+            //logger.info "$datasetName ($accession:$platform) already exists in BIO_ASSAY_DATASET ..."
+	}else{
+	    logger.info "Start inserting $datasetName ($accession:$platform) into BIO_ASSAY_DATASET ..."
 
-	void loadBioAssayDataset(String datasetName, String accession, String platform, long bioExperimentId){
+	    String qry = """ insert into bio_assay_dataset
+                                 (bio_experiment_id,
+                                  dataset_name,
+                                  dataset_description, 
+				  accession,
+                                  create_date) 
+			     values(?, ?, ?, ?, sysdate) """
+	    biomart.execute(qry, [
+		bioExperimentId,
+		datasetName,
+		accession + " " + platform,
+		accession
+	    ])
 
-		if(isBioAssayDatasetExist(datasetName, bioExperimentId)){
-                    //logger.info "$datasetName ($accession:$platform) already exists in BIO_ASSAY_DATASET ..."
-		}else{
-			logger.info "Start inserting $datasetName ($accession:$platform) into BIO_ASSAY_DATASET ..."
-
-			String qry = """ insert into bio_assay_dataset(bio_experiment_id, dataset_name, dataset_description, 
-										accession, create_date) 
-							 values(?, ?, ?, ?, sysdate) """
-			biomart.execute(qry, [
-				bioExperimentId,
-				datasetName,
-				accession + " " + platform,
-				accession
-			])
-
-			logger.info "End loading $datasetName into BIO_ASSAY_DATASET ..."
-		}
+	    logger.info "End loading $datasetName into BIO_ASSAY_DATASET ..."
 	}
+    }
 
-
-	boolean isBioAssayDatasetExist(String datasetName, long bioExperimentId){
-		String qry = "select count(1) from bio_assay_dataset where dataset_name=? and bio_experiment_id=?"
-		if(biomart.firstRow(qry, [
-			datasetName,
-			bioExperimentId
-		])[0] > 0){
-			return true
-		}else{
-			return false
-		}
+    boolean isBioAssayDatasetExist(String datasetName, long bioExperimentId){
+	String qry = "select count(1) from bio_assay_dataset where dataset_name=? and bio_experiment_id=?"
+	if(biomart.firstRow(qry, [
+	    datasetName,
+	    bioExperimentId
+	])[0] > 0){
+	    return true
+	}else{
+	    return false
 	}
+    }
 
+    void setTestsDataTable(String testsDataTable){
+	this.testsDataTable = testsDataTable
+    }
 
-	void setTestsDataTable(String testsDataTable){
-		this.testsDataTable = testsDataTable
-	}
-
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

@@ -34,32 +34,29 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class ObservationFact {
 
-	Sql i2b2demodata
-	Map conceptPathToCode, subjectToPatient
-	String studyName, basePath
+    Sql i2b2demodata
+    Map conceptPathToCode, subjectToPatient
+    String studyName, basePath
 
+    void loadObservationFact(Map subjects){
 
-	void loadObservationFact(Map subjects){
+	logger.info "Start loading OBSERVATION_FACT ..."
 
-		logger.info "Start loading OBSERVATION_FACT ..."
+	String conceptPath
+	subjects.each{key, val ->
 
-		String conceptPath
-		subjects.each{key, val ->
+	    long patientNum =subjectToPatient[key]
+	    if(val.equals(null) || val.size() ==0 )   conceptPath = basePath
+	    else conceptPath = basePath + val + "/"
+	    String conceptCode = conceptPathToCode[conceptPath]
 
-			long patientNum =subjectToPatient[key]
-			if(val.equals(null) || val.size() ==0 )   conceptPath = basePath
-			else conceptPath = basePath + val + "/"
-			String conceptCode = conceptPathToCode[conceptPath]
-
-			insertObservationFact(patientNum, conceptCode)
-		}
+	    insertObservationFact(patientNum, conceptCode)
 	}
+    }
 
+    void insertObservationFact(long patientNum, String conceptCode){
 
-	void insertObservationFact(long patientNum, String conceptCode){
-
-
-		String qry = """ insert into observation_fact (patient_num, concept_cd, modifier_cd
+	String qry = """ insert into observation_fact (patient_num, concept_cd, modifier_cd
 							,valtype_cd
 							,tval_char
 							,nval_num
@@ -69,59 +66,53 @@ class ObservationFact {
 							,provider_id
 							,location_cd
 							)
-						 values(?, ?, ?
-								  ,'T' -- Text data type
-								  ,'E'  --Stands for Equals for Text Types
-								  ,null	--	not numeric for Proteomics
-								  ,?
-								  ,sysdate
-								  ,'@'
-								  ,'@'
-								  ,'@')
-							""";
+				 values(?, ?, ?
+					  ,'T' -- Text data type
+					  ,'E'  --Stands for Equals for Text Types
+					  ,null	--	not numeric for Proteomics
+					  ,?
+					  ,sysdate
+					  ,'@'
+					  ,'@'
+					  ,'@')
+			""";
 
-		if(isObservationFactExist(patientNum, conceptCode)){
-			logger.info "($patientNum, $conceptCode) already exists in OBSERVATION_FACT ..."
-		}else{
-			i2b2demodata.execute(qry, [
-				patientNum,
-				conceptCode,
-				studyName,
-				studyName
-			])
-		}
+	if(isObservationFactExist(patientNum, conceptCode)){
+	    logger.info "($patientNum, $conceptCode) already exists in OBSERVATION_FACT ..."
+	}else{
+	    i2b2demodata.execute(qry, [
+		patientNum,
+		conceptCode,
+		studyName,
+		studyName
+	    ])
 	}
+    }
 
+    boolean isObservationFactExist(long patientNum, String conceptCode){
+	String qry = "select count(*) from observation_fact where patient_num=? and concept_cd=?"
+	def res = i2b2demodata.firstRow(qry, [patientNum, conceptCode])
+	if(res[0] > 0) return true
+	else return false
+    }
 
+    void setBasePath(String basePath){
+	this.basePath = basePath
+    }
 
-	boolean isObservationFactExist(long patientNum, String conceptCode){
-		String qry = "select count(*) from observation_fact where patient_num=? and concept_cd=?"
-		def res = i2b2demodata.firstRow(qry, [patientNum, conceptCode])
-		if(res[0] > 0) return true
-		else return false
-	}
+    void setStudyName(String studyName){
+	this.studyName = studyName
+    }
 
+    void setSubjectToPatient(Map subjectToPatient){
+	this.subjectToPatient = subjectToPatient
+    }
 
-	void setBasePath(String basePath){
-		this.basePath = basePath
-	}
+    void setConceptPathToCode(Map conceptPathToCode){
+	this.conceptPathToCode = conceptPathToCode
+    }
 
-
-	void setStudyName(String studyName){
-		this.studyName = studyName
-	}
-
-	void setSubjectToPatient(Map subjectToPatient){
-		this.subjectToPatient = subjectToPatient
-	}
-
-
-	void setConceptPathToCode(Map conceptPathToCode){
-		this.conceptPathToCode = conceptPathToCode
-	}
-
-
-	void setI2b2demodata(Sql i2b2demodata){
-		this.i2b2demodata = i2b2demodata
-	}
+    void setI2b2demodata(Sql i2b2demodata){
+	this.i2b2demodata = i2b2demodata
+    }
 }

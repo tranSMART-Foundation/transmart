@@ -68,17 +68,16 @@ class BioDataExtCode {
         }
     }
 
-
     void insertBioDataExtCode(long bioMarkerID, String synonym, String dataType) {
          biomart.execute("""
                 insert into BIO_DATA_EXT_CODE(BIO_DATA_ID, CODE, CODE_TYPE, BIO_DATA_TYPE, CODE_SOURCE)
                   values(:bio_data_id, :code, :code_type, :bio_data_type, :code_source)
                 """,
                 [bio_data_id: bioMarkerID,
-                        code: synonym,
-                        code_type: 'SYNONYM',
-                        bio_data_type: 'BIO_MARKER.' + dataType,
-                        code_source: 'Alias'])
+                 code: synonym,
+                 code_type: 'SYNONYM',
+                 bio_data_type: 'BIO_MARKER.' + dataType,
+                 code_source: 'Alias'])
     }
 
     boolean isBioDataExtCodeExist(long bioDataId) {
@@ -88,7 +87,6 @@ class BioDataExtCode {
         return count > 0
     }
 
-
     boolean isBioDataExtCodeExist(String dataType, long bioDataId) {
         String qry = "select count(1) from bio_data_ext_code where bio_data_type=? and bio_data_id=?"
         GroovyRowResult rowResult = biomart.firstRow(qry, [dataType, bioDataId])
@@ -96,14 +94,12 @@ class BioDataExtCode {
         return count > 0
     }
 
-
     boolean isBioDataExtCodeExist(long bioDataId, String synonym) {
         String qry = "select count(*) from BIO_DATA_EXT_CODE where BIO_DATA_ID=? and CODE=?"
         GroovyRowResult res = biomart.firstRow(qry, [bioDataId, synonym])
         int count = res[0]
         return count > 0
     }
-
 
     void setBiomart(Sql biomart) {
         this.biomart = biomart

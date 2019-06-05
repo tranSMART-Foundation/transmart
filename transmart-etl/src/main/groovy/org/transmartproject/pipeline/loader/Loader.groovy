@@ -47,402 +47,381 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class Loader {
 
-	static Map sampleTypes, subjects, platformMap
-	static List subjectSamples
+    static Map sampleTypes, subjects, platformMap
+    static List subjectSamples
 
-	static main(args) {
+    static main(args) {
 
-//		PropertyConfigurator.configure("conf/log4j.properties");
-		
-		println new Date()
+//	PropertyConfigurator.configure("conf/log4j.properties");
 
-		logger.info("Start loading property file ...")
-		//Properties props = Util.loadConfiguration("loader.properties")
-		Properties props = Util.loadConfiguration("conf/SNP.properties")
+	println new Date()
 
-		Sql i2b2demodata = Util.createSqlFromPropertyFile(props, "i2b2demodata")
-		Sql i2b2metadata = Util.createSqlFromPropertyFile(props, "i2b2metadata")
-		Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
-		Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
-		Sql searchapp = Util.createSqlFromPropertyFile(props, "searchapp")
+	logger.info("Start loading property file ...")
+	//Properties props = Util.loadConfiguration("loader.properties")
+	Properties props = Util.loadConfiguration("conf/SNP.properties")
 
-		File subjectSampleMappingFile = new File(props.get("source_directory") + "/" + props.get("subject_sample_mapping"))
+	Sql i2b2demodata = Util.createSqlFromPropertyFile(props, "i2b2demodata")
+	Sql i2b2metadata = Util.createSqlFromPropertyFile(props, "i2b2metadata")
+	Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
+	Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
+	Sql searchapp = Util.createSqlFromPropertyFile(props, "searchapp")
 
-		Loader loader = new Loader()
-		loader.loadSubjectSampleMappingFile(subjectSampleMappingFile)
+	File subjectSampleMappingFile = new File(props.get("source_directory") + "/" + props.get("subject_sample_mapping"))
 
-		List concepts = loader.getConcepts(props)
-		Map visualAttributes = loader.getVisualAttributes(props)
+	Loader loader = new Loader()
+	loader.loadSubjectSampleMappingFile(subjectSampleMappingFile)
 
-		// mapping between subject id/sample id and sample type
-		//Util.printMap(subjects)
-		//Util.printMap(sampleTypes)
-		Util.printMap(visualAttributes)
+	List concepts = loader.getConcepts(props)
+	Map visualAttributes = loader.getVisualAttributes(props)
 
-		//loader.deleteConceptPath(props.get("snp_base_node").toString().replace("/", "\\"), i2b2demodata, i2b2metadata, deapp)
+	// mapping between subject id/sample id and sample type
+	//Util.printMap(subjects)
+	//Util.printMap(sampleTypes)
+	Util.printMap(visualAttributes)
 
-		// loading records into PATIENT_DIMENSION
-		Map subjectToPatient = loader.loadPatientDimension(props, i2b2demodata)
-		Util.printMap(subjectToPatient)
+	//loader.deleteConceptPath(props.get("snp_base_node").toString().replace("/", "\\"), i2b2demodata, i2b2metadata, deapp)
 
-		// loading records into CONCEPT_DIMENSION
-		Map conceptPathToCode = loader.loadConceptDimension(props, i2b2demodata, concepts)
-		Util.printMap(conceptPathToCode)
+	// loading records into PATIENT_DIMENSION
+	Map subjectToPatient = loader.loadPatientDimension(props, i2b2demodata)
+	Util.printMap(subjectToPatient)
 
-		// loading records into I2B2
-		loader.loadI2b2(props, i2b2metadata, visualAttributes, conceptPathToCode)
+	// loading records into CONCEPT_DIMENSION
+	Map conceptPathToCode = loader.loadConceptDimension(props, i2b2demodata, concepts)
+	Util.printMap(conceptPathToCode)
 
-		// loading records into I2B2_SECURE
-		loader.loadI2b2Secure(props, i2b2metadata, visualAttributes, conceptPathToCode)
+	// loading records into I2B2
+	loader.loadI2b2(props, i2b2metadata, visualAttributes, conceptPathToCode)
 
-		// loading records into I2B2_TAGS need to be completed
-		loader.loadI2b2Tags(props, i2b2metadata)
+	// loading records into I2B2_SECURE
+	loader.loadI2b2Secure(props, i2b2metadata, visualAttributes, conceptPathToCode)
 
-		// loading records into OBSERVATION_FACT
-		loader.loadObservationFact(props, i2b2demodata, conceptPathToCode, subjectToPatient)
+	// loading records into I2B2_TAGS need to be completed
+	loader.loadI2b2Tags(props, i2b2metadata)
 
-		// loading records into CONCEPT_COUNTS
-		// TO_BE_DONE: update parent node's count ...
-		loader.loadConceptCounts(props, i2b2demodata)
+	// loading records into OBSERVATION_FACT
+	loader.loadObservationFact(props, i2b2demodata, conceptPathToCode, subjectToPatient)
 
-		// loading records into DE_GPL_INFO
-		loader.loadDeGPLInfo(props, deapp)
+	// loading records into CONCEPT_COUNTS
+	// TO_BE_DONE: update parent node's count ...
+	loader.loadConceptCounts(props, i2b2demodata)
 
-		// loading records into DE_SUBJECT_SAMPLE_MAPPING
-		loader.loadDeSubjectSampleMapping(props, deapp, subjectToPatient, conceptPathToCode)
+	// loading records into DE_GPL_INFO
+	loader.loadDeGPLInfo(props, deapp)
 
-		// loading records into BIO_CONTENT_REPOSITORY
-		loader.loadBioContentRepository(props, biomart)
+	// loading records into DE_SUBJECT_SAMPLE_MAPPING
+	loader.loadDeSubjectSampleMapping(props, deapp, subjectToPatient, conceptPathToCode)
 
-		// loading records into BIO_CONTENT
-		loader.loadBioContent(props, biomart)
+	// loading records into BIO_CONTENT_REPOSITORY
+	loader.loadBioContentRepository(props, biomart)
 
-		// loading records into BIO_CONTENT_REFERENCE
-		loader.loadBioContentReference(props, biomart)
+	// loading records into BIO_CONTENT
+	loader.loadBioContent(props, biomart)
+
+	// loading records into BIO_CONTENT_REFERENCE
+	loader.loadBioContentReference(props, biomart)
+    }
+
+    // need to be completed
+    void loadI2b2Tags(Properties props, Sql i2b2metadata){
 	
+    }
+
+    List getConcepts(Properties props){
+	String snpBaseNode = props.get("snp_base_node")
+	String platformName = props.get("platform_name")
+
+	List concepts = []
+	concepts = [snpBaseNode + "/"]
+	concepts << snpBaseNode + "/" + platformName + "/"
+	sampleTypes.each{k, v ->
+	    concepts << snpBaseNode + "/" + platformName + "/" + k + "/"
+	}
+	return concepts
+    }
+
+    Map getVisualAttributes(Properties props){
+	String snpBaseNode = props.get("snp_base_node")
+	String platformName = props.get("platform_name")
+
+	// used to fill I2B2's C_VISUALATTRIBUTES column
+	Map visualAttrs = [:]
+	visualAttrs[snpBaseNode + "/"] = "FA"
+	if(sampleTypes.size() > 0){
+	    visualAttrs[snpBaseNode + "/" + platformName + "/"] = "FA"
+	    sampleTypes.each{k, v ->
+		// set as high dimensional node
+		visualAttrs[snpBaseNode + "/" + platformName + "/" + k + "/"] = "LAH"
+	    }
+	}else{
+	    // set as high dimensional node
+	    visualAttrs[snpBaseNode + "/" + platformName + "/"] = "LAH"
 	}
 
+	return visualAttrs
+    }
 
-	// need to be completed
-	void loadI2b2Tags(Properties props, Sql i2b2metadata){
+    Map loadConceptDimension(Properties props, Sql i2b2demodata, List concepts){
 
+	Map conceptPathToCode = [:]
+
+	ConceptDimension cd = new ConceptDimension()
+	cd.setI2b2demodata(i2b2demodata)
+	cd.setStudyName(props.get("study_name"))
+
+	if(props.get("skip_concept_dimension").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into CONCEPT_DIMENSION table ..."
+	}else{
+	    logger.info "Start loading records into CONCEPT_DIMENSION table ..."
+	    cd.loadConceptDimensions(concepts)
+	    logger.info "End loading records into CONCEPT_DIMENSION table ..."
 	}
 
+	conceptPathToCode = cd.getConceptCode(concepts)
 
-	List getConcepts(Properties props){
+	return conceptPathToCode
+    }
 
-		String snpBaseNode = props.get("snp_base_node")
-		String platformName = props.get("platform_name")
+    Map loadPatientDimension(Properties props, Sql i2b2demodata){
 
-		List concepts = []
-		concepts = [snpBaseNode + "/"]
-		concepts << snpBaseNode + "/" + platformName + "/"
-		sampleTypes.each{k, v ->
-			concepts << snpBaseNode + "/" + platformName + "/" + k + "/"
-		}
-		return concepts
+	PatientDimension pd = new PatientDimension()
+	pd.setI2b2demodata(i2b2demodata)
+	pd.setSourceSystemPrefix(props.get("source_system_prefix"))
+
+	if(props.get("skip_patient_dimension").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into PATIENT_DIMENSION table ..."
+	}else{
+	    logger.info "Start loading records into PATIENT_DIMENSION table ..."
+
+	    pd.loadPatientDimensionFromSamples(subjects)
+	    logger.info "End loading records into PATIENT_DIMENSION table ..."
 	}
 
+	return pd.getPatientMap()
+    }
 
-	Map getVisualAttributes(Properties props){
+    void loadI2b2(Properties props, Sql i2b2metadata, Map visualAttrs, Map conceptPathToCode){
 
-		String snpBaseNode = props.get("snp_base_node")
-		String platformName = props.get("platform_name")
-
-		// used to fill I2B2's C_VISUALATTRIBUTES column
-		Map visualAttrs = [:]
-		visualAttrs[snpBaseNode + "/"] = "FA"
-		if(sampleTypes.size() > 0){
-			visualAttrs[snpBaseNode + "/" + platformName + "/"] = "FA"
-			sampleTypes.each{k, v ->
-				// set as high dimensional node
-				visualAttrs[snpBaseNode + "/" + platformName + "/" + k + "/"] = "LAH"
-			}
-		}else{
-			// set as high dimensional node
-			visualAttrs[snpBaseNode + "/" + platformName + "/"] = "LAH"
-		}
-
-		return visualAttrs
+	if(props.get("skip_i2b2").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into I2B2 table ..."
+	}else{
+	    logger.info "Start loading records into I2B2 table ..."
+	    I2b2 i2b2 = new I2b2()
+	    i2b2.setI2b2metadata(i2b2metadata)
+	    i2b2.setStudyName(props.get("study_name"))
+	    i2b2.setVisualAttrs(visualAttrs)
+	    i2b2.loadConceptPaths(conceptPathToCode)
+	    logger.info "End loading records into I2B2 table ..."
 	}
+    }
 
+    void loadI2b2Secure(Properties props, Sql i2b2metadata, Map visualAttrs, Map conceptPathToCode){
 
-	Map loadConceptDimension(Properties props, Sql i2b2demodata, List concepts){
+	if(props.get("skip_i2b2_secure").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into I2B2_secure table ..."
+	}else{
+	    logger.info "Start loading records into I2B2_secure table ..."
+	    I2b2Secure i2b2Secure = new I2b2Secure()
+	    i2b2Secure.setI2b2metadata(i2b2metadata)
+	    i2b2Secure.setStudyName(props.get("study_name"))
+	    i2b2Secure.setVisualAttrs(visualAttrs)
 
-		Map conceptPathToCode = [:]
-
-		ConceptDimension cd = new ConceptDimension()
-		cd.setI2b2demodata(i2b2demodata)
-		cd.setStudyName(props.get("study_name"))
-
-		if(props.get("skip_concept_dimension").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into CONCEPT_DIMENSION table ..."
-		}else{
-			logger.info "Start loading records into CONCEPT_DIMENSION table ..."
-			cd.loadConceptDimensions(concepts)
-			logger.info "End loading records into CONCEPT_DIMENSION table ..."
-		}
-
-		conceptPathToCode = cd.getConceptCode(concepts)
-
-		return conceptPathToCode
+	    i2b2Secure.loadConceptPaths(conceptPathToCode)
+	    logger.info "End loading records into I2B2_secure table ..."
 	}
+    }
 
+    void loadObservationFact(Properties props, Sql i2b2demodata, Map conceptPathToCode, Map subjectToPatient){
 
-	Map loadPatientDimension(Properties props, Sql i2b2demodata){
-
-		PatientDimension pd = new PatientDimension()
-		pd.setI2b2demodata(i2b2demodata)
-		pd.setSourceSystemPrefix(props.get("source_system_prefix"))
-
-		if(props.get("skip_patient_dimension").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into PATIENT_DIMENSION table ..."
-		}else{
-			logger.info "Start loading records into PATIENT_DIMENSION table ..."
-
-			pd.loadPatientDimensionFromSamples(subjects)
-			logger.info "End loading records into PATIENT_DIMENSION table ..."
-		}
-
-		return pd.getPatientMap()
+	if(props.get("skip_observation_fact").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into OBSERVATION_FACT table ..."
+	}else{
+	    logger.info "Start loading records into OBSERVATION_FACT table ..."
+	    ObservationFact obsf = new ObservationFact()
+	    obsf.setI2b2demodata(i2b2demodata)
+	    obsf.setConceptPathToCode(conceptPathToCode)
+	    obsf.setSubjectToPatient(subjectToPatient)
+	    obsf.setStudyName(props.get("study_name"))
+	    obsf.setBasePath(props.get("snp_base_node") + "/" + props.get("platform_name") + "/")
+	    obsf.loadObservationFact(subjects)
+	    logger.info "End loading records into OBSERVATION_FACT table ..."
 	}
+    }
 
-
-	void loadI2b2(Properties props, Sql i2b2metadata, Map visualAttrs, Map conceptPathToCode){
-
-		if(props.get("skip_i2b2").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into I2B2 table ..."
-		}else{
-			logger.info "Start loading records into I2B2 table ..."
-			I2b2 i2b2 = new I2b2()
-			i2b2.setI2b2metadata(i2b2metadata)
-			i2b2.setStudyName(props.get("study_name"))
-			i2b2.setVisualAttrs(visualAttrs)
-			i2b2.loadConceptPaths(conceptPathToCode)
-			logger.info "End loading records into I2B2 table ..."
-		}
-	}
-
-
-	void loadI2b2Secure(Properties props, Sql i2b2metadata, Map visualAttrs, Map conceptPathToCode){
-
-		if(props.get("skip_i2b2_secure").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into I2B2_secure table ..."
-		}else{
-			logger.info "Start loading records into I2B2_secure table ..."
-			I2b2Secure i2b2Secure = new I2b2Secure()
-			i2b2Secure.setI2b2metadata(i2b2metadata)
-			i2b2Secure.setStudyName(props.get("study_name"))
-			i2b2Secure.setVisualAttrs(visualAttrs)
-
-			i2b2Secure.loadConceptPaths(conceptPathToCode)
-			logger.info "End loading records into I2B2_secure table ..."
-		}
-	}
-
-
-	void loadObservationFact(Properties props, Sql i2b2demodata, Map conceptPathToCode, Map subjectToPatient){
-
-		if(props.get("skip_observation_fact").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into OBSERVATION_FACT table ..."
-		}else{
-			logger.info "Start loading records into OBSERVATION_FACT table ..."
-			ObservationFact obsf = new ObservationFact()
-			obsf.setI2b2demodata(i2b2demodata)
-			obsf.setConceptPathToCode(conceptPathToCode)
-			obsf.setSubjectToPatient(subjectToPatient)
-			obsf.setStudyName(props.get("study_name"))
-			obsf.setBasePath(props.get("snp_base_node") + "/" + props.get("platform_name") + "/")
-			obsf.loadObservationFact(subjects)
-			logger.info "End loading records into OBSERVATION_FACT table ..."
-		}
-	}
-
-
-	void loadConceptCounts(Properties props, Sql i2b2demodata){
-
+    void loadConceptCounts(Properties props, Sql i2b2demodata){
 		if(props.get("skip_concept_counts").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into CONCEPT_COUNTS table ..."
-		}else{
-			logger.info "Start loading records into CONCEPT_COUNTS table ..."
-			ConceptCounts cc = new ConceptCounts()
-			cc.setI2b2demodata(i2b2demodata)
-			cc.setPlatform(props.get("platform_name"))
-			cc.setBasePath(props.get("snp_base_node") + "/")
-			cc.setSubjects(subjects)
-			cc.loadConceptCounts()
-			logger.info "End loading records into CONCEPT_COUNTS table ..."
-		}
+	    logger.info "Skip loading records into CONCEPT_COUNTS table ..."
+	}else{
+	    logger.info "Start loading records into CONCEPT_COUNTS table ..."
+	    ConceptCounts cc = new ConceptCounts()
+	    cc.setI2b2demodata(i2b2demodata)
+	    cc.setPlatform(props.get("platform_name"))
+	    cc.setBasePath(props.get("snp_base_node") + "/")
+	    cc.setSubjects(subjects)
+	    cc.loadConceptCounts()
+	    logger.info "End loading records into CONCEPT_COUNTS table ..."
 	}
+    }
 
-
-	void loadDeSubjectSampleMapping(Properties props, Sql deapp, Map subjectToPatient, Map conceptPathToCode){
-
-		if(props.get("skip_de_subject_sample_mapping").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
-		}else{
-			logger.info "Start loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
-			SubjectSampleMapping ssm = new SubjectSampleMapping()
-			ssm.setDeapp(deapp)
-			ssm.setPlatform(props.get("platform_type"))
-			ssm.setPlatformPath(props.get("snp_base_node") + "/" + props.get("platform_name") + "/")
-			ssm.setSubjectPatientMap(subjectToPatient)
-			ssm.setconceptPathToCode(conceptPathToCode)
-			ssm.setSubjectSamples(subjectSamples)
-			ssm.loadSubjectSampleMapping()
-			logger.info "End loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
-		}
+    void loadDeSubjectSampleMapping(Properties props, Sql deapp, Map subjectToPatient, Map conceptPathToCode){
+	if(props.get("skip_de_subject_sample_mapping").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
+	}else{
+	    logger.info "Start loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
+	    SubjectSampleMapping ssm = new SubjectSampleMapping()
+	    ssm.setDeapp(deapp)
+	    ssm.setPlatform(props.get("platform_type"))
+	    ssm.setPlatformPath(props.get("snp_base_node") + "/" + props.get("platform_name") + "/")
+	    ssm.setSubjectPatientMap(subjectToPatient)
+	    ssm.setconceptPathToCode(conceptPathToCode)
+	    ssm.setSubjectSamples(subjectSamples)
+	    ssm.loadSubjectSampleMapping()
+	    logger.info "End loading records into DE_SUBJECT_SAMPLE_MAPPING table ..."
 	}
+    }
 
+    void loadDeGPLInfo(Properties props, Sql deapp){
 
-	void loadDeGPLInfo(Properties props, Sql deapp){
-
-		if(props.get("skip_de_gpl_info").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into DE_GPL_INFO table ..."
-		}else{
-			logger.info "Start loading records into DE_GPL_INFO table ..."
-			GplInfo gi = new GplInfo()
-			gi.setDeapp(deapp)
-			String gplPlatorm = props.get("platform")
-			String title = props.get("title")
-			String organism = props.get("organism")
-			String markerType = props.get("marker_type")
-			gi.insertGplInfo(gplPlatorm, title, organism, markerType)
-			logger.info "End loading records into DE_GPL_INFO table ..."
-		}
+	if(props.get("skip_de_gpl_info").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into DE_GPL_INFO table ..."
+	}else{
+	    logger.info "Start loading records into DE_GPL_INFO table ..."
+	    GplInfo gi = new GplInfo()
+	    gi.setDeapp(deapp)
+	    String gplPlatorm = props.get("platform")
+	    String title = props.get("title")
+	    String organism = props.get("organism")
+	    String markerType = props.get("marker_type")
+	    gi.insertGplInfo(gplPlatorm, title, organism, markerType)
+	    logger.info "End loading records into DE_GPL_INFO table ..."
 	}
+    }
 
+    void loadBioContentRepository(Properties props, Sql biomart){
 
-	void loadBioContentRepository(Properties props, Sql biomart){
-
-		if(props.get("skip_bio_content_repository").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into BIO_CONTENT_REPOSITORY table ..."
-		}else{
-			logger.info "Start loading records into BIO_CONTENT_REPOSITORY table ..."
-			BioContentRepository bcr = new BioContentRepository()
-			bcr.setBiomart(biomart)
-			bcr.insertBioContentRepository("http://www.genome.jp/", "Y", "KEGG", "URL")
-			logger.info "End loading records into BIO_CONTENT_REPOSITORY table ..."
-		}
+	if(props.get("skip_bio_content_repository").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into BIO_CONTENT_REPOSITORY table ..."
+	}else{
+	    logger.info "Start loading records into BIO_CONTENT_REPOSITORY table ..."
+	    BioContentRepository bcr = new BioContentRepository()
+	    bcr.setBiomart(biomart)
+	    bcr.insertBioContentRepository("http://www.genome.jp/", "Y", "KEGG", "URL")
+	    logger.info "End loading records into BIO_CONTENT_REPOSITORY table ..."
 	}
+    }
 
+    void loadBioContent(Properties props, Sql biomart){
 
-	void loadBioContent(Properties props, Sql biomart){
-
-		if(props.get("skip_bio_content").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into BIO_CONTENT table ..."
-		}else{
-			logger.info "Start loading records into BIO_CONTENT table ..."
-			BioContent bc = new BioContent()
-			bc.setBiomart(biomart)
-			bc.loadBioContentForKEGG()
-			logger.info "End loading records into BIO_CONTENT table ..."
-		}
+	if(props.get("skip_bio_content").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into BIO_CONTENT table ..."
+	}else{
+	    logger.info "Start loading records into BIO_CONTENT table ..."
+	    BioContent bc = new BioContent()
+	    bc.setBiomart(biomart)
+	    bc.loadBioContentForKEGG()
+	    logger.info "End loading records into BIO_CONTENT table ..."
 	}
+    }
 
+    void loadBioContentReference(Properties props, Sql biomart){
 
-	void loadBioContentReference(Properties props, Sql biomart){
-
-		if(props.get("skip_bio_content_reference").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading records into BIO_CONTENT_REFERENCE table ..."
-		}else{
-			logger.info "Start loading records into BIO_CONTENT_REFERENCE table ..."
-			BioContentReference bcrf = new BioContentReference()
-			bcrf.setBiomart(biomart)
-			bcrf.loadBioContentReferenceForKEGG()
-			logger.info "End loading records into BIO_CONTENT_REFERENCE table ..."
-		}
+	if(props.get("skip_bio_content_reference").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading records into BIO_CONTENT_REFERENCE table ..."
+	}else{
+	    logger.info "Start loading records into BIO_CONTENT_REFERENCE table ..."
+	    BioContentReference bcrf = new BioContentReference()
+	    bcrf.setBiomart(biomart)
+	    bcrf.loadBioContentReferenceForKEGG()
+	    logger.info "End loading records into BIO_CONTENT_REFERENCE table ..."
 	}
+    }
 
+    /**
+     *  Using this method to load/process Subject Sample Mapping file, and then populate maps/lists:
+     *  
+     *     subjects:   subject id/sample_id -->  sample type mapping, and will be used for 
+     *     				loading PATIENT_DIMENSION, DOBSERVATION_FACT and CONCEPT_COUNTS
+     *     
+     *     sampleTypes:  list of sample types, and is used to populate CONCEPPT_DIMENSION and I2B2
+     *  
+     * @param subjectSampleMapping		point too SubjectSampleMapping file
+     */
 
-	/**
-	 *  Using this method to load/process Subject Sample Mapping file, and then populate maps/lists:
-	 *  
-	 *     subjects:   subject id/sample_id -->  sample type mapping, and will be used for 
-	 *     				loading PATIENT_DIMENSION, DOBSERVATION_FACT and CONCEPT_COUNTS
-	 *     
-	 *     sampleTypes:  list of sample types, and is used to populate CONCEPPT_DIMENSION and I2B2
-	 *  
-	 * @param subjectSampleMapping		point too SubjectSampleMapping file
-	 */
+    void loadSubjectSampleMappingFile(File subjectSampleMapping){
 
-	void loadSubjectSampleMappingFile(File subjectSampleMapping){
+	subjects = [:]   	// subject_id -> sampleType mapping
+	sampleTypes = [:]	// unique sampleType
+	subjectSamples = []
+	Map dataMap = [:]
 
-		subjects = [:]   	// subject_id -> sampleType mapping
-		sampleTypes = [:]	// unique sampleType
-		subjectSamples = []
-		Map dataMap = [:]
+	String [] str
+	if(subjectSampleMapping.exists()){
+	    logger.info("Start reading " + subjectSampleMapping.toString())
+	    int index = 1
+	    subjectSampleMapping.eachLine{
+		//if((it.indexOf("study_id") == -1) && (it.indexOf("Data+SNP_Profiling+PLATFORM+TISSUETYPE") >= 0)){
+		//if((it.indexOf("study_id") == -1) && (it.toUpperCase().indexOf("SNP_PROFILING") >= 0)){
+		if((it.indexOf("study_id") == -1) && (it.indexOf("subject_id") == -1)) {
 
-		String [] str
-		if(subjectSampleMapping.exists()){
-			logger.info("Start reading " + subjectSampleMapping.toString())
-			int index = 1
-			subjectSampleMapping.eachLine{
-				//if((it.indexOf("study_id") == -1) && (it.indexOf("Data+SNP_Profiling+PLATFORM+TISSUETYPE") >= 0)){
-				//if((it.indexOf("study_id") == -1) && (it.toUpperCase().indexOf("SNP_PROFILING") >= 0)){
-				if((it.indexOf("study_id") == -1) && (it.indexOf("subject_id") == -1)) {
+		    //logger.info it
 
-					//logger.info it
+		    if(it.indexOf("\t") != -1) str = it.split("\t")
+		    else str = it.split(" +")
 
-					if(it.indexOf("\t") != -1) str = it.split("\t")
-					else str = it.split(" +")
+		    if(str.size() != 9){
+			logger.warn("Line: " + index + " missing column(s) in: " + subjectSampleMapping.toString())
+			logger.info index + ":  " + str.size() + ":  " + it
+		    } else{
+			String sampleType = str[5].trim()
 
-					if(str.size() != 9){
-						logger.warn("Line: " + index + " missing column(s) in: " + subjectSampleMapping.toString())
-						logger.info index + ":  " + str.size() + ":  " + it
-					} else{
-						String sampleType = str[5].trim()
-
-						if(sampleType.size() > 0) {
-							sampleTypes[sampleType] = 1
-							subjects[str[2].trim()] = sampleType
-						}else{
-							subjects[str[2].trim()] = ""
-						}
-
-						dataMap["TRIAL_NAME"] = str[0].trim()
-						dataMap["SITE_ID"] = str[1].trim()
-						dataMap["SUBJECT_ID"] = str[2].trim()
-						dataMap["SAMPLE_CD"] = str[3].trim()
-						dataMap["GPL_ID"] = str[4].trim()
-						dataMap["SAMPLE_TYPE"] = sampleType
-						dataMap["CATEGORY_CD"] = str[8].trim()
-
-						subjectSamples << dataMap
-						dataMap = [:]
-					}
-				}
-				index++
+			if(sampleType.size() > 0) {
+			    sampleTypes[sampleType] = 1
+			    subjects[str[2].trim()] = sampleType
+			}else{
+			    subjects[str[2].trim()] = ""
 			}
-		}else{
-			logger.error("Cannot find " + subjectSampleMapping.toString())
-			throw new RuntimeException("Cannot find " + subjectSampleMapping.toString())
+
+			dataMap["TRIAL_NAME"] = str[0].trim()
+			dataMap["SITE_ID"] = str[1].trim()
+			dataMap["SUBJECT_ID"] = str[2].trim()
+			dataMap["SAMPLE_CD"] = str[3].trim()
+			dataMap["GPL_ID"] = str[4].trim()
+			dataMap["SAMPLE_TYPE"] = sampleType
+			dataMap["CATEGORY_CD"] = str[8].trim()
+
+			subjectSamples << dataMap
+			dataMap = [:]
+		    }
 		}
+		index++
+	    }
+	}else{
+	    logger.error("Cannot find " + subjectSampleMapping.toString())
+	    throw new RuntimeException("Cannot find " + subjectSampleMapping.toString())
 	}
+    }
 
+    void deleteConceptPath(String conceptPath, Sql i2b2demodata, Sql i2b2metadata, Sql deapp){
 
-	void deleteConceptPath(String conceptPath, Sql i2b2demodata, Sql i2b2metadata, Sql deapp){
+	String qry 
 
-		String qry 
-		
-		qry = """ delete from de_subject_sample_mapping where concept_code in 
-						(select concept_cd from i2b2demodata.concept_dimension where concept_path like '${conceptPath}%') """
-		deapp.execute(qry)
-		
-		qry = "delete from i2b2 where c_fullname like '${conceptPath}%'"
-		i2b2metadata.execute(qry)
+	qry = """ delete from de_subject_sample_mapping where concept_code in 
+			(select concept_cd from i2b2demodata.concept_dimension where concept_path like '${conceptPath}%') """
+	deapp.execute(qry)
 
-		qry = "delete from i2b2_secure where c_fullname like '${conceptPath}%'"
-		i2b2metadata.execute(qry)
+	qry = "delete from i2b2 where c_fullname like '${conceptPath}%'"
+	i2b2metadata.execute(qry)
 
-		qry = """ delete from observation_fact where concept_cd in
+	qry = "delete from i2b2_secure where c_fullname like '${conceptPath}%'"
+	i2b2metadata.execute(qry)
+
+	qry = """ delete from observation_fact where concept_cd in
                         (select concept_cd from concept_dimension where concept_path like '${conceptPath}%') """
-		i2b2demodata.execute(qry)
+	i2b2demodata.execute(qry)
 
-		qry = "delete from concept_dimension where concept_path like '${conceptPath}%'"
-		i2b2demodata.execute(qry)
+	qry = "delete from concept_dimension where concept_path like '${conceptPath}%'"
+	i2b2demodata.execute(qry)
 
-		qry = "delete from concept_counts where concept_path like '${conceptPath}%'"
-		i2b2demodata.execute(qry)
-	}
+	qry = "delete from concept_counts where concept_path like '${conceptPath}%'"
+	i2b2demodata.execute(qry)
+    }
 }

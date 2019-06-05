@@ -34,15 +34,15 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioAssayAnalysisDataTea {
 
-	Sql biomart
-	String testsDataTable
-	long bioAssay
+    Sql biomart
+    String testsDataTable
+    long bioAssay
 
-	void loadBioAssayAnalysisDataTea(){
+    void loadBioAssayAnalysisDataTea(){
 
-		logger.info "Start loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+	logger.info "Start loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
 
-		String qry = """ insert /*+ parallel (BIO_ASSAY_ANALYSIS_DATA_TEA, 8) */
+	String qry = """ insert /*+ parallel (BIO_ASSAY_ANALYSIS_DATA_TEA, 8) */
 						into BIO_ASSAY_ANALYSIS_DATA_TEA
 						nologging
 						(
@@ -75,121 +75,113 @@ class BioAssayAnalysisDataTea {
 						where TEA_NORMALIZED_PVALUE <= 0.05
 					 """
 
-		biomart.execute(qry)
+	biomart.execute(qry)
 
-		logger.info "End loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+	logger.info "End loading data into BIO_ASSAY_ANALYSIS_DATA_TEA ..."
+    }
+
+    boolean isBioAssayAnalysisDataTeaExist(long bioExperimentId){
+	String qry = "select count(1) from bio_assay_analysis_data_tea where bio_experimentt_id=?"
+	if(biomart.firstRow(qry, [bioExperimentId,])[0] > 0){
+	    return true
+	}else{
+	    return false
+	}
+    }
+
+    void dropBioAssayAnalysisDataTeaIndexes(){
+	logger.info "Start dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+
+	String stmt = ""
+	String qry = """ select index_name from user_indexes
+			 where table_name='BIO_ASSAY_ANALYSIS_DATA_TEA'
+			 and index_name not like 'PK_%' and index_name not like '%_PK'"""
+	biomart.eachRow(qry) {
+	    stmt = "drop index ${it.index_name}"
+	    biomart.execute(stmt)
 	}
 
+	logger.info "End dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+    }
 
+    void createBioAssayAnalysisDataTeaIndexes(){
 
-	boolean isBioAssayAnalysisDataTeaExist(long bioExperimentId){
-		String qry = "select count(1) from bio_assay_analysis_data_tea where bio_experimentt_id=?"
-		if(biomart.firstRow(qry, [bioExperimentId,])[0] > 0){
-			return true
-		}else{
-			return false
-		}
+	logger.info "End recreating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+
+	String qry = ""
+	qry = """ create index idx_tea_probe_name on BIO_ASSAY_ANALYSIS_DATA_TEA 
+			(FEATURE_GROUP_NAME, BIO_ASY_ANALYSIS_DATA_ID)
+			 TABLESPACE INDX NOLOGGING PARALLEL 8 """
+	biomart.execute(qry)
+
+	qry = """ create index idx_tea_probe_id on BIO_ASSAY_ANALYSIS_DATA_TEA
+			(BIO_ASSAY_FEATURE_GROUP_ID, BIO_ASY_ANALYSIS_DATA_ID)
+			 TABLESPACE INDX NOLOGGING PARALLEL 8 """
+	biomart.execute(qry)
+
+	qry = """ create index idx_tea_experiment_type on BIO_ASSAY_ANALYSIS_DATA_TEA 
+			(BIO_EXPERIMENT_TYPE, BIO_ASY_ANALYSIS_DATA_ID)
+			 TABLESPACE INDX NOLOGGING PARALLEL 8 """
+	biomart.execute(qry)
+
+	qry = """ create index idx_tea_experiment_analysis on BIO_ASSAY_ANALYSIS_DATA_TEA
+			(BIO_EXPERIMENT_ID, BIO_ASSAY_ANALYSIS_ID)
+			 TABLESPACE INDX NOLOGGING PARALLEL 8 """
+	biomart.execute(qry)
+
+	qry = """ create index idx_tea_experiment_analysis1 on BIO_ASSAY_ANALYSIS_DATA_TEA
+			(BIO_EXPERIMENT_ID, BIO_ASSAY_ANALYSIS_ID, BIO_ASY_ANALYSIS_DATA_ID)
+			 TABLESPACE INDX NOLOGGING PARALLEL 8 """
+	biomart.execute(qry)
+
+	qry = """ create index idx_tea_analysis on BIO_ASSAY_ANALYSIS_DATA_TEA
+			(BIO_ASSAY_ANALYSIS_ID, BIO_ASY_ANALYSIS_DATA_ID)
+			 TABLESPACE INDX NOLOGGING PARALLEL 8 """
+	biomart.execute(qry)
+
+	qry = """ create index idx_tea_probe_analysis on BIO_ASSAY_ANALYSIS_DATA_TEA
+			(BIO_ASSAY_FEATURE_GROUP_ID, BIO_ASSAY_ANALYSIS_ID)
+			 TABLESPACE INDX NOLOGGING PARALLEL 8 """
+	biomart.execute(qry)
+
+	logger.info "Start recreating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+    }
+
+    void disableBioAssayAnalysisDataTeaConstraints(){
+
+	logger.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+
+	String stmt = ""
+	String qry = """ select constraint_name from user_constraints
+			 where table_name='BIO_ASSAY_ANALYSIS_DATA_TEA' and constraint_type='R' """
+	biomart.eachRow(qry) {
+	    stmt = "alter table BIO_ASSAY_ANALYSIS_DATA_TEA disable constraint ${it.constraint_name}"
+	    biomart.execute(stmt)
 	}
 
+	logger.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+    }
 
-	void dropBioAssayAnalysisDataTeaIndexes(){
-		logger.info "Start dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+    void enableBioAssayAnalysisDataTeaConstraints(){
 
-		String stmt = ""
-		String qry = """ select index_name from user_indexes
-						 where table_name='BIO_ASSAY_ANALYSIS_DATA_TEA'
-							   and index_name not like 'PK_%' and index_name not like '%_PK'"""
-		biomart.eachRow(qry) {
-			stmt = "drop index ${it.index_name}"
-			biomart.execute(stmt)
-		}
+	logger.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
 
-		logger.info "End dropping indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+	String stmt = ""
+	String qry = """ select constraint_name from user_constraints
+			 where table_name='BIO_ASSAY_ANALYSIS_DATA_TEA' and constraint_type='R' """
+	biomart.eachRow(qry) {
+	    stmt = "alter table BIO_ASSAY_ANALYSIS_DATA_TEA enable constraint ${it.constraint_name}"
+	    biomart.execute(stmt)
 	}
 
+	logger.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
+    }
 
-	void createBioAssayAnalysisDataTeaIndexes(){
+    void setTestsDataTable(String testsDataTable){
+	this.testsDataTable = testsDataTable
+    }
 
-		logger.info "End recreating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
-
-		String qry = ""
-		qry = """ create index idx_tea_probe_name on BIO_ASSAY_ANALYSIS_DATA_TEA 
-					(FEATURE_GROUP_NAME, BIO_ASY_ANALYSIS_DATA_ID)
-				  TABLESPACE INDX NOLOGGING PARALLEL 8 """
-		biomart.execute(qry)
-
-		qry = """ create index idx_tea_probe_id on BIO_ASSAY_ANALYSIS_DATA_TEA
-					(BIO_ASSAY_FEATURE_GROUP_ID, BIO_ASY_ANALYSIS_DATA_ID)
-				  TABLESPACE INDX NOLOGGING PARALLEL 8 """
-		biomart.execute(qry)
-
-		qry = """ create index idx_tea_experiment_type on BIO_ASSAY_ANALYSIS_DATA_TEA 
-					(BIO_EXPERIMENT_TYPE, BIO_ASY_ANALYSIS_DATA_ID)
-				  TABLESPACE INDX NOLOGGING PARALLEL 8 """
-		biomart.execute(qry)
-
-		qry = """ create index idx_tea_experiment_analysis on BIO_ASSAY_ANALYSIS_DATA_TEA
-					(BIO_EXPERIMENT_ID, BIO_ASSAY_ANALYSIS_ID)
-				  TABLESPACE INDX NOLOGGING PARALLEL 8 """
-		biomart.execute(qry)
-
-		qry = """ create index idx_tea_experiment_analysis1 on BIO_ASSAY_ANALYSIS_DATA_TEA
-					(BIO_EXPERIMENT_ID, BIO_ASSAY_ANALYSIS_ID, BIO_ASY_ANALYSIS_DATA_ID)
-				  TABLESPACE INDX NOLOGGING PARALLEL 8 """
-		biomart.execute(qry)
-
-		qry = """ create index idx_tea_analysis on BIO_ASSAY_ANALYSIS_DATA_TEA
-						(BIO_ASSAY_ANALYSIS_ID, BIO_ASY_ANALYSIS_DATA_ID)
-				  TABLESPACE INDX NOLOGGING PARALLEL 8 """
-		biomart.execute(qry)
-		
-		qry = """ create index idx_tea_probe_analysis on BIO_ASSAY_ANALYSIS_DATA_TEA
-						(BIO_ASSAY_FEATURE_GROUP_ID, BIO_ASSAY_ANALYSIS_ID)
-				  TABLESPACE INDX NOLOGGING PARALLEL 8 """
-		biomart.execute(qry)
-
-		logger.info "Start recreating indexes for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
-	}
-
-
-	void disableBioAssayAnalysisDataTeaConstraints(){
-
-		logger.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
-
-		String stmt = ""
-		String qry = """ select constraint_name from user_constraints
-						 where table_name='BIO_ASSAY_ANALYSIS_DATA_TEA' and constraint_type='R' """
-		biomart.eachRow(qry) {
-			stmt = "alter table BIO_ASSAY_ANALYSIS_DATA_TEA disable constraint ${it.constraint_name}"
-			biomart.execute(stmt)
-		}
-
-		logger.info "Start disabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
-	}
-
-
-	void enableBioAssayAnalysisDataTeaConstraints(){
-
-		logger.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
-
-		String stmt = ""
-		String qry = """ select constraint_name from user_constraints
-						 where table_name='BIO_ASSAY_ANALYSIS_DATA_TEA' and constraint_type='R' """
-		biomart.eachRow(qry) {
-			stmt = "alter table BIO_ASSAY_ANALYSIS_DATA_TEA enable constraint ${it.constraint_name}"
-			biomart.execute(stmt)
-		}
-
-		logger.info "Start enabling constraints for BIO_ASSAY_ANALYSIS_DATA_TEA ... "
-	}
-
-
-	void setTestsDataTable(String testsDataTable){
-		this.testsDataTable = testsDataTable
-	}
-
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

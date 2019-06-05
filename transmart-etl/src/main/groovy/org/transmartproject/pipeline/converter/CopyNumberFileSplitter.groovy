@@ -33,37 +33,35 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class CopyNumberFileSplitter {
 
-	File copyNumberFile
-	String copyNumberFilePrefix
+    File copyNumberFile
+    String copyNumberFilePrefix
 	
-	void splitCopyNumberFile(){
+    void splitCopyNumberFile(){
 		
-		logger.info "Start reading Copy NUmber file: " + copyNumberFile.toString()
+	logger.info "Start reading Copy NUmber file: " + copyNumberFile.toString()
 		
-		Map cnMap = [:]
-		copyNumberFile.eachLine{
-			String [] str = it.split("\t")
-			cnMap[str[0] + ":" + str[1]] = str[4]
-		}
+	Map cnMap = [:]
+	copyNumberFile.eachLine{
+	    String [] str = it.split("\t")
+	    cnMap[str[0] + ":" + str[1]] = str[4]
 	}
-	
-	
-	void writeCopyNumberFile(StringBuffer sb, String chr){
-		File cn = new File(copyNumberFilePrefix + ".chr" + chr)
-		if(!cn.exists()){
-			logger.info "creat new Copy Number file: " + cn.toString()
-			cn.createNewFile()
-		}
-		
-		cn.append(sb.toString())
+    }
+
+    void writeCopyNumberFile(StringBuffer sb, String chr){
+	File cn = new File(copyNumberFilePrefix + ".chr" + chr)
+	if(!cn.exists()){
+	    logger.info "creat new Copy Number file: " + cn.toString()
+	    cn.createNewFile()
 	}
-	
-	
-	void setCopyNumberFilePrefix(String copyNumberFilePrefix){
-		this.copyNumberFilePrefix = copyNumberFilePrefix
-	}
-	
-	void setCopyNumberFile(copyNumberFile){
-		this.copyNumberFile = copyNumberFile
-	}
+
+	cn.append(sb.toString())
+    }
+
+    void setCopyNumberFilePrefix(String copyNumberFilePrefix){
+	this.copyNumberFilePrefix = copyNumberFilePrefix
+    }
+
+    void setCopyNumberFile(copyNumberFile){
+	this.copyNumberFile = copyNumberFile
+    }
 }

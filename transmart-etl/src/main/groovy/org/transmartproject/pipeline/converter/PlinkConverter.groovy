@@ -33,141 +33,125 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class PlinkConverter {
 
-	// full path of PLINK program 
-	String plink
-	String plinkSourceDirectory, plinkDestinationDirectory, studyName
+    // full path of PLINK program 
+    String plink
+    String plinkSourceDirectory, plinkDestinationDirectory, studyName
 	
-	void createBinaryFromLongPlink(){
+    void createBinaryFromLongPlink(){
 		
-		File lgen = getLgenFile()
-		String plinkSourceFile = plinkSourceDirectory + "/" + studyName
-		String outputFile = plinkDestinationDirectory + "/" + studyName
-		
-		String fam = outputFile + ".fam"
-		if(!isFamExist(fam)) {
-			logger.info "Cannot find PLINK FAM file " + fam
-			throw new RuntimeException("Cannot find PLINK FAM file " + fam)
-		}
-		
-		String map = outputFile + ".map"
-		if(!isFamExist(map)) {
-			logger.info "Cannot find PLINK MAP file " + map
-			throw new RuntimeException("Cannot find PLINK MAP file " + map)
-		}
-		
-		logger.info "Read Long-formt PLINK files from " + plinkSourceFile
-		logger.info "Write Binary PLINK files to " + plinkDestinationDirectory 
-		StringBuffer sb = new StringBuffer()
-		sb.append(plink + " --lfile " + plinkSourceFile)
-		sb.append(" --noweb --make-bed ")
-		sb.append(" --out " + outputFile)
-		
-		String command = sb.toString()
-		logger.info "Run: " + command
-		Process proc = command.execute()
-		logger.info(proc.getText())
+	File lgen = getLgenFile()
+	String plinkSourceFile = plinkSourceDirectory + "/" + studyName
+	String outputFile = plinkDestinationDirectory + "/" + studyName
+
+	String fam = outputFile + ".fam"
+	if(!isFamExist(fam)) {
+	    logger.info "Cannot find PLINK FAM file " + fam
+	    throw new RuntimeException("Cannot find PLINK FAM file " + fam)
 	}
-	
-	
-	
-	void recodePlinkFileByChrs() {
-		
-		for(int chr in 1..24){
-			recodePlinkFileByChr(chr.toString())
-		}
+
+	String map = outputFile + ".map"
+	if(!isFamExist(map)) {
+	    logger.info "Cannot find PLINK MAP file " + map
+	    throw new RuntimeException("Cannot find PLINK MAP file " + map)
 	}
-	
-	
-	
-	void recodePlinkFileByChr(String chr) {
-		
-		logger.info "Read Binary PLINK files from: " + plinkDestinationDirectory
-		logger.info "Generate PLINK files for chromosome: " + chr
-		
-		StringBuffer sb = new StringBuffer()
-		sb.append(plink + " --bfile " + plinkDestinationDirectory + "/" + studyName)
-		sb.append(" --noweb --recode --chr " + chr)
-		sb.append(" --out " + plinkDestinationDirectory + "/chr" + chr)
-		
-		String command = sb.toString()
-		logger.info "Run: " + command
-		Process proc = command.execute()
-		logger.info(proc.getText())
-	}		
-	
-	
-	void recodePlinkFile() {
-		
-		logger.info "Read Binary PLINK files from: " + plinkDestinationDirectory
-		logger.info "Recode PLINK files for all chromosomes... "
-		
-		StringBuffer sb = new StringBuffer()
-		sb.append(plink + " --bfile " + plinkDestinationDirectory + "/" + studyName)
-		sb.append(" --noweb --recode ")
-		sb.append(" --out " + plinkDestinationDirectory + "/all")
-		
-		String command = sb.toString()
-		logger.info "Run: " + command
-		Process proc = command.execute()
-		logger.info(proc.getText())
+
+	logger.info "Read Long-formt PLINK files from " + plinkSourceFile
+	logger.info "Write Binary PLINK files to " + plinkDestinationDirectory 
+	StringBuffer sb = new StringBuffer()
+	sb.append(plink + " --lfile " + plinkSourceFile)
+	sb.append(" --noweb --make-bed ")
+	sb.append(" --out " + outputFile)
+
+	String command = sb.toString()
+	logger.info "Run: " + command
+	Process proc = command.execute()
+	logger.info(proc.getText())
+    }
+
+    void recodePlinkFileByChrs() {
+	for(int chr in 1..24){
+	    recodePlinkFileByChr(chr.toString())
 	}
-	
-	
-	boolean isFamExist(String fam){
-		File famFile = new File(fam)
-		return famFile.exists()
+    }
+
+    void recodePlinkFileByChr(String chr) {
+	logger.info "Read Binary PLINK files from: " + plinkDestinationDirectory
+	logger.info "Generate PLINK files for chromosome: " + chr
+
+	StringBuffer sb = new StringBuffer()
+	sb.append(plink + " --bfile " + plinkDestinationDirectory + "/" + studyName)
+	sb.append(" --noweb --recode --chr " + chr)
+	sb.append(" --out " + plinkDestinationDirectory + "/chr" + chr)
+
+	String command = sb.toString()
+	logger.info "Run: " + command
+	Process proc = command.execute()
+	logger.info(proc.getText())
+    }		
+
+    void recodePlinkFile() {
+	logger.info "Read Binary PLINK files from: " + plinkDestinationDirectory
+	logger.info "Recode PLINK files for all chromosomes... "
+
+	StringBuffer sb = new StringBuffer()
+	sb.append(plink + " --bfile " + plinkDestinationDirectory + "/" + studyName)
+	sb.append(" --noweb --recode ")
+	sb.append(" --out " + plinkDestinationDirectory + "/all")
+
+	String command = sb.toString()
+	logger.info "Run: " + command
+	Process proc = command.execute()
+	logger.info(proc.getText())
+    }
+
+    boolean isFamExist(String fam){
+	File famFile = new File(fam)
+	return famFile.exists()
+    }
+
+    boolean isMapExist(String map){
+	File mapFile = new File(map)
+	return mapFile.exists()
+    }
+
+    File getLgenFile(){
+	File lgen = new File(plinkDestinationDirectory + "/" + studyName + ".lgen")
+
+	if(lgen.exists()){
+	    logger.info "Start transforming PLINK Long format to Binart format ..."
+	} else{
+	    logger.error "PLINK Long format file: " + lgen.toString() + " doesn't exist."
+	    throw new RuntimeException("PLINK Long format file: " + lgen.toString() + " doesn't exist.")
 	}
-	
-	boolean isMapExist(String map){
-		File mapFile = new File(map)
-		return mapFile.exists()
-	}
-	
-	
-	File getLgenFile(){
-		
-		File lgen = new File(plinkDestinationDirectory + "/" + studyName + ".lgen")
-		
-		if(lgen.exists()){
-			logger.info "Start transforming PLINK Long format to Binart format ..."
-		} else{
-			logger.error "PLINK Long format file: " + lgen.toString() + " doesn't exist."
-			throw new RuntimeException("PLINK Long format file: " + lgen.toString() + " doesn't exist.")
-		}
-		
-		return lgen
-	}
-	
-	
-	/**
-	 * 
-	 * @param plinkSourceDirectory		location to find .lgen, .map and .fam files
-	 */
-	void setPlinkSourceDirectory(String plinkSourceDirectory){
-		this.plinkSourceDirectory = plinkSourceDirectory
-	}
-	
-	
-	/**
-	 * 
-	 * @param plinkDestinationDirectory		location to store generated Binary PLINK files
-	 */
-	void setPlinkDestinationDirectory(String plinkDestinationDirectory){
-		this.plinkDestinationDirectory = plinkDestinationDirectory
-	}
-	
-	
-	void setStudyName(String studyName){
-		this.studyName = studyName
-	}
-	
-	
-	/**
-	 * 
-	 * @param plink		full path for PLINK program
-	 */
-	
+
+	return lgen
+    }
+
+    /**
+     * 
+     * @param plinkSourceDirectory		location to find .lgen, .map and .fam files
+     */
+    void setPlinkSourceDirectory(String plinkSourceDirectory){
+	this.plinkSourceDirectory = plinkSourceDirectory
+    }
+
+    /**
+     * 
+     * @param plinkDestinationDirectory		location to store generated Binary PLINK files
+     */
+    void setPlinkDestinationDirectory(String plinkDestinationDirectory){
+	this.plinkDestinationDirectory = plinkDestinationDirectory
+    }
+
+    void setStudyName(String studyName){
+	this.studyName = studyName
+    }
+
+    /**
+     * 
+     * @param plink		full path for PLINK program
+     */
 	void setPlink(String plink){
-		this.plink = plink
-	}
+	this.plink = plink
+    }
 }

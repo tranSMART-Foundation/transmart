@@ -34,101 +34,95 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class ConceptDimension {
 
-	Sql i2b2demodata
-	String tableName, studyName
+    Sql i2b2demodata
+    String tableName, studyName
 
-	void loadConceptDimensions(List concepts){
-		concepts.each{ insertConceptDimension(it) }
+    void loadConceptDimensions(List concepts){
+	concepts.each{ insertConceptDimension(it) }
+    }
+
+    Map getConceptCode(List concepts){
+
+	Map conceptPathToCode = [:]
+
+	concepts.each{
+	    String conceptCode = getConceptCode(it)
+	    if(!conceptCode.equals(null)){
+		conceptPathToCode[it] = conceptCode
+	    }
 	}
+	return conceptPathToCode
+    }
 
+    String getConceptCode(String conceptPath){
 
-	Map getConceptCode(List concepts){
+	String qry = "select concept_cd from concept_dimension where concept_path=?"
 
-		Map conceptPathToCode = [:]
-
-		concepts.each{
-			String conceptCode = getConceptCode(it)
-			if(!conceptCode.equals(null)){
-				conceptPathToCode[it] = conceptCode
-			}
-		}
-		return conceptPathToCode
+	def res = i2b2demodata.firstRow(qry, [conceptPath.replace("/", "\\")])
+	if(res.equals(null)){
+	    logger.info "No concept code for the concept: $conceptPath"
+	    return null
+	}else{
+	    return res[0]
 	}
+    }
 
+    /**
+     * Create the following trigger for CONCEPT_DIMENSION:
+     * 
+     create or replace TRIGGER "TRG_CONCEPT_DIMENSION_CD"
+     before insert on "CONCEPT_DIMENSION"
+     for each row begin
+     if inserting then
+     if :NEW."CONCEPT_CD" is null then
+     select TM_CZ.CONCEPT_ID.nextval into :NEW."CONCEPT_CD" from dual;
+     end if;
+     end if;
+     end;
+     * 	
+     * @param conceptPath
+     * @param nameChar
+     * @param trialName
+     */
+    void insertConceptDimension(String conceptPath){
 
-	String getConceptCode(String conceptPath){
+	if(tableName.equals(null)) tableName = "CONCEPT_DIMENSION"
 
-		String qry = "select concept_cd from concept_dimension where concept_path=?"
+	String [] str = conceptPath.split("/")
+	String nameChar = str[str.size()-1]
+	logger.info str.size() + ":\t" + nameChar
 
-		def res = i2b2demodata.firstRow(qry, [conceptPath.replace("/", "\\")])
-		if(res.equals(null)){
-			logger.info "No concept code for the concept: $conceptPath"
-			return null
-		}else{
-			return res[0]
-		}
+	String qry = "insert into concept_dimension(concept_path, name_char, sourcesystem_cd, table_name) values(?,?,?,?)"
+
+	String concept = conceptPath.replace("/", "\\")
+	if(isConceptDimensionExist(concept)){
+	    logger.info "$conceptPath already exists ..."
+	}else{
+	    i2b2demodata.execute(qry, [
+		concept,
+		nameChar,
+		studyName,
+		tableName
+	    ])
 	}
+    }
 
-	/**
-	 * Create the following trigger for CONCEPT_DIMENSION:
-	 * 
-	 create or replace TRIGGER "TRG_CONCEPT_DIMENSION_CD"
-	 before insert on "CONCEPT_DIMENSION"
-	 for each row begin
-	 if inserting then
-	 if :NEW."CONCEPT_CD" is null then
-	 select TM_CZ.CONCEPT_ID.nextval into :NEW."CONCEPT_CD" from dual;
-	 end if;
-	 end if;
-	 end;
-	 * 	
-	 * @param conceptPath
-	 * @param nameChar
-	 * @param trialName
-	 */
-	void insertConceptDimension(String conceptPath){
+    boolean isConceptDimensionExist(String conceptPath){
+	String qry = "select count(*) from concept_dimension where concept_path=?"
+	def res = i2b2demodata.firstRow(qry, [conceptPath])
+	if(res[0] > 0) return true
+	else return false
+    }
 
-		if(tableName.equals(null)) tableName = "CONCEPT_DIMENSION"
+    void setI2b2demodata(Sql i2b2demodata){
+	this.i2b2demodata = i2b2demodata
+    }
 
-		String [] str = conceptPath.split("/")
-		String nameChar = str[str.size()-1]
-		logger.info str.size() + ":\t" + nameChar
+    void setTableName(String tableName){
+	this.tableName = tableName
+    }
 
-		String qry = "insert into concept_dimension(concept_path, name_char, sourcesystem_cd, table_name) values(?,?,?,?)"
-
-		String concept = conceptPath.replace("/", "\\")
-		if(isConceptDimensionExist(concept)){
-			logger.info "$conceptPath already exists ..."
-		}else{
-			i2b2demodata.execute(qry, [
-				concept,
-				nameChar,
-				studyName,
-				tableName
-			])
-		}
-	}
-
-
-	boolean isConceptDimensionExist(String conceptPath){
-		String qry = "select count(*) from concept_dimension where concept_path=?"
-		def res = i2b2demodata.firstRow(qry, [conceptPath])
-		if(res[0] > 0) return true
-		else return false
-	}
-
-
-	void setI2b2demodata(Sql i2b2demodata){
-		this.i2b2demodata = i2b2demodata
-	}
-
-
-	void setTableName(String tableName){
-		this.tableName = tableName
-	}
-
-
-	void setStudyName(String studyName){
-		this.studyName = studyName
-	}
+    void setStudyName(String studyName){
+	this.studyName = studyName
+    }
 }

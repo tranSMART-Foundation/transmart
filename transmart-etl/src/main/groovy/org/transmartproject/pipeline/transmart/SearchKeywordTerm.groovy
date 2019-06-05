@@ -47,16 +47,14 @@ class SearchKeywordTerm {
 
         String qry = """ insert into search_keyword_term (KEYWORD_TERM, SEARCH_KEYWORD_ID, RANK,TERM_LENGTH)
 	                 select upper(keyword), search_keyword_id, 1, length(keyword)
-	 				 from search_keyword
-	 				 where search_keyword_id not in
-	 			 			(select search_keyword_id from searchapp.search_keyword_term)
-	 			    """
+	 		 from search_keyword
+	 		 where search_keyword_id not in
+	 			(select search_keyword_id from searchapp.search_keyword_term)
+	 	     """
         searchapp.execute(qry)
 
         logger.info "End populating SEARCH_KEYWORD_TERM using data from SEARCH_KEYWORD ... "
     }
-
-
 
     void insertSearchKeywordTerm(String keywordTerm, long searchKeywordId, int rank) {
         String keywordTermUpper = keywordTerm.toUpperCase()
@@ -65,19 +63,17 @@ class SearchKeywordTerm {
         } else {
             logger.info "Save $keywordTermUpper:$searchKeywordId into SEARCH_KEYWORD_TERM ..."
             savedTerms.add([
-                    keywordTermUpper,
-                    searchKeywordId,
-                    rank,
-                    keywordTermUpper
+                keywordTermUpper,
+                searchKeywordId,
+                rank,
+                keywordTermUpper
             ])
             logger.info "savedTerms "+savedTerms.size()
             if(savedTerms.size() >= 1000) {
                 doInsertSearchKeywordTerms()
             }
-
         }
     }
-
 
     void doInsertSearchKeywordTerms() {
         String qry = """ insert into search_keyword_term(keyword_term, search_keyword_id, rank, term_length)
@@ -85,39 +81,37 @@ class SearchKeywordTerm {
 
         logger.info "doInsertSearchKeywordTerms list size: "+savedTerms.size()
         try {
-        searchapp.withTransaction {
-            searchapp.withBatch(qry, {stmt ->
-                savedTerms.each {
-                    logger.info "Insert ${it[0]}:${it[1]} into SEARCH_KEYWORD_TERM ..."
-                    stmt.addBatch(it)
-                }
-           })
-        }
+            searchapp.withTransaction {
+		searchapp.withBatch(qry, {stmt ->
+                    savedTerms.each {
+			logger.info "Insert ${it[0]}:${it[1]} into SEARCH_KEYWORD_TERM ..."
+			stmt.addBatch(it)
+                    }
+		})
+            }
         }
         catch (SQLException e) {
             def ee = e.getNextException()
             if(ee) {ee.printStackTrace()
-            logger.info "doInsertSearchKeywordTerms exception"
+		    logger.info "doInsertSearchKeywordTerms exception"
             }
         }
         finally
         {
             logger.info "doInsertSearchKeywordTerms done"
         }
-        
+
         savedTerms = []
     }
-
 
     boolean isSearchKeywordTermExist(String keywordTerm, long searchKeywordId) {
         String keywordTermUpper = keywordTerm.toUpperCase()
         String qry = """ select count(*) from search_keyword_term
-		                 where keyword_term=? and search_keyword_id=?"""
+		         where keyword_term=? and search_keyword_id=?"""
         def res = searchapp.firstRow(qry, [keywordTermUpper, searchKeywordId])
         int count = res[0]
         return count > 0
     }
-
 
     void setSearchapp(Sql searchapp) {
         this.searchapp = searchapp
@@ -130,5 +124,4 @@ class SearchKeywordTerm {
             doInsertSearchKeywordTerms()
         }
     }
-    
 }

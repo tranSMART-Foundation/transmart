@@ -43,876 +43,851 @@ import org.transmartproject.pipeline.transmart.SearchKeywordTerm
 @Slf4j('logger')
 class VCF {
 
-	private String genePairDelimiter, geneSymbolDelimiter
-	private int batchSize
+    private String genePairDelimiter, geneSymbolDelimiter
+    private int batchSize
 
-        private static SearchKeyword searchKeyword
-        private static SearchKeywordTerm searchKeywordTerm
+    private static SearchKeyword searchKeyword
+    private static SearchKeywordTerm searchKeywordTerm
 	
-	static main(args) {
+    static main(args) {
 
-//		PropertyConfigurator.configure("conf/log4j.properties");
+//	PropertyConfigurator.configure("conf/log4j.properties");
 		
-		logger.info("Start loading property file VCF.properties ...")
-		Properties props = Util.loadConfiguration("conf/VCF.properties");
+	logger.info("Start loading property file VCF.properties ...")
+	Properties props = Util.loadConfiguration("conf/VCF.properties");
 
-		Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
-		Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
-		Sql tm_lz = Util.createSqlFromPropertyFile(props, "tm_lz")
-		Sql searchapp = Util.createSqlFromPropertyFile(props, "searchapp")
+	Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
+	Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
+	Sql tm_lz = Util.createSqlFromPropertyFile(props, "tm_lz")
+	Sql searchapp = Util.createSqlFromPropertyFile(props, "searchapp")
 
-                searchKeyword = new SearchKeyword()
-                searchKeyword.setSearchapp(searchapp)
+        searchKeyword = new SearchKeyword()
+        searchKeyword.setSearchapp(searchapp)
 
-                searchKeywordTerm = new SearchKeywordTerm()
-                searchKeywordTerm.setSearchapp(searchapp)
+        searchKeywordTerm = new SearchKeywordTerm()
+        searchKeywordTerm.setSearchapp(searchapp)
 
-		VCF vcf = new VCF()
-		vcf.setGenePairDelimiter(props.get("gene_pair_delimiter"))
-		vcf.setGeneSymbolDelimiter(props.get("gene_symbol_delimiter"))
-		vcf.setBatchSize(Integer.parseInt(props.get("batch_size")))
-                vcf.processVCFData(props)
-		vcf.createVCFTable(tm_lz, props)
-		vcf.loadVCFData(tm_lz, props)
-		vcf.createVCFIndex(tm_lz, props)
+	VCF vcf = new VCF()
+	vcf.setGenePairDelimiter(props.get("gene_pair_delimiter"))
+	vcf.setGeneSymbolDelimiter(props.get("gene_symbol_delimiter"))
+	vcf.setBatchSize(Integer.parseInt(props.get("batch_size")))
+        vcf.processVCFData(props)
+	vcf.createVCFTable(tm_lz, props)
+	vcf.loadVCFData(tm_lz, props)
+	vcf.createVCFIndex(tm_lz, props)
 
-		vcf.createVCFGeneTable(tm_lz, props)
-		vcf.loadVCFGene(tm_lz, props)
-		vcf.createVCFGeneIndex(tm_lz, props)
+	vcf.createVCFGeneTable(tm_lz, props)
+	vcf.loadVCFGene(tm_lz, props)
+	vcf.createVCFGeneIndex(tm_lz, props)
 
-		vcf.loadDeSnpInfo(deapp, tm_lz,props)
-		vcf.loadDeSnpGeneMap(deapp, tm_lz, props)
-		vcf.loadDeRcSnpInfo(deapp, tm_lz, props)
-		vcf.loadSearchKeyword(searchapp, deapp, props)
-                searchKeyword.closeSearchKeyword()
-                searchKeywordTerm.closeSearchKeywordTerm()
+	vcf.loadDeSnpInfo(deapp, tm_lz,props)
+	vcf.loadDeSnpGeneMap(deapp, tm_lz, props)
+	vcf.loadDeRcSnpInfo(deapp, tm_lz, props)
+	vcf.loadSearchKeyword(searchapp, deapp, props)
+        searchKeyword.closeSearchKeyword()
+        searchKeywordTerm.closeSearchKeywordTerm()
 
-                print new Date()
-                println" VCF SNPs load completed successfully"
-	}
+        print new Date()
+        println" VCF SNPs load completed successfully"
+    }
 
+    void loadDeRcSnpInfo(Sql deapp, Sql tmlz, Properties props){
 
-	void loadDeRcSnpInfo(Sql deapp, Sql tmlz, Properties props){
+        Boolean isPostgres = Util.isPostgres()
+        String qry1;
+        String qry2;
+        String qry3;
+        String qry4;
+        String vcfTable = "vcf" + props.get("human_genome_version")
+        String hgVersion = props.get("human_genome_version")
 
-            Boolean isPostgres = Util.isPostgres()
-            String qry1;
-            String qry2;
-            String qry3;
-            String qry4;
-            String vcfTable = "vcf" + props.get("human_genome_version")
-            String hgVersion = props.get("human_genome_version")
+        if(props.get("skip_de_rc_snp_info").toString().toLowerCase().equals("yes")){
+            logger.info("Skip loading VCF's SNP RS# from table $vcfTable into DE_RC_SNP_INFO ...")
+        }else{
+            logger.info("Start loading VCF's SNP RS# from $vcfTable into DE_RC_SNP_INFO ...")
 
-            if(props.get("skip_de_rc_snp_info").toString().toLowerCase().equals("yes")){
-                logger.info("Skip loading VCF's SNP RS# from table $vcfTable into DE_RC_SNP_INFO ...")
-            }else{
-                logger.info("Start loading VCF's SNP RS# from $vcfTable into DE_RC_SNP_INFO ...")
-
-                if (isPostgres) {
-                    qry1 = "select rs_id,chrom, pos, ref, alt, gene_info, variation_class, $hgVersion AS hgversion from tm_lz.$vcfTable "
-                    qry2 = "select count(*) from deapp.de_rc_snp_info where snp_info_id = ? and hg_version = ? and rs_id = ?"
-                    qry3 = """ insert into DE_RC_SNP_INFO (snp_info_id, rs_id, chrom, pos, ref, alt, gene_info, gene_name, entrez_id, variation_class, hg_version)
+            if (isPostgres) {
+                qry1 = "select rs_id,chrom, pos, ref, alt, gene_info, variation_class, $hgVersion AS hgversion from tm_lz.$vcfTable "
+                qry2 = "select count(*) from deapp.de_rc_snp_info where snp_info_id = ? and hg_version = ? and rs_id = ?"
+                qry3 = """ insert into DE_RC_SNP_INFO (snp_info_id, rs_id, chrom, pos, ref, alt, gene_info, gene_name, entrez_id, variation_class, hg_version)
                                                          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			   """
-                    qry4 = "select snp_info_id from de_snp_info where name = ?"
-                } else {
-                    qry1 = "select rs_id,chrom, pos, ref, alt, gene_info, variation_class, $hgVersion AS hgversion from tm_lz.$vcfTable "
-                    qry2 = "select count(*) from deapp.de_rc_snp_info where snp_info_id = ? and hg_version = ? and rs_id = ?"
-                    qry3 = """ insert into DE_RC_SNP_INFO (snp_info_id, rs_id, chrom, pos, ref, alt, gene_info, gene_name, entrez_id, variation_class, hg_version)
+                qry4 = "select snp_info_id from de_snp_info where name = ?"
+            } else {
+                qry1 = "select rs_id,chrom, pos, ref, alt, gene_info, variation_class, $hgVersion AS hgversion from tm_lz.$vcfTable "
+                qry2 = "select count(*) from deapp.de_rc_snp_info where snp_info_id = ? and hg_version = ? and rs_id = ?"
+                qry3 = """ insert into DE_RC_SNP_INFO (snp_info_id, rs_id, chrom, pos, ref, alt, gene_info, gene_name, entrez_id, variation_class, hg_version)
                                                          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 						 """
-                    qry4 = "select snp_info_id from de_snp_info where name = ?"
-		}
+                qry4 = "select snp_info_id from de_snp_info where name = ?"
+	    }
 
-                //deapp.withTransaction {
-                    deapp.withBatch(batchSize,qry3, { ps ->
-                        tmlz.eachRow(qry1) {
-                            GroovyRowResult rowResult = deapp.firstRow(qry4, [it.rs_id])
-                            int snpInfoId = rowResult[0]
-                            rowResult = deapp.firstRow(qry2, [snpInfoId, it.hgversion, it.rs_id])
-                            int count = rowResult[0]
-                            if(count > 0){
-                                logger.info "${it.rs_id}:${it.chrom}:${it.pos} already exists in DE_RC_SNP_INFO ..."
-                            }
-                            else{
-                                if(it.gene_info == null || it.gene_info.indexOf(":") < 0) {
-                                    logger.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} ${snpInfoId} '' into DE_RC_SNP_INFO ..."
-                                    ps.addBatch([snpInfoId, it.rs_id, it.chrom, it.pos, it.ref, it.alt,
-                                                 it.gene_info, null, null, it.variation_class, it.hgversion])
-                                } else {
-                                    String[] genes = it.gene_info.split(/(:|\|)/)
-                                    String geneName = genes[0]
-                                    long geneId = genes[1].toInteger()
-                                    logger.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} ${snpInfoId} ${geneName}:${geneId} into DE_RC_SNP_INFO ..."
-                                    ps.addBatch([snpInfoId, it.rs_id, it.chrom, it.pos, it.ref, it.alt,
-                                                 it.gene_info, geneName, geneId, it.variation_class, it.hgversion])
-                                }
-                            }
-                        }
-                    })
-                //}
-
-                logger.info("End loading VCF's SNP RS# from $vcfTable into DE_RC_SNP_INFO ...")
-            }
-	}
-
-
-        void loadDeSnpGeneMap(Sql deapp, Sql tmlz, Properties props){
-
-            Boolean isPostgres = Util.isPostgres()
-            String qry1;
-            String qry2;
-            String qry3;
-            String qry4;
-            String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
-            if(isPostgres) {
-                logger.info("On Postgres DE_SNP_GENE_MAP is a view, no need to load copy of data ...")
-            }
-            else {
-    
-                if(props.get("skip_de_snp_gene_map").toString().toLowerCase().equals("yes")){
-                    logger.info("Skip loading VCF's SNP RS# from table $vcfGeneTable into DE_SNP_GENE_MAP ...")
-                }else{
-                    logger.info("Start loading VCF's SNP RS# from $vcfGeneTable into DE_SNP_GENE_MAP ...")
-
-                    if(isPostgres) {
-                        qry1 = "select rs_id, gene_id from tm_lz.$vcfGeneTable"
-                        qry2 = "select count(*) from de_snp_gene_map where snp_id = ? and snp_name=? and entrez_gene_id=?"
-                        qry3 = """ insert into DE_SNP_GENE_MAP (snp_id, snp_name, entrez_gene_id)
-							 values (?, ?, ?)
-						 """
-                        qry4 = "select snp_info_id from deapp.de_snp_info where name = ?"
-                    } else {
-                        qry1 = "select rs_id, gene_id from tm_lz.$vcfGeneTable"
-                        qry2 = "select count(*) from de_snp_gene_map where snp_id = ? and snp_name=? and entrez_gene_id=?"
-                        qry3 = """ insert into DE_SNP_GENE_MAP (snp_id, snp_name, entrez_gene_id)
-							 values (?, ?, ?)
-						 """
-                        qry4 = "select snp_info_id from deapp.de_snp_info where name = ?"
+            //deapp.withTransaction {
+            deapp.withBatch(batchSize,qry3, { ps ->
+                tmlz.eachRow(qry1) {
+                    GroovyRowResult rowResult = deapp.firstRow(qry4, [it.rs_id])
+                    int snpInfoId = rowResult[0]
+                    rowResult = deapp.firstRow(qry2, [snpInfoId, it.hgversion, it.rs_id])
+                    int count = rowResult[0]
+                    if(count > 0){
+                        logger.info "${it.rs_id}:${it.chrom}:${it.pos} already exists in DE_RC_SNP_INFO ..."
                     }
-
-                    //deapp.withTransaction {
-                        deapp.withBatch(batchSize,qry3, { ps ->
-                            tmlz.eachRow(qry1) {
-                                GroovyRowResult rowResult = deapp.firstRow(qry4, [it.rs_id])
-                                int snpInfoId = rowResult[0]
-                                rowResult = deapp.firstRow(qry2, [snpInfoId, it.rs_id, it.gene_id])
-                                int count = rowResult[0]
-                                if(count > 0){
-                                    logger.info "${it.rs_id}:${it.gene_id} already exists in DE_SNP_GENE_MAP ..."
-                                }
-                                else{
-                                    logger.info "Insert ${it.rs_id}:${it.gene_id} ${snpInfoId} into DE_SNP_GENE_MAP ..."
-                                    ps.addBatch([snpInfoId, it.rs_id, it.gene_id])
-                                }
-                            }
-                        })
-                    //}
-                
-                    logger.info("End loading VCF's SNP RS# from $vcfGeneTable into DE_SNP_GENE_MAP ...")
+                    else{
+                        if(it.gene_info == null || it.gene_info.indexOf(":") < 0) {
+                            logger.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} ${snpInfoId} '' into DE_RC_SNP_INFO ..."
+                            ps.addBatch([snpInfoId, it.rs_id, it.chrom, it.pos, it.ref, it.alt,
+                                         it.gene_info, null, null, it.variation_class, it.hgversion])
+                        } else {
+                            String[] genes = it.gene_info.split(/(:|\|)/)
+                            String geneName = genes[0]
+                            long geneId = genes[1].toInteger()
+                            logger.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} ${snpInfoId} ${geneName}:${geneId} into DE_RC_SNP_INFO ..."
+                            ps.addBatch([snpInfoId, it.rs_id, it.chrom, it.pos, it.ref, it.alt,
+                                         it.gene_info, geneName, geneId, it.variation_class, it.hgversion])
+                        }
+                    }
                 }
-            }
-	}
+            })
+            //}
 
+            logger.info("End loading VCF's SNP RS# from $vcfTable into DE_RC_SNP_INFO ...")
+        }
+    }
 
-        void loadDeSnpInfo(Sql deapp, Sql tmlz, Properties props){
+    void loadDeSnpGeneMap(Sql deapp, Sql tmlz, Properties props){
 
-            Boolean isPostgres = Util.isPostgres()
-            String qry1;
-            String qry2;
-            String qry3;
-            String vcfTable = "vcf" + props.get("human_genome_version")
-
-            if(props.get("skip_de_snp_info").toString().toLowerCase().equals("yes")){
-                logger.info("Skip loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
+        Boolean isPostgres = Util.isPostgres()
+        String qry1;
+        String qry2;
+        String qry3;
+        String qry4;
+        String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
+        if(isPostgres) {
+            logger.info("On Postgres DE_SNP_GENE_MAP is a view, no need to load copy of data ...")
+        }
+        else {
+    
+            if(props.get("skip_de_snp_gene_map").toString().toLowerCase().equals("yes")){
+                logger.info("Skip loading VCF's SNP RS# from table $vcfGeneTable into DE_SNP_GENE_MAP ...")
             }else{
-                logger.info("Start loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
+                logger.info("Start loading VCF's SNP RS# from $vcfGeneTable into DE_SNP_GENE_MAP ...")
 
                 if(isPostgres) {
-                    qry1 = "select rs_id, chrom, pos from tm_lz.$vcfTable"
-                    qry2 = "select count(*) from de_snp_info where name=? and chrom=? and chrom_pos=?"
-                    qry3 = "insert into DE_SNP_INFO (name, chrom, chrom_pos) values (?, ?, ?)"
+                    qry1 = "select rs_id, gene_id from tm_lz.$vcfGeneTable"
+                    qry2 = "select count(*) from de_snp_gene_map where snp_id = ? and snp_name=? and entrez_gene_id=?"
+                    qry3 = """ insert into DE_SNP_GENE_MAP (snp_id, snp_name, entrez_gene_id)
+							 values (?, ?, ?)
+						 """
+                    qry4 = "select snp_info_id from deapp.de_snp_info where name = ?"
                 } else {
-                    qry1 = "select rs_id, chrom, pos from tm_lz.$vcfTable"
-                    qry2 = "select count(*) from de_snp_info where name=? and chrom=? and chrom_pos=?"
-                    qry3 = "insert into DE_SNP_INFO (name, chrom, chrom_pos) values (?, ?, ?)"
+                    qry1 = "select rs_id, gene_id from tm_lz.$vcfGeneTable"
+                    qry2 = "select count(*) from de_snp_gene_map where snp_id = ? and snp_name=? and entrez_gene_id=?"
+                    qry3 = """ insert into DE_SNP_GENE_MAP (snp_id, snp_name, entrez_gene_id)
+							 values (?, ?, ?)
+						 """
+                    qry4 = "select snp_info_id from deapp.de_snp_info where name = ?"
                 }
-                
+
                 //deapp.withTransaction {
-                    deapp.withBatch(batchSize,qry3, { ps ->
-                        tmlz.eachRow(qry1) {
-                            GroovyRowResult rowResult = deapp.firstRow(qry2, [it.rs_id, it.chrom, it.pos])
-                            int count = rowResult[0]
-                            if(count > 0){
-                                logger.info "${it.rs_id}:${it.chrom}:${it.pos} already exists in DE_SNP_INFO ..."
-                            }
-                            else{
-                                logger.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} into DE_SNP_INFO ..."
-                                ps.addBatch([it.rs_id, it.chrom, it.pos])
-                            }
+                deapp.withBatch(batchSize,qry3, { ps ->
+                    tmlz.eachRow(qry1) {
+                        GroovyRowResult rowResult = deapp.firstRow(qry4, [it.rs_id])
+                        int snpInfoId = rowResult[0]
+                        rowResult = deapp.firstRow(qry2, [snpInfoId, it.rs_id, it.gene_id])
+                        int count = rowResult[0]
+                        if(count > 0){
+                            logger.info "${it.rs_id}:${it.gene_id} already exists in DE_SNP_GENE_MAP ..."
                         }
-
-                    })
-                    //}
+                        else{
+                            logger.info "Insert ${it.rs_id}:${it.gene_id} ${snpInfoId} into DE_SNP_GENE_MAP ..."
+                            ps.addBatch([snpInfoId, it.rs_id, it.gene_id])
+                        }
+                    }
+                })
+                //}
                 
-                logger.info("End loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
+                logger.info("End loading VCF's SNP RS# from $vcfGeneTable into DE_SNP_GENE_MAP ...")
             }
-	}
+        }
+    }
 
+    void loadDeSnpInfo(Sql deapp, Sql tmlz, Properties props){
+
+        Boolean isPostgres = Util.isPostgres()
+        String qry1;
+        String qry2;
+        String qry3;
+        String vcfTable = "vcf" + props.get("human_genome_version")
+
+        if(props.get("skip_de_snp_info").toString().toLowerCase().equals("yes")){
+            logger.info("Skip loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
+        }else{
+            logger.info("Start loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
+
+            if(isPostgres) {
+                qry1 = "select rs_id, chrom, pos from tm_lz.$vcfTable"
+                qry2 = "select count(*) from de_snp_info where name=? and chrom=? and chrom_pos=?"
+                qry3 = "insert into DE_SNP_INFO (name, chrom, chrom_pos) values (?, ?, ?)"
+            } else {
+                qry1 = "select rs_id, chrom, pos from tm_lz.$vcfTable"
+                qry2 = "select count(*) from de_snp_info where name=? and chrom=? and chrom_pos=?"
+                qry3 = "insert into DE_SNP_INFO (name, chrom, chrom_pos) values (?, ?, ?)"
+            }
+                
+            //deapp.withTransaction {
+            deapp.withBatch(batchSize,qry3, { ps ->
+                tmlz.eachRow(qry1) {
+                    GroovyRowResult rowResult = deapp.firstRow(qry2, [it.rs_id, it.chrom, it.pos])
+                    int count = rowResult[0]
+                    if(count > 0){
+                        logger.info "${it.rs_id}:${it.chrom}:${it.pos} already exists in DE_SNP_INFO ..."
+                    }
+                    else{
+                        logger.info "Insert ${it.rs_id}:${it.chrom}:${it.pos} into DE_SNP_INFO ..."
+                        ps.addBatch([it.rs_id, it.chrom, it.pos])
+                    }
+                }
+
+            })
+            //}
+            logger.info("End loading VCF's SNP RS# from table $vcfTable into DE_SNP_INFO ...")
+        }
+    }
 
     void loadSearchKeyword(Sql searchapp, Sql deapp, Properties props){
 
-            Boolean isPostgres = Util.isPostgres()
-            String qry;
-            String qrysyn;
+        Boolean isPostgres = Util.isPostgres()
+        String qry;
+        String qrysyn;
 
-            if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
-                logger.info("Skip loading SNP RS# from DE_SNP_INFO to SEARCH_KEYWORD ...")
-            }else{
-                logger.info("Start loading SNP RS# from DE_SNP_INFO to SEARCH_KEYWORD ...")
+        if(props.get("skip_search_keyword").toString().toLowerCase().equals("yes")){
+            logger.info("Skip loading SNP RS# from DE_SNP_INFO to SEARCH_KEYWORD ...")
+        }else{
+            logger.info("Start loading SNP RS# from DE_SNP_INFO to SEARCH_KEYWORD ...")
 
-                if(isPostgres) {
-    			//String stmt = "alter table search_keyword disable constraint "
-			//searchapp.execute(stmt)
+            if(isPostgres) {
+    		//String stmt = "alter table search_keyword disable constraint "
+		//searchapp.execute(stmt)
 
-                        qry = " select name, snp_info_id from deapp.de_snp_info "
-                } else {
-    			//String stmt = "alter table search_keyword disable constraint "
-			//searchapp.execute(stmt)
+                qry = " select name, snp_info_id from deapp.de_snp_info "
+            } else {
+    		//String stmt = "alter table search_keyword disable constraint "
+		//searchapp.execute(stmt)
 
-                        qry = " select name, snp_info_id from deapp.de_snp_info "
-                }
-
-                deapp.eachRow(qry)
-                {
-                    long snpInfoId = it.snp_info_id
-                    searchKeyword.insertSearchKeyword(it.name, snpInfoId,
-                                                              'SNP:'+it.name,
-                                                              'SNP', 'SNP', 'SNP')
-                    long searchKeywordID = searchKeyword.getSearchKeywordId(it.name, 'SNP')
-                    if(searchKeywordID){
-                        searchKeywordTerm.insertSearchKeywordTerm(it.name, searchKeywordID, 1)
-                    }
-                }
-                
-                logger.info("End loading SNP RS# from table DE_SNP_INFO into SEARCH_KEYWORD ...")
+                qry = " select name, snp_info_id from deapp.de_snp_info "
             }
-	}
 
+            deapp.eachRow(qry)
+            {
+                long snpInfoId = it.snp_info_id
+                searchKeyword.insertSearchKeyword(it.name, snpInfoId,
+                                                  'SNP:'+it.name,
+                                                  'SNP', 'SNP', 'SNP')
+                long searchKeywordID = searchKeyword.getSearchKeywordId(it.name, 'SNP')
+                if(searchKeywordID){
+                    searchKeywordTerm.insertSearchKeywordTerm(it.name, searchKeywordID, 1)
+                }
+            }
 
-	void loadVCFData(Sql biomart, Properties props){
+            logger.info("End loading SNP RS# from table DE_SNP_INFO into SEARCH_KEYWORD ...")
+        }
+    }
 
-		int index = 0
-		String vcfTable = "vcf" + props.get("human_genome_version")
-		String hgVersion = props.get("human_genome_version")
-		String dbSNPVersion = props.get("dbSNP_version")
+    void loadVCFData(Sql biomart, Properties props){
 
-		File vcfData = new File(props.get("vcf_source_file") + ".tsv")
+	int index = 0
+	String vcfTable = "vcf" + props.get("human_genome_version")
+	String hgVersion = props.get("human_genome_version")
+	String dbSNPVersion = props.get("dbSNP_version")
 
-		String qry = """ insert into $vcfTable (chrom, pos, rs_id, ref, alt, variation_class,
+	File vcfData = new File(props.get("vcf_source_file") + ".tsv")
+
+	String qry = """ insert into $vcfTable (chrom, pos, rs_id, ref, alt, variation_class,
                                 gene_info, af, gmaf)
 						 values(?, ?, ?, ?, ?,  ?, ?, ?, ?) """
 
-		if(vcfData.size() > 0){
-			logger.info("Start loading VCF data from the file [${vcfData.toString()}] into the table ${vcfTable} ...")
-			//biomart.withTransaction {
-			biomart.withBatch(batchSize, qry, { stmt ->
-				vcfData.eachLine {
-					index++
-					if((index % 100000) == 0) {
-						if((index % 1000000) == 0) println index + "..."
-						else print index + "..."
-					}
+	if(vcfData.size() > 0){
+	    logger.info("Start loading VCF data from the file [${vcfData.toString()}] into the table ${vcfTable} ...")
+	    //biomart.withTransaction {
+	    biomart.withBatch(batchSize, qry, { stmt ->
+		vcfData.eachLine {
+		    index++
+		    if((index % 100000) == 0) {
+			if((index % 1000000) == 0) println index + "..."
+			else print index + "..."
+		    }
 
-					String [] str = it.split("\t")
+		    String [] str = it.split("\t")
 
-					if(str.size() > 8) {
-						stmt.addBatch([
-							str[0].replace("chr", ""),
-							str[1],
-							str[2],
-							str[3],
-							str[4],
-							str[5],
-							str[6],
-							str[7],
-							str[8]
-						])
-					}else if(str.size() > 7) {
-						stmt.addBatch([
-							str[0].replace("chr", ""),
-							str[1],
-							str[2],
-							str[3],
-							str[4],
-							str[5],
-							str[6],
-							str[7],
-							null
-						])
-					}else if(str.size() > 6) {
-						stmt.addBatch([
-							str[0].replace("chr", ""),
-							str[1],
-							str[2],
-							str[3],
-							str[4],
-							str[5],
-							str[6],
-							null,
-							null
-						])
-					} else {
-						stmt.addBatch([
-							str[0].replace("chr", ""),
-							str[1],
-							str[2],
-							str[3],
-							str[4],
-							str[5],
-							null,
-							null,
-							null
-						])
-					}
-				}
-			})
-			//}
-			logger.info("End loading VCF data into ${vcfTable} ...")
-		}else{
-			logger.error("File ${vcfData.toString()} is empty or does not exist ...")
+		    if(str.size() > 8) {
+			stmt.addBatch([
+			    str[0].replace("chr", ""),
+			    str[1],
+			    str[2],
+			    str[3],
+			    str[4],
+			    str[5],
+			    str[6],
+			    str[7],
+			    str[8]
+			])
+		    }else if(str.size() > 7) {
+			stmt.addBatch([
+			    str[0].replace("chr", ""),
+			    str[1],
+			    str[2],
+			    str[3],
+			    str[4],
+			    str[5],
+			    str[6],
+			    str[7],
+			    null
+			])
+		    }else if(str.size() > 6) {
+			stmt.addBatch([
+			    str[0].replace("chr", ""),
+			    str[1],
+			    str[2],
+			    str[3],
+			    str[4],
+			    str[5],
+			    str[6],
+			    null,
+			    null
+			])
+		    } else {
+			stmt.addBatch([
+			    str[0].replace("chr", ""),
+			    str[1],
+			    str[2],
+			    str[3],
+			    str[4],
+			    str[5],
+			    null,
+			    null,
+			    null
+			])
+		    }
 		}
+	    })
+	    //}
+	    logger.info("End loading VCF data into ${vcfTable} ...")
+	}else{
+	    logger.error("File ${vcfData.toString()} is empty or does not exist ...")
 	}
+    }
 
+    void loadVCFGene(Sql biomart, Properties props){
 
-	void loadVCFGene(Sql biomart, Properties props){
+	String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
 
-		String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
+	String qry = """ insert into $vcfGeneTable (chr, rs_id, pos, gene_symbol, gene_id) values(?, ?, ?, ?, ?) """
 
-		String qry = """ insert into $vcfGeneTable (chr, rs_id, pos, gene_symbol, gene_id) values(?, ?, ?, ?, ?) """
-
-		File input = new File(props.get("vcf_source_file") + ".gene")
-		if(input.size() > 0){
-			logger.info("Start loading VCF data into ${vcfGeneTable} ...")
-			//biomart.withTransaction {
-			biomart.withBatch(batchSize, qry, { stmt ->
-				input.eachLine{
-					def str = it.split("\t")
-					Map genePair = getGeneMap(str[3])
-					genePair.each{ k, v ->
-						stmt.addBatch([str[0], str[2], str[1], k, v])
-					}
-				}
-			})
-			//}
-		} else{
-			logger.info(input.toString() + " is empty or does not exist ...")
+	File input = new File(props.get("vcf_source_file") + ".gene")
+	if(input.size() > 0){
+	    logger.info("Start loading VCF data into ${vcfGeneTable} ...")
+	    //biomart.withTransaction {
+	    biomart.withBatch(batchSize, qry, { stmt ->
+		input.eachLine{
+		    def str = it.split("\t")
+		    Map genePair = getGeneMap(str[3])
+		    genePair.each{ k, v ->
+			stmt.addBatch([str[0], str[2], str[1], k, v])
+		    }
 		}
+	    })
+	    //}
+	} else{
+	    logger.info(input.toString() + " is empty or does not exist ...")
 	}
+    }
 
+    void processVCFData(Properties props){
+	if(props.get("skip_process_vcf_data").toString().toLowerCase().equals("yes")){
+	    logger.info("Skip processing VCF data: ${props.get("vcf_source_file")} ...")
+	}else{
+	    File input = new File(props.get("vcf_source_file"))
 
-	void processVCFData(Properties props){
-		if(props.get("skip_process_vcf_data").toString().toLowerCase().equals("yes")){
-			logger.info("Skip processing VCF data: ${props.get("vcf_source_file")} ...")
-		}else{
-			File input = new File(props.get("vcf_source_file"))
+	    File output = new File(props.get("vcf_source_file") + ".tsv")
+	    if(output.size() > 0){
+		output.delete()
+	    }
+	    output.createNewFile()
 
-			File output = new File(props.get("vcf_source_file") + ".tsv")
-			if(output.size() > 0){
-				output.delete()
-			}
-			output.createNewFile()
+	    File geneOutput = new File(props.get("vcf_source_file") + ".gene")
+	    if(geneOutput.size() > 0){
+		geneOutput.delete()
+	    }
+	    geneOutput.createNewFile()
 
-			File geneOutput = new File(props.get("vcf_source_file") + ".gene")
-			if(geneOutput.size() > 0){
-				geneOutput.delete()
-			}
-			geneOutput.createNewFile()
-
-			logger.info("Start processing VCF data: " + input.toString() + "...")
-			readVCFData1(input, output, geneOutput, props)
-			logger.info("End processing VCF data: " + input.toString() + "...")
-		}
+	    logger.info("Start processing VCF data: " + input.toString() + "...")
+	    readVCFData1(input, output, geneOutput, props)
+	    logger.info("End processing VCF data: " + input.toString() + "...")
 	}
+    }
 
+    void readVCFData(File vcfInput, File output, File geneOutput, Properties props){
 
-	void readVCFData(File vcfInput, File output, File geneOutput, Properties props){
+	String [] str, info
+	StringBuffer sb = new StringBuffer()
+	StringBuffer line = new StringBuffer()
 
-		String [] str, info
-		StringBuffer sb = new StringBuffer()
-		StringBuffer line = new StringBuffer()
+	StringBuffer sb1 = new StringBuffer()
+	StringBuffer line1 = new StringBuffer()
 
-		StringBuffer sb1 = new StringBuffer()
-		StringBuffer line1 = new StringBuffer()
+	String vc, geneinfo
+	Map infoId = [:]
 
-		String vc, geneinfo
-		Map infoId = [:]
+	String [] infoIdList = props.get("info_id_list").split(";")
 
-		String [] infoIdList = props.get("info_id_list").split(";")
+	int lineNum = 0
+	if(vcfInput.size() > 0){
+	    vcfInput.eachLine {
+		vc = ""
+		geneinfo = ""
 
-		int lineNum = 0
-		if(vcfInput.size() > 0){
-			vcfInput.eachLine {
-				vc = ""
-				geneinfo = ""
+		if(it.indexOf("#") != 0) {
+		    lineNum++
+		    str = it.split("\t")
 
+		    // VCF v4.1 columns: CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO
+		    sb.append("${str[0]}\t${str[1]}\t${str[2]}\t${str[3]}\t${str[4]}\t")
 
-				if(it.indexOf("#") != 0) {
-					lineNum++
-					str = it.split("\t")
+		    if(str[7].indexOf(";") != -1) {
+			info = str[7].split(";")
+			info.each{ id ->
+			    if(id.indexOf("VC=") != -1) vc = id.replace("VC=", "").trim()
 
-					// VCF v4.1 columns: CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO
-					sb.append("${str[0]}\t${str[1]}\t${str[2]}\t${str[3]}\t${str[4]}\t")
+			    if(id.indexOf("GENEINFO=") != -1) {
+				geneinfo = id.replace("GENEINFO=", "").trim()
+				line.append(str[2] + "\t" + geneinfo + "\n")
+			    }
 
-					if(str[7].indexOf(";") != -1) {
-						info = str[7].split(";")
-						info.each{ id ->
-							if(id.indexOf("VC=") != -1) vc = id.replace("VC=", "").trim()
-
-							if(id.indexOf("GENEINFO=") != -1) {
-								geneinfo = id.replace("GENEINFO=", "").trim()
-								line.append(str[2] + "\t" + geneinfo + "\n")
-							}
-
-							infoIdList.each{
-								if(id.indexOf(it + "=") == 0){
-									infoId[it] = id.replace(it + "=", "").trim()
-								}
-							}
-						}
-					}
-
-					sb.append(vc + "\t")
-					sb.append(geneinfo + "\t")
-					infoIdList.each{
-						if(!infoId[it].equals(null) && infoId[it].size() > 0) {
-							sb.append(infoId[it] + "\t")
-						} else {
-							sb.append("\t")
-						}
-					}
-					sb.append("\n")
-
-					if((lineNum % 100000) == 0) {
-						if((lineNum % 1000000) == 0) println lineNum + "..."
-						else print lineNum + "..."
-						output.append(sb.toString())
-						sb.delete(0, sb.size())
-
-						geneOutput.append(line.toString())
-						line.delete(0, line.size())
-					}
+			    infoIdList.each{
+				if(id.indexOf(it + "=") == 0){
+				    infoId[it] = id.replace(it + "=", "").trim()
 				}
+			    }
 			}
+		    }
 
-			println lineNum
-			logger.info("Total SNP# in " + vcfInput.toString() + ": \t" + lineNum)
+		    sb.append(vc + "\t")
+		    sb.append(geneinfo + "\t")
+		    infoIdList.each{
+			if(!infoId[it].equals(null) && infoId[it].size() > 0) {
+			    sb.append(infoId[it] + "\t")
+			} else {
+			    sb.append("\t")
+			}
+		    }
+		    sb.append("\n")
 
+		    if((lineNum % 100000) == 0) {
+			if((lineNum % 1000000) == 0) println lineNum + "..."
+			else print lineNum + "..."
 			output.append(sb.toString())
 			sb.delete(0, sb.size())
 
 			geneOutput.append(line.toString())
 			line.delete(0, line.size())
-		}else{
-			logger.error("The file " + vcfInput.toString() + " is empty or does not exist ...")
+		    }
 		}
+	    }
+
+	    println lineNum
+	    logger.info("Total SNP# in " + vcfInput.toString() + ": \t" + lineNum)
+
+	    output.append(sb.toString())
+	    sb.delete(0, sb.size())
+
+	    geneOutput.append(line.toString())
+	    line.delete(0, line.size())
+	}else{
+	    logger.error("The file " + vcfInput.toString() + " is empty or does not exist ...")
 	}
+    }
 
+    void readVCFData1(File vcfInput, File output, File geneOutput, Properties props){
 
-	void readVCFData1(File vcfInput, File output, File geneOutput, Properties props){
+	StringBuffer [] sb = new StringBuffer()[]
+	StringBuffer line = new StringBuffer()
+	StringBuffer gene = new StringBuffer()
 
-		StringBuffer [] sb = new StringBuffer()[]
-		StringBuffer line = new StringBuffer()
-		StringBuffer gene = new StringBuffer()
+	String [] infoIdList = props.get("info_id_list").split(";")
 
-		String [] infoIdList = props.get("info_id_list").split(";")
+	int lineNum = 0
+	if(vcfInput.size() > 0){
+	    vcfInput.eachLine {
+		if((it.indexOf("##") == -1) && (it.indexOf("chr") == 0)){
+		    lineNum++
 
-		int lineNum = 0
-		if(vcfInput.size() > 0){
-			vcfInput.eachLine {
-				if((it.indexOf("##") == -1) && (it.indexOf("chr") == 0)){
-					lineNum++
+		    sb = readLine(it, infoIdList)
+		    line.append(sb[0].toString())
+		    gene.append(sb[1].toString())
 
-					sb = readLine(it, infoIdList)
-					line.append(sb[0].toString())
-					gene.append(sb[1].toString())
-
-					if((lineNum % 100000) == 0) {
-						if((lineNum % 1000000) == 0) println lineNum + "..."
-						else print lineNum + "..."
-						output.append(line.toString())
-						line.setLength(0)
-
-						geneOutput.append(gene.toString())
-						gene.setLength(0)
-					}
-				}
-			}
-
-			println lineNum
-			logger.info("Total SNP# in " + vcfInput.toString() + ": \t" + lineNum)
-
+		    if((lineNum % 100000) == 0) {
+			if((lineNum % 1000000) == 0) println lineNum + "..."
+			else print lineNum + "..."
 			output.append(line.toString())
 			line.setLength(0)
 
 			geneOutput.append(gene.toString())
 			gene.setLength(0)
-		}else{
-			logger.error("The file " + vcfInput.toString() + " is empty or does not exist ...")
+		    }
 		}
+	    }
+
+	    println lineNum
+	    logger.info("Total SNP# in " + vcfInput.toString() + ": \t" + lineNum)
+
+	    output.append(line.toString())
+	    line.setLength(0)
+
+	    geneOutput.append(gene.toString())
+	    gene.setLength(0)
+	}else{
+	    logger.error("The file " + vcfInput.toString() + " is empty or does not exist ...")
 	}
+    }
 
+    StringBuffer [] readLine(String line, String [] infoIdList){
 
-	StringBuffer [] readLine(String line, String [] infoIdList){
+	StringBuffer sb = new StringBuffer()
+	StringBuffer gene = new StringBuffer()
+	ArrayList rsid = new ArrayList()
 
-		StringBuffer sb = new StringBuffer()
-		StringBuffer gene = new StringBuffer()
-		ArrayList rsid = new ArrayList()
+	// VCF v4.1 columns: CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO
+	String [] str = line.split("\t")
 
-		// VCF v4.1 columns: CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO
-		String [] str = line.split("\t")
+	String vc =getAttributeValue("VC", str[7])
+	String geneInfo = getAttributeValue("GENEINFO", str[7])
 
-		String vc =getAttributeValue("VC", str[7])
-		String geneInfo = getAttributeValue("GENEINFO", str[7])
+	// split rs_id if there are multiple
+	rsid = getSnpId(str[2])
+	rsid.each{
+	    // generate a record for VCF table
+	    sb.append("${str[0]}\t${str[1]}\t$it\t${str[3]}\t${str[4]}\t")
+	    sb.append( vc + "\t")
+	    sb.append(geneInfo + "\t")
 
-		// split rs_id if there are multiple
-		rsid = getSnpId(str[2])
-		rsid.each{
-			// generate a record for VCF table
-			sb.append("${str[0]}\t${str[1]}\t$it\t${str[3]}\t${str[4]}\t")
-			sb.append( vc + "\t")
-			sb.append(geneInfo + "\t")
+	    infoIdList.each{
+		sb.append(getAttributeValue(it, str[7]) + "\t")
+	    }
+	    sb.append("\n")
 
-			infoIdList.each{
-				sb.append(getAttributeValue(it, str[7]) + "\t")
-			}
-			sb.append("\n")
-
-			// generate a record for VCF_GENE table
-			if(geneInfo.size() > 0) gene.append("${str[0]}\t${str[1]}\t$it\t$geneInfo\n")
-		}
+	    // generate a record for VCF_GENE table
+	    if(geneInfo.size() > 0) gene.append("${str[0]}\t${str[1]}\t$it\t$geneInfo\n")
+	}
 		
-		return [sb, gene]
+	return [sb, gene]
+    }
+
+    ArrayList getSnpId(String ids){
+	ArrayList rsid = new ArrayList()
+	if(ids.indexOf(";") != -1){
+	    String [] str = ids.split(";")
+	    str.each{ rsid.add(it) }
+	} else {
+	    rsid.add(ids)
 	}
 
+	return rsid
+    }
 
+    /**
+     * 
+     * @param attributeName		attribute name, usaullay in upper case
+     * @param info				value of INFO column
+     * @return					extracted value for this attribute
+     */
+    String getAttributeValue(String attributeName, String info){
 
-	ArrayList getSnpId(String ids){
-		ArrayList rsid = new ArrayList()
-		if(ids.indexOf(";") != -1){
-			String [] str = ids.split(";")
-			str.each{ rsid.add(it) }
-		} else {
-			rsid.add(ids)
-		}
-
-		return rsid
+	String value = ""
+	String [] str = info.split(";")
+	str.each{
+	    if(it.indexOf(attributeName + "=") != -1)  value = it.replace(attributeName + "=", "").trim()
 	}
 
+	return value
+    }
 
-	/**
-	 * 
-	 * @param attributeName		attribute name, usaullay in upper case
-	 * @param info				value of INFO column
-	 * @return					extracted value for this attribute
-	 */
-	String getAttributeValue(String attributeName, String info){
+    /**
+     *  extract [gene symbol:gene id] map to VCF_GENE and 
+     *  later populate DE_SNP_GENE_MAP
+     *  
+     * @param str	value from INFO's GENEINFO attribute
+     * @return		a map: gene_symbol -> gene_id
+     */
+    Map getGeneMap(String str){
 
-		String value = ""
-		String [] str = info.split(";")
-		str.each{
-			if(it.indexOf(attributeName + "=") != -1)  value = it.replace(attributeName + "=", "").trim()
-		}
+	Map geneMap = [:]
+	String [] genes, lst
 
-		return value
+	if(str.indexOf(genePairDelimiter) != -1){
+
+	    /* The gene pair's delimiter "|" cannot escaped from a parameter, 
+	     * so hardcode it here for now.
+	     */
+	    genes = str.split(/\|/)
+	    genes.each{
+		lst = it.split(geneSymbolDelimiter)
+		geneMap[lst[0]] = lst[1]
+	    }
+	}else{
+	    lst = str.split(geneSymbolDelimiter)
+	    geneMap[lst[0]] = lst[1]
 	}
 
+	return geneMap
+    }
 
-	/**
-	 *  extract [gene symbol:gene id] map to VCF_GENE and 
-	 *  later populate DE_SNP_GENE_MAP
-	 *  
-	 * @param str	value from INFO's GENEINFO attribute
-	 * @return		a map: gene_symbol -> gene_id
-	 */
-	Map getGeneMap(String str){
+    /**
+     *  create index after data is loaded for performance reason
+     *  
+     * @param sql
+     * @param props
+     */
+    void createVCFIndex(Sql sql, Properties props){
 
-		Map geneMap = [:]
-		String [] genes, lst
+        Boolean isPostgres = Util.isPostgres()
+        String qry;
+        String qry1;
+        String vcfTable = "vcf" + props.get("human_genome_version")
 
-		if(str.indexOf(genePairDelimiter) != -1){
+        if(props.get("skip_create_vcf_index").toString().toLowerCase().equals("yes")){
+            logger.info("Skip creating indexes on table ${vcfTable} ...")
+        }else{
 
-			/* The gene pair's delimiter "|" cannot escaped from a parameter, 
-			 * so hardcode it here for now.
-			 */
-			genes = str.split(/\|/)
-			genes.each{
-				lst = it.split(geneSymbolDelimiter)
-				geneMap[lst[0]] = lst[1]
-			}
-		}else{
-			lst = str.split(geneSymbolDelimiter)
-			geneMap[lst[0]] = lst[1]
-		}
+            logger.info "Start creating indexes for table: ${vcfTable}"
 
-		return geneMap
-	}
+            if(isPostgres) {
+                qry = """ create index idx_${vcfTable} on ${vcfTable} (rs_id)"""   /* tablespace indx */
 
-
-
-	/**
-	 *  create index after data is loaded for performance reason
-	 *  
-	 * @param sql
-	 * @param props
-	 */
-        void createVCFIndex(Sql sql, Properties props){
-
-            Boolean isPostgres = Util.isPostgres()
-            String qry;
-            String qry1;
-            String vcfTable = "vcf" + props.get("human_genome_version")
-
-            if(props.get("skip_create_vcf_index").toString().toLowerCase().equals("yes")){
-                logger.info("Skip creating indexes on table ${vcfTable} ...")
-            }else{
-
-                logger.info "Start creating indexes for table: ${vcfTable}"
-
-                if(isPostgres) {
-                    qry = """ create index idx_${vcfTable} on ${vcfTable} (rs_id)"""   /* tablespace indx */
-
-                    qry1 = "select count(*)  from pg_indexes where indexname=?"
-                    if(sql.firstRow(qry1, [vcfTable])[0] > 0){
-                        qry1 = "drop index ${vcfTable}"
-                        sql.execute(qry1)
-                    }
-                } else {
-                    qry = """ create index idx_${vcfTable} on ${vcfTable} (rs_id) nologging parallel tablespace indx """
-
-                    qry1 = "select count(*)  from user_indexes where index_name=?"
-                    if(sql.firstRow(qry1, [vcfTable.toUpperCase()])[0] > 0){
-                        qry1 = "drop index ${vcfTable} purge"
-                        sql.execute(qry1)
-                    }
+                qry1 = "select count(*)  from pg_indexes where indexname=?"
+                if(sql.firstRow(qry1, [vcfTable])[0] > 0){
+                    qry1 = "drop index ${vcfTable}"
+                    sql.execute(qry1)
                 }
+            } else {
+                qry = """ create index idx_${vcfTable} on ${vcfTable} (rs_id) nologging parallel tablespace indx """
+
+                qry1 = "select count(*)  from user_indexes where index_name=?"
+                if(sql.firstRow(qry1, [vcfTable.toUpperCase()])[0] > 0){
+                    qry1 = "drop index ${vcfTable} purge"
+                    sql.execute(qry1)
+                }
+            }
             
-                sql.execute(qry)
+            sql.execute(qry)
 
-                logger.info "End creating indexes for table: ${vcfTable}"
-            }
+            logger.info "End creating indexes for table: ${vcfTable}"
         }
+    }
 
+    /**
+     *  create index after data is loaded for performance reason
+     *
+     * @param sql
+     * @param props
+     */
+    void createVCFGeneIndex(Sql sql, Properties props){
 
-	/**
-	 *  create index after data is loaded for performance reason
-	 *
-	 * @param sql
-	 * @param props
-	 */
-	void createVCFGeneIndex(Sql sql, Properties props){
+        Boolean isPostgres = Util.isPostgres()
+        String qry;
+        String qry1;
+        String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
 
-            Boolean isPostgres = Util.isPostgres()
-            String qry;
-            String qry1;
-            String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
+        if(props.get("skip_create_vcf_gene_index").toString().toLowerCase().equals("yes")){
+            logger.info("Skip creating indexes on table ${vcfGeneTable} ...")
+        }else{
 
-            if(props.get("skip_create_vcf_gene_index").toString().toLowerCase().equals("yes")){
-                logger.info("Skip creating indexes on table ${vcfGeneTable} ...")
-            }else{
+            logger.info "Start creating indexes for table: ${vcfGeneTable}"
 
-                logger.info "Start creating indexes for table: ${vcfGeneTable}"
+            if (isPostgres) {
+                qry = """ create index idx_${vcfGeneTable} on ${vcfGeneTable} (rs_id) """ /* tablespace indx */
 
-                if (isPostgres) {
-                    qry = """ create index idx_${vcfGeneTable} on ${vcfGeneTable} (rs_id) """ /* tablespace indx */
-
-                    qry1 = "select count(*)  from pg_indexes where indexname=?"
-                    if(sql.firstRow(qry1, [vcfGeneTable])[0] > 0){
-                        qry1 = "drop index ${vcfGeneTable}"
-                        sql.execute(qry1)
-                    }
-                } else  {
-                    qry = """ create index idx_${vcfGeneTable} on ${vcfGeneTable} (rs_id) nologging parallel tablespace indx """
-
-                    qry1 = "select count(*)  from user_indexes where index_name=?"
-                    if(sql.firstRow(qry1, [vcfGeneTable.toUpperCase()])[0] > 0){
-                        qry1 = "drop index ${vcfGeneTable} purge"
-                        sql.execute(qry1)
-                    }
+                qry1 = "select count(*)  from pg_indexes where indexname=?"
+                if(sql.firstRow(qry1, [vcfGeneTable])[0] > 0){
+                    qry1 = "drop index ${vcfGeneTable}"
+                    sql.execute(qry1)
                 }
-                
-                sql.execute(qry)
+            } else  {
+                qry = """ create index idx_${vcfGeneTable} on ${vcfGeneTable} (rs_id) nologging parallel tablespace indx """
 
-                logger.info "End creating indexes for table: ${vcfGeneTable}"
+                qry1 = "select count(*)  from user_indexes where index_name=?"
+                if(sql.firstRow(qry1, [vcfGeneTable.toUpperCase()])[0] > 0){
+                    qry1 = "drop index ${vcfGeneTable} purge"
+                    sql.execute(qry1)
+                }
             }
-	}
 
+            sql.execute(qry)
 
-	/**
-	 *  create table without index for performance reason
-	 *
-	 * @param sql
-	 * @param props
-	 */
-	void createVCFTable(Sql sql, Properties props){
+            logger.info "End creating indexes for table: ${vcfGeneTable}"
+        }
+    }
 
-            Boolean isPostgres = Util.isPostgres()
-            String qry;
-            String qry1;
-            String qry2;
-            String vcfTable = "vcf" + props.get("human_genome_version")
-            String [] ids = props.get("info_id_list").split(";")
-            String str = ""
+    /**
+     *  create table without index for performance reason
+     *
+     * @param sql
+     * @param props
+     */
+    void createVCFTable(Sql sql, Properties props){
 
-            if(props.get("skip_create_vcf_table").toString().toLowerCase().equals("yes")){
-                logger.info("Skip creating table: ${vcfTable} ...")
-            }else{
-                logger.info "Start creating table: ${vcfTable}"
+        Boolean isPostgres = Util.isPostgres()
+        String qry;
+        String qry1;
+        String qry2;
+        String vcfTable = "vcf" + props.get("human_genome_version")
+        String [] ids = props.get("info_id_list").split(";")
+        String str = ""
 
-                if(isPostgres){
-                    ids.each{ str += "  $it  varchar(1000), \n" }
-                    qry = """ create table ${vcfTable} (
-					chrom  			varchar(2),
-					pos			numeric(10),
-					rs_id			varchar(200),
-					ref			varchar(4000),
-					alt			varchar(4000),
-					variation_class		varchar(10),
-					$str
-					gene_info		varchar(1000)
-				)
+        if(props.get("skip_create_vcf_table").toString().toLowerCase().equals("yes")){
+            logger.info("Skip creating table: ${vcfTable} ...")
+        }else{
+            logger.info "Start creating table: ${vcfTable}"
+
+            if(isPostgres){
+                ids.each{ str += "  $it  varchar(1000), \n" }
+                qry = """ create table ${vcfTable} (
+				chrom  			varchar(2),
+				pos			numeric(10),
+				rs_id			varchar(200),
+				ref			varchar(4000),
+				alt			varchar(4000),
+				variation_class		varchar(10),
+				$str
+				gene_info		varchar(1000)
+			)
                     """
-                    qry1 = "select count(*)  from pg_tables where tablename=?"
-                    if(sql.firstRow(qry1, [vcfTable])[0] > 0){
-                        qry1 = "drop table ${vcfTable}"
-                        sql.execute(qry1)
-                    }
-                } else {
-                    ids.each{ str += "  $it  varchar2(1000), \n" }
-                    qry = """ create table ${vcfTable} (
-					chrom  			varchar2(2),
-					pos			number(10),
-					rs_id			varchar2(200),
-					ref			varchar2(4000),
-					alt			varchar2(4000),
-					variation_class		varchar2(10),
-					$str
-					gene_info		varchar2(1000)
-				)
-				partition by list (chrom)
-				(
-					partition part_chr1 values('1'),
-					partition part_chr2 values('2'),
-					partition part_chr3 values('3'),
-					partition part_chr4 values('4'),
-					partition part_chr5 values('5'),
-					partition part_chr6 values('6'),
-					partition part_chr7 values('7'),
-					partition part_chr8 values('8'),
-					partition part_chr9 values('9'),
-					partition part_chr10 values('10'),
-					partition part_chr11 values('11'),
-					partition part_chr12 values('12'),
-					partition part_chr13 values('13'),
-					partition part_chr14 values('14'),
-					partition part_chr15 values('15'),
-					partition part_chr16 values('16'),
-					partition part_chr17 values('17'),
-					partition part_chr18 values('18'),
-					partition part_chr19 values('19'),
-					partition part_chr20 values('20'),
-					partition part_chr21 values('21'),
-					partition part_chr22 values('22'),
-					partition part_chrX values('X'),
-					partition part_chrY values('Y'),
-					partition part_chrM values('M'),
-					partition part_other values(default)
-				) nologging
-			   """
-
-                    qry1 = "select count(*)  from user_tables where table_name=?"
-                    if(sql.firstRow(qry1, [vcfTable.toUpperCase()])[0] > 0){
-                        qry1 = "drop table ${vcfTable} purge"
-                        sql.execute(qry1)
-                    }
+                qry1 = "select count(*)  from pg_tables where tablename=?"
+                if(sql.firstRow(qry1, [vcfTable])[0] > 0){
+                    qry1 = "drop table ${vcfTable}"
+                    sql.execute(qry1)
                 }
-                
-                sql.execute(qry)
+            } else {
+                ids.each{ str += "  $it  varchar2(1000), \n" }
+                qry = """ create table ${vcfTable} (
+				chrom  			varchar2(2),
+				pos			number(10),
+				rs_id			varchar2(200),
+				ref			varchar2(4000),
+				alt			varchar2(4000),
+				variation_class		varchar2(10),
+				$str
+				gene_info		varchar2(1000)
+			)
+			partition by list (chrom)
+			(
+				partition part_chr1 values('1'),
+				partition part_chr2 values('2'),
+				partition part_chr3 values('3'),
+				partition part_chr4 values('4'),
+				partition part_chr5 values('5'),
+				partition part_chr6 values('6'),
+				partition part_chr7 values('7'),
+				partition part_chr8 values('8'),
+				partition part_chr9 values('9'),
+				partition part_chr10 values('10'),
+				partition part_chr11 values('11'),
+				partition part_chr12 values('12'),
+				partition part_chr13 values('13'),
+				partition part_chr14 values('14'),
+				partition part_chr15 values('15'),
+				partition part_chr16 values('16'),
+				partition part_chr17 values('17'),
+				partition part_chr18 values('18'),
+				partition part_chr19 values('19'),
+				partition part_chr20 values('20'),
+				partition part_chr21 values('21'),
+				partition part_chr22 values('22'),
+				partition part_chrX values('X'),
+				partition part_chrY values('Y'),
+				partition part_chrM values('M'),
+				partition part_other values(default)
+			) nologging
+		  """
 
-                logger.info "End creating table: ${vcfTable}"
+                qry1 = "select count(*)  from user_tables where table_name=?"
+                if(sql.firstRow(qry1, [vcfTable.toUpperCase()])[0] > 0){
+                    qry1 = "drop table ${vcfTable} purge"
+                    sql.execute(qry1)
+                }
             }
-	}
 
+            sql.execute(qry)
 
-	/**
-	 *  create table without index for performance reason
-	 *
-	 * @param sql
-	 * @param props
-	 */
-	void createVCFGeneTable(Sql sql, Properties props){
+            logger.info "End creating table: ${vcfTable}"
+        }
+    }
 
-            Boolean isPostgres = Util.isPostgres()
-            String qry;
-            String qry1;
-            String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
+    /**
+     *  create table without index for performance reason
+     *
+     * @param sql
+     * @param props
+     */
+    void createVCFGeneTable(Sql sql, Properties props){
 
-            if(props.get("skip_create_vcf_gene_table").toString().toLowerCase().equals("yes")){
-                logger.info("Skip creating table: ${vcfGeneTable} ...")
-            }else{
-                logger.info "Start creating table: ${vcfGeneTable}"
+        Boolean isPostgres = Util.isPostgres()
+        String qry;
+        String qry1;
+        String vcfGeneTable = "vcf" + props.get("human_genome_version") + "_gene"
 
-                if(isPostgres) {
-                    qry = """ create table ${vcfGeneTable} (
-					chr			varchar(10),
-					pos			numeric(10),
-					rs_id			varchar(200),
-					gene_symbol		varchar(100),
-					gene_id			numeric(10)
-					)
-			  """
+        if(props.get("skip_create_vcf_gene_table").toString().toLowerCase().equals("yes")){
+            logger.info("Skip creating table: ${vcfGeneTable} ...")
+        }else{
+            logger.info "Start creating table: ${vcfGeneTable}"
 
-                    qry1 = "select count(*)  from pg_tables where tablename=?"
-                    if(sql.firstRow(qry1, [vcfGeneTable])[0] > 0){
-                        qry1 = "drop table ${vcfGeneTable}"
-                        sql.execute(qry1)
-                    }
-                } else {
-    
-                    qry = """ create table ${vcfGeneTable} (
-					chr			varchar2(10),
-					pos			number(10),
-					rs_id			varchar2(200),
-					gene_symbol		varchar2(100),
-					gene_id			number(10)
-					)
-			  """
+            if(isPostgres) {
+                qry = """ create table ${vcfGeneTable} (
+				chr			varchar(10),
+				pos			numeric(10),
+				rs_id			varchar(200),
+				gene_symbol		varchar(100),
+				gene_id			numeric(10)
+				)
+		     """
 
-                    qry1 = "select count(*)  from user_tables where table_name=?"
-                    if(sql.firstRow(qry1, [vcfGeneTable.toUpperCase()])[0] > 0){
-                        qry1 = "drop table ${vcfGeneTable} purge"
-                        sql.execute(qry1)
-                    }
+                qry1 = "select count(*)  from pg_tables where tablename=?"
+                if(sql.firstRow(qry1, [vcfGeneTable])[0] > 0){
+                    qry1 = "drop table ${vcfGeneTable}"
+                    sql.execute(qry1)
                 }
+            } else {
+    
+                qry = """ create table ${vcfGeneTable} (
+				chr			varchar2(10),
+				pos			number(10),
+				rs_id			varchar2(200),
+				gene_symbol		varchar2(100),
+				gene_id			number(10)
+			)
+		     """
 
-                sql.execute(qry)
+                qry1 = "select count(*)  from user_tables where table_name=?"
+                if(sql.firstRow(qry1, [vcfGeneTable.toUpperCase()])[0] > 0){
+                    qry1 = "drop table ${vcfGeneTable} purge"
+                    sql.execute(qry1)
+                }
+            }
 
-			logger.info "End creating table: ${vcfGeneTable}"
-		}
+            sql.execute(qry)
+
+	    logger.info "End creating table: ${vcfGeneTable}"
 	}
+    }
 
+    void setGeneSymbolDelimiter( String geneSymbolDelimiter){
+	this.geneSymbolDelimiter = geneSymbolDelimiter
+    }
 
-	void setGeneSymbolDelimiter( String geneSymbolDelimiter){
-		this.geneSymbolDelimiter = geneSymbolDelimiter
-	}
+    void setGenePairDelimiter(String genePairDelimiter){
+	this.genePairDelimiter = genePairDelimiter
+    }
 
-
-	void setGenePairDelimiter(String genePairDelimiter){
-		this.genePairDelimiter = genePairDelimiter
-	}
-
-
-	void setBatchSize(int batchSize){
-		this.batchSize = batchSize
-	}
-	
+    void setBatchSize(int batchSize){
+	this.batchSize = batchSize
+    }	
 }

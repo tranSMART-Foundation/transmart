@@ -36,82 +36,77 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class ConceptCounts {
 
-	Sql i2b2demodata
-	String basePath, platform
-	Map subjects
+    Sql i2b2demodata
+    String basePath, platform
+    Map subjects
 
-	void loadConceptCounts(){
+    void loadConceptCounts(){
 
-		Map sampleCounts = [:]
-		int total = 0
-		subjects.each{key, val ->
-			total++
-			if(sampleCounts[val].equals(null)) sampleCounts[val] = 1
-			else sampleCounts[val] += 1
-		}
-
-		logger.info "Total samples: $total"
-		logger.info basePath + "\t" + platform
-
-		String [] str = basePath.split("/")
-		String parentPath = basePath.replace(str[-1] + "/", "")
-		logger.info parentPath
-		insertConceptCount(basePath, parentPath, total)
-		insertConceptCount(basePath + platform + "/", basePath, total)
-
-		sampleCounts.each{k, v ->
-			if(!k.equals(null) && k.toString().size() > 0){
-				String parentConceptPath = basePath + platform + "/"
-				String conceptPath = basePath + platform + "/" + k + "/"
-				insertConceptCount(conceptPath, parentConceptPath, v)
-			}
-		}
-
+	Map sampleCounts = [:]
+	int total = 0
+	subjects.each{key, val ->
+	    total++
+	    if(sampleCounts[val].equals(null)) sampleCounts[val] = 1
+	    else sampleCounts[val] += 1
 	}
 
+	logger.info "Total samples: $total"
+	logger.info basePath + "\t" + platform
 
-	void insertConceptCount(String conceptPath, String parentConceptPath, int totalCnt ){
+	String [] str = basePath.split("/")
+	String parentPath = basePath.replace(str[-1] + "/", "")
+	logger.info parentPath
+	insertConceptCount(basePath, parentPath, total)
+	insertConceptCount(basePath + platform + "/", basePath, total)
 
-		String qry = "insert into concept_counts(CONCEPT_PATH, PARENT_CONCEPT_PATH, PATIENT_COUNT) values(?, ?, ?)"
-
-		String path = conceptPath.replace("/", "\\")
-		String parentPath = parentConceptPath.replace("/", "\\")
-
-		if(isConceptCountsExist(path)){
-			logger.info "$conceptPath already exists in CONCEPT_COUNTS ..."
-		}else{
-			logger.info "Insert ($path, $totalCnt) into CONCEPT_COUNTS ..."
-			i2b2demodata.execute(qry, [
-				path,
-				parentPath,
-				totalCnt
-			])
-		}
+	sampleCounts.each{k, v ->
+	    if(!k.equals(null) && k.toString().size() > 0){
+		String parentConceptPath = basePath + platform + "/"
+		String conceptPath = basePath + platform + "/" + k + "/"
+		insertConceptCount(conceptPath, parentConceptPath, v)
+	    }
 	}
+    }
 
+    void insertConceptCount(String conceptPath, String parentConceptPath, int totalCnt ){
 
-	boolean isConceptCountsExist(String conceptPath){
-		String qry = "select count(*) from concept_counts where concept_path=?"
-		def res = i2b2demodata.firstRow(qry, [conceptPath])
-		if(res[0] > 0) return true
-		else return false
+	String qry = "insert into concept_counts(CONCEPT_PATH, PARENT_CONCEPT_PATH, PATIENT_COUNT) values(?, ?, ?)"
+
+	String path = conceptPath.replace("/", "\\")
+	String parentPath = parentConceptPath.replace("/", "\\")
+
+	if(isConceptCountsExist(path)){
+	    logger.info "$conceptPath already exists in CONCEPT_COUNTS ..."
+	}else{
+	    logger.info "Insert ($path, $totalCnt) into CONCEPT_COUNTS ..."
+	    i2b2demodata.execute(qry, [
+		path,
+		parentPath,
+		totalCnt
+	    ])
 	}
+    }
 
+    boolean isConceptCountsExist(String conceptPath){
+	String qry = "select count(*) from concept_counts where concept_path=?"
+	def res = i2b2demodata.firstRow(qry, [conceptPath])
+	if(res[0] > 0) return true
+	else return false
+    }
 
-	void setBasePath(String basePath){
-		this.basePath = basePath
-	}
+    void setBasePath(String basePath){
+	this.basePath = basePath
+    }
 
-	void setSubjects(Map subjects){
-		this.subjects = subjects
-	}
+    void setSubjects(Map subjects){
+	this.subjects = subjects
+    }
 
-	void setPlatform(String platform){
-		this.platform = platform
-	}
+    void setPlatform(String platform){
+	this.platform = platform
+    }
 
-
-	void setI2b2demodata(Sql i2b2demodata){
-		this.i2b2demodata = i2b2demodata
-	}
+    void setI2b2demodata(Sql i2b2demodata){
+	this.i2b2demodata = i2b2demodata
+    }
 }

@@ -36,119 +36,115 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class GenomeWideSNP6CNCopyNumberFormatter {
 
-	private static Properties props
+    private static Properties props
 
-	Map snpCallMap, columnMap
+    Map snpCallMap, columnMap
 
+    StringBuffer sb = new StringBuffer()
+
+    static main(args) {
+
+//	PropertyConfigurator.configure("conf/log4j.properties");
+
+	GenomeWideSNP6CNCopyNumberFormatter cnf = new GenomeWideSNP6CNCopyNumberFormatter()
+
+	if(args.size() > 0){
+	    logger.info("Start loading property files conf/Common.properties and ${args[0]} ...")
+	    cnf.setProperties(Util.loadConfiguration(args[0]));
+	} else {
+	    logger.info("Start loading property files conf/Common.properties and conf/SNP.properties ...")
+	    cnf.setProperties(Util.loadConfiguration("conf/SNP.properties"));
+	}
+
+	// output filename for CN copy number
+	File cnOutput = new File(props.get("output_directory") + File.separator + props.get("cn_copy_number_output"))
+	if(cnOutput.size() > 0){
+	    cnOutput.delete()
+	    cnOutput.createNewFile()
+	}
+
+	String copyNumberColumn = props.get("copy_number_coulmn")
+	ArrayList al = new ArrayList()
+	al = cnf.getCopyNumberFile(props)
+	int count = 0
+	al.each{
+	    count++
+	    println "Sample $count: $it"
+	    cnOutput.append(cnf.formatCopyNumberFile(it, copyNumberColumn).toString())
+	}
+    }
+
+    ArrayList getCopyNumberFile(Properties props){
+
+	ArrayList al = new ArrayList()
+
+	String copyNumberFileDirectory = props.get("copy_number_source_directory")
+	String copyNumberFilePattern = props.get("copy_number_file_pattern")
+
+	logger.info "Start looking Copy Number file for processing ..."
+	logger.info("Search CopyNumber file from " + copyNumberFileDirectory)
+
+	File cn = new File(copyNumberFileDirectory)
+	if(cn.isDirectory()){
+	    cn.eachFile{
+		logger.info "Checking file's pattern: " + it.toString()
+		if(it.toString().indexOf(copyNumberFilePattern) > 0) {
+		    al.add(it)
+		}
+	    }
+	}
+
+	return al
+    }
+
+    StringBuffer formatCopyNumberFile(File input, String copyNumberColumn){
+
+	String sampleName = input.getName().split(/\./)[0]
+
+	int copyNumberColumnIndex
 	StringBuffer sb = new StringBuffer()
 
-	static main(args) {
+	int index = 0
+	input.eachLine{
+	    if(it.indexOf("ProbeSetName") == 0) {
+		println it
+		columnMap = getColumnMap(it)
 
-//		PropertyConfigurator.configure("conf/log4j.properties");
-
-		GenomeWideSNP6CNCopyNumberFormatter cnf = new GenomeWideSNP6CNCopyNumberFormatter()
-
-		if(args.size() > 0){
-			logger.info("Start loading property files conf/Common.properties and ${args[0]} ...")
-			cnf.setProperties(Util.loadConfiguration(args[0]));
-		} else {
-			logger.info("Start loading property files conf/Common.properties and conf/SNP.properties ...")
-			cnf.setProperties(Util.loadConfiguration("conf/SNP.properties"));
+		if(copyNumberColumn.size() > 1) {
+		    copyNumberColumnIndex = columnMap[copyNumberColumn]
 		}
-
-		// output filename for CN copy number
-		File cnOutput = new File(props.get("output_directory") + File.separator + props.get("cn_copy_number_output"))
-		if(cnOutput.size() > 0){
-			cnOutput.delete()
-			cnOutput.createNewFile()
+		else {
+		    copyNumberColumnIndex = Integer.parseInt(copyNumberColumn)
 		}
-		
-		String copyNumberColumn = props.get("copy_number_coulmn")
-		ArrayList al = new ArrayList()
-		al = cnf.getCopyNumberFile(props)
-		int count = 0
-		al.each{
-			count++
-			println "Sample $count: $it"
-			cnOutput.append(cnf.formatCopyNumberFile(it, copyNumberColumn).toString())
-		}
+		logger.info("Copy Number Column used: $copyNumberColumn[Column: $copyNumberColumnIndex]")
+	    }
+	    if(it.indexOf("CN_") == 0) {
+		index++
+		String [] str = it.split("\t")
+		String line = sampleName + "\t" + str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[copyNumberColumnIndex] + "\n"
+		sb.append(line)
+	    }
 	}
 
+	logger.info("Total processed probes: " + index )
 
-	ArrayList getCopyNumberFile(Properties props){
+	return sb
+    }
 
-		ArrayList al = new ArrayList()
+    Map getColumnMap (String header) {
+	Map columnMap = [:]
 
-		String copyNumberFileDirectory = props.get("copy_number_source_directory")
-		String copyNumberFilePattern = props.get("copy_number_file_pattern")
-
-		logger.info "Start looking Copy Number file for processing ..."
-		logger.info("Search CopyNumber file from " + copyNumberFileDirectory)
-
-		File cn = new File(copyNumberFileDirectory)
-		if(cn.isDirectory()){
-			cn.eachFile{
-				logger.info "Checking file's pattern: " + it.toString()
-				if(it.toString().indexOf(copyNumberFilePattern) > 0) {
-					al.add(it)
-				}
-			}
-		}
-
-		return al
+	int index = 0
+	header.split("\t").each{
+	    println index + ": \t" + it
+	    columnMap[it.replace(".CEL", "")] = index
+	    index++
 	}
 
+	return columnMap
+    }
 
-	StringBuffer formatCopyNumberFile(File input, String copyNumberColumn){
-
-		String sampleName = input.getName().split(/\./)[0]
-
-		int copyNumberColumnIndex
-		StringBuffer sb = new StringBuffer()
-
-		int index = 0
-		input.eachLine{
-			if(it.indexOf("ProbeSetName") == 0) {
-				println it
-				columnMap = getColumnMap(it)
-
-				if(copyNumberColumn.size() > 1) {
-					copyNumberColumnIndex = columnMap[copyNumberColumn]
-				}
-				else {
-					copyNumberColumnIndex = Integer.parseInt(copyNumberColumn)
-				}
-				logger.info("Copy Number Column used: $copyNumberColumn[Column: $copyNumberColumnIndex]")
-			}
-			if(it.indexOf("CN_") == 0) {
-				index++
-				String [] str = it.split("\t")
-				String line = sampleName + "\t" + str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[copyNumberColumnIndex] + "\n"
-				sb.append(line)
-			}
-		}
-
-		logger.info("Total processed probes: " + index )
-
-		return sb
-	}
-
-
-	Map getColumnMap (String header) {
-		Map columnMap = [:]
-
-		int index = 0
-		header.split("\t").each{
-			println index + ": \t" + it
-			columnMap[it.replace(".CEL", "")] = index
-			index++
-		}
-
-		return columnMap
-	}
-
-
-	void setProperties(Properties props){
-		this.props = props
-	}
+    void setProperties(Properties props){
+	this.props = props
+    }
 }

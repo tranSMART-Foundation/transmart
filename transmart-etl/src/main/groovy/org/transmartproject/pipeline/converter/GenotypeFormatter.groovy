@@ -33,48 +33,46 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class GenotypeFormatter {
 
-	File genotypeFile
-	Map samplePatientMap
+    File genotypeFile
+    Map samplePatientMap
 
-	void format(){
+    void format(){
 
-		logger.info "Start formatting Genotype file: " + genotypeFile.toString()
+	logger.info "Start formatting Genotype file: " + genotypeFile.toString()
 
-		File f = new File(genotypeFile.toString().replace(".genotype", ".lgen"))
-		if(f.size() > 0){
-			f.delete()
-		}
-		f.createNewFile()
+	File f = new File(genotypeFile.toString().replace(".genotype", ".lgen"))
+	if(f.size() > 0){
+	    f.delete()
+	}
+	f.createNewFile()
 
-		StringBuffer sb = new StringBuffer()
+	StringBuffer sb = new StringBuffer()
 
-		int lineNum = 0
-		genotypeFile.eachLine{
-			lineNum++
-			String [] str = it.split("\t")
-			sb.append(samplePatientMap[str[0]] + "\t" + samplePatientMap[str[0]] + "\t")
-			for(int i=1; i<str.size(); i++){
-				sb.append(str[i] + "\t")
-			}
+	int lineNum = 0
+	genotypeFile.eachLine{
+	    lineNum++
+	    String [] str = it.split("\t")
+	    sb.append(samplePatientMap[str[0]] + "\t" + samplePatientMap[str[0]] + "\t")
+	    for(int i=1; i<str.size(); i++){
+		sb.append(str[i] + "\t")
+	    }
 
-			if((lineNum % 10000) == 0){
-				f.append(sb.toString())
-				sb.setLength(0)
-			}
-			sb.append("\n")
-		}
-		
+	    if((lineNum % 10000) == 0){
 		f.append(sb.toString())
 		sb.setLength(0)
+	    }
+	    sb.append("\n")
 	}
 
+	f.append(sb.toString())
+	sb.setLength(0)
+    }
 
-	void setGenotypeFile(File genotypeFile){
-		this.genotypeFile = genotypeFile
-	}
+    void setGenotypeFile(File genotypeFile){
+	this.genotypeFile = genotypeFile
+    }
 
-
-	void setSamplePatientMap(Map samplePatientMap){
-		this.samplePatientMap = samplePatientMap
-	}
+    void setSamplePatientMap(Map samplePatientMap){
+	this.samplePatientMap = samplePatientMap
+    }
 }

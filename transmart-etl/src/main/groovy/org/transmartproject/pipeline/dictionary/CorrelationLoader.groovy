@@ -60,7 +60,6 @@ class CorrelationLoader {
     }
 
     public boolean insertCorrelation(CorrelationEntry correlationEntry) {
-
         // Look up the BIO_MARKER_ID for symbol 1
         BioMarker bioMarker = new BioMarker()
         bioMarker.setBiomart(sqlBiomart)

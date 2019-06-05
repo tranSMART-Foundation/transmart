@@ -31,93 +31,92 @@ import groovy.sql.Sql
 
 abstract class DataProcessor {
 
-	def config
+    def config
 	
-	DataProcessor(conf) {
-		config = conf
-	}
+    DataProcessor(conf) {
+	config = conf
+    }
 	
-	abstract boolean processFiles(File dir, Sql sql, studyInfo)
-	abstract boolean runStoredProcedures(jobId, Sql sql, studyInfo)
-	abstract String getProcedureName()
+    abstract boolean processFiles(File dir, Sql sql, studyInfo)
+    abstract boolean runStoredProcedures(jobId, Sql sql, studyInfo)
+    abstract String getProcedureName()
 	
-	boolean process(File dir, studyInfo) {
-		def res = false
-		
-		config.logger.log("Connecting to database server for dir ${dir} studyInfo ${studyInfo}")
-		def sql = Sql.newInstance( config.db.jdbcConnectionString, config.db.username, config.db.password, config.db.jdbcDriver )
-		sql.connection.autoCommit = false
-		config.logger.log("New SQL jdbc ${config.db.jdbcConnectionString} user ${config.db.username} pass ${config.db.password} driver ${config.db.jdbcDriver}")
-		if (processFiles(dir, sql, studyInfo)) {
-			// run stored procedure(s) in the background here
-			// poll log & watch for stored procedure to finish	
-			
-			config.logger.log("DataProcessor processFiles success dir ${dir} studyInfo ${studyInfo}")
-			config.logger.log("sql.call cz_start_audit "+ [getProcedureName(), config.db.username, 'Sql.NUMERIC'])
-			// retrieve job number
-			try {
-			sql.call('{call cz_start_audit(?,?,?)}', [getProcedureName(), config.db.username, Sql.NUMERIC]) {
-				jobId ->
-				
-				config.logger.log("Job ID: ${jobId}")
-				
-				def t = Thread.start {
-				        config.logger.log("Run procedure: ${getProcedureName()}")
-					res = runStoredProcedures(jobId, sql, studyInfo)
-				}
-				
-				def lastSeqId = 0
-				
-				// opening control connection for the main thread
-				def ctrlSql = Sql.newInstance( config.db.jdbcConnectionString, config.db.username, config.db.password, config.db.jdbcDriver )
-				config.logger.log("create ctrlSql connection at ${config.db.jdbcConnectionString} user ${config.db.username} pwd ${config.db.password}");
-				
-				while (true) {
-					// fetch last log message
-					ctrlSql.eachRow("SELECT * FROM cz_job_audit WHERE job_id=${jobId} and seq_id>${lastSeqId} order by seq_id") {
-						row ->
-						
-						config.logger.log("-- ${row.step_desc} [${row.step_status} / ${row.records_manipulated} recs / ${row.time_elapsed_secs}s]")
-						lastSeqId = row.seq_id
-					}
-					
-					if (! t.isAlive() ) break
-					
-					Thread.sleep(2000)
-				}
-				
-				// closing control connection - don't need it anymore
-				config.logger.log("closing controlSQL connection ctrlSql");
-				ctrlSql.close()
-				
-				// figuring out if there are any errors in the error log
-				sql.eachRow("SELECT * FROM cz_job_error where job_id=${jobId} order by seq_id") {
-					config.logger.log(LogType.ERROR, "${it.error_message} / ${it.error_stack} / ${it.error_backtrace}")
-					res = false
-				}
-				
-				if (res) {
-					config.logger.log("Procedure completed successfully")
-					sql.call("{call cz_end_audit(?,?)}", [jobId, 'SUCCESS'])
-				}
-				else {
-					config.logger.log(LogType.ERROR, "Procedure completed with errors!")
-					sql.call("{call cz_end_audit(?,?)}", [jobId, 'FAIL'])
-				}
-				config.logger.log("Procedure completed result ${res}")
+    boolean process(File dir, studyInfo) {
+	def res = false
+
+	config.logger.log("Connecting to database server for dir ${dir} studyInfo ${studyInfo}")
+	def sql = Sql.newInstance( config.db.jdbcConnectionString, config.db.username, config.db.password, config.db.jdbcDriver )
+	sql.connection.autoCommit = false
+	config.logger.log("New SQL jdbc ${config.db.jdbcConnectionString} user ${config.db.username} pass ${config.db.password} driver ${config.db.jdbcDriver}")
+	if (processFiles(dir, sql, studyInfo)) {
+	    // run stored procedure(s) in the background here
+	    // poll log & watch for stored procedure to finish	
+
+	    config.logger.log("DataProcessor processFiles success dir ${dir} studyInfo ${studyInfo}")
+	    config.logger.log("sql.call cz_start_audit "+ [getProcedureName(), config.db.username, 'Sql.NUMERIC'])
+	    // retrieve job number
+	    try {
+		sql.call('{call cz_start_audit(?,?,?)}', [getProcedureName(), config.db.username, Sql.NUMERIC]) {
+		    jobId ->
+
+		    config.logger.log("Job ID: ${jobId}")
+
+		    def t = Thread.start {
+			config.logger.log("Run procedure: ${getProcedureName()}")
+			res = runStoredProcedures(jobId, sql, studyInfo)
+		    }
+
+		    def lastSeqId = 0
+
+		    // opening control connection for the main thread
+		    def ctrlSql = Sql.newInstance( config.db.jdbcConnectionString, config.db.username, config.db.password, config.db.jdbcDriver )
+		    config.logger.log("create ctrlSql connection at ${config.db.jdbcConnectionString} user ${config.db.username} pwd ${config.db.password}");
+
+		    while (true) {
+			// fetch last log message
+			ctrlSql.eachRow("SELECT * FROM cz_job_audit WHERE job_id=${jobId} and seq_id>${lastSeqId} order by seq_id") {
+			    row ->
+			    config.logger.log("-- ${row.step_desc} [${row.step_status} / ${row.records_manipulated} recs / ${row.time_elapsed_secs}s]")
+			    lastSeqId = row.seq_id
 			}
-			}
-			catch(Exception e){
-			config.logger.log("Exception caught: data ${e}")
-			}
-						
+
+			if (! t.isAlive() )
+			    break
+
+			Thread.sleep(2000)
+		    }
+
+		    // closing control connection - don't need it anymore
+		    config.logger.log("closing controlSQL connection ctrlSql");
+		    ctrlSql.close()
+
+		    // figuring out if there are any errors in the error log
+		    sql.eachRow("SELECT * FROM cz_job_error where job_id=${jobId} order by seq_id") {
+			config.logger.log(LogType.ERROR, "${it.error_message} / ${it.error_stack} / ${it.error_backtrace}")
+			res = false
+		    }
+
+		    if (res) {
+			config.logger.log("Procedure completed successfully")
+			sql.call("{call cz_end_audit(?,?)}", [jobId, 'SUCCESS'])
+		    }
+		    else {
+			config.logger.log(LogType.ERROR, "Procedure completed with errors!")
+			sql.call("{call cz_end_audit(?,?)}", [jobId, 'FAIL'])
+		    }
+		    config.logger.log("Procedure completed result ${res}")
 		}
-		
-		config.logger.log("closing SQL connection and commit changes");
-		sql.commit()
-		sql.close()
-		
-		return res
+	    }
+	    catch(Exception e){
+		config.logger.log("Exception caught: data ${e}")
+	    }
+
 	}
 
+	config.logger.log("closing SQL connection and commit changes");
+	sql.commit()
+	sql.close()
+
+	return res
+    }
 }

@@ -167,6 +167,4 @@ class MiRNASynonymsDictionary {
                 })
         resultsMap
     }
-
-
 }

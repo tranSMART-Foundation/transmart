@@ -34,141 +34,136 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class AffymetrixGenotypingDataFormatter {
 
-	String genotypingFileDirectory, outputDirectory, studyName
-	String sourceGenotypingFilePattern
-	Map celPatientMap, celSampleCdMap
+    String genotypingFileDirectory, outputDirectory, studyName
+    String sourceGenotypingFilePattern
+    Map celPatientMap, celSampleCdMap
 
+    void createGenotypingFile(){
+	File gt = new File(genotypingFileDirectory)
 
-	void createGenotypingFile(){
-		File gt = new File(genotypingFileDirectory)
-
-		gt.eachFileRecurse {
-			if(it.toString().indexOf(sourceGenotypingFilePattern) >= 0 ) {
-				logger.info("Processing " + it)
-				processGenotypingFile(it)
-			}
-		}
+	gt.eachFileRecurse {
+	    if(it.toString().indexOf(sourceGenotypingFilePattern) >= 0 ) {
+		logger.info("Processing " + it)
+		processGenotypingFile(it)
+	    }
 	}
-
+    }
 	
-	void processGenotypingFile(File gtInputFile){
+    void processGenotypingFile(File gtInputFile){
 		
-		long probeCount = 0
-		int expectedCelCount
-		int celCount
-		def samples = []
+	long probeCount = 0
+	int expectedCelCount
+	int celCount
+	def samples = []
 
-		boolean isHeaderLine = false
-		boolean isGenotypingdata = false
+	boolean isHeaderLine = false
+	boolean isGenotypingdata = false
 
-		File genotypingDataOutputFile = getGenotypingDataOutputFile()
-		File gtOutputFileWithGsm = getGenotypingDataOutputFileWithGsm()
+	File genotypingDataOutputFile = getGenotypingDataOutputFile()
+	File gtOutputFileWithGsm = getGenotypingDataOutputFileWithGsm()
 
-		String [] str
-		StringBuffer sb = new StringBuffer()
-		StringBuffer sbGsm = new StringBuffer()
+	String [] str
+	StringBuffer sb = new StringBuffer()
+	StringBuffer sbGsm = new StringBuffer()
 
-		println "Print celPatientMap"
-		Util.printMap(celPatientMap)
-		println "Print celSampleCdMap"
-		Util.printMap(celSampleCdMap)
-		
-		gtInputFile.eachLine {
+	println "Print celPatientMap"
+	Util.printMap(celPatientMap)
+	println "Print celSampleCdMap"
+	Util.printMap(celSampleCdMap)
 
-			if(it.indexOf("#%affymetrix-algorithm-param-apt-opt-cel-count") >= 0 ) {
-				str = it.split("=")
-				expectedCelCount = Integer.parseInt(str[1].trim())
-				logger.info "Expected CEL Count: " + expectedCelCount
-			}
+	gtInputFile.eachLine {
+	    if(it.indexOf("#%affymetrix-algorithm-param-apt-opt-cel-count") >= 0 ) {
+		str = it.split("=")
+		expectedCelCount = Integer.parseInt(str[1].trim())
+		logger.info "Expected CEL Count: " + expectedCelCount
+	    }
 
-			if(it.indexOf("probeset_id") == 0){
-				isHeaderLine = true
-				str = it.split("\t")
-				for(int i in 1..str.size()-1){
-					samples[i] = str[i].trim() //.replace(".CEL", "")
-				}
-			}
-			
-			if(isHeaderLine && it.indexOf("probeset_id") != 0 && it.indexOf("AFFX-") != 0){
-				probeCount++
-				str = it.split("\t")
-				for(int i in 1..str.size()-1) {
-					if(!celPatientMap[samples[i]].equals(null)){
-						def patientNum = celPatientMap[samples[i]]
-						sb.append(patientNum + "\t" + patientNum + "\t")
-						sb.append(str[0].trim() + "\t")
-
-						// #Calls: -1=NN, 0=AA, 1=AB, 2=BB
-						String gt = ""
-						if(str[i].indexOf("0") >= 0) gt = " A A"
-						if(str[i].indexOf("1") >= 0) gt = " A B"
-						if(str[i].indexOf("2") >= 0) gt = " B B"
-						if(str[i].indexOf("-1") >= 0) gt = " 0 0"
-						sb.append(gt + "\n")
-
-						sbGsm.append(celSampleCdMap[samples[i]] + "\t" + patientNum + "\t")
-						sbGsm.append(str[0].trim() + "\t")
-						sbGsm.append(gt + "\n")
-
-						//genotypingDataOutputFile.append(sb.toString())
-						//sb.delete(0,  sb.length())
-					}
-				}
-				genotypingDataOutputFile.append(sb.toString())
-				sb.delete(0,  sb.length())
-
-				gtOutputFileWithGsm.append(sbGsm.toString())
-				sbGsm.delete(0,  sbGsm.length())
-			}
+	    if(it.indexOf("probeset_id") == 0){
+		isHeaderLine = true
+		str = it.split("\t")
+		for(int i in 1..str.size()-1){
+		    samples[i] = str[i].trim() //.replace(".CEL", "")
 		}
+	    }
 
-		logger.info ("  Processed probe count:  $probeCount  ")
+	    if(isHeaderLine && it.indexOf("probeset_id") != 0 && it.indexOf("AFFX-") != 0){
+		probeCount++
+		str = it.split("\t")
+		for(int i in 1..str.size()-1) {
+		    if(!celPatientMap[samples[i]].equals(null)){
+			def patientNum = celPatientMap[samples[i]]
+			sb.append(patientNum + "\t" + patientNum + "\t")
+			sb.append(str[0].trim() + "\t")
+
+			// #Calls: -1=NN, 0=AA, 1=AB, 2=BB
+			String gt = ""
+			if(str[i].indexOf("0") >= 0) gt = " A A"
+			if(str[i].indexOf("1") >= 0) gt = " A B"
+			if(str[i].indexOf("2") >= 0) gt = " B B"
+			if(str[i].indexOf("-1") >= 0) gt = " 0 0"
+			sb.append(gt + "\n")
+
+			sbGsm.append(celSampleCdMap[samples[i]] + "\t" + patientNum + "\t")
+			sbGsm.append(str[0].trim() + "\t")
+			sbGsm.append(gt + "\n")
+
+			//genotypingDataOutputFile.append(sb.toString())
+			//sb.delete(0,  sb.length())
+		    }
+		}
+		genotypingDataOutputFile.append(sb.toString())
+		sb.delete(0,  sb.length())
+
+		gtOutputFileWithGsm.append(sbGsm.toString())
+		sbGsm.delete(0,  sbGsm.length())
+	    }
 	}
 
+	logger.info ("  Processed probe count:  $probeCount  ")
+    }
 
-	File getGenotypingDataOutputFile(){
-		File outputFile = new File(outputDirectory + File.separator + studyName + ".lgen")
-		/*
-		 if(outputFile.size() > 0) {
-		 outputFile.delete()
-		 outputFile.createNewFile()
-		 } */
-		return outputFile
-	}
+    File getGenotypingDataOutputFile(){
+	File outputFile = new File(outputDirectory + File.separator + studyName + ".lgen")
+	/*
+	 if(outputFile.size() > 0) {
+	 outputFile.delete()
+	 outputFile.createNewFile()
+     } */
+	return outputFile
+    }
 
-	File getGenotypingDataOutputFileWithGsm(){
-		File outputFile = new File(outputDirectory + File.separator + studyName + ".lgen.gsm")
-		/*
-		 if(outputFile.size() > 0) {
-		 outputFile.delete()
-		 outputFile.createNewFile()
-		 }
-		 */
-		return outputFile
-	}
+    File getGenotypingDataOutputFileWithGsm(){
+	File outputFile = new File(outputDirectory + File.separator + studyName + ".lgen.gsm")
+	/*
+	 if(outputFile.size() > 0) {
+	 outputFile.delete()
+	 outputFile.createNewFile()
+     }
+	 */
+	return outputFile
+    }
 
-	void setGenotypingFileDirectory(String genotypingFileDirectory){
-		this.genotypingFileDirectory = genotypingFileDirectory
-	}
+    void setGenotypingFileDirectory(String genotypingFileDirectory){
+	this.genotypingFileDirectory = genotypingFileDirectory
+    }
 
+    void setSourceGenotypingFilePattern(String sourceGenotypingFilePattern){
+	this.sourceGenotypingFilePattern = sourceGenotypingFilePattern
+    }
 
-	void setSourceGenotypingFilePattern(String sourceGenotypingFilePattern){
-		this.sourceGenotypingFilePattern = sourceGenotypingFilePattern
-	}
+    void setOutputDirectory(String outputDirectory){
+	this.outputDirectory = outputDirectory
+    }
 
-	void setOutputDirectory(String outputDirectory){
-		this.outputDirectory = outputDirectory
-	}
+    void setStudyName(String studyName){
+	this.studyName = studyName
+    }
 
-	void setStudyName(String studyName){
-		this.studyName = studyName
-	}
-
-	void setCelPatientMap(Map celPatientMap){
-		this.celPatientMap = celPatientMap
-	}
+    void setCelPatientMap(Map celPatientMap){
+	this.celPatientMap = celPatientMap
+    }
 	
-	void setCelSampleCdMap(Map celSampleCdMap){
-		this.celSampleCdMap = celSampleCdMap
-	}
+    void setCelSampleCdMap(Map celSampleCdMap){
+	this.celSampleCdMap = celSampleCdMap
+    }
 }

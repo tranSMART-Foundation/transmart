@@ -35,60 +35,56 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class BioContentReference {
 
-	Sql biomart
+    Sql biomart
 
-	void loadBioContentReferenceForKEGG(){
-		String qry = """ insert into bio_content_reference(bio_content_id, bio_data_id, content_reference_type)
-						 select distinct bc.bio_file_content_id, path.bio_marker_id, bcr.location_type
-						 from bio_content bc, bio_marker path, bio_content_repository bcr
-						 where bc.repository_id = bcr.bio_content_repo_id
-							  and path.primary_external_id=substr(bc.location, length(bc.location)-7)
-							  and path.primary_source_code='KEGG' and
-							  (bc.bio_file_content_id, path.bio_marker_id) not in 
-							    (select bio_content_id, bio_data_id from bio_content_reference)
-		  			"""
-		biomart.execute(qry)
+    void loadBioContentReferenceForKEGG(){
+	String qry = """ insert into bio_content_reference(bio_content_id, bio_data_id, content_reference_type)
+				 select distinct bc.bio_file_content_id, path.bio_marker_id, bcr.location_type
+				 from bio_content bc, bio_marker path, bio_content_repository bcr
+				 where bc.repository_id = bcr.bio_content_repo_id
+					  and path.primary_external_id=substr(bc.location, length(bc.location)-7)
+					  and path.primary_source_code='KEGG'
+					  and (bc.bio_file_content_id, path.bio_marker_id) not in 
+					    (select bio_content_id, bio_data_id from bio_content_reference)
+		     """
+	biomart.execute(qry)
+    }
+
+    void insertBioContentReference(long contentId, long dataId, String referenceType, String studyName){
+
+	String qry = """ insert into bio_content_reference(bio_content_id, bio_data_id, content_reference_type, etl_id_c) values(?, ?, ?, ?) """
+
+	if(isBioContentReferenceExist(contentId, dataId)){
+            //logger.info "$contentId:$dataId already exists in BIO_CONTENT_REFERENCE ..."
+	}else{
+	    logger.info "Insert $contentId:$dataId into BIO_CONTENT_REFERENCE ..."
+	    biomart.execute(qry, [
+		contentId,
+		dataId,
+		referenceType,
+		studyName
+	    ])
 	}
+    }
 
+    boolean isBioContentReferenceExist(long contentId, long dataId){
+	String qry = """ select count(*) from bio_content_reference 
+		         where bio_content_id=? and bio_data_id=? """
+	def res = biomart.firstRow(qry, [contentId, dataId])
+	if(res[0] > 0) return true
+	else return false
+    }
 
-	void insertBioContentReference(long contentId, long dataId, String referenceType, String studyName){
+    long getBioDataContentReferenceId(long contentId, long dataId){
+	String qry = """ select bio_content_reference_id 
+		         from bio_content_reference
+			 where correlation=? and type_name=?"""
+	def res = biomart.firstRow(qry, [contentId, dataId])
+	if(res.equals(null)) return 0
+	else return res[0]
+    }
 
-		String qry = """ insert into bio_content_reference(bio_content_id, bio_data_id, content_reference_type, etl_id_c) values(?, ?, ?, ?) """
-
-		if(isBioContentReferenceExist(contentId, dataId)){
-                    //logger.info "$contentId:$dataId already exists in BIO_CONTENT_REFERENCE ..."
-		}else{
-			logger.info "Insert $contentId:$dataId into BIO_CONTENT_REFERENCE ..."
-			biomart.execute(qry, [
-				contentId,
-				dataId,
-				referenceType,
-				studyName
-			])
-		}
-	}
-
-
-	boolean isBioContentReferenceExist(long contentId, long dataId){
-		String qry = """ select count(*) from bio_content_reference 
-		                 where bio_content_id=? and bio_data_id=? """
-		def res = biomart.firstRow(qry, [contentId, dataId])
-		if(res[0] > 0) return true
-		else return false
-	}
-
-
-	long getBioDataContentReferenceId(long contentId, long dataId){
-		String qry = """ select bio_content_reference_id 
-		                 from bio_content_reference
-						 where correlation=? and type_name=?"""
-		def res = biomart.firstRow(qry, [contentId, dataId])
-		if(res.equals(null)) return 0
-		else return res[0]
-	}
-
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

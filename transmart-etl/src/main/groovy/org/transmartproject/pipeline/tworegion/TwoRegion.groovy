@@ -29,7 +29,7 @@ import java.sql.BatchUpdateException
 class TwoRegion extends HighDimImport {
     private static HashMap<String, Integer> genes;
     private static String queryCombined =
-               "INSERT INTO deapp.de_two_region_junction\
+        "INSERT INTO deapp.de_two_region_junction\
                          (up_chr, up_pos, up_strand, up_end, down_chr, down_pos, down_strand, down_end, is_in_frame, external_id, assay_id) \
                  VALUES (:up_chr,:up_pos,:up_strand,:up_end,:down_chr,:down_pos,:down_strand,:down_end, :is_in_frame,:external_id,:assay_id);\
                 INSERT INTO deapp.de_two_region_event \
@@ -49,7 +49,7 @@ class TwoRegion extends HighDimImport {
                         gene_id, event_id, effect) VALUES   \
                       (:down_gene, currval( 'de_two_region_event_seq'), 'FUSION');";
     private static String queryCombinedOracle =
-            "BEGIN INSERT INTO deapp.de_two_region_junction\
+        "BEGIN INSERT INTO deapp.de_two_region_junction\
                       (up_chr, up_pos, up_strand, up_end, down_chr, down_pos, down_strand, down_end, is_in_frame, external_id, assay_id) \
               VALUES (:up_chr,:up_pos,:up_strand,:up_end,:down_chr,:down_pos,:down_strand,:down_end, :is_in_frame,:external_id,:assay_id);\
              INSERT INTO deapp.de_two_region_event \
@@ -79,7 +79,6 @@ class TwoRegion extends HighDimImport {
         if (isOracle) {
             queryCombined = queryCombinedOracle;
         }
-
 
         cleanupOptions()
         startAudit()
@@ -126,26 +125,25 @@ class TwoRegion extends HighDimImport {
                 def tokens = line.split();
                 //sample	up_gene	dw_gene	up_chr	up_strand	up_Genome_pos	up_loc	dw_chr	dw_strand	dw_Genome_pos	dw_loc	Span_reads_num	Junc_reads_num	Fusion_Type	down_fusion_part_frame.shift_or_not	fusionscore	fusionscore2	fusionscore3	sum_junc_and_span
                 deapp.execute(queryCombined, [
-                        'up_gene'    : tokens[1],
-                        'down_gene'  : tokens[2],
-                        'up_chr'     : tokens[3].substring(3),
-                        'up_pos'     : Integer.parseInt(tokens[5]),
-                        'up_strand'  : tokens[4],
-                        'up_end'     : Integer.parseInt(tokens[5]),
-                        'down_chr'   : tokens[7].substring(3),
-                        'down_pos'   : Integer.parseInt(tokens[9]),
-                        'down_strand': tokens[8],
-                        'down_end'   : Integer.parseInt(tokens[9]),
-                        'reads_span' :Integer.parseInt(tokens[11]),
-                        'reads_junction':Integer.parseInt(tokens[12]),
-                        'soap_type'  :tokens[13],
-                        'is_in_frame':tokens[14] == 'inframe-shift',
-                        'assay_id'   : sampleMapping[tokens[0]]])
+                    'up_gene'    : tokens[1],
+                    'down_gene'  : tokens[2],
+                    'up_chr'     : tokens[3].substring(3),
+                    'up_pos'     : Integer.parseInt(tokens[5]),
+                    'up_strand'  : tokens[4],
+                    'up_end'     : Integer.parseInt(tokens[5]),
+                    'down_chr'   : tokens[7].substring(3),
+                    'down_pos'   : Integer.parseInt(tokens[9]),
+                    'down_strand': tokens[8],
+                    'down_end'   : Integer.parseInt(tokens[9]),
+                    'reads_span' :Integer.parseInt(tokens[11]),
+                    'reads_junction':Integer.parseInt(tokens[12]),
+                    'soap_type'  :tokens[13],
+                    'is_in_frame':tokens[14] == 'inframe-shift',
+                    'assay_id'   : sampleMapping[tokens[0]]])
                 totalUpdated++;
                 if (totalUpdated % 100 == 0) {
                     print('.')
                 }
-
             }
             writeAudit('Inserted soap junctions',totalUpdated,stepCt,'Done');
             println('')
@@ -177,42 +175,39 @@ class TwoRegion extends HighDimImport {
                 //                        9. Number of spanning mate pairs
                 //                        10. Number of spanning mate pairs where one end spans a fusion
                 deapp.execute(queryCombined, [
-                        'up_gene'    : tokens[1],
-                        'up_chr'     : tokens[2],
-                        'up_pos'     : Integer.parseInt(tokens[3]),
-                        'up_strand'  : null,
-                        'up_end'     : Integer.parseInt(tokens[3]),
-                        'down_gene'  : tokens[4],
-                        'down_chr'   : tokens[5],
-                        'down_pos'   : Integer.parseInt(tokens[6]),
-                        'down_strand': null,
-                        'down_end'   : Integer.parseInt(tokens[6]),
-                        'reads_junction':Integer.parseInt(tokens[7]),
-                        'pairs_span' :Integer.parseInt(tokens[8]),
-                        'pairs_junction':Integer.parseInt(tokens[9]),
-                        'assay_id'   : sampleMapping[tokens[0]]])
+                    'up_gene'    : tokens[1],
+                    'up_chr'     : tokens[2],
+                    'up_pos'     : Integer.parseInt(tokens[3]),
+                    'up_strand'  : null,
+                    'up_end'     : Integer.parseInt(tokens[3]),
+                    'down_gene'  : tokens[4],
+                    'down_chr'   : tokens[5],
+                    'down_pos'   : Integer.parseInt(tokens[6]),
+                    'down_strand': null,
+                    'down_end'   : Integer.parseInt(tokens[6]),
+                    'reads_junction':Integer.parseInt(tokens[7]),
+                    'pairs_span' :Integer.parseInt(tokens[8]),
+                    'pairs_junction':Integer.parseInt(tokens[9]),
+                    'assay_id'   : sampleMapping[tokens[0]]])
                 totalUpdated++;
                 if (totalUpdated % 100 == 0) {
                     print('.')
                 }
-
             }
             writeAudit('Inserted tophat junctions',totalUpdated,stepCt,'Done');
             println('')
             println("Successfully inserted $totalUpdated events")
-
         }
         catch (BatchUpdateException ex) {
             throw ex.getNextException()
         }
         stepCt++;
-
     }
 
     private static Boolean parseOptions(args) {
         def cli = new CliBuilder(usage: '-[hscdiatmoxjuf] ',
-                posix:false,
-                header: 'Parameters marked with asterisk * are mandatory')
+				 posix:false,
+				 header: 'Parameters marked with asterisk * are mandatory')
         // Create the list of options.
         cli.with {
             h longOpt: 'help', 'Show usage information'
@@ -221,7 +216,7 @@ class TwoRegion extends HighDimImport {
             d longOpt: 'datasource', args: 1, argName: 'datasource', required:true, '* Identification of the dataset this data comes from'
             t longOpt: 'tophatFusionPost', args: 1, argName: 'tophatFile', 'Path to the result of tophat fusion-post'
             o longOpt: 'soapFusion', args: 1, argName: 'soapFile', 'Path to file containing combined SOAPFuse fusion files'
-//            x longOpt: 'soapFusionDir', args: 1, argName: 'soapDir', 'Path to directory containing SOAPFuse fusion files with sampleID in their name'
+//          x longOpt: 'soapFusionDir', args: 1, argName: 'soapDir', 'Path to directory containing SOAPFuse fusion files with sampleID in their name'
             m longOpt: 'mapping', args: 1, argName: 'mappingFile', '(TopHat andd SOAPFuse only) Path to the subject sample mapping file (subjectID;sampleID)'
             j longOpt: 'cgaJunctions', args: 1, argName: 'junctionFile', 'Path to file containing output of CGA tools, junction file, needs to be used with cga-events, sample-id and subject-id'
             u longOpt: 'cgaEvents', args: 1, argName: 'eventsFile', 'Path to file containing output of CGA tools, events file, needs to be used with cga-junctions, sample-id and subject-id'
@@ -231,10 +226,10 @@ class TwoRegion extends HighDimImport {
             r longOpt: 'ref', args: 1, argName: 'ref', 'Human genome reference version (i.e. hg18)'
         }
         cli.footer = "Example:\n-s example_study -c \"/Public studies/example_study/soap\" -d s --mapping sample/tworegion/mapping.txt --soapFusion sample/tworegion/soapresult.txt  \n" +
-                "\n" +
-                "-s example_study -c \"/Public studies/example_study/tophat\" -d t --mapping sample/tworegion/mapping.txt --tophatFusionPost sample/tworegion/tophatresults.txt  \n" +
-                "\n" +
-                "-s example_study -c \"/Public studies/example_study/cga\" -d b --cgaJunctions sample/tworegion/cga_junctions.csv  --cgaEvents sample/tworegion/cga_events.tsv -i subject1 -a sample1"
+            "\n" +
+            "-s example_study -c \"/Public studies/example_study/tophat\" -d t --mapping sample/tworegion/mapping.txt --tophatFusionPost sample/tworegion/tophatresults.txt  \n" +
+            "\n" +
+            "-s example_study -c \"/Public studies/example_study/cga\" -d b --cgaJunctions sample/tworegion/cga_junctions.csv  --cgaEvents sample/tworegion/cga_events.tsv -i subject1 -a sample1"
         options = cli.parse(args)
         // Show usage text when -h or --help option is used.
         if (!options) {
@@ -290,7 +285,7 @@ class TwoRegion extends HighDimImport {
             def updatedCounts = deapp.withBatch(100, "INSERT INTO deapp.de_two_region_junction\
              (up_chr, up_pos, up_strand, up_end, down_chr, down_pos, down_strand, down_end, is_in_frame, external_id, assay_id) VALUES \
             (:up_chr,:up_pos,:up_strand,:up_end,:down_chr,:down_pos,:down_strand,:down_end, null,       :external_id,:assay_id)", {
-                BatchingPreparedStatementWrapper it ->
+                    BatchingPreparedStatementWrapper it ->
                     new File(options.cgaJunctions).eachLine {line ->
                         if (line[0] == '#' || line[0] == ' ' || line[0] == '>') {
                             //header
@@ -303,18 +298,18 @@ class TwoRegion extends HighDimImport {
                         // Id            LeftChr LeftPosition       LeftStrand          LeftLength         RightChr              RightPosition     RightStrand                RightLength
 
                         it.addBatch([
-                                'external_id': Integer.parseInt(tokens[0]),
-                                'up_chr'     : tokens[1],
-                                'up_pos'     : Integer.parseInt(tokens[2]),
-                                'up_strand'  : tokens[3],
-                                'up_end'     : Integer.parseInt(tokens[2])+Integer.parseInt(tokens[4]),
-                                'down_chr'   : tokens[5],
-                                'down_pos'   : Integer.parseInt(tokens[6]),
-                                'down_strand': tokens[7],
-                                'down_end'   :  Integer.parseInt(tokens[6])+Integer.parseInt(tokens[8]),
-                                'assay_id'   : assayId])
+                            'external_id': Integer.parseInt(tokens[0]),
+                            'up_chr'     : tokens[1],
+                            'up_pos'     : Integer.parseInt(tokens[2]),
+                            'up_strand'  : tokens[3],
+                            'up_end'     : Integer.parseInt(tokens[2])+Integer.parseInt(tokens[4]),
+                            'down_chr'   : tokens[5],
+                            'down_pos'   : Integer.parseInt(tokens[6]),
+                            'down_strand': tokens[7],
+                            'down_end'   :  Integer.parseInt(tokens[6])+Integer.parseInt(tokens[8]),
+                            'assay_id'   : assayId])
                     }
-            })
+		})
             def totalUpdated = (updatedCounts as Integer[]).sum();
             writeAudit('Inserted cga junctions',totalUpdated,stepCt,'Done');
         }
@@ -378,11 +373,11 @@ class TwoRegion extends HighDimImport {
             def containedGenes = tokens[16].split(';').findAll({ it != '' && !it.matches('^LOC[0-9]+')});
             genesCount += insertGenes(containedGenes, 'CONTAINED')
             def fusionGenes = tokens[17]
-                                .replaceAll('TSS-UPSTREAM\\[','') //we don't care the genes are fused in a TFBS
-                                .replaceAll('\\]/','/')
-                                .split('[;/]')
-                                .findAll({  it != '' && !it.matches('^LOC[0-9]+')})
-                                .unique();
+                .replaceAll('TSS-UPSTREAM\\[','') //we don't care the genes are fused in a TFBS
+                .replaceAll('\\]/','/')
+                .split('[;/]')
+                .findAll({  it != '' && !it.matches('^LOC[0-9]+')})
+                .unique();
             genesCount += insertGenes(fusionGenes, 'FUSION')
         }
         writeAudit('Inserted cga events',eventsCount,stepCt,'Done');
@@ -391,7 +386,6 @@ class TwoRegion extends HighDimImport {
         println('')
         println("Successfully inserted $eventsCount events")
     }
-
 
     private static void getBiomarkerId(String hugo) {
         String query =     ''
@@ -417,7 +411,5 @@ class TwoRegion extends HighDimImport {
         }
         genesCount
     }
-
-
 }
 

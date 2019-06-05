@@ -133,5 +133,4 @@ class UniProtDictionary {
             correlationLoader.close()
         }
     }
-
 }

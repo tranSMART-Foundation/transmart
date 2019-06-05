@@ -35,244 +35,224 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class SubjectSampleMapping {
 
-	Sql deapp
-	List subjectSamples
-	Map subjectPatientMap, conceptPathToCode
-	String platformPath, platform
+    Sql deapp
+    List subjectSamples
+    Map subjectPatientMap, conceptPathToCode
+    String platformPath, platform
 
-	void loadSubjectSampleMapping(){
+    void loadSubjectSampleMapping(){
 
-		logger.info platformPath
-		Util.printMap(subjectPatientMap)
-		Util.printMap(conceptPathToCode)
+	logger.info platformPath
+	Util.printMap(subjectPatientMap)
+	Util.printMap(conceptPathToCode)
 
-		Map dataMap = [:]
-		subjectSamples.each{
-			dataMap = it
+	Map dataMap = [:]
+	subjectSamples.each{
+	    dataMap = it
 
-			dataMap["PATIENT_ID"] = subjectPatientMap[dataMap["SUBJECT_ID"]]
-			dataMap["SAMPLE_ID"] = dataMap["PATIENT_ID"]
-			dataMap["SOURCE_CD"] = "STD"
-			dataMap["PLATFORM_CD"] = conceptPathToCode[platformPath]
+	    dataMap["PATIENT_ID"] = subjectPatientMap[dataMap["SUBJECT_ID"]]
+	    dataMap["SAMPLE_ID"] = dataMap["PATIENT_ID"]
+	    dataMap["SOURCE_CD"] = "STD"
+	    dataMap["PLATFORM_CD"] = conceptPathToCode[platformPath]
 
-			if(dataMap["SAMPLE_TYPE"].equals(null) || dataMap["SAMPLE_TYPE"].toString().size()==0)
-				dataMap["SAMPLE_TYPE_CD"] =  conceptPathToCode[platformPath]
-			else
-				dataMap["SAMPLE_TYPE_CD"] =  conceptPathToCode[platformPath + dataMap["SAMPLE_TYPE"] + "/"]
+	    if(dataMap["SAMPLE_TYPE"].equals(null) || dataMap["SAMPLE_TYPE"].toString().size()==0)
+		dataMap["SAMPLE_TYPE_CD"] =  conceptPathToCode[platformPath]
+	    else
+		dataMap["SAMPLE_TYPE_CD"] =  conceptPathToCode[platformPath + dataMap["SAMPLE_TYPE"] + "/"]
 
-			dataMap["CONCEPT_CODE"] = dataMap["SAMPLE_TYPE_CD"]
-			dataMap["DATA_UID"] = dataMap["CONCEPT_CODE"] + "-" + dataMap["PATIENT_ID"]
+	    dataMap["CONCEPT_CODE"] = dataMap["SAMPLE_TYPE_CD"]
+	    dataMap["DATA_UID"] = dataMap["CONCEPT_CODE"] + "-" + dataMap["PATIENT_ID"]
 
-			//String [] str = platformPath.split("/")
-			dataMap["PLATFORM"] = platform //str[-2]
-			//if(dataMap["PLATFORM"].toString().toUpperCase().indexOf("SNP") != -1) dataMap["PLATFORM"] = "SNP"
+	    //String [] str = platformPath.split("/")
+	    dataMap["PLATFORM"] = platform //str[-2]
+	    //if(dataMap["PLATFORM"].toString().toUpperCase().indexOf("SNP") != -1) dataMap["PLATFORM"] = "SNP"
 
-			insertSubjectSampleMapping(dataMap)
-			dataMap = [:]
-		}
+	    insertSubjectSampleMapping(dataMap)
+	    dataMap = [:]
 	}
+    }
 
-	void insertSubjectSampleMapping(Map dataMap){
-		String qry = """ insert into de_subject_sample_mapping (
-							PATIENT_ID,
-							SUBJECT_ID,
-							CONCEPT_CODE,
-							ASSAY_ID,
-							SAMPLE_TYPE,
-							TRIAL_NAME,
-							SAMPLE_TYPE_CD,
-							PLATFORM,
-							PLATFORM_CD,
-							DATA_UID,
-							GPL_ID,
-							SAMPLE_ID,
-							SAMPLE_CD,
-							CATEGORY_CD,
-							SOURCE_CD)
-						values(?,?,?,seq_assay_id.nextval,?, ?,?,?,?,?, ?,?,?,?,?)"""
+    void insertSubjectSampleMapping(Map dataMap){
+	String qry = """ insert into de_subject_sample_mapping
+				(PATIENT_ID,
+				 SUBJECT_ID,
+				 CONCEPT_CODE,
+				 ASSAY_ID,
+				 SAMPLE_TYPE,
+				 TRIAL_NAME,
+				 SAMPLE_TYPE_CD,
+				 PLATFORM,
+				 PLATFORM_CD,
+				 DATA_UID,
+				 GPL_ID,
+				 SAMPLE_ID,
+				 SAMPLE_CD,
+				 CATEGORY_CD,
+				 SOURCE_CD)
+			values(?,?,?,seq_assay_id.nextval,?, ?,?,?,?,?, ?,?,?,?,?)"""
 
-		if(isSubjectSampleMappingExist(dataMap)){
-			logger.info "Exist a record for $dataMap"
-		} else {
-			logger.info "Insert a record for $dataMap"
-			deapp.execute(qry, [
-				dataMap["PATIENT_ID"],
-				dataMap["SUBJECT_ID"],
-				dataMap["CONCEPT_CODE"],
-				//dataMap["ASSAY_ID"],
-				dataMap["SAMPLE_TYPE"],
-				dataMap["TRIAL_NAME"],
-				dataMap["SAMPLE_TYPE_CD"],
-				dataMap["PLATFORM"],
-				dataMap["PLATFORM_CD"],
-				dataMap["DATA_UID"],
-				dataMap["GPL_ID"],
-				dataMap["SAMPLE_ID"],
-				dataMap["SAMPLE_CD"],
-				dataMap["CATEGORY_CD"],
-				dataMap["SOURCE_CD"]
-			])
-		}
+	if(isSubjectSampleMappingExist(dataMap)){
+	    logger.info "Exist a record for $dataMap"
+	} else {
+	    logger.info "Insert a record for $dataMap"
+	    deapp.execute(qry, [
+		dataMap["PATIENT_ID"],
+		dataMap["SUBJECT_ID"],
+		dataMap["CONCEPT_CODE"],
+		//dataMap["ASSAY_ID"],
+		dataMap["SAMPLE_TYPE"],
+		dataMap["TRIAL_NAME"],
+		dataMap["SAMPLE_TYPE_CD"],
+		dataMap["PLATFORM"],
+		dataMap["PLATFORM_CD"],
+		dataMap["DATA_UID"],
+		dataMap["GPL_ID"],
+		dataMap["SAMPLE_ID"],
+		dataMap["SAMPLE_CD"],
+		dataMap["CATEGORY_CD"],
+		dataMap["SOURCE_CD"]
+	    ])
 	}
+    }
 
+    boolean isSubjectSampleMappingExist(Map dataMap){
+	String qry = """ select count(*) from de_subject_sample_mapping 
+		         where patient_id=? and trial_name=?
+                             and sample_cd=? and platform=? """
+	def res = deapp.firstRow(qry, [
+	    dataMap["PATIENT_ID"],
+	    dataMap["TRIAL_NAME"],
+	    dataMap["SAMPLE_CD"],
+	    dataMap["PLATFORM"]
+	])
+	if(res[0] > 0) return true
+	else return false
+    }
 
+    Map getSamplePatientMap(String studyName, String platform){
+	Map samplePatientMap = [:]
 
-	boolean isSubjectSampleMappingExist(Map dataMap){
-
-		String qry = """ select count(*) from de_subject_sample_mapping 
-		                 where patient_id=? and trial_name=? and sample_cd=? and platform=? """
-		def res = deapp.firstRow(qry, [
-			dataMap["PATIENT_ID"],
-			dataMap["TRIAL_NAME"],
-			dataMap["SAMPLE_CD"],
-			dataMap["PLATFORM"]
-		])
-		if(res[0] > 0) return true
-		else return false
-	}
-
-
-
-	Map getSamplePatientMap(String studyName, String platform){
-
-		Map samplePatientMap = [:]
-
-		String qry = """select sample_cd, patient_id from de_subject_sample_mapping 
+	String qry = """select sample_cd, patient_id from de_subject_sample_mapping 
                         where platform=? and trial_name=? """
-		deapp.eachRow(qry, [platform, studyName]) {
-			samplePatientMap[it.sample_cd] = it.patient_id
-		}
-
-		return samplePatientMap
+	deapp.eachRow(qry, [platform, studyName]) {
+	    samplePatientMap[it.sample_cd] = it.patient_id
 	}
 
+	return samplePatientMap
+    }
 
+    Map getSamplePatientMap(String studyName){
 
-	Map getSamplePatientMap(String studyName){
+	Map samplePatientMap = [:]
 
-		Map samplePatientMap = [:]
-
-		String qry = """select sample_cd, patient_id from de_subject_sample_mapping trial_name=? """
-		deapp.eachRow(qry, [studyName]) {
-			samplePatientMap[it.sample_cd] = it.patient_id
-		}
-
-		return samplePatientMap
+	String qry = """select sample_cd, patient_id from de_subject_sample_mapping trial_name=? """
+	deapp.eachRow(qry, [studyName]) {
+	    samplePatientMap[it.sample_cd] = it.patient_id
 	}
 
+	return samplePatientMap
+    }
 
-	Map getSubjectSampleMapping(){
+    Map getSubjectSampleMapping(){
 
-		Map subjectSampleMapping = [:]
+	Map subjectSampleMapping = [:]
 
-		String qry = "select sample_type, concept_code from de_subject_snp_dataset "
-		deapp.eachRow(qry) {
-			subjectSampleMapping[it.subject_id] = it.patient_num
-		}
-
-		return subjectSampleMapping
+	String qry = "select sample_type, concept_code from de_subject_snp_dataset "
+	deapp.eachRow(qry) {
+	    subjectSampleMapping[it.subject_id] = it.patient_num
 	}
 
+	return subjectSampleMapping
+    }
 
-	Map getSampleConceptCodeMap(String trialName){
+    Map getSampleConceptCodeMap(String trialName){
 
-		Map sampleConceptCodeMap = [:]
+	Map sampleConceptCodeMap = [:]
 
-		String qry = "select sample_type, concept_code from de_subject_sample_mapping where trial_name = ?"
-		deapp.eachRow(qry, [trialName]) {
-			sampleConceptCodeMap[it.sample_type] = it.concept_code
-		}
-
-		return sampleConceptCodeMap
+	String qry = "select sample_type, concept_code from de_subject_sample_mapping where trial_name = ?"
+	deapp.eachRow(qry, [trialName]) {
+	    sampleConceptCodeMap[it.sample_type] = it.concept_code
 	}
 
+	return sampleConceptCodeMap
+    }
 
+    /**
+     * 
+     * @param trialName
+     * @param platform	   "SNP" for SNP data
+     * @return a map with the format:   patient_num:concept_code -> subject_id:sample_type
+     */
+    Map getPatientConceptCodeMap(String trialName, String platform){
 
-	/**
-	 * 
-	 * @param trialName
-	 * @param platform	   "SNP" for SNP data
-	 * @return a map with the format:   patient_num:concept_code -> subject_id:sample_type
-	 */
-	Map getPatientConceptCodeMap(String trialName, String platform){
+	logger.info "Extract a map [patient_id -> subject_id:sample_type:concept_code] from DE_SUBJECT_SAMPLE_MAPPING ... "
 
-		logger.info "Extract a map [patient_id -> subject_id:sample_type:concept_code] from DE_SUBJECT_SAMPLE_MAPPING ... "
-
-		Map map = [:]
-		String qry = """ select patient_id, subject_id, sample_type, concept_code
-						 from de_subject_sample_mapping 
+	Map map = [:]
+	String qry = """ select patient_id, subject_id, sample_type, concept_code
+			 from de_subject_sample_mapping 
                          where trial_name = ? and platform=? """
-		deapp.eachRow(qry, [trialName, platform]) {
-			map[it.patient_id + ":" + it.concept_code] = it.subject_id + ":" + it.sample_type
-		}
-
-		return map
+	deapp.eachRow(qry, [trialName, platform]) {
+	    map[it.patient_id + ":" + it.concept_code] = it.subject_id + ":" + it.sample_type
 	}
 
-	
-	
-	/**
-	 *
-	 * @param trialName
-	 * @param platform	   "SNP" for SNP data
-	 * @return a map with the format: sample_cd (GSM#) -> patient_num
-	 */
-	Map getPatientSampleMap(String trialName, String platform){
+	return map
+    }
 
+    /**
+     *
+     * @param trialName
+     * @param platform	   "SNP" for SNP data
+     * @return a map with the format: sample_cd (GSM#) -> patient_num
+     */
+    Map getPatientSampleMap(String trialName, String platform){
 		logger.info "Extract a map [sample_cd (GSM#) -> patient_id] from DE_SUBJECT_SAMPLE_MAPPING ... "
 
-		Map map = [:]
-		String qry = """ select patient_id, sample_cd
-						 from de_subject_sample_mapping
-						 where trial_name = ? and platform=? """
-		deapp.eachRow(qry, [trialName, platform]) {
-			map[it.sample_cd] = it.patient_id
-		}
-
-		return map
+	Map map = [:]
+	String qry = """ select patient_id, sample_cd
+			 from de_subject_sample_mapping
+			 where trial_name = ?
+                             and platform=? """
+	deapp.eachRow(qry, [trialName, platform]) {
+	    map[it.sample_cd] = it.patient_id
 	}
 
-	
-	Map getPatientConceptCodeMap(String trialName){
+	return map
+    }
 
-		logger.info "Extract a map [patient_id -> subject_id:sample_type:concept_code] from DE_SUBJECT_SAMPLE_MAPPING ... "
+    Map getPatientConceptCodeMap(String trialName){
+	logger.info "Extract a map [patient_id -> subject_id:sample_type:concept_code] from DE_SUBJECT_SAMPLE_MAPPING ... "
 
-		Map map = [:]
-		String qry = """ select patient_id, subject_id, sample_type, concept_code 
+	Map map = [:]
+	String qry = """ select patient_id, subject_id, sample_type, concept_code 
                          from de_subject_sample_mapping where trial_name = ? """
-		deapp.eachRow(qry, [trialName]) {
-			map[(int) it.patient_id] = it.subject_id + ":" + it.sample_type + ":" + it.concept_code
-		}
-
-		return map
+	deapp.eachRow(qry, [trialName]) {
+	    map[(int) it.patient_id] = it.subject_id + ":" + it.sample_type + ":" + it.concept_code
 	}
 
+	return map
+    }
 
-	void setPlatformPath(String platformPath){
-		this.platformPath = platformPath
-	}
+    void setPlatformPath(String platformPath){
+	this.platformPath = platformPath
+    }
 
+    void setconceptPathToCode(Map conceptPathToCode){
+	this.conceptPathToCode = conceptPathToCode
+    }
 
-	void setconceptPathToCode(Map conceptPathToCode){
-		this.conceptPathToCode = conceptPathToCode
-	}
+    void setSubjectPatientMap(Map subjectPatientMap){
+	this.subjectPatientMap = subjectPatientMap
+    }
 
+    void setPlatform(String platform){
+	this.platform = platform
+    }
 
-	void setSubjectPatientMap(Map subjectPatientMap){
-		this.subjectPatientMap = subjectPatientMap
-	}
+    void setSubjectSamples(List subjectSamples){
+	this.subjectSamples = subjectSamples
+    }
 
-
-	void setPlatform(String platform){
-		this.platform = platform
-	}
-
-
-	void setSubjectSamples(List subjectSamples){
-		this.subjectSamples = subjectSamples
-	}
-
-	void setSql(Sql deapp){
-		this.deapp = deapp
-	}
+    void setSql(Sql deapp){
+	this.deapp = deapp
+    }
 }

@@ -36,57 +36,54 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class GplInfo {
 
-	Sql deapp
+    Sql deapp
 
-	void insertGplInfo(String platform, String title, String organism, String markerType){
+    void insertGplInfo(String platform, String title, String organism, String markerType){
 
-		String qry = "insert into de_gpl_info(platform,title,organism,annotation_date,marker_type) values(?,?,?,sysdate,?)"
+	String qry = "insert into de_gpl_info(platform,title,organism,annotation_date,marker_type) values(?,?,?,sysdate,?)"
 
-		if(isGplInfoExist(platform, markerType)){
-                    //logger.info "$platform:$markerType already exists in DE_GPL_INFO ..."
-		}else{
-			logger.info "Insert $platform:$markerType into DE_GPL_INFO ..."
-			deapp.execute(qry, [
-				platform,
-				title,
-				organism,
-				markerType
-			])
-		}
+	if(isGplInfoExist(platform, markerType)){
+            //logger.info "$platform:$markerType already exists in DE_GPL_INFO ..."
+	}else{
+	    logger.info "Insert $platform:$markerType into DE_GPL_INFO ..."
+	    deapp.execute(qry, [
+		platform,
+		title,
+		organism,
+		markerType
+	    ])
 	}
+    }
 
+    void insertGplInfo(Map gplInfoMap){
 
-	void insertGplInfo(Map gplInfoMap){
+	logger.info "Start inserting data into DE_GPL_INFO ... "
 
-		logger.info "Start inserting data into DE_GPL_INFO ... "
-
-		if(isGplInfoExist(gplInfoMap["platform"], gplInfoMap["markerType"])){
-			logger.info "Platform [${gplInfoMap["platform"]}] already extists in DE_GPL_INFO ... "
-		}else{
-			String qry = """insert into de_gpl_info (platform, title, organism, annotation_date, marker_type, release_nbr) values(?, ?, ?, ?, ?,?) """
-			deapp.execute(qry, [
-				gplInfoMap["platform"],
-				gplInfoMap["title"],
-				gplInfoMap["organism"],
-				gplInfoMap["annotationDate"],
-				gplInfoMap["markerType"],
-				gplInfoMap["releaseNbr"]
-			])
-			logger.info "Platform ${gplInfoMap["platform"]} is inserted into DE_GPL_INFO ... "
-		}
-		logger.info "End loading data into the table DE_SNP_INFO ... "
+	if(isGplInfoExist(gplInfoMap["platform"], gplInfoMap["markerType"])){
+	    logger.info "Platform [${gplInfoMap["platform"]}] already extists in DE_GPL_INFO ... "
+	}else{
+	    String qry = """insert into de_gpl_info (platform, title, organism, annotation_date, marker_type, release_nbr) values(?, ?, ?, ?, ?,?) """
+	    deapp.execute(qry, [
+		gplInfoMap["platform"],
+		gplInfoMap["title"],
+		gplInfoMap["organism"],
+		gplInfoMap["annotationDate"],
+		gplInfoMap["markerType"],
+		gplInfoMap["releaseNbr"]
+	    ])
+	    logger.info "Platform ${gplInfoMap["platform"]} is inserted into DE_GPL_INFO ... "
 	}
+	logger.info "End loading data into the table DE_SNP_INFO ... "
+    }
 
+    boolean isGplInfoExist(String platform, String markerType){
+	String qry = "select count(*) from de_gpl_info where platform=? and marker_type=?"
+	def res = deapp.firstRow(qry, [platform, markerType])
+	if(res[0] > 0) return true
+	else return false
+    }
 
-	boolean isGplInfoExist(String platform, String markerType){
-		String qry = "select count(*) from de_gpl_info where platform=? and marker_type=?"
-		def res = deapp.firstRow(qry, [platform, markerType])
-		if(res[0] > 0) return true
-		else return false
-	}
-
-
-	void setDeapp(Sql deapp){
-		this.deapp = deapp
-	}
+    void setDeapp(Sql deapp){
+	this.deapp = deapp
+    }
 }

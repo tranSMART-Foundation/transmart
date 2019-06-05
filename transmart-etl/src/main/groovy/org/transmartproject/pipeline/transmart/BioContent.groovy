@@ -35,59 +35,54 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class BioContent {
 
-	Sql biomart
+    Sql biomart
 
-	void loadBioContentForKEGG(){
-		String qry = """ insert into bio_content (repository_id, location, file_type)
+    void loadBioContentForKEGG(){
+	String qry = """ insert into bio_content (repository_id, location, file_type)
 	                     select distinct bcr.bio_content_repo_id
-								, bcr.location||'dbget-bin/show_pathway?'|| bm.primary_external_id as location
-								, 'Data'
-						from bio_content_repository bcr, bio_marker bm
-						where bcr.repository_type='KEGG'
-							and bm.primary_source_code='KEGG' 
-							and (bcr.bio_content_repo_id, location) not in 
-							  (select repository_id, location from bio_content)
-					"""
-		biomart.execute(qry)
+				  , bcr.location||'dbget-bin/show_pathway?'|| bm.primary_external_id as location
+				  , 'Data'
+			 from bio_content_repository bcr, bio_marker bm
+			 where bcr.repository_type='KEGG'
+			     and bm.primary_source_code='KEGG' 
+			     and (bcr.bio_content_repo_id, location) not in 
+			         (select repository_id, location from bio_content)
+		"""
+	biomart.execute(qry)
+    }
+
+    void insertBioContent(long repository_id, String location, String fileType, String studyName){
+	String qry = """ insert into bio_content(repository_id, location, file_type, etl_id_c) values(?, ?, ?, ?) """
+
+	if(isBioContentExist(repository_id, location)){
+            //logger.info "$repository_id:$location already exists in BIO_CONTENT ..."
+	}else{
+	    logger.info "Insert $repository_id:$location into BIO_CONTENT ..."
+	    biomart.execute(qry, [
+		repository_id,
+		location,
+		fileType,
+		studyName
+	    ])
 	}
+    }
 
+    boolean isBioContentExist(long repository_id, String location){
+	String qry = "select count(*) from bio_content where repository_id=? and location=?"
+	def res = biomart.firstRow(qry, [repository_id, location])
+	if(res[0] > 0) return true
+	else return false
+    }
 
-	void insertBioContent(long repository_id, String location, String fileType, String studyName){
+    long getBioContentId(long repository_id, String location){
+	String qry = """ select bio_file_content_id from bio_content
+			 where repository_id=? and location=?"""
+	def res = biomart.firstRow(qry, [repository_id, location])
+	if(res.equals(null)) return 0
+	else return res[0]
+    }
 
-		String qry = """ insert into bio_content(repository_id, location, file_type, etl_id_c) values(?, ?, ?, ?) """
-
-		if(isBioContentExist(repository_id, location)){
-                    //logger.info "$repository_id:$location already exists in BIO_CONTENT ..."
-		}else{
-			logger.info "Insert $repository_id:$location into BIO_CONTENT ..."
-			biomart.execute(qry, [
-				repository_id,
-				location,
-				fileType,
-				studyName
-			])
-		}
-	}
-
-
-	boolean isBioContentExist(long repository_id, String location){
-		String qry = "select count(*) from bio_content where repository_id=? and location=?"
-		def res = biomart.firstRow(qry, [repository_id, location])
-		if(res[0] > 0) return true
-		else return false
-	}
-
-
-	long getBioContentId(long repository_id, String location){
-		String qry = """ select bio_file_content_id from bio_content
-						 where repository_id=? and location=?"""
-		def res = biomart.firstRow(qry, [repository_id, location])
-		if(res.equals(null)) return 0
-		else return res[0]
-	}
-
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

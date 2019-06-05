@@ -36,44 +36,42 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class BioContentRepository {
 
-	Sql biomart
+    Sql biomart
 
-	void insertBioContentRepository(String location, String isActive, String repositoryType, String locationType){
+    void insertBioContentRepository(String location, String isActive, String repositoryType, String locationType){
 
-		String qry = """ insert into bio_content_repository(location, active_y_n, repository_type, location_type) values(?, ?, ?, ?) """
+	String qry = """ insert into bio_content_repository(location, active_y_n, repository_type, location_type) values(?, ?, ?, ?) """
 
-		if(isBioContentRepositoryExist(location, repositoryType)){
-                    //logger.info "\"$location:$repositoryType\" already exists in BIO_CONTENT_REPOSITORY ..."
-		}else{
-			logger.info "Insert \"$location:$repositoryType\" into BIO_CONTENT_REPOSITORY ..."
-			biomart.execute(qry, [
-				location,
-				isActive,
-				repositoryType,
-				locationType
-			])
-		}
+	if(isBioContentRepositoryExist(location, repositoryType)){
+            //logger.info "\"$location:$repositoryType\" already exists in BIO_CONTENT_REPOSITORY ..."
+	}else{
+	    logger.info "Insert \"$location:$repositoryType\" into BIO_CONTENT_REPOSITORY ..."
+	    biomart.execute(qry, [
+		location,
+		isActive,
+		repositoryType,
+		locationType
+	    ])
 	}
+    }
 
+    boolean isBioContentRepositoryExist(String location, String type){
+	String qry = "select count(*) from bio_content_repository where location=? and repository_type=?"
+	def res = biomart.firstRow(qry, [location, type])
+	if(res[0] > 0) return true
+	else return false
+    }
 
-	boolean isBioContentRepositoryExist(String location, String type){
-		String qry = "select count(*) from bio_content_repository where location=? and repository_type=?"
-		def res = biomart.firstRow(qry, [location, type])
-		if(res[0] > 0) return true
-		else return false
-	}
+    long getBioContentRepositoryId(String location, String type){
+	String qry = """ select bio_content_repo_id
+                         from bio_content_repository
+			 where location=? and repository_type=?"""
+	def res = biomart.firstRow(qry, [location, type])
+	if(res.equals(null)) return 0
+	else return res[0]
+    }
 
-	
-	long getBioContentRepositoryId(String location, String type){
-		String qry = """ select bio_content_repo_id from bio_content_repository
-						 where location=? and repository_type=?"""
-		def res = biomart.firstRow(qry, [location, type])
-		if(res.equals(null)) return 0
-		else return res[0]
-	}
-
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

@@ -34,65 +34,59 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class I2b2Secure {
 
-	Sql i2b2metadata
-	String studyName
-	Map visualAttrs
+    Sql i2b2metadata
+    String studyName
+    Map visualAttrs
 
+    void loadConceptPaths(Map conceptPathToCode){
 
-	void loadConceptPaths(Map conceptPathToCode){
-
-		conceptPathToCode.each{key, val ->
-			loadConceptPath(key, val)
-		}
+	conceptPathToCode.each{key, val ->
+	    loadConceptPath(key, val)
 	}
-
+    }
 	
-	void loadConceptPath(String conceptPath, String conceptCode){
+    void loadConceptPath(String conceptPath, String conceptCode){
 
-		String qry = """ INSERT INTO I2B2_SECURE (c_hlevel, C_FULLNAME, C_NAME, C_VISUALATTRIBUTES, c_synonym_cd,
-								C_FACTTABLECOLUMN, C_TABLENAME, C_COLUMNNAME, C_DIMCODE, C_TOOLTIP,
-								SOURCESYSTEM_CD, c_basecode, C_OPERATOR, c_columndatatype, c_comment, secure_obj_token)
-						 VALUES(?, ?, ?, ?, 'N',  
-							   'CONCEPT_CD', 'CONCEPT_DIMENSION', 'CONCEPT_PATH', ?, ?,
-								?, ?, 'LIKE', 'T',
-								?, 'EXP:PUBLIC')""";
+	String qry = """ INSERT INTO I2B2_SECURE (c_hlevel, C_FULLNAME, C_NAME, C_VISUALATTRIBUTES, c_synonym_cd,
+						  C_FACTTABLECOLUMN, C_TABLENAME, C_COLUMNNAME, C_DIMCODE, C_TOOLTIP,
+						  SOURCESYSTEM_CD, c_basecode, C_OPERATOR, c_columndatatype, c_comment, secure_obj_token)
+				 VALUES(?, ?, ?, ?, 'N',  
+				        'CONCEPT_CD', 'CONCEPT_DIMENSION', 'CONCEPT_PATH', ?, ?,
+					?, ?, 'LIKE', 'T',
+					?, 'EXP:PUBLIC')""";
 
-		String [] str = conceptPath.split("/")
-		int c_hlevel = str.size() - 2
-		String c_name = str[str.size() - 1]
-		String path = conceptPath.replace("/", "\\")
-		String c_comment = "trial:" + studyName
-		String visualAttr = visualAttrs[conceptPath]
-		
-		if(isI2b2SecureExist(path)){
-			logger.info "$conceptPath already exists ..."
-		}else{
-			logger.info "insert concept path: $conceptPath into I2B2 ..."
-			i2b2metadata.execute(qry, [c_hlevel, path, c_name, visualAttr, path, path, studyName, conceptCode, c_comment])
-		}
+	String [] str = conceptPath.split("/")
+	int c_hlevel = str.size() - 2
+	String c_name = str[str.size() - 1]
+	String path = conceptPath.replace("/", "\\")
+	String c_comment = "trial:" + studyName
+	String visualAttr = visualAttrs[conceptPath]
+
+	if(isI2b2SecureExist(path)){
+	    logger.info "$conceptPath already exists ..."
+	}else{
+	    logger.info "insert concept path: $conceptPath into I2B2 ..."
+	    i2b2metadata.execute(qry, [c_hlevel, path, c_name, visualAttr, path, path, studyName, conceptCode, c_comment])
 	}
+    }
 
+    boolean isI2b2SecureExist(String conceptPath){
+	String qry = "select count(*) from i2b2_secure where c_fullname=?"
+	def res = i2b2metadata.firstRow(qry, [conceptPath])
+	if(res[0] > 0) return true
+	else return false
+    }
 
-	boolean isI2b2SecureExist(String conceptPath){
-		String qry = "select count(*) from i2b2_secure where c_fullname=?"
-		def res = i2b2metadata.firstRow(qry, [conceptPath])
-		if(res[0] > 0) return true
-		else return false
-	}
+    void setI2b2metadata(Sql i2b2metadata){
+	this.i2b2metadata = i2b2metadata
+    }
 
+    void setStudyName(String studyName){
+	this.studyName = studyName
+    }
 
-	void setI2b2metadata(Sql i2b2metadata){
-		this.i2b2metadata = i2b2metadata
-	}
-
-
-	void setStudyName(String studyName){
-		this.studyName = studyName
-	}
-	
-	
-	void setVisualAttrs(Map visualAttrs){
-		this.visualAttrs = visualAttrs
-	}
+    void setVisualAttrs(Map visualAttrs){
+	this.visualAttrs = visualAttrs
+    }
 }
 

@@ -34,39 +34,37 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioAssayDataAnnotation {
 
-	Sql biomart
-	String testsDataTable, gxAnnotationTable
+    Sql biomart
+    String testsDataTable, gxAnnotationTable
 
-	void loadBioAssayDataAnnotation(){
-		logger.info "Start loading new probes into BIO_ASSAY_DATA_ANNOTATION ..."
-		
-		String qry = """ insert into bio_assay_data_annotation(bio_assay_feature_group_id, bio_marker_id)
-						 select t1.bio_assay_feature_group_id, t3.bio_marker_id
-						 from bio_assay_feature_group t1, $gxAnnotationTable t2, bio_marker t3, gse_analysis t4
-						 where upper(t1.feature_group_name)=upper(t2.probe_id) 
-						 	and to_char(t2.gene_symbol) = to_char(t3.bio_marker_name) 
-						 	and upper(t2.species)=to_char(upper(t3.organism))
-							and upper(t2.platform)=upper(t4.platform)
-							and t3.bio_marker_type='GENE'
-						minus
-						select bio_assay_feature_group_id, bio_marker_id
-						from bio_assay_data_annotation """
+    void loadBioAssayDataAnnotation(){
+	logger.info "Start loading new probes into BIO_ASSAY_DATA_ANNOTATION ..."
 
-		biomart.execute(qry)
-		logger.info "End loading new probes into BIO_ASSAY_DATA_ANNOTATION ..."
-	}
+	String qry = """ insert into bio_assay_data_annotation(bio_assay_feature_group_id, bio_marker_id)
+			         select t1.bio_assay_feature_group_id, t3.bio_marker_id
+			         from bio_assay_feature_group t1, $gxAnnotationTable t2, bio_marker t3, gse_analysis t4
+				 where upper(t1.feature_group_name)=upper(t2.probe_id) 
+				     and to_char(t2.gene_symbol) = to_char(t3.bio_marker_name) 
+				     and upper(t2.species)=to_char(upper(t3.organism))
+				     and upper(t2.platform)=upper(t4.platform)
+				     and t3.bio_marker_type='GENE'
+				 minus
+				 select bio_assay_feature_group_id, bio_marker_id
+				 from bio_assay_data_annotation """
 
+	biomart.execute(qry)
+	logger.info "End loading new probes into BIO_ASSAY_DATA_ANNOTATION ..."
+    }
 
-	void setGxAnnotationTable(String gxAnnotationTable){
-		this.gxAnnotationTable = gxAnnotationTable
-	}
-	
-	
-	void setTestsDataTable(String testsDataTable){
-		this.testsDataTable = testsDataTable
-	}
+    void setGxAnnotationTable(String gxAnnotationTable){
+	this.gxAnnotationTable = gxAnnotationTable
+    }
 
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setTestsDataTable(String testsDataTable){
+	this.testsDataTable = testsDataTable
+    }
+
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

@@ -34,42 +34,40 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioDataDisease {
 
-	Sql biomart
+    Sql biomart
 
-	void loadBioDataDisease(long bioDataId, long bioDiseaseId, String etlSource){
+    void loadBioDataDisease(long bioDataId, long bioDiseaseId, String etlSource){
 
-		if(isBioDataDiseaseExist(bioDataId, bioDiseaseId, etlSource)){
-			logger.info "($bioDataId, $bioDiseaseId, $etlSource) already exists in BIO_DATA_DISEASE ..."
-		}else{
-			logger.info "Start loading ($bioDataId, $bioDiseaseId, $etlSource) into BIO_DATA_DISEASE ..."
+	if(isBioDataDiseaseExist(bioDataId, bioDiseaseId, etlSource)){
+	    logger.info "($bioDataId, $bioDiseaseId, $etlSource) already exists in BIO_DATA_DISEASE ..."
+	}else{
+	    logger.info "Start loading ($bioDataId, $bioDiseaseId, $etlSource) into BIO_DATA_DISEASE ..."
 
-			String qry = """ insert into bio_data_disease(bio_data_id, bio_disease_id, etl_source) values(?, ?, ?) """
-			biomart.execute(qry, [
-				bioDataId,
-				bioDiseaseId,
-				etlSource
-			])
+	    String qry = """ insert into bio_data_disease(bio_data_id, bio_disease_id, etl_source) values(?, ?, ?) """
+	    biomart.execute(qry, [
+		bioDataId,
+		bioDiseaseId,
+		etlSource
+	    ])
 
-			logger.info "End loading ($bioDataId, $bioDiseaseId, $etlSource) into BIO_DATA_DISEASE ..."
-		}
+	    logger.info "End loading ($bioDataId, $bioDiseaseId, $etlSource) into BIO_DATA_DISEASE ..."
 	}
+    }
 
-
-	boolean isBioDataDiseaseExist(long bioDataId, long bioDiseaseId, String etlSource){
-		String qry = "select count(1) from bio_data_disease where bio_data_id=? and bio_disease_id=? and etl_source=?"
-		if(biomart.firstRow(qry, [
-			bioDataId,
-			bioDiseaseId,
-			etlSource
-		])[0] > 0){
-			return true
-		}else{
-			return false
-		}
+    boolean isBioDataDiseaseExist(long bioDataId, long bioDiseaseId, String etlSource){
+	String qry = "select count(1) from bio_data_disease where bio_data_id=? and bio_disease_id=? and etl_source=?"
+	if(biomart.firstRow(qry, [
+	    bioDataId,
+	    bioDiseaseId,
+	    etlSource
+	])[0] > 0){
+	    return true
+	}else{
+	    return false
 	}
+    }
 
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

@@ -100,7 +100,6 @@ class DictionaryLoader {
     }
 
     private void insertSynonyms(BioMarkerEntry bmEntry, long bioMarkerID, long searchKeywordID) {
-
         // Insert all synonyms from the BioMarkerEntry
         for (String synonym : bmEntry.synonyms) {
             insertSynonymIntoBioDataExtCode(synonym, bioMarkerID, bmEntry.markerType)
@@ -109,7 +108,6 @@ class DictionaryLoader {
     }
 
     private void insertSynonymIntoBioDataExtCode(String synonym, long bioMarkerID, String dataCategory) {
-
         // Insert into BIO_DATA_EXT_CODE
         BioDataExtCode bioDataExtCode = new BioDataExtCode()
         bioDataExtCode.setBiomart(sqlBiomart)
@@ -123,7 +121,6 @@ class DictionaryLoader {
     }
 
     private void insertTermIntoSearchKeywordTerm(String keywordTerm, long searchKeywordID) {
-
         if(searchKeywordID) {
     
             // Insert into SEARCH_KEYWORD_TERM
@@ -132,5 +129,4 @@ class DictionaryLoader {
             searchKeywordTerm.insertSearchKeywordTerm(keywordTerm, searchKeywordID, 2)
         }
     }
-
 }

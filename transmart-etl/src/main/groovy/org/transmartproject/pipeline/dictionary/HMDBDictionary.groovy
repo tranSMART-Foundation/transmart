@@ -89,5 +89,4 @@ class HMDBDictionary {
             dictionaryLoader.close()
         }
     }
-
 }

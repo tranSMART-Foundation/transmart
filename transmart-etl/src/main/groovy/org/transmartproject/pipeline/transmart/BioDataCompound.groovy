@@ -34,42 +34,40 @@ import groovy.util.logging.Slf4j
 @Slf4j('logger')
 class BioDataCompound {
 
-	Sql biomart
+    Sql biomart
 
-	void loadBioDataCompound(long bioDataId, long bioCompoundId, String etlSource){
+    void loadBioDataCompound(long bioDataId, long bioCompoundId, String etlSource){
 
-		if(isBioDataCompoundExist(bioDataId, bioCompoundId, etlSource)){
-                    //logger.info "($bioDataId, $bioCompoundId, $etlSource) already exists in BIO_DATA_COMPOUND ..."
-		}else{
-			logger.info "Start loading ($bioDataId, $bioCompoundId, $etlSource) into BIO_DATA_COMPOUND ..."
+	if(isBioDataCompoundExist(bioDataId, bioCompoundId, etlSource)){
+            //logger.info "($bioDataId, $bioCompoundId, $etlSource) already exists in BIO_DATA_COMPOUND ..."
+	}else{
+	    logger.info "Start loading ($bioDataId, $bioCompoundId, $etlSource) into BIO_DATA_COMPOUND ..."
 
-			String qry = """ insert into bio_data_compound(bio_data_id, bio_compound_id, etl_source) values(?, ?, ?) """
-			biomart.execute(qry, [
-				bioDataId,
-				bioCompoundId,
-				etlSource
-			])
+	    String qry = """ insert into bio_data_compound(bio_data_id, bio_compound_id, etl_source) values(?, ?, ?) """
+	    biomart.execute(qry, [
+		bioDataId,
+		bioCompoundId,
+		etlSource
+	    ])
 
-			logger.info "End loading ($bioDataId, $bioCompoundId, $etlSource) into BIO_DATA_COMPOUND ..."
-		}
+	    logger.info "End loading ($bioDataId, $bioCompoundId, $etlSource) into BIO_DATA_COMPOUND ..."
 	}
+    }
 
-
-	boolean isBioDataCompoundExist(long bioDataId, long bioCompoundId, String etlSource){
-		String qry = "select count(1) from bio_data_compound where bio_data_id=? and bio_compound_id=? and etl_source=?"
-		if(biomart.firstRow(qry, [
-			bioDataId,
-			bioCompoundId,
-			etlSource
-		])[0] > 0){
-			return true
-		}else{
-			return false
-		}
+    boolean isBioDataCompoundExist(long bioDataId, long bioCompoundId, String etlSource){
+	String qry = "select count(1) from bio_data_compound where bio_data_id=? and bio_compound_id=? and etl_source=?"
+	if(biomart.firstRow(qry, [
+	    bioDataId,
+	    bioCompoundId,
+	    etlSource
+	])[0] > 0){
+	    return true
+	}else{
+	    return false
 	}
+    }
 
-
-	void setBiomart(Sql biomart){
-		this.biomart = biomart
-	}
+    void setBiomart(Sql biomart){
+	this.biomart = biomart
+    }
 }

@@ -38,214 +38,204 @@ import org.transmartproject.pipeline.util.Util
 @Slf4j('logger')
 class GPLReader {
 
-	String  sourceDirectory
-	Sql sql
-	Map expectedProbes
-	File snpInfo, probeInfo, snpGeneMap, gplInput, snpMap
+    String  sourceDirectory
+    Sql sql
+    Map expectedProbes
+    File snpInfo, probeInfo, snpGeneMap, gplInput, snpMap
 
-	static main(args) {
+    static main(args) {
 
-//		PropertyConfigurator.configure("conf/log4j.properties");
+//  PropertyConfigurator.configure("conf/log4j.properties");
 
-		Util util = new Util()
-		GPLReader al = new GPLReader()
+	Util util = new Util()
+	GPLReader al = new GPLReader()
 
-		Properties props = Util.loadConfiguration("conf/loader.properties")
+	Properties props = Util.loadConfiguration("conf/loader.properties")
 
-		Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
-		Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
+	Sql deapp = Util.createSqlFromPropertyFile(props, "deapp")
+	Sql biomart = Util.createSqlFromPropertyFile(props, "biomart")
 
-		al.loadGxGPL(props, biomart)
-	}
-
+	al.loadGxGPL(props, biomart)
+    }
 	
-	void loadGxGPL(Properties props, Sql biomart){
+    void loadGxGPL(Properties props, Sql biomart){
 
-		if(props.get("skip_gx_gpl_loader").toString().toLowerCase().equals("yes")){
-			logger.info "Skip loading GX GPL annotation file(s) ..."
+	if(props.get("skip_gx_gpl_loader").toString().toLowerCase().equals("yes")){
+	    logger.info "Skip loading GX GPL annotation file(s) ..."
+	}else{
+
+	    GexGPL gpl = new GexGPL()
+	    gpl.setSql(biomart)
+	    gpl.setAnnotationTable(props.get("annotation_table"))
+
+	    if(props.get("recreate_annotation_table").toString().toLowerCase().equals("yes")){
+		logger.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GX annotation file(s) ..."
+		gpl.createAnnotationTable()
+	    }
+
+	    String annotationSourceDirectory = props.get("annotation_source")
+	    String [] gplList = props.get("gpl_list").split(/\,/)
+	    gplList.each {
+		File annotationSource = new File(annotationSourceDirectory + File.separator + "GPL." + it + ".txt")
+		gpl.loadGxGPLs(annotationSource)
+	    }
+	}
+    }
+
+    void processGPLs(String inputFileName){
+
+	long numProbes
+	if(inputFileName.indexOf(";")){
+	    String [] names = inputFileName.split(";")
+	    for(int i in 0..names.size()-1){
+		File inputFile = new File(sourceDirectory + File.separator + names[i])
+
+		if(inputFile.exists()){
+		    logger.info("Start parsing " + inputFile.toString())
+
+		    setGPLInputFile(inputFile)
+		    numProbes = parseGPLFile() //probeInfo, snpGeneMap, snpMapFile)
+		    if(numProbes == expectedProbes[names[i]])
+			logger.info("Probes in " + names[i] + ": " + numProbes + "; expected: " + expectedProbes[names[i]])
+		    else
+			logger.warn("Probes in " + names[i] + ": " + numProbes + "; expected: " + expectedProbes[names[i]])
 		}else{
-
-
-			GexGPL gpl = new GexGPL()
-			gpl.setSql(biomart)
-			gpl.setAnnotationTable(props.get("annotation_table"))
-
-			if(props.get("recreate_annotation_table").toString().toLowerCase().equals("yes")){
-				logger.info "Start recreating annotation table ${props.get("annotation_table")} for GPL GX annotation file(s) ..."
-				gpl.createAnnotationTable()
-			}
-
-
-			String annotationSourceDirectory = props.get("annotation_source")
-			String [] gplList = props.get("gpl_list").split(/\,/)
-			gplList.each {
-				File annotationSource = new File(annotationSourceDirectory + File.separator + "GPL." + it + ".txt")
-				gpl.loadGxGPLs(annotationSource)
-			}
+		    logger.warn("Cannot find the file: " + inputFile.toString())
 		}
+	    }
+	}else{
+	    File inputFile = new File(sourceDirectory + File.separator + inputFileName)
+
+	    logger.info("Start parsing " + inputFile.toString())
+
+	    setGPLInputFile(inputFile)
+	    numProbes = parseGPLFile() //probeInfo, snpGeneMap, snpMapFile)
+	    if(numProbes == expectedProbes[inputFileName])
+		logger.info("Probes in " + inputFileName + ": " + numProbes + "; expected: " + expectedProbes[inputFileName])
+	    else
+		logger.warn("Probes in " + inputFileName + ": " + numProbes + "; expected: " + expectedProbes[inputFileName])
 	}
+    }
 
-	void processGPLs(String inputFileName){
+    long parseGPLFile(){
+	String [] str, header
+	def genes = [:]
+	boolean isHeaderLine = false
+	boolean isAnnotationLine = false
 
-		long numProbes
-		if(inputFileName.indexOf(";")){
-			String [] names = inputFileName.split(";")
-			for(int i in 0..names.size()-1){
-				File inputFile = new File(sourceDirectory + File.separator + names[i])
+	StringBuffer sb_probeinfo = new StringBuffer()
+	StringBuffer sb_snpGeneMap = new StringBuffer()
+	StringBuffer sb_snpMap = new StringBuffer()
 
-				if(inputFile.exists()){
-					logger.info("Start parsing " + inputFile.toString())
+	long numProbes = 0
+	gplInput.eachLine{
+	    str = it.split("\t")
+	    if(str.size() > 14){
+		if(it.indexOf("ID") == 0) {
+		    isHeaderLine = true
 
-					setGPLInputFile(inputFile)
-					numProbes = parseGPLFile() //probeInfo, snpGeneMap, snpMapFile)
-					if(numProbes == expectedProbes[names[i]])
-						logger.info("Probes in " + names[i] + ": " + numProbes + "; expected: " + expectedProbes[names[i]])
-					else
-						logger.warn("Probes in " + names[i] + ": " + numProbes + "; expected: " + expectedProbes[names[i]])
-				}else{
-					logger.warn("Cannot find the file: " + inputFile.toString())
-				}
-			}
+		    if((gplInput.name.indexOf("GPL2004") > -1) || (gplInput.name.indexOf("GPL2005") > -1)){
+			// used for GPL2004 and GPL2005
+			logger.info str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[5] + "\t" + str[12]
+		    }
+
+		    if((gplInput.name.indexOf("GPL3718") > -1) || (gplInput.name.indexOf("GPL3720") > -1)){
+			// used for GPL3718 and GPL3720
+			logger.info str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[5] + "\t" + str[13]
+		    }
 		}else{
-			File inputFile = new File(sourceDirectory + File.separator + inputFileName)
-
-			logger.info("Start parsing " + inputFile.toString())
-
-			setGPLInputFile(inputFile)
-			numProbes = parseGPLFile() //probeInfo, snpGeneMap, snpMapFile)
-			if(numProbes == expectedProbes[inputFileName])
-				logger.info("Probes in " + inputFileName + ": " + numProbes + "; expected: " + expectedProbes[inputFileName])
-			else
-				logger.warn("Probes in " + inputFileName + ": " + numProbes + "; expected: " + expectedProbes[inputFileName])
-		}
-	}
-
-
-	long parseGPLFile(){
-		String [] str, header
-		def genes = [:]
-		boolean isHeaderLine = false
-		boolean isAnnotationLine = false
-
-		StringBuffer sb_probeinfo = new StringBuffer()
-		StringBuffer sb_snpGeneMap = new StringBuffer()
-		StringBuffer sb_snpMap = new StringBuffer()
-
-		long numProbes = 0
-		gplInput.eachLine{
-			str = it.split("\t")
-			if(str.size() > 14){
-				if(it.indexOf("ID") == 0) {
-					isHeaderLine = true
-
-					if((gplInput.name.indexOf("GPL2004") > -1) || (gplInput.name.indexOf("GPL2005") > -1)){
-						// used for GPL2004 and GPL2005
-						logger.info str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[5] + "\t" + str[12]
-					}
-
-					if((gplInput.name.indexOf("GPL3718") > -1) || (gplInput.name.indexOf("GPL3720") > -1)){
-						// used for GPL3718 and GPL3720
-						logger.info str[0] + "\t" + str[1] + "\t" + str[2] + "\t" + str[5] + "\t" + str[13]
-					}
-				}else{
-					//if(isHeaderLine && numProbes < 10) {
-					if(isHeaderLine) {
-						String snpId, rsId, chr, pos
-						if((gplInput.name.indexOf("GPL2004") > -1) || (gplInput.name.indexOf("GPL2005") > -1)){
-							// used for GPL2004 and GPL2005
-							snpId = str[0].trim()
-							rsId = str[1].trim()
-							chr = str[2].trim()
-							pos = str[5].trim()
-							genes = getSNPGeneMapping(str[12])
-						}
-
-						if((gplInput.name.indexOf("GPL3718") > -1) || (gplInput.name.indexOf("GPL3720") > -1)){
-							// used for GPL3718 and GPL3720
-							snpId = str[0].trim()
-							rsId = str[2].trim()
-							chr = str[3].trim()
-							pos = str[6].trim()
-							genes = getSNPGeneMapping(str[13])
-
-						}
-
-						if(!chr.equals(null) && !pos.equals(null) && (chr.size()>0) && (pos.size() > 0) &&
-						!(snpId.indexOf("AFFX") >= 0)){
-							numProbes++
-							if(!rsId.equals(null) && (rsId.indexOf("---") == -1))  sb_probeinfo.append(snpId + "\t" + rsId + "\n")
-							sb_snpMap.append(chr + "\t" + snpId + "\t0\t" + pos + "\n")
-						}
-
-						genes.each { key, val ->
-							String [] s = val.split(":")
-							String mappingRecord = str[0] + "\t" + key
-							sb_snpGeneMap.append(mappingRecord + "\n")
-						}
-					}
-				}
+		    //if(isHeaderLine && numProbes < 10) {
+		    if(isHeaderLine) {
+			String snpId, rsId, chr, pos
+			if((gplInput.name.indexOf("GPL2004") > -1) || (gplInput.name.indexOf("GPL2005") > -1)){
+			    // used for GPL2004 and GPL2005
+			    snpId = str[0].trim()
+			    rsId = str[1].trim()
+			    chr = str[2].trim()
+			    pos = str[5].trim()
+			    genes = getSNPGeneMapping(str[12])
 			}
-		}
 
-		probeInfo.append(sb_probeinfo.toString())
-		snpGeneMap.append(sb_snpGeneMap.toString())
-		snpMap.append(sb_snpMap.toString())
-
-		return numProbes
-	}
-
-
-	Map getSNPGeneMapping(String associatedGene){
-
-		String [] str, gene
-		def mapping = [:]
-
-		if(associatedGene.indexOf("///") >= 0) {
-			str = associatedGene.split("///")
-			for(int i in 0..str.size()-1) {
-
-				if(str[i].indexOf("//")) {
-					gene = str[i].split("//")
-					if(gene.size() >= 6 &&  !(gene[5].indexOf("---") >= 0)){
-						// 4 -- gene symbol; 5 -- gene id; 6 -- gene description
-						//println gene[4] + ":" + gene[5] + ":" + gene[6]
-						mapping[gene[5].trim()] = gene[4].trim() + ":" + gene[6].trim()
-					}
-				}
+			if((gplInput.name.indexOf("GPL3718") > -1) || (gplInput.name.indexOf("GPL3720") > -1)){
+			    // used for GPL3718 and GPL3720
+			    snpId = str[0].trim()
+			    rsId = str[2].trim()
+			    chr = str[3].trim()
+			    pos = str[6].trim()
+			    genes = getSNPGeneMapping(str[13])
 			}
+
+			if(!chr.equals(null) && !pos.equals(null) && (chr.size()>0) && (pos.size() > 0) &&
+			   !(snpId.indexOf("AFFX") >= 0)){
+			    numProbes++
+			    if(!rsId.equals(null) && (rsId.indexOf("---") == -1))  sb_probeinfo.append(snpId + "\t" + rsId + "\n")
+			    sb_snpMap.append(chr + "\t" + snpId + "\t0\t" + pos + "\n")
+			}
+
+			genes.each { key, val ->
+			    String [] s = val.split(":")
+			    String mappingRecord = str[0] + "\t" + key
+			    sb_snpGeneMap.append(mappingRecord + "\n")
+			}
+		    }
 		}
-		return mapping
+	    }
 	}
 
+	probeInfo.append(sb_probeinfo.toString())
+	snpGeneMap.append(sb_snpGeneMap.toString())
+	snpMap.append(sb_snpMap.toString())
 
-	void setProbeInfo(File probeInfo){
-		this.probeInfo = probeInfo
+	return numProbes
+    }
+
+    Map getSNPGeneMapping(String associatedGene){
+
+	String [] str, gene
+	def mapping = [:]
+
+	if(associatedGene.indexOf("///") >= 0) {
+	    str = associatedGene.split("///")
+	    for(int i in 0..str.size()-1) {
+
+		if(str[i].indexOf("//")) {
+		    gene = str[i].split("//")
+		    if(gene.size() >= 6 &&  !(gene[5].indexOf("---") >= 0)){
+			// 4 -- gene symbol; 5 -- gene id; 6 -- gene description
+			//println gene[4] + ":" + gene[5] + ":" + gene[6]
+			mapping[gene[5].trim()] = gene[4].trim() + ":" + gene[6].trim()
+		    }
+		}
+	    }
 	}
+	return mapping
+    }
 
-	void setSnpGeneMap(File snpGeneMap){
-		this.snpGeneMap = snpGeneMap
-	}
+    void setProbeInfo(File probeInfo){
+	this.probeInfo = probeInfo
+    }
 
+    void setSnpGeneMap(File snpGeneMap){
+	this.snpGeneMap = snpGeneMap
+    }
 
-	void setSnpMap(File snpMap){
-		this.snpMap = snpMap
-	}
+    void setSnpMap(File snpMap){
+	this.snpMap = snpMap
+    }
 
+    void setGPLInputFile(File gplInput){
+	this.gplInput = gplInput
+    }
 
-	void setGPLInputFile(File gplInput){
-		this.gplInput = gplInput
-	}
+    void setSourceDirectory(String sourceDirectory){
+	this.sourceDirectory = sourceDirectory
+    }
 
+    void setExpectedProbes(Map expectedProbes){
+	this.expectedProbes = expectedProbes
+    }
 
-	void setSourceDirectory(String sourceDirectory){
-		this.sourceDirectory = sourceDirectory
-	}
-
-	void setExpectedProbes(Map expectedProbes){
-		this.expectedProbes = expectedProbes
-	}
-
-	void setSql(Sql sql){
-		this.sql = sql
-	}
+    void setSql(Sql sql){
+	this.sql = sql
+    }
 }
