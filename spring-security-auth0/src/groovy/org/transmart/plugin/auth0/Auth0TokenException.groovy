@@ -10,8 +10,8 @@ import org.springframework.security.core.AuthenticationException
  */
 @CompileStatic
 class Auth0TokenException extends AuthenticationException {
-	Auth0TokenException(Exception cause) {
-		super(cause.getClass().simpleName + ' thrown while decoding JWT token: ' +
-				cause.localizedMessage, cause)
-	}
+    Auth0TokenException(Exception cause) {
+	super(cause.getClass().simpleName + ' thrown while decoding JWT token: ' +
+	      cause.localizedMessage, cause)
+    }
 }

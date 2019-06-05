@@ -18,22 +18,22 @@ import java.security.SignatureException
 @CompileStatic
 class Auth0AuthenticationProvider implements AuthenticationProvider {
 
-	AuthService authService
+    AuthService authService
 
-	Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		try {
-			Auth0JWTToken tokenAuth = ((Auth0JWTToken) authentication)
-			tokenAuth.principal = authService.loadAuthUserDetailsByUniqueId(tokenAuth.decodedJWT.subject)
-			tokenAuth.authenticated = true
-			authentication
-		}
-		catch (InvalidKeyException | NoSuchAlgorithmException | IllegalStateException |
-		       SignatureException | IOException | JWTVerificationException e) {
-			throw new Auth0TokenException(e)
-		}
+    Authentication authenticate(Authentication authentication) throws AuthenticationException {
+	try {
+	    Auth0JWTToken tokenAuth = ((Auth0JWTToken) authentication)
+	    tokenAuth.principal = authService.loadAuthUserDetailsByUniqueId(tokenAuth.decodedJWT.subject)
+	    tokenAuth.authenticated = true
+	    authentication
 	}
+	catch (InvalidKeyException | NoSuchAlgorithmException | IllegalStateException |
+	       SignatureException | IOException | JWTVerificationException e) {
+	    throw new Auth0TokenException(e)
+	}
+    }
 
-	boolean supports(Class<?> authentication) {
-		Auth0JWTToken.isAssignableFrom authentication
-	}
+    boolean supports(Class<?> authentication) {
+	Auth0JWTToken.isAssignableFrom authentication
+    }
 }

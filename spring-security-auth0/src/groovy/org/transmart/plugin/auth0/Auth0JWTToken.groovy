@@ -15,33 +15,33 @@ import org.transmart.plugin.shared.security.AuthUserDetails
  */
 @CompileStatic
 class Auth0JWTToken extends AbstractAuthenticationToken {
-	private static final long serialVersionUID = 1
+    private static final long serialVersionUID = 1
 
-	AuthUserDetails principal
+    AuthUserDetails principal
 
-	Auth0JWTToken(String jwt) {
-		super(null)
-		Assert.notNull jwt, 'JWT token is required for authentication'
-		details = JWT.decode(jwt)
-	}
+    Auth0JWTToken(String jwt) {
+	super(null)
+	Assert.notNull jwt, 'JWT token is required for authentication'
+	details = JWT.decode(jwt)
+    }
 
-	String getCredentials() { jwtToken }
+    String getCredentials() { jwtToken }
 
-	String getJwtToken() { decodedJWT.token }
+    String getJwtToken() { decodedJWT.token }
 
-	Collection<GrantedAuthority> getAuthorities() {
-		(Collection<GrantedAuthority>) principal?.authorities
-	}
+    Collection<GrantedAuthority> getAuthorities() {
+	(Collection<GrantedAuthority>) principal?.authorities
+    }
 
-	DecodedJWT getDecodedJWT() {
-		(DecodedJWT) details
-	}
+    DecodedJWT getDecodedJWT() {
+	(DecodedJWT) details
+    }
 
-	boolean hasExpired() {
-		decodedJWT?.expiresAt?.before new Date()
-	}
+    boolean hasExpired() {
+	decodedJWT?.expiresAt?.before new Date()
+    }
 
-	boolean isAuthenticated() {
-		super.isAuthenticated() && !hasExpired()
-	}
+    boolean isAuthenticated() {
+	super.isAuthenticated() && !hasExpired()
+    }
 }

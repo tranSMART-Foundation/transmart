@@ -24,55 +24,55 @@ import java.util.regex.Pattern
 @CompileStatic
 class Auth0AuthenticationFilter extends GenericFilterBean {
 
-	protected static final Pattern bearerPattern = Pattern.compile('^Bearer$', Pattern.CASE_INSENSITIVE)
+    protected static final Pattern bearerPattern = Pattern.compile('^Bearer$', Pattern.CASE_INSENSITIVE)
 
-	AuthenticationManager authenticationManager
-	AuthenticationEntryPoint entryPoint
+    AuthenticationManager authenticationManager
+    AuthenticationEntryPoint entryPoint
 
-	void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest) req
-		HttpServletResponse response = (HttpServletResponse) res
-		if (request.method == 'OPTIONS') {
-			// CORS / X-domain pre-flight request
-			chain.doFilter request, response
-			return
-		}
-
-		if (!SecurityContextHolder.context.authentication) {
-			String jwt = getToken(request)
-			if (jwt) {
-				try {
-					SecurityContextHolder.context.authentication = authenticationManager.authenticate(
-							new Auth0JWTToken(jwt))
-				}
-				catch (AuthenticationException e) {
-					SecurityContextHolder.clearContext()
-					entryPoint.commence request, response, e
-					return
-				}
-			}
-		}
-
-		chain.doFilter request, response
+    void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+	HttpServletRequest request = (HttpServletRequest) req
+	HttpServletResponse response = (HttpServletResponse) res
+	if (request.method == 'OPTIONS') {
+	    // CORS / X-domain pre-flight request
+	    chain.doFilter request, response
+	    return
 	}
 
-	/**
-	 * Looks at the authorization bearer http header and extracts the JWT.
-	 */
-	protected String getToken(HttpServletRequest request) {
-		String authorizationHeader = request.getHeader('authorization')
-		if (!authorizationHeader) {
-			return null
+	if (!SecurityContextHolder.context.authentication) {
+	    String jwt = getToken(request)
+	    if (jwt) {
+		try {
+		    SecurityContextHolder.context.authentication = authenticationManager.authenticate(
+			new Auth0JWTToken(jwt))
 		}
-
-		String[] parts = authorizationHeader.split(' ')
-		if (parts.length != 2) {
-			return null
+		catch (AuthenticationException e) {
+		    SecurityContextHolder.clearContext()
+		    entryPoint.commence request, response, e
+		    return
 		}
-
-		String scheme = parts[0]
-		String credentials = parts[1]
-
-		bearerPattern.matcher(scheme).matches() ? credentials : null
+	    }
 	}
+
+	chain.doFilter request, response
+    }
+
+    /**
+     * Looks at the authorization bearer http header and extracts the JWT.
+     */
+    protected String getToken(HttpServletRequest request) {
+	String authorizationHeader = request.getHeader('authorization')
+	if (!authorizationHeader) {
+	    return null
+	}
+
+	String[] parts = authorizationHeader.split(' ')
+	if (parts.length != 2) {
+	    return null
+	}
+
+	String scheme = parts[0]
+	String credentials = parts[1]
+
+	bearerPattern.matcher(scheme).matches() ? credentials : null
+    }
 }

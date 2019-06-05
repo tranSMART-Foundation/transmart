@@ -10,32 +10,32 @@ import spock.lang.Specification
  */
 class Auth0AuthenticationEntryPointSpec extends Specification {
 
-	private Auth0AuthenticationEntryPoint entryPoint = new Auth0AuthenticationEntryPoint()
-	private MockHttpServletRequest request = new MockHttpServletRequest()
-	private MockHttpServletResponse response = new MockHttpServletResponse()
+    private Auth0AuthenticationEntryPoint entryPoint = new Auth0AuthenticationEntryPoint()
+    private MockHttpServletRequest request = new MockHttpServletRequest()
+    private MockHttpServletResponse response = new MockHttpServletResponse()
 
-	void 'test commence for options request'() {
-		when:
-		request.method = 'OPTIONS'
-		entryPoint.commence request, response, null
+    void 'test commence for options request'() {
+	when:
+	    request.method = 'OPTIONS'
+	entryPoint.commence request, response, null
 
-		then:
-		response.status == 204
-	}
+	then:
+	    response.status == 204
+    }
 
-	void 'test commence for Auth0TokenException'() {
-		when:
-		entryPoint.commence request, response, new Auth0TokenException(new NullPointerException())
+    void 'test commence for Auth0TokenException'() {
+	when:
+	    entryPoint.commence request, response, new Auth0TokenException(new NullPointerException())
 
-		then:
-		response.status == 401
-	}
+	then:
+	    response.status == 401
+    }
 
-	void 'test commence for other exception'() {
-		when:
-		entryPoint.commence request, response, new NoStackUsernameNotFoundException()
+    void 'test commence for other exception'() {
+	when:
+	    entryPoint.commence request, response, new NoStackUsernameNotFoundException()
 
-		then:
-		response.status == 403
-	}
+	then:
+	    response.status == 403
+    }
 }

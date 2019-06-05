@@ -20,18 +20,18 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED
 @CompileStatic
 class Auth0AuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-	void commence(HttpServletRequest request, HttpServletResponse response,
-	              AuthenticationException e) throws IOException, ServletException {
+    void commence(HttpServletRequest request, HttpServletResponse response,
+	          AuthenticationException e) throws IOException, ServletException {
 
-		if ('OPTIONS' == request.method) {
-			// X-domain pre-flight request
-			response.status = SC_NO_CONTENT
-		}
-		else if (e instanceof Auth0TokenException) {
-			response.sendError SC_UNAUTHORIZED, e.message
-		}
-		else {
-			response.sendError SC_FORBIDDEN, e.message
-		}
+	if ('OPTIONS' == request.method) {
+	    // X-domain pre-flight request
+	    response.status = SC_NO_CONTENT
 	}
+	else if (e instanceof Auth0TokenException) {
+	    response.sendError SC_UNAUTHORIZED, e.message
+	}
+	else {
+	    response.sendError SC_FORBIDDEN, e.message
+	}
+    }
 }

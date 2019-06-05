@@ -30,94 +30,94 @@ import javax.servlet.http.HttpServletResponse
 @Slf4j('logger')
 class AuthService {
 
-	protected static final GrantedAuthority PUBLIC_USER = new SimpleGrantedAuthority(Roles.PUBLIC_USER.authority)
+    protected static final GrantedAuthority PUBLIC_USER = new SimpleGrantedAuthority(Roles.PUBLIC_USER.authority)
 
-	@Autowired private List<LogoutHandler> logoutHandlers
-	@Autowired private SecurityService securityService
-	@Autowired private UserService userService
+    @Autowired private List<LogoutHandler> logoutHandlers
+    @Autowired private SecurityService securityService
+    @Autowired private UserService userService
 
-	/**
-	 * Find the <code>AuthUser</code> with the specified unique id and build
-	 * an <code>AuthUserDetails</code> instance from it.
-	 */
-	@Transactional(readOnly = true, noRollbackFor = [IllegalArgumentException, UsernameNotFoundException])
-	AuthUserDetails loadAuthUserDetailsByUniqueId(String uniqueId) throws UsernameNotFoundException {
-		AuthUser authUser = userService.findBy('uniqueId', uniqueId)
-		if (authUser) {
-			userDetails authUser
-		}
-		else {
-			logger.warn 'No AuthUser found with uniqueId/subject "{}"', uniqueId
-			throw new NoStackUsernameNotFoundException()
-		}
+    /**
+     * Find the <code>AuthUser</code> with the specified unique id and build
+     * an <code>AuthUserDetails</code> instance from it.
+     */
+    @Transactional(readOnly = true, noRollbackFor = [IllegalArgumentException, UsernameNotFoundException])
+    AuthUserDetails loadAuthUserDetailsByUniqueId(String uniqueId) throws UsernameNotFoundException {
+	AuthUser authUser = userService.findBy('uniqueId', uniqueId)
+	if (authUser) {
+	    userDetails authUser
+	}
+	else {
+	    logger.warn 'No AuthUser found with uniqueId/subject "{}"', uniqueId
+	    throw new NoStackUsernameNotFoundException()
+	}
+    }
+
+    /**
+     * Find the <code>AuthUser</code> with the specified username and build
+     * an <code>AuthUserDetails</code> instance from it.
+     */
+    @Transactional(readOnly = true, noRollbackFor = [IllegalArgumentException, UsernameNotFoundException])
+    AuthUserDetails loadAuthUserDetails(String username) throws UsernameNotFoundException {
+	AuthUser authUser = userService.authUser(username)
+	if (authUser) {
+	    userDetails authUser
+	}
+	else {
+	    logger.warn 'No AuthUser found with username "{}"', username
+	    throw new NoStackUsernameNotFoundException()
+	}
+    }
+
+    protected AuthUserDetails userDetails(AuthUser authUser) {
+	List<GrantedAuthority> authorities = []
+	for (Role role in authUser.authorities) {
+	    authorities << new SimpleGrantedAuthority(role.authority)
+	}
+	if (!authorities) {
+	    authorities << PUBLIC_USER // TODO
 	}
 
-	/**
-	 * Find the <code>AuthUser</code> with the specified username and build
-	 * an <code>AuthUserDetails</code> instance from it.
-	 */
-	@Transactional(readOnly = true, noRollbackFor = [IllegalArgumentException, UsernameNotFoundException])
-	AuthUserDetails loadAuthUserDetails(String username) throws UsernameNotFoundException {
-		AuthUser authUser = userService.authUser(username)
-		if (authUser) {
-			userDetails authUser
-		}
-		else {
-			logger.warn 'No AuthUser found with username "{}"', username
-			throw new NoStackUsernameNotFoundException()
-		}
-	}
+	new AuthUserDetails(authUser.username, authUser.passwd, authUser.enabled, true /*!user.accountExpired*/,
+			    true, true /*!user.accountLocked*/, authorities,
+			    authUser.id, authUser.userRealName, authUser.email)
+    }
 
-	protected AuthUserDetails userDetails(AuthUser authUser) {
-		List<GrantedAuthority> authorities = []
-		for (Role role in authUser.authorities) {
-			authorities << new SimpleGrantedAuthority(role.authority)
-		}
-		if (!authorities) {
-			authorities << PUBLIC_USER // TODO
-		}
-
-		new AuthUserDetails(authUser.username, authUser.passwd, authUser.enabled, true /*!user.accountExpired*/,
-				true, true /*!user.accountLocked*/, authorities,
-				authUser.id, authUser.userRealName, authUser.email)
+    void logout() {
+	Authentication authentication = SecurityContextHolder.context.authentication
+	if (authentication) {
+	    HttpServletRequest request = currentRequest()
+	    HttpServletResponse response = currentResponse()
+	    for (LogoutHandler handler in logoutHandlers) {
+		handler.logout request, response, authentication
+	    }
 	}
+    }
 
-	void logout() {
-		Authentication authentication = SecurityContextHolder.context.authentication
-		if (authentication) {
-			HttpServletRequest request = currentRequest()
-			HttpServletResponse response = currentResponse()
-			for (LogoutHandler handler in logoutHandlers) {
-				handler.logout request, response, authentication
-			}
-		}
+    @Transactional
+    void grantRoles(AuthUser user, Roles... roles) {
+	for (Roles role in roles) {
+	    grantRole user, role
 	}
+    }
 
-	@Transactional
-	void grantRoles(AuthUser user, Roles... roles) {
-		for (Roles role in roles) {
-			grantRole user, role
-		}
-	}
+    @CompileDynamic // TODO use GrailsCompileStatic
+    protected void grantRole(AuthUser user, Roles role) {
+	Role.createCriteria().get {
+	    eq 'authority', role.authority
+	    cache true
+	    lock true
+	}.addToPeople user
+    }
 
-	@CompileDynamic // TODO use GrailsCompileStatic
-	protected void grantRole(AuthUser user, Roles role) {
-		Role.createCriteria().get {
-			eq 'authority', role.authority
-			cache true
-			lock true
-		}.addToPeople user
-	}
+    protected HttpServletRequest currentRequest() {
+	currentRequestAttributes().request
+    }
 
-	protected HttpServletRequest currentRequest() {
-		currentRequestAttributes().request
-	}
+    protected HttpServletResponse currentResponse() {
+	currentRequestAttributes().response
+    }
 
-	protected HttpServletResponse currentResponse() {
-		currentRequestAttributes().response
-	}
-
-	protected GrailsWebRequest currentRequestAttributes() {
-		(GrailsWebRequest) RequestContextHolder.currentRequestAttributes()
-	}
+    protected GrailsWebRequest currentRequestAttributes() {
+	(GrailsWebRequest) RequestContextHolder.currentRequestAttributes()
+    }
 }
