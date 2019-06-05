@@ -24,139 +24,139 @@ import java.lang.reflect.Method
 @Slf4j('logger')
 class CustomizationService implements InitializingBean  {
 
-	static transactional = false
+    static transactional = false
 
-	private Map<String, Map<String, UserLevel>> levels = [:].withDefault { [:] } as Map
-	private Map<String, String> controllerDefaultActions = [:]
+    private Map<String, Map<String, UserLevel>> levels = [:].withDefault { [:] } as Map
+    private Map<String, String> controllerDefaultActions = [:]
 
-	@Autowired private GrailsApplication grailsApplication
-	@Autowired private SecurityService securityService
+    @Autowired private GrailsApplication grailsApplication
+    @Autowired private SecurityService securityService
 
-	/**
-	 * Get the user level for the current user.
-	 *
-	 * @return UNREGISTERED if not authenticated,
-	 *         ADMIN if the user has ROLE_ADMIN,
-	 *         TWO if the user has ROLE_DATASET_EXPLORER_ADMIN,
-	 *         ONE if the user has ROLE_STUDY_OWNER,
-	 *         ZERO otherwise
-	 */
-	UserLevel currentUserLevel() {
-		if (securityService.loggedIn()) {
-			userLevel securityService.principal().authorities.collect { GrantedAuthority a -> a.authority }
-		}
-		else {
-			UserLevel.UNREGISTERED
-		}
+    /**
+     * Get the user level for the current user.
+     *
+     * @return UNREGISTERED if not authenticated,
+     *         ADMIN if the user has ROLE_ADMIN,
+     *         TWO if the user has ROLE_DATASET_EXPLORER_ADMIN,
+     *         ONE if the user has ROLE_STUDY_OWNER,
+     *         ZERO otherwise
+     */
+    UserLevel currentUserLevel() {
+	if (securityService.loggedIn()) {
+	    userLevel securityService.principal().authorities.collect { GrantedAuthority a -> a.authority }
 	}
-
-	/**
-	 * Get the user level for the specified user. Do not call this if the user is
-	 * currently authenticated as it would result in unnecessary database calls;
-	 * use currentUserLevel() instead.
-	 *
-	 * @return ADMIN if the user has ROLE_ADMIN,
-	 *         TWO if the user has ROLE_DATASET_EXPLORER_ADMIN,
-	 *         ONE if the user has ROLE_STUDY_OWNER,
-	 *         ZERO otherwise
-	 */
-	UserLevel userLevel(AuthUser authUser) {
-		if (authUser.username == securityService.currentUsername()) {
-			currentUserLevel()
-		}
-		else {
-			userLevel authUser.authorities*.authority
-		}
+	else {
+	    UserLevel.UNREGISTERED
 	}
+    }
 
-	/**
-	 * Get the user level for the given role names.
-	 *
-	 * @return ADMIN if the user has ROLE_ADMIN,
-	 *         TWO if the user has ROLE_DATASET_EXPLORER_ADMIN,
-	 *         ONE if the user has ROLE_STUDY_OWNER,
-	 *         ZERO otherwise
-	 */
-	UserLevel userLevel(Collection<String> roleNames) {
-		if (roleNames.contains(Roles.ADMIN.authority)) {
-			UserLevel.ADMIN
-		}
-		else if (roleNames.contains(Roles.DATASET_EXPLORER_ADMIN.authority)) {
-			UserLevel.TWO
-		}
-		else if (roleNames.contains(Roles.STUDY_OWNER.authority)) {
-			UserLevel.ONE
-		}
-		else {
-			UserLevel.ZERO
-		}
+    /**
+     * Get the user level for the specified user. Do not call this if the user is
+     * currently authenticated as it would result in unnecessary database calls;
+     * use currentUserLevel() instead.
+     *
+     * @return ADMIN if the user has ROLE_ADMIN,
+     *         TWO if the user has ROLE_DATASET_EXPLORER_ADMIN,
+     *         ONE if the user has ROLE_STUDY_OWNER,
+     *         ZERO otherwise
+     */
+    UserLevel userLevel(AuthUser authUser) {
+	if (authUser.username == securityService.currentUsername()) {
+	    currentUserLevel()
 	}
+	else {
+	    userLevel authUser.authorities*.authority
+	}
+    }
 
-	void checkUserLevelAccess(String controller, String action) {
-		String username = securityService.currentUsername()
-		logger.debug 'checkUserLevelAccess() controller "{}" action "{}" user "{}"', controller, action, username
-		if (controller && levels.containsKey(controller)) {
-			if (!action) {
-				action = controllerDefaultActions[controller]
-			}
-			UserLevel minLevel = levels[controller][action]
-			if (!minLevel) {
-				logger.trace 'checkUserLevelAccess() no RequiresLevel annotation for /{}/{}', controller, action
-				return
-			}
+    /**
+     * Get the user level for the given role names.
+     *
+     * @return ADMIN if the user has ROLE_ADMIN,
+     *         TWO if the user has ROLE_DATASET_EXPLORER_ADMIN,
+     *         ONE if the user has ROLE_STUDY_OWNER,
+     *         ZERO otherwise
+     */
+    UserLevel userLevel(Collection<String> roleNames) {
+	if (roleNames.contains(Roles.ADMIN.authority)) {
+	    UserLevel.ADMIN
+	}
+	else if (roleNames.contains(Roles.DATASET_EXPLORER_ADMIN.authority)) {
+	    UserLevel.TWO
+	}
+	else if (roleNames.contains(Roles.STUDY_OWNER.authority)) {
+	    UserLevel.ONE
+	}
+	else {
+	    UserLevel.ZERO
+	}
+    }
 
-			UserLevel userLevel = currentUserLevel()
-			if (userLevel < minLevel) {
-				logger.error 'checkUserLevelAccess() {} < {}, access denied for /{}/{} user {}',
-						userLevel, minLevel, controller, action, username
-				throw new AccessDeniedException('You are not authorized to perform this action')
-			}
+    void checkUserLevelAccess(String controller, String action) {
+	String username = securityService.currentUsername()
+	logger.debug 'checkUserLevelAccess() controller "{}" action "{}" user "{}"', controller, action, username
+	if (controller && levels.containsKey(controller)) {
+	    if (!action) {
+		action = controllerDefaultActions[controller]
+	    }
+	    UserLevel minLevel = levels[controller][action]
+	    if (!minLevel) {
+		logger.trace 'checkUserLevelAccess() no RequiresLevel annotation for /{}/{}', controller, action
+		return
+	    }
 
-			logger.debug 'checkUserLevelAccess() {} >= {}, access allowed for /{}/{} user {}',
-					userLevel, minLevel, controller, action, username
+	    UserLevel userLevel = currentUserLevel()
+	    if (userLevel < minLevel) {
+		logger.error 'checkUserLevelAccess() {} < {}, access denied for /{}/{} user {}',
+		    userLevel, minLevel, controller, action, username
+		throw new AccessDeniedException('You are not authorized to perform this action')
+	    }
+	    
+	    logger.debug 'checkUserLevelAccess() {} >= {}, access allowed for /{}/{} user {}',
+		userLevel, minLevel, controller, action, username
+	}
+    }
+
+    /**
+     * Get a <code>Settings</code> instance for the currently authenticated user.
+     */
+    Settings userSetting(String name, long userId = securityService.currentUserId()) {
+	findSetting name, userId
+    }
+
+    /**
+     * Get a shared <code>Settings</code> instance.
+     */
+    Settings setting(String name) {
+	findSetting name, 0
+    }
+
+    void afterPropertiesSet() {
+	findControllerUserLevels()
+    }
+
+    protected void findControllerUserLevels() {
+	levels.clear()
+	for (GrailsClass gc in grailsApplication.getArtefacts(ControllerArtefactHandler.TYPE)) {
+	    String controllerName = gc.logicalPropertyName
+	    controllerDefaultActions[controllerName] = ((GrailsControllerClass) gc).defaultAction
+
+	    for (Method method in gc.clazz.methods) {
+		RequiresLevel annotation = method.getAnnotation(RequiresLevel)
+		if (annotation) {
+		    levels[controllerName][method.name] = annotation.value()
 		}
+	    }
 	}
+	logger.debug 'levels {}, controllerDefaultActions {}', levels, controllerDefaultActions
+    }
 
-	/**
-	 * Get a <code>Settings</code> instance for the currently authenticated user.
-	 */
-	Settings userSetting(String name, long userId = securityService.currentUserId()) {
-		findSetting name, userId
+    @CompileDynamic
+    private Settings findSetting(String name, long userId) {
+	Settings.createCriteria().get {
+	    eq 'fieldname', name
+	    eq 'userid', userId
+	    cache true
 	}
-
-	/**
-	 * Get a shared <code>Settings</code> instance.
-	 */
-	Settings setting(String name) {
-		findSetting name, 0
-	}
-
-	void afterPropertiesSet() {
-		findControllerUserLevels()
-	}
-
-	protected void findControllerUserLevels() {
-		levels.clear()
-		for (GrailsClass gc in grailsApplication.getArtefacts(ControllerArtefactHandler.TYPE)) {
-			String controllerName = gc.logicalPropertyName
-			controllerDefaultActions[controllerName] = ((GrailsControllerClass) gc).defaultAction
-
-			for (Method method in gc.clazz.methods) {
-				RequiresLevel annotation = method.getAnnotation(RequiresLevel)
-				if (annotation) {
-					levels[controllerName][method.name] = annotation.value()
-				}
-			}
-		}
-		logger.debug 'levels {}, controllerDefaultActions {}', levels, controllerDefaultActions
-	}
-
-	@CompileDynamic
-	private Settings findSetting(String name, long userId) {
-		Settings.createCriteria().get {
-			eq 'fieldname', name
-			eq 'userid', userId
-			cache true
-		}
-	}
+    }
 }

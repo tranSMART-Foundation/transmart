@@ -5,19 +5,19 @@ package org.transmart.plugin.custom
  */
 class CmsSection {
 
-	String closure
-	String instanceType
-	String name
+    String closure
+    String instanceType
+    String name
 
-	static mapping = {
-		table name: 'CMS_SECTION', schema: 'BIOMART_USER'
-		id generator: 'sequence', params: [sequence: 'BIOMART_USER.SEQ_CMS_SECTION_ID']
-		cache true
+    static mapping = {
+	table name: 'CMS_SECTION', schema: 'BIOMART_USER'
+	id generator: 'sequence', params: [sequence: 'BIOMART_USER.SEQ_CMS_SECTION_ID']
+	cache true
 
-		closure type: 'text'
-	}
+	closure type: 'text'
+    }
 
-	static constraints = {
-		name unique: 'instanceType'
-	}
+    static constraints = {
+	name unique: 'instanceType'
+    }
 }

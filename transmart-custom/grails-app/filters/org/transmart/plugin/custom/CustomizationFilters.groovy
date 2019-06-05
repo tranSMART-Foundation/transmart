@@ -5,32 +5,32 @@ package org.transmart.plugin.custom
  */
 class CustomizationFilters {
 
-	CmsService cmsService
-	CustomizationService customizationService
+    CmsService cmsService
+    CustomizationService customizationService
 
-	def filters = {
+    def filters = {
 
-		/**
-		 * Intercepts all requests to enforce minimum <code>UserLevel</code> for controller
-		 * actions annotated with <code>@RequiresLevel</code>.
-		 */
-		checkUserLevelAccess(controller: '*', action: '*') {
-			before = {
-				customizationService.checkUserLevelAccess controllerName, actionName
-			}
-		}
-
-		/**
-		 * Calls CmsService to store the current GSP model in a thread-local for
-		 * use by renderers.
-		 */
-		cmsModelAccess(controller: '*', action: '*') {
-			after = { Map model ->
-				cmsService.setModel model ?: [:]
-			}
-			afterView = { Exception e ->
-				cmsService.clearModel()
-			}
-		}
+	/**
+	 * Intercepts all requests to enforce minimum <code>UserLevel</code> for controller
+	 * actions annotated with <code>@RequiresLevel</code>.
+	 */
+	checkUserLevelAccess(controller: '*', action: '*') {
+	    before = {
+		customizationService.checkUserLevelAccess controllerName, actionName
+	    }
 	}
+
+	/**
+	 * Calls CmsService to store the current GSP model in a thread-local for
+	 * use by renderers.
+	 */
+	cmsModelAccess(controller: '*', action: '*') {
+	    after = { Map model ->
+		cmsService.setModel model ?: [:]
+	    }
+	    afterView = { Exception e ->
+		cmsService.clearModel()
+	    }
+	}
+    }
 }

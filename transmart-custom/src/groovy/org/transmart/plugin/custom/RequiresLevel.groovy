@@ -18,5 +18,5 @@ import java.lang.annotation.Target
 @Inherited
 @Documented
 @interface RequiresLevel {
-	UserLevel value()
+    UserLevel value()
 }
