@@ -7,17 +7,17 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 enum Roles {
-	ACROSS_TRIALS,
-	ADMIN,
-	DATASET_EXPLORER_ADMIN,
-	PUBLIC_USER,
-	SPECTATOR,
-	STUDY_OWNER,
-	TRAINING_USER
+    ACROSS_TRIALS,
+    ADMIN,
+    DATASET_EXPLORER_ADMIN,
+    PUBLIC_USER,
+    SPECTATOR,
+    STUDY_OWNER,
+    TRAINING_USER
 
-	final String authority
+    final String authority
 
-	private Roles() {
-		authority = 'ROLE_' + name()
-	}
+    private Roles() {
+	authority = 'ROLE_' + name()
+    }
 }

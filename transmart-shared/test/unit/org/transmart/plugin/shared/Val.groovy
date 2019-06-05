@@ -7,11 +7,11 @@ import grails.validation.Validateable
  */
 @Validateable
 class Val {
-	String s
-	Integer i
+    String s
+    Integer i
 
-	static constraints = {
-		s blank: false, nullable: false, maxSize: 20
-		i nullable: true, min: 2, max: 5
-	}
+    static constraints = {
+	s blank: false, nullable: false, maxSize: 20
+	i nullable: true, min: 2, max: 5
+    }
 }

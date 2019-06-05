@@ -15,37 +15,37 @@ import javax.servlet.http.HttpServletResponse
 @CompileStatic
 class UtilService {
 
-	static transactional = false
+    static transactional = false
 
-	@Autowired private MessageSource messageSource
+    @Autowired private MessageSource messageSource
 
-	/**
-	 * Resolves validation errors from message bundles and collects them by property name.
-	 * @param o a domain class instance or other Validateable
-	 * @return resolved error strings
-	 */
-	Map<String, List<String>> errorStrings(GroovyObject o, Locale locale = Locale.getDefault()) {
-		Map<String, List<String>> stringsByField = [:].withDefault { [] } as Map
-		if (o.hasProperty('errors')) {
-			Errors errors = (Errors) o['errors']
-			for (FieldError fieldError in errors.fieldErrors) {
-				stringsByField[fieldError.field] << messageSource.getMessage(fieldError, locale)
-			}
-		}
-		[:] + stringsByField
+    /**
+     * Resolves validation errors from message bundles and collects them by property name.
+     * @param o a domain class instance or other Validateable
+     * @return resolved error strings
+     */
+    Map<String, List<String>> errorStrings(GroovyObject o, Locale locale = Locale.getDefault()) {
+	Map<String, List<String>> stringsByField = [:].withDefault { [] } as Map
+	if (o.hasProperty('errors')) {
+	    Errors errors = (Errors) o['errors']
+	    for (FieldError fieldError in errors.fieldErrors) {
+		stringsByField[fieldError.field] << messageSource.getMessage(fieldError, locale)
+	    }
 	}
+	[:] + stringsByField
+    }
 
-	void sendDownload(HttpServletResponse response, String contentType, String filename, byte[] content) {
-		response.setHeader 'Content-Length', content.length as String
-		sendDownload response, contentType, filename, new ByteArrayInputStream(content)
-	}
+    void sendDownload(HttpServletResponse response, String contentType, String filename, byte[] content) {
+	response.setHeader 'Content-Length', content.length as String
+	sendDownload response, contentType, filename, new ByteArrayInputStream(content)
+    }
 
-	void sendDownload(HttpServletResponse response, String contentType, String filename, InputStream inputStream) {
-		if (contentType) {
-			response.contentType = contentType
-		}
-		response.setHeader 'Content-Disposition', 'attachment;filename=' + filename
-		StreamUtils.copy inputStream, response.outputStream
-		response.outputStream.flush()
+    void sendDownload(HttpServletResponse response, String contentType, String filename, InputStream inputStream) {
+	if (contentType) {
+	    response.contentType = contentType
 	}
+	response.setHeader 'Content-Disposition', 'attachment;filename=' + filename
+	StreamUtils.copy inputStream, response.outputStream
+	response.outputStream.flush()
+    }
 }

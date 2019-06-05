@@ -7,11 +7,11 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 class Utils {
-	private Utils() {
-		// static only
-	}
+    private Utils() {
+	// static only
+    }
 
-	static String asLikeLiteral(String s) {
-		s.replaceAll(/[\\%_]/, '\\\\$0')
-	}
+    static String asLikeLiteral(String s) {
+	s.replaceAll(/[\\%_]/, '\\\\$0')
+    }
 }

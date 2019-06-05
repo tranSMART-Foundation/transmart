@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
  */
 @CompileStatic
 class TestUserDetailsService implements UserDetailsService {
-	UserDetails loadUserByUsername(String username) {
-		new User(username, username, [])
-	}
+    UserDetails loadUserByUsername(String username) {
+	new User(username, username, [])
+    }
 }

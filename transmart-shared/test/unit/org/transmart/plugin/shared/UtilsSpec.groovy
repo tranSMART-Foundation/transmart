@@ -7,19 +7,19 @@ import spock.lang.Specification
  */
 class UtilsSpec extends Specification {
 
-	void 'test asLikeLiteral'(String input, String expected) {
+    void 'test asLikeLiteral'(String input, String expected) {
 
-		expect:
-		Utils.asLikeLiteral(input) == expected
+	expect:
+	    Utils.asLikeLiteral(input) == expected
 
-		where:
-		input | expected
-		''            | ''
-		'foo'         | 'foo'
-		'\\'          | '\\\\'
-		'%'           | '\\%'
-		'_'           | '\\_'
-		'\\%'         | '\\\\\\%'
-		'f%\\_oo\\\\' | 'f\\%\\\\\\_oo\\\\\\\\'
-	}
+	where:
+	    input | expected
+	    ''            | ''
+	    'foo'         | 'foo'
+	    '\\'          | '\\\\'
+	    '%'           | '\\%'
+	    '_'           | '\\_'
+	    '\\%'         | '\\\\\\%'
+	    'f%\\_oo\\\\' | 'f\\%\\\\\\_oo\\\\\\\\'
+    }
 }
