@@ -402,9 +402,9 @@ class ChartService {
         JFreeChart chart = null
         Color transparent = new Color(255, 255, 255, 0)
 
-        Color subset1SeriesColor = new Color(254, 220, 119, 150)
+        Color subset1SeriesColor = new Color(110, 155, 73, 150)
         Color subset2SeriesColor = new Color(110, 158, 200, 150)
-        Color subset1SeriesOutlineColor = new Color(214, 152, 13)
+        Color subset1SeriesOutlineColor = new Color(110, 155, 73)
         Color subset2SeriesOutlineColor = new Color(17, 86, 146)
 
         SVGGraphics2D renderer = new SVGGraphics2D(width, height)
@@ -528,7 +528,12 @@ class ChartService {
                     chart.plot.renderer.setSeriesPaint(0, subset2SeriesColor)
                     chart.plot.renderer.setSeriesOutlinePaint(0, subset2SeriesOutlineColor)
                 }
-                chart.plot.renderer.maximumBarWidth = 0.09
+		chart.plot.renderer.maximumBarWidth = 0.09
+		chart.plot.renderer.setSeriesOutlinePaint(0, subset1SeriesOutlineColor)
+		chart.plot.renderer.setSeriesOutlinePaint(1, subset2SeriesOutlineColor)
+		chart.plot.renderer.setUseOutlinePaintForWhiskers(true)
+		chart.plot.renderer.setSeriesPaint(0, new Color(110, 155, 73))
+		chart.plot.renderer.setSeriesPaint(1, new Color(110, 158, 200))
 
                 break
 
