@@ -237,6 +237,20 @@ div.analysissubtitle {
     margin-bottom: 15px;
 }
 
+table.stats_table {
+    margin-top: 5px;
+    border-collapse: collapse;
+}
+
+table.stats_table td {
+    border: 1px solid black;
+    padding: 5px;
+}
+
+.stats_title {
+    font-weight: bold;
+}
+
 div.smalltitle {
     padding-bottom: 5px !important;
 }

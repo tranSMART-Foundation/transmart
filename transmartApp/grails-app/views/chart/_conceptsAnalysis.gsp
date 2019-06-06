@@ -9,14 +9,24 @@
 			<g:if test="${concept.value?.commons?.omics_params != null}">
 			    <div class="analysissubtitle">${concept.value?.commons?.conceptKey ?: ""}</div>
 			</g:if>
-			<div style="margin-top: -15px; padding-bottom: 10px;">
+			<div style="margin-top: -15px; padding-bottom: 10px; font-size: 12px;">
 			    ${concept.value?.commons?.testmessage}<br/>
 			    <g:if test="${concept.value?.commons.pvalue != null}">
 				<g:if test="${concept.value?.commons.tstat != null && concept.value?.commons.tstat != Double.NaN}">
-				    With a <i>p-value of ${concept.value?.commons.pvalue}</i> for a <i>T-stat at ${concept.value?.commons.tstat}</i>
+				  <table class="stats_table">
+				    <tr><td><span class="stats_title">p-value</span></td>
+				      <td>${concept.value?.commons.pvalue}</td>
+				    </tr>
+				    <tr><td><span class="stats_title">t-statistic</span></td>
+				      <td>${concept.value?.commons.tstat}</td>
+				    </tr>
+				  </table>
 				</g:if>
 				<g:elseif test="${concept.value?.commons.chisquare != null && concept.value?.commons.chisquare != Double.NaN}">
-				    With a <i>p-value of ${concept.value?.commons.pvalue}</i> for a <i>χ² at ${concept.value?.commons.chisquare}</i>
+				  <table class="stats_table">
+				    <tr><td><span class="stats_title">p-Value</span></td><td>${concept.value?.commons.pvalue}</td></tr>
+                                    <tr><td><span class="stats_title">χ²</span></td><td>${concept.value?.commons.chisquare}</td></tr>
+				  </table>
 				</g:elseif>
 				<g:else>
 				    Variable arithmetically undefined <i>(NaN)</i>
