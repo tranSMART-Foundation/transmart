@@ -10,6 +10,8 @@ import org.jfree.chart.axis.ValueAxis
 import org.jfree.chart.entity.StandardEntityCollection
 import org.jfree.chart.labels.BoxAndWhiskerToolTipGenerator
 import org.jfree.chart.plot.CategoryPlot
+import org.jfree.chart.plot.PiePlot
+import org.jfree.chart.plot.PieLabelLinkStyle
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.category.BarRenderer
@@ -320,7 +322,9 @@ class ChartService {
 
                 // Getting the concept data
 		p.conceptData = i2b2HelperService.getConceptDistributionDataForConcept(concept, p.instance)
-                p.conceptBar = getSVGChart(type: 'bar', data: p.conceptData, size: [width: 400, height: p.conceptData.size() * 15 + 80])
+                p.conceptBar = getSVGChart(type: 'bar', data: p.conceptData,
+					   size: [width: 500, height: p.conceptData.size() * 22 + 90],
+					   ylabel: "Count", xlabel:"Concept")
             }
 
             // Let's calculate the χ² test if possible
@@ -388,6 +392,11 @@ class ChartService {
         // We retrieve the dimension if provided
 	int width = size?.width ?: 300
 	int height = size?.height ?: 300
+
+	if (type == 'pie') {
+	    width = 400;
+	    height = 400;
+	}
 
         // If no data is being sent we return an empty string
 	if (!data) {
@@ -599,14 +608,14 @@ class ChartService {
 
                 chart.title.font.size = 13
                 chart.title.padding = new RectangleInsets(30, 0, 0, 0)
-                chart.plot.labelBackgroundPaint = new Color(230, 230, 230)
-                chart.plot.labelOutlinePaint = new Color(130, 130, 130)
-                chart.plot.labelShadowPaint = transparent
-                chart.plot.labelPadding = new RectangleInsets(5, 5, 5, 5)
-                chart.plot.maximumLabelWidth = 0.2
-                chart.plot.shadowPaint = transparent
-                chart.plot.interiorGap = 0
-		chart.plot.baseSectionOutlinePaint = new Color(213, 18, 42)
+		PiePlot plot = (PiePlot) chart.getPlot();
+		plot.setLabelBackgroundPaint(null);
+		plot.setLabelOutlinePaint(null);
+		plot.setLabelShadowPaint(null);
+		plot.setMaximumLabelWidth(0.25);
+		plot.setShadowPaint(transparent);
+		plot.setInteriorGap(0.25);
+		plot.setLabelLinkStyle(PieLabelLinkStyle.STANDARD);
 
                 data.eachWithIndex { o, i ->
                     if(o.key){
@@ -641,8 +650,14 @@ class ChartService {
 						    false, true, false)
                 chart.setChartParameters()
 
-                chart.plot.renderer.setSeriesPaint(0, new Color(128, 193, 119))
-                chart.plot.renderer.setSeriesOutlinePaint(0, new Color(84, 151, 12))
+		def categoryPlot = chart.getCategoryPlot()
+                categoryPlot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_RIGHT)
+                categoryPlot.renderer.setSeriesPaint(0, new Color(128, 193, 119))
+                categoryPlot.renderer.setSeriesOutlinePaint(0, new Color(84, 151, 12))
+		CategoryAxis axis = new CategoryAxis();
+		axis.setMaximumCategoryLabelLines(2);
+		axis.configure();
+		categoryPlot.setDomainAxis(axis);
 
                 break
         }
