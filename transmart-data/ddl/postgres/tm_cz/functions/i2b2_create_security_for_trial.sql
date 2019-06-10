@@ -31,7 +31,6 @@ AS $$
     rowCt			numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
-    rtnCd			numeric;
 
     TrialID varchar(100);
     securedStudy varchar(5);
@@ -46,8 +45,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_CREATE_SECURITY_FOR_TRIAL';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_create_security_for_trial';
     
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -68,13 +67,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete security records for trial from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete security records for trial from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
     begin
 	insert into i2b2demodata.observation_fact
@@ -118,13 +117,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;	
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert security records for trial from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert security records for trial from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
     
     --	insert patients to patient_trial table
     
@@ -137,13 +136,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA patient_trial',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA patient_trial',rowCt,stepCt,'Done');
 
     begin
 	insert into i2b2demodata.patient_trial
@@ -162,13 +161,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial into I2B2DEMODATA patient_trial',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial into I2B2DEMODATA patient_trial',rowCt,stepCt,'Done');
     
     --	if secure study, then create bio_experiment record if needed and insert to search_secured_object
     
@@ -196,13 +195,13 @@ begin
 			errorNumber := SQLSTATE;
 			errorMessage := SQLERRM;
 		    --Handle errors.
-			select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+			perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		    --End Proc
-			select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+			perform tm_cz.cz_end_audit (jobID, 'FAIL');
 			return -16;	
 		end;
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial/study into biomart.bio_experiment',rowCt,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial/study into biomart.bio_experiment',rowCt,stepCt,'Done');
 	    end if;
 	    
 	    select bio_experiment_id into v_bio_experiment_id
@@ -234,13 +233,13 @@ begin
 		    errorNumber := SQLSTATE;
 		    errorMessage := SQLERRM;
 		--Handle errors.
-		    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		    return -16;	
 	    end;
 	    stepCt := stepCt + 1;
-	    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted trial/study into SEARCHAPP search_secure_object',rowCt,stepCt,'Done') into rtnCd;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted trial/study into SEARCHAPP search_secure_object',rowCt,stepCt,'Done');
 	end if;
     else
 	--	if securedStudy = N, delete entry from searchapp.search_secure_object
@@ -254,20 +253,20 @@ begin
 		    errorNumber := SQLSTATE;
 		    errorMessage := SQLERRM;
 		--Handle errors.
-		    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		    return -16;	
 	    end;
 	    stepCt := stepCt + 1;
-	    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted trial/study from SEARCHAPP search_secure_object',rowCt,stepCt,'Done') into rtnCd;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted trial/study from SEARCHAPP search_secure_object',rowCt,stepCt,'Done');
 	end if;		
     end if;
     
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	select tm_cz.cz_end_audit (jobID, 'SUCCESS') into rtnCd;
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 1;
@@ -277,9 +276,9 @@ exception
 	errorNumber := SQLSTATE;
 	errorMessage := SQLERRM;
     --Handle errors.
-	select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
     --End Proc
-	select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
 
 end;

@@ -41,8 +41,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    perform sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-    procedureName := 'I2B2_MOVE_NODE';
+    perform sys_context('userenv', 'current_schema') INTO databaseName ;
+    procedureName := 'i2b2_move_node';
     
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

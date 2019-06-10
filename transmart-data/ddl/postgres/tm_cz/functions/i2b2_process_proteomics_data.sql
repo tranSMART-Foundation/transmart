@@ -104,8 +104,8 @@ BEGIN
   newJobFlag := 0; -- False (Default)
   jobID := currentJobID;
 
-  databaseName := 'TM_CZ';
-  procedureName := 'I2B2_PROCESS_PROTEOMICS_DATA';
+  databaseName := 'tm_cz';
+  procedureName := 'i2b2_process_proteomics_data';
 
   --Audit JOB Initialization
   --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -117,7 +117,7 @@ BEGIN
     	
 	stepCt := 0;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_proteomics_data',0,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_proteomics_data',0,stepCt,'Done');
 	
 	--	Get count of records in LT_SRC_PROTEOMICS_SUB_SAM_MAP
 	
@@ -130,9 +130,9 @@ BEGIN
 	
 	if pCount > 0 then
 		stepCt := stepCt + 1;
-		select cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR') into rtnCd;
-		select cz_error_handler(jobid,procedurename, '-1', 'Application raised error') into rtnCd;
-		select cz_end_audit (jobId,'FAIL') into rtnCd;
+		perform cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
+		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
 		return 161;
 	end if;
 	
@@ -142,9 +142,9 @@ BEGIN
 
 	if pCount = 0 then
 		stepCt := stepCt + 1;
-		select cz_write_audit(jobId,databasename,procedurename,'Platform not found in LT_PROTEIN_ANNOTATION',1,stepCt,'ERROR') into rtnCd;
-		select CZ_ERROR_HANDLER(JOBID,PROCEDURENAME, '-1', 'Application raised error') into rtnCd;
-		select cz_end_audit (jobId,'FAIL') into rtnCd;
+		perform cz_write_audit(jobId,databasename,procedurename,'Platform not found in LT_PROTEIN_ANNOTATION',1,stepCt,'ERROR');
+		perform CZ_ERROR_HANDLER(JOBID,PROCEDURENAME, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
 		return 163;
 	end if;
 	
@@ -154,9 +154,9 @@ BEGIN
 	
 	if pCount = 0 then
 		stepCt := stepCt + 1;
-		select cz_write_audit(jobId,databasename,procedurename,'Platform not found in DE_GPL_INFO',1,stepCt,'ERROR') into rtnCd;
-		select CZ_ERROR_HANDLER(JOBID,PROCEDURENAME, '-1', 'Application raised error') into rtnCd;
-		select cz_end_audit (jobId,'FAIL') into rtnCd;
+		perform cz_write_audit(jobId,databasename,procedurename,'Platform not found in DE_GPL_INFO',1,stepCt,'ERROR');
+		perform CZ_ERROR_HANDLER(JOBID,PROCEDURENAME, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
 		return 16;
 	end if;
 		
@@ -168,9 +168,9 @@ BEGIN
 	
 	if pCount > 0 then
 		stepCt := stepCt + 1;
-		select cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR') into rtnCd;
-		select cz_error_handler(jobid,procedurename, '-1', 'Application raised error') into rtnCd;
-		select CZ_END_AUDIT (JOBID,'FAIL') into rtnCd;
+		perform cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
+		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform CZ_END_AUDIT (JOBID,'FAIL');
 		return 162;
 	end if;
 	
@@ -184,9 +184,9 @@ BEGIN
 	
 	if pCount > 0 then
 		stepCt := stepCt + 1;
-		select cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_PROTEOMICS_SUB_SAM_MAP',1,stepCt,'ERROR') into rtnCd;
-		select CZ_ERROR_HANDLER(JOBID,PROCEDURENAME, '-1', 'Application raised error') into rtnCd;
-		select cz_end_audit (jobId,'FAIL') into rtnCd;
+		perform cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_PROTEOMICS_SUB_SAM_MAP',1,stepCt,'ERROR');
+		perform CZ_ERROR_HANDLER(JOBID,PROCEDURENAME, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
 		return 164;
 	end if;
 		
@@ -199,7 +199,7 @@ BEGIN
 	where c_name = rootNode;
 	
 	if pExists = 0 then
-		select i2b2_add_root_node(rootNode, jobId) into rtnCd;
+		perform i2b2_add_root_node(rootNode, jobId);
 	end if;
 	
 	select c_hlevel into root_level
@@ -216,7 +216,7 @@ BEGIN
 	select length(tPath) - length(replace(tPath,'\','')) into pCount;
 
 	if pCount > 2 then
-		select i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
+		perform i2b2_fill_in_tree(null, tPath, jobId);
 	end if;
 
 	--	uppercase study_id in LT_SRC_PROTEOMICS_SUB_SAM_MAP in case curator forgot
@@ -232,7 +232,7 @@ BEGIN
 	
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_PROTEOMICS_SUB_SAM_MAP',rowCt,stepCt,'Done') into rtnCd;	
+	perform cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_PROTEOMICS_SUB_SAM_MAP',rowCt,stepCt,'Done');	
 	
 	--	create records in patient_dimension for subject_ids if they do not exist
 	--	format of sourcesystem_cd:  trial:[site:]subject_cd
@@ -281,8 +281,8 @@ BEGIN
 	
 	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
-	select cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',rowCt,stepCt,'Done') into rtnCd;	
-	select i2b2_create_security_for_trial(TrialId, secureStudy, jobID) into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',rowCt,stepCt,'Done');	
+	perform i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
 
 	--	Delete existing observation_fact data, will be repopulated
 
@@ -303,7 +303,7 @@ BEGIN
 	
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
 
 	begin
 	execute('truncate table tm_wz.WT_PROTEOMICS_NODES');
@@ -350,7 +350,7 @@ BEGIN
 	--  and decode(dataType,'R',sign(a.intensity_value),1) = 1;	--	take all values when dataType T, only >0 for dataType R
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP WT_PROTEOMICS_NODE_VALUES',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP WT_PROTEOMICS_NODE_VALUES',rowCt,stepCt,'Done');
 
 	begin
 	insert into WT_PROTEOMICS_NODES
@@ -380,7 +380,7 @@ BEGIN
 		   
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_proteomics_nodes',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_proteomics_nodes',rowCt,stepCt,'Done');
 	--	insert for platform node so platform concept can be populated
 
 	begin
@@ -414,7 +414,7 @@ BEGIN
 		   
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in WT_PROTEOMICS_NODES',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in WT_PROTEOMICS_NODES',rowCt,stepCt,'Done');
 	--	insert for ATTR1 node so ATTR1 concept can be populated in sample_type_cd
 
 	begin
@@ -448,7 +448,7 @@ BEGIN
 		   
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_PROTEOMICS_NODES',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_PROTEOMICS_NODES',rowCt,stepCt,'Done');
 	--	insert for ATTR2 node so ATTR2 concept can be populated in timepoint_cd
 
 	begin
@@ -482,7 +482,7 @@ BEGIN
 		   
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_PROTEOMICS_NODES',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_PROTEOMICS_NODES',rowCt,stepCt,'Done');
 	--	insert for tissue_type node so tissue_type_cd can be populated
 
 	begin
@@ -515,7 +515,7 @@ BEGIN
 		   
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_PROTEOMICS_NODES',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_PROTEOMICS_NODES',rowCt,stepCt,'Done');
 	begin
 	update WT_PROTEOMICS_NODES
 	set node_name=parse_nth_value(leaf_node,length(leaf_node)-length(replace(leaf_node,'\','')),'\');
@@ -528,7 +528,7 @@ BEGIN
 		   
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_proteomics_nodes',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_proteomics_nodes',rowCt,stepCt,'Done');
 --	add leaf nodes for proteomics data  The cursor will only add nodes that do not already exist.
 
 	 FOR r_addNodes in addNodes Loop
@@ -539,16 +539,16 @@ BEGIN
 		stepCt := stepCt + 1;
 		get diagnostics rowCt := ROW_COUNT;
 		if rtnCd > 1 then
-			select cz_write_audit(jobId,databasename,procedurename,'Error while executing tm_cz.i2b2_add_node(' || TrialID || ',' || r_addNodes.leaf_node || ',' || r_addNodes.node_name || ',' || jobId || ')' ,1,stepCt,'ERROR') into rtnCd;
-			select cz_end_audit (jobId,'FAIL') into rtnCd;
+			perform cz_write_audit(jobId,databasename,procedurename,'Error while executing tm_cz.i2b2_add_node(' || TrialID || ',' || r_addNodes.leaf_node || ',' || r_addNodes.node_name || ',' || jobId || ')' ,1,stepCt,'ERROR');
+			perform cz_end_audit (jobId,'FAIL');
 			return 168;
 		end if;	
 		tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
-		select cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done') into rtnCd;
-		select i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID) into rtnCd;
+		perform cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
+		select i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID) nto rtnCd;
 		if rtnCd > 1 then
-			select cz_write_audit(jobId,databasename,procedurename,'Error while executing tm_cz.i2b2_fill_in_tree(' || TrialID || ',' || r_addNodes.leaf_node || ',' || jobId || ')' ,1,stepCt,'ERROR') into rtnCd;
-			select cz_end_audit (jobId,'FAIL') into rtnCd;
+			perform cz_write_audit(jobId,databasename,procedurename,'Error while executing tm_cz.i2b2_fill_in_tree(' || TrialID || ',' || r_addNodes.leaf_node || ',' || jobId || ')' ,1,stepCt,'ERROR');
+			perform cz_end_audit (jobId,'FAIL');
 			return 170;
 		end if;	
 	END LOOP;  
@@ -574,7 +574,7 @@ BEGIN
 	
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Update WT_PROTEOMICS_NODES with newly created concept_cds',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Update WT_PROTEOMICS_NODES with newly created concept_cds',rowCt,stepCt,'Done');
   --Load the DE_SUBJECT_SAMPLE_MAPPING from wt_subject_proteomics_data
 
   --PATIENT_ID      = PATIENT_ID (SAME AS ID ON THE PATIENT_DIMENSION)
@@ -725,7 +725,7 @@ BEGIN
 
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 
 	begin
 	insert into observation_fact
@@ -774,7 +774,7 @@ BEGIN
 	
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 	--	Insert sample facts 
 
 	begin
@@ -824,7 +824,7 @@ BEGIN
 	
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 	--Update I2b2 for correct data type
 	begin
 	update i2b2 t
@@ -839,7 +839,7 @@ BEGIN
   
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',rowCt,stepCt,'Done');
 
 	 ---INSERT sample_dimension
 	begin
@@ -854,7 +854,7 @@ BEGIN
 	end;
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'insert distinct sample_cd in sample_dimension from de_subject_sample_mapping',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'insert distinct sample_cd in sample_dimension from de_subject_sample_mapping',rowCt,stepCt,'Done');
 
     ---- update c_metadataxml in i2b2
 
@@ -884,7 +884,7 @@ BEGIN
 		  
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Update c_columndatatype and c_metadataxml for numeric data types in I2B2METADATA i2b2',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Update c_columndatatype and c_metadataxml for numeric data types in I2B2METADATA i2b2',rowCt,stepCt,'Done');
 
 	--UPDATE VISUAL ATTRIBUTES for Leaf Active (Default is folder)
 	begin
@@ -903,7 +903,7 @@ BEGIN
 	  
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for leaf nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for leaf nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
   
         begin
 	update i2b2 a
@@ -918,15 +918,15 @@ BEGIN
         
         stepCt := stepCt + 1;
         get diagnostics rowCt := ROW_COUNT;
-	select cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
   
   --Build concept Counts
   --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
   -- a unique top-level node for proteomics data
   
-    select i2b2_create_concept_counts(topNode ,jobID ) into rtnCd;
+    perform i2b2_create_concept_counts(topNode ,jobID );
 	stepCt := stepCt + 1;
-	select cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
 	
 	--	delete each node that is hidden
 
@@ -934,20 +934,20 @@ BEGIN
 
     --	deletes hidden nodes for a trial one at a time
 
-		select i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+		perform i2b2_delete_1_node(r_delNodes.c_fullname);
 		stepCt := stepCt + 1;
 		tText := 'Deleted node: ' || r_delNodes.c_fullname;
 		get diagnostics rowCt := ROW_COUNT;
-		select cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done') into rtnCd;
+		perform cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
 	END LOOP;  	
 
 
   --Reload Security: Inserts one record for every I2B2 record into the security table
 
-    select i2b2_load_security_data(jobId) into rtnCd;
+    perform i2b2_load_security_data(jobId);
 	stepCt := stepCt + 1;
-	select cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
 
 --	tag data with probeset_id from reference.probeset_deapp
 	begin
@@ -1004,13 +1004,13 @@ BEGIN
 	pExists := rowCt;
 	
 	stepCt := stepCt + 1;
-	select cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP WT_SUBJECT_PROTEOMICS_PROBESET',rowCt,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP WT_SUBJECT_PROTEOMICS_PROBESET',rowCt,stepCt,'Done');
 		
 	if pExists = 0 then
 		stepCt := stepCt + 1;
-		select cz_write_audit(jobId,databasename,procedurename,'Unable to match probesets to platform in probeset_deapp',1,stepCt,'ERROR') into rtnCd;
-		select CZ_ERROR_HANDLER(JOBID,PROCEDURENAME, '-1', 'Application raised error') into rtnCd;
-		select cz_end_audit (jobId,'FAIL') into rtnCd;
+		perform cz_write_audit(jobId,databasename,procedurename,'Unable to match probesets to platform in probeset_deapp',1,stepCt,'ERROR');
+		perform CZ_ERROR_HANDLER(JOBID,PROCEDURENAME, '-1', 'Application raised error');
+		perform cz_end_audit (jobId,'FAIL');
 		return 165;
 	end if;
 
@@ -1063,16 +1063,16 @@ BEGIN
 	end;
 		stepCt := stepCt + 1;
 		get diagnostics rowCt := ROW_COUNT;
-		select cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP DE_SUBJECT_PROTEIN_DATA',rowCt,stepCt,'Done') into rtnCd;
+		perform cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP DE_SUBJECT_PROTEIN_DATA',rowCt,stepCt,'Done');
 	else
 		
-	--	Calculate ZScores and insert data into de_subject_protein_data.  The 'L' parameter indicates that the proteomics data will be selected from
+	--	Calculate ZScores and insert data into de_subject_protein_data.  The 'L' parameter indicates that the proteomics data will be perform ed from
 	--	WT_SUBJECT_PROTEOMICS_PROBESET as part of a Load.  
 
 		if dataType = 'R' or dataType = 'L' then
-			select I2B2_PROTEOMICS_ZSCORE_CALC(TrialID,'L',jobId,dataType,logBase,sourceCD) into rtnCd;
+			select I2B2_PROTEOMICS_ZSCORE_CALC(TrialID,'L',jobId,dataType,logBase,sourceCD);
 			stepCt := stepCt + 1;
-			select cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done') into rtnCd;
+			perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
 		end if;
 	
 	end if;
@@ -1080,14 +1080,14 @@ BEGIN
     ---Cleanup OVERALL JOB if this proc is being run standalone
 	
 	stepCt := stepCt + 1;
-	select cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_proteomics_data',0,stepCt,'Done') into rtnCd;
+	perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_proteomics_data',0,stepCt,'Done');
 
 	IF newJobFlag = 1
 	THEN
-		select cz_end_audit(jobID, 'SUCCESS') into rtnCd;
+		perform cz_end_audit(jobID, 'SUCCESS');
 	END IF;
 
-	return rtnCd;
+	return 1;
 END;
 $$;
 

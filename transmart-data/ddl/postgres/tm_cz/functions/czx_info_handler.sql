@@ -23,7 +23,6 @@ AS $$
     declare
 
     databasename	VARCHAR(100);
-    rtnCd		numeric;
 
 begin
 
@@ -31,10 +30,10 @@ begin
       from tm_cz.cz_job_master 
      where job_id = jobid;
     
-    select tm_cz.czx_write_audit(jobid, databaseName, messageProcedure, 'Step contains more details', 0, stepNumber, 'Information' ) into rtnCd;
+    perform tm_cz.czx_write_audit(jobid, databaseName, messageProcedure, 'Step contains more details', 0, stepNumber, 'Information' );
 
-    select tm_cz.czx_write_info(jobid, messageID, messageLine, messageProcedure, infoMessage ) into rtnCd;
-    return rtnCd;
+    perform tm_cz.czx_write_info(jobid, messageID, messageLine, messageProcedure, infoMessage );
+    return 1;
 
 end;
 $$;

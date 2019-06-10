@@ -61,7 +61,6 @@ Declare
   rowCt			numeric(18,0);
   errorNumber		character varying;
   errorMessage	character varying;
-  rtnCd			integer;
   
 	addNodes CURSOR FOR
 	SELECT distinct t.leaf_node
@@ -117,8 +116,8 @@ BEGIN
   newJobFlag := 0; -- False (Default)
   jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-	procedureName := 'I2B2_PROCESS_METABOLOMIC_DATA';
+  databaseName := 'tm_cz';
+  procedureName := 'i2b2_process_metabolomic_data';
 
   --Audit JOB Initialization
   --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -145,7 +144,7 @@ BEGIN
 	if pCount > 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
 		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		select cz_end_audit (jobId,'FAIL') into rtnCd;
+		perform cz_end_audit (jobId,'FAIL');
 		return 161;
 	end if;
   
@@ -162,7 +161,7 @@ BEGIN
 	if PCOUNT = 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_qpcr_metabolomics_annotation',1,stepCt,'ERROR');
 		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		select cz_end_audit (jobId,'FAIL') into rtnCd;
+		perform cz_end_audit (jobId,'FAIL');
 		RETURN 163;
 	end if;
 		
@@ -175,7 +174,7 @@ BEGIN
 	if pCount > 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
 		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		select CZ_END_AUDIT (JOBID,'FAIL') into rtnCd;
+		perform CZ_END_AUDIT (JOBID,'FAIL');
 		return 162;
 	end if;
 	
@@ -190,7 +189,7 @@ BEGIN
 	if pCount > 0 then
 		perform cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_METABOLOMIC_MAP',1,stepCt,'ERROR');
 		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		select cz_end_audit (jobId,'FAIL') into rtnCd;
+		perform cz_end_audit (jobId,'FAIL');
 		RETURN 164;
 	end if;
 		
@@ -233,9 +232,9 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 
@@ -285,9 +284,9 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	
@@ -311,9 +310,9 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
@@ -361,9 +360,9 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
@@ -394,9 +393,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 		   
@@ -430,9 +429,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	
@@ -468,9 +467,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	
@@ -506,9 +505,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 		   
@@ -543,9 +542,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	
@@ -561,9 +560,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	
@@ -583,9 +582,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 		stepCt := stepCt + 1;
@@ -614,9 +613,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	
@@ -765,9 +764,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
@@ -813,9 +812,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	  
@@ -861,9 +860,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	  
@@ -881,9 +880,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	
@@ -903,9 +902,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
     stepCt := stepCt + 1;
@@ -936,9 +935,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end; 
 	stepCt := stepCt + 1;
@@ -958,9 +957,9 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
@@ -1055,14 +1054,14 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_mbolomics_probeset',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_mbolomics_probeset',rowCt,stepCt,'Done');
 
 	select count(*) into pExists
 	from information_schema.tables
@@ -1074,7 +1073,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create partition ' || partitionName,1,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create partition ' || partitionName,1,stepCt,'Done');
 	else
 	sqlText := 'drop index if exists ' || partitionIndx || '_idx1';
 	raise notice 'sqlText= %', sqlText;
@@ -1089,12 +1088,12 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on ' || partitionName,1,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on ' || partitionName,1,stepCt,'Done');
 	sqlText := 'truncate table ' || partitionName;
 	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate ' || partitionName,1,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate ' || partitionName,1,stepCt,'Done');
 	end if;
 	
 	--	insert into de_subject_metabolomics_data when dataType is T (transformed)

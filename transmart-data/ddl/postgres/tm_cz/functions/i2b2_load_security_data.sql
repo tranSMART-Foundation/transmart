@@ -30,13 +30,12 @@ AS $$
     rowCt			numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
-    rtnCd			numeric;
 
 begin
 
     --Set Audit Parameters
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_LOAD_SECURITY';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_load_security_data';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -45,7 +44,7 @@ begin
     truncate table i2b2metadata.i2b2_secure;
 
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate I2B2METADATA i2b2_secure',0,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate I2B2METADATA i2b2_secure',0,stepCt,'Done');
 
     insert into i2b2metadata.i2b2_secure
 		(c_hlevel,
@@ -102,7 +101,7 @@ begin
 				  on b.sourcesystem_cd = f.modifier_cd;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert security data into I2B2METADATA i2b2_secure',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert security data into I2B2METADATA i2b2_secure',rowCt,stepCt,'Done');
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     perform tm_cz.cz_end_audit (jobID, 'SUCCESS') where coalesce(currentJobId, -1) <> jobId;
@@ -114,9 +113,9 @@ exception
 	errorNumber := SQLSTATE;
 	errorMessage := SQLERRM;
     --Handle errors.
-	select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
     --End Proc
-	select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
 
 end;
@@ -158,8 +157,8 @@ AS $$
 
 begin
     --Set Audit Parameters
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_LOAD_SECURITY';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_load_security_data';
 
     select case when coalesce(currentjobid, -1) < 1 then tm_cz.cz_start_audit(procedureName, databaseName) else currentjobid end into jobId;
 

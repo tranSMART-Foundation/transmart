@@ -31,7 +31,6 @@ AS $$
     rowCt			numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
-    rtnCd			numeric;
     
     TrialID varchar(100);
     auditText varchar(4000);
@@ -54,8 +53,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_FILL_IN_TREE';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_fill_in_tree';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -87,8 +86,8 @@ begin
             if v_count = 0 then
 		auditText := 'Inserting ' || root_node;
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditText,0,stepCt,'Done') into rtnCD;
-		select tm_cz.i2b2_add_node(trial_id, root_node, node_name, jobId) into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditText,0,stepCt,'Done');
+		perform tm_cz.i2b2_add_node(trial_id, root_node, node_name, jobId);
             end if;
 	    
 	end loop;
@@ -100,7 +99,7 @@ begin
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	select tm_cz.cz_end_audit (jobID, 'SUCCESS') into rtnCD;
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
     
     return 1;
@@ -110,9 +109,9 @@ exception
 	errorNumber := SQLSTATE;
 	errorMessage := SQLERRM;
     --Handle errors.
-	select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
     --End Proc
-	select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
 
 	

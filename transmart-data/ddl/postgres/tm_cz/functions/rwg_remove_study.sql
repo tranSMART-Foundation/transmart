@@ -32,8 +32,8 @@ BEGIN
 	--Set Audit Parameters
 	newJobFlag := 0; -- False (Default)
 	jobID := currentJobID;
-	SELECT current_user INTO databaseName; --(sic)
-	procedureName := 'RWG_REMOVE_STUDY';
+	select current_user INTO databaseName; --(sic)
+	procedureName := 'rwg_remove_study';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it

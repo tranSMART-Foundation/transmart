@@ -65,8 +65,8 @@ BEGIN
 	--Set Audit Parameters
 	newJobFlag := 0; -- False (Default)
 	jobID := currentJobID;
-	SELECT current_user INTO databaseName; --(sic)
-	procedureName := 'RWG_LOAD_HEAT_MAP_RESULTS';
+	select current_user INTO databaseName; --(sic)
+	procedureName := 'rwg_load_heat_map_results';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it

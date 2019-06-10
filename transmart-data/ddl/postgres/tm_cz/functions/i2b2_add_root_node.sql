@@ -35,8 +35,6 @@ AS $$
     errorNumber		character varying;
     errorMessage	character varying;
     
-    rtnCd			integer;
-
 begin
     rootNode := root_node;
     rootPath := '\' || rootNode || '\';
@@ -47,8 +45,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_ADD_ROOT_NODE';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_add_root_node';
     
 
     --Audit JOB Initialization
@@ -59,7 +57,7 @@ begin
     end if;
     
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done');
     
     begin
 	
@@ -117,7 +115,7 @@ begin
 	get diagnostics rowCt := ROW_COUNT;
 	
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert to table_access',rowCt,stepCt,'Done') into rtnCd;	
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert to table_access',rowCt,stepCt,'Done');	
 
 	--	insert root_node into i2b2
 	
@@ -183,16 +181,16 @@ begin
 	get diagnostics rowCt := ROW_COUNT;
 	
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert root_node ' || rootNode || ' to i2b2',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert root_node ' || rootNode || ' to i2b2',rowCt,stepCt,'Done');
 	
     end;
     
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done') into rtnCD;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done');
     
     --Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	select tm_cz.cz_end_audit (jobID, 'SUCCESS') into rtnCd;
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 1;
@@ -202,9 +200,9 @@ exception
 	errorNumber := SQLSTATE;
 	errorMessage := SQLERRM;
     --Handle errors.
-	select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
     --End Proc
-	select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
 	
 end;

@@ -22,7 +22,6 @@ AS $$
 
     declare
 
-    rtnCd	integer;
     jobId	numeric;
 
 begin
@@ -46,7 +45,7 @@ begin
     
 exception 
     when others then
-	select tm_cz.cz_write_error(jobId,SQLERRML,SQLSTATE,SQLERRM,null,null) into rtnCd;
+	perform tm_cz.cz_write_error(jobId,SQLERRML,SQLSTATE,SQLERRM,null,null);
 	return -16;
 
 end;
@@ -77,8 +76,6 @@ AS $$
 
     declare
 
-    rtnCd	integer;
-
 begin
     begin
 	insert into tm_cz.cz_job_master
@@ -100,7 +97,7 @@ begin
     
 exception 
     when others then
-	select tm_cz.cz_write_error(jobId,SQLERRML,SQLSTATE,SQLERRM,null,null) into rtnCd;
+	perform tm_cz.cz_write_error(jobId,SQLERRML,SQLSTATE,SQLERRM,null,null);
 	return -16;
 
 end;

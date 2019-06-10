@@ -12,28 +12,27 @@ AS $$
     procedureName varchar(100);
     jobID bigint;
     rowCt integer;
-    rtnCd integer;
 
 begin
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentjobid;
 
-    PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-    procedureName := 'CZ_AUDIT_EXAMPLE';
+    perform sys_context('userenv', 'current_schema') INTO databaseName ;
+    procedureName := 'cz_audit_example';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
 	raise notice '%', 'Here' || to_char(jobID);
-	select cz_start_audit (procedureName, databaseName, jobID) into rtnCd;
+	perform cz_start_audit (procedureName, databaseName, jobID);
 	raise notice '%', 'Here2' || to_char(jobID);
     end if;
 
     --Step Audit
     rowCt := 0;
-    select cz_write_audit (jobID, databaseName, procedureName, 'Start loading some data', rowCt, 1, 'PASS') into rtnCd;
+    perform cz_write_audit (jobID, databaseName, procedureName, 'Start loading some data', rowCt, 1, 'PASS');
 
     begin
 	update cz_job_master set job_name = job_name;
@@ -41,10 +40,10 @@ begin
     end;
 
     --Step Audit
-    select cz_write_audit (jobID, databaseName, procedureName, '# of rows on the cz_job_master table', rowCt, 2, 'PASS') into rtnCd;
+    perform cz_write_audit (jobID, databaseName, procedureName, '# of rows on the cz_job_master table', rowCt, 2, 'PASS');
 
 
-    select cz_write_info (jobID, 1, 39, procedureName, 'Writing a message') into rtnCd;
+    perform cz_write_info (jobID, 1, 39, procedureName, 'Writing a message');
 
 
 
@@ -56,20 +55,20 @@ begin
     end;
 
     --Step Audit
-    select cz_write_audit (jobID, databaseName, procedureName, 'Should have caused an error!', rowCt, 3, 'PASS') into rtnCd;
+    perform cz_write_audit (jobID, databaseName, procedureName, 'Should have caused an error!', rowCt, 3, 'PASS');
 
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	select cz_end_audit (jobID, 'SUCCESS') into rtnCd;
+	perform cz_end_audit (jobID, 'SUCCESS');
     end if;
 
 exception
     when others then
     --Handle errors.
-	select cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM) into rtnCd;
+	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
-	select cz_end_audit (jobID, 'FAIL') into rtnCd;
+	perform cz_end_audit (jobID, 'FAIL');
 
 end;
 

@@ -20,7 +20,6 @@ AS $$
     gplId	character varying(100);
     errorNumber		character varying;
     errorMessage	character varying;
-    rtnCd			integer;
     rowCt			numeric(18,0);
     
 BEGIN
@@ -31,8 +30,8 @@ BEGIN
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
     
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_LOAD_RBM_ANNOTATION';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_load_rbm_annotation';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -42,7 +41,7 @@ BEGIN
     end if;
 
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_rbm_annotation',0,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_rbm_annotation',0,stepCt,'Done');
 
     --	get GPL id from external table
     
@@ -60,14 +59,14 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;	
 
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from REFERENCE antigen_deapp',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from REFERENCE antigen_deapp',rowCt,stepCt,'Done');
 
     
     --	delete any existing data from annotation_deapp
@@ -80,14 +79,14 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;	
 
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from annotation_deapp',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from annotation_deapp',rowCt,stepCt,'Done');
 
     --	delete any existing data from deapp.de_mrna_annotation
     begin
@@ -99,14 +98,14 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
 
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_mrna_annotation',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_mrna_annotation',rowCt,stepCt,'Done');
     
     --	insert any new probesets into probeset_deapp
     begin
@@ -127,14 +126,14 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into antigen_deapp',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into antigen_deapp',rowCt,stepCt,'Done');
     
     --	insert data into annotation_deapp
     begin
@@ -162,14 +161,14 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into REFERENCE annotation_deapp',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into REFERENCE annotation_deapp',rowCt,stepCt,'Done');
     
     --	insert data into deapp.de_rbm_annotation
     begin
@@ -197,14 +196,14 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_rbm_annotation',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_rbm_annotation',rowCt,stepCt,'Done');
     
     --	update gene_id if null
     begin
@@ -228,14 +227,14 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_rbm_annotation',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_rbm_annotation',rowCt,stepCt,'Done');
     
     --	update gene_symbol if null
     begin
@@ -259,14 +258,14 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_rbm_annotation',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_rbm_annotation',rowCt,stepCt,'Done');
     
     --	insert probesets into biomart.bio_assay_feature_group
     begin
@@ -285,14 +284,14 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Insert probesets into biomart.bio_assay_feature_group',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Insert probesets into biomart.bio_assay_feature_group',rowCt,stepCt,'Done');
     
     --	insert probesets into biomart.bio_assay_data_annotation
     begin
@@ -317,22 +316,22 @@ BEGIN
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.bio_assay_data_annotation',rowCt,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.bio_assay_data_annotation',rowCt,stepCt,'Done');
     
     stepCt := stepCt + 1;
-    select cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_rbm_annotation',0,stepCt,'Done') into rtnCd;
+    perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_rbm_annotation',0,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     IF newJobFlag = 1
     THEN
-	select cz_end_audit (jobID, 'SUCCESS') into rtnCd;
+	perform cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 
     return 1;

@@ -33,8 +33,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := -1;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_TRUNCATE_RELEASE_TABLES';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_truncate_release_tables';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

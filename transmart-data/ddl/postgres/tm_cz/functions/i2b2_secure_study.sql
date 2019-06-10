@@ -38,8 +38,6 @@ AS $$
     pExists				integer;
     TrialId				varchar(100);
 
-    rtnCd numeric;
-
 begin
 
     TrialId := trial_id;
@@ -48,8 +46,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_SECURE_STUDY';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_secure_study';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

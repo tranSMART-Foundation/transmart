@@ -53,8 +53,8 @@ BEGIN
 	--Set Audit Parameters
 	newJobFlag := 0; -- False (Default)
 	jobID := currentJobID;
-	SELECT current_user INTO databaseName; --(sic)
-	procedureName := 'RWG_ADD_SEARCH_TERM';
+	select current_user INTO databaseName; --(sic)
+	procedureName := 'rwg_add_search_term';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it

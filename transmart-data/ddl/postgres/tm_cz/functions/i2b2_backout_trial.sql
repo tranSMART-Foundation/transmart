@@ -22,8 +22,7 @@ AS $$
      ******************************************************************/
 
     declare
-
-    rtnCd			integer;
+ 
     pExists			integer;
     sqlTxt			character varying;
     topNode			character varying;
@@ -49,7 +48,7 @@ begin
     newJobFlag := 0; -- False (Default)
     jobId := currentjobId;
 
-    databaseName := 'TM_CZ';
+    databaseName := 'tm_cz';
     procedureName := 'i2b2_backout_trial';
     
     --Audit JOB Initialization
@@ -63,9 +62,9 @@ begin
 	errorNumber := '';
 	errorMessage := 'Invalid value for trialid argument';
 	--Handle errors.
-	select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+	perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+	perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	return -16;
     end if;
 
@@ -82,7 +81,7 @@ begin
     stepCt := stepCt + 1;
     if (path_string is not null AND length(path_string) > 0) then
 	auditMessage := 'The use of the path_string argument for this stored procedure (i2b2_backout_trial) is deprecated';
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
     end if;
 
     -- retrieve topNode for study with given trial id (trialid)
@@ -94,9 +93,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
 
@@ -108,7 +107,7 @@ begin
         -- In case of erroneous trialid, the database does not contain any data associated with this trialid (trying to remove does not harm)
         -- In case of inconsistencies in the database, we still might try to remove data associate with this trialid.
 	auditMessage := 'Not able to retrieve top node associated with trial id: ' || trialid;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
 	end if;
 
     -- check consistency between topNode and path_string
@@ -118,9 +117,9 @@ begin
 	errorNumber := '';
 	errorMessage := 'Discrepancy between path_string argument value ('||path_string||') and value found in database ('||topNode||')';
 	--Handle errors.
-	select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+	perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+	perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	return -16;
     end if;
 
@@ -129,15 +128,15 @@ begin
     stepCt := stepCt + 1;
     if (topNode is null OR length(topNode) = 0) then
 	auditMessage := 'Not able to retrieve top node associated with trial id: ' || trialid;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
 
 	auditMessage := 'Start deleting all data for trial ' || trialid;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
     else
 	auditMessage := 'Start deleting all data for trial ' || trialid || ' and topNode ' || topNode;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
 
-	select tm_cz.i2b2_delete_all_nodes(topNode,jobId) into rtnCd;	
+	perform tm_cz.i2b2_delete_all_nodes(topNode,jobId);
     end if;
 
     --	delete clinical data
@@ -151,13 +150,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from lz_src_clinical_data',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from lz_src_clinical_data',rowCt,stepCt,'Done');
 
     --	delete observation_fact SECURITY data, do before patient_dimension delete
     
@@ -173,13 +172,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete SECURITY data for trial from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete SECURITY data for trial from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
     --	delete patient data
     
@@ -192,13 +191,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA patient_dimension',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA patient_dimension',rowCt,stepCt,'Done');
 
     begin
 	delete from i2b2demodata.patient_trial
@@ -209,13 +208,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA patient_trial',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA patient_trial',rowCt,stepCt,'Done');
 
     --	delete gene expression data
     
@@ -238,7 +237,7 @@ begin
 	    sqlTxt := 'drop table if exists deapp.de_subject_microarray_data_' || v_partition_id;
 	    execute sqlTxt;
 	    stepCt := stepCt + 1;
-	    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_microarray_data',rowCt,stepCt,'Done') into rtnCd;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_microarray_data',rowCt,stepCt,'Done');
 	end loop;
 	
 	begin
@@ -251,13 +250,13 @@ begin
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 	    --Handle errors.
-		select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	    --End Proc
-		select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobId, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 	
     end if;
     
@@ -282,7 +281,7 @@ begin
 	    sqlTxt := 'drop table if exists deapp.de_subject_acgh_data_' || v_partition_id;
 	    execute sqlTxt;
 	    stepCt := stepCt + 1;
-	    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_acgh_data',rowCt,stepCt,'Done') into rtnCd;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_acgh_data',rowCt,stepCt,'Done');
 	end loop;
 	
 	begin
@@ -295,13 +294,13 @@ begin
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 	    --Handle errors.
-		select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	    --End Proc
-		select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobId, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 	
     end if;
 
@@ -325,7 +324,7 @@ begin
 	    sqlTxt := 'drop table if exists deapp.de_subject_rnaseq_data_' || v_partition_id;
 	    execute sqlTxt;
 	    stepCt := stepCt + 1;
-	    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_rnaseq_data',rowCt,stepCt,'Done') into rtnCd;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_rnaseq_data',rowCt,stepCt,'Done');
 	end loop;
 	
 	begin
@@ -338,13 +337,13 @@ begin
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 	    --Handle errors.
-		select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	    --End Proc
-		select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobId, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 	
     end if;
 
@@ -368,7 +367,7 @@ begin
 	 where bio_data_unique_id = 'EXP:' || TrialId;
 
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete trial from search_secure_object',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete trial from search_secure_object',rowCt,stepCt,'Done');
 
     end if;
 
@@ -376,14 +375,14 @@ begin
     if (topNode is null OR length(topNode) = 0)
     then
 	auditMessage := 'trialid argument possibly contained erroneous value ' || trialid;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done') into rtnCd;
-	select tm_cz.cz_end_audit (jobId, 'WARNING') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
+	perform tm_cz.cz_end_audit (jobId, 'WARNING');
 	return -1;
 	end if;
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	select tm_cz.cz_end_audit (jobId, 'SUCCESS') into rtnCD;
+	perform tm_cz.cz_end_audit (jobId, 'SUCCESS');
     end if;
 
     return 1;
@@ -393,9 +392,9 @@ exception
 	errorNumber := SQLSTATE;
 	errorMessage := SQLERRM;
     --Handle errors.
-	select tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage) into rtnCd;
+	perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
     --End Proc
-	select tm_cz.cz_end_audit (jobId, 'FAIL') into rtnCd;
+	perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	return -16;
 
 end;

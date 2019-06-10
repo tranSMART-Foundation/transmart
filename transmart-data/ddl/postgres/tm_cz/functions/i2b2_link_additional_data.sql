@@ -28,7 +28,6 @@ AS $$
     pexists			INTEGER;
     subjCt			INTEGER;
     bslash			char(1);
-    rtnCd	INTEGER;
     --Audit variables
     newJobFlag INTEGER;
     databaseName VARCHAR(100);
@@ -48,8 +47,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_LINK_ADDITIONAL_DATA';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_link_additional_data';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -59,7 +58,7 @@ begin
     end if;
 
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done')into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done');
     
     select count(*) into pExists
       from (select t.platform, bcr.location
@@ -73,7 +72,7 @@ begin
     
     if pExists > 0 then
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'At least one platform in lt_src_mrna_subj_samp_map does not exist in bio_content_repository',0,stepCt,'Done')into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'At least one platform in lt_src_mrna_subj_samp_map does not exist in bio_content_repository',0,stepCt,'Done');
 	return 16;
     end if;
     
@@ -94,11 +93,11 @@ begin
 	   (select 1 from deapp.de_gpl_info g
 	     where t.platform = g.platform);
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Check patient mapping',SQL%ROWCOUNT,stepCt,'Done')into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Check patient mapping',SQL%ROWCOUNT,stepCt,'Done');
     
     if pExists < subjCt then
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'One or more subject in subject_sample map file are not mapped to patients',0,stepCt,'Done')into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'One or more subject in subject_sample map file are not mapped to patients',0,stepCt,'Done');
 	return 16;
     end if;
 
@@ -140,7 +139,7 @@ begin
 	       and bc.location || '/' || t.trial_name = x.cel_location
 	       and substr(t.sample_cd,instr(t.sample_cd,'.')) = x.cel_file_suffix);
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add additional data links to bio_content',SQL%ROWCOUNT,stepCt,'Done')into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add additional data links to bio_content',SQL%ROWCOUNT,stepCt,'Done');
     
     --	insert into bio_experiment if needed
 
@@ -158,7 +157,7 @@ begin
 	   (select 1 from biomart.bio_experiment x
 	     where t.trial_name = x.accession);
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added trial to bio_experiment if needed',SQL%ROWCOUNT,stepCt,'Done')into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added trial to bio_experiment if needed',SQL%ROWCOUNT,stepCt,'Done');
 
     --	insert into bio_content_reference
     
@@ -186,7 +185,7 @@ begin
 	       and x.bio_data_id = be.bio_experiment_id
 	       and x.content_reference_type = 'Data');
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added data to bio_content_reference',SQL%ROWCOUNT,stepCt,'Done')into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added data to bio_content_reference',SQL%ROWCOUNT,stepCt,'Done');
 
     --	insert records into de_subject_sample_mapping with dummy concept codes (-1)
 
@@ -226,14 +225,14 @@ begin
 	     where t.platform = g.platform);
     pExists := SQL%ROWCOUNT;
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert additional data records into de_subject_sample_mapping',SQL%ROWCOUNT,stepCt,'Done')into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert additional data records into de_subject_sample_mapping',SQL%ROWCOUNT,stepCt,'Done');
 
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done')into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 THEN
-	SELECT tm_cz.czx_end_audit (jobID, 'SUCCESS')into rtnCd;
+	perform tm_cz.czx_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 0;
@@ -243,9 +242,9 @@ exception
 	v_sqlerrm := substr(SQLERRM,1,1000);
 	raise notice 'error: %', v_sqlerrm;
     --Handle errors.
-	SELECT tm_cz.czx_error_handler (jobID, procedureName,v_sqlerrm)into rtnCd;
+	perform tm_cz.czx_error_handler (jobID, procedureName,v_sqlerrm);
     -- End Proc
-	SELECT tm_cz.czx_end_audit (jobID, 'FAIL')into rtnCd;
+	perform tm_cz.czx_end_audit (jobID, 'FAIL');
 	return 16;
 
 end;

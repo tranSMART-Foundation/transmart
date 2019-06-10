@@ -30,8 +30,6 @@ AS $$
     errorBackTrace VARCHAR(4000);
     stepNo numeric(18,0);
     
-    rtnCd	integer;
-
 begin
     --Get DB Name
     select database_name into databaseName
@@ -50,10 +48,10 @@ begin
     --errorBackTrace := dbms_utility.format_error_backtrace;
 
     --Update the audit step for the error
-    select tm_cz.czx_write_audit(jobid, databaseName,procedureName, 'Job Failed: See error log for details',1, stepNo, 'FAIL') into rtnCd;
+    perform tm_cz.czx_write_audit(jobid, databaseName,procedureName, 'Job Failed: See error log for details',1, stepNo, 'FAIL');
     
     --write out the error info
-    select tm_cz.czx_write_error(jobid, errorNumber, errorMessage, errorStack, errorBackTrace) into rtnCd;
+    perform tm_cz.czx_write_error(jobid, errorNumber, errorMessage, errorStack, errorBackTrace);
     
     return 1;
 

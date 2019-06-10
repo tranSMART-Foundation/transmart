@@ -31,7 +31,6 @@ AS $$
     thisRowCt		numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
-    rtnCd		integer;
 
     topNode		varchar(2000);
     topNodeEscaped	varchar(2000);
@@ -98,10 +97,10 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_LOAD_CLINICAL_DATA';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_load_clinical_data';
 
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_load_clinical_data ',0,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_load_clinical_data ',0,stepCt,'Done');
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -114,7 +113,7 @@ begin
     stepCt := 0;
     stepCt := stepCt + 1;
     tText := 'Start i2b2_load_clinical_data for ' || TrialId;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done');
 
     if (secureStudy not in ('Y','N') ) then
 	secureStudy := 'Y';
@@ -131,9 +130,9 @@ begin
 
     if topLevel < 3 then
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path specified in top_node must contain at least 2 nodes',0,stepCt,'Msg') into rtnCd;
-	select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-	select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path specified in top_node must contain at least 2 nodes',0,stepCt,'Msg');
+	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
     end if;
 
@@ -146,14 +145,14 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
 	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from lz_src_clinical_data',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from lz_src_clinical_data',rowCt,stepCt,'Done');
 
     begin
 	insert into tm_lz.lz_src_clinical_data
@@ -189,14 +188,14 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data into lz_src_clinical_data',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data into lz_src_clinical_data',rowCt,stepCt,'Done');
 
     --	truncate tm_wz.wrk_clinical_data and load data from external file
 
@@ -235,14 +234,14 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load lt_src_clinical_data to work table',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load lt_src_clinical_data to work table',rowCt,stepCt,'Done');
 
     -- Get root_node from topNode
 
@@ -257,7 +256,7 @@ begin
      where c_name = root_node;
 
     if pExists = 0 or pCount = 0 then
-	select tm_cz.i2b2_add_root_node(root_node, jobId) into rtnCd;
+	perform tm_cz.i2b2_add_root_node(root_node, jobId);
     end if;
 
     select c_hlevel into root_level
@@ -275,8 +274,8 @@ begin
 
     if pCount > 2 then
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding upper-level nodes',0,stepCt,'Done') into rtnCd;
-	select tm_cz.i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding upper-level nodes',0,stepCt,'Done');
+	perform tm_cz.i2b2_fill_in_tree(null, tPath, jobId);
     end if;
 
     select count(*) into pExists
@@ -286,7 +285,7 @@ begin
     --	add top node for study
 
     if pExists = 0 then
-	select tm_cz.i2b2_add_node(TrialId, topNode, study_name, jobId) into rtnCd;
+	perform tm_cz.i2b2_add_node(TrialId, topNode, study_name, jobId);
     end if;
 
     --	Set data_type, category_path, and usubjid 
@@ -298,7 +297,7 @@ begin
 				     '(::){1,}', ':', 'g'); 
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set columns in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set columns in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done');
 
     --	Delete rows where data_value is null
 
@@ -310,14 +309,14 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete null data_values in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete null data_values in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done');
   
     --Remove Invalid pipes in the data values.
     --RULE: If Pipe is last or first, delete it
@@ -332,14 +331,14 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove pipes in data_value',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove pipes in data_value',rowCt,stepCt,'Done');
   
     --Remove invalid Parens in the data
     --They have appeared as empty pairs or only single ones.
@@ -356,13 +355,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove empty parentheses 1',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove empty parentheses 1',rowCt,stepCt,'Done');
   
     begin
 	update tm_wz.wrk_clinical_data
@@ -376,13 +375,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove empty parentheses 2',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove empty parentheses 2',rowCt,stepCt,'Done');
 
     --Replace the Pipes with Commas in the data_label column
     begin
@@ -395,13 +394,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Replace pipes with comma in data_label',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Replace pipes with comma in data_label',rowCt,stepCt,'Done');
   
     --	set visit_name to null when there's only a single visit_name for the catgory
   
@@ -419,13 +418,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set single visit_name to null',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set single visit_name to null',rowCt,stepCt,'Done');
 
     --	set data_label to null when it duplicates the last part of the category_path
     --	Remove data_label from last part of category_path when they are the same
@@ -459,13 +458,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set data_label to null when found in category_path',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set data_label to null when found in category_path',rowCt,stepCt,'Done');
 
     --	set visit_name to null if same as data_label
   
@@ -484,13 +483,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
       return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set visit_name to null when found in data_label',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set visit_name to null when found in data_label',rowCt,stepCt,'Done');
 
     --	set visit_name to null if same as data_value
 
@@ -509,13 +508,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set visit_name to null when found in data_value',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set visit_name to null when found in data_value',rowCt,stepCt,'Done');
 
     --	set visit_name to null if only DATALABEL in category_cd
 
@@ -530,13 +529,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set visit_name to null when only DATALABEL in category_cd',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set visit_name to null when only DATALABEL in category_cd',rowCt,stepCt,'Done');
 
     --	change any % to Pct and & and + to ' and ' and _ to space in data_label only
 
@@ -551,9 +550,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
 
@@ -571,13 +570,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove leading, trailing, double spaces',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove leading, trailing, double spaces',rowCt,stepCt,'Done');
   
     --1. DETERMINE THE DATA_TYPES OF THE FIELDS
     --	replaced cursor with update, used temp table to store category_cd/data_label because correlated subquery ran too long
@@ -605,13 +604,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert numeric data into WZ wt_num_data_types',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert numeric data into WZ wt_num_data_types',rowCt,stepCt,'Done');
 
     --	Check if any duplicate records of key columns (site_id, subject_id, visit_name, data_label, category_cd) for numeric data
     --	exist.  Raise error if yes
@@ -642,19 +641,19 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Check for duplicate key columns',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Check for duplicate key columns',rowCt,stepCt,'Done');
 
     if rowCt > 0 then
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',0,stepCt,'Msg') into rtnCd;
-	select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-	select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',0,stepCt,'Msg');
+	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
     end if;
 
@@ -671,13 +670,13 @@ begin
 	     group by category_cd, data_label, data_value) x;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Check for multiple visit_names for category/label/value ',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Check for multiple visit_names for category/label/value ',rowCt,stepCt,'Done');
 
     if pCount > 0 then
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Multiple visit names for category/label/value',0,stepCt,'Msg') into rtnCd;
-	select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-	select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Multiple visit names for category/label/value',0,stepCt,'Msg');
+	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
     end if;
 
@@ -696,13 +695,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated data_type flag for numeric data_types',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated data_type flag for numeric data_types',rowCt,stepCt,'Done');
 
     -- Build all needed leaf nodes in one pass for both numeric and text nodes
 
@@ -751,13 +750,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes for trial',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes for trial',rowCt,stepCt,'Done');
 
     --	set node_name
 
@@ -770,13 +769,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated node name for leaf nodes',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated node name for leaf nodes',rowCt,stepCt,'Done');
 
     --	insert subjects into patient_dimension if needed
 
@@ -810,13 +809,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subject information into temp table',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subject information into temp table',rowCt,stepCt,'Done');
     
     --	Delete dropped subjects from patient_dimension if they do not exist in de_subject_sample_mapping
 
@@ -835,13 +834,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete dropped subjects from patient_dimension',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete dropped subjects from patient_dimension',rowCt,stepCt,'Done');
 
 
     --	update patients with changed information
@@ -859,13 +858,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update subjects with changed demographics in patient_dimension',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update subjects with changed demographics in patient_dimension',rowCt,stepCt,'Done');
 
     --	insert new subjects into patient_dimension
 	
@@ -900,13 +899,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert new subjects into patient_dimension',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert new subjects into patient_dimension',rowCt,stepCt,'Done');
 		
     --	delete leaf nodes that will not be reused, if any
 	
@@ -914,9 +913,9 @@ begin
 
 	--	deletes unused leaf nodes for a trial one at a time
 
-	select tm_cz.i2b2_delete_1_node(r_delUnusedLeaf.c_fullname) into rtnCd;
+	perform tm_cz.i2b2_delete_1_node(r_delUnusedLeaf.c_fullname);
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted unused leaf node: ' || r_delUnusedLeaf.c_fullname,1,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted unused leaf node: ' || r_delUnusedLeaf.c_fullname,1,stepCt,'Done');
 
     end loop;
 	
@@ -933,13 +932,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update name_char in concept_dimension for changed names',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update name_char in concept_dimension for changed names',rowCt,stepCt,'Done');
 	
     begin
 	insert into i2b2demodata.concept_dimension
@@ -971,13 +970,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted new leaf nodes into I2B2DEMODATA concept_dimension',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted new leaf nodes into I2B2DEMODATA concept_dimension',rowCt,stepCt,'Done');
 	
     --	update i2b2 with name, data_type and xml for leaf nodes
     begin
@@ -997,13 +996,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated name and data type in i2b2 if changed',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated name and data type in i2b2 if changed',rowCt,stepCt,'Done');
 			   
     begin
 	insert into i2b2metadata.i2b2
@@ -1062,13 +1061,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted leaf nodes into I2B2METADATA i2b2',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted leaf nodes into I2B2METADATA i2b2',rowCt,stepCt,'Done');
 
     begin
 	for ul in uploadI2b2 loop
@@ -1091,13 +1090,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated I2B2 for metadataXML',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated I2B2 for metadataXML',rowCt,stepCt,'Done');
 
 				
     --	delete from observation_fact all concept_cds for trial that are clinical data, exclude concept_cds from biomarker data
@@ -1135,13 +1134,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete clinical data for study from observation_fact',rowCt,stepCt,'Done') into rtnCd;  
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete clinical data for study from observation_fact',rowCt,stepCt,'Done');  
 	
     --Insert into observation_fact
 	
@@ -1206,17 +1205,17 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
     -- insert any missing nodes in the hierarchy now,
     -- so we can check parent and be sure of a match
-    select tm_cz.i2b2_fill_in_tree(TrialId, topNodeEscaped, jobID) into rtnCd;
+    perform tm_cz.i2b2_fill_in_tree(TrialId, topNodeEscaped, jobID);
 
     --	update c_visualattributes for all nodes in study, done to pick up node that changed c_columndatatype
 	
@@ -1252,18 +1251,18 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set c_visualattributes in i2b2',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set c_visualattributes in i2b2',rowCt,stepCt,'Done');
 
 
     -- final procs
   
-    select tm_cz.i2b2_create_concept_counts(topNodeEscaped, jobID) into rtnCd;
+    perform tm_cz.i2b2_create_concept_counts(topNodeEscaped, jobID);
 	
     --	delete each node that is hidden after create concept counts
 	
@@ -1271,22 +1270,22 @@ begin
 
 	--	deletes hidden nodes for a trial one at a time
 
-	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+	perform tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname);
 	stepCt := stepCt + 1;
 	tText := 'Deleted node: ' || r_delNodes.c_fullname;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
     end loop;
 
-    select tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID) into rtnCd;
-    select tm_cz.i2b2_load_security_data(jobID) into rtnCd;
+    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
+    perform tm_cz.i2b2_load_security_data(jobID);
 	
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_clinical_data',0,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_clinical_data',0,stepCt,'Done');
 	
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	select tm_cz.cz_end_audit (jobID, 'SUCCESS') into rtnCd;
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 1;

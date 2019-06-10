@@ -110,8 +110,8 @@ BEGIN
   newJobFlag := 0; -- False (Default)
   jobID := currentJobID;
 
-  databaseName := 'TM_CZ';
-  procedureName := 'I2B2_PROCESS_QPCR_MIRNA_DATA';
+  databaseName := 'tm_cz';
+  procedureName := 'i2b2_process_qpcr_mirna_data';
   --Audit JOB Initialization
   --If Job ID does not exist, then this is a single procedure run and we need to create it
   IF(jobID IS NULL or jobID < 1)

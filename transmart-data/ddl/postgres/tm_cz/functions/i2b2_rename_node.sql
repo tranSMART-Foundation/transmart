@@ -31,7 +31,6 @@ AS $$
     rowCt bigint;
     errorNumber    character varying;
     errorMessage  character varying;
-    rtnCd      integer;
 
 begin
     
@@ -39,8 +38,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_RENAME_NODE';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_rename_node';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -97,9 +96,9 @@ begin
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 	    --Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    --End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 			
@@ -125,9 +124,9 @@ begin
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 	    --Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    --End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
@@ -148,9 +147,9 @@ begin
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 	    --Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    --End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;

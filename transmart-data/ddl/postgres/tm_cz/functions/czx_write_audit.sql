@@ -25,7 +25,6 @@ AS $$
     lastTime timestamp;
     currTime timestamp;
     elapsedSecs	numeric;
-    rtnCd		numeric;
     
 begin
 
@@ -68,7 +67,7 @@ begin
     exception 
 	when others then
 	--raise notice 'proc failed state=%  errm=%', SQLSTATE, SQLERRM;
-	    select tm_cz.czx_write_error(jobid,'0'::character varying(10),SQLERRM::character varying(1000),SQLSTATE::character varying(1000),SQLERRM::character varying(1000)) into rtnCd;
+	    perform tm_cz.czx_write_error(jobid,'0'::character varying(10),SQLERRM::character varying(1000),SQLSTATE::character varying(1000),SQLERRM::character varying(1000));
 	    return -16;
     end;
     

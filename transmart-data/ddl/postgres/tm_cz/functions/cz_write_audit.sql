@@ -25,7 +25,6 @@ AS $$
     lastTime    timestamp;
     currTime    timestamp;
     elapsedSecs numeric;
-    rtnCd       numeric;
     
 begin
 
@@ -67,7 +66,7 @@ begin
             ,elapsedSecs);
     exception 
         when others then
-            select tm_cz.cz_write_error(jobId,SQLSTATE,SQLERRM,null,null) into rtnCd;
+            perform tm_cz.cz_write_error(jobId,SQLSTATE,SQLERRM,null,null);
             return -16;
     end;
     

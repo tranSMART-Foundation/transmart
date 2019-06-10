@@ -13,7 +13,6 @@ AS $$
     jobID bigint;
     errorNumber		character varying;
     errorMessage	character varying;
-    rtnCd			integer;
     rowCt			numeric(18,0);
     stepCt bigint;
 
@@ -25,8 +24,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := -1;
     
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_RBA_SEQ_ANNOTATION';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_rna_seq_annotation';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -108,7 +107,6 @@ AS $$
     jobID bigint;
     errorNumber		character varying;
     errorMessage	character varying;
-    rtnCd			integer;
     rowCt			numeric(18,0);
     stepCt bigint;
 
@@ -120,8 +118,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
     
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_RNA_SEQ_ANNOTATION';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_rna_seq_annotation';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

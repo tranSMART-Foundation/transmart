@@ -62,8 +62,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'RDC_RELOAD_MRNA_DATA';
+    databaseName := 'tm_cz';
+    procedureName := 'rdc_reload_mrna_data';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

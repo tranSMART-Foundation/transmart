@@ -41,8 +41,8 @@ BEGIN
 	--Set Audit Parameters
 	newJobFlag := 0; -- False (Default)
 	jobID := currentJobID;
-	SELECT current_user INTO databaseName; --(sic)
-	procedureName := 'RWG_IMPORT_FROM_EXT';
+	select current_user INTO databaseName; --(sic)
+	procedureName := 'rwg_import_from_ext';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it

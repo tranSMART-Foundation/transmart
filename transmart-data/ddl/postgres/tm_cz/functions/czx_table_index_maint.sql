@@ -31,7 +31,6 @@ AS $$
     rowCt			numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
-    rtnCd			integer;
     
     v_ct		int;
     v_index		record;
@@ -55,24 +54,24 @@ begin
 
     stepCt := 0;
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done') into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done');
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,' run_type: ' || p_run_type || ' schema: ' || p_schema ||  ' table: ' || p_table,0,stepCt,'Done') into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,' run_type: ' || p_run_type || ' schema: ' || p_schema ||  ' table: ' || p_table,0,stepCt,'Done');
 
 
     if p_run_type not in ('DROP','ADD','SAVE') then
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Invalid run_type',0,stepCt,'Done') into rtnCd;
-	select tm_cz.czx_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-	select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Invalid run_type',0,stepCt,'Done');
+	perform tm_cz.czx_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	perform tm_cz.czx_end_audit (jobID, 'FAIL');
 	return 16;
     end if;
     
     if p_schema is null or p_schema = '' then
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Schema name missing',0,stepCt,'Done') into rtnCd;
-	select tm_cz.czx_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-	select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Schema name missing',0,stepCt,'Done');
+	perform tm_cz.czx_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	perform tm_cz.czx_end_audit (jobID, 'FAIL');
 	return 16;
     end if;
     
@@ -89,13 +88,13 @@ begin
 	if p_run_type != 'SAVE' then
 	    if p_table = 'ALL' then
 		stepCt := stepCt + 1;
-		select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No saved indexes foound for schema',0,stepCt,'Done') into rtnCd;
+		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No saved indexes foound for schema',0,stepCt,'Done');
 	    else
 		stepCt := stepCt + 1;
-		select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No saved indexes found for table',0,stepCt,'Done') into rtnCd;
+		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No saved indexes found for table',0,stepCt,'Done');
 	    end if;
-	    select tm_cz.czx_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-	    select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.czx_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	    perform tm_cz.czx_end_audit (jobID, 'FAIL');
 	    return 16;
 	end if;
     end if;
@@ -127,13 +126,13 @@ begin
 	if v_ct = 0 then
 	    if p_table = 'ALL' then
 		stepCt := stepCt + 1;
-		select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No indexes foound for schema',0,stepCt,'Done') into rtnCd;
+		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No indexes foound for schema',0,stepCt,'Done');
 	    else
 		stepCt := stepCt + 1;
-		select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No indexes found for table',0,stepCt,'Done') into rtnCd;
+		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No indexes found for table',0,stepCt,'Done');
 	    end if;
-	    select tm_cz.czx_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-	    select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.czx_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	    perform tm_cz.czx_end_audit (jobID, 'FAIL');
 	    return 16;
 	end if;
 	
@@ -152,15 +151,15 @@ begin
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 	    --Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    --End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return 16;
 	end;
 
 	stepCt := stepCt + 1; 
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Deleted existing indexes for ' ||
-				     case when p_table = 'ALL' then p_schema else p_table end,rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Deleted existing indexes for ' ||
+				     case when p_table = 'ALL' then p_schema else p_table end,rowCt,stepCt,'Done');
 		
         --	insert indexes for schema tables into cz.table_index
 		
@@ -198,14 +197,14 @@ begin
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 	    --Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    --End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return 16;
 	end;
 	stepCt := stepCt + 1; 
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Inserted indexes for ' ||
-				     case when p_table = 'ALL' then p_schema else p_table end,rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Inserted indexes for ' ||
+				     case when p_table = 'ALL' then p_schema else p_table end,rowCt,stepCt,'Done');
     else 
 	--	drop indexes for DROP or ADD
 
@@ -226,14 +225,14 @@ begin
 		--	errorNumber := SQLSTATE;
 		--	errorMessage := SQLERRM;
 		--Handle errors.
-		--	select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		--	perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		--	select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		--	perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		--	return 16;
 	    end;
 	    stepCt := stepCt + 1;
-	    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Dropped index ' || v_index.index_name || ' for ' ||
-					 case when p_table = 'ALL' then p_schema else p_table end,rowCt,stepCt,'Done') into rtnCd;
+	    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Dropped index ' || v_index.index_name || ' for ' ||
+					 case when p_table = 'ALL' then p_schema else p_table end,rowCt,stepCt,'Done');
 	    
 	    if p_run_type = 'ADD' then
 		--	add indexes for schema
@@ -244,17 +243,17 @@ begin
 		exception 
 		    when others then
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,v_index.index_sql || ': ' || sqlerrm,0,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,v_index.index_sql || ': ' || sqlerrm,0,stepCt,'Done');
 			errorNumber := SQLSTATE;
 			errorMessage := SQLERRM;
 		    --Handle errors.
-			select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+			perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		    --End Proc
-			select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+			perform tm_cz.czx_end_audit (jobID, 'FAIL');
 			return 16;
 		end;
 		stepCt := stepCt + 1;
-		select tm_cz.czx_write_audit(jobId,databaseName,procedureName, 'Added index ' || v_index.index_name || ' on ' || p_schema || '.' || v_index.table_name,0,stepCt,'Done') into rtnCd;
+		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName, 'Added index ' || v_index.index_name || ' on ' || p_schema || '.' || v_index.table_name,0,stepCt,'Done');
 	    end if;
 	end loop;
     end if;
@@ -262,11 +261,11 @@ begin
     ---Cleanup OVERALL JOB if this proc is being run standalone
 
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done') into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done');
 
     --Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	select tm_cz.czx_end_audit (jobID, 'SUCCESS') into rtnCd;
+	perform tm_cz.czx_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 1;

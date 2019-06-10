@@ -31,7 +31,6 @@ AS $$
     rowCt			numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
-    rtnCd			numeric;
     
 begin
 
@@ -51,7 +50,7 @@ begin
     end if;
     
     if path = ''  or path = '%' or path_name = '' then 
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path or Path name missing, no action taken',0,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path or Path name missing, no action taken',0,stepCt,'Done');
 	return 1;
 	end if;
 
@@ -64,14 +63,14 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
 	    get diagnostics rowCt := ROW_COUNT;	
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Nodes hidden in i2b2metadata.i2b2',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Nodes hidden in i2b2metadata.i2b2',rowCt,stepCt,'Done');
 
     
     begin
@@ -82,18 +81,18 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
 	    get diagnostics rowCt := ROW_COUNT;	
     end;
     stepCt := stepCt + 1;
-    select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted hidden nodes from i2b2demodata.concept_counts',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted hidden nodes from i2b2demodata.concept_counts',rowCt,stepCt,'Done');
 
     --	reload i2b2_secure for hidden nodes
     
-    select tm_cz.load_security_data(jobId) into rtnCd;
+    perform tm_cz.load_security_data(jobId);
     
     return 1;
     

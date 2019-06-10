@@ -33,7 +33,6 @@ Declare
 	rowCt			numeric(18,0);
 	errorNumber		character varying;
 	errorMessage	character varying;
-	rtnCd			integer;
 
 	TrialID			varchar(100);
 	RootNode		varchar(2000);
@@ -87,7 +86,7 @@ BEGIN
 	--Set Audit Parameters
 	newJobFlag := 0; -- False (Default)
 	jobID := currentJobID;
-	databaseName := 'TM_CZ';
+	databaseName := 'tm_cz';
 	procedureName := 'i2b2_process_rnaseq_data';
 
 	--Audit JOB Initialization
@@ -101,7 +100,7 @@ BEGIN
 
 	stepCt := 0;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_rnaseq_data',0,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_rnaseq_data',0,stepCt,'Done');
 
 	if (secureStudy not in ('Y','N') ) then
 		secureStudy := 'Y';
@@ -136,9 +135,9 @@ BEGIN
 
 	if pCount > 0 then
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'subject_id missing in lt_src_mrna_subj_samp_map',0,pCount,'Done') into rtnCd;
-		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'subject_id missing in lt_src_mrna_subj_samp_map',0,pCount,'Done');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end if;
 
@@ -150,9 +149,9 @@ BEGIN
 
 	if pCount > 0 then
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'sample_cd missing in lt_src_mrna_subj_samp_map',0,pCount,'Done') into rtnCd;
-		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'sample_cd missing in lt_src_mrna_subj_samp_map',0,pCount,'Done');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end if;
 
@@ -164,9 +163,9 @@ BEGIN
 
 	if pCount > 0 then
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Platform missing in lt_src_mrna_subj_samp_map',0,pCount,'Done') into rtnCd;
-		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Platform missing in lt_src_mrna_subj_samp_map',0,pCount,'Done');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end if;
 
@@ -177,9 +176,9 @@ BEGIN
 	where gpl_id in (select distinct m.platform from tm_lz.lt_src_mrna_subj_samp_map m);
 
 	if pCount = 0 then
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No Chromosomal platforms in deapp.de_chromosomal_region',0,pCount,'Done') into rtnCd;
-		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No Chromosomal platforms in deapp.de_chromosomal_region',0,pCount,'Done');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end if;
 
@@ -194,9 +193,9 @@ BEGIN
 			and gi.title is not null);
 
 	if pCount > 0 then
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'deapp.de_gpl_info entry missing for one or more platforms',0,pCount,'Done') into rtnCd;
-		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'deapp.de_gpl_info entry missing for one or more platforms',0,pCount,'Done');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end if;
 
@@ -207,9 +206,9 @@ BEGIN
 	where tissue_type is null;
 
 	if pCount > 0 then
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Tissue_Type is null for subjects',0,pCount,'Done') into rtnCd;
-		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Tissue_Type is null for subjects',0,pCount,'Done');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end if;
 
@@ -222,9 +221,9 @@ BEGIN
 		  having count(distinct platform) > 1) x;
 
 	if pCount > 0 then
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Multiple platforms for single sample',0,pCount,'Done') into rtnCd;
-		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Multiple platforms for single sample',0,pCount,'Done');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end if;
 
@@ -237,7 +236,7 @@ BEGIN
 	where c_name = rootNode;
 
 	if pExists = 0 then
-		select tm_cz.i2b2_add_root_node(rootNode, jobId) into rtnCd;
+		perform tm_cz.i2b2_add_root_node(rootNode, jobId);
 	end if;
 
 	select c_hlevel into root_level
@@ -254,7 +253,7 @@ BEGIN
 	select length(tPath) - length(replace(tPath,'\','')) into pCount;
 
 	if pCount > 2 then
-		select tm_cz.i2b2_fill_in_tree('', tPath, jobId) into rtnCd;
+		perform tm_cz.i2b2_fill_in_tree('', tPath, jobId);
 	end if;
 
 	--	uppercase study_id in tm_lz.lt_src_mrna_subj_samp_map in case curator forgot
@@ -268,14 +267,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in tm_lz.lt_src_mrna_subj_samp_map',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in tm_lz.lt_src_mrna_subj_samp_map',rowCt,stepCt,'Done');
 
 	--	create records in patient_dimension for subject_ids if they do not exist
 	--	format of sourcesystem_cd:  trial:[site:]subject_cd
@@ -321,18 +320,18 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',rowCt,stepCt,'Done');
 
 	--	add security for trial if new subjects added to patient_dimension
 
 	if pCount > 0 then
-		select tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID) into rtnCd;
+		perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
 	end if;
 
 	--	Delete existing observation_fact data, will be repopulated
@@ -352,13 +351,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
 
 	--	check if trial/source_cd already loaded, if yes, get existing partition_id else get new one
 
@@ -421,13 +420,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP tm_wz.wt_mrna_node_values',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP tm_wz.wt_mrna_node_values',rowCt,stepCt,'Done');
 
 	--	inserts that create the ontology for the leaf nodes
 
@@ -456,14 +455,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 
     stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_mrna_nodes',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_mrna_nodes',rowCt,stepCt,'Done');
 
 	--	insert for platform node so platform concept can be populated
 
@@ -493,13 +492,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
     stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done');
 
 	--	insert for ATTR1 node so ATTR1 concept can be populated in sample_type_cd
 
@@ -531,13 +530,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
     stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done');
 
 	--	insert for ATTR2 node so ATTR2 concept can be populated in timepoint_cd
 
@@ -569,13 +568,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
     stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done');
 
 	--	insert for tissue_type node so tissue_type_cd can be populated
 
@@ -606,13 +605,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
     stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done');
 
 	--	set node_name
 
@@ -625,13 +624,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
     stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_mrna_nodes',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_mrna_nodes',rowCt,stepCt,'Done');
 
 	--	add leaf nodes for mRNA data  The cursor will only add nodes that do not already exist.
 
@@ -639,13 +638,13 @@ BEGIN
 
     --Add nodes for all types (ALSO DELETES EXISTING NODE)
 
-		select tm_cz.i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId) into rtnCd;
+		perform tm_cz.i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId);
 		stepCt := stepCt + 1;
 		tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
 
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,1,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,1,stepCt,'Done');
 
-		select tm_cz.i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID) into rtnCd;
+		perform tm_cz.i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID);
 
 	END LOOP;
 
@@ -667,13 +666,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update tm_wz.wt_mrna_nodes with newly created concept_cds',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update tm_wz.wt_mrna_nodes with newly created concept_cds',rowCt,stepCt,'Done');
 
 	--	delete any site/subject/samples that are not in lt_src_mrna_data for the trial on a reload
 
@@ -695,14 +694,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 		end;
 	end if;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete dropped site/subject/sample from de_subject_sample_mapping',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete dropped site/subject/sample from de_subject_sample_mapping',rowCt,stepCt,'Done');
 
 	--Update or insert DE_SUBJECT_SAMPLE_MAPPING from wt_subject_mrna_data
 
@@ -793,14 +792,14 @@ BEGIN
 			errorNumber := SQLSTATE;
 			errorMessage := SQLERRM;
 			--Handle errors.
-			select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+			perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 			--End Proc
-			select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+			perform tm_cz.cz_end_audit (jobID, 'FAIL');
 			return -16;
 		end;
 
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update existing data in de_subject_sample_mapping',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update existing data in de_subject_sample_mapping',rowCt,stepCt,'Done');
 	pcount := rowCt;	--	set counter to check that all subject_sample mapping records were added/updated
 	--	insert any site/subject/samples that are not in de_subject_sample_mapping
 
@@ -928,22 +927,22 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 	pCount := pCount + rowCt;
 
 	--	check if all records from lt_src_mrna_subj_samp_map were added/updated
 
 	if scount <> pCount then
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Not all records in lt_src_mrna_subj_samp_map inserted/updated in de_subject_sample_mapping',0,stepCt,'Done') into rtnCd;
-		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Not all records in lt_src_mrna_subj_samp_map inserted/updated in de_subject_sample_mapping',0,stepCt,'Done');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end if;	
 	--	Insert records for subjects into observation_fact
@@ -990,13 +989,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
     stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
 	--Update I2b2 for correct c_columndatatype, c_visualattributes, c_metadataxml
 
@@ -1014,21 +1013,21 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Initialize visualattributes and xml in i2b2',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Initialize visualattributes and xml in i2b2',rowCt,stepCt,'Done');
 
   --Build concept Counts
   --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
   -- a unique top-level node for mRNA data
 
-    select tm_cz.i2b2_create_concept_counts(topNode ,jobID ) into rtnCd;
+    perform tm_cz.i2b2_create_concept_counts(topNode ,jobID );
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
 
 	--	delete each node that is hidden
 
@@ -1036,19 +1035,19 @@ BEGIN
 
     --	deletes hidden nodes for a trial one at a time
 
-		select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+		perform tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname);
 		stepCt := stepCt + 1;
 		tText := 'Deleted node: ' || r_delNodes.c_fullname;
 
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done');
 
 	END LOOP;
 
 	--Reload Security: Inserts one record for every I2B2 record into the security table
 
-	select tm_cz.i2b2_load_security_data(jobId) into rtnCd;
+	perform tm_cz.i2b2_load_security_data(jobId);
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
 
 	--	tag data with probeset_id from reference.probeset_deapp
 
@@ -1096,18 +1095,18 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_rnaseq_region',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_rnaseq_region',rowCt,stepCt,'Done');
 
 	if rowCt = 0 then
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Unable to match regions to platform in region_deapp',0,rowCt,'Done') into rtnCd;
-		select tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error') into rtnCd;
-		select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Unable to match regions to platform in region_deapp',0,rowCt,'Done');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end if;
 
@@ -1124,7 +1123,7 @@ BEGIN
 		raise notice 'sqlText= %', sqlText;
 		execute sqlText;
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create partition ' || partitionName,1,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create partition ' || partitionName,1,stepCt,'Done');
 	else
 		sqlText := 'drop index if exists ' || partitionIndx || '_idx1';
 		raise notice 'sqlText= %', sqlText;
@@ -1139,12 +1138,12 @@ BEGIN
 		raise notice 'sqlText= %', sqlText;
 		execute sqlText;
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on ' || partitionName,1,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on ' || partitionName,1,stepCt,'Done');
 		sqlText := 'truncate table ' || partitionName;
 		raise notice 'sqlText= %', sqlText;
 		execute sqlText;
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate ' || partitionName,1,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate ' || partitionName,1,stepCt,'Done');
 	end if;
 
 	--	insert into de_subject_rnaseq_data when dataType is T (transformed)
@@ -1158,7 +1157,7 @@ BEGIN
 		execute sqlText;
 		get diagnostics rowCt := ROW_COUNT;
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted data into ' || partitionName,rowCt,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted data into ' || partitionName,rowCt,stepCt,'Done');
 
 	else
 		--	calculate zscore and insert to partition
@@ -1168,7 +1167,7 @@ BEGIN
 		execute ('truncate table tm_wz.wt_subject_rnaseq_logs');
 		execute ('truncate table tm_wz.wt_subject_rnaseq_calcs');
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes and truncate zscore work tables',1,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes and truncate zscore work tables',1,stepCt,'Done');
 
 		begin
 		insert into tm_wz.wt_subject_rnaseq_logs
@@ -1196,17 +1195,17 @@ BEGIN
 			errorNumber := SQLSTATE;
 			errorMessage := SQLERRM;
 			--Handle errors.
-			select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+			perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 			--End Proc
-			select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+			perform tm_cz.cz_end_audit (jobID, 'FAIL');
 			return -16;
 		end;
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rnaseq_logs',rowCt,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rnaseq_logs',rowCt,stepCt,'Done');
 
 		execute ('create index wt_subject_rnaseq_logs_i1 on tm_wz.wt_subject_rnaseq_logs (region_id) tablespace "indx"');
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rnaseq_logs',0,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rnaseq_logs',0,stepCt,'Done');
 
 		--	calculate mean_intensity, median_intensity, and stddev_intensity per region
 
@@ -1229,17 +1228,17 @@ BEGIN
 			errorNumber := SQLSTATE;
 			errorMessage := SQLERRM;
 			--Handle errors.
-			select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+			perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 			--End Proc
-			select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+			perform tm_cz.cz_end_audit (jobID, 'FAIL');
 			return -16;
 		end;
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate mean, median, stddev readcounts for trial in TM_WZ wt_subject_rnaseq_calcs',rowCt,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate mean, median, stddev readcounts for trial in TM_WZ wt_subject_rnaseq_calcs',rowCt,stepCt,'Done');
 
 		execute ('create index wt_subject_rnaseq_calcs_i1 on tm_wz.wt_subject_rnaseq_calcs (region_id) tablespace "indx"');
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rnaseq_calcs',0,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rnaseq_calcs',0,stepCt,'Done');
 
 		-- calculate zscore and insert into partition
 
@@ -1256,7 +1255,7 @@ BEGIN
 		execute sqlText;
 		get diagnostics rowCt := ROW_COUNT;
 		stepCt := stepCt + 1;
-		select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score and insert into ' || partitionName,rowCt,stepCt,'Done') into rtnCd;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score and insert into ' || partitionName,rowCt,stepCt,'Done');
 
 	end if;
 
@@ -1277,12 +1276,12 @@ BEGIN
     ---Cleanup OVERALL JOB if this proc is being run standalone
 
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_rnaseq_data',0,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_rnaseq_data',0,stepCt,'Done');
 
 	---Cleanup OVERALL JOB if this proc is being run standalone
 	IF newJobFlag = 1
 	THEN
-		select tm_cz.cz_end_audit (jobID, 'SUCCESS') into rtnCd;
+		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 
 	return 1;

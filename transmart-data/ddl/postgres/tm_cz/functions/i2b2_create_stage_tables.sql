@@ -29,7 +29,7 @@ AS $$
     jobID 		numeric(18,0);
     stepCt 		numeric(18,0);
     rowCount	numeric(18,0);
-    rtnCd integer;
+
     --	Define the abstract result set record
     
     r_stage_table		record;
@@ -48,8 +48,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := -1;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_CREATE_STAGE_TABLES';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_create_stage_tables';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -59,7 +59,7 @@ begin
     end if;
     
     stepCt := 0;	
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done')into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done');
     
     for r_stage_table in
 	select upper(table_owner) as table_owner
@@ -99,16 +99,16 @@ begin
 	    end if;
 	    execute immediate tText;
 	    stepCt := stepCt + 1;
-	    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Created '|| release_table,0,stepCt,'Done')into rtnCd;
+	    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Created '|| release_table,0,stepCt,'Done');
 
     end loop;
     
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End i2b2_create_release_tablese',0,stepCt,'Done')into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End i2b2_create_release_tablese',0,stepCt,'Done');
     stepCt := stepCt + 1;
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	select tm_cz.czx_end_audit (jobID, 'SUCCESS')into rtnCd;
+	perform tm_cz.czx_end_audit (jobID, 'SUCCESS');
     end if;
 
 exception
@@ -116,9 +116,9 @@ exception
 	v_sqlerrm := substr(SQLERRM,1,1000);
 	raise notice 'error: %', v_sqlerrm;
     --Handle errors.
-	select tm_cz.czx_error_handler (jobID, procedureName,v_sqlerrm)into rtnCd;
+	perform tm_cz.czx_error_handler (jobID, procedureName,v_sqlerrm);
     --End Proc
-	select tm_cz.czx_end_audit (jobID, 'FAIL')into rtnCd;
+	perform tm_cz.czx_end_audit (jobID, 'FAIL');
 
 end;
 $$;

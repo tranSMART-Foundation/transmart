@@ -23,7 +23,6 @@ AS $$
 
     declare
     endDate timestamp;
-    rtnCd	numeric;
 
 begin
     
@@ -48,7 +47,7 @@ begin
 exception 
     when others then
     --raise notice 'proc failed state=%  errm=%', SQLSTATE, SQLERRM;
-	select tm_cz.cz_write_error(jobId,SQLSTATE,SQLERRM,null,null) into rtnCd;
+	perform tm_cz.cz_write_error(jobId,SQLSTATE,SQLERRM,null,null);
 	return -16;
 end;
 $$;

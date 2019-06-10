@@ -30,7 +30,6 @@ declare
 	rowCt			numeric(18,0);
 	errorNumber		character varying;
 	errorMessage	character varying;
-	rtnCd			integer;
 	
 	dcount 				int;
 	lcount 				int;
@@ -66,7 +65,7 @@ BEGIN
 
 	stepCt := 0;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done');
 
 	select clock_timestamp() into upload_date;
  
@@ -105,14 +104,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Updated trial data in BIOMART bio_experiment',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Updated trial data in BIOMART bio_experiment',rowCt,stepCt,'Done');
 
 /*	
 	--	Update existing bio_clinical_trial data only for true Clinical Trials or JnJ Experimental Medicine Studies
@@ -232,13 +231,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study to BIOMART bio_experiment',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study to BIOMART bio_experiment',rowCt,stepCt,'Done');
 
 /*		
 	--	Add new trial data to bio_clinical_trial
@@ -336,14 +335,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added study to bio_data_uid',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added study to bio_data_uid',rowCt,stepCt,'Done');
 
 	--	delete existing compound data for study, compound list may change
 	
@@ -360,14 +359,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study data from bio_compound',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study data from bio_compound',rowCt,stepCt,'Done');
 
 	--	add study compound data
 	
@@ -396,14 +395,14 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			get diagnostics rowCt := ROW_COUNT;	
 			end;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study compound to bio_compound',rowCt,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study compound to bio_compound',rowCt,stepCt,'Done');
 					
 			--	Insert new trial data into bio_data_compound
 			begin
@@ -429,14 +428,14 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			get diagnostics rowCt := ROW_COUNT;	
 			end;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study compound to bio_data_compound',rowCt,stepCt,'Done') into rtnCd;			
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study compound to bio_data_compound',rowCt,stepCt,'Done');			
 			dcount := dcount - 1;
 		end loop;
 	end loop;
@@ -456,14 +455,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study data from bio_data_disease',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study data from bio_data_disease',rowCt,stepCt,'Done');
 
 	--	add study disease data
 	
@@ -493,14 +492,14 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			get diagnostics rowCt := ROW_COUNT;	
 			end;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study disease to bio_disease',rowCt,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study disease to bio_disease',rowCt,stepCt,'Done');
 			
 			--	Insert new trial data into bio_data_disease
 			begin
@@ -526,14 +525,14 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			get diagnostics rowCt := ROW_COUNT;	
 			end;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study disease to bio_data_disease',rowCt,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study disease to bio_data_disease',rowCt,stepCt,'Done');
 			dcount := dcount - 1;
 		end loop;
 	end loop;
@@ -553,14 +552,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study data from bio_data_taxonomy',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study data from bio_data_taxonomy',rowCt,stepCt,'Done');
 
 	--	add study organism to taxonomy
 	
@@ -590,14 +589,14 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			get diagnostics rowCt := ROW_COUNT;	
 			end;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study organism to bio_taxonomy',rowCt,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study organism to bio_taxonomy',rowCt,stepCt,'Done');
 							
 			--	Insert new trial data into bio_data_taxonomy
 			begin
@@ -623,14 +622,14 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			get diagnostics rowCt := ROW_COUNT;	
 			end;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study organism to bio_data_taxonomy',rowCt,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study organism to bio_data_taxonomy',rowCt,stepCt,'Done');
 
 			dcount := dcount - 1;
 		end loop;
@@ -658,14 +657,14 @@ BEGIN
 			errorNumber := SQLSTATE;
 			errorMessage := SQLERRM;
 			--Handle errors.
-			select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+			perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 			--End Proc
-			select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+			perform tm_cz.czx_end_audit (jobID, 'FAIL');
 			return -16;
 		get diagnostics rowCt := ROW_COUNT;	
 		end;
 		stepCt := stepCt + 1;
-		select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert link to NCBI into bio_content_repository',rowCt,stepCt,'Done') into rtnCd;
+		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert link to NCBI into bio_content_repository',rowCt,stepCt,'Done');
 	end if;
 
 	--	insert GSE studies into bio_content
@@ -696,14 +695,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add GEO study to bio_content',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add GEO study to bio_content',rowCt,stepCt,'Done');
 	
 	--	insert GSE studies into bio_content_reference
 	
@@ -735,14 +734,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added GEO study to bio_content_reference',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added GEO study to bio_content_reference',rowCt,stepCt,'Done');
 
 	--	add PUBMED linking
 	
@@ -761,14 +760,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study pubmed from bio_content_reference',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study pubmed from bio_content_reference',rowCt,stepCt,'Done');
 		
 	begin
 	delete from biomart.bio_content dc
@@ -783,14 +782,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study pubmed from bio_content',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study pubmed from bio_content',rowCt,stepCt,'Done');
 
 	--	add study pubmed ids'
 	
@@ -811,14 +810,14 @@ BEGIN
 			errorNumber := SQLSTATE;
 			errorMessage := SQLERRM;
 			--Handle errors.
-			select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+			perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 			--End Proc
-			select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+			perform tm_cz.czx_end_audit (jobID, 'FAIL');
 			return -16;
 		get diagnostics rowCt := ROW_COUNT;	
 		end;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add pubmed url to bio_content_repository',rowCt,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add pubmed url to bio_content_repository',rowCt,stepCt,'Done');
 	end if;
 	
 	for study_pubmed_rec in
@@ -867,14 +866,14 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			get diagnostics rowCt := ROW_COUNT;	
 			end;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study pubmed to bio_content',rowCt,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study pubmed to bio_content',rowCt,stepCt,'Done');
 		
 			begin
 			insert into biomart.bio_content_reference
@@ -902,14 +901,14 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			get diagnostics rowCt := ROW_COUNT;	
 			end;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study pubmed to bio_content_reference',rowCt,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study pubmed to bio_content_reference',rowCt,stepCt,'Done');
 			dcount := dcount - 1;
 		end loop;
 	end loop;
@@ -924,14 +923,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete study from i2b2_tags',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete study from i2b2_tags',rowCt,stepCt,'Done');
 
 	begin
 	insert into i2b2metadata.i2b2_tags
@@ -950,14 +949,14 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	get diagnostics rowCt := ROW_COUNT;	
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study to i2b2_tags',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study to i2b2_tags',rowCt,stepCt,'Done');
 
 /*					 
 	--	Insert trial data tags - COMPOUND
@@ -1024,12 +1023,12 @@ BEGIN
     ---Cleanup OVERALL JOB if this proc is being run standalone
 
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done');
 
 	---Cleanup OVERALL JOB if this proc is being run standalone
 	IF newJobFlag = 1
 	THEN
-		select tm_cz.czx_end_audit (jobID, 'SUCCESS') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'SUCCESS');
 	END IF;
 
 	return 0;

@@ -27,7 +27,6 @@ AS $$
     trial_id  alias for $1;
     data_type alias for $2;
     currentJobID alias for $3;
-    rtnCd integer;
     TrialId 	varchar(200);
     msgText		varchar(2000);
     dataType	varchar(50);
@@ -63,8 +62,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_COPY_TO_STAGE';
+    databaseName := 'tm_cz';
+    procedureName := 'nz_i2b2_copy_to_stage';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

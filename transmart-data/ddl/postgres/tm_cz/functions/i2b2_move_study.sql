@@ -24,7 +24,6 @@ AS $$
 
     root_node		varchar(2000);
     root_level	integer;
-    rtnCd			integer;
 
     --Audit variables
     newJobFlag		integer;
@@ -44,8 +43,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_MOVE_STUDY';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_move_study';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -70,7 +69,7 @@ begin
 	where concept_path like old_path || '%';
 	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',rowCt,stepCt,'Done');
 
 
 
@@ -85,7 +84,7 @@ begin
 	 where c_fullname like old_path || '%';
 	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
-	select tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',rowCt,stepCt,'Done');
 
 
 
@@ -107,7 +106,7 @@ begin
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	select tm_cz.cz_end_audit (jobID, 'SUCCESS') into rtnCD;
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 1;
@@ -117,9 +116,9 @@ exception
 	errorNumber := SQLSTATE;
 	errorMessage := SQLERRM;
     --Handle errors.
-	select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
     --End Proc
-	select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
 
 end;

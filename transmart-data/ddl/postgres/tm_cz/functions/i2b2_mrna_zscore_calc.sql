@@ -53,8 +53,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_MRNA_ZSCORE_CALC';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_mrna_zscore_calc';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

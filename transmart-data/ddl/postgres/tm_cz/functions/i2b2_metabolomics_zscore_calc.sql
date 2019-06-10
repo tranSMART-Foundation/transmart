@@ -42,8 +42,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_METABOLOMICS_ZSCORE_CALC';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_metabolomics_zscore_calc';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -96,8 +96,8 @@ begin
 	if runType = 'R' then
 	select count(*) into idxExists
 	from DE_SUBJECT_METABOLOMICS_DATA
-	SELECT sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName FROM dual;
-	procedureName := 'I2B2_METABOLOMICS_ZSCORE_CALC';
+	select sys_context('userenv', 'current_schema') INTO databaseName FROM dual;
+	procedureName := 'i2b2_metabolomics_zscore_calc';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -454,7 +454,6 @@ AS $$
     jobID		numeric;
     stepCt		numeric;
     rowCt		bigint;
-    rtnCd		integer;
     errorNumber		character varying;
     errorMessage	character varying;
 
@@ -473,7 +472,7 @@ begin
     partitionindx := partition_indx;
     partitionName := partition_name;
 
-    databaseName := 'TM_CZ';
+    databaseName := 'tm_cz';
     procedureName := 'i2b2_metabolomics_zscore_calc';
 
     --Audit JOB Initialization
@@ -492,8 +491,8 @@ begin
 	stepCt := stepCt + 1;
 	perform cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
 			       ,0,stepCt,'Done');
-	select cz_error_handler(jobid,procedurename, '-1', 'Application raised error') into rtnCd;
-	select cz_end_audit (jobId,'FAIL') into rtnCd;
+	perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+	perform cz_end_audit (jobId,'FAIL');
 	return;
     end if;
     
@@ -508,8 +507,8 @@ begin
 	    stepCt := stepCt + 1;
 	    perform cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in WT_SUBJECT_MBOLOMICS_PROBESET - procedure exiting'
 				   ,0,stepCt,'Done');
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
-	    select cz_end_audit (jobId,'FAIL') into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform cz_end_audit (jobId,'FAIL');
 	    return;
 	end if;
     end if;
@@ -525,10 +524,10 @@ begin
 	
 	if idxExists = 0 then
 	    stepCt := stepCt + 1;
-	    select cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_metabolomics_data - procedure exiting'
-				  ,0,stepCt,'Done') into rtnCd;
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
-	    select cz_end_audit (jobId,'FAIL') into rtnCd;
+	    perform cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_metabolomics_data - procedure exiting'
+				  ,0,stepCt,'Done');
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform cz_end_audit (jobId,'FAIL');
 	    return;
 	end if;
     end if;
@@ -587,9 +586,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return;
     end;
 
@@ -623,9 +622,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return;
     end;
     stepCt := stepCt + 1;
@@ -664,9 +663,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return;
     end;
     stepCt := stepCt + 1;
@@ -694,9 +693,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.cz_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return;
     end;
     perform cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP DE_SUBJECT_METABOLOMICS_DATA',rowCt,stepCt,'Done');

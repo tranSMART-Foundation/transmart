@@ -37,8 +37,8 @@ BEGIN
 	--Set Audit Parameters
 	newJobFlag := 0; -- False (Default)
 	jobID := currentJobID;
-	SELECT current_user INTO databaseName; --(sic)
-	procedureName := 'RWG_CREATE_ANALYSIS_ENTRY';
+	select current_user INTO databaseName; --(sic)
+	procedureName := 'rwg_create_analysis_entry';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it

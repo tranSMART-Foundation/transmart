@@ -29,7 +29,6 @@ Declare
     stepCt         integer;
 	rowCt		integer;
 	v_sqlerrm		varchar(1000);
-	rtnCd			integer;
 	errorNumber		character varying;
 	errorMessage	character varying;
 	
@@ -52,8 +51,8 @@ BEGIN
     newJobFlag := 0; -- False (Default)
     jobID := -1;
 
-	databaseName := 'TM_CZ';
-	procedureName := 'I2B2_MOVE_ANALYSIS_TO_PROD';
+	databaseName := 'tm_cz';
+	procedureName := 'i2b2_move_analysis_to_prod';
 	
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -64,7 +63,7 @@ BEGIN
 	END IF;
         
     stepCt := 1;    
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting i2b2_move_analysis_to_prod',0,stepCt,'Done') into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting i2b2_move_analysis_to_prod',0,stepCt,'Done');
 	
 	--	delete existing data for staged analyses from bio_asy_analysis_gwas
 	
@@ -87,13 +86,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select * from tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete exising data for staged analyses from BIOMART.BIO_ASSAY_ANALYSIS_GWAS',rowCt,stepCt,'Done') into rtnCd;
+	perform * from tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete exising data for staged analyses from BIOMART.BIO_ASSAY_ANALYSIS_GWAS',rowCt,stepCt,'Done');
 	raise notice 'here';
 	--	delete existing data for staged analyses from bio_asy_analysis_eqtl
 	
@@ -116,13 +115,13 @@ BEGIN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
 		--Handle errors.
-		select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+		perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		--End Proc
-		select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete exising data for staged analyses from BIOMART.BIO_ASSAY_ANALYSIS_EQTL',rowCt,stepCt,'Done') into rtnCd;
+	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete exising data for staged analyses from BIOMART.BIO_ASSAY_ANALYSIS_EQTL',rowCt,stepCt,'Done');
 			
     --    load staged analysis to array
 	
@@ -130,7 +129,7 @@ BEGIN
     v_EQTL_staged := 0;
     
 	for stage_rec in
-		select baa.bio_assay_analysis_id
+		perform baa.bio_assay_analysis_id
 			  ,lz.etl_id
 			  ,lz.study_id
 			  ,case when lz.data_type = 'Metabolic GWAS' then 'GWAS' else lz.data_type end as data_type
@@ -147,7 +146,7 @@ BEGIN
 	loop   
 	
 	    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Loading ' || stage_rec.study_id || ' ' || stage_rec.orig_data_type || ' ' ||
-                       stage_rec.analysis_name,0,stepCt,'Done') into rtnCd;
+                       stage_rec.analysis_name,0,stepCt,'Done');
 					   
 		v_bio_assay_analysis_id := stage_rec.bio_assay_analysis_id;
 		v_data_type := stage_rec.data_type;
@@ -193,13 +192,13 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			end;
             stepCt := stepCt + 1;
-            select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert data for analysis from BIOMART_STAGE.BIO_ASSAY_ANALYSIS_' || v_data_type,rowCt,stepCt,'Done') into rtnCd;
+            perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert data for analysis from BIOMART_STAGE.BIO_ASSAY_ANALYSIS_' || v_data_type,rowCt,stepCt,'Done');
 			
 			--	update data_count in bio_assay_analysis
 			
@@ -213,24 +212,24 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			end;
             stepCt := stepCt +1;
-            select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Update data_count in bio_assay_analysis',rowCt,stepCt,'Done') into rtnCd;
+            perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Update data_count in bio_assay_analysis',rowCt,stepCt,'Done');
 			
 			v_sqlText := 'delete from biomart_stage.bio_assay_analysis_' || v_data_type || 
 						 ' where bio_assay_analysis_id = ' || v_bio_assay_analysis_id;
 			execute v_sqlText;
 			get diagnostics rowCt := ROW_COUNT;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete data for analysis from BIOMART_STAGE.BIO_ASSAY_ANALYSIS_' || v_data_type,rowCt,stepCt,'Done') into rtnCd;       
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete data for analysis from BIOMART_STAGE.BIO_ASSAY_ANALYSIS_' || v_data_type,rowCt,stepCt,'Done');       
            
 			--	load top 500 rows to bio_asy_analysis_gwas_top50
 			
-			-- select * from tm_cz.i2b2_load_gwas_top50(v_bio_assay_analysis_id,jobId) into rtnCd;
+			-- perform * from tm_cz.i2b2_load_gwas_top50(v_bio_assay_analysis_id,jobId);
 			
         end if;
         
@@ -274,13 +273,13 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			end;
             stepCt := stepCt + 1;
-            select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert data for analysis from BIOMART_STAGE.BIO_ASSAY_ANALYSIS_' || v_data_type,rowCt,stepCt,'Done') into rtnCd;
+            perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert data for analysis from BIOMART_STAGE.BIO_ASSAY_ANALYSIS_' || v_data_type,rowCt,stepCt,'Done');
         
 			--	update data_count in bio_assay_analysis
 			
@@ -294,24 +293,24 @@ BEGIN
 				errorNumber := SQLSTATE;
 				errorMessage := SQLERRM;
 				--Handle errors.
-				select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+				perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 				--End Proc
-				select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
 			end;
             stepCt := stepCt +1;
-            select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Update data_count in bio_assay_analysis',rowCt,stepCt,'Done') into rtnCd;
+            perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Update data_count in bio_assay_analysis',rowCt,stepCt,'Done');
            			
 			v_sqlText := 'delete from biomart_stage.bio_assay_analysis_' || v_data_type || 
 						 ' where bio_assay_analysis_id = ' || v_bio_assay_analysis_id;
 			execute  v_sqlText;
 			get diagnostics rowCt := ROW_COUNT;
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete data for analysis from BIOMART_STAGE.BIO_ASSAY_ANALYSIS_' || v_data_type,rowCt,stepCt,'Done') into rtnCd;       
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete data for analysis from BIOMART_STAGE.BIO_ASSAY_ANALYSIS_' || v_data_type,rowCt,stepCt,'Done');       
 
 			--	load top 500 rows to bio_asy_analysis_eqtl_top50
 			
-			select * from tm_ca.i2b2_load_eqtl_top50(v_bio_assay_analysis_id,jobId) into rtnCd;
+			perform * from tm_ca.i2b2_load_eqtl_top50(v_bio_assay_analysis_id,jobId);
 			
 		end if;    
 		
@@ -327,13 +326,13 @@ BEGIN
 			errorNumber := SQLSTATE;
 			errorMessage := SQLERRM;
 			--Handle errors.
-			select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+			perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 			--End Proc
-			select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+			perform tm_cz.czx_end_audit (jobID, 'FAIL');
 			return -16;
 		end;
         stepCt := stepCt + 1;
-        select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Set status to PRODUCTION in tm_lz.lz_src_analysis_metadata',rowCt,stepCt,'Done') into rtnCd;               
+        perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Set status to PRODUCTION in tm_lz.lz_src_analysis_metadata',rowCt,stepCt,'Done');               
         
 	end loop;
       
@@ -341,7 +340,7 @@ BEGIN
 	
 	if v_GWAS_staged = 0 and v_EQTL_staged = 0 then
 	    stepCt := stepCt + 1;
-        select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No staged data - run terminating normally',0,stepCt,'Done') into rtnCd;
+        perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No staged data - run terminating normally',0,stepCt,'Done');
 		return 0;
 	end if;
     
@@ -354,14 +353,14 @@ BEGIN
 			  select distinct bio_assay_analysis_id from biomart_stage.bio_assay_analysis_eqtl) x;
 		if v_exists > 0 then
 			stepCt := stepCt + 1;
-			select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'**WARNING ** Data remains in staging tables',0,stepCt,'Done') into rtnCd;
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'**WARNING ** Data remains in staging tables',0,stepCt,'Done');
 		end if;
 	end if;
     
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End i2b2_move_analysis_to_prod',0,stepCt,'Done') into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End i2b2_move_analysis_to_prod',0,stepCt,'Done');
     stepCt := stepCt + 1;
     
-    select tm_cz.czx_end_audit(jobId, 'Success') into rtnCd;
+    perform tm_cz.czx_end_audit(jobId, 'Success');
 	return 0;
     
     

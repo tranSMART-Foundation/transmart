@@ -52,8 +52,8 @@ BEGIN
 	--Set Audit Parameters
 	newJobFlag := 0; -- False (Default)
 	jobID := currentJobID;
-	SELECT current_user INTO databaseName; --(sic)
-	procedureName := 'RWG_LOAD_ANALYSIS_METADATA';
+	select current_user INTO databaseName; --(sic)
+	procedureName := 'rwg_load_analysis_metadata';
 
 	--Audit JOB Initialization
 	--If Job ID does not exist, then this is a single procedure run and we need to create it

@@ -22,7 +22,6 @@ AS $$
 
     declare
 
-    rtnCd	integer;
     jobId	numeric;
 
 begin
@@ -46,7 +45,7 @@ begin
     
 exception 
     when others then
-	select tm_cz.czx_write_error(jobId,'0',SQLERRML,SQLSTATE,SQLERRM) into rtnCd;
+	perform tm_cz.czx_write_error(jobId,'0',SQLERRML,SQLSTATE,SQLERRM);
 	return -16;
 
 end;

@@ -46,8 +46,8 @@ begin
     v_row_count := 0;
 
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_LOAD_OMICSOFT_ANNOT';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_load_omicsoft_annot';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

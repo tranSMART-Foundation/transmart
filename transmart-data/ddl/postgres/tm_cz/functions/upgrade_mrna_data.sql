@@ -45,8 +45,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'UPGRADE_MRNA_DATA';
+    databaseName := 'tm_cz';
+    procedureName := 'upgrade_mrna_data';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

@@ -66,8 +66,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    PERFORM sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName ;
-    procedureName := 'I2B2_ADD_SNP_BIOMARKER_NODES';
+    perform sys_context('userenv', 'current_schema') INTO databaseName ;
+    procedureName := 'i2b2_add_snp_biomarker_nodes';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

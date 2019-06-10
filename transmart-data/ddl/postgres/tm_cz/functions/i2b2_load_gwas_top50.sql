@@ -31,7 +31,6 @@ AS $$
     rowCt		integer;
     tExists		integer;
     v_sqlerrm		varchar(1000);
-    rtnCd		integer;
     errorNumber		character varying;
     errorMessage	character varying;
     
@@ -44,8 +43,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_LOAD_GWAS_TOP50';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_load_gwas_top50';
     
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -54,7 +53,7 @@ begin
 	select tm_cz.czx_start_audit (procedureName, databaseName) into jobId;
     end if;
     
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done') into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done');
     
     begin
 	delete from biomart.bio_asy_analysis_gwas_top50
@@ -65,13 +64,13 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.czx_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete analysis from bio_asy_analysis_gwas_top50',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete analysis from bio_asy_analysis_gwas_top50',rowCt,stepCt,'Done');
     
     begin
 	insert into biomart.bio_asy_analysis_gwas_top50
@@ -111,17 +110,17 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    select tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage) into rtnCd;
+	    perform tm_cz.czx_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    select tm_cz.czx_end_audit (jobID, 'FAIL') into rtnCd;
+	    perform tm_cz.czx_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert into bio_asy_analysis_gwas_top50',rowCt,stepCt,'Done') into rtnCd;
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert into bio_asy_analysis_gwas_top50',rowCt,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newjobflag = 1 then
-	select tm_cz.czx_end_audit (jobID, 'SUCCESS') into rtnCd;
+	perform tm_cz.czx_end_audit (jobID, 'SUCCESS');
     end if;
     
     return 0;
