@@ -37,6 +37,7 @@ function highDimensionalConceptDropped(node, filter) {
 }
 
 function omicsFilterInfoReceived(result, request) {
+    console.log('omicsFilterInfoReceived result ' + result.responseText);
     omics_filter_info = JSON.parse(result.responseText);
     omics_filter_info.filter = (omics_filter_info.filter == "true");
     if (omics_filter_info.filter_type != 'VCF') {
@@ -186,7 +187,7 @@ function addOmicsFilterAutocomplete() {
         }
 
         return jQuery('<li></li>')
-            .data("item.autocomplete", item )
+            .data("ui-autocomplete-item", item )
             .append(resulta)
             .appendTo(ul);
     };

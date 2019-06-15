@@ -16,13 +16,13 @@ function advancedWorkflowMenu() {
         method : 'GET',
         timeout: '1800000',
         success : function(result, request)
-    {
-        createAdvancedWorkflowMenu(result);
-    },
+	{
+            createAdvancedWorkflowMenu(result);
+	},
         failure : function(result, request)
-    {
-        //Ext.Msg.alert("Problem loading the list of available Analysis");
-    }
+	{
+            //Ext.Msg.alert("Problem loading the list of available Analysis");
+	}
     });
 }
 
@@ -61,12 +61,12 @@ function createAdvancedWorkflowMenu(result) {
         // add components to the advanced workflow toolbar
         Ext.getCmp('advancedWorkflowToolbar')
             .add(
-                    {
-                        text : 'Analysis',
-                iconCls : 'comparebutton',
-                disabled : false,
-                menu : advMenu
-                    }
+                {
+                    text : 'Analysis',
+                    iconCls : 'comparebutton',
+                    disabled : false,
+                    menu : advMenu
+                }
                 ,'->',
                 {
                     text: 'Save to PDF',
@@ -124,25 +124,25 @@ function loadAnalysisPage(itemId, isCompletedJob, jobName) {
             // if it's loading completed job then display the result as well
             if (isCompletedJob) {
                 switch (itemId) {
-                    case 'aCGHSurvivalAnalysis' :
-                        survivalAnalysisACGHView.renderResults(jobName, survivalAnalysisACGHView);
-                        break;
-                    case 'groupTestaCGH' :
-                        groupTestView.renderResults(jobName, groupTestView);
-                        break;
-                    case 'groupTestRNASeq' :
-                        RNASeqgroupTestView.renderResults(jobName, RNASeqgroupTestView);
-                        break;
-                    case 'acghFrequencyPlot' :
-                        frequencyPlotView.renderResults(jobName, frequencyPlotView);
-                        break;
+                case 'aCGHSurvivalAnalysis' :
+                    survivalAnalysisACGHView.renderResults(jobName, survivalAnalysisACGHView);
+                    break;
+                case 'groupTestaCGH' :
+                    groupTestView.renderResults(jobName, groupTestView);
+                    break;
+                case 'groupTestRNASeq' :
+                    RNASeqgroupTestView.renderResults(jobName, RNASeqgroupTestView);
+                    break;
+                case 'acghFrequencyPlot' :
+                    frequencyPlotView.renderResults(jobName, frequencyPlotView);
+                    break;
                 }
             }
         }
     }),
 
-        // update analysis element
-        Ext.get('analysis').dom.value = itemId;
+    // update analysis element
+    Ext.get('analysis').dom.value = itemId;
     if (module) {
         Ext.fly('selectedAnalysis').update(module.text, false).removeClass('warning').addClass('selected');
     }
@@ -167,37 +167,36 @@ function onItemClick(item) {
       loadPluginView(item.id);
       },
       failure : function(result, request) {
-    //Ext.Msg.alert("Problem loading the list of available Analysis");
-    }
-    });*/
+      //Ext.Msg.alert("Problem loading the list of available Analysis");
+      }
+      });*/
 }
 function renderCohortSummary(){
     var cohortsSummary=""
 
-        // get selected cohort summary
-        for(var i = 1; i<=GLOBAL.NumOfSubsets; i++){
-            var currentQuery = getQuerySummary(i)
-                if(currentQuery!=""){
-                    cohortsSummary += "Subset "+i+": "
-                        cohortsSummary += currentQuery
-                        cohortsSummary += "<br>"
-                }
-
+    // get selected cohort summary
+    for(var i = 1; i<=GLOBAL.NumOfSubsets; i++){
+        var currentQuery = getQuerySummary(i)
+        if(currentQuery!=""){
+            cohortsSummary += "Subset "+i+": "
+            cohortsSummary += currentQuery
+            cohortsSummary += "<br>"
         }
+
+    }
 
     if(""==cohortsSummary){
         // hide cohort Summary & show warning
         Ext.get('cohortSummary').hide();
         Ext.get('cohortWarningMsg').show();
         Ext.fly('cohortWarningMsg').update("WARNING: You have not selected a study and the analysis will not work. " +
-                "Please go back to the Comparison tab and make a cohort selection.").addClass("warning");
+					   "Please go back to the Comparison tab and make a cohort selection.").addClass("warning");
     } else {
         // hide warning & show cohort Summary
         Ext.fly('cohortSummary').update(cohortsSummary);
         Ext.get('cohortWarningMsg').hide();
         Ext.get('cohortSummary').show();
     }
-
 
 }
 
@@ -212,7 +211,6 @@ function checkPreviousAnalysis()
     return true;
 }
 
-
 function loadPluginView(){
 
     //Remove the output screen.
@@ -220,21 +218,21 @@ function loadPluginView(){
 
     //Whenever we switch views, make the binning toggle false. All the analysis pages default to this state.
     GLOBAL.Binning = false
-        GLOBAL.ManualBinning = false
-        GLOBAL.NumberOfBins = 4
-        GLOBAL.AnalysisRun = false
+    GLOBAL.ManualBinning = false
+    GLOBAL.NumberOfBins = 4
+    GLOBAL.AnalysisRun = false
 
-        var selectedAnalysis = document.getElementById("analysis").value;
+    var selectedAnalysis = document.getElementById("analysis").value;
     selectedAnalysis = selectedAnalysis.charAt(0).toUpperCase()+selectedAnalysis.substring(1);
     eval("load"+selectedAnalysis+"View()");
-
+    
 }
 
 //This function fires when an item is dropped onto one of the independent/dependent variable DIVs in the data association tool.
 function dropOntoVariableSelection(source, e, data)
 {
     data.node.attributes.oktousevalues = "N"
-        var concept = createPanelItemNew(this.el, convertNodeToConcept(data.node));
+    var concept = createPanelItemNew(this.el, convertNodeToConcept(data.node));
     return true;
 }
 
@@ -260,43 +258,43 @@ function dropNumericOntoCategorySelection2(source, e, data, targetdiv)
         //Keep track of whether all the nodes are numeric or not.
         var allNodesNumeric = true
 
-            //Keep track of whether the folder has any leaves.
-            var foundLeafNode = false
+        //Keep track of whether the folder has any leaves.
+        var foundLeafNode = false
 
-            //Loop through child nodes to add them to input.
-            for ( var i = 0; i<data.node.childNodes.length; i++)
+        //Loop through child nodes to add them to input.
+        for ( var i = 0; i<data.node.childNodes.length; i++)
+        {
+            //Grab the child node.
+            var child=data.node.childNodes[i];
+
+            //This tells us whether it is a numeric or character node.
+            var val=child.attributes.oktousevalues;
+
+            //If we are a numeric leaf node, add it to the tree.
+            if(val==='Y' && child.leaf==true)
             {
-                //Grab the child node.
-                var child=data.node.childNodes[i];
+                //Reset the alpha/numeric flag so we don't get the popup for entering a value.
+                child.attributes.oktousevalues = "N";
 
-                //This tells us whether it is a numeric or character node.
-                var val=child.attributes.oktousevalues;
+                //Set the flag indicating we had a leaf node.
+                foundLeafNode = true;
 
-                //If we are a numeric leaf node, add it to the tree.
-                if(val==='Y' && child.leaf==true)
-                {
-                    //Reset the alpha/numeric flag so we don't get the popup for entering a value.
-                    child.attributes.oktousevalues = "N";
+                //Add the item to the input.
+                var concept = createPanelItemNew(targetdiv, convertNodeToConcept(child));
 
-                    //Set the flag indicating we had a leaf node.
-                    foundLeafNode = true;
-
-                    //Add the item to the input.
-                    var concept = createPanelItemNew(targetdiv, convertNodeToConcept(child));
-
-                    //Set back to original value
-                    child.attributes.oktousevalues=val;
-                }
-                else if(val==='N' && child.leaf==true)
-                {
-                    //Set the flag indicating we had a leaf node.
-                    foundLeafNode = true;
-
-                    //If we find a non-numeric node, set our flag.
-                    allNodesNumeric = false
-                }
-
+                //Set back to original value
+                child.attributes.oktousevalues=val;
             }
+            else if(val==='N' && child.leaf==true)
+            {
+                //Set the flag indicating we had a leaf node.
+                foundLeafNode = true;
+
+                //If we find a non-numeric node, set our flag.
+                allNodesNumeric = false
+            }
+
+        }
 
         //If no leaf nodes found, alert the user.
         if(!foundLeafNode)
@@ -335,7 +333,6 @@ function dropNumericOntoCategorySelection2(source, e, data, targetdiv)
     return true;
 }
 
-
 //This function fires when an item is dropped onto one of the
 //independent/dependent variable DIVs in the data association tool.
 function dropOntoCategorySelection(source, e, data)
@@ -364,21 +361,21 @@ function dropOntoCategorySelection2(source, e, data, targetdiv)
         //Keep track of whether the folder has any leaves.
         var foundLeafNode = false
 
-            for ( var i = 0; i<data.node.childNodes.length; i++)
+        for ( var i = 0; i<data.node.childNodes.length; i++)
+        {
+            //Grab the child node.
+            var child=data.node.childNodes[i];
+
+            //If this is a leaf node, add it.
+            if(child.leaf==true)
             {
-                //Grab the child node.
-                var child=data.node.childNodes[i];
+                //Add the item to the input.
+                var concept = createPanelItemNew(targetdiv, convertNodeToConcept(child));
 
-                //If this is a leaf node, add it.
-                if(child.leaf==true)
-                {
-                    //Add the item to the input.
-                    var concept = createPanelItemNew(targetdiv, convertNodeToConcept(child));
-
-                    //Set the flag indicating we had a leaf node.
-                    foundLeafNode = true;
-                }
+                //Set the flag indicating we had a leaf node.
+                foundLeafNode = true;
             }
+        }
         //Adding this condition for certain nodes like Dosage and Response, where children of Dosage & Response are intentionally hidden
         if (data.node.childrenRendered && data.node.firstChild == null) {
             foundLeafNode = true;
@@ -422,21 +419,19 @@ function createNodeTypeArrayFromDiv(divElement, attributeToPull) {
 
 //This might be inefficient.
 //Return new array with duplicate values removed
-Array.prototype.unique =
-function() {
+Array.prototype.unique = function() {
     var a = [];
     var l = this.length;
     for(var i=0; i<l; i++) {
         for(var j=i+1; j<l; j++) {
-            // If this[i] is found later in the array
-            if (this[i] === this[j])
+	    // If this[i] is found later in the array
+	    if (this[i] === this[j])
                 j = ++i;
         }
         a.push(this[i]);
     }
     return a;
 };
-
 
 function setupSubsetIds(formParams){
 
@@ -489,8 +484,8 @@ function submitJob(formParams)
             runJob(result, formParams);
         },
         failure: function(result, request){
-                     Ext.Msg.alert('Status', 'Unable to create data export job.');
-                 },
+            Ext.Msg.alert('Status', 'Unable to create data export job.');
+        },
         timeout: '1800000',
         params: formParams
     });
@@ -508,12 +503,12 @@ function runJob(result, formParams) {
     formParams.jobName=jobName;
 
     Ext.Ajax.request(
-            {
-                url: pageInfo.basePath+"/RModules/scheduleJob",
-        method: 'POST',
-        timeout: '1800000',
-        params: Ext.urlEncode(formParams) // or a URL encoded string
-            });
+        {
+            url: pageInfo.basePath+"/RModules/scheduleJob",
+            method: 'POST',
+            timeout: '1800000',
+            params: Ext.urlEncode(formParams) // or a URL encoded string
+        });
 
     //Start the js code to check the job status so we can display results when we are done.
     checkPluginJobStatus(jobName)
@@ -534,36 +529,36 @@ function checkPluginJobStatus(jobName)
 {
     var checkTask = {
         run: function () {
-                 Ext.Ajax.request({
-                     url : pageInfo.basePath+"/asyncJob/checkJobStatus",
-                 method : 'POST',
-                 timeout : '300000',
-                 params: {jobName: jobName},
-                 scope: this,
-                 success : function (result, options) {
-                     var jobStatusInfo = Ext.util.JSON.decode(result.responseText);
-                     var status = jobStatusInfo.jobStatus;
-                     var viewerURL = jobStatusInfo.jobViewerURL;
-                     var fullViewerURL = pageInfo.basePath + viewerURL;
+            Ext.Ajax.request({
+                url : pageInfo.basePath+"/asyncJob/checkJobStatus",
+                method : 'POST',
+                timeout : '300000',
+                params: {jobName: jobName},
+                scope: this,
+                success : function (result, options) {
+                    var jobStatusInfo = Ext.util.JSON.decode(result.responseText);
+                    var status = jobStatusInfo.jobStatus;
+                    var viewerURL = jobStatusInfo.jobViewerURL;
+                    var fullViewerURL = pageInfo.basePath + viewerURL;
 
-                     if (status =='Completed') {
-                         runner.stopAll();
-                         //Set the results DIV to use the URL from the job.
-                         Ext.get('analysisOutput').load({url : fullViewerURL, callback: loadModuleOutput});
-                         //Set the flag that says we run an analysis so we can warn the user if they navigate away.
-                         GLOBAL.AnalysisRun = true;
-                     } else if (status == 'Cancelled' || status == 'Error') {
-                         runner.stopAll();
-                     }
-                     updateWorkflowStatus(jobStatusInfo);
-                 },
-                 failure : function () {
-                               runner.stopAll();
-                               showWorkflowStatusErrorDialog('Failed', 'Could not complete the job, please contact an ' +
-                                       'administrator');
-                           }
-                 });
-             },
+                    if (status =='Completed') {
+                        runner.stopAll();
+                        //Set the results DIV to use the URL from the job.
+                        Ext.get('analysisOutput').load({url : fullViewerURL, callback: loadModuleOutput});
+                        //Set the flag that says we run an analysis so we can warn the user if they navigate away.
+                        GLOBAL.AnalysisRun = true;
+                    } else if (status == 'Cancelled' || status == 'Error') {
+                        runner.stopAll();
+                    }
+                    updateWorkflowStatus(jobStatusInfo);
+                },
+                failure : function () {
+                    runner.stopAll();
+                    showWorkflowStatusErrorDialog('Failed', 'Could not complete the job, please contact an ' +
+						  'administrator');
+                }
+            });
+        },
         interval: 1000
     }
 
@@ -599,7 +594,7 @@ function setupCategoricalItemsList (strDivSource, strDivTarget) {
     // clear it out first
     while (categoricalTargetDiv.dom.hasChildNodes())
         categoricalTargetDiv.dom
-            .removeChild(categoricalTargetDiv.dom.firstChild);
+        .removeChild(categoricalTargetDiv.dom.firstChild);
     for ( var i = 0, n = categoricalSourceDiv.dom.childNodes.length; i < n; ++i) {
         // clone and append
         var newnode = categoricalSourceDiv.dom.childNodes[i].cloneNode(true);
@@ -628,10 +623,10 @@ function setupCategoricalItemsList (strDivSource, strDivTarget) {
 
         },
         onNodeOver: function(target, dd, e, dragData) {
-                        var ret= this.dropOK ? this.dropAllowed : this.dropNotAllowed;
-                        console.log(ret);
-                        return ret;
-                    }
+            var ret= this.dropOK ? this.dropAllowed : this.dropNotAllowed;
+            console.log(ret);
+            return ret;
+        }
     });
     dropZone.notifyDrop = _dropOntoBin;
 }
@@ -645,12 +640,12 @@ function clearDataAssociation()
 
     //Whenever we switch views, make the binning toggle false. All the analysis pages default to this state.
     GLOBAL.Binning = false
-        GLOBAL.ManualBinning = false
-        GLOBAL.NumberOfBins = 4
-        GLOBAL.AnalysisRun = false
+    GLOBAL.ManualBinning = false
+    GLOBAL.NumberOfBins = 4
+    GLOBAL.AnalysisRun = false
 
-        //Set the message below the cohort summary that lets the user know they need to select a cohort.
-        renderCohortSummary();
+    //Set the message below the cohort summary that lets the user know they need to select a cohort.
+    renderCohortSummary();
 
 }
 
@@ -677,10 +672,10 @@ function loadCommonHighDimFormObjects(formParams, divName)
     formParams[divName + "PathwayName"]     = window[divName + 'pathwayName'];
 
     var mrnaData = false
-        var mirnaData = false
-        var snpData = false
+    var mirnaData = false
+    var snpData = false
 
-        var tempGeneList    = window[divName + 'pathway'];
+    var tempGeneList    = window[divName + 'pathway'];
     var tempMarkerType    = window[divName + 'markerType'];
     var tempGPL       = window[divName + 'gplValues'];
 
@@ -702,12 +697,12 @@ function loadCommonHighDimFormObjects(formParams, divName)
         var fullGEXGPL      = String(tempGPL);
 
         if(fullGEXSampleType == ",")  fullGEXSampleType = ""
-            if(fullGEXTissueType == ",")  fullGEXTissueType = ""
-                if(fullGEXTime == ",")      fullGEXTime = ""
-                    if(fullGEXGPL == ",")       fullGEXGPL = ""
+        if(fullGEXTissueType == ",")  fullGEXTissueType = ""
+        if(fullGEXTime == ",")      fullGEXTime = ""
+        if(fullGEXGPL == ",")       fullGEXGPL = ""
 
-                        //This flag will tell us to write the GEX text file.
-                        mrnaData = true;
+        //This flag will tell us to write the GEX text file.
+        mrnaData = true;
 
         //Fix the platform to be something the R script expects.
         //tempMarkerType = "MRNA"; // after this is commented out it seems does not affect the R script, however marker
@@ -733,12 +728,12 @@ function loadCommonHighDimFormObjects(formParams, divName)
         var fullSNPGPL      = String(tempGPL);
 
         if(fullSNPSampleType == ",")  fullSNPSampleType = ""
-            if(fullSNPTissueType == ",")  fullSNPTissueType = ""
-                if(fullSNPTime == ",")      fullSNPTime = ""
-                    if(fullSNPGPL == ",")       fullSNPGPL = ""
+        if(fullSNPTissueType == ",")  fullSNPTissueType = ""
+        if(fullSNPTime == ",")      fullSNPTime = ""
+        if(fullSNPGPL == ",")       fullSNPGPL = ""
 
-                        //This flag will tell us to write the SNP text file.
-                        snpData = true;
+        //This flag will tell us to write the SNP text file.
+        snpData = true;
 
         formParams["snppathway"]                = fullSNPGeneList;
         formParams["snptime"]                 = fullSNPTime;
@@ -758,7 +753,7 @@ function loadCommonHighDimFormObjects(formParams, divName)
     //If we don't have a platform, fill in Clinical.
     if(tempPlatform == null || tempPlatform == "") tempMarkerType = "CLINICAL"
 
-        formParams[divName + "Type"]              = tempMarkerType;
+    formParams[divName + "Type"]              = tempMarkerType;
     formParams[divName + "Pathway"]             = tempGeneList;
 }
 

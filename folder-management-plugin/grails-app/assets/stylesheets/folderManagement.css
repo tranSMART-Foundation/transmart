@@ -19,35 +19,35 @@
     cursor: pointer;
     background-repeat: no-repeat;
     background-position: 2px 50%;
-    background-image: url('../images/filetypes/page_white.png');
+    background-image: url('filetypes/page_white.png');
 }
 
-.foldericon.program { background-image: url('../images/foldertypes/program.png'); }
-.foldericon.study   { background-image: url('../images/foldertypes/study.png'); }
-.foldericon.studywsubject   { background-image: url('../images/foldertypes/studywsubject.png'); }
-.foldericon.folder  { background-image: url('../images/foldertypes/folder.png'); }
-.foldericon.assay   { background-image: url('../images/foldertypes/assay.png'); }
-.foldericon.analysis { background-image: url('../images/foldertypes/analysis.png'); }
+.foldericon.program { background-image: url('foldertypes/program.png'); }
+.foldericon.study   { background-image: url('foldertypes/study.png'); }
+.foldericon.studywsubject   { background-image: url('foldertypes/studywsubject.png'); }
+.foldericon.folder  { background-image: url('foldertypes/folder.png'); }
+.foldericon.assay   { background-image: url('foldertypes/assay.png'); }
+.foldericon.analysis { background-image: url('foldertypes/analysis.png'); }
 
-.foldericon.addcart { background-image: url('../images/icons/addcart.png'); background-repeat: no-repeat; padding: 2px 2px 2px 24px; }
-.foldericon.removecart { background-image: url('../images/icons/removecart.png'); padding: 2px 2px 2px 24px; }
-.foldericon.deletefile { background-image: url('../images/icons/bin_closed.png'); background-repeat: no-repeat; }
-.foldericon.exportgo { background-image: url('../images/icons/package_go.png'); }
+.foldericon.addcart { background-image: url('icons/addcart.png'); background-repeat: no-repeat; padding: 2px 2px 2px 24px; }
+.foldericon.removecart { background-image: url('icons/removecart.png'); padding: 2px 2px 2px 24px; }
+.foldericon.deletefile { background-image: url('icons/bin_closed.png'); background-repeat: no-repeat; }
+.foldericon.exportgo { background-image: url('icons/package_go.png'); }
 
 /* File icons are !important so that they override the icon properties in Dataset Explorer... */
 .fileicon {
     padding: 3px 24px 0px 0px;
-    background-image: url('../images/filetypes/page_white.png') !important;
+    background-image: url('filetypes/page_white.png') !important;
     background-repeat: no-repeat;
 }
 
-.fileicon.csv, .fileicon.xls, .fileicon.xlsx { background-image: url('../images/filetypes/page_white_excel.png') !important; }
-.fileicon.doc, .fileicon.docx { background-image: url('../images/filetypes/page_white_word.png') !important; }
-.fileicon.txt, .fileicon.log, .fileicon.rtf { background-image: url('../images/filetypes/page_white_text.png') !important; }
-.fileicon.pdf { background-image: url('../images/filetypes/page_white_acrobat.png') !important; }
-.fileicon.zip { background-image: url('../images/filetypes/page_white_zip.png') !important; }
-.fileicon.xml, .fileicon.html, .fileicon.htm { background-image: url('../images/filetypes/page_white_code.png') !important; }
-.fileicon.png, .fileicon.jpg, .fileicon.bmp, .fileicon.gif { background-image: url('../images/filetypes/page_white_picture.png') !important; }
+.fileicon.csv, .fileicon.xls, .fileicon.xlsx { background-image: url('filetypes/page_white_excel.png') !important; }
+.fileicon.doc, .fileicon.docx { background-image: url('filetypes/page_white_word.png') !important; }
+.fileicon.txt, .fileicon.log, .fileicon.rtf { background-image: url('filetypes/page_white_text.png') !important; }
+.fileicon.pdf { background-image: url('filetypes/page_white_acrobat.png') !important; }
+.fileicon.zip { background-image: url('filetypes/page_white_zip.png') !important; }
+.fileicon.xml, .fileicon.html, .fileicon.htm { background-image: url('filetypes/page_white_code.png') !important; }
+.fileicon.png, .fileicon.jpg, .fileicon.bmp, .fileicon.gif { background-image: url('filetypes/page_white_picture.png') !important; }
 
 .filelisttable .th {
     font-weight: bold;
@@ -105,7 +105,7 @@
 }
 
 .ajaxloading {
-    background-image: url('../images/loader-large.gif') !important;
+    background-image: url('loader-large.gif') !important;
     background-repeat: no-repeat !important;
     background-position: 50% 50% !important;
     min-height: 128px;
@@ -124,9 +124,9 @@ col.wide {
 }
 
 .x-tree-node-expanded .x-tree-node-icon.fileFolderNode {
-    background-image: url('../images/icons/filefolder-open.png')
+    background-image: url('icons/filefolder-open.png')
 }
 
 .x-tree-node-collapsed .x-tree-node-icon.fileFolderNode {
-    background-image: url('../images/icons/filefolder.png')
+    background-image: url('icons/filefolder.png')
 }

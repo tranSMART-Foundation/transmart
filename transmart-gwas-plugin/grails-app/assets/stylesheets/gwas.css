@@ -113,10 +113,10 @@ font-size: 11px;
 }
 
 .search-img {
-    background-image: url(../images/search_button_up.png) !important;
+    background-image: url(search_button_up.png) !important;
 }
 .parent-filter {
-	background-image: url(../images/down_arrow.PNG) !important;
+	background-image: url(down_arrow.PNG) !important;
     background-repeat:no-repeat;
     background-position:right top;
     font-size:1.125em;
@@ -193,7 +193,7 @@ font-size: 11px;
 }
 
 .ui-autocomplete-loading { 
-	background: white url(../images/loader-small.gif) right center no-repeat;
+	background: white url(loader-small.gif) right center no-repeat;
 	}
 
 #search-categories {
@@ -227,11 +227,11 @@ font-size: 11px;
 
 /* These two classes are to toggle the arrows back and forth for the slider pane */
 .toggle-icon-left {
-	background-image: url("../images/small_arrow_left.png") !important;  
+	background-image: url("small_arrow_left.png") !important;  
 }
 
 .toggle-icon-right {
-	background-image: url(../images/small_arrow_right.png) !important;	
+	background-image: url(small_arrow_right.png) !important;	
 }
 
 #gwas-filter-div {
@@ -347,7 +347,7 @@ ul.dynatree-container li span.dynatree-active a {
 ul.dynatree-container li span.dynatree-expanded a{
 	background-color:#DFEFFD !important;
 	color:#000;
-	background-image: url(../images/up_arrow_small.png) !important;
+	background-image: url(up_arrow_small.png) !important;
     background-position: 268px 10px;
     background-repeat: no-repeat;
 	}
@@ -383,7 +383,7 @@ span.dynatree-active a {
 	
 span.dynatree-folder a{
 	color:#000;
-	background-image: url(../images/right_arrow_big.PNG) !important;
+	background-image: url(right_arrow_big.PNG) !important;
     background-position: 268px 10px;
     background-repeat: no-repeat;
     font-weight: normal !important;
@@ -865,7 +865,7 @@ border-top: 1px solid #CCC;
 
 .diseaseHierarchy {
     padding-left: 16px;
-    background-image: url('../images/elbow.png');
+    background-image: url('elbow.png');
     background-repeat: no-repeat;
     background-position: 4px 0px;
 }
@@ -875,7 +875,7 @@ border-top: 1px solid #CCC;
 .analysis-tabs { background: transparent; border: none; }
 .analysis-tabs .ui-widget-header { background: transparent; border: none; border-bottom: 1px solid #c0c0c0; border-radius: 0px; -moz-border-radius: 0px; -webkit-border-radius: 0px; }
 .analysis-tabs ul .ui-state-default { background: transparent; border: none; }
-.analysis-tabs ul .ui-state-active { background: transparent url(../images/uiTabsArrow.png) no-repeat bottom center; border: none; }
+.analysis-tabs ul .ui-state-active { background: transparent url(uiTabsArrow.png) no-repeat bottom center; border: none; }
 .analysis-tabs ul .ui-state-default a { color: #c0c0c0; }
 .analysis-tabs ul .ui-state-active a { color: #1b74b3; }
 /* End tab CSS */
@@ -1018,7 +1018,7 @@ select.multiselect {
 }
 
 .ajaxloading, #table-results-div.ajaxloading {
-	background-image: url('../images/loader-large.gif') !important;
+	background-image: url('loader-large.gif') !important;
 	background-repeat: no-repeat !important;
 	background-position: 50% 50% !important;
 	min-height: 64px;
@@ -1026,7 +1026,7 @@ select.multiselect {
 div.errorbox {
     background-color: #FCC;
     border: 1px solid #F88;
-    background-image: url('../images/exclamation.png');
+    background-image: url('exclamation.png');
     background-repeat: no-repeat;
     background-position: 8px 50%;
     padding: 8px 8px 8px 32px;
@@ -1036,7 +1036,7 @@ div.errorbox {
 div.infobox {
     background-color: #BFCFFD;
     border: 1px solid #88F;
-    background-image: url('../images/information.png');
+    background-image: url('information.png');
     background-repeat: no-repeat;
     background-position: 8px 50%;
     padding: 8px 8px 8px 32px;
