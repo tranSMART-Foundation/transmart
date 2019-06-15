@@ -25,6 +25,7 @@
 	<asset:stylesheet href="browseTab.css"/>
         <asset:javascript src="gwas.js"/>
 	<asset:stylesheet href="gwasTab.css"/>
+	<asset:stylesheet href="jquery-plugin.css"/>
 
         <script type="text/javascript">
 	    var gwasSearchResultsURL = "${createLink(action: 'loadSearchResults')}";

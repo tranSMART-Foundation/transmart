@@ -32,6 +32,5 @@
 <asset:javascript src="XNAT/angular.min.js"/>
 <asset:javascript src="XNAT/ng-table.min.js"/>
 <asset:javascript src="XNAT/script.js"/>
-<!--<asset:javascript src="src/extern/jquery-2.1.0.min.js"/>-->
 </body>
 </html>
