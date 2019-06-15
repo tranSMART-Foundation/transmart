@@ -286,6 +286,32 @@ environments {
 }
 /* }}} */
 
+/* {{{ SmartR Configuration */
+
+// directory to copy scripts - with server URL appended to allow for multiple servers
+smartR.remoteScriptsDirectory = "/tmp/smart_r_scripts"
+smartR.remoteSCRiptDirectory += transmartURL.replaceAll("\\W+","")
+
+environments {
+    production {
+	smartR.baseDir = "/tmp/heim-production"
+    }
+    development {
+	smartR.baseDir = "/tmp/heim-dev"
+    }
+}
+def smartrBaseDirectory = new File(smartR.baseDir)
+def smartrRemoteScriptDirectory = new File(smartR.remoteScriptDirectory)
+
+[smartR.baseDir,smartR.remoteScriptDirectory].each {
+    File useDir = new File(it)
+    if(useDir.exists()) {
+	useDir.mkdir()
+    }
+}
+
+/* }}} */
+
 /* {{{ GWAS Configuration */
 
 com.recomdata.dataUpload.appTitle="Upload data to tranSMART"

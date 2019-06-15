@@ -110,7 +110,7 @@ grails.project.dependency.resolution = {
 	compile 'org.apache.lucene:lucene-highlighter:2.4.0'
 	compile 'org.apache.solr:solr-core:5.4.1'
 	compile 'org.apache.solr:solr-solrj:5.4.1'
-	compile 'org.jfree:jfreechart:1.0.19'
+	compile 'org.jfree:jfreechart:1.5.0'
 	compile 'org.jfree:jfreesvg:2.1'
 	compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.2', {
 	    excludes 'groovy', 'nekohtml', 'httpclient', 'httpcore'
@@ -177,8 +177,9 @@ grails.project.dependency.resolution = {
 	build ':release:3.1.2'
 	build ':tomcat:8.0.50'
 
-	runtime ':jquery-ui:1.10.4'
-	runtime ':jquery:1.11.1'    // do we need this version?
+//	runtime ':jquery-ui:1.10.4' // latest plugin version available in repo.grails.org
+//	runtime ':jquery:1.11.1'    // latest plugin version available in repo.grails.org
+
 //	runtime ':prototype:1.0'    // requires  resources:1.0
 //	runtime ':resources:1.2.14'
 

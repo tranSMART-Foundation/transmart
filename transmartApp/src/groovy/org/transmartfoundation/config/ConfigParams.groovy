@@ -11,7 +11,9 @@ class ConfigParams {
     Map adminParams
     Map analysisParams
     Map analyzeParams
+    Map assetsParams
     Map authParams
+    Map auth0Params
     Map browseParams
     Map buildInfoParams
     Map contactParams
@@ -42,6 +44,7 @@ class ConfigParams {
     Map xnatImportParams
     Map xnatViewParams
 
+    Map manifestParams
     Map unknownParams
 
 }

@@ -25,6 +25,7 @@ class ConfigService {
             'com.recomdata.plugins.pluginScriptDirectory': [
                 desc: 'Script directory for plugins'],
         ]
+
         Map analysisParams = [
             'com.recomdata.datasetExplorer.genePatternEnabled': [
                 desc: 'If \'true\' (quoted string), GenePattern is enabled'],
@@ -46,12 +47,19 @@ class ConfigService {
             'com.recomdata.datasetExplorer.plinkExcutable': [
                 desc: 'Full path to plink executable'],
         ]
+
         Map analyzeParams = [
             'com.recomdata.datasetExplorer.imageTempDir': [
                 desc: 'Temporary image directories for analysis results'],
             'com.recomdata.plugins.tempFolderDirectory': [
                 desc: 'Temporary directory for plugins to save files'],
         ]
+
+        Map assetsParams = [
+	    'grails.assets.cacheLocation': [
+		desc: 'Cache location for build'],
+	]
+
         Map authParams = [
             'grails.plugin.springsecurity.providerNames': [
                 desc: 'List of loaded authentication providers'],
@@ -77,6 +85,16 @@ class ConfigService {
             'user.password.strength.regex': [
                 desc: 'Password strength regex that is used to test passwords that are entered by users'],
         ]
+
+        Map auth0Params = [
+	    'grails.plugin.springsecurity.auth0.active': [
+		desc: 'Auth0 active'],
+	    'grails.plugin.springsecurity.auth0.base64EncodedSecret': [
+		desc: 'Auth0 base64 encoded'],
+	    'grails.plugin.springsecurity.auth0.loginCallback': [
+		desc: 'Auth0 login callback'],
+	]
+
         Map browseParams = [
             'com.recomdata.FmFolderJob.cronExpression': [
                 default: '0 0/5 * * * ?',
@@ -125,20 +143,23 @@ class ConfigService {
                 default:false,
                 desc: 'If true, display \'Delete Study\' in Browse tab for admin users'],
         ]
+
         Map buildInfoParams = [
-            'buildinfo.properties.include': [
+            'buildInfo.properties.include': [
                 default:[],
                 desc: 'Groovy list of properties to add to the buildInfo panel e.g. \'app.grails.version\' and \'build.groovy\''],
-            'buildinfo.properties.exclude': [
+            'buildInfo.properties.exclude': [
                 default:[],
                 desc: 'Groovy list of properties to exclude from the buildInfo panel e.g. \'env.proc.cores\''],
         ]
+
         Map contactParams = [
             'com.recomdata.adminEmail': [
                 desc: 'Email address to request administrator support, or to request a login username'],
             'com.recomdata.contactUs': [
                 desc: 'contact email address'],
         ]
+
         Map dataSourceParams = [
             'dataSource.dialect' : [
                 desc: 'Data source dialect' ],
@@ -181,6 +202,7 @@ class ConfigService {
             'dataSource.properties.testOnReturn' : [
                 desc: 'Data source test on return' ],
         ]
+
         Map exportParams = [
             'com.recomdata.export.jobs.sweep.startDelay': [
                 desc: 'start delay for the sweep job (msec)'],
@@ -195,7 +217,7 @@ class ConfigService {
             'dataExport.bed.acgh.rgbColorScheme': [
                 desc: 'Alternative color scheme for aCGH BED tracks. Current colors are based on cghCall R package'],
             'com.recomdata.search.gene.max': [
-                desc: 'Maaximum number of genes in SNP data service'],
+                desc: 'Maximum number of genes in SNP data service'],
             'com.recomdata.search.genepathway': [
                 desc: 'Gene pathway in SNP data service'],
             'com.recomdata.plugins.resultSize': [
@@ -213,6 +235,7 @@ class ConfigService {
             'com.recomdata.transmart.data.export.max.export.jobs.loaded': [
                 desc: 'Data Export maximum jobs loaded '],
         ]
+
         Map galaxyParams = [
             'com.galaxy.export.galaxyEnabled': [
                 default: false,
@@ -220,6 +243,7 @@ class ConfigService {
             'com.galaxy.export.galaxyEnabled': [
                 desc: 'Galaxy server URL for Galaxy export tab'],
         ]
+
         Map generalParams = [
             'com.recomdata.appTitle': [
                 desc: 'Application title, usually including the release'],
@@ -245,9 +269,10 @@ class ConfigService {
                 desc: 'Disclaimer text for welcome screen'],
             'com.recomdata.view.studyview': [
                 desc: 'View to choose for study display'],
-            'org.transmart.configFine': [
+	    'org.transmart.configFine': [
                 desc: 'Set to true on successful startup, last value in Config.groovy'],
         ]
+
         Map gwasParams = [
             'com.recomdata.rwg.manhattanplots.cacheImages': [
                 desc: 'If true, cache Manhattan plot mages for GWAS'],
@@ -262,6 +287,7 @@ class ConfigService {
             'grails.plugin.transmartGwasPlink.plinkPath': [
                 desc: 'Full path to the plink executable for GWAS-plink plugin'],
         ]
+
         Map gwavaParams = [
             'com.recomdata.rwg.webstart.codebase': [
                 desc: 'GWAVA webstart parameters'],
@@ -276,6 +302,7 @@ class ConfigService {
             'com.recomdata.rwg.webstart.transmart.url': [
                 desc: 'GWAVA webstart parameters'],
         ]
+
         Map helpParams = [
             'com.recomdata.adminHelpURL': [
                 desc: 'Location of the help pages as an absolute URL. May be a remote copy.'],
@@ -320,6 +347,7 @@ class ConfigService {
             'org.transmartproject.helpUrls.tableWithFisher': [
                 desc: 'URL of local help for Table with Fisher workflow'],
         ]
+
         Map i2b2Params = [
             'com.recomdata.i2b2.subject.domain': [ default: '(undefined)',
                 desc: 'DatasetExplorer i2b2 server domain'],
@@ -342,11 +370,13 @@ class ConfigService {
             'org.transmartproject.i2b2.waitTimeMilliseconds': [ default:600000,
                 desc: 'I2b2 plugin server wait time (ms)'],
         ]
+
         Map kerberosParams = [
             'grails.plugin.springsecurity.kerberos.active': [
                 default:false,
                 desc: 'If true, and Kerberos and LDAP (also required) providers are included in providwerNames, Kerberos authentication is used'],
         ]
+
         Map ldapParams = [
             'grails.plugin.springsecurity.ldap.active': [
                 default:false,
@@ -364,10 +394,12 @@ class ConfigService {
             'org.transmart.security.ldap.context.server':[
                 desc: 'Active directory server'],
         ]
+
         Map logParams = [
             'log4j': [
                 desc: 'Closure to configure server logging'],
         ]
+
         Map loginParams = [
             'bruteForceLoginLock.allowedNumberOfAttempts': [
                 default:2,
@@ -380,6 +412,7 @@ class ConfigService {
             'ui.loginScreen.disclaimer': [
                 desc: 'Text displayed below login screen'],
         ]
+
         Map metacoreParams = [
             'com.thomsonreuters.transmart.metacoreAnalyticsEnable': [
                 default: false,
@@ -401,6 +434,7 @@ class ConfigService {
             'com.thomsonreuters.transmart.metacorePassword': [
                 desc: 'Metacore analytics password'],
         ]
+
         Map oauthParams = [
             'dataSource_oauth2.dbCreate': [
                 desc: 'If true, create new Oauth2 database' ],
@@ -417,6 +451,7 @@ class ConfigService {
             'dataSource_oauth2.formatSql': [
                 desc: 'Oauth2 database formatSql setting' ],
         ]
+
         Map rmodulesParams = [
             'RModules.host': [
                 desc: 'Host address for Rserve server'],
@@ -430,6 +465,7 @@ class ConfigService {
                 default:true,
                 desc: 'If defined as true, display \'Analysis Jobs\' tab in the Analyze tab pages'],
         ]
+
         Map samlParams = [
             'org.transmart.security.samlEnabled': [
                 default:false,
@@ -447,6 +483,7 @@ class ConfigService {
             'org.transmart.security.saml.createInexistentUsers': [
                 desc: 'If true, federated access can create federated users that exist on other servers'],
         ]
+
         Map sampleParams = [
             'sampleExplorer.idfield': [
                 desc: 'Sample explorer solr ID field name'],
@@ -463,6 +500,7 @@ class ConfigService {
             'sampleExplorer.fieldMapping.columns': [
                 desc: 'Names and pretty names of solR sample fields with optional width and other fields'],
        ]
+
         Map searchParams = [
             'com.recomdata.searchengine.index': [
                 desc: 'Search tool Lucene index location'],
@@ -483,6 +521,7 @@ class ConfigService {
             'com.recomdata.solr.numberOfSuggestions': [
                 desc: 'Search (obsolete) number of items in search suggestions box'],
         ]
+
         Map smartrParams = [
             'ipaConnector.username': [
                 desc: 'IPA connector username'],
@@ -495,9 +534,11 @@ class ConfigService {
             'grails.plugin.transmartGwasPlink.enabled': [
                 desc: 'GWAS plink enabled if true'],
         ]
+
         Map solrParams = [
             :
         ]
+
         Map springParams = [
             'grails.plugin.springsecurity.userLookup.userDomainClassName': [
                 desc: 'customized user GORM class (org.transmart.searchapp.AuthUser)'],
@@ -516,6 +557,7 @@ class ConfigService {
             'grails.plugin.springsecurity.logout.afterLogoutUrl': [
                 desc: 'URL after logout (/login/forceAuth)'],
         ]
+
         Map uiParams = [
             'com.recomdata.sessionTimeout': [
                 desc: 'Session timeout (inactivity in seconds)'],
@@ -569,6 +611,7 @@ class ConfigService {
                 default:false,
                 desc: 'If true, remove the Upload tab from the common header'],
         ]
+
         Map uploadParams = [
             'com.recomdata.dataUpload.uploads.dir': [
                 desc: 'GWAS data upload directory on server'],
@@ -583,9 +626,11 @@ class ConfigService {
             'com.recomdata.dataUpload.stageScript': [
                 desc: 'GWAS analysis ETL script'],
         ]
+
         Map x509Params = [
             :
         ]
+
         Map xnatImportParams = [
             'org.transmart.data.location': [
                 desc: 'Local directory of transmart-data files for XNAT import scripts<br>Defaults to /transmart-data under /transmart'],
@@ -598,6 +643,7 @@ class ConfigService {
             'org.transmart.importxnatplugin.workingdir': [
                 desc: 'Working directory for XNAT import<br>Defaults to value of RModules.tempFolderDirectory'],
         ]
+
         Map xnatViewParams = [
             'ui.tabs.datasetExplorer.xnatEnabled.show': [
                 default:false,
@@ -612,6 +658,7 @@ class ConfigService {
                 desc: 'XNAT password (plain text) for XNAT image viewer'],
         ]
 
+        Map manifestParams = [:]
         Map Params = [:]
 
         def properties = grailsApplication.config.toProperties().sort()
@@ -645,6 +692,15 @@ class ConfigService {
             else if(k == 'com.recomdata.datasetExplorer.pmServiceProxy'){addConfig(analyzeParams,k,v,'Turn proxy on if the project management cell is deployed on a different server or not through the apache proxy')}
             else if(k == 'com.recomdata.plugins.tempFolderDirectory'){addConfig(analyzeParams,k,v,'')}
 
+	    //assets
+	    else if(k == 'grails.assets.cacheLocation'){addConfig(assetsParams,k,v,'')}
+	    else if(k == 'grails.assets.minifyJs'){addConfig(assetsParams,k,v,'Minify settings for javascript')}
+	    else if(k == 'grails.assets.minify.js.excludes'){addConfig(assetsParams,k,v,'Exclusions for build minify failures')}
+	    else if(k == 'grails.assets.minifyOptions.excludes'){addConfig(assetsParams,k,v,'Exclusions for build minify failures')}
+	    else if(k == 'grails.assets.minifyOptions.languageMode'){addConfig(assetsParams,k,v,'Javascript language mode for minify')}
+	    else if(k == 'grails.assets.minifyOptions.optimizationLevel'){addConfig(assetsParams,k,v,'grails.assets.minifyOptions.optimizationLevel')}
+	    else if(k == 'grails.assets.minifyOptions.targetLanguage'){addConfig(assetsParams,k,v,'grails.assets.minifyOptions.targetLanguage')}
+
             // auth
             else if(k == 'grails.plugin.springsecurity.providerNames'){addConfigLink(authParams,k,linkAuthProviders(grailsApplication.config.grails.plugin.springsecurity.providerNames),'Click link to see full list')}
             else if(k == 'com.recomdata.guestAutoLogin'){addConfig(authParams,k,v,'')}
@@ -656,6 +712,11 @@ class ConfigService {
             else if(k == 'org.transmart.security.spnegoEnabled'){addConfig(authParams,k,v,'')}
             else if(k == 'org.transmart.security.sslValidation'){addConfig(authParams,k,v,'')}
             else if(k == 'user.password.strength.regex'){addConfig(authParams,k,v,'')}
+
+	    // auth0
+	    else if(k == 'grails.plugin.springsecurity.auth0.active'){addConfig(auth0Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.auth0.base64EncodedSecret'){addConfig(auth0Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.auth0.loginCallback'){addConfig(auth0Params,k,v,'')}
 
             // browse
             else if(k == 'com.recomdata.FmFolderJob.cronExpression'){addConfig(browseParams,k,v,'')}
@@ -751,6 +812,17 @@ class ConfigService {
             else if(k == 'com.recomdata.skipdisclaimer'){addConfig(generalParams,k,v,'')}
             else if(k == 'com.recomdata.disclaimer'){addConfig(generalParams,k,v,'')}
             else if(k == 'com.recomdata.view.studyview'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.hibernate.pass.readonly'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.json.legacy.builder'){addConfig(generalParams,k,v,'')}
+            else if(k == 'grails.project.groupId'){addConfig(generalParams,k,v,'Project groupId')}
+            else if(k == 'grails.scaffolding.templates.domainSuffix'){addConfig(generalParams,k,v,'scaffolding templates suffix')}
+            else if(k == 'grails.views.gsp.codecs.expression'){addConfig(generalParams,k,v,'GSP codecs expression')}
+            else if(k == 'grails.views.gsp.codecs.scriptlet'){addConfig(generalParams,k,v,'GSP codecs scriptlet')}
+            else if(k == 'grails.views.gsp.codecs.staticparts'){addConfig(generalParams,k,v,'GSP codecs static parts')}
+            else if(k == 'grails.views.gsp.codecs.taglib'){addConfig(generalParams,k,v,'GSP page codec taglib')}
+            else if(k == 'grails.views.gsp.htmlcodec'){addConfig(generalParams,k,v,'GSP page codec')}
+            else if(k == 'grails.views.gsp.javascript.library'){addConfig(generalParams,k,v,'javascript library for GSP pages')}
+            else if(k == 'grails.web.disable.multipart'){addConfig(generalParams,k,v,'Web disable multi-part')}
             else if(k == 'org.transmart.configFine'){addConfig(generalParams,k,v,'')}
 
             else if(k == 'grails.cache.ehcache.ehcacheXmlLocation'){addConfig(generalParams,k,v,'')}
@@ -781,6 +853,9 @@ class ConfigService {
             else if(k == 'hibernate.cache.region.factory_class'){addConfig(generalParams,k,v,'')}
             else if(k == 'hibernate.cache.use_query_cache'){addConfig(generalParams,k,v,'')}
             else if(k == 'hibernate.cache.use_second_level_cache'){addConfig(generalParams,k,v,'')}
+            else if(k == 'hibernate.format_sql'){addConfig(generalParams,k,v,'')}
+            else if(k == 'hibernate.singleSession'){addConfig(generalParams,k,v,'')}
+            else if(k == 'hibernate.use_sql_comments'){addConfig(generalParams,k,v,'')}
 
             // gwas
             else if(k == 'com.recomdata.rwg.manhattanplots.cacheImages'){addConfig(gwasParams,k,v,'')}
@@ -1002,6 +1077,11 @@ class ConfigService {
             else if(k == 'grails.plugin.springsecurity.oauthProvider.tokenServices.supportRefreshToken'){addConfig(oauthParams,k,v,'')}
             else if(k == 'grails.plugin.springsecurity.oauthProvider.userApprovalEndpointUrl'){addConfig(oauthParams,k,v,'')}
             else if(k == 'grails.plugin.springsecurity.oauthProvider.userApprovalParameter'){addConfig(oauthParams,k,v,'')}
+            else if(k == 'hibernate_oauth2.cache.use_query_cache'){addConfig(oauthParams,k,v,'Hibernate Oauth2 use query cache')}
+            else if(k == 'hibernate_oauth2.cache.use_second_level_cache'){addConfig(oauthParams,k,v,'Hibernate Oauth2 use second level cache')}
+            else if(k == 'hibernate_oauth2.format_sql'){addConfig(oauthParams,k,v,'Hibernate Oauth2 format SQL')}
+            else if(k == 'hibernate_oauth2.singleSession'){addConfig(oauthParams,k,v,'Hibernate Oauth2 single session')}
+            else if(k == 'hibernate_oauth2.use_sql_comments'){addConfig(oauthParams,k,v,'Hibernate Oauth2 use SQL comments')}
 
             // rmodules
             else if(k == 'RModules.host'){addConfig(rmodulesParams,k,v,'')}
@@ -1243,7 +1323,8 @@ class ConfigService {
             else if(k == 'org.xnat.projectName'){addConfig(xnatViewParams,k,v,'')}
             else if(k == 'org.xnat.username'){addConfig(xnatViewParams,k,encodeConfigUsername(v),'')}
 
-
+	    // assets.manifest
+	    else if (k.startsWith('grails.assets.manifest.')){addConfig(manifestParams,k,v,'')}
 
             // all remaining params not known go here
 
@@ -1252,43 +1333,48 @@ class ConfigService {
          }
 
         def settings = [
-                        'adminParams'      : adminParams,
-                        'analysisParams'   : analysisParams,
-                        'analyzeParams'    : analyzeParams,
-                        'authParams'       : authParams,
-                        'browseParams'     : browseParams,
-                        'buildInfoParams'  : buildInfoParams,
-                        'contactParams'    : contactParams,
-                        'dataSourceParams' : dataSourceParams,
-                        'exportParams'     : exportParams,
-                        'galaxyParams'     : galaxyParams,
-                        'generalParams'    : generalParams,
-                        'gwasParams'       : gwasParams,
-                        'gwavaParams'      : gwavaParams,
-                        'helpParams'       : helpParams,
-                        'i2b2Params'       : i2b2Params,
-                        'kerberosParams'   : kerberosParams,
-                        'ldapParams'       : ldapParams,
-                        'logParams'        : logParams,
-                        'loginParams'      : loginParams,
-                        'metacoreParams'   : metacoreParams,
-                        'oauthParams'      : oauthParams,
-                        'rmodulesParams'   : rmodulesParams,
-                        'samlParams'       : samlParams,
-                        'sampleParams'     : sampleParams,
-                        'searchParams'     : searchParams,
-                        'smartrParams'     : smartrParams,
-                        'solrParams'       : solrParams,
-                        'springParams'     : springParams,
-                        'uiParams'         : uiParams,
-                        'uploadParams'     : uploadParams,
-                        'x509Params'       : x509Params,
-                        'xnatImportParams' : xnatImportParams,
-                        'xnatViewParams'   : xnatViewParams,
+            'adminParams'      : adminParams,
+            'analysisParams'   : analysisParams,
+            'analyzeParams'    : analyzeParams,
+            'assetsParams'     : assetsParams,
+            'authParams'       : authParams,
+            'auth0Params'      : auth0Params,
+            'browseParams'     : browseParams,
+            'buildInfoParams'  : buildInfoParams,
+            'contactParams'    : contactParams,
+            'dataSourceParams' : dataSourceParams,
+            'exportParams'     : exportParams,
+            'galaxyParams'     : galaxyParams,
+            'generalParams'    : generalParams,
+            'gwasParams'       : gwasParams,
+            'gwavaParams'      : gwavaParams,
+            'helpParams'       : helpParams,
+            'i2b2Params'       : i2b2Params,
+            'kerberosParams'   : kerberosParams,
+            'ldapParams'       : ldapParams,
+            'logParams'        : logParams,
+            'loginParams'      : loginParams,
+            'metacoreParams'   : metacoreParams,
+            'oauthParams'      : oauthParams,
+            'rmodulesParams'   : rmodulesParams,
+            'samlParams'       : samlParams,
+            'sampleParams'     : sampleParams,
+            'searchParams'     : searchParams,
+            'smartrParams'     : smartrParams,
+            'solrParams'       : solrParams,
+            'springParams'     : springParams,
+            'uiParams'         : uiParams,
+            'uploadParams'     : uploadParams,
+            'x509Params'       : x509Params,
+            'xnatImportParams' : xnatImportParams,
+            'xnatViewParams'   : xnatViewParams,
 
-                        'unknownParams'    : Params
+            'manifestParams'   : manifestParams,
+            'unknownParams'    : Params
             ]
+
         ConfigParams configParams = new ConfigParams(settings)
+
         return configParams
     }
 

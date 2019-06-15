@@ -39,7 +39,9 @@
 	    <g:render template="configAdmin"/>
 	    <g:render template="configAnalysis"/>
 	    <g:render template="configAnalyze"/>
+	    <g:render template="configAssets"/>
 	    <g:render template="configAuth"/>
+	    <g:render template="configAuth0"/>
 	    <g:render template="configBrowse"/>
 	    <g:render template="configBuildInfo"/>
 	    <g:render template="configContact"/>
@@ -69,6 +71,7 @@
 	    <g:render template="configX509"/>
 	    <g:render template="configXnatImport"/>
 	    <g:render template="configXnatView"/>
+	    <g:render template="configManifest"/>
 	    <g:render template="configUnknown"/>
 	</div>
     </body>

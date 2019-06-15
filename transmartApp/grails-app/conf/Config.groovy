@@ -17,7 +17,7 @@ grails.assets.minifyOptions = [
     optimizationLevel: 'SIMPLE', //Or ADVANCED or WHITESPACE_ONLY
     excludes: ["**/fractalis.js","**/fractalis.unminified.js"]
 ]
-grails.asset.minify.js.excludes = ["**/fractalis.js","**/fractalis.unminified.js"]
+grails.assets.minify.js.excludes = ["**/fractalis.js","**/fractalis.unminified.js"]
 
 /**
  * Running externalized configuration
