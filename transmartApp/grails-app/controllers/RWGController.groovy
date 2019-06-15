@@ -45,6 +45,7 @@ class RWGController {
     }
 
     def updateSearchCategory() {
+	logger.debug 'updateSearchCategory params.id {}', params.id
 	session.searchCategory = params.id
 	render 'OK'
     }
@@ -68,7 +69,7 @@ class RWGController {
      * json: JSON array containing the 'children' of the jQuery dynaTree
      * isCategory: boolean indicating whether the node being added is a category
      * categoryName: name of the category (i.e. as stored in database and displayed in tree)
-     * uniqueTreeId: unique identifier for the node being added. This ill be a concatenation of the parent's unique id + the index of this child's index in children list
+     * uniqueTreeId: unique identifier for the node being added. This will be a concatenation of the parent's unique id + the index of this child's index in children list
      *     e.g. category nodes will be 1,2,3; their children will be 1:1, 1:2, 1:3, 2:1, ...; their children 1:1:1, 1:1:2, ...
      * initialFacetCounts: JSONObject containing the initial facet counts for the nodes in the tree
      */
@@ -381,6 +382,7 @@ class RWGController {
 
     // Return search keywords
     def searchAutoComplete(String category, String term) {
+	logger.debug 'searchAutoComplete category {} term {}'. category, term 
 	render searchKeywordService.findSearchKeywords(
 	    category ?: 'ALL', term,
 	    params.int('max', 15)) as JSON

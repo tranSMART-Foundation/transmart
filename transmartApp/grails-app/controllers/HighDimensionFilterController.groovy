@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.dataquery.highdim.projections.Projection
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
@@ -8,6 +9,7 @@ import org.transmartproject.db.dataquery.highdim.HighDimensionResourceService
 /**
  * Author: Denny Verbeeck (dverbeec@its.jnj.com)
  */
+@Slf4j('logger')
 class HighDimensionFilterController {
 
     I2b2HelperService i2b2HelperService
@@ -72,22 +74,41 @@ class HighDimensionFilterController {
             return
         }
 
+	logger.info 'concept_key {}', concept_key
+
 	String conceptCode = i2b2HelperService.getConceptCodeFromKey(concept_key)
 
+	logger.info 'conceptCode {}', conceptCode
+
 	DeGplInfo platform = DeSubjectSampleMapping.findByConceptCode(conceptCode).platform
+
+	logger.info 'platform {}', platform
+	logger.info 'marker_type {}', platform.markerType
 	HighDimensionDataTypeResource resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept_key)
+	logger.info 'filterType {}', resource.highDimensionFilterType
+	logger.info 'resource {}', resource
 
 	Map result = [platform            : platform,
 		      auto_complete_source: '/transmart/highDimensionFilter/searchAutoComplete',
 		      filter_type         : resource.highDimensionFilterType,
-                      filter: filter,
-                      concept_key: concept_key,
+                      filter              : filter,
+                      concept_key         : concept_key,
+		      concept_code        : conceptCode]
+	Map subresult = [//platform            : platform,
+		      auto_complete_source: '/transmart/highDimensionFilter/searchAutoComplete',
+		      filter_type         : resource.highDimensionFilterType,
+                      filter              : filter,
+                      concept_key         : concept_key,
 		      concept_code        : conceptCode]
 
 	if (!result.filter_type) {
 	    result.error = 'Unrecognized marker type ' + platform.markerType
 	}
-	render(result as JSON)
+
+	logger.info 'subresult to render: {}', subresult
+	render (subresult as JSON)
+	logger.info 'result to render: {}', result
+	render (result as JSON)
     }
 
     def searchAutoComplete(String concept_key, String term, String search_property) {
@@ -95,11 +116,14 @@ class HighDimensionFilterController {
 	    render([] as JSON)
 	    return
         }
-
+	logger.info 'searchAutoComplete concept_key {} term {} search_property {}', concept_key, term, search_property
 	HighDimensionDataTypeResource resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept_key)
 	String conceptCode = i2b2HelperService.getConceptCodeFromKey(concept_key)
 	List<String> symbols = resource.searchAnnotation(conceptCode, term, search_property)
+	logger.info 'symbols {}', symbols
+	logger.info 'symbols {}', symbols
         symbols.collect {[label: it]}
+	logger.info 'symbols collected {}', symbols
 
         render symbols as JSON
     }
