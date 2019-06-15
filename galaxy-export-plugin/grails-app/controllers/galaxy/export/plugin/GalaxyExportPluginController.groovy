@@ -1,35 +1,36 @@
 package galaxy.export.plugin
 
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.core.io.Resource
 
+@Slf4j('logger')
 class GalaxyExportPluginController {
+    def assetResourceLocator
 
+    private static final List<String> scripts = ['galaxyExport.js'].asImmutable()
+    private static final List<String> styles = [].asImmutable()
+    
     /**
      *   Called to get the path to javascript resources such that the plugin can be loaded in the datasetExplorer
      */
     def loadScripts = {
 
-        def scripts = [servletContext.contextPath + pluginContextPath + '/js/galaxyExport.js']
-
-        def styles = []
-
         JSONObject result = new JSONObject()
         JSONArray rows = new JSONArray()
 
-        for (file in scripts) {
-            def m = [:]
-            m['path'] = file.toString()
-            m['type'] = 'script'
-            rows.put(m)
+        for (String script in scripts) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
+	    logger.info 'loading GalaxyExport script {} asset{}', script, assetRes.getPath()
+	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
         }
 
-        for (file in styles) {
-            def n = [:]
-            n['path'] = file.toString()
-            n['type'] = 'css'
-            rows.put(n)
+        for (String style in styles) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
+	    logger.info 'loading GalaxyExport style {} asset {}', style, assetRes.getPath()
+	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
         }
 
         result.put('success', true)

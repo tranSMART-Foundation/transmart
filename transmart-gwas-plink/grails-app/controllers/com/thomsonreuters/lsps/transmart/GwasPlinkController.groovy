@@ -1,11 +1,19 @@
 package com.thomsonreuters.lsps.transmart
 
 import com.thomsonreuters.lsps.transmart.jobs.GwasPlinkAnalysisJob
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.core.io.Resource
 
+@Slf4j('logger')
 class GwasPlinkController {
+
+    private static final List<String> scripts = ['gwasPlinkAdd.js'].asImmutable()
+    private static final List<String> styles = [].asImmutable()
+
     def gwasPlinkAnalysisService
+    def assetResourceLocator
 
     def show() {
     }
@@ -28,18 +36,17 @@ class GwasPlinkController {
         JSONObject result = new JSONObject()
         JSONArray rows = new JSONArray()
 
-        ['gwasPlinkAdd.js'].each {
-            JSONObject aScript = new JSONObject()
-            aScript.put('path', '' + servletContext.contextPath + pluginContextPath + '/js/' + it as String)
-            aScript.put('type', 'script')
-            rows.put(aScript)
+	for (String script in scripts) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
+	    logger.info 'loading GwasPlink script {} asset {}', script, assetRes.getPath()
+	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
         }
-        [].each {
-            JSONObject aStylesheet = new JSONObject()
-            aStylesheet.put('path', '' + servletContext.contextPath + pluginContextPath + '/css/' + it as String)
-            aStylesheet.put('type', 'stylesheet')
-            rows.put(aStylesheet)
-        }
+
+	for (String style in styles) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
+	    logger.info 'loading GwasPlink style {} asset {}', style, assetRes.getPath()
+	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
+	}
 
         result.put('success', true)
         result.put('totalCount', rows.size())

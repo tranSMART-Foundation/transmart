@@ -1,11 +1,13 @@
 package smartR.plugin
 
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
+import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.ContentType
 import heim.session.SessionService
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
-import groovyx.net.http.HTTPBuilder
-import groovyx.net.http.ContentType
+import org.springframework.core.io.Resource
 import org.transmartproject.core.dataquery.highdim.HighDimensionResource
 import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
 import org.transmartproject.core.dataquery.assay.Assay
@@ -15,7 +17,15 @@ import org.transmartproject.core.dataquery.assay.TissueType
 import org.transmartproject.core.dataquery.highdim.Platform
 import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstraint
 
+@Slf4j('logger')
 class SmartRController {
+    def assetResourceLocator
+
+    // list of required javascript files
+    private static final List<String> scripts = ['smartR/smartR.js'].asImmutable()
+
+    // list of required css files
+    private static final List<String> styles = [].asImmutable()
 
     HighDimensionResource highDimensionResourceService
     SessionService sessionService
@@ -31,29 +41,22 @@ class SmartRController {
     */
     def loadScripts = {
 
-        // list of required javascript files
-        def scripts = [servletContext.contextPath + pluginContextPath + '/js/smartR/smartR.js']
-
-        // list of required css files
-        def styles = []
 
         JSONObject result = new JSONObject()
         JSONArray rows = new JSONArray()
 
         // for all js files
-        for (file in scripts) {
-            def m = [:]
-            m['path'] = file.toString()
-            m['type'] = 'script'
-            rows.put(m)
-        }
+        for (String script in scripts) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
+	    logger.info 'loading SmartR script {} asset {}', script, assetRes.getPath()
+ 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
+       }
 
         // for all css files
-        for (file in styles) {
-            def n = [:]
-            n['path'] = file.toString()
-            n['type'] = 'css'
-            rows.put(n)
+        for (String style in styles) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
+	    logger.info 'loading SmartR style {} asset {}', style, assetRes.getPath()
+	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
         }
 
         result.put('success', true)

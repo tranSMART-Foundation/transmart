@@ -4,16 +4,18 @@ import grails.converters.JSON
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.Resource
 import org.transmart.plugin.shared.SecurityService
 
 @Slf4j('logger')
 class MetacoreEnrichmentController {
+    def assetResourceLocator
 	
     // Maximum loop count when creating temp directories
     private static final int TEMP_DIR_ATTEMPTS = 10000
 
-    private static final List<String> JS = ['metacoreEnrichment', 'metacoreEnrichmentDisplay', 'raphael-min'].asImmutable()
-    private static final List<String> CSS = ['metacore'].asImmutable()
+    private static final List<String> scripts = ['metacore/metacoreEnrichment.js', 'metacore/metacoreEnrichmentDisplay.js', 'metacore/raphael-min.js'].asImmutable()
+    private static final List<String> styles = ['metacore.css'].asImmutable()
 
     def dataExportService
     @Autowired private MetacoreEnrichmentService metacoreEnrichmentService
@@ -127,12 +129,16 @@ class MetacoreEnrichmentController {
     def loadScripts() {
 	List<Map> rows = []
 
-	for (String file in JS) {
-	    rows << [path: resource(dir: 'js/metacore', file: file + '.js', plugin: 'transmart-metacore-plugin'), type: 'script']
+	for (String script in scripts) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
+	    logger.info 'loading Metacore script {} asset {}', script, assetRes.getPath()
+	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
         }
 
-	for (String file in CSS) {
-	    rows << [path: resource(dir: 'css', file: file + '.css', plugin: 'transmart-fractalis'), type: 'css']
+	for (String style in styles) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
+	    logger.info 'loading Metacore style {} asset{}', style, assetRes.getPath()
+	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
 	}
 
 	render([success: true, totalCount: rows.size(), files: rows] as JSON)
