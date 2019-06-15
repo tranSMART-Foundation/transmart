@@ -4,6 +4,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartRenderingInfo
 import org.jfree.chart.JFreeChart
+import org.jfree.chart.axis.AxisLocation
 import org.jfree.chart.axis.CategoryAxis
 import org.jfree.chart.axis.NumberAxis
 import org.jfree.chart.axis.ValueAxis
@@ -21,6 +22,7 @@ import org.jfree.chart.renderer.category.ScatterRenderer
 import org.jfree.chart.renderer.category.StandardBarPainter
 import org.jfree.chart.renderer.xy.StandardXYBarPainter
 import org.jfree.chart.renderer.xy.XYBarRenderer
+import org.jfree.chart.ui.RectangleInsets
 import org.jfree.data.category.CategoryDataset
 import org.jfree.data.category.DefaultCategoryDataset
 import org.jfree.data.general.Dataset
@@ -32,7 +34,6 @@ import org.jfree.data.statistics.DefaultMultiValueCategoryDataset
 import org.jfree.data.statistics.HistogramDataset
 import org.jfree.data.statistics.MultiValueCategoryDataset
 import org.jfree.graphics2d.svg.SVGGraphics2D
-import org.jfree.ui.RectangleInsets
 import org.jfree.util.ShapeUtilities
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
@@ -214,7 +215,10 @@ class ChartService {
             // Let's calculate the T test if possible
             if (result[1].exists && result[2].exists) {
 
-		if (result[1].conceptData.toArray() == result[2].conceptData.toArray()) {
+		if (result[1].conceptData.size() == 0 && result[2].conceptData.size() == 0) {
+                    result.commons.testmessage = 'No t-test calculated: subset data is empty'
+		}
+		else if (result[1].conceptData.toArray() == result[2].conceptData.toArray()) {
                     result.commons.testmessage = 'No t-test calculated: these are the same subsets'
 		}
 		else if (result[1].conceptData.size() < 2 || result[2].conceptData.size() < 2) {
@@ -284,7 +288,10 @@ class ChartService {
             // Let's calculate the T test if possible
 	    if (result[2].exists) {
 
-		if (result[1].conceptData.toArray() == result[2].conceptData.toArray()) {
+		if (result[1].conceptData.size() == 0 && result[2].conceptData.size() == 0) {
+                    result.commons.testmessage = 'No t-test calculated: subset data is empty'
+		}
+		else if (result[1].conceptData.toArray() == result[2].conceptData.toArray()) {
                     result.commons.testmessage = 'No t-test calculated: these are the same subsets'
 		}
 		else if (result[1].conceptData.size() < 2 || result[2].conceptData.size() < 2) {
@@ -336,7 +343,10 @@ class ChartService {
                     junction = junction ?: (v > 0 && result[2].conceptData[k] > 0)
                 }
 
-		if (!junction) {
+		if (result[1].conceptData.size() == 0 && result[2].conceptData.size() == 0) {
+                    result.commons.testmessage = 'No χ² test calculated: subsets are empty'
+		}
+		else if (!junction) {
                     result.commons.testmessage = 'No χ² test calculated: subsets are disjointed'
 		}
 		else if (result[1].conceptData == result[2].conceptData) {
