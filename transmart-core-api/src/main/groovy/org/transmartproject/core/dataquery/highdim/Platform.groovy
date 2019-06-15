@@ -57,7 +57,7 @@ interface Platform {
 
     /**
      * Returns an iterable with the platform template entries. The type of
-     * this entries depends on the marker type and is not constrained by this
+     * these entries depends on the marker type and is not constrained by this
      * API.
      *
      * If the marker type does not have an associated template or it's of

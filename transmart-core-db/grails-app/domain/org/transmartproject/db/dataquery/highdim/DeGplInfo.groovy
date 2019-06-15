@@ -32,16 +32,17 @@ class DeGplInfo implements Platform {
 
     static mapping = {
         table         schema: 'deapp'
-        id              column: 'platform',   generator: 'assigned'
+        id            column: 'platform',   generator: 'assigned'
         version      false
 
         genomeReleaseId column: 'genome_build'
+        myTitle column: 'title'
     }
 
     static constraints = {
         annotationDate  nullable: true
         genomeReleaseId nullable: true
-        id             maxSize:  50
+        id               maxSize:  50
         markerType      nullable: true, maxSize: 100
         organism        nullable: true, maxSize: 100
         title           nullable: true, maxSize: 500
