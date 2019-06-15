@@ -49,7 +49,7 @@
         <parameter>
             <name>LOAD_TYPE</name>
             <default_value>L</default_value>
-            <description>L=Load lt_src_mrna_data using bulk loader and run i2b2_process_mrna_data, I=Insert data to lt_src_mrna_data and run i2b2_process_mrna_data, F=File only, i2b2_process_mrna_data will not be run</description>
+            <description>L=Load lt_src_rna_seq_data using bulk loader and run i2b2_process_RNA_sequencing_data, I=Insert data to lt_src_rna_seq_data and run i2b2_process_RNA_sequencing_data, F=File only, i2b2_process_RNA_sequencing_data will not be run</description>
         </parameter>
         <parameter>
             <name>LOG_BASE</name>
