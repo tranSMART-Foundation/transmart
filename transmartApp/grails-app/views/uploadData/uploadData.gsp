@@ -10,8 +10,7 @@
 	<asset:stylesheet href="ext/resources/css/ext-all.css"/>
 	<asset:stylesheet href="ext/resources/css/xtheme-gray.css"/>
 	<asset:stylesheet href="main.css"/>
-	<asset:stylesheet href="jquery-ui-1.10.4.custom.css"/>
-        <asset:stylesheet href="jquery/skin/ui.dynatree.css"/>
+	<asset:stylesheet href="jquery-plugin.css"/>
         <asset:stylesheet href="rwg.css"/>
         <asset:stylesheet href="adminTab.css"/>
         <asset:stylesheet href="uploadDataTab.css"/>

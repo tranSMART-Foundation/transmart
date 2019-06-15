@@ -7,13 +7,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
         <title>${grailsApplication.config.com.recomdata.appTitle}</title>
         
-        %{-- jQuery CSS for cupertino theme --}%
-        <asset:stylesheet href="jquery/ui/jquery-ui-1.10.3.custom.css"/>
-        <asset:stylesheet href="jquery/skin/ui.dynatree.css"/>
+        %{-- jquery-ui CSS for cupertino theme --}%
+        <asset:stylesheet href="jquery-cupertino.css"/>
         
         %{-- Our CSS --}%
         <asset:stylesheet href="browseTab.css"/>
         <asset:stylesheet href="folderManagement.css"/>
+
         <asset:stylesheet href="jquery/simpleModal.css"/>
         <asset:stylesheet href="jquery/multiselect/ui.multiselect.css"/>
         <asset:stylesheet href="jquery/multiselect/common.css"/>

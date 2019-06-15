@@ -11,6 +11,7 @@
 	<asset:link rel="icon" href='searchtool.ico' type="image/x-ico" />
 
 	<asset:stylesheet href="browseTab.css" />
+	<asset:stylesheet href="jquery-cupertino.css" />
 
     </head>
 
