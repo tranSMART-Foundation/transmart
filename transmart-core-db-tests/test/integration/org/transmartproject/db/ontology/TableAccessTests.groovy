@@ -80,7 +80,7 @@ class TableAccessTests {
             assertThat e, allOf(
                 isA(RuntimeException),
                 hasProperty('message', containsString('could not find it ' +
-		      'in class org.transmartproject.db.ontology.' +
+		      'in org.transmartproject.db.ontology.' +
 		      'I2b2\'s table (fullname: \\notini2b2\\)'))
             )
         }
