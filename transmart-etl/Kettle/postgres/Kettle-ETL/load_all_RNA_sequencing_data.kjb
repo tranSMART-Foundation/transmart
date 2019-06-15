@@ -119,10 +119,10 @@
       <yloc>88</yloc>
       </entry>
     <entry>
-      <name>truncate lt_src_RNA_sequencing_data</name>
+      <name>truncate lt_src_rna_seq_data</name>
       <description/>
       <type>SQL</type>
-      <sql>truncate table LT_SRC_RNA_SEQ_DATA;</sql>
+      <sql>truncate table lt_src_rna_seq_data;</sql>
       <useVariableSubstitution>F</useVariableSubstitution>
       <sqlfromfile>F</sqlfromfile>
       <sqlfilename/>
@@ -358,7 +358,7 @@
     </hop>
     <hop>
       <from>Write audit with study_id</from>
-      <to>truncate lt_src_RNA_sequencing_data</to>
+      <to>truncate lt_src_rna_seq_data</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -366,7 +366,7 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>truncate lt_src_RNA_sequencing_data</from>
+      <from>truncate lt_src_rna_seq_data</from>
       <to>Load subject-sample map</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -402,7 +402,7 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>truncate lt_src_RNA_sequencing_data</from>
+      <from>truncate lt_src_rna_seq_data</from>
       <to>Write To Log</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
