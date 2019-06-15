@@ -110,8 +110,8 @@ BEGIN
   newJobFlag := 0; -- False (Default)
   jobID := currentJobID;
 
-  	databaseName := 'TM_CZ';
-	procedureName := 'I2B2_LOAD_RBM_DATA';
+  	databaseName := 'tm_cz';
+	procedureName := 'i2b2_load_rbm_data';
 
   --Audit JOB Initialization
   --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -1136,7 +1136,7 @@ begin
     ---Cleanup OVERALL JOB if this proc is being run standalone
 	
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_LOAD_RBM_DATA',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_rbm_data',0,stepCt,'Done');
 
 	IF newJobFlag = 1
 	THEN
