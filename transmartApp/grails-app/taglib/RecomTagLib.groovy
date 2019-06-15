@@ -1,11 +1,14 @@
+import groovy.util.logging.Slf4j
+
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.transmart.biomart.ContentRepository
 
-import java.text.DecimalFormat
-import java.text.SimpleDateFormat
-
+@Slf4j('logger')
 class RecomTagLib {
 
     def diseaseService
@@ -315,12 +318,24 @@ class RecomTagLib {
 	    'visibility: visible; display: block; vertical-align: middle;' :
 	    'visibility: hidden; display: none; vertical-align: middle;'
 
+	StringBuilder outlog = new StringBuilder()
+
+	outlog << '<thead><tr><th colSpan="' << colSpan << '" class="tableToggle">'
+	outlog << '<a id="' << divPrefix << '_fopen" style="' << openStyle << '" '
+	outlog << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Open' src=\"${assetPath(src:'sorted_desc.gif')}\" /></a> "
+	outlog << "<a id='" << divPrefix << "_fclose' style='" << closedStyle << "' "
+	outlog << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Close' src=\"${assetPath(src:'sorted_asc.gif)')}\" /></a> "
+	outlog << "</th></tr></thead>"
+	
+	logger.info 'status {} tableHeader {}', status, outlog
+
 	out << '<thead><tr><th colSpan="' << colSpan << '" class="tableToggle">'
 	out << '<a id="' << divPrefix << '_fopen" style="' << openStyle << '" '
-	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Open' src=\"${resource(dir: 'images/skin', file: 'sorted_desc.gif')}\" /></a> "
+	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Open' src=\"${assetPath(src:'sorted_desc.gif')}\" /></a> "
 	out << "<a id='" << divPrefix << "_fclose' style='" << closedStyle << "' "
-	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Close' src=\"${resource(dir: 'images/skin', file: 'sorted_asc.gif')}\" /></a> "
+	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Close' src=\"${assetPath(src:'sorted_asc.gif)')}\" /></a> "
 	out << "</th></tr></thead>"
+
     }
 
     def fieldDate = { attrs, body ->
