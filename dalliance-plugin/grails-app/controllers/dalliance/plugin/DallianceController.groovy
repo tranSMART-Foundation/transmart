@@ -1,32 +1,40 @@
 package dalliance.plugin
 
+import groovy.util.logging.Slf4j
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.core.io.Resource
 
+@Slf4j('logger')
 class DallianceController {
+    def assetResourceLocator
+
+    private static final List<String> scripts = ['dalliance-all.js','dalliance.js'].asImmutable()
+
+    private static final List<String> styles = [].asImmutable()
 
     def index() {
         render (view: 'main')
     }
 
     def loadScripts = {
-        def scripts = [
-            servletContext.contextPath+pluginContextPath+'/build/dalliance-all.js',
-            servletContext.contextPath+pluginContextPath+'/dalliance.js',
-        ]
 
         JSONObject result = new JSONObject()
         JSONArray rows = new JSONArray()
 
-        for (file in scripts) {
-
-            JSONObject aScript = new JSONObject()
-            aScript.put('path', file.toString())
-            aScript.put('type', 'script')
-            rows.put(aScript)
+        for (String script in scripts) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
+	    logger.info 'loading Dalliance script {} asset {}', script, assetRes.getPath()
+	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
         }
 
-        result.put('success', true)
+ 	for (String style in styles) {
+	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
+	    logger.info 'loading Dalliance style {} asset {}', style, assetRes.getPath()
+	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
+	}
+
+	result.put('success', true)
         result.put('totalCount', scripts.size())
         result.put('files', rows)
 
