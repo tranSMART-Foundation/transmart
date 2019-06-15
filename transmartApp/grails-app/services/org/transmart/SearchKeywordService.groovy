@@ -76,6 +76,7 @@ class SearchKeywordService {
 
 	for (Map filtercat in filtercats) {
 
+	    logger.debug 'findFilterCategories {}', filtercat
 	    Set<Map> choices = new TreeSet<>(new Comparator<Map>() {
 		int compare(Map m1, Map m2) {
 		    m1.name.compareTo m2.name
@@ -117,6 +118,8 @@ class SearchKeywordService {
 		categories << [category: filtercat, choices: choices]
             }
         }
+
+	logger.debug 'findFilterCategories result.size {}', categories.size()
 
 	categories
     }
@@ -257,6 +260,8 @@ class SearchKeywordService {
 		}
 	    }
 	}
+
+	logger.debg 'findSearchKeywords result {}', keywords
 
 	keywords
     }
