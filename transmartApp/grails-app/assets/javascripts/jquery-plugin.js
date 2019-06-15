@@ -1,11 +1,12 @@
 /**
-* Copyright (c) 2016 The Hyve B.V.
-* This code is licensed under the GNU General Public License,
-* version 3, or (at your option) any later version.
+* Set of jquery plugin javascript files to load in all pages
+* jquery 2.2.0 
+* jquery-ui 1.12.1
+* other files not yet updated from earlier tranSMART builds
 */
 
-//= require jquery-1.8.3.min.js
-//= require jquery-ui.min.js
+//= require jquery.js
+//= require jquery-ui.js
 //= require jquery/jquery.migrate.js
 //= require jquery/jquery.tablesorter.js
 //= require jquery/jquery.cookie.js
