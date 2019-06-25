@@ -64,8 +64,8 @@ class DatasetExplorerController {
     @Value('${ui.tabs.datasetExplorer.workspace.hide:false}')
     private boolean hideWorkspace
 
-    @Value('${ui.tabs.sampleExplorer.show:false}')
-    private boolean sampleExplorerEnabled
+    @Value('${ui.tabs.sampleExplorer.hide:false}')
+    private boolean hideSampleExplorer
 
     @Value('${com.thomsonreuters.transmart.metacoreAnalyticsEnable:false}')
     private boolean metacoreAnalyticsEnabled
@@ -129,7 +129,7 @@ class DatasetExplorerController {
 	    dataExportJobsEnabled   : canSeeData && !hideDataExportJobs,
 	    analysisJobsEnabled     : analysisJobsEnabled,
 	    workspaceEnabled        : !hideWorkspace,
-	    sampleExplorerEnabled   : sampleExplorerEnabled,
+	    sampleExplorerEnabled   : !hideSampleExplorer,
 	    metacoreAnalyticsEnabled: metacoreAnalyticsEnabled,
 	    metacoreUrl             : metacoreUrl,
 	    analysisTabExtensions   : transmartExtensionsRegistry.analysisTabExtensions as JSON,

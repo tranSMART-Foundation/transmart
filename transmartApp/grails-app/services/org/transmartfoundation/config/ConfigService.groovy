@@ -240,7 +240,7 @@ class ConfigService {
             'com.galaxy.export.galaxyEnabled': [
                 default: false,
                 desc: 'Galaxy export plugin enabled if true'],
-            'com.galaxy.export.galaxyEnabled': [
+            'com.galaxy.export.galaxyURL': [
                 desc: 'Galaxy server URL for Galaxy export tab'],
         ]
 
@@ -461,6 +461,10 @@ class ConfigService {
                 desc: 'Path to R scripts'],
             'RModules.tempFolderDirectory': [
                 desc: 'working directory for R scripts, where the jobs are created and output files are generated'],
+            'org.transmartproject.rmodules.deployment.dataexportRscripts': [
+                desc: 'temp directory to deploy R scripts for data export'],
+            'org.transmartproject.rmodules.deployment.rscripts': [
+                desc: 'temp directory to deploy R scroipts for advanced workflows'],
             'ui.tabs.datasetExplorer.analysisJobs.show': [
                 default:true,
                 desc: 'If defined as true, display \'Analysis Jobs\' tab in the Analyze tab pages'],
@@ -1096,6 +1100,8 @@ class ConfigService {
             else if(k == 'quartz.jdbcStore'){addConfig(rmodulesParams,k,v,'')}
             else if(k == 'quartz.props.scheduler.skipUpdateCheck'){addConfig(rmodulesParams,k,v,'')}
             else if(k == 'quartz.waitForJobsToCompleteOnShutdown'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'org.transmartproject.rmodules.deployment.dataexportRscripts'){addConfig(rmodulesParams,k,v,'')}
+            else if(k == 'org.transmartproject.rmodules.deployment.rscripts'){addConfig(rmodulesParams,k,v,'')}
 
             // saml
             else if(k == 'org.transmart.security.samlEnabled'){addConfig(samlParams,k,v,'')}
