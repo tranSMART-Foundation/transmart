@@ -9,9 +9,9 @@ import org.springframework.core.io.Resource
 class DallianceController {
     def assetResourceLocator
 
-    private static final List<String> scripts = ['dalliance-all.js','dalliance.js'].asImmutable()
+    private static final List<String> scripts = ['build/dalliance-all.js','head/dalliance.js'].asImmutable()
 
-    private static final List<String> styles = [].asImmutable()
+    private static final List<String> styles = ['dalliance.css', 'dalliance-scoped.css'].asImmutable()
 
     def index() {
         render (view: 'main')
