@@ -19,10 +19,11 @@ grails.project.dependency.resolution = {
         mavenLocal()
         mavenCentral()
 
-        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+        mavenRepo 'http://localhost/content/repositories/public/'
     }
 
-    String tmVersion = '16.4-SNAPSHOT'
+    String tmVersion = '19.0-SNAPSHOT'
 
     dependencies {
     	// needed to support folder-management

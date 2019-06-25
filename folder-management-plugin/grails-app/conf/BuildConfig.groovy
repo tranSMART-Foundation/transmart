@@ -13,7 +13,8 @@ grails.project.dependency.resolution = {
         mavenLocal()
         grailsCentral()
         mavenCentral()
-        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+        mavenRepo 'http://localhost/content/repositories/public/'
     }
 
     dependencies {
@@ -31,10 +32,10 @@ grails.project.dependency.resolution = {
 
     plugins {
 	compile ':asset-pipeline:2.14.1.1'
-        compile ':search-domain:16.4-SNAPSHOT'
-	compile ':transmart-core:16.4-SNAPSHOT'
+        compile ':search-domain:19.0-SNAPSHOT'
+	compile ':transmart-core:19.0-SNAPSHOT'
 
-//        compile ':transmart-legacy-db:16.4-SNAPSHOT'
+//        compile ':transmart-legacy-db:19.0-SNAPSHOT'
 //        compile ':spring-security-core:2.0.0'
         compile ':quartz:1.0.2'
 

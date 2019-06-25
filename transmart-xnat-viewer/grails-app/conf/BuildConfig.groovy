@@ -5,7 +5,7 @@ grails.project.test.reports.dir = 'target/test-reports'
 grails.project.target.level = 1.8
 grails.project.source.level = 1.8
 
-tmVersion = '16.4-SNAPSHOT'
+tmVersion = '19.0-SNAPSHOT'
 
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
@@ -39,7 +39,8 @@ grails.project.dependency.resolution = {
         //mavenRepo 'http://repository.codehaus.org'
         //mavenRepo 'http://download.java.net/maven/2/'
         //mavenRepo 'http://repository.jboss.com/maven2/'
-        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+        mavenRepo 'http://localhost/content/repositories/public/'
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.

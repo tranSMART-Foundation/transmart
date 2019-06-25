@@ -17,7 +17,7 @@
 
     <groupId>uk.ac.ebi.mydas</groupId>
     <artifactId>mydas_master</artifactId>
-    <version>1.7.0.transmart-16.4-SNAPSHOT</version>
+    <version>1.7.0.transmart-19.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>mydas_master Maven Webapp</name>
@@ -32,10 +32,17 @@
     </licenses>
 
     <repositories>
+<!--
         <repository>
             <id>repo.transmartfoundation.org</id>
             <name>TranSMART Foundation Maven Public Group</name>
             <url>http://repo.transmartfoundation.org/content/groups/public/</url>
+        </repository>
+-->
+        <repository>
+            <id>localhost</id>
+            <name>TranSMART Foundation Maven Public Group</name>
+            <url>http://localhost/groups/public/</url>
         </repository>
     </repositories>
 

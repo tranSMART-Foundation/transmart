@@ -1,6 +1,3 @@
-grails.project.repos.default = 'repo.thehyve.nl-snapshots'
-grails.project.repos."${grails.project.repos.default}".url = 'https://repo.thehyve.nl/content/repositories/snapshots/'
-
 def defaultVMSettings = [
         maxMemory: 768,
         minMemory: 64,
@@ -70,11 +67,12 @@ grails.project.dependency.resolution = {
         mavenLocal() // Note: use './grailsw maven-install' to install required plugins locally
 	grailsCentral()
 	mavenCentral()
-        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+        mavenRepo 'http://localhost/content/repositories/public/'
     }
 
     dependencies {
-	compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
+	compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
 
 	test 'org.hamcrest:hamcrest-library:1.3'
         test 'org.hamcrest:hamcrest-core:1.3'
@@ -110,7 +108,7 @@ grails.project.dependency.resolution = {
 
     plugins {
     	compile ':hibernate:3.6.10.19', { export = false }
-	compile ':transmart-core:16.4-SNAPSHOT'
+	compile ':transmart-core:19.0-SNAPSHOT'
         build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false
         }

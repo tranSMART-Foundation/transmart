@@ -6,7 +6,7 @@
     <groupId>org.transmartproject</groupId>
     <artifactId>transmart-core-api</artifactId>
     <name>tranSMART Core API</name>
-    <version>16.4-SNAPSHOT</version>
+    <version>19.0-SNAPSHOT</version>
 
     <build>
         <pluginManagement>
@@ -108,6 +108,7 @@
     </dependencies>
 
     <distributionManagement>
+<!--
         <repository>
             <id>repo.transmartfoundation.org-releases</id>
             <url>https://repo.transmartfoundation.org/content/repositories/releases/</url>
@@ -116,7 +117,16 @@
             <id>repo.transmartfoundation.org-snapshots</id>
             <url>https://repo.transmartfoundation.org/content/repositories/snapshots/</url>
         </snapshotRepository>
+-->
     </distributionManagement>
+        <repository>
+            <id>localhost</id>
+            <url>http://localhost/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>localhost</id>
+            <url>http://localhost/content/repositories/snapshots/</url>
+        </snapshotRepository>
 
     <properties>
         <groovyVersion>2.1.0</groovyVersion>

@@ -60,7 +60,8 @@ grails.project.dependency.resolution = {
             grailsCentral()
             mavenCentral()
 
-            mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//            mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+            mavenRepo 'http://localhost/content/repositories/public/'
         }
     }
     else {
@@ -69,7 +70,7 @@ grails.project.dependency.resolution = {
 
     dependencies {
         compile 'com.google.protobuf:protobuf-java:2.5.0'
-        compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
+        compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
 
         runtime 'org.postgresql:postgresql:42.2.2.jre7', { export = false }
         runtime 'com.oracle:ojdbc7:12.1.0.1', { export = false }
@@ -107,10 +108,10 @@ grails.project.dependency.resolution = {
         test ':functional-test:2.0.0'
 
         if (!dm) {
-            compile ':transmart-core:16.4-SNAPSHOT'
-            compile ':transmart-shared:16.4-SNAPSHOT'
+            compile ':transmart-core:19.0-SNAPSHOT'
+            compile ':transmart-shared:19.0-SNAPSHOT'
 
-	    test ':transmart-core-db-tests:16.4-SNAPSHOT'
+	    test ':transmart-core-db-tests:19.0-SNAPSHOT'
         }
         else {
             dm.internalDependencies delegate

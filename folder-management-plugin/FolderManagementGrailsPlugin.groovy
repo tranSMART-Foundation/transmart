@@ -1,6 +1,6 @@
 class FolderManagementGrailsPlugin {
     // the plugin version
-    def version = '16.4-SNAPSHOT'
+    def version = '19.0-SNAPSHOT'
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = '2.5.4 > *'
     // the other plugins this plugin depends on

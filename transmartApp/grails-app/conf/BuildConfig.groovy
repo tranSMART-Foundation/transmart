@@ -1,7 +1,7 @@
 import grails.util.Environment
 
 def forkSettingsRun   = [minMemory: 1536, maxMemory: 4096, maxPerm: 384, debug: false]
-def forkSettingsWar   = [minMemory: 1536, maxMemory: 8192, maxPerm: 2560, debug: false]
+def forkSettingsWar   = [minMemory: 2048, maxMemory: 8192, maxPerm: 2560, debug: false, forkReserve: false]
 def forkSettingsOther = [minMemory:  256, maxMemory: 1024, maxPerm: 384, debug: false]
 
 // grails.assets configuration
@@ -88,7 +88,8 @@ grails.project.dependency.resolution = {
 	    grailsCentral()
 	    mavenCentral()
 
-	    mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//	    mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+	    mavenRepo 'http://localhost/content/repositories/public/'
 	}
     }
     else {
@@ -121,7 +122,7 @@ grails.project.dependency.resolution = {
 	    //also remove xercesImpl because it breaks tomcat and is not otherwise needed
 	    excludes 'bcprov-jdk15', 'spring-security-config', 'spring-security-core', 'spring-security-web', 'xercesImpl'
 	}
-	compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
+	compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
 
 	runtime 'com.jcraft:jsch:0.1.42'
 	runtime 'com.lowagie:itext:2.0.8', { transitive = false }
@@ -185,7 +186,7 @@ grails.project.dependency.resolution = {
 
 	//test ':code-coverage:1.2.6' // Doesn't work with forked tests yet
 
-	String tmVersion = '16.4-SNAPSHOT'
+	String tmVersion = '19.0-SNAPSHOT'
 	if (!dm) {
 	    compile ':smart-r:'                   + tmVersion
 	    compile ':rdc-rmodules:'              + tmVersion

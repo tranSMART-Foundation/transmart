@@ -1,5 +1,5 @@
 class TransmartXnatImporterGrailsPlugin {
-    def version = '16.4-SNAPSHOT'
+    def version = '19.0-SNAPSHOT'
     def grailsVersion = '2.5.4 > *'
     def title = 'Transmart Xnat Importer Plugin'
     def author = 'Erwin Vast'

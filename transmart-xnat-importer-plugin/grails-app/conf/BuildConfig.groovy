@@ -22,7 +22,8 @@ grails.project.dependency.resolution = {
         //mavenRepo 'http://repository.codehaus.org'
         //mavenRepo 'http://download.java.net/maven/2/'
         //mavenRepo 'http://repository.jboss.com/maven2/'
-        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+        mavenRepo 'http://localhost/content/repositories/public/'
     }
 
     dependencies {
@@ -33,8 +34,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-	runtime ':biomart-domain:16.4-SNAPSHOT'
-	runtime ':transmart-shared:16.4-SNAPSHOT'
+	runtime ':biomart-domain:19.0-SNAPSHOT'
+	runtime ':transmart-shared:19.0-SNAPSHOT'
 
 	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false

@@ -45,7 +45,8 @@ grails.project.dependency.resolution = {
             grailsCentral()
             mavenLocal()
             mavenCentral()
-            mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//            mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+            mavenRepo 'http://localhost/content/repositories/public/'
         }
     }
     else {
@@ -61,11 +62,11 @@ grails.project.dependency.resolution = {
 
         compile 'com.google.guava:guava:19.0'
 //	compile 'com.google.guava:guava:16.0-dev-20140115-68c8348'
-        compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
+        compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
         //test 'com.jayway.restassured:rest-assured:2.4.1'
 
         runtime 'org.javassist:javassist:3.16.1-GA'
-        runtime 'com.ittm_solutions.ipacore:IpaApi:16.4-SNAPSHOT'
+        runtime 'com.ittm_solutions.ipacore:IpaApi:19.0-SNAPSHOT'
 
 	test 'org.hamcrest:hamcrest-library:1.3'
         test 'org.hamcrest:hamcrest-core:1.3'
@@ -90,10 +91,10 @@ grails.project.dependency.resolution = {
         test ':karma-test-runner:0.2.4'
 
         if (!dm) {
-            runtime ':transmart-core:16.4-SNAPSHOT'
+            runtime ':transmart-core:19.0-SNAPSHOT'
 
-            test ':transmart-core:16.4-SNAPSHOT'
-            test ':transmart-core-db-tests:16.4-SNAPSHOT'
+            test ':transmart-core:19.0-SNAPSHOT'
+            test ':transmart-core-db-tests:19.0-SNAPSHOT'
         }
         else {
             dm.internalDependencies delegate

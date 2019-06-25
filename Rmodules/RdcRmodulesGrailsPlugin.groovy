@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component
 import org.transmartproject.core.users.User
 
 class RdcRmodulesGrailsPlugin {
-    def version = '16.4-SNAPSHOT'
+    def version = '19.0-SNAPSHOT'
     def grailsVersion = '2.5.4 > *'
     def title = 'R Modules Plugin'
     def author = 'Sai Kumar Munikuntla'

@@ -3,7 +3,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 group = 'com.ittm_solutions.ipacore'
-version = '16.4-SNAPSHOT'
+version = '19.0-SNAPSHOT'
 
 description = 'IpaApi add-on for SmartR'
 

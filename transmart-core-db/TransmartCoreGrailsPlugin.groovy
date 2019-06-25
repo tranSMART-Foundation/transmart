@@ -26,8 +26,8 @@ import org.transmartproject.db.ontology.DefaultConceptsResource
 import org.transmartproject.db.support.DatabasePortabilityService
 
 class TransmartCoreGrailsPlugin {
-    def version = '16.4-SNAPSHOT'
-    def grailsVersion = '2.3 > *'
+    def version = '19.0-SNAPSHOT'
+    def grailsVersion = '2.5.4 > *'
     def pluginExcludes = [
         'grails-app/views/error.gsp'
     ]

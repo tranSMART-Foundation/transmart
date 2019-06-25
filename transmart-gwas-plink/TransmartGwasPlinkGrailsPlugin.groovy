@@ -3,9 +3,9 @@ import org.springframework.stereotype.Component
 
 class TransmartGwasPlinkGrailsPlugin {
     // the plugin version
-    def version = '16.4-SNAPSHOT'
+    def version = '19.0-SNAPSHOT'
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = '2.3.11 > *'
+    def grailsVersion = '2.5.4 > *'
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             'grails-app/views/error.gsp'

@@ -20,14 +20,15 @@ grails.project.dependency.resolution = {
         mavenCentral()
         mavenLocal() // Note: use 'grails maven-install' to install required plugins locally
 
-        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+        mavenRepo 'http://localhost/content/repositories/public/'
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.13'
     }
     plugins {
-        String tmVersion = '16.4-SNAPSHOT'
+        String tmVersion = '19.0-SNAPSHOT'
 
         compile ':transmart-java:' + tmVersion
 

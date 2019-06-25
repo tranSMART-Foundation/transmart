@@ -1,5 +1,5 @@
 class TransmartMetacorePluginGrailsPlugin {
-    def version = '16.4-SNAPSHOT'
+    def version = '19.0-SNAPSHOT'
     def grailsVersion = '2.5.4 > *'
     def title = 'Transmart Metacore Plugin'
     def author = 'Valeria Hohlova'
@@ -15,7 +15,7 @@ class TransmartMetacorePluginGrailsPlugin {
 	if (application.config.com.thomsonreuters.transmart.metacoreAnalyticsEnable) {
 	    ctx.getBean('transmartExtensionsRegistry').registerAnalysisTabExtension(
 		'transmart-metacore-plugin',
-		'/MetacoreEnrichment/loadScripts',
+		'/metacoreEnrichment/loadScripts',
 		'loadMetaCoreEnrichment')
 	}
     }

@@ -14,13 +14,14 @@ grails.project.dependency.resolution = {
         grailsCentral()
         mavenLocal()
         mavenCentral()
-        mavenRepo 'https://repo.transmartfoundation.org/content/groups/public/'
+//        mavenRepo 'https://repo.transmartfoundation.org/content/groups/public/'
+        mavenRepo 'http://localhost/content/groups/public/'
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         compile 'net.sf.opencsv:opencsv:2.3'
-        compile 'uk.ac.ebi.mydas:mydas:1.7.0.transmart-16.4-SNAPSHOT'
-        compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
+        compile 'uk.ac.ebi.mydas:mydas:1.7.0.transmart-19.0-SNAPSHOT'
+        compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
 	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
    }
 

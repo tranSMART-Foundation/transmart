@@ -14,9 +14,9 @@ class smartRGrailsPlugin {
     public static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
     // the plugin version
-    def version = '16.4-SNAPSHOT'
+    def version = '19.0-SNAPSHOT'
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = '2.3 > *'
+    def grailsVersion = '2.5.4 > *'
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
         'grails-app/views/error.gsp'
@@ -114,7 +114,7 @@ class smartRGrailsPlugin {
 
         if (ctx.containsBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME)) {
             ctx.getBean(TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME)
-                    .registerAnalysisTabExtension('smartR', '/SmartR/loadScripts', 'addSmartRPanel')
+                    .registerAnalysisTabExtension('smartR', '/smartR/loadScripts', 'addSmartRPanel')
         }
 
     }

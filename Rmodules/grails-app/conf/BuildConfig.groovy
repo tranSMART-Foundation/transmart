@@ -31,7 +31,8 @@ grails.project.dependency.resolution = {
         mavenLocal() // Note: use 'grails maven-install' to install required plugins locally
         grailsCentral()
         mavenCentral()
-        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+//        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
+        mavenRepo 'http://localhost/content/repositories/public/'
     }
 
     dependencies {
@@ -39,7 +40,7 @@ grails.project.dependency.resolution = {
         compile 'net.sf.opencsv:opencsv:2.3'
         compile 'org.mapdb:mapdb:0.9.10'
         compile 'org.rosuda:Rserve:1.7.3'
-	compile 'org.transmartproject:transmart-core-api:16.4-SNAPSHOT'
+	compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
 //	compile 'com.lowagie:itext:2.0.8' //latest 4.2.2
 //	compile 'org.xhtmlrenderer:core-renderer:R8'
 
@@ -57,7 +58,7 @@ grails.project.dependency.resolution = {
         compile ':quartz:1.0.2'
 	compile ':spring-security-core:2.0.0'
 
-	compile ':transmart-shared:16.4-SNAPSHOT'
+	compile ':transmart-shared:19.0-SNAPSHOT'
 
 	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
 	    export = false

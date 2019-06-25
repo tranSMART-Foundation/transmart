@@ -1,6 +1,6 @@
 class TransmartLegacyDbGrailsPlugin {
-    def version = '16.4-SNAPSHOT'
-    def grailsVersion = '2.3 > *'
+    def version = '19.0-SNAPSHOT'
+    def grailsVersion = '2.5.4 > *'
     def title = 'Transmart Legacy DB Plugin'
     def author = 'Florian Guitton'
     def authorEmail = 'f.guitton@imperial.ac.uk'
