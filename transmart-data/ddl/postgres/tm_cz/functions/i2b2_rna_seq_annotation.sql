@@ -84,7 +84,7 @@ begin
     end;
     
     stepCt := stepCt + 1;
-    performcz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into antigen_deapp',rowCt,stepCt,'Done');
+    performcz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into de_rnaseq_annotation',rowCt,stepCt,'Done');
     
     return 0 ;
 
@@ -172,7 +172,7 @@ begin
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert data in DE_RNASEQ_ANNOTATION',0,stepCt,'Done');
+    perform cz_write_audit(jobId,databaseName,procedureName,'Insert data in de_rnaseq_annotation',0,stepCt,'Done');
     
     begin
 	update deapp.de_rnaseq_annotation a

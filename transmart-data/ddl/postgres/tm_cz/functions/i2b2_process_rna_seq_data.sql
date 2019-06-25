@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_process_rna_seq_data(character varying, character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_process_rna_seq_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT NULL::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_rna_seq_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT NULL::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -54,6 +54,7 @@ AS $$
     rowCt		numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
+    rtnCd integer;
  
     addNodes CURSOR FOR
 			SELECT distinct t.leaf_node
@@ -1149,8 +1150,8 @@ begin
 
 	if dataType = 'R' or dataType = 'L' then
 	    begin
-		perform I2B2_RNA_SEQ_ZSCORE_CALC(TrialID, partitionName, partitionindx,partitioniD,'L',jobId,dataType,logBase,sourceCD);
-		get diagnostics rowCt := ROW_COUNT;
+		select I2B2_RNA_SEQ_ZSCORE_CALC(TrialID, partitionName, partitionindx,partitioniD,'L',jobId,dataType,logBase,sourceCD) into rtnCd;
+		    get diagnostics rowCt := ROW_COUNT;
 	    exception
 		when others then
 		    errorNumber := SQLSTATE;
@@ -1162,6 +1163,11 @@ begin
 		    return -16;
 	    end;
 	    stepCt := stepCt + 1;
+	    if rtnCd <> 1 then
+	    perform cz_write_audit(jobId,databaseName,procedureName,'Failed to calculate Z-Score',rowCt,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+	    end if;
 	    perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',rowCt,stepCt,'Done');
 	end if;
 
