@@ -50,7 +50,7 @@
 			    <tr>
 				<td>
 				    <g:each var='location' in="${imageLocations}">
-					<g:img file="${location}" width='800' height='600'/> <br/>
+					<g:img file="${request.getContextPath()}${location}" width='800' height='600'/> <br/>
 				    </g:each>
 				</td>
 				<td>${statisticByStratificationTable}</td>
@@ -82,7 +82,7 @@
 		<tr>
 		    <td>
 			<g:if test="${zipLink}">
-			    <a class='AnalysisLink' class='downloadLink' href="${resource(file: zipLink)}">Download raw R data</a>
+			    <a class='AnalysisLink' class='downloadLink' href="${request.getContextPath()}${zipLink}">Download raw R data</a>
 			</g:if>
 		    </td>
 		</tr>	

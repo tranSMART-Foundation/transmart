@@ -18,7 +18,7 @@
 	<div id="template-group-test-plot" class="x-hidden">
 	    <div id="plotResultContainer" class="plotResultContainer">
 		%{--Image--}%
-		<g:img file="{filename}" class='freq-plot'/>
+		<g:img file="${request.getContextPath()}${filename}" class='freq-plot'/>
 		<hr class="separator"/>
 		%{--Download button --}%
 		<div class="resultToolBar">

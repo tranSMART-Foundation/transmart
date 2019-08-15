@@ -15,7 +15,7 @@
 	<div id="template-freq-plot" class="x-hidden">
 	    <div id="plotResultContainer" class="plot_result_container">
 		%{--Image--}%
-		<g:img file="{filename}" class='freq-plot'/>
+		<g:img file="${request.getContextPath()}${filename}" class='freq-plot'/>
 		<hr class="separator"/>
 		%{--Download button --}%
 		<div class="resultToolBar">

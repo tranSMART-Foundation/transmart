@@ -29,7 +29,7 @@
 	    <span class='AnalysisHeader'>Scatter Plot</span><br/>
 
 	    <g:each var='location' in="${imageLocations}">
-		<g:img file="${location}" width='600' height='600'/> <br/>
+		<g:img file="${request.getContextPath()}${location}" width='600' height='600'/> <br/>
 	    </g:each>
 
 	    <br/>
@@ -37,7 +37,7 @@
 	    ${linearRegressionData}
 	    <br/>
             <g:if test="${zipLink}">
-		<a class='AnalysisLink' class='downloadLink' href="${resource(file: zipLink)}">Download raw R data</a>
+		<a class='AnalysisLink' class='downloadLink' href="${request.getContextPath()}${zipLink}">Download raw R data</a>
             </g:if>
 	</form>
     </body>

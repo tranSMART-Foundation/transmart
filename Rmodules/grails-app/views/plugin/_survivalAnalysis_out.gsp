@@ -30,7 +30,7 @@
 	    <br/>	
 	    <span class='AnalysisHeader'>Survival Curve</span><br/><br/>
 	    <g:each var='location' in="${imageLocation}">
-		<g:img file="${location}"/>
+		<g:img file="${request.getContextPath()}${location}"/>
 	    </g:each>
 	    <br/>
 	    <br/>	
@@ -46,7 +46,7 @@
 	    <br/>
 	    <br/>
 	    <g:if test="${zipLink}">
-		<a class='AnalysisLink' class='downloadLink' href="${resource(file: zipLink)}">Download raw R data</a>
+		<a class='AnalysisLink' class='downloadLink' href="${request.getContextPath()}${zipLink}">Download raw R data</a>
 	    </g:if>
 	</form>
     </body>

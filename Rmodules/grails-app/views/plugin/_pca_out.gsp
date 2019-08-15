@@ -5,7 +5,7 @@ ${summaryTable}
 <br/>
 
 <g:each var='location' in="${imageLocations}">
-    <g:img file="${location}"/> <br/>
+    <g:img file="${request.getContextPath()}${location}"/> <br/>
 </g:each>
 
 <br/>
@@ -16,5 +16,5 @@ ${geneListTable}
 
 <br/>
 <g:if test="${zipLink}">
-    <a class='AnalysisLink' class='downloadLink' href="${resource(file: zipLink)}">Download raw R data</a>
+    <a class='AnalysisLink' class='downloadLink' href="${request.getContextPath()}${zipLink}">Download raw R data</a>
 </g:if>
