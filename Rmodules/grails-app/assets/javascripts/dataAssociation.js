@@ -114,7 +114,6 @@ function loadAnalysisPage(itemId, isCompletedJob, jobName) {
         url : pageInfo.basePath+'/dataAssociation/variableSelection',
         data : {analysis:itemId},
         success : function (response, status) {
-
             // insert response into 'variableSelection' html element
             $j('#variableSelection').html(response);
 
@@ -175,17 +174,17 @@ function renderCohortSummary(){
     var cohortsSummary=""
 
     // get selected cohort summary
-    for(var i = 1; i<=GLOBAL.NumOfSubsets; i++){
+    for(var i = 1; i<=GLOBAL.NumOfSubsets; i++) {
         var currentQuery = getQuerySummary(i)
-        if(currentQuery!=""){
-            cohortsSummary += "Subset "+i+": "
+        if(currentQuery != ""){
+            cohortsSummary += "Subset " + i + ": "
             cohortsSummary += currentQuery
             cohortsSummary += "<br>"
         }
 
     }
 
-    if(""==cohortsSummary){
+    if ("" == cohortsSummary){
         // hide cohort Summary & show warning
         Ext.get('cohortSummary').hide();
         Ext.get('cohortWarningMsg').show();
@@ -224,8 +223,8 @@ function loadPluginView(){
 
     var selectedAnalysis = document.getElementById("analysis").value;
     selectedAnalysis = selectedAnalysis.charAt(0).toUpperCase()+selectedAnalysis.substring(1);
-    eval("load"+selectedAnalysis+"View()");
-    
+    var loadViewName = "load"+selectedAnalysis+"View";
+    window[loadViewName]();
 }
 
 //This function fires when an item is dropped onto one of the independent/dependent variable DIVs in the data association tool.
@@ -262,7 +261,7 @@ function dropNumericOntoCategorySelection2(source, e, data, targetdiv)
         var foundLeafNode = false
 
         //Loop through child nodes to add them to input.
-        for ( var i = 0; i<data.node.childNodes.length; i++)
+        for( var i = 0; i<data.node.childNodes.length; i++)
         {
             //Grab the child node.
             var child=data.node.childNodes[i];
@@ -361,7 +360,7 @@ function dropOntoCategorySelection2(source, e, data, targetdiv)
         //Keep track of whether the folder has any leaves.
         var foundLeafNode = false
 
-        for ( var i = 0; i<data.node.childNodes.length; i++)
+        for( var i = 0; i<data.node.childNodes.length; i++)
         {
             //Grab the child node.
             var child=data.node.childNodes[i];
@@ -595,7 +594,7 @@ function setupCategoricalItemsList (strDivSource, strDivTarget) {
     while (categoricalTargetDiv.dom.hasChildNodes())
         categoricalTargetDiv.dom
         .removeChild(categoricalTargetDiv.dom.firstChild);
-    for ( var i = 0, n = categoricalSourceDiv.dom.childNodes.length; i < n; ++i) {
+    for( var i = 0, n = categoricalSourceDiv.dom.childNodes.length; i < n; ++i) {
         // clone and append
         var newnode = categoricalSourceDiv.dom.childNodes[i].cloneNode(true);
         //Draggable node has to have only text content.
@@ -624,7 +623,6 @@ function setupCategoricalItemsList (strDivSource, strDivTarget) {
         },
         onNodeOver: function(target, dd, e, dragData) {
             var ret= this.dropOK ? this.dropAllowed : this.dropNotAllowed;
-            console.log(ret);
             return ret;
         }
     });
