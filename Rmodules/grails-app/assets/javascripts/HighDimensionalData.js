@@ -43,8 +43,8 @@ var HighDimensionalData = function () {
  */
 HighDimensionalData.prototype.populate_data = function () {
     for (var key in this.data) {
-        if (this.data.hasOwnProperty(key)) {
 
+        if (this.data.hasOwnProperty(key)) {
             var _tmp_data = this.data[key];
 
             // set global marker type
@@ -55,7 +55,6 @@ HighDimensionalData.prototype.populate_data = function () {
             }
 
             if (document.getElementById("highDimContainer")) {
-
                 document.getElementById("highDimensionType").value = key;
                 document.getElementById("platforms1").value = GLOBAL.HighDimDataType;
                 document.getElementById("gpl1").value = _tmp_data.platforms[0].id ? _tmp_data.platforms[0].id : "";
@@ -75,12 +74,11 @@ HighDimensionalData.prototype.populate_data = function () {
                 }
 
                 this.create_pathway_search_box('searchPathway', 'divpathway');
-                
             	document.getElementById("probesAggregation").checked = false;
                 if(this.hideAggregation){
-                	document.getElementById("probesAggregationDiv").style.visibility = "hidden";
-                }else{
-                	document.getElementById("probesAggregationDiv").style.visibility = "visible";
+                    document.getElementById("probesAggregationDiv").style.visibility = "hidden";
+                }else{ 
+               	    document.getElementById("probesAggregationDiv").style.visibility = "visible";
                 }
             }
 
@@ -187,6 +185,7 @@ HighDimensionalData.prototype.create_pathway_search_box = function (searchInputE
         //Remove the pathway box.
         document.getElementById(divName).style.display = "none";
     }
+
 }
 
 HighDimensionalData.prototype.generate_view = function () {
@@ -270,8 +269,7 @@ HighDimensionalData.prototype.generate_view = function () {
      * @private
      */
     var _create_view = function () {
-        return new Ext.Window({
-
+	return new Ext.Window({
             id: 'compareStepPathwaySelectionWindow',
             title: 'Compare Subsets-Pathway Selection',
             layout: 'fit',
@@ -300,7 +298,7 @@ HighDimensionalData.prototype.generate_view = function () {
             ],
             resizable: false,
             autoLoad: {
-                url: pageInfo.basePath + '/static/panels/highDimensionalWindow.html',
+                url: pageInfo.basePath + '/assets/panels/highDimensionalWindow.html',
                 scripts: true,
                 nocache: true,
                 discardUrl: true,
@@ -430,6 +428,7 @@ HighDimensionalData.prototype.getPlatformValidator = function(platforms) {
 }
 
 HighDimensionalData.prototype.getPlatforms = function(data) {
+
     var keys = Object.keys(data);
     var platformTitles = [];
 
@@ -444,6 +443,7 @@ HighDimensionalData.prototype.getPlatforms = function(data) {
 }
 
 HighDimensionalData.prototype.fetchNodeDetails = function( divId, callback ) {
+
     // get nodes from the dropzone
     var _nodes = Ext.get(divId).dom.childNodes;
 
@@ -635,7 +635,6 @@ HighDimensionalData.prototype.display_high_dimensional_popup = function () {
     } else {
         console.error("No view port to display the window.");
     }
-
 }
 
 var highDimensionalData = new HighDimensionalData();
