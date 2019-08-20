@@ -9,15 +9,18 @@ else {
 	console = [info: { println "[INFO] $it" }, warn: { println "[WARN] $it" }]
 }
 
-grails.assets.minifyJs = true
 
-grails.assets.minifyOptions = [
-    languageMode: 'ES5', // tried ECMASCRIPT6
-    targetLanguage: 'ES5', //Can go from ES5 to ES6 for those bleeding edgers
-    optimizationLevel: 'SIMPLE', //Or ADVANCED or WHITESPACE_ONLY
-    excludes: ["**/fractalis.js","**/fractalis.unminified.js"]
-]
-grails.assets.minify.js.excludes = ["**/fractalis.js","**/fractalis.unminified.js"]
+//grails.assets.minifyJs = true
+
+//grails.assets.minifyOptions = [
+//    languageMode: 'ES5', // tried ECMASCRIPT6
+//    targetLanguage: 'ES5', //Can go from ES5 to ES6 for those bleeding edgers
+//    optimizationLevel: 'SIMPLE', //Or ADVANCED or WHITESPACE_ONLY
+//    excludes: ["**/ext-all.js","**/fractalis.js","**/fractalis.unminified.js"]
+//]
+////grails.assets.minify.js.excludes = ["**/fractalis.js","**/fractalis.unminified.js"]
+//
+//grails.assets.excludes = ["tiny_mce/src/*.js"] // excluded from processing if included by the require tree.
 
 /**
  * Running externalized configuration
@@ -77,6 +80,18 @@ for (location in grails.config.locations) {
 }
 
 grails {
+
+    assets {
+	minifyJs = true
+	minifyOptions = [
+	    languageMode: 'ES5', // tried ECMASCRIPT6
+	    targetLanguage: 'ES5', //Can go from ES5 to ES6 for those bleeding edgers
+	    optimizationLevel: 'SIMPLE', //SIMPLE or ADVANCED or WHITESPACE_ONLY
+	    excludes: ["**/extjs-all.js","**/ext-all.js",'**/ext-all.min.js',"**/fractalis.js","**/fractalis.unminified.js"]
+	]
+	excludes = ["tiny_mce/src/*.js"] // excluded from processing if included by the require tree.
+    }
+
     cache {
 	enabled = true
 	ehcache {

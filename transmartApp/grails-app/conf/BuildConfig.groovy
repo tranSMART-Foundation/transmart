@@ -7,14 +7,20 @@ def forkSettingsOther = [minMemory:  256, maxMemory: 1024, maxPerm: 384, debug: 
 // grails.assets configuration
 
 // minify javascript files in war (true should be the default)
-grails.assets.minifyJs = true
-
-grails.assets.minifyOptions = [
-    languageMode: 'ES5', // tried ECMASCRIPT6
-    targetLanguage: 'ES5', //Can go from ES5 to ES6 for those bleeding edgers
-    optimizationLevel: 'SIMPLE', //Or ADVANCED or WHITESPACE_ONLY
-    excludes: ["**/fractalis.js","**/fractalis.unminified.js"]
-]
+//grails {
+//    assets {
+//	minifyJs = true
+//
+////    excludes = ["tiny_mce/src/*.js"], // excluded from processing if included by the require tree.
+//	minifyOptions = [
+//	    languageMode: 'ES5', // tried ECMASCRIPT6
+//	    targetLanguage: 'ES5', //Can go from ES5 to ES6 for those bleeding edgers
+//	    optimizationLevel: 'WHITESPACE_ONLY', //SIMPLE or ADVANCED or WHITESPACE_ONLY
+//	    //	excludes: ['**/ext-all.js','**/extjs-all.js','** /ext-all.min.js','**/fractalis.js','**/fractalis.unminified.js']
+//	    excludes: ['**/fractalis.js','**/fractalis.unminified.js']
+//	]
+//    }
+//}
 
 //It is also possible to exclude files from minification
 //grails.assets.minifyOptions.excludes = ["**/*.min.js"]
@@ -53,14 +59,8 @@ grails.war.resources = { stagingDir ->
     copy(todir: "${stagingDir}/WEB-INF/dataExportRscripts") {
 	fileset(dir: 'src/main/resources/dataExportRScripts')
     }
-    copy(todir: "${stagingDir}/WEB-INF/Rscripts") {
-	fileset(dir: '../Rmodules/src/main/resources/Rscripts')
-    }
     copy(todir: "${stagingDir}/WEB-INF/classes/public") {
 	fileset(dir: 'src/main/resources/public')
-    }
-    copy(todir: "${stagingDir}/WEB-INF/classes/public") {
-	fileset(dir: '../Rmodules/src/main/resources/public')
     }
     copy(todir: "${stagingDir}/WEB-INF/HeimScripts") {
 	fileset(dir: '../SmartR/src/main/resources/HeimScripts')
@@ -88,8 +88,7 @@ grails.project.dependency.resolution = {
 	    grailsCentral()
 	    mavenCentral()
 
-//	    mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
-	    mavenRepo 'http://localhost/content/repositories/public/'
+	    mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
 	}
     }
     else {
