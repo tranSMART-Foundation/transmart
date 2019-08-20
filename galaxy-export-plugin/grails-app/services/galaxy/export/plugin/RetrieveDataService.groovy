@@ -9,10 +9,10 @@ import com.github.jmchilton.blend4j.galaxy.beans.LibraryContent
 import com.github.jmchilton.blend4j.galaxy.beans.LibraryFolder
 import com.recomdata.transmart.domain.i2b2.AsyncJob
 import com.sun.jersey.api.client.ClientResponse
+import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import org.apache.commons.lang.StringUtils
-import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -111,8 +111,7 @@ class RetrieveDataService {
      * Method that will get the list of jobs to show in the galaxy jobs tab
      */
     def getjobs(String userName, jobType = null) {
-        JSONObject result = new JSONObject()
-        JSONArray rows = new JSONArray()
+	List<Map> rows = []
 
         def jobResults = null
         def c = AsyncJob.createCriteria()
@@ -136,7 +135,7 @@ class RetrieveDataService {
             }
         }
 
-        def m = [:]
+        Map m = [:]
         def d
         for (jobResult in jobResults)	{
             m = [:]
@@ -158,21 +157,17 @@ class RetrieveDataService {
                 m['lastExportTime'] = ' '
                 m['exportStatus'] = ' '
             }
-            rows.put(m)
+            rows << m
         }
 
-        result.put('success', true)
-        result.put('totalCount', jobResults.size())
-        result.put('jobs', rows)
-
-        return result
+	render([success: true, totalCount: rows.size(), jobs: rows] as JSON)
     }
 
     private def getLatest(ArrayList<?> exports){
 
         switch (exports.size()){
             case 0:
-                logger.error("An error has occured while exporting to galaxy. The job name doesn't existe in the database")
+                logger.error("An error has occured while exporting to galaxy. The job name doesn't exist in the database")
                 return null
             case 1:
                 return exports[0]

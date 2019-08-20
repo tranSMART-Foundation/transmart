@@ -2,8 +2,6 @@ package galaxy.export.plugin
 
 import grails.converters.JSON
 import groovy.util.logging.Slf4j
-import org.codehaus.groovy.grails.web.json.JSONArray
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.core.io.Resource
 
 @Slf4j('logger')
@@ -18,8 +16,7 @@ class GalaxyExportPluginController {
      */
     def loadScripts = {
 
-        JSONObject result = new JSONObject()
-        JSONArray rows = new JSONArray()
+	List<Map> rows = []
 
         for (String script in scripts) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
@@ -33,10 +30,6 @@ class GalaxyExportPluginController {
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
         }
 
-        result.put('success', true)
-        result.put('totalCount', scripts.size())
-        result.put('files', rows)
-
-        render result as JSON
+	render([success: true, totalCount: rows.size(), files: rows] as JSON)
     }
 }
