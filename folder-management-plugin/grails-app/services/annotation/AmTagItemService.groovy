@@ -18,7 +18,7 @@ class AmTagItemService {
 
 	List<AmTagItem> amTagItems = AmTagItem.executeQuery('''
 		from AmTagItem ati
-		where viewInGrid=true
+		where viewInGrid=1
 		and ati.amTagTemplate.id = :amTagTemplateId
 		order by displayOrder''', [amTagTemplateId: key])
 
