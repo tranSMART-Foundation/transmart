@@ -108,7 +108,6 @@
     </dependencies>
 
     <distributionManagement>
-<!--
         <repository>
             <id>repo.transmartfoundation.org-releases</id>
             <url>https://repo.transmartfoundation.org/content/repositories/releases/</url>
@@ -117,16 +116,7 @@
             <id>repo.transmartfoundation.org-snapshots</id>
             <url>https://repo.transmartfoundation.org/content/repositories/snapshots/</url>
         </snapshotRepository>
--->
     </distributionManagement>
-        <repository>
-            <id>localhost</id>
-            <url>http://localhost/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>localhost</id>
-            <url>http://localhost/content/repositories/snapshots/</url>
-        </snapshotRepository>
 
     <properties>
         <groovyVersion>2.1.0</groovyVersion>

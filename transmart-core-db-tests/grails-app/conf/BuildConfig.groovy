@@ -67,8 +67,7 @@ grails.project.dependency.resolution = {
         mavenLocal() // Note: use './grailsw maven-install' to install required plugins locally
 	grailsCentral()
 	mavenCentral()
-//        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
-        mavenRepo 'http://localhost/content/repositories/public/'
+        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
     }
 
     dependencies {
@@ -109,6 +108,7 @@ grails.project.dependency.resolution = {
     plugins {
     	compile ':hibernate:3.6.10.19', { export = false }
 	compile ':transmart-core:19.0-SNAPSHOT'
+	compile ':transmart-shared:19.0-SNAPSHOT'
         build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false
         }

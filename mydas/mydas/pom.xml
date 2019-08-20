@@ -32,17 +32,10 @@
     </licenses>
 
     <repositories>
-<!--
         <repository>
             <id>repo.transmartfoundation.org</id>
             <name>TranSMART Foundation Maven Public Group</name>
             <url>http://repo.transmartfoundation.org/content/groups/public/</url>
-        </repository>
--->
-        <repository>
-            <id>localhost</id>
-            <name>TranSMART Foundation Maven Public Group</name>
-            <url>http://localhost/groups/public/</url>
         </repository>
     </repositories>
 

@@ -45,8 +45,7 @@ grails.project.dependency.resolution = {
             grailsCentral()
             mavenLocal()
             mavenCentral()
-//            mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
-            mavenRepo 'http://localhost/content/repositories/public/'
+            mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
         }
     }
     else {

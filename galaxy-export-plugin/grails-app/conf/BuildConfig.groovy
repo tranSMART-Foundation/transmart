@@ -17,8 +17,7 @@ grails.project.dependency.resolution = {
         mavenLocal()
         mavenCentral()
 
-//        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
-        mavenRepo 'http://localhost/content/repositories/public/'
+        mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
     }
     dependencies {
         compile 'com.github.jmchilton.blend4j:blend4j:0.1.2' 
