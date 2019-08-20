@@ -21,7 +21,7 @@
 		<tr>
 		    <td class="foldertitle">
 			<g:set var='folderIconType' value="${folder.folderType.toLowerCase()}"/>
-			<g:if test="${folder.folderType.equalsIgnoreCase(FolderType.STUDY.name()) && ontologyService.checkSubjectLevelData(fmFolderService.getAssociatedAccession(folder))}">
+			<g:if test="${folder.folderType.equalsIgnoreCase(com.recomdata.util.FolderType.STUDY.name()) && ontologyService.checkSubjectLevelData(fmFolderService.getAssociatedAccession(folder))}">
 			    <g:set var='folderIconType' value='studywsubject'/>
 			</g:if>
 			<span>
