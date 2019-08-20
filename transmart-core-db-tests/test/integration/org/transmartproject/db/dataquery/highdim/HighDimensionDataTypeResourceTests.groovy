@@ -30,6 +30,7 @@ import org.transmartproject.core.querytool.QueryDefinition
 import org.transmartproject.db.dataquery.highdim.mrna.MrnaTestData
 import org.transmartproject.db.ontology.I2b2
 import org.transmartproject.db.ontology.StudyTestData
+import org.transmartproject.core.querytool.QueryResult
 import org.transmartproject.db.test.RuleBasedIntegrationTestMixin
 
 import javax.annotation.Resource
@@ -46,16 +47,16 @@ class HighDimensionDataTypeResourceTests {
     HighDimensionDataTypeResource resource
     QueriesResource queriesResourceService
 
+    StudyTestData studyTestData = new StudyTestData()
 
-    I2b2 i2b2Node
+    I2b2 i2b2Node = studyTestData.i2b2List[0]
+
+    MrnaTestData testData = new MrnaTestData(conceptCode: i2b2Node.code, patients: studyTestData.i2b2Data.patients)
 
     @Before
     void setUp() {
-        StudyTestData studyTestData = new StudyTestData()
         studyTestData.saveAll()
-        i2b2Node = studyTestData.i2b2List[0]
 
-        MrnaTestData testData = new MrnaTestData(conceptCode: i2b2Node.code, patients: studyTestData.i2b2Data.patients)
         testData.saveAll()
 
         assertThat mrnaModule, is(notNullValue())
@@ -66,23 +67,27 @@ class HighDimensionDataTypeResourceTests {
     @Test
     void basicTest() {
         def definition = new QueryDefinition([
-                new Panel(
-                        items: [
-                                new Item(
-                                        conceptKey: i2b2Node.key.toString()
-                                )
-                        ]
-                )
+            new Panel(
+                items: [
+                    new Item(
+                        conceptKey: i2b2Node.key.toString()
+                    )
+                ]
+            )
         ])
 
-        def result = queriesResourceService.runQuery(definition)
+        QueryResult result = queriesResourceService.runQuery(definition)
+
+//	assertThat result, allOf(isA(QueryResult))
+
         def ontologyTerms = resource.getAllOntologyTermsForDataTypeBy(result)
 
         assertThat ontologyTerms, allOf(
-                hasSize(1),
-                contains(
-                        hasProperty('key', equalTo(i2b2Node.key.toString()))
-                )
+//	    isA(LinkedHashSet),
+            hasSize(1),
+            contains(
+                hasProperty('key', equalTo(i2b2Node.key.toString()))
+            )
         )
     }
 }

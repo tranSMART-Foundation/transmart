@@ -100,7 +100,7 @@ class PatientSetQueryBuilderServiceTests {
         assertThat sql, allOf(
                 startsWith('INSERT INTO I2B2DEMODATA.qt_patient_set_collection'),
                 containsString('SELECT patient_num FROM ' +
-                        'observation_fact'),
+                        'I2B2DEMODATA.observation_fact'),
                 containsString('concept_cd IN (SELECT concept_cd FROM ' +
                         'concept_dimension WHERE concept_path LIKE ' +
                         '\'\\\\full\\\\name\\\\%\')')
@@ -132,12 +132,12 @@ class PatientSetQueryBuilderServiceTests {
         def sql = service.buildPatientSetQuery(resultInstance, definition)
 
         assertThat sql, allOf(
-                startsWith('INSERT INTO qt_patient_set_collection'),
+                startsWith('INSERT INTO I2B2DEMODATA.qt_patient_set_collection'),
                 containsString('OR (concept_cd IN (SELECT concept_cd FROM ' +
                         'concept_dimension WHERE concept_path LIKE ' +
                         '\'\\\\full\\\\name2\\\\%\')'),
                 containsString('INTERSECT (SELECT patient_num FROM ' +
-                        'observation_fact WHERE (concept_cd IN (SELECT ' +
+                        'I2B2DEMODATA.observation_fact WHERE (concept_cd IN (SELECT ' +
                         'concept_cd FROM concept_dimension WHERE concept_path ' +
                         'LIKE \'\\\\full\\\\name3\\\\%\''),
         );
@@ -159,7 +159,7 @@ class PatientSetQueryBuilderServiceTests {
 
         assertThat sql, containsString('SELECT patient_num FROM ' +
                 'I2B2DEMODATA.patient_dimension EXCEPT (SELECT patient_num FROM ' +
-                'observation_fact WHERE (concept_cd IN (SELECT concept_cd ' +
+                'I2B2DEMODATA.observation_fact WHERE (concept_cd IN (SELECT concept_cd ' +
                 'FROM concept_dimension WHERE concept_path ' +
                 'LIKE \'\\\\full\\\\name\\\\%\')) ' +
                 'AND concept_cd != \'SECURITY\') ORDER BY 1')
@@ -187,7 +187,7 @@ class PatientSetQueryBuilderServiceTests {
 
         def sql = service.buildPatientSetQuery(resultInstance, definition)
         assertThat sql, containsString('EXCEPT (SELECT patient_num ' +
-                'FROM observation_fact WHERE (concept_cd IN (SELECT ' +
+                'FROM I2B2DEMODATA.observation_fact WHERE (concept_cd IN (SELECT ' +
                 'concept_cd FROM concept_dimension WHERE concept_path ' +
                 'LIKE \'\\\\b\\\\%\')) AND concept_cd != \'SECURITY\')')
     }

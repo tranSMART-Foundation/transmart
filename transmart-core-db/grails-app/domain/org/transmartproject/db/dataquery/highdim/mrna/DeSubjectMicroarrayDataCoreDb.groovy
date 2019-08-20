@@ -52,8 +52,8 @@ class DeSubjectMicroarrayDataCoreDb implements Serializable {
         id       composite: [ 'assay', 'probe' ]
         version  false
 
-//        assay    column: 'assay_id'
-//        patient  column: 'patient_id'
+        assay    column: 'assay_id'
+        patient  column: 'patient_id'
         probe    column: 'probeset_id'
 
         // this is needed due to a Criteria bug.

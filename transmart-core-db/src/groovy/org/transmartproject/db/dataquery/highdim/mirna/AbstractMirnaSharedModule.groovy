@@ -153,6 +153,7 @@ abstract class AbstractMirnaSharedModule extends AbstractHighDimensionDataTypeMo
 	    ilike search_property, search_term + '%'
             projections { distinct(search_property) }
 	    order search_property, 'ASC'
+            maxResults(100)
         }
     }
 

@@ -161,7 +161,7 @@ class ProteinModule extends AbstractHighDimensionDataTypeModule {
             }
             ilike(search_property, search_term + '%')
             projections { distinct(search_property) }
-//            maxResults(100)
+            maxResults 100
             order(search_property, 'ASC')
         }
     }

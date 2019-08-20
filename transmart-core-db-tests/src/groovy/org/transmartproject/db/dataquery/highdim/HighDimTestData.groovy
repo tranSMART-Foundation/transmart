@@ -32,6 +32,7 @@ import org.transmartproject.db.i2b2data.PatientDimension
 import org.transmartproject.db.ontology.ConceptTestData
 import org.transmartproject.db.search.SearchGeneSignature
 import org.transmartproject.db.search.SearchKeywordCoreDb
+import org.transmartproject.db.TestDataHelper
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
@@ -160,6 +161,11 @@ class HighDimTestData extends AbstractTestData {
 		res.id = id
 		res
 	}
+
+    //to be removed (unnecessary indirection)
+    static void save(List objects) {
+        TestDataHelper.save(objects)
+    }
 
     void saveAll() {}
 }

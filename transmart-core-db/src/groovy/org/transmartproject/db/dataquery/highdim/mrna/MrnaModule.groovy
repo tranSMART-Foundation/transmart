@@ -20,6 +20,7 @@
 package org.transmartproject.db.dataquery.highdim.mrna
 
 import grails.orm.HibernateCriteriaBuilder
+import groovy.util.logging.Slf4j
 import org.hibernate.ScrollableResults
 import org.hibernate.engine.SessionImplementor
 import org.hibernate.sql.JoinFragment
@@ -42,6 +43,7 @@ import org.transmartproject.db.dataquery.highdim.parameterproducers.SimpleRealPr
 
 import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
 
+@Slf4j('logger')
 class MrnaModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'mrna'

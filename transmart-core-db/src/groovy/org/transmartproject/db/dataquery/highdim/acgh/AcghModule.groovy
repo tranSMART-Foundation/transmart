@@ -22,7 +22,6 @@ package org.transmartproject.db.dataquery.highdim.acgh
 import grails.orm.HibernateCriteriaBuilder
 import org.hibernate.ScrollableResults
 import org.hibernate.engine.SessionImplementor
-import org.hibernate.sql.JoinFragment
 import org.hibernate.transform.Transformers
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.dataquery.TabularResult
@@ -125,8 +124,8 @@ class AcghModule extends AbstractHighDimensionDataTypeModule {
         HibernateCriteriaBuilder criteriaBuilder = createCriteriaBuilder(DeSubjectAcghData, 'acgh', session)
 
         criteriaBuilder.with {
-            createAlias 'jRegion', 'region', JoinFragment.INNER_JOIN
-            createAlias 'jRegion.platform', 'platform', JoinFragment.INNER_JOIN
+            createAlias 'jRegion', 'region', org.hibernate.criterion.CriteriaSpecification.INNER_JOIN
+            createAlias 'jRegion.platform', 'platform', org.hibernate.criterion.CriteriaSpecification.INNER_JOIN
 
             projections {
                 property 'acgh.assay.id', 'assayId'

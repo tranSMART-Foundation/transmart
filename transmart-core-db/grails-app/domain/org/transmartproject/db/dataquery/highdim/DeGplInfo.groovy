@@ -19,8 +19,10 @@
 
 package org.transmartproject.db.dataquery.highdim
 
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.dataquery.highdim.Platform
 
+@Slf4j('logger')
 class DeGplInfo implements Platform {
 
     Date    annotationDate
@@ -36,19 +38,20 @@ class DeGplInfo implements Platform {
         version      false
 
         genomeReleaseId column: 'genome_build'
-        myTitle column: 'title'
     }
 
     static constraints = {
         annotationDate  nullable: true
-        genomeReleaseId nullable: true
-        id               maxSize:  50
+        genomeReleaseId nullable: true, maxSize: 20
+        id              maxSize:  50
         markerType      nullable: true, maxSize: 100
         organism        nullable: true, maxSize: 100
         title           nullable: true, maxSize: 500
     }
 
+    @Override
     Iterable<?> getTemplate() {
-        throw new UnsupportedOperationException()
+	logger.debug 'Called getTemplate in DeGplInfo - only throws an exception if used'
+//        throw new UnsupportedOperationException()
     }
 }

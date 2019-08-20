@@ -35,7 +35,7 @@ class QtPatientSetCollection {
         sort           setIndex: 'asc'
 
         patient        column:   'patient_num'
-//	resultInstance column:   'result_instance_id'
+	resultInstance column:   'result_instance_id'
     }
 
     static constraints = {

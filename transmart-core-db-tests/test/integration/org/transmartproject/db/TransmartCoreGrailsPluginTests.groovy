@@ -23,14 +23,12 @@ import org.junit.Test
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
+import org.transmart.plugin.shared.Utils
 
 class TransmartCoreGrailsPluginTests {
 
     @Test
     void testStringAsLikeLiteral() {
-        assertThat ''.respondsTo('asLikeLiteral'),
-                hasSize(greaterThanOrEqualTo(1))
-
         def data = [
                 ''            : '',
                 'foo'         : 'foo',
@@ -42,7 +40,7 @@ class TransmartCoreGrailsPluginTests {
         ]
 
         data.each { String input, String expected ->
-            assertThat input.asLikeLiteral(), is(equalTo(expected))
+            assertThat Utils.asLikeLiteral(input), is(equalTo(expected))
         }
     }
 }

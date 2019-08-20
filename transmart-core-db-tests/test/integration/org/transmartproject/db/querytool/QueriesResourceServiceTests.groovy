@@ -22,6 +22,7 @@ package org.transmartproject.db.querytool
 import grails.test.mixin.TestMixin
 import org.junit.Before
 import org.junit.Test
+import org.junit.rules.ExpectedException
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.exceptions.InvalidRequestException
 import org.transmartproject.core.exceptions.NoSuchResourceException
@@ -46,6 +47,8 @@ class QueriesResourceServiceTests {
 
     QueriesResource queriesResourceService
     def sessionFactory
+
+    ExpectedException expectedException = ExpectedException.none();
 
     private void addObservationFact(Map extra,
                                     String conceptCd,
@@ -337,8 +340,7 @@ class QueriesResourceServiceTests {
 
         try {
             QueryResult result = queriesResourceService.runQuery(inputDefinition)
-
-            assertThat result, hasProperty('status', equalTo(QueryStatus.ERROR))
+	    assertThat result, hasProperty('status', equalTo(QueryStatus.ERROR))
         } finally {
             queriesResourceService.patientSetQueryBuilderService = orig
         }
@@ -360,10 +362,9 @@ class QueriesResourceServiceTests {
         ] as PatientSetQueryBuilderService
 
         try {
-        QueryResult result = queriesResourceService.runQuery(inputDefinition)
-
-        assertThat result, hasProperty('status', equalTo(QueryStatus.ERROR))
-        } finally {
+            QueryResult result = queriesResourceService.runQuery(inputDefinition)
+            assertThat result, hasProperty('status', equalTo(QueryStatus.ERROR))
+	} finally {
             queriesResourceService.patientSetQueryBuilderService = orig
         }
     }

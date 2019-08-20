@@ -61,9 +61,9 @@ class DeSubjectSampleMapping implements Assay {
         id               column: 'assay_id',    generator: 'assigned'
 	version false
 
-        patient                                cascade: 'save-update'
+        patient          column: 'patient_id',  cascade: 'save-update'
         patientInTrialId column: 'subject_id'
-        platform         column: 'gpl_id',     cascade: 'save-update'
+        platform         column: 'gpl_id',      cascade: 'save-update'
         platformType     column: 'platform'
         platformTypeCd   column: 'platform_cd'
         sampleCode       column: 'sample_cd'
@@ -114,5 +114,5 @@ class DeSubjectSampleMapping implements Assay {
     TissueType getTissueType() {
         new TissueType(code: tissueTypeCd, label: tissueTypeName)
     }
-//  endregion
+    //  endregion
 }

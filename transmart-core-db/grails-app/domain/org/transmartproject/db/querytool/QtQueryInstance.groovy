@@ -43,10 +43,10 @@ class QtQueryInstance {
             params: [sequence: 'qt_sq_qi_qiid', schema: 'i2b2demodata']
 	version false
 
-//        queryMaster column: 'query_master_id'
-	}
+        queryMaster column: 'query_master_id'
+    }
 
-	static constraints = {
+    static constraints = {
         batchMode      nullable:   true,   maxSize:   50
         deleteFlag     nullable:   true,   maxSize:   3
         endDate        nullable:   true
@@ -54,5 +54,5 @@ class QtQueryInstance {
         message        nullable:   true
         statusTypeId   nullable:   true
         userId         maxSize:    50
-	}
+    }
 }

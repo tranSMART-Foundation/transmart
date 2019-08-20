@@ -50,7 +50,7 @@ class HighDimensionResourceService implements HighDimensionResource {
      * findAutowiringMetadata(String beanName, Class<?> clazz) is called with
      * '(inner bean)', ConceptsResourceService as parameters, and then does a
      * lookup on a cache whose key is preferably the bean name.
-     * Only if the bean name is empty does it use the class name, excpet the
+     * Only if the bean name is empty does it use the class name, except if the
      * the bean name is '(inner bean)', which I'm guessing is used with other
      * inner beans.
      */
@@ -71,7 +71,6 @@ class HighDimensionResourceService implements HighDimensionResource {
     }
 
     Map<HighDimensionDataTypeResource, Collection<Assay>> getSubResourcesAssayMultiMap(List<AssayConstraint> assayConstraints) {
-
         List<DeSubjectSampleMapping> assays = DeSubjectSampleMapping.withCriteria {
             platform {
                 // fetch platforms
@@ -85,9 +84,13 @@ class HighDimensionResourceService implements HighDimensionResource {
 	} // one row per assay
 
         HashMultimap multiMap = HashMultimap.create()
+	int iassay = 0
+	int isaved = 0
         for (Assay a in assays) {
+	    ++iassay
 	    String dataTypeName = cachingDataTypeResourceForPlatform.call(a.platform)
 	    if (dataTypeName) {
+		++isaved
 		multiMap.put cachingDataTypeResourceProducer.call(dataTypeName), a
             }
 	}
@@ -111,7 +114,7 @@ class HighDimensionResourceService implements HighDimensionResource {
     }.memoizeAtMost(MAX_CACHED_PLATFORM_MAPPINGS)
 
     @Lazy
-    Closure<HighDimensionDataTypeResourceImpl> cachingDataTypeResourceProducer =
+    Closure<HighDimensionDataTypeResourceImpl> cachingDataTypeResourceProducer = 
         this.&getSubResourceForType.memoizeAtMost(MAX_CACHED_DATA_TYPE_RESOURCES)
 
     /**
@@ -123,7 +126,6 @@ class HighDimensionResourceService implements HighDimensionResource {
      */
     void registerHighDimensionDataTypeModule(String moduleName, Closure<HighDimensionDataTypeResource> factory) {
 	dataTypeRegistry[moduleName] = factory
-	logger.debug 'Registered high dimensional data type module "{}"', moduleName
     }
 
     HighDimensionDataTypeResource getHighDimDataTypeResourceFromConcept(String conceptKey) {

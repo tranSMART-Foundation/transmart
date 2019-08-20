@@ -159,7 +159,7 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
             ilike(search_property, search_term + '%')
             projections { distinct(search_property) }
             order(search_property, 'ASC')
-            maxResults(100)
+            maxResults 100
         }
     }
 

@@ -18,38 +18,59 @@
  */
 package org.transmartproject.db
 
+import grails.util.Pair
+
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.everyItem
+import static org.hamcrest.Matchers.isA
+
 /**
  * Helper class for dealing with test data.
  */
 class TestDataHelper {
 
-	/**
-	 * Fills the object with dummy values for all the fields that are mandatory (nullable = false) and have no value
-	 */
-	static void completeObject(obj) {
-		List<MetaProperty> fields = getMandatoryProps(obj.getClass()).findAll { it.getProperty(obj) == null } //all without value
-		for (MetaProperty f in fields) {
-			f.setProperty obj, getDummyObject(f.type)
-		}
+    /**
+     * Fills the object with dummy values for all the fields that are mandatory (nullable = false) and have no value
+     */
+    static void completeObject(obj) {
+	List<MetaProperty> fields = getMandatoryProps(obj.getClass()).findAll { it.getProperty(obj) == null } //all without value
+	for (MetaProperty f in fields) {
+	    f.setProperty obj, getDummyObject(f.type)
 	}
+    }
 
-	private static getDummyObject(Class type) {
-		switch (type) {
-			case String: return ''
-			case Character: return ''
-			case Integer: return 0
-			case Date: return new Date()
-			default: throw new UnsupportedOperationException('Not supported: ' + type.name + '. Care to add it?')
-		}
+    private static getDummyObject(Class type) {
+	switch (type) {
+	    case String: return ''
+	    case Character: return ''
+	    case Integer: return 0
+	    case Date: return new Date()
+	    default: throw new UnsupportedOperationException('Not supported: ' + type.name + '. Care to add it?')
 	}
+    }
 
-	private static List<MetaProperty> getMandatoryProps(Class clazz) {
-		def mandatory = clazz.constraints?.findAll { !it.value.nullable } //get all not nullable properties
-		clazz.metaClass.properties.findAll { mandatory.containsKey it.name }
-	}
+    private static List<MetaProperty> getMandatoryProps(Class clazz) {
+	def mandatory = clazz.constraints?.findAll { !it.value.nullable } //get all not nullable properties
+	clazz.metaClass.properties.findAll { mandatory.containsKey it.name }
+    }
 
-	static List<String> getMissingValueFields(obj, Collection<String> fields) {
-		List<MetaProperty> props = obj.getClass().metaClass.properties.findAll { fields.contains(it.name) }
-		props.findAll({ !it.getProperty(obj) }).collect({ it.name })
-	}
+    static List<String> getMissingValueFields(obj, Collection<String> fields) {
+	List<MetaProperty> props = obj.getClass().metaClass.properties.findAll { fields.contains(it.name) }
+	props.findAll({ !it.getProperty(obj) }).collect({ it.name })
+    }
+
+    static void save(Collection objects) {
+        if (objects == null) {
+            return //shortcut for no objects to save
+        }
+
+        List<Pair> result = objects.collect { new Pair(it.save(flush: true), it) }
+        result.each {
+            if (it.aValue == null) {
+                throw new RuntimeException("Could not save ${it.bValue}. Errors: ${it.bValue?.errors}")
+            }
+        }
+
+        if(result) assertThat result.collect { it.aValue }, everyItem(isA(result[0].bValue.getClass()))
+    }
 }

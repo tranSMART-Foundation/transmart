@@ -142,7 +142,7 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
     }
 
     Projection createProjection(Map<String, Object> params, String name)
-            throws UnsupportedByDataTypeException {
+    throws UnsupportedByDataTypeException {
         module.createProjection params, name
     }
 

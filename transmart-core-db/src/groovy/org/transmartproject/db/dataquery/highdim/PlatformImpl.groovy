@@ -1,9 +1,11 @@
 package org.transmartproject.db.dataquery.highdim
 
-import groovy.transform.CompileStatic
+//import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.dataquery.highdim.Platform
 
-@CompileStatic
+@Slf4j('logger')
+//@CompileStatic
 class PlatformImpl implements Platform {
 
     Date    annotationDate
@@ -13,7 +15,9 @@ class PlatformImpl implements Platform {
     String  organism
     String  title
 
-    Iterable getTemplate() {
-        throw new UnsupportedOperationException()
+    @Override
+    Iterable<?> getTemplate() {
+	logger.debug 'PlatformImpl.getTemplate throws exception'
+	throw new UnsupportedOperationException()
     }
 }
