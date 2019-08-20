@@ -1,7 +1,9 @@
 package fm
 
 import com.recomdata.util.FolderType
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class FmFolder implements Buildable {
     Boolean activeInd = true
     String description
@@ -43,7 +45,7 @@ class FmFolder implements Buildable {
      * @return folder with matching uniqueId or null if match not found.
      */
     static FmFolder findByUniqueId(String uniqueId) {
-	// TODO BB
+	// TODO BB ..
 	get FmData.findByUniqueId(uniqueId)?.id
     }
 
@@ -56,7 +58,7 @@ class FmFolder implements Buildable {
 	    return uniqueId
 	}
 
-	// TODO BB
+	// TODO BB ..
         FmData data = FmData.get(id)
 	if (data) {
             uniqueId = data.uniqueId
@@ -92,7 +94,14 @@ class FmFolder implements Buildable {
      * @return true if this folder has children, false otherwise
      */
     boolean hasChildren() {
-	countByParentAndActiveInd this, true
+        def children = FmFolder.createCriteria().list {
+            eq('parent', this)
+            eq('activeInd', true)
+        }
+        if (children) {
+            return true
+        }
+        return false
     }
 
     void build(GroovyObject builder) {
