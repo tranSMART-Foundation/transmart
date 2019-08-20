@@ -49,7 +49,7 @@ class FractalisController {
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: "css"]
 	}
 
-	render([success: true, totalCount: scripts.size(), files: rows] as JSON)
+	render([success: true, totalCount: rows.size(), files: rows] as JSON)
     }
 
     def state() {
