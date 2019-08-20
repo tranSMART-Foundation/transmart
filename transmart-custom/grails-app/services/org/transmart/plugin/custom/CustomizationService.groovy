@@ -94,8 +94,8 @@ class CustomizationService implements InitializingBean  {
 
     void checkUserLevelAccess(String controller, String action) {
 	String username = securityService.currentUsername()
-	logger.debug 'checkUserLevelAccess() controller "{}" action "{}" user "{}"', controller, action, username
 	if (controller && levels.containsKey(controller)) {
+	    logger.debug 'checkUserLevelAccess() controller "{}" action "{}" user "{}"', controller, action, username
 	    if (!action) {
 		action = controllerDefaultActions[controller]
 	    }
