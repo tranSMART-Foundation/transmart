@@ -1,5 +1,8 @@
 package annotation
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class AmTagDisplayValue implements Serializable {
     private static final long serialVersionUID = 1
 
@@ -15,7 +18,7 @@ class AmTagDisplayValue implements Serializable {
     static transients = ['codeName', 'uniqueId']
 
     static mapping = {
-	table 'am_tag_display_vw' // TODO BB
+	table 'am_tag_display_vw' // TODO BB .. this is a view
 	id composite: ['subjectUid', 'objectUid', 'amTagItem']
 	version false
 	cache true

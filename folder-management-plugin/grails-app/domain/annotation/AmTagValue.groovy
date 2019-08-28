@@ -1,5 +1,8 @@
 package annotation
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class AmTagValue {
 
     String value
@@ -21,7 +24,7 @@ class AmTagValue {
     }
 
     static AmTagValue findByUniqueId(String uniqueId) {
-	// TODO BB
+	// TODO BB ..
 	get AmData.findByUniqueId(uniqueId)?.id
     }
 
@@ -31,6 +34,7 @@ class AmTagValue {
      */
     String getUniqueId() {
 	if (uniqueId) {
+	    logger.debug 'getUniqueId has uniqueId {}', uniqueId
 	    return uniqueId
 	}
 

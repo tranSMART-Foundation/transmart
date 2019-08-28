@@ -1,5 +1,8 @@
 package annotation
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class AmTagItem implements Comparable<AmTagItem> {
     Boolean activeInd
     String codeTypeName

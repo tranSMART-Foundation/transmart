@@ -1,9 +1,11 @@
 package annotation
 
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.ConceptCode
 
+@Slf4j('logger')
 class MetaDataController {
 
     static allowedMethods = [save: 'POST', update: 'POST', delete: 'POST']
@@ -81,6 +83,7 @@ class MetaDataController {
 	String value = params.term ? params.term.toUpperCase() : ''
 
 	List<Map> itemlist = []
+
 	itemlist.addAll searchKeywordService.findSearchKeywords('DISEASE', params.term, 10)
 	itemlist.addAll searchKeywordService.findSearchKeywords('GENE', params.term, 10)
 	itemlist.addAll searchKeywordService.findSearchKeywords('PATHWAY', params.term, 10)
