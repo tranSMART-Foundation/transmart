@@ -10,7 +10,7 @@ window.smartRApp.directive('summaryStats', [
             scope: {
                 summaryData: '='
             },
-            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/summaryStatistics.html'
+            templateUrl: $rootScope.smartRPath +  '/assets/smartR/_angular/templates/summaryStatistics.html'
         };
     }
 ]);

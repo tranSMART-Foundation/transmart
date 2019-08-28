@@ -8,11 +8,11 @@ window.smartRApp.directive('sortingCriteria', [
         return {
             restrict: 'E',
             scope: {
-                criteria : '=',
-                samples: '=',
-                subsets: '='
+                criteria: '=',
+                samples:  '=',
+                subsets:  '='
             },
-            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/sortingCriteria.html'
+            templateUrl: $rootScope.smartRPath +  '/assets/smartR/_angular/templates/sortingCriteria.html'
         };
     }
 ]);

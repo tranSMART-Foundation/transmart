@@ -9,7 +9,7 @@ window.smartRApp.directive('workflowControls', [
         return {
             restrict: 'E',
             transclude: true,
-            templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/workflowControls.html',
+            templateUrl: $rootScope.smartRPath + '/assets/smartR/_angular/templates/workflowControls.html',
             link: function(scope, element) {
                 var controls = element.children()[0];
                 var scrollbarWidth = smartRUtils.getScrollBarWidth();

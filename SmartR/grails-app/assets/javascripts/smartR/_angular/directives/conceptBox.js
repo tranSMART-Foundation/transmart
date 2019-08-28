@@ -16,7 +16,7 @@ window.smartRApp.directive('conceptBox', [
                 max: '@',
                 type: '@'
             },
-            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/conceptBox.html',
+            templateUrl: $rootScope.smartRPath +  '/assets/smartR/_angular/templates/conceptBox.html',
             link: function(scope, element) {
                 var max = parseInt(scope.max);
                 var min = parseInt(scope.min);
@@ -115,7 +115,7 @@ window.smartRApp.directive('conceptBox', [
                 };
 
                 scope.$watchGroup([
-                    'instructionNodeType',
+		    'instructionNodeType',
                     'instructionNodePlatform',
                     'instructionMaxNodes',
                     'instructionMinNodes'],

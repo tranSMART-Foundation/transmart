@@ -18,7 +18,7 @@ window.smartRApp.directive('runButton', [
                 params: '=?argumentsToUse',
                 waitMessage: '@?'
             },
-            templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/runButton.html',
+            templateUrl: $rootScope.smartRPath + '/assets/smartR/_angular/templates/runButton.html',
             link: function(scope, element) {
                 var params = scope.params ? scope.params : {};
                 if (!scope.waitMessage) {

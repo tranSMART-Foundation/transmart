@@ -10,7 +10,7 @@ window.smartRApp.directive('workflowWarnings', [
             scope: {
                 warnings: '='
             },
-            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/workflowWarnings.html',
+            templateUrl: $rootScope.smartRPath +  '/assets/smartR/_angular/templates/workflowWarnings.html',
             link: function(scope) {
                 scope.$watch('warnings', function() {
                     scope.visibility = $.isEmptyObject(scope.warnings) ? 'hidden' : 'visible';

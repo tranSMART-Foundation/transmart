@@ -15,7 +15,7 @@ angular.module('ipaApi',['ngTable'])
                 numericPrecision: '=',
                 paginationNumRows: '=',
             },
-            css: [$rootScope.smartRPath + '/css/ng-table.css'],
+            css: [$rootScope.smartRPath + '/assets/ng-table.css'],
 
             controller: ['$scope', 'NgTableParams', function($scope,NgTableParams) {
                 function simpleTableToNgTable(simpleTable,precision) {
@@ -357,6 +357,6 @@ angular.module('ipaApi',['ngTable'])
             }],
 
             // FIXME is there no other way to not depend on the $rootScope and smartR specifics
-            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/ipaApi.html'
+            templateUrl: $rootScope.smartRPath +  '/assets/smartR/_angular/templates/ipaApi.html'
         }
         }]);

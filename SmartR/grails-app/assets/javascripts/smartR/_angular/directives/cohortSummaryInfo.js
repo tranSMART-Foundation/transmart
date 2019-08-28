@@ -7,7 +7,7 @@ window.smartRApp.directive('cohortSummaryInfo', [function() {
     return {
         restrict: 'E',
         template: '<span id="sr-cohort-selection" style="font-size: 11px;"></span>',
-        controller: function($scope, $element) {
+        controller: ['$scope', '$element', function($scope, $element) {
             var span = $element.children()[0];
 
             function _showCohortInfo() {
@@ -35,7 +35,6 @@ window.smartRApp.directive('cohortSummaryInfo', [function() {
                     _showCohortInfo();
                 });
             });
-        }
+        }]
     };
-
 }]);

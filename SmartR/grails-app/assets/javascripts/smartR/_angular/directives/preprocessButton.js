@@ -17,7 +17,7 @@ window.smartRApp.directive('preprocessButton', [
                 numberOfRows: '=?',
                 projection: '@?'
             },
-            templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/preprocessButton.html',
+            templateUrl: $rootScope.smartRPath + '/assets/smartR/_angular/templates/preprocessButton.html',
             link: function(scope, element) {
 
                 var template_btn = element.children()[0];

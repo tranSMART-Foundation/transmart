@@ -24,7 +24,7 @@ window.smartRApp.directive('fetchButton', [
                 message: '=?',
                 hasPreprocessTab: '=?'
             },
-            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/fetchButton.html',
+            templateUrl: $rootScope.smartRPath +  '/assets/smartR/_angular/templates/fetchButton.html',
             link: function(scope, element) {
                 var template_btn = element.children()[0],
                     template_msg = element.children()[1];
@@ -52,7 +52,7 @@ window.smartRApp.directive('fetchButton', [
                 // completion. FIXME
                 scope.$watch('summaryData', function(newValue) {
                     if (scope.summaryData &&
-                            scope.showSummaryStats &&
+                        scope.showSummaryStats &&
                             scope.running &&
                             Object.keys(newValue).indexOf('subsets') !== -1) {
                         scope.allSamples = newValue.allSamples;
