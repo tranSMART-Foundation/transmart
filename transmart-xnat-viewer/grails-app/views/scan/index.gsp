@@ -29,7 +29,7 @@
         </table>
     </div>
 </div>
-<asset:javascript src="XNAT/angular.min.js"/>
+<%-- <asset:javascript src="XNAT/angular.min.js"/> --%>
 <asset:javascript src="XNAT/ng-table.min.js"/>
 <asset:javascript src="XNAT/script.js"/>
 </body>
