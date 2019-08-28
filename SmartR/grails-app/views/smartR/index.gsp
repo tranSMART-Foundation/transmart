@@ -1,4 +1,5 @@
-<r:require modules="smartR_all"/>
+<asset:stylesheet href="smartR_all.css"/>
+<asset:javascript src="smartR_all.js"/>
 
 <div id="sr-loading">Loading...</div>
 <div id="sr-index" data-ng-app="smartRApp" style="padding: 10px;">

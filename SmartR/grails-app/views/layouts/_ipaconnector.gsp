@@ -13,7 +13,7 @@
                 max="-1"
                 label="High Dimensional"
                 tooltip="Select high dimensional data node(s) from the Data Set Explorer Tree and drag it into the box.
-                The nodes needs to be from the same platform."
+                The nodes need to be from the same platform."
             >
             </concept-box>
 

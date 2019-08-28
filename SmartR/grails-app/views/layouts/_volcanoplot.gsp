@@ -1,4 +1,3 @@
-
 <script type="text/ng-template" id="volcanoplot">
 
     <div ng-controller="VolcanoplotController">
@@ -13,7 +12,7 @@
                              max="-1"
                              label="High Dimensional Variables"
                              tooltip="Select high dimensional data node(s) from the data tree and drag it into the box.
-                             The nodes needs to be from the same platform.">
+                             The nodes need to be from the same platform.">
                 </concept-box>
                 <br/>
                 <br/>
