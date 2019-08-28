@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
- * Public service with the controller is to communicate.
+ * Public service with which the controller is to communicate.
  */
 @Component
 @Slf4j('logger')
