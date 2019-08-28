@@ -40,9 +40,9 @@ window.smartRPanel = new Ext.Panel({
     listeners: {
         render: function (panel) {
             /**
-        * WORKAROUND : code below is needed to reorder the javascript script load that're broken due to
-        * ExtJS panel
-        */
+             * WORKAROUND : code below is needed to reorder the javascript script load that is broken due to
+             * ExtJS panel
+             */
             // start workaround
             var updater = panel.getUpdater();
             updater.on('update', function() {
