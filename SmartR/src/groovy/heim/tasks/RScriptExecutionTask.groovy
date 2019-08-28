@@ -3,7 +3,7 @@ package heim.tasks
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import groovy.transform.TypeChecked
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import heim.SmartRRuntimeConstants
 import heim.rserve.RFunctionArg
 import heim.rserve.RScriptOutputManager
@@ -15,7 +15,7 @@ import org.rosuda.REngine.Rserve.RConnection
 
 import static heim.rserve.RUtil.runRCommand
 
-@Log4j
+@Slf4j('logger')
 @TypeChecked
 // TODO: convert to prototype bean
 class RScriptExecutionTask extends AbstractTask {
@@ -43,7 +43,7 @@ class RScriptExecutionTask extends AbstractTask {
     private void injectScriptDir(RConnection conn) {
         def remoteScriptDir = fileToLoad.getParentFile().getParentFile()  // We need the HeimScripts root
         String path = RUtil.escapeRStringContent(remoteScriptDir.absolutePath)
-        runRCommand(conn, 'remoteScriptDir <- \'$path\'')
+        runRCommand(conn, "remoteScriptDir <- \"$path\"")
     }
 
     private void sourceCoreUtils(RConnection conn) {
