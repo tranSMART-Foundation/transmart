@@ -5,8 +5,6 @@ import groovy.util.logging.Slf4j
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.ContentType
 import heim.session.SessionService
-import org.codehaus.groovy.grails.web.json.JSONArray
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.core.io.Resource
 import org.transmartproject.core.dataquery.highdim.HighDimensionResource
 import org.transmartproject.core.dataquery.highdim.HighDimensionDataTypeResource
@@ -40,37 +38,28 @@ class SmartRController {
     *   Called to get the path to smartR.js such that the plugin can be loaded in the datasetExplorer
     */
     def loadScripts = {
-
-
-        JSONObject result = new JSONObject()
-        JSONArray rows = new JSONArray()
+	List<Map> rows = []
 
         // for all js files
         for (String script in scripts) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
-	    logger.info 'loading SmartR script {} asset {}', script, assetRes.getPath()
  	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
        }
 
         // for all css files
         for (String style in styles) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
-	    logger.info 'loading SmartR style {} asset {}', style, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
         }
 
-        result.put('success', true)
-        result.put('totalCount', scripts.size())
-        result.put('files', rows)
-
-        render result as JSON
+	render([success: true, totalCount: rows.size(), files: rows] as JSON)
     }
 
     /**
      * Get smart-r plugin context path
      */
     def smartRContextPath = {
-        render servletContext.contextPath + pluginContextPath as String
+        render servletContext.contextPath as String
     }
 
     def biocompendium = {
