@@ -2,8 +2,11 @@
 
 'use strict';
 
-window.smartRApp.controller('CorrelationController',
-    ['$scope', 'smartRUtils', 'commonWorkflowService', function($scope, smartRUtils, commonWorkflowService) {
+window.smartRApp.controller('CorrelationController', [
+    '$scope',
+    'smartRUtils',
+    'commonWorkflowService',
+    function($scope, smartRUtils, commonWorkflowService) {
 
         commonWorkflowService.initializeWorkflow('correlation', $scope);
 
@@ -28,13 +31,14 @@ window.smartRApp.controller('CorrelationController',
         };
 
         $scope.$watch('runAnalysis.params.transformation', function(newValue, oldValue) {
-            // spearman and kendall are resistant to log transformation. Therefor the default to spearman if log used
+            // spearman and kendall are resistant to log transformation. Therefore we default to spearman if log+pearson used
             if (newValue !== oldValue && newValue !== 'raw' && $scope.runAnalysis.params.method === 'pearson') {
                 $scope.runAnalysis.params.method = 'spearman';
             }
         });
 
-        $scope.$watchGroup(['fetch.running', 'runAnalysis.running'],
+        $scope.$watchGroup(
+	    ['fetch.running', 'runAnalysis.running'],
             function(newValues) {
                 var fetchRunning = newValues[0],
                     runAnalysisRunning = newValues[1];

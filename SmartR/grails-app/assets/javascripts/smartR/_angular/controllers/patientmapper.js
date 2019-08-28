@@ -2,8 +2,11 @@
 
 'use strict';
 
-window.smartRApp.controller('PatientmapperController',
-    ['$scope', 'smartRUtils', 'commonWorkflowService', function($scope, smartRUtils, commonWorkflowService) {
+window.smartRApp.controller('PatientmapperController', [
+    '$scope',
+    'smartRUtils',
+    'commonWorkflowService',
+    function($scope, smartRUtils, commonWorkflowService) {
 
         commonWorkflowService.initializeWorkflow('patientmapper', $scope);
 

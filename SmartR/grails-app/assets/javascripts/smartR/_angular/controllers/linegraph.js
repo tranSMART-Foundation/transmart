@@ -2,8 +2,11 @@
 
 'use strict';
 
-window.smartRApp.controller('LinegraphController',
-    ['$scope', 'smartRUtils', 'commonWorkflowService', function($scope, smartRUtils, commonWorkflowService) {
+window.smartRApp.controller('LinegraphController', [
+    '$scope',
+    'smartRUtils',
+    'commonWorkflowService',
+    function($scope, smartRUtils, commonWorkflowService) {
 
         commonWorkflowService.initializeWorkflow('linegraph', $scope);
 
@@ -36,7 +39,7 @@ window.smartRApp.controller('LinegraphController',
             if ($scope.fetch.conceptBoxes.highData.concepts.length > 0 &&
                 ($scope.fetch.selectedBiomarkers.length === 0 || $scope.fetch.selectedBiomarkers.length > 10)) {
                 $scope.fetch.button.disabled = true;
-                $scope.fetch.button.message = 'Please select between 1 and 10 biomarker for your high dimensional data';
+                $scope.fetch.button.message = 'Please select between 1 and 10 biomarkers for your high dimensional data';
             } else {
                 $scope.fetch.button.disabled = false;
                 $scope.fetch.button.message = '';
