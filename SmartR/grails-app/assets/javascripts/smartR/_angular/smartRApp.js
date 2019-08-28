@@ -11,10 +11,10 @@ window.smartRApp = angular.module('smartRApp', ['ngRoute', 'door3.css', 'ipaApi'
         //disable IE ajax request caching
         $httpProvider.defaults.headers.get['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
     }])
-    .run(function($rootScope, $http) {
+    .run(['$rootScope', '$http', function($rootScope, $http) {
         // get plugin context path and put it in root scope
         $http.get(pageInfo.basePath + '/SmartR/smartRContextPath').then(
             function(d) { $rootScope.smartRPath = d.data; },
             function(msg) { throw 'Error: ' + msg; }
         );
-    });
+    }]);
