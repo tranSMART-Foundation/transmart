@@ -10,7 +10,7 @@ window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', func
         service.currentScope = scope;
         // load workflow specific css
         $css.bind({
-            href: scope.smartRPath + '/css/' + workflowName + '.css'
+            href: scope.smartRPath + '/assets/' + workflowName + '.css'
         }, scope);
 
         rServeService.destroyAndStartSession(workflowName);
