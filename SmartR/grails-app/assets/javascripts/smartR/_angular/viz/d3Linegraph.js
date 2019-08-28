@@ -13,7 +13,7 @@ window.smartRApp.directive('lineGraph', [
             scope: {
                 data: '='
             },
-            templateUrl: $rootScope.smartRPath + '/js/smartR/_angular/templates/linegraph.html',
+            templateUrl: $rootScope.smartRPath + '/assets/smartR/_angular/templates/linegraph.html',
             link: function (scope, element) {
                 var template_ctrl = element.children()[0],
                     template_viz = element.children()[1];

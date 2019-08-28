@@ -13,7 +13,7 @@ window.smartRApp.directive('boxplot', [
         scope: {
             data: '='
         },
-        templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/boxplot.html',
+        templateUrl: $rootScope.smartRPath +  '/assets/smartR/_angular/templates/boxplot.html',
         link: function (scope, element) {
             var vizDiv = element.children()[0];
             /**

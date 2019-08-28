@@ -15,7 +15,7 @@ window.smartRApp.directive('heatmapPlot', [
                 height: '@',
                 params: '='
             },
-            templateUrl: $rootScope.smartRPath +  '/js/smartR/_angular/templates/heatmap.html',
+            templateUrl: $rootScope.smartRPath +  '/assets/smartR/_angular/templates/heatmap.html',
             link: function(scope, element) {
                 var viz = element.children()[1];
                 /**
