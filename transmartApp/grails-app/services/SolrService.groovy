@@ -480,7 +480,7 @@ class SolrService {
     private void querySolr(Map args, Closure handler) {
 	new HTTPBuilder(solrServerUrl).get(args) { HttpResponseDecorator response, xml ->
 	    //We should probably do something with the status.
-	    if (response.status != '200') {
+	    if (response.status != 200) {
 		logger.error 'Response status from solr web service call: {}', response.status
 	    }
 
