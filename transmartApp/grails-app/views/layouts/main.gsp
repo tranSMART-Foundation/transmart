@@ -3,8 +3,7 @@
     <head>
 	<title>Transmart</title>
 
-	<asset:link href="transmart.ico" rel="shortcut icon"/>
-	<asset:link href="images/transmart.ico" rel="icon"/>
+	<asset:link href="transmart.ico" rel="icon" type="image/x-icon"/>
 
 
 	<asset:javascript src="jquery-plugin.js"/>
