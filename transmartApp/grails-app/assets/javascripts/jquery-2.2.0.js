@@ -12,6 +12,9 @@
  * Date: 2016-01-08T20:02Z
  */
 
+// transmart-bugfix see comments for any changes needed for
+// issues found in tranSMART testing
+
 (function( global, factory ) {
 
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
@@ -5642,7 +5645,9 @@ var getStyles = function( elem ) {
 		// FF meanwhile throws on frame elements through "defaultView.getComputedStyle"
 		var view = elem.ownerDocument.defaultView;
 
-		if ( !view.opener ) {
+// transmart-bugfix test null view - can happen on FireFox (seen on version 67)
+//		if (!view.opener ) {
+		if ( !view || !view.opener ) {
 			view = window;
 		}
 
