@@ -124,7 +124,7 @@ class AsyncJobService {
         jobResultsService[jobName] = [:]
 	updateStatus jobName, jobStatus
 
-	logger.debug 'Sending {} back to the client', jobName
+	logger.debug 'Sending {} back to the client status {}', jobName, jobStatus
         JSONObject result = new JSONObject()
 	result.put 'jobName', jobName
 	result.put 'jobStatus', jobStatus
