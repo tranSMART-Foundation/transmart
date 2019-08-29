@@ -3,6 +3,7 @@ package com.recomdata.transmart.asynchronous.job
 import com.recomdata.asynchronous.JobResultsService
 import com.recomdata.genepattern.JobStatus
 import com.recomdata.genepattern.WorkflowStatus
+import groovy.util.logging.Slf4j
 import grails.converters.JSON
 import grails.gsp.PageRenderer
 import org.json.JSONObject
@@ -11,6 +12,7 @@ import org.transmart.audit.StudyIdService
 import org.transmartproject.core.log.AccessLogEntryResource
 import org.transmartproject.core.users.User
 
+@Slf4j('logger')
 class AsyncJobController {
 
     AccessLogEntryResource accessLogService
@@ -50,6 +52,8 @@ class AsyncJobController {
 	String workflow = getWorkflow()
 
         JSONObject result = asyncJobService.createnewjob(params)
+
+	logger.debug 'asyncJobService.createnewjob result: {}', result
 
         auditLogService.report 'Run advanced workflow', request,
                                user: currentUserBean,
