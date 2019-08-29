@@ -593,7 +593,7 @@ Ext.DomQuery = function(){
             }
         }else if(mode == "~"){
             for(var i = 0, n; n = ns[i]; i++){
-                while((n = n.nextSibling) && (n.nodeType != 1 || (tagName == '*' || n.tagName.toLowerCase()!=tagName)));
+                while((n = n.nextSibling) && (n.nodeType != 1 || (tagName == '*' || n.tagName.toLowerCase() != tagName)));
                 if(n){
                     result[++ri] = n;
                 }
@@ -653,8 +653,7 @@ Ext.DomQuery = function(){
             var a;
             if(st){
                 a = Ext.DomQuery.getStyle(ci, attr);
-            }
-            else if(attr == "class" || attr == "className"){
+            }else if(attr == "class" || attr == "className"){
                 a = ci.className;
             }else if(attr == "for"){
                 a = ci.htmlFor;
@@ -903,7 +902,7 @@ Ext.DomQuery = function(){
             var n = valueCache[path](root);
             n = n[0] ? n[0] : n;
             var v = (n && n.firstChild ? n.firstChild.nodeValue : null);
-            return ((v === null||v === undefined||v==='') ? defaultValue : v);
+            return ((v === null || v === undefined || v==='') ? defaultValue : v);
         },
 
         
@@ -939,13 +938,13 @@ Ext.DomQuery = function(){
             }, {
                 re: /^\:([\w-]+)(?:\(((?:[^\s>\/]*|.*?))\))?/,
                 select: 'n = byPseudo(n, "{1}", "{2}");'
-            },{
+            }, {
                 re: /^(?:([\[\{])(?:@)?([\w-]+)\s?(?:(=|.=)\s?['"]?(.*?)["']?)?[\]\}])/,
                 select: 'n = byAttribute(n, "{2}", "{4}", "{3}", "{1}");'
             }, {
                 re: /^#([\w-]+)/,
                 select: 'n = byId(n, null, "{1}");'
-            },{
+            }, {
                 re: /^@([\w-]+)/,
                 select: 'return {firstChild:{nodeValue:attrValue(n, "{1}")}};'
             }
@@ -1278,7 +1277,7 @@ Ext.util.Observable.prototype = {
         this.eventsSuspended = false;
     },
 
-                getMethodEvent : function(method){
+    getMethodEvent : function(method){
         if(!this.methodEvents){
             this.methodEvents = {};
         }
@@ -1341,12 +1340,12 @@ Ext.util.Observable.prototype = {
         return e;
     },
 
-        beforeMethod : function(method, fn, scope){
+    beforeMethod : function(method, fn, scope){
         var e = this.getMethodEvent(method);
         e.before.push({fn: fn, scope: scope});
     },
 
-        afterMethod : function(method, fn, scope){
+    afterMethod : function(method, fn, scope){
         var e = this.getMethodEvent(method);
         e.after.push({fn: fn, scope: scope});
     },
@@ -1798,7 +1797,7 @@ Ext.EventManager = function(){
             }
         },
 
-                fireResize : function(){
+        fireResize : function(){
             if(resizeEvent){
                 resizeEvent.fire(D.getViewWidth(), D.getViewHeight());
             }
@@ -2581,7 +2580,7 @@ El.prototype = {
         return this;
     },
 
-        classReCache: {},
+    classReCache: {},
 
     
     toggleClass : function(className){
@@ -4358,12 +4357,12 @@ Ext.Fx = {
 
             anchor = anchor || "t";
 
-                        var r = this.getFxRestore();
+            var r = this.getFxRestore();
             
             var b = this.getBox();
-                        this.setSize(b);
+            this.setSize(b);
 
-                        var wrap = this.fxWrap(r.pos, o, "visible");
+            var wrap = this.fxWrap(r.pos, o, "visible");
 
             var st = this.dom.style;
             st.visibility = "visible";
@@ -4486,7 +4485,7 @@ Ext.Fx = {
             this.clearOpacity();
             this.clip();
 
-                        var r = this.getFxRestore();
+            var r = this.getFxRestore();
             var st = this.dom.style;
 
             var after = function(){
@@ -4908,7 +4907,8 @@ Ext.Fx = {
     },
 
 	
-    getFxEl : function(){         return Ext.get(this.dom);
+    getFxEl : function(){
+        return Ext.get(this.dom);
     },
 
 	
@@ -5705,21 +5705,23 @@ Ext.UpdateManager = Ext.Updater;
 
 (function() {
 Date.formatCodeToRegex = function(character, currentGroup) {
-        var p = Date.parseCodes[character];
+    var p = Date.parseCodes[character];
 
     if (p) {
-      p = Ext.type(p) == 'function'? p() : p;
-      Date.parseCodes[character] = p;     }
+	p = Ext.type(p) == 'function'? p() : p;
+	Date.parseCodes[character] = p;
+    }
 
     return p? Ext.applyIf({
-      c: p.c? String.format(p.c, currentGroup || "{0}") : p.c
+	c: p.c? String.format(p.c, currentGroup || "{0}") : p.c
     }, p) : {
         g:0,
         c:null,
-        s:Ext.escapeRe(character)     }
+        s:Ext.escapeRe(character)
+    }
 }
 
-var $f = Date.formatCodeToRegex;
+    var $f = Date.formatCodeToRegex;
 
 Ext.apply(Date, {
         parseFunctions: {count:0},
@@ -5928,21 +5930,25 @@ Ext.apply(Date, {
         }
 
         code += "if (u){\n"
-            + "v = new Date(u * 1000);\n"             + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0 && s >= 0 && ms >= 0){\n"
-            + "v = new Date(y, m, d, h, i, s, ms);\n"
-            + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0 && s >= 0){\n"
-            + "v = new Date(y, m, d, h, i, s);\n"
-            + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0){\n"
-            + "v = new Date(y, m, d, h, i);\n"
-            + "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0){\n"
-            + "v = new Date(y, m, d, h);\n"
-            + "}else if (y >= 0 && m >= 0 && d > 0){\n"
-            + "v = new Date(y, m, d);\n"
-            + "}else if (y >= 0 && m >= 0){\n"
-            + "v = new Date(y, m);\n"
-            + "}else if (y >= 0){\n"
-            + "v = new Date(y);\n"
-            + "}\n}\nreturn (v && (z || o))?"             +     " (Ext.type(z) == 'number' ? v.add(Date.SECOND, -v.getTimezoneOffset() * 60 - z) :"             +         " v.add(Date.MINUTE, -v.getTimezoneOffset() + (sn == '+'? -1 : 1) * (hr * 60 + mn))) : v;\n"             + "}";
+		+ "v = new Date(u * 1000);\n"
+		+ "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0 && s >= 0 && ms >= 0){\n"
+		+ "v = new Date(y, m, d, h, i, s, ms);\n"
+		+ "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0 && s >= 0){\n"
+		+ "v = new Date(y, m, d, h, i, s);\n"
+		+ "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0 && i >= 0){\n"
+		+ "v = new Date(y, m, d, h, i);\n"
+		+ "}else if (y >= 0 && m >= 0 && d > 0 && h >= 0){\n"
+		+ "v = new Date(y, m, d, h);\n"
+		+ "}else if (y >= 0 && m >= 0 && d > 0){\n"
+		+ "v = new Date(y, m, d);\n"
+		+ "}else if (y >= 0 && m >= 0){\n"
+		+ "v = new Date(y, m);\n"
+		+ "}else if (y >= 0){\n"
+		+ "v = new Date(y);\n"
+		+ "}\n}\nreturn (v && (z || o))?"
+		+     " (Ext.type(z) == 'number' ? v.add(Date.SECOND, -v.getTimezoneOffset() * 60 - z) :"
+		+         " v.add(Date.MINUTE, -v.getTimezoneOffset() + (sn == '+'? -1 : 1) * (hr * 60 + mn))) : v;\n"
+		+ "}";
 
         Date.parseRegexes[regexNum] = new RegExp("^" + regex + "$", "i");
         eval(code);
@@ -12485,7 +12491,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
         return this;
     },
 
-        initState : function(config){
+    initState : function(config){
         if(Ext.state.Manager){
             var state = Ext.state.Manager.get(this.stateId || this.id);
             if(state){
@@ -12497,7 +12503,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
         }
     },
 
-        initStateEvents : function(){
+    initStateEvents : function(){
         if(this.stateEvents){
             for(var i = 0, e; e = this.stateEvents[i]; i++){
                 this.on(e, this.saveState, this, {delay:100});
@@ -12550,7 +12556,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
         }
     },
 
-            onRender : function(ct, position){
+    onRender : function(ct, position){
         if(this.autoEl){
             if(typeof this.autoEl == 'string'){
                 this.el = document.createElement(this.autoEl);
@@ -12574,18 +12580,17 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
         }
     },
 
-        getAutoCreate : function(){
+    getAutoCreate : function(){
         var cfg = typeof this.autoCreate == "object" ?
-                      this.autoCreate : Ext.apply({}, this.defaultAutoCreate);
+            this.autoCreate : Ext.apply({}, this.defaultAutoCreate);
         if(this.id && !cfg.id){
             cfg.id = this.id;
         }
         return cfg;
     },
 
-        afterRender : Ext.emptyFn,
+    afterRender : Ext.emptyFn,
 
-    
     destroy : function(){
         if(this.fireEvent("beforedestroy", this) !== false){
             this.beforeDestroy();
@@ -12603,11 +12608,10 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
         }
     },
 
-	    beforeDestroy : Ext.emptyFn,
+    beforeDestroy : Ext.emptyFn,
 
-	    onDestroy  : Ext.emptyFn,
+    onDestroy  : Ext.emptyFn,
 
-    
     getEl : function(){
         return this.el;
     },
@@ -16185,7 +16189,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         Ext.Panel.superclass.onHide.call(this);
     },
 
-        createToolHandler : function(t, tc, overCls, panel){
+    createToolHandler : function(t, tc, overCls, panel){
         return function(e){
             t.removeClass(overCls);
             e.stopEvent();
@@ -16195,7 +16199,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         };
     },
 
-        afterRender : function(){
+    afterRender : function(){
         if(this.fromMarkup && this.height === undefined && !this.autoHeight){
             this.height = this.el.getHeight();
         }
@@ -16224,7 +16228,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         Ext.Panel.superclass.afterRender.call(this);         this.initEvents();
     },
 
-        setAutoScroll : function(){
+    setAutoScroll : function(){
         if(this.rendered && this.autoScroll){
             var el = this.body || this.el;
             if(el){
@@ -16233,14 +16237,14 @@ Ext.Panel = Ext.extend(Ext.Container, {
         }
     },
 
-        getKeyMap : function(){
+    getKeyMap : function(){
         if(!this.keyMap){
             this.keyMap = new Ext.KeyMap(this.el, this.keys);
         }
         return this.keyMap;
     },
 
-        initEvents : function(){
+    initEvents : function(){
         if(this.keys){
             this.getKeyMap();
         }
@@ -16249,24 +16253,24 @@ Ext.Panel = Ext.extend(Ext.Container, {
         }
     },
 
-        initDraggable : function(){
+    initDraggable : function(){
         
         this.dd = new Ext.Panel.DD(this, typeof this.draggable == 'boolean' ? null : this.draggable);
     },
 
-        beforeEffect : function(){
+    beforeEffect : function(){
         if(this.floating){
             this.el.beforeAction();
         }
         this.el.addClass('x-panel-animated');
     },
 
-        afterEffect : function(){
+    afterEffect : function(){
         this.syncShadow();
         this.el.removeClass('x-panel-animated');
     },
 
-        createEffect : function(a, cb, scope){
+    createEffect : function(a, cb, scope){
         var o = {
             scope:scope,
             block:true
@@ -16295,7 +16299,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         return this;
     },
 
-        onCollapse : function(doAnim, animArg){
+    onCollapse : function(doAnim, animArg){
         if(doAnim){
             this[this.collapseEl].slideOut(this.slideAnchor,
                     Ext.apply(this.createEffect(animArg||true, this.afterCollapse, this),
@@ -16306,7 +16310,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         }
     },
 
-        afterCollapse : function(){
+    afterCollapse : function(){
         this.collapsed = true;
         this.el.addClass(this.collapsedCls);
         this.afterEffect();
@@ -16325,7 +16329,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         return this;
     },
 
-        onExpand : function(doAnim, animArg){
+    onExpand : function(doAnim, animArg){
         if(doAnim){
             this[this.collapseEl].slideIn(this.slideAnchor,
                     Ext.apply(this.createEffect(animArg||true, this.afterExpand, this),
@@ -16336,7 +16340,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         }
     },
 
-        afterExpand : function(){
+    afterExpand : function(){
         this.collapsed = false;
         this.afterEffect();
         this.fireEvent('expand', this);
@@ -16348,21 +16352,21 @@ Ext.Panel = Ext.extend(Ext.Container, {
         return this;
     },
 
-        onDisable : function(){
+    onDisable : function(){
         if(this.rendered && this.maskDisabled){
             this.el.mask();
         }
         Ext.Panel.superclass.onDisable.call(this);
     },
 
-        onEnable : function(){
+    onEnable : function(){
         if(this.rendered && this.maskDisabled){
             this.el.unmask();
         }
         Ext.Panel.superclass.onEnable.call(this);
     },
 
-        onResize : function(w, h){
+    onResize : function(w, h){
         if(w !== undefined || h !== undefined){
             if(!this.collapsed){
                 if(typeof w == 'number'){
@@ -16452,13 +16456,13 @@ Ext.Panel = Ext.extend(Ext.Container, {
         return this.getSize().height - this.getFrameHeight();
     },
 
-        syncShadow : function(){
+    syncShadow : function(){
         if(this.floating){
             this.el.sync(true);
         }
     },
 
-        getLayoutTarget : function(){
+    getLayoutTarget : function(){
         return this.body;
     },
 
@@ -16487,7 +16491,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         return this;
     },
 
-        beforeDestroy : function(){
+    beforeDestroy : function(){
         Ext.Element.uncache(
             this.header,
             this.tbar,
@@ -16512,7 +16516,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         Ext.Panel.superclass.beforeDestroy.call(this);
     },
 
-        createClasses : function(){
+    createClasses : function(){
         this.headerCls = this.baseCls + '-header';
         this.headerTextCls = this.baseCls + '-header-text';
         this.bwrapCls = this.baseCls + '-bwrap';
@@ -16522,7 +16526,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         this.footerCls = this.baseCls + '-footer';
     },
 
-        createGhost : function(cls, useShim, appendTo){
+    createGhost : function(cls, useShim, appendTo){
         var el = document.createElement('div');
         el.className = 'x-panel-ghost ' + (cls ? cls : '');
         if(this.header){
@@ -16544,7 +16548,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         }
     },
 
-        doAutoLoad : function(){
+    doAutoLoad : function(){
         this.body.load(
             typeof this.autoLoad == 'object' ?
                 this.autoLoad : {url: this.autoLoad});
@@ -17670,7 +17674,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
         this.selected = new Ext.CompositeElementLite();
     },
 
-        onRender : function(){
+    onRender : function(){
         if(!this.el){
             this.el = document.createElement('div');
             this.el.id = this.id;
@@ -17678,7 +17682,7 @@ Ext.DataView = Ext.extend(Ext.BoxComponent, {
         Ext.DataView.superclass.onRender.apply(this, arguments);
     },
 
-        afterRender : function(){
+    afterRender : function(){
         Ext.DataView.superclass.afterRender.call(this);
 
         this.el.on({
