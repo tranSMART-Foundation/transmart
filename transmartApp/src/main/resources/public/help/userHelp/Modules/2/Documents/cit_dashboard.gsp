@@ -24,10 +24,10 @@
 	<asset:stylesheet href="main.css"/>
 	<asset:stylesheet href="dashboard.css"/>
 	<asset:stylesheet href="nav_styles.css"/>
-	<asset:image rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>   
+	<asset:image rel="icon" href="transmart.ico" type="image/x-icon"/>   
 	<asset:javascript src="toggle.js"/>
 	<%-- <assetignore:javascript src="FusionCharts.js" />	(FusionCharts is a commercial product) --%>
-	<asset:javascript src="ext-prototype-adapter.js"/>
+	<asset:javascript src="ext-prototype-adapter-all.js"/>
         
 	<g:layoutHead /> 
 
