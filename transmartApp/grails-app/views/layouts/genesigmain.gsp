@@ -3,8 +3,7 @@
     <head>
 	<title><g:layoutTitle default="Gene Signature"/></title>
 
-	<asset:link rel="shortcut icon" href="transmart.ico" type="image/x-ico" />
-	<asset:link rel="icon" href="transmart.ico" type="image/x-ico" />
+	<asset:link rel="icon" href="transmart.ico" type="image/x-icon" />
 
 	<asset:stylesheet href="main.css"/>
 	<asset:stylesheet href="sanofi.css"/>
