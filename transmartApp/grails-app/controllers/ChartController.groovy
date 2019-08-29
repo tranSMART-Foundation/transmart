@@ -100,11 +100,20 @@ class ChartController {
 	accessLogService.report 'DatasetExplorer-Concept Distribution With Values',
 	    'Concept:' + concept_key
 
+        // We retrieve the highdimension parameters from the client, if they were passed
+        Map omicsparams = [:]
+        params.findAll { k, v ->
+            k.startsWith("omics_")
+        }.each { k, v ->
+            omicsParams[k] = v
+        }
+
 	Map analysis = chartService.getConceptAnalysis(
 	    i2b2HelperService.getConceptKeyForAnalysis(concept_key ?: null),
 	    omicsParams,
 	    [1: [exists: true, instance: ''], 2: [exists: false], commons: [:]],
 	    [width: 245, height: 180])
+
 	render(analysis as JSON)
     }
 
@@ -173,12 +182,8 @@ class ChartController {
             List<String> keys = i2b2HelperService.getConceptKeysInSubsets(result_instance_id1, result_instance_id2)
             Set<String> uniqueConcepts = i2b2HelperService.getDistinctConceptSet(result_instance_id1, result_instance_id2)
 
-	    logger.debug 'Unique concepts: {}', uniqueConcepts
-	    logger.debug 'keys: {}', keys
-
 	    for (String key in keys) {
 		if (!i2b2HelperService.isHighDimensionalConceptKey(key)) {
-		    logger.trace 'adding concept data for {}', key
 		    if (s1) {
 			i2b2HelperService.addConceptDataToTable(table, key, result_instance_id1)
 		    }
@@ -265,9 +270,7 @@ class ChartController {
     }
 
     def clearGrid() {
-	logger.debug 'Clearing grid'
 	session.removeAttribute 'gridtable'
-	logger.debug 'Setting export filename to null, since there is nothing to export'
 	session.removeAttribute 'expdsfilename'
 	render'grid cleared!'
     }
