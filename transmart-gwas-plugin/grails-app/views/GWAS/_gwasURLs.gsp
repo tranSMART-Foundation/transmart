@@ -8,4 +8,4 @@
     var gwasGetAnalysisDataURL = "${createLink(controller: 'gwasSearch', action: 'getAnalysisResults')}";
     var gwasExportAnalysisURL = "${createLink(controller: 'gwasSearch', action: 'exportAnalysis')}";
     var gwasGetManhattanPlotUrl = "${createLink(controller: 'gwasSearch', action: 'getManhattanPlotImage')}";
-<script>
+</script>
