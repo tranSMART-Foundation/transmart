@@ -7,8 +7,7 @@
 
 	<title>${grailsApplication.config.com.recomdata.appTitle}</title>
 
-	<asset:link rel="shortcut icon" href='searchtool.ico' type="image/x-ico" />
-	<asset:link rel="icon" href='searchtool.ico' type="image/x-ico" />
+	<asset:link rel="icon" href="transmart.ico" type="image/x-icon" />
 
 	<asset:stylesheet href="browseTab.css" />
 	<asset:stylesheet href="jquery-cupertino.css" />
