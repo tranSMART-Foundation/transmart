@@ -11,6 +11,6 @@ class LogTagLib {
      */
     def logMsg = { attrs, body ->
 	String level = attrs.level?.toLowerCase() ?: 'info'
-        logger."${level}"(body())
+        logger."${level}" '{}', body()
     }
 }
