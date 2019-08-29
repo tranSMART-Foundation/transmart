@@ -2,8 +2,7 @@
 <html>
     <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<asset:image rel="shortcut icon" href="transmart.ico"/>
-	<asset:link rel="icon" href="images/transmart.ico"/>
+	<asset:link rel="icon" href="transmart.ico" type="text/x-icon"/>
 	<asset:stylesheet href="main.css"/>
 	<title>${grailsApplication.config.com.recomdata.appTitle}</title>
     </head>
