@@ -12,13 +12,16 @@ missing.packages <- function(required) {
 new.packages <- missing.packages(required.packages);
 if (!length(new.packages))
 	q();
-source("http://bioconductor.org/biocLite.R");
-bioclite.packages <-
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install()
+#source("http://bioconductor.org/biocLite.R");
+biocmanager.packages <-
 		intersect(new.packages, c("impute", "multtest", "CGHbase", "edgeR",
 								  "snpStats", "preprocessCore", "GO.db",
 								  "AnnotationDbi", "QDNAseq"));
-if (length(bioclite.packages))
-	biocLite(bioclite.packages);
+if (length(biocmanager.packages))
+	biocManager::install(biocmanager.packages);
 # 1.10.0 version contains an important fix.
 # We still need to install the old package with biocLite first to install all dependencies.
 # For some reasons below installations does not take care of installing dependencies first.
