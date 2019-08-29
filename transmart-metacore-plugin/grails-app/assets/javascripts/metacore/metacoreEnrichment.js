@@ -21,6 +21,10 @@ function scrollToEnrichmentResults() {
 
 // TODO: needs refactoring: copy of renderCohortSummary from /plugins/rdc-modules-0.1/js/dataAssociations.js accepting divId
 function renderCohortSummaryMetaCoreEnrichment(cohortSummaryDisplayId) {
+    if (cohortSummaryDisplayId == null) {
+	return;
+    }
+
     var cohortsSummary = ""
     for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
         var currentQuery = getQuerySummary(i)
