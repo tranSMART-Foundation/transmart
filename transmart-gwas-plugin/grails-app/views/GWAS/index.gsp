@@ -21,8 +21,8 @@
 	    <asset:stylesheet href="folderManagement.css"/>
 	</g:ifPlugin>
 
-	<asset:javascript src="browseTab.js"/>
-	<asset:stylesheet href="browseTab.css"/>
+<%--	<asset:javascript src="browseTab.js"/> --%>
+<%--	<asset:stylesheet href="browseTab.css"/> --%>
         <asset:javascript src="gwas.js"/>
 	<asset:stylesheet href="gwasTab.css"/>
 	<asset:stylesheet href="jquery-plugin.css"/>
@@ -55,7 +55,9 @@
 	    var dataTypeBrowseWindow = "${createLink(controller: 'GWAS', action: 'browseDataTypesMultiSelect')}";
 	    var regionBrowseWindow = "${createLink(controller: 'gwasSearch', action: 'getRegionFilter')}";
 	    var eqtlTranscriptGeneWindow = "${createLink(controller: 'gwasSearch', action: 'getEqtlTranscriptGeneFilter')}";
-        </script>
+
+            var sessionSearchCategory = "${rwgSearchCategory}";
+</script>
 
 	<g:ifPlugin name='transmart-gwas'>
             <g:render template='/GWAS/gwasURLs' plugin='transmart-gwas'/>
@@ -271,7 +273,7 @@
 	    </div>	 
 	</div>
 	<div id="side-scroll">
-	    <div id="filter-div"></div>
+	    <div id="gwas-filter-div"></div>
 	</div>
 	<button id="toggle-btn"></button>
 	<div id="searchHelp" style="position: absolute; top: 30px; left: 272px">
