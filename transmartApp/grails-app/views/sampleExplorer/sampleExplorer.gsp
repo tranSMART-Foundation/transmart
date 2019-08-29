@@ -7,8 +7,7 @@
 
 	<title>Sample Explorer :: ${grailsApplication.config.com.recomdata.appTitle}</title>
 
-	<asset:image href="transmart.ico" rel="shortcut icon"/>
-	<asset:link href="images/transmart.ico" rel="icon"/>
+	<asset:link href="transmart.ico" rel="icon" type="image/x-icon"/>
 
 	<asset:stylesheet href="sampleTab.css"/>
 
