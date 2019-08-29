@@ -692,17 +692,17 @@ Ext.onReady(function () {
             jQuery.post(pageInfo.basePath + '/pluginDetector/checkPlugin',
                 {pluginName: pluginName })
                 .done(function(data) {
-                    if (data === 'true') {
+                    if (data) {
                         loadResources()
                     } else {
-                        console.log("Plugin " + pluginName + " not active");
+			console.log("Plugin " + pluginName + " not active");
                         def.reject('not active');
                     }
                 })
                 .fail(function() {
                     console.log('Could not determine whether plugin ' + pluginName +
-                            ' is active');
-                    def.reject.apply(def, arguments);
+				' is active');
+		    def.reject.apply(def, arguments);
                 });
         } else {
             loadResources();
@@ -714,19 +714,13 @@ Ext.onReady(function () {
         });
     }
 
-    /* load the legacy hardcoded tabs */
-    loadPlugin('dalliance-plugin', '/Dalliance/loadScripts', function () {
+    /* load the legacy hardcoded tabs: only dalliance uses this method in 19.0 */
+    loadPlugin('dalliance-plugin', '/dalliance/loadScripts', function () {
         loadDalliance(resultsTabPanel);
         Ext.getCmp('dallianceBrowser').on('deactivate', function() {
             document.title = 'Dataset Explorer';
         });
     }, true);
-
-    if (GLOBAL.metacoreAnalyticsEnabled === 'true') {
-        loadPlugin('transmart-metacore-plugin', '/MetacoreEnrichment/loadScripts', function () {
-            loadMetaCoreEnrichment(resultsTabPanel);
-        }, true);
-    }
 
     /* load the tabs registered with the extension mechanism */
     (function loadAnalysisTabExtensions() {
@@ -739,6 +733,7 @@ Ext.onReady(function () {
 
     // wait for all the tab scripts to be loaded, and only then run their bootstrap code
     // this ensures that they are added in a predictable order
+
     (function runTabBootstrapCode() {
         var def = jQuery.Deferred();
         var n = pluginPromises.length;
@@ -762,7 +757,7 @@ Ext.onReady(function () {
     })();
 
 
-    if (GLOBAL.galaxyEnabled === 'true') {
+    if (GLOBAL.galaxyEnabled) {
         resultsTabPanel.add(GalaxyPanel);
     }
 
@@ -875,7 +870,7 @@ Ext.onReady(function () {
         width: 490,
         split: false,
         autoLoad: {
-            url: pageInfo.basePath+'/panels/setValueDialog.html',
+            url: pageInfo.basePath + '/assets/panels/setValueDialog.html',
             scripts: true,
             nocache: true,
             discardUrl: true,
@@ -1038,6 +1033,7 @@ Ext.onReady(function () {
                 buttons: omicsFilterWinButtons,
                 tools: []
             });
+
         omicsfilterwin.show();
         omicsfilterwin.hide();
     }
@@ -1534,7 +1530,7 @@ function createTree(ontresponse) {
 }
 
 /*
- * the id_in drives which off these tabs is created
+ * the id_in drives which of these tabs is created
  * 
  */
 function getSubCategories(ontresponse) {
@@ -1591,8 +1587,9 @@ function setupDragAndDrop() {
         return true;
     };
 
-    /* set up drag and drop for grid */
+    /* set up drag and drop for GridView */
     var mcd = Ext.get(analysisGridPanel.body);
+
     dtg = new Ext.dd.DropTarget(mcd, {
         ddGroup: 'makeQuery'
     });
@@ -1601,6 +1598,7 @@ function setupDragAndDrop() {
         buildAnalysis(data.node);
         return true;
     };
+
 }
 
 function getValue(node, defaultvalue) {
@@ -1615,8 +1613,8 @@ function ontologyRightClick(eventNode, event) {
     if (!this.contextMenuOntology) {
         this.contextMenuOntology = new Ext.menu.Menu({
             id: 'contextMenuOntology',
-            items: [
-                {
+	    items: [
+		{
                     text: 'Show Definition', handler: function () {
                         showConceptInfoDialog(eventNode.attributes.id, eventNode.attributes.text, eventNode.attributes.comment);
                     }
@@ -1703,7 +1701,7 @@ function showExportStepSplitTimeSeries() {
             ],
             resizable: false ,
             autoLoad: {
-                url: pageInfo.basePath+'/panels/exportStepSplitTimeSeries.html',
+                url: pageInfo.basePath + '/assets/panels/exportStepSplitTimeSeries.html',
                 scripts: true,
                 nocache: true,
                 discardUrl: true,
@@ -1752,7 +1750,7 @@ function showExportStepDataSelection() {
             ],
             resizable: false,
             autoLoad: {
-                url: pageInfo.basePath+'/panels/exportStepDataSelection.html',
+                url: pageInfo.basePath + '/assets/panels/exportStepDataSelection.html',
                 scripts: true,
                 nocache: true,
                 discardUrl: true,
