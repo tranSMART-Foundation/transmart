@@ -4,7 +4,7 @@ STATE = {
     QueryRequestCounter: 0
 };
 
-// list of supported platform
+// list of supported platforms
 // TODO : future refactoring should retrieve these values from gpl definitions in the database
 var HIGH_DIMENSIONAL_DATA = {
     "mrna"          : {"platform" : "MRNA_AFFYMETRIX",  "type" : "Gene Expression"},
@@ -138,7 +138,7 @@ function convertNodeToConcept(node)
     return new Concept(name, key, level, tooltip, tablename, dimcode, comment, normalunits, oktousevalues, value, nodeType, visualattributes, applied_path, modifiedNode);
 }
 
-function createPanelItemNew(panel, concept)
+function createPanelItemNew(panel, concept, hideUpdateMenuItems)
 {
     var li=document.createElement('div'); //was li
     //convert all object attributes to element attributes so i can get them later (must be a way to keep them in object?)
@@ -228,7 +228,7 @@ function createPanelItemNew(panel, concept)
     li.appendChild(textElem);
     panel.appendChild(li);
     Ext.get(li).addListener('click',conceptClick);
-    Ext.get(li).addListener('contextmenu',conceptRightClick);
+    Ext.get(li).addListener('contextmenu',conceptRightClickBuilder(!!hideUpdateMenuItems));
     new Ext.ToolTip({ target:li, html:concept.key, dismissDelay:10000 });
     li.concept=concept;
     //return the node
@@ -327,57 +327,64 @@ function selectConcept(concept)
     selectedConcept.className=selectedConcept.className+" selected";
 }
 
-function conceptRightClick(event)
-{
-    var conceptnode=this.dom;
-    selectConcept(conceptnode, true);
-    var conceptid=this.dom.attributes.conceptid.nodeValue;
-    var comment=this.dom.attributes.conceptcomment.nodeValue;
+function conceptRightClickBuilder(hideUpdateMenuItems) {
+    return function conceptRightClick(event) {
+	var conceptnode=this.dom;
+	selectConcept(conceptnode, true);
+	var conceptid=conceptnode.attributes.conceptid.nodeValue;
+	var comment=conceptnode.attributes.conceptcomment.nodeValue;
 
-    if (!this.contextMenuConcepts) {
-	this.contextMenuConcepts = new Ext.menu.Menu({
-	    id: 'contextMenuConcepts',
-	    items: [{
+        var menuItems = [
+	    {
                 text: 'Delete', handler: function () {
-                    selectedDiv.removeChild(selectedConcept);
-                    removeUselessPanels();
-                    invalidateSubset(getSubsetFromPanel(selectedDiv));
+		    selectedDiv.removeChild(selectedConcept);
+		    removeUselessPanels();
+		    invalidateSubset(getSubsetFromPanel(selectedDiv));
 		}
-	    },{
+	    }
+	];
+
+        if (!hideUpdateMenuItems && conceptnode.attributes.oktousevalues.nodeValue == 'Y') {
+            menuItems.push({
                 id: 'setvaluemenu',
                 text: 'Set Value',
                 handler: function () {
-                    showSetValueDialog();
+		    showSetValueDialog();
                 }
-	    }, {
+            });
+	}
+
+	if (!hideUpdateMenuItems && conceptnode.attributes.oktousevalues.nodeValue == 'H') {
+            menuItems.push({
                 id: 'geneexprfiltermenu',
                 text: 'Set Filter',
                 handler: function () {
-                    // set the global variable for repopulating the filter window
-                    omicsFilterRepopulateWindow = selectedConcept.attributes;
+		    // set the global variable for repopulating the filter window
+		    omicsFilterRepopulateWindow = selectedConcept.attributes;
 
-                    // create mock node object for highDimensionalConceptDropped
-                    var node = {id: selectedConcept.attributes.conceptid.nodeValue}
-                    highDimensionalConceptDropped(node, true);
-                }
-	    }, {
-		text: 'Show Definition',
-		handler: function () {
-		    showConceptInfoDialog(conceptid, conceptid, comment);}
-	    }]
+		    // create mock node object for highDimensionalConceptDropped
+		    var node = {id: selectedConcept.attributes.conceptid.nodeValue}
+		    highDimensionalConceptDropped(node, true);
+		}
+	    });
+	}
+
+        menuItems.push({
+            text: 'Show Definition',
+            handler: function () {
+                showConceptInfoDialog(conceptid, conceptid, comment);
+            }
         });
+
+        this.contextMenuConcepts = new Ext.menu.Menu({
+            id: 'contextMenuConcepts',
+            items: menuItems
+        });
+        var xy = event.getXY();
+        this.contextMenuConcepts.showAt(xy);
+
+        return false;
     }
-    var xy = event.getXY();
-    this.contextMenuConcepts.showAt(xy);
-    var m=Ext.getCmp('setvaluemenu');
-    var o=Ext.getCmp('geneexprfiltermenu');
-    m.hide();
-    o.hide();
-    if(this.dom.attributes.oktousevalues.nodeValue=='Y')
-	m.show();
-    else if (this.dom.attributes.oktousevalues.nodeValue == 'H')
-	o.show();
-    return false;
 }
 
 function setValue(conceptnode, setvaluemode, setvalueoperator, setvaluehighlowselect, setvaluehighvalue, setvaluelowvalue, setvalueunits)
@@ -424,6 +431,31 @@ function applySetValueDialog(validation) {
 	}
 
 	setvaluewin.hide();
+    }
+}
+
+function setValueMethodChanged(value)
+{
+    if(value=="highlow") {
+	document.getElementById("divhighlow").style.display="inline";
+	document.getElementById("divnumeric").style.display="none";
+    }
+    if(value=="numeric") {
+	document.getElementById("divhighlow").style.display="none";
+	document.getElementById("divnumeric").style.display="inline"; 
+    }
+    if(value=="novalue") {
+	document.getElementById("divhighlow").style.display="none";
+	document.getElementById("divnumeric").style.display="none";
+    }
+}
+
+function setValueOperatorChanged(value) {
+    if(value=="BETWEEN") {
+	document.getElementById("divhighvalue").style.display="inline";
+    }
+    else {
+	document.getElementById("divhighvalue").style.display="none"; 
     }
 }
 
@@ -535,7 +567,9 @@ function clearAnalysisPanel()
     var cleartxt2="<div style='text-align:center;font:12pt arial;width:100%;height:100%;'><table style='width:100%;height:100%;'><tr><td align='center' valign='center'>Select Advanced->Haploview from the menu</td></tr></table></div>";
     updateAnalysisPanel(cleartxt, false);
     var ag=Ext.getCmp("analysisGridPanel");
-    ag.body.update("<div></div>");
+    if (typeof(ag.body) !== "undefined") {
+	ag.body.update("<div></div>");
+    }
     var aog=Ext.getCmp("analysisOtherPanel");
     if(aog) aog.body.update(cleartxt2);
     clearGrid();
@@ -1456,7 +1490,7 @@ function showCompareStepPathwaySelection()
 	    resizable: false,
 	    autoLoad:
 	    {
-		url: pageInfo.basePath+'/panels/compareStepPathwaySelection.html',
+		url: pageInfo.basePath + '/assets/panels/compareStepPathwaySelection.html',
 		scripts: true,
 		nocache:true,
 		discardUrl:true,
@@ -1644,7 +1678,7 @@ function showCompareStepPathwaySelectionRBM()
 	    resizable: false,
 	    autoLoad:
 	    {
-		url: pageInfo.basePath+'/panels/compareStepPathwaySelectionRBM.html',
+		url: pageInfo.basePath + '/assets/panels/compareStepPathwaySelectionRBM.html',
 		scripts: true,
 		nocache:true,
 		discardUrl:true,
@@ -1862,7 +1896,7 @@ function getTreeNodeFromJsonNode(concept)
 
 	if(oktousevalues != "N" && !leaf)
 	{
-		iconCls="foldernumericicon";
+		iconCls="programicon";
 	}
 
 	//set whether expanded or not.
