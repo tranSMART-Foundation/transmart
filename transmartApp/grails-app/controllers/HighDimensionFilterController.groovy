@@ -26,6 +26,7 @@ class HighDimensionFilterController {
 	String template = 'highDimensionFilterDialog'
 	boolean filter = params.boolean('filter', true)
 	String concept_key = params.concept_key ?: null
+
 	if (!gpl_id) {
             render template: template, model: [error: 'No GPL ID provided.']
             return
@@ -45,14 +46,14 @@ class HighDimensionFilterController {
 	HighDimensionDataTypeResource resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept_key)
 
 	render template: template, model: [
-	    gpl_id: platform.id,
+	    gpl_id               : platform.id,
             marker_type          : platform.markerType,
-	    filter_type: resource.highDimensionFilterType,
+	    filter_type          : resource.highDimensionFilterType,
             searchable_properties: resource.getSearchableAnnotationProperties().collectEntries {
                 [it, searchableAnnotationPropertiesDictionary.get(it, it)]
             },
             filter               : filter,
-            projections: resource.searchableProjections.collectEntries {
+            projections          : resource.searchableProjections.collectEntries {
                 [it, Projection.prettyNames.get(it, it)]
             }]
     }
@@ -69,24 +70,17 @@ class HighDimensionFilterController {
 	String template = 'highDimensionFilterDialog'
 	String concept_key = params.concept_key ?: null
 	boolean filter = params.boolean('filter', true)
+
         if (concept_key == null) {
             render template: template, model: [error: 'No concept key provided.']
             return
         }
 
-	logger.info 'concept_key {}', concept_key
-
 	String conceptCode = i2b2HelperService.getConceptCodeFromKey(concept_key)
-
-	logger.info 'conceptCode {}', conceptCode
 
 	DeGplInfo platform = DeSubjectSampleMapping.findByConceptCode(conceptCode).platform
 
-	logger.info 'platform {}', platform
-	logger.info 'marker_type {}', platform.markerType
 	HighDimensionDataTypeResource resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept_key)
-	logger.info 'filterType {}', resource.highDimensionFilterType
-	logger.info 'resource {}', resource
 
 	Map result = [platform            : platform,
 		      auto_complete_source: '/transmart/highDimensionFilter/searchAutoComplete',
@@ -94,20 +88,9 @@ class HighDimensionFilterController {
                       filter              : filter,
                       concept_key         : concept_key,
 		      concept_code        : conceptCode]
-	Map subresult = [//platform            : platform,
-		      auto_complete_source: '/transmart/highDimensionFilter/searchAutoComplete',
-		      filter_type         : resource.highDimensionFilterType,
-                      filter              : filter,
-                      concept_key         : concept_key,
-		      concept_code        : conceptCode]
 
-	if (!result.filter_type) {
-	    result.error = 'Unrecognized marker type ' + platform.markerType
-	}
+	if (result.filter_type == "") result['error'] = "Unrecognized marker type " + platform.markerType
 
-	logger.info 'subresult to render: {}', subresult
-	render (subresult as JSON)
-	logger.info 'result to render: {}', result
 	render (result as JSON)
     }
 
@@ -116,14 +99,10 @@ class HighDimensionFilterController {
 	    render([] as JSON)
 	    return
         }
-	logger.info 'searchAutoComplete concept_key {} term {} search_property {}', concept_key, term, search_property
 	HighDimensionDataTypeResource resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept_key)
 	String conceptCode = i2b2HelperService.getConceptCodeFromKey(concept_key)
 	List<String> symbols = resource.searchAnnotation(conceptCode, term, search_property)
-	logger.info 'symbols {}', symbols
-	logger.info 'symbols {}', symbols
         symbols.collect {[label: it]}
-	logger.info 'symbols collected {}', symbols
 
         render symbols as JSON
     }
