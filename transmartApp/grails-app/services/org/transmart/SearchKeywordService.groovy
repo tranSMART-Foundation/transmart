@@ -50,16 +50,12 @@ class SearchKeywordService {
 
     /** Finds all of the search categories pertaining to search keywords */
     List<Map<String, String>> findSearchCategories() {
-	logger.debug 'Finding all of the search categories...'
-
 	List<String> results = SearchKeyword.createCriteria().list {
             projections {
 		distinct 'dataCategory'
             }
 	    order 'dataCategory', 'asc'
         }
-
-	logger.debug 'Categories found: {}', results.size()
 
 	List<Map<String, String>> categories = []
 
@@ -76,7 +72,6 @@ class SearchKeywordService {
 
 	for (Map filtercat in filtercats) {
 
-	    logger.debug 'findFilterCategories {}', filtercat
 	    Set<Map> choices = new TreeSet<>(new Comparator<Map>() {
 		int compare(Map m1, Map m2) {
 		    m1.name.compareTo m2.name
@@ -119,15 +114,11 @@ class SearchKeywordService {
             }
         }
 
-	logger.debug 'findFilterCategories result.size {}', categories.size()
-
 	categories
     }
 
     /** Searches for all keywords for a given term (like %il%) */
     List<Map> findSearchKeywords(String category, String term, int max) {
-	logger.debug 'Finding matches for {} in {}', term, category
-
 	List results = SearchKeywordTerm.createCriteria().list {
 	    if (term) {
 		like 'keywordTerm', term.toUpperCase() + '%'
@@ -148,7 +139,6 @@ class SearchKeywordService {
             }
 
 	    if (!securityService.principal().isAdmin()) {
-		logger.debug 'User is not an admin so filter out gene lists or signatures that are not public'
                 or {
 		    isNull 'ownerAuthUserId'
 		    eq 'ownerAuthUserId', securityService.currentUserId()
@@ -159,7 +149,6 @@ class SearchKeywordService {
 	    order 'termLength', 'asc'
 	    order 'keywordTerm', 'asc'
         }
-	logger.debug 'Search keywords found: {}', results.size()
 
 	List<Map> keywords = []
 	List<String> dupeList = [] // store category:keyword for a duplicate check until DB is cleaned up
@@ -171,11 +160,9 @@ class SearchKeywordService {
 	    String dupeKey = sk.searchKeyword.displayDataCategory + ':' + sk.searchKeyword.keyword +
                 ':' + sk.searchKeyword.bioDataId
             if (dupeKey in dupeList) {
-		logger.debug 'Found duplicate: {}', dupeKey
                 continue
             }
             else {
-		logger.debug 'Found new entry, adding to the list: {}', dupeList
                 dupeList << dupeKey
             }
             ///////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +174,7 @@ class SearchKeywordService {
 		m.id = sk.searchKeyword.id
             }
             else {
-		m.id == sk.searchKeyword.uniqueId
+		m.id = sk.searchKeyword.uniqueId
             }
 
             if ('TEXT'.compareToIgnoreCase(sk.searchKeyword.dataCategory) != 0) {
@@ -207,6 +194,7 @@ class SearchKeywordService {
                 }
 		m.synonyms = synList.toString()
             }
+
 	    keywords << m
         }
 
@@ -223,7 +211,6 @@ class SearchKeywordService {
 		maxResults max
 		order 'bioConceptCode', 'asc'
             }
-	    logger.debug 'Bio concept code keywords found: {}', results.size()
 
             for (result in results) {
                 //Get display name by category
@@ -247,7 +234,6 @@ class SearchKeywordService {
 			    maxResults max
 			    order cat.platformProperty, 'asc'
 			}
-			logger.debug 'Platform {} keywords found: {}', cat.platformProperty, results.size()
 
 			for (result in results) {
 			    Map m = [label: result[cat.platformProperty], category: cat.displayName,
@@ -260,8 +246,6 @@ class SearchKeywordService {
 		}
 	    }
 	}
-
-	logger.debg 'findSearchKeywords result {}', keywords
 
 	keywords
     }
