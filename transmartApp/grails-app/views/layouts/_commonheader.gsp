@@ -50,7 +50,7 @@
                     <%-- <g:remoteLink controller="export" action="selection" update="${overlayExportDiv}"
                                        params="[eleId:overlayExportDiv]"
                                        before="initLoadingDialog('${overlayExportDiv}')" onComplete="centerDialog('${overlayExportDiv}')">--%>
-                    <img src="${resource(dir: 'images', file: 'cart.png')}"/> Export Cart
+                    <asset:image src="cart.png"/> Export Cart
                     <%-- </g:remoteLink>--%>
                     <div id="cartcount">${exportCount ?: 0}</div>
                 </div>
