@@ -5,7 +5,7 @@
 * other files not yet updated from earlier tranSMART builds
 */
 
-//= require jquery.js
+//= require jquery-2.2.0.js
 //= require jquery-ui.js
 //= require jquery/jquery.migrate.js
 //= require jquery/jquery.tablesorter.js
