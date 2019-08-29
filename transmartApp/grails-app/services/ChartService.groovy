@@ -161,7 +161,9 @@ class ChartService {
 	}.each { Map it ->
 	    String key = it.concept_key + it.omics_selector + ' - ' + it.omics_projection_type
 	    if (!concepts.containsKey(key)) {
-		concepts[key] = getConceptAnalysis(it.concept_key, it, subsets, null)
+		if (i2b2HelperService.isHighDimensionalConceptKey(it.concept_key)) {
+		    concepts[key] = getConceptAnalysis(it.concept_key, it, subsets, null)
+		}
 	    }
         }
         concepts
@@ -668,6 +670,7 @@ class ChartService {
                 categoryPlot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_RIGHT)
                 categoryPlot.renderer.setSeriesPaint(0, new Color(128, 193, 119))
                 categoryPlot.renderer.setSeriesOutlinePaint(0, new Color(84, 151, 12))
+
 		CategoryAxis axis = new CategoryAxis();
 		axis.setMaximumCategoryLabelLines(2);
 		axis.configure();
