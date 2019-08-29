@@ -74,7 +74,7 @@ class HighDimensionQueryService {
             }
         }
 
-	logger.info 'High dimensional concepts found: {}', concepts
+	logger.debug 'High dimensional concepts found: {}', concepts
         concepts
     }
 
@@ -84,19 +84,36 @@ class HighDimensionQueryService {
     ExportTableNew addHighDimConceptDataToTable(ExportTableNew tablein, omics_constraint, String result_instance_id) {
         checkQueryResultAccess result_instance_id
 
-        def concept_key = omics_constraint.concept_key
-        def selector = omics_constraint.omics_selector
-	String columnid = (concept_key + selector + omics_constraint.omics_projection_type).encodeAsSHA1()
-	String columnname = selector + ' in ' + concept_key
+        ExportColumn hascol
 
-	/*add the column to the table if its not there*/
+        if (!i2b2HelperService.isValidOmicsParams(omics_constraint)) {
+            return i2b2HelperService.addConceptDataToTable(tablein, omics_constraint.concept_key, result_instance_id)
+        }
+
+        String concept_key = omics_constraint.concept_key
+        String selector = omics_constraint.omics_selector
+        String projection_type = omics_constraint.omics_projection_type
+        String newlabel = selector + ' ' + projection_type
+
+        String columnname =  newlabel
+        String columnid = "${concept_key}${newlabel}\\".encodeAsSHA1()
+
+        // Clean up tooltip - remove all except alphanumeric, _-/\()[]
+        String columntooltip = "${i2b2HelperService.keyToPath(concept_key)}${newlabel}\\".replaceAll('[^a-zA-Z0-9_/\\-\\\\()\\[\\]]+','_')
+
+        /* add the subject and columnid column to the table if it's not there*/
         if (tablein.getColumn('subject') == null) {
 	    tablein.putColumn 'subject',
 		new ExportColumn('subject', 'Subject', '', 'string')
         }
+
+        hascol = tablein.getColumnByBasename(columnname); // check existing column with same basename
+
         if (tablein.getColumn(columnid) == null) {
 	    tablein.putColumn columnid,
-		new ExportColumn(columnid, columnname, '', 'number')
+		new ExportColumn(columnid, columnname, '', 'number', columntooltip)
+            if(hascol)
+                tablein.setColumnUnique(columnid); // make labels unique by expanding
         }
 
 	HighDimensionDataTypeResource resource =
