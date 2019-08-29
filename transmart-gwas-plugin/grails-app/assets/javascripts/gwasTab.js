@@ -6,7 +6,7 @@
 
 // require jquery.js
 // require jquery-ui.js
-// require jquery-plugins.js
+// require jquery-plugin.js
 // require extjs.js
 // require session-timeout.js
 
