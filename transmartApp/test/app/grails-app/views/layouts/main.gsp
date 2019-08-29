@@ -10,7 +10,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<title><g:layoutTitle default="Grails"/></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<asset:image rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+	<asset:link rel="icon" href="transmart.ico" type="image/x-icon"/>
 	<asset:image rel="apple-touch-icon" href="apple-touch-icon.png"/>
 	<asset:link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-retina.png">
 	<asset:stylesheet href="main_mod.css"/>
