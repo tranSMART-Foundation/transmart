@@ -63,11 +63,13 @@ class StudyIdService {
 
         String studyId = ''
         try {
-	    logger.debug 'Query study id for concept key: {}', conceptKey
+	    logger.debug 'Query study id for concept key: {} options {}', conceptKey, options
 	    OntologyTerm term = conceptsResourceService.getByKey(conceptKey)
             Study study = term?.study
             studyId = study?.id
+	    logger.debug 'studyId {} study.ontologyTerm {}', studyId, study?.ontologyTerm
             if (options?.studyConceptOnly && study?.ontologyTerm != term) {
+		logger.debug 'studyId {} set to null ontologyTerm {} does not match term {}', studyId, study?.ontologyTerm, term
                 studyId = null
             }
 	    logger.debug 'Study id for concept key {} is: {}', conceptKey, studyId
