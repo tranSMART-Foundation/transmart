@@ -542,17 +542,19 @@ class GWASController {
     //Get analyses for current SOLR query and store them in session
     def getFacetResultsForTable() {
 
+        // q params are filtered on but not faceted
 	List<String> queryParams = request.getParameterValues('q') as List
 
-        // save all the filter params to a session List variable
-	List<String> sessionFilterParams = [] + queryParams
-
 	//fq params are also faceted and also filtered on
-	sessionFilterParams.addAll request.getParameterValues('fq')
+	String[] facetQueryParams = request.getParameterValues('fq')
+
+        // save all the filter params to a session List variable
+	List<String> sessionFilterParams = []
+	if(queryParams) sessionFilterParams.addAll queryParams
+
+	if(facetQueryParams) sessionFilterParams.addAll facetQueryParams
 
 	session.solrSearchFilter = sessionFilterParams
-
-	logger.info 'facet search: {}', params
 
         // build the SOLR query
 	String nonfacetedQueryString = ''
@@ -592,11 +594,12 @@ class GWASController {
 	String[] facetQueryParams = request.getParameterValues('fq')
 
         // save all the filter params to a session List variable
-	List<String> sessionFilterParams = [] + queryParams
-	sessionFilterParams.addAll facetQueryParams
-	session.solrSearchFilter = sessionFilterParams
+	List<String> sessionFilterParams = []
+	if(queryParams) sessionFilterParams.addAll queryParams
+	
+	if(facetQueryParams) sessionFilterParams.addAll facetQueryParams
 
-	logger.info 'facet search: {}', params
+	session.solrSearchFilter = sessionFilterParams
 
         // build the SOLR query
 	String nonfacetedQueryString = createSOLRNonfacetedQueryString(queryParams)
@@ -621,7 +624,6 @@ class GWASController {
         //  and save the search term to the session variable so that is applied to the query to get the analysis list
 	List<String> queryParams = []
 	session.solrSearchFilter = queryParams
-	logger.info 'Initial facet search: {}', queryParams
 
 	// get the base query string (i.e. "q=(*:*)" since no filters for initial search
 	String solrQueryString = createSOLRQueryString(createSOLRNonfacetedQueryString(queryParams),
@@ -646,7 +648,6 @@ class GWASController {
     // Return search keywords
     def searchAutoComplete(String category, Long max, String term) {
 	category = category ?: 'ALL'
-	logger.info 'searchKeywordService.findSearchKeywords: {}', category
 	render(searchKeywordService.findSearchKeywords(category, term, max ?: 15) as JSON)
     }
 
