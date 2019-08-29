@@ -3,9 +3,6 @@
     <head>
 	<meta content="main" name="layout"/>
 	<title><g:if env="development">Grails Runtime Exception</g:if><g:else>Error</g:else></title>
-	<!--  <g:if env="development">
-	      <asset:stylesheet href="errors.css"/>
-	</g:if> -->
     </head>
 
     <body>
