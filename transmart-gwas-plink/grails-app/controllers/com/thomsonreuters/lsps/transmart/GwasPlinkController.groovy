@@ -1,9 +1,8 @@
 package com.thomsonreuters.lsps.transmart
 
 import com.thomsonreuters.lsps.transmart.jobs.GwasPlinkAnalysisJob
+import grails.converters.JSON
 import groovy.util.logging.Slf4j
-import org.codehaus.groovy.grails.web.json.JSONArray
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.core.io.Resource
 
 @Slf4j('logger')
@@ -33,8 +32,7 @@ class GwasPlinkController {
     }
 
     def loadScripts() {
-        JSONObject result = new JSONObject()
-        JSONArray rows = new JSONArray()
+	List<Map> rows = []
 
 	for (String script in scripts) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
@@ -48,11 +46,6 @@ class GwasPlinkController {
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
 	}
 
-        result.put('success', true)
-        result.put('totalCount', rows.size())
-        result.put('files', rows)
-
-        response.setContentType('text/json')
-        response.outputStream << result.toString()
+	render([success: true, totalCount: rows.size(), files: rows] as JSON)
     }
 }
