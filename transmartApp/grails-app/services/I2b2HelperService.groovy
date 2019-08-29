@@ -134,22 +134,27 @@ class I2b2HelperService implements InitializingBean {
     private List<String> survivalDataList
 
     /**
-     * Gets a distribution of information from the patient dimention table for value columns
+     * Gets a distribution of information from the patient dimension table for value columns
      */
     double[] getPatientDemographicValueDataForSubset(String col, String resultInstanceId) {
 	checkQueryResultAccess resultInstanceId
+
+        String authStudiesString = getSqlInString(getAuthorizedStudies())
 
         // NOTE: UGLY, UGLY CODE -  The sourcesystem_cd field, in the case that across trials data
         // exists, will be TrialId:SubjectId, where SubjectId is a unique subject id across trials.
 	List<Double> values = []
 	Set<String> idSet = []
 	String sql = '''
-			SELECT ''' + col + ''', sourcesystem_cd, patient_num
-			FROM I2B2DEMODATA.patient_dimension f
-			WHERE patient_num IN (
-               select distinct patient_num
-				from I2B2DEMODATA.qt_patient_set_collection
-		        where result_instance_id = ?)'''
+		SELECT ''' + col + ''', sourcesystem_cd, f.patient_num
+		FROM I2B2DEMODATA.patient_dimension f
+		JOIN patient_trial pt ON pt.patient_num = f.patient_num
+		WHERE
+		pt.trial IN (''' + authStudiesString + ''') AND
+		f.patient_num IN (
+		    select distinct patient_num
+		    from I2B2DEMODATA.qt_patient_set_collection
+		    where result_instance_id = ?)'''
 	eachRow(sql, [resultInstanceId]) { row ->
 	    String id = rowGet(row, 2, String)
 	    String code = rowGet(row, 1, String)
@@ -172,7 +177,6 @@ class I2b2HelperService implements InitializingBean {
      * Converts a concept key to a path
      */
     String keyToPath(String conceptKey) {
-	logger.trace 'keytoPath from key: {}', conceptKey
 	String fullname = conceptKey.substring(conceptKey.indexOf('\\', 2), conceptKey.length())
 	if (fullname.endsWith('\\')) {
 	    fullname
@@ -190,17 +194,45 @@ class I2b2HelperService implements InitializingBean {
     }
 
     /**
+     * Gets the trimmed last part of the display name from a concept key
+     */
+    def String getTrimmedNameFromKey(String conceptKey, int maxTrimmed = 125) {
+        String[] splits = conceptKey.split('\\\\');
+
+        String concept_name = ''
+        String node_name = ''
+        int fullName = 1
+        int nameLength
+
+        // skip 3 levels \\Top Node\ parse from repeated \Top Node\...
+        for(int i = (splits.length); i > 1; i--)  {
+            node_name = splits[i-1]
+            nameLength = concept_name.length() + node_name.length()
+            if(nameLength > maxTrimmed) {
+                concept_name = '...' + concept_name
+                fullName = 0
+                break
+            }
+
+            concept_name = '\\' + node_name + concept_name;
+        }
+
+        return concept_name;
+    }
+
+    /**
      * Gets the short display name from a concept key
      */
     String getShortNameFromKey(String conceptKey) {
-	conceptKey.split('\\\\')[-1]
+        String[] splits = conceptKey.split('\\\\');
+
+        String concept_name = splits[splits.length - 1]
     }
 
     /**
      * Gets the concept codes associated with a concept key (comma delimited string returned)
      */
     String getConceptCodeFromKey(String key) {
-	logger.trace 'Getting concept codes for key:{}', key
         String path = key.substring(key.indexOf('\\', 2), key.length())
         if (!path.endsWith('\\')) {
             path += '\\'
@@ -250,7 +282,6 @@ class I2b2HelperService implements InitializingBean {
      * Gets the level from a concept key (level indicates depth in tree)
      */
     private int getLevelFromKey(String key) {
-	logger.trace 'Getting level from key:{}', key
         String fullname = key.substring(key.indexOf('\\', 2), key.length())
         int res = 0
 	String sql = 'SELECT c_hlevel FROM i2b2metadata.i2b2 WHERE C_FULLNAME = ?'
@@ -262,7 +293,6 @@ class I2b2HelperService implements InitializingBean {
     }
 
     String getMarkerTypeFromConceptCd(String conceptCd) {
-	logger.trace 'Getting marker type from concept code:{}', conceptCd
 	String sql = '''
 			select dgi.marker_type
 			from I2B2DEMODATA.concept_dimension cd, DEAPP.de_gpl_info dgi
@@ -284,20 +314,14 @@ class I2b2HelperService implements InitializingBean {
      * Determines if a concept key is a value concept.
      */
     private boolean isValueConceptKey(String conceptKey) {
-        logger.trace '----------------- start isValueConceptKey'
-	logger.trace 'conceptKey: {}', conceptKey
 	if (isXTrialsConcept(conceptKey)) {
 	    AcrossTrialsOntologyTerm itemProbe = (AcrossTrialsOntologyTerm) conceptsResourceService.getByKey(conceptKey)
-	    logger.trace 'itemProbe.modifierDimension.valueType = {}', itemProbe.modifierDimension.valueType
 	    boolean xTrialsValueConcept = itemProbe.modifierDimension.valueType.equalsIgnoreCase('N')
-	    logger.trace 'isValueConceptKey returns {}', xTrialsValueConcept
             return xTrialsValueConcept
 	}
 
 	String conceptCode = getConceptCodeFromKey(conceptKey)
-	logger.trace 'conceptCode: {}', conceptCode
 	boolean ret = isValueConceptCode(conceptCode)
-	logger.trace 'isValueConceptKey returns {}', ret
 
 	ret
     }
@@ -364,8 +388,6 @@ class I2b2HelperService implements InitializingBean {
      * Gets the distinct patient counts for the children of a parent concept key
      */
     Map<String, Integer> getChildrenWithPatientCountsForConcept(String conceptKey) {
-        logger.debug '----------------- getChildrenWithPatientCountsForConcept'
-	logger.debug 'conceptKey = {}', conceptKey
 
 	String xTrialsTopNode = '\\\\' + ACROSS_TRIALS_TABLE_CODE + '\\' + ACROSS_TRIALS_TOP_TERM_NAME + '\\'
 	boolean xTrialsCaseFlag = isXTrialsConcept(conceptKey) || (conceptKey == xTrialsTopNode)
@@ -373,7 +395,6 @@ class I2b2HelperService implements InitializingBean {
 	Map<String, Integer> counts = [:]
 
         if (xTrialsCaseFlag) {
-	    logger.trace 'XTrials for getConceptDistributionDataForConcept'
 	    OntologyTerm node = conceptsResourceService.getByKey(conceptKey)
 	    for (OntologyTerm term in node.children) {
 		counts[term.fullName] = getObservationCountForXTrialsNode((AcrossTrialsOntologyTerm) term)
@@ -381,11 +402,9 @@ class I2b2HelperService implements InitializingBean {
         }
         else {
 	    String path = keyToPath(conceptKey)
-	    logger.trace 'Trying to get counts for parent_concept_path={}', path
 	    String sql = 'select * from I2B2DEMODATA.CONCEPT_COUNTS where parent_concept_path = ?'
 	    eachRow(sql, [path]) { row ->
 		String conceptPath = rowGet(row, 'concept_path', String)
-		logger.trace 'Found {}', conceptPath
 		counts[conceptPath] = rowGet(row, 'patient_count', Integer)
 	    }
         }
@@ -398,7 +417,6 @@ class I2b2HelperService implements InitializingBean {
      * for display in a distribution histogram
      */
     private List<Double> getConceptDistributionDataForValueConcept(String conceptCode) {
-	logger.trace 'Getting concept distribution data for value concept: {}', conceptCode
 	List<Double> values = []
 	String sql = 'SELECT NVAL_NUM FROM I2B2DEMODATA.OBSERVATION_FACT f WHERE CONCEPT_CD = ?'
 	eachRow(sql, [conceptCode]) { row ->
@@ -416,19 +434,16 @@ class I2b2HelperService implements InitializingBean {
      * for display in a distribution histogram for a given subset
      */
     private List<Double> getConceptDistributionDataForValueConcept(String conceptKey, String resultInstanceId) {
-        logger.debug '----------------- getConceptDistributionDataForValueConcept'
-	logger.debug 'Getting concept distribution data for value conceptKey, {}, with results_instance_id = {}',
-	    conceptKey, resultInstanceId
 
 	checkQueryResultAccess resultInstanceId
-	logger.trace 'Access assured'
 
 	boolean xTrialsCaseFlag = isXTrialsConcept(conceptKey)
-	logger.trace 'Check for xTrials case = {}', xTrialsCaseFlag
 
 	List<Double> values
 
-        if (xTrialsCaseFlag) {
+	String authStudiesString = getSqlInString(getAuthorizedStudies())
+
+	if (xTrialsCaseFlag) {
 	    values = fetchAcrossTrialsData(conceptKey, resultInstanceId)*.value as List<Double>
             }
         else {
@@ -454,26 +469,18 @@ class I2b2HelperService implements InitializingBean {
             }
 	}
 
-	logger.debug 'getConceptDistributionDataForValueConcept now finished: returning values n = {}', values.size()
-
 	values
     }
 
     List<Double> getConceptDistributionDataForValueConceptFromCode(String conceptCode, String resultInstanceId) {
-        logger.debug '----------------- getConceptDistributionDataForValueConceptFromCode'
-	logger.debug 'Getting concept distribution data for value conceptCode, {}, with results_instance_id = {}',
-	    conceptCode, resultInstanceId
 
 	checkQueryResultAccess resultInstanceId
-	logger.trace 'Access assured'
 
 	List<Double> values = []
 	if (!resultInstanceId) {
-	    logger.debug 'getConceptDistributionDataForValueConceptFromCode called with no result_istance_id'
 	    return getConceptDistributionDataForValueConcept(conceptCode)
         }
 
-	logger.trace 'Getting concept distribution data for value concept code:{}', conceptCode
 	String sql = '''
 		SELECT NVAL_NUM
 		FROM I2B2DEMODATA.OBSERVATION_FACT f
@@ -489,9 +496,6 @@ class I2b2HelperService implements InitializingBean {
 	    }
         }
 
-	logger.debug 'getConceptDistributionDataForValueConceptFromCode now finished: returning values n = {}',
-	    values.size()
-
 	values
     }
 
@@ -501,7 +505,7 @@ class I2b2HelperService implements InitializingBean {
     int getPatientSetSize(String resultInstanceId) {
 	checkQueryResultAccess resultInstanceId
 
-	logger.debug 'getPatientSetSize : resultInstanceId = {}', resultInstanceId
+        String authStudiesString = getSqlInString(getAuthorizedStudies())
 
         // original code counted split_part(pd.sourcesystem_cd , ':', 2)
         // but this is a postgres-only built-in function
@@ -511,7 +515,9 @@ class I2b2HelperService implements InitializingBean {
                 SELECT DISTINCT pd.sourcesystem_cd AS subject_id
 			FROM I2B2DEMODATA.qt_patient_set_collection ps
 			JOIN I2B2DEMODATA.patient_dimension pd ON ps.patient_num=pd.patient_num
+                    JOIN patient_trial pt ON pt.patient_num = ps.patient_num
                 WHERE ps.result_instance_id = CAST(? AS numeric)
+                AND pt.trial IN (''' + authStudiesString + ''')
             ) patient_set'''
 
 	int i = 0
@@ -527,9 +533,6 @@ class I2b2HelperService implements InitializingBean {
      */
     int getPatientSetIntersectionSize(String resultInstanceId1, String resultInstanceId2) {
 	checkQueryResultAccess resultInstanceId1, resultInstanceId2
-
-	logger.debug 'Getting patient set intersection - resultInstanceId1 = {}, resultInstanceId2 = {}',
-	    resultInstanceId1, resultInstanceId2
 
         // original code counted split_part(pd.sourcesystem_cd , ':', 2)
         // but this is a postgres-only built-in function
@@ -575,15 +578,12 @@ class I2b2HelperService implements InitializingBean {
      * Determines if a concept code is a value concept code or not by checking the metadata xml
      */
     boolean isValueConceptCode(String conceptCode) {
-	logger.trace 'Checking isValueConceptCode for code:{}', conceptCode
 	String sql = 'SELECT C_METADATAXML FROM I2B2METADATA.I2B2 WHERE C_BASECODE = ?'
         String xml = ''
 	eachRow(sql, [conceptCode]) { row ->
 	    def clob = rowGet(row, 'c_metadataxml', Object)
-	    logger.trace 'checking metadata xml:{}', clob
 	    xml = clobToString(clob)
 	}
-	logger.trace 'METADATA XML:{}', xml
 
 	nodeXmlRepresentsValueConcept xml
     }
@@ -596,7 +596,6 @@ class I2b2HelperService implements InitializingBean {
      * @return true if i2b2metadata.i2b2.c_visualattributes equals 'LAH' for the given concept code
      */
     boolean isHighDimensionalConceptCode(String conceptCode) {
-	logger.info 'Checking isHighDimensionalConceptCode for code:{}', conceptCode
 	boolean res = false
 	String sql = 'SELECT C_VISUALATTRIBUTES FROM I2B2METADATA.I2B2 WHERE C_BASECODE = ?'
 	eachRow(sql, [conceptCode]) { row ->
@@ -618,7 +617,6 @@ class I2b2HelperService implements InitializingBean {
 
     Map<String, Integer> getConceptDistributionDataForConcept(String conceptKey,
 	                                                      String resultInstanceId) throws SQLException {
-        logger.debug '----------------- start getConceptDistributionDataForConcept'
 	checkQueryResultAccess resultInstanceId
 
 	boolean xTrialsCaseFlag = isXTrialsConcept(conceptKey)
@@ -626,16 +624,13 @@ class I2b2HelperService implements InitializingBean {
 
 	Map<String, Integer> results = [:]
 
-	logger.trace 'input conceptKey = {}', conceptKey
 	if (leafNodeFlag) {
 	    conceptKey = getParentConceptKey(conceptKey)
         }
-	logger.trace 'lookup conceptKey = {}', conceptKey
 
 	OntologyTerm node = conceptsResourceService.getByKey(conceptKey)
 
         if (xTrialsCaseFlag) {
-	    logger.trace 'XTrials for getConceptDistributionDataForConcept'
 	    for (OntologyTerm term in node.children) {
 		results[term.name] = getObservationCountForXTrialsNode(
 		    (AcrossTrialsOntologyTerm) term, resultInstanceId)
@@ -657,7 +652,6 @@ class I2b2HelperService implements InitializingBean {
             }
         }
 
-	logger.debug 'getConceptDistributionDataForConcept - returns {}', results
 	results
     }
 
@@ -683,14 +677,9 @@ class I2b2HelperService implements InitializingBean {
     }
 
     private int getObservationCountForXTrialsNode(AcrossTrialsOntologyTerm termNode, String resultInstanceId) {
-        logger.debug '--------  start getObservationCountForXTrialsNode'
-	logger.debug '---------- case: termNode and resultInstanceId'
-	logger.debug 'termNode.name = {}', termNode.name
 	checkQueryResultAccess resultInstanceId
 
 	List<String> modifierList = getAllXTrialsLeafNodes(termNode)*.code
-
-	logger.trace 'modifierList = {}; resultInstanceId = {}', modifierList, resultInstanceId
 
         // original code counted split_part(pd.sourcesystem_cd , ':', 2)
         // but this is a postgres-only built-in function
@@ -716,15 +705,11 @@ class I2b2HelperService implements InitializingBean {
     }
 
     private int getObservationCountForXTrialsNode(AcrossTrialsOntologyTerm termNode) {
-	logger.debug '-------- start getObservationCountForXTrialsNode'
-	logger.debug '--------------------------- case: termNode only'
-        
+        String authStudiesString = getSqlInString(getAuthorizedStudies())
 	List<String> modifierList = getAllXTrialsLeafNodes(termNode)*.code
 	if (!modifierList) {
 	    return 0
 	}
-
-	logger.trace 'For case NOT using resultInstanceId; modifierList = {}', modifierList
 
         // original code counted split_part(pd.sourcesystem_cd , ':', 2)
         // but this is a postgres-only built-in function
@@ -733,7 +718,10 @@ class I2b2HelperService implements InitializingBean {
                 SELECT DISTINCT pd.sourcesystem_cd AS subject_id
 			FROM I2B2DEMODATA.observation_fact f
 			JOIN I2B2DEMODATA.patient_dimension pd ON f.patient_num=pd.patient_num
-			WHERE f.modifier_cd in (''' + listToIN(modifierList) + ''')
+                    JOIN patient_trial pt ON pt.patient_num = f.patient_num
+			WHERE
+                    pt.trial IN (''' + authStudiesString + ''') AND
+                    f.modifier_cd in (''' + listToIN(modifierList) + ''')
                     AND f.concept_cd != 'SECURITY'
 		) subjectList'''
 		
@@ -765,8 +753,6 @@ class I2b2HelperService implements InitializingBean {
      */
     private int getObservationCountForConceptForSubset(String conceptKey, String resultInstanceId) {
 	checkQueryResultAccess resultInstanceId
-
-	logger.trace 'Getting observation count for concept:{} and instance:{}', conceptKey, resultInstanceId
 
 	String fullname = conceptKey.substring(conceptKey.indexOf('\\', 2), conceptKey.length())
 	String fullnameLike = Utils.asLikeLiteral(fullname) + '%'
@@ -801,11 +787,9 @@ class I2b2HelperService implements InitializingBean {
 	                                                        String resultInstanceId, String subset) {
 	checkQueryResultAccess resultInstanceId
 
-	logger.trace 'Getting sampleCDs for patient number'
-	Map<Long, String> mapOfSampleCdsByPatientNum = buildMapOfSampleCdsByPatientNum(resultInstanceId)
+        String authStudiesString = getSqlInString(getAuthorizedStudies())
 
-	logger.trace 'Adding patient demographic data to grid with result instance id:{} and subset: {}',
-	    resultInstanceId, subset
+	Map<Long, String> mapOfSampleCdsByPatientNum = buildMapOfSampleCdsByPatientNum(resultInstanceId)
 
         //if i have an empty table structure so far
 	if (!table.columns) {
@@ -826,13 +810,15 @@ class I2b2HelperService implements InitializingBean {
 			FROM I2B2DEMODATA.patient_dimension p
 			INNER JOIN I2B2DEMODATA.patient_trial t ON p.patient_num = t.patient_num
 			WHERE p.PATIENT_NUM IN (
-				SELECT DISTINCT patient_num
-				FROM I2B2DEMODATA.qt_patient_set_collection
-				WHERE result_instance_id=?
+				SELECT DISTINCT ps.patient_num
+				FROM I2B2DEMODATA.qt_patient_set_collection ps
+                        JOIN patient_trial pt ON pt.patient_num = ps.patient_num
+				WHERE
+                            pt.trial IN (''' + authStudiesString + ''') AND
+                            result_instance_id=?
 			)
 		) I
 		ORDER BY I.PATIENT_NUM'''
-	logger.trace 'Initial grid query: {}, riid: {}', sql, resultInstanceId
 
 	eachRow(sql, [resultInstanceId]) { row ->
 	    // If I already have this subject mark it in the subset column as belonging to both subsets
@@ -924,26 +910,22 @@ class I2b2HelperService implements InitializingBean {
      * Adds a column of data to the grid export table
      */
     ExportTableNew addConceptDataToTable(ExportTableNew table, String conceptKey, String resultInstanceId) {
-	checkQueryResultAccess resultInstanceId
+	//checkQueryResultAccess resultInstanceId
 
-	if (pathIsBlacklisted(conceptKey)) {
+        ExportColumn hascol
+
+        if (pathIsBlacklisted(conceptKey)) {
 	    return table
 	}
 
-	logger.debug '----------------- start addConceptDataToTable <<<<<< <<<<<< <<<<<<'
-	logger.trace 'conceptKey = {}', conceptKey
-
 	boolean leafConceptFlag = isLeafConceptKey(conceptKey)
-	logger.trace 'is Leaf Concept key: {}', leafConceptFlag
-
 	boolean xTrialsCaseFlag = isXTrialsConcept(conceptKey)
-	logger.trace 'is XTrials case = {}', xTrialsCaseFlag
 
 	// As the column headers only show the (in many cases ambiguous) leaf part of the concept path,
 	// showing the full concept path in the tooltip is much more informative.
-	// As no tooltip text is passed on to the GridView code, the value of the string columnid is used
+	// As no tooltip text is passed on to the GridView code, the value of the string columnId is used
 	// and shown as the tooltip text when hoovering over the column header in GridView.
-	// Explicitly passing a tooltip text to the GridView code removes the necessity to use this columnid value.
+	// Explicitly passing a tooltip text to the GridView code removes the necessity to use this columnId value.
 	// Removal of some undesired non-alpha-numeric characters from tooltip string
 	// prevents display errors in GridView (drop down menu, columns not showing or cells not being filled).
 
@@ -952,17 +934,20 @@ class I2b2HelperService implements InitializingBean {
 	String columnTooltip = keyToPath(conceptKey).replaceAll('[^a-zA-Z0-9_\\-\\\\]+', '_')
 
         if (leafConceptFlag) {
-            logger.debug '----------------- this is a Leaf Node'
-
 	    boolean valueLeafNodeFlag = isValueConceptKey(conceptKey)
 	    String columnType = valueLeafNodeFlag ? 'number' : 'string'
 
-	    // add the subject and columnid column to the table if its not there
+	    // add the subject and columnId column to the table if its not there
 	    if (table.getColumn('subject') == null) {
 		table.putColumn 'subject', new ExportColumn('subject', 'Subject', '', 'string')
             }
+
+	    hascol = table.getColumnByBasename(columnName); // check existing column with same basename
+
 	    if (table.getColumn(columnId) == null) {
 		table.putColumn columnId, new ExportColumn(columnId, columnName, '', columnType, columnTooltip)
+                if(hascol)
+                    table.setColumnUnique(columnId); // make labels unique by expanding
             }
 
             if (xTrialsCaseFlag) {
@@ -979,11 +964,7 @@ class I2b2HelperService implements InitializingBean {
             // Check whether the folder is valid: first find all children of the current code
 	    OntologyTerm item = conceptsResourceService.getByKey(conceptKey)
 
-            logger.debug '----------------- this is Folder Node'
-	    logger.trace 'conceptKey = {}; children? {}', conceptKey, (item.children as boolean)
-
             if (!item.children) {
-		logger.trace 'Can not show data in gridview for empty node: {}' + conceptKey
 		return table
             }
 
@@ -998,21 +979,25 @@ class I2b2HelperService implements InitializingBean {
 	    }
 
 	    if (any) {
-		logger.trace 'Can not show data in gridview for folder nodes with mixed type of children'
 		return table
             }
-
-            logger.debug '----------------- all folder child nodes are categorical leaf nodes'
 
 	    // add the subject column to the table if it's not there
 	    if (table.getColumn('subject') == null) {
 		table.putColumn 'subject', new ExportColumn('subject', 'Subject', '', 'string')
 	    }
 
-	    addFolderConceptDataToTable table, conceptKey, resultInstanceId, item, xTrialsCaseFlag
+            hascol = table.getColumnByBasename(columnName); // check existing column with same basename
+
+            if (table.getColumn(columnId) == null) {
+                table.putColumn(columnId, new ExportColumn(columnId, columnName, '', columnType,columnTooltip));
+                if(hascol)
+                    table.setColumnUnique(columnId); // make labels unique by expanding
+            }
+
+ 	    addFolderConceptDataToTable table, conceptKey, resultInstanceId, item, xTrialsCaseFlag
         }
 
-	logger.debug '----------------- end addConceptDataToTable >>>>>> >>>>>> >>>>>>'
 	table
     }
 
@@ -1039,14 +1024,11 @@ class I2b2HelperService implements InitializingBean {
         }
 
 	if (!xTrialsCaseFlag) {
-            logger.debug '----------------- this is Folder Node - single study case'
 	    addSingleTrialFolderConceptDataToTable table, resultInstanceId, item, expandFolderIntoColumns, columnId
 	    return
 	}
 
-	logger.trace '----------------- this is Folder Node - xTrials case'
 	for (OntologyTerm child in item.children) {
-	    logger.trace 'Child key code: {}', child.key
 	    conceptKey = child.key
 	    insertAcrossTrialsConceptDataIntoTable columnId, conceptKey, resultInstanceId, table
 	}
@@ -1082,8 +1064,6 @@ class I2b2HelperService implements InitializingBean {
 	    }
         }
 
-	logger.trace 'Children concepts: {}', conceptCodes
-
         // Determine the patients to query
 	List<Long> patientIds = QtPatientSetCollection.executeQuery('''
 		SELECT q.patient.id
@@ -1091,9 +1071,8 @@ class I2b2HelperService implements InitializingBean {
 		WHERE q.resultInstance.id = ?''',
 		[resultInstanceId.toLong()]) as List<Long>
 
-            // If nothing is found, return
-            if (!concepts || !patientIds) {
-            logger.debug 'no concept; no parentIds'
+        // If nothing is found, return
+        if (!concepts || !patientIds) {
             return
         }
 
@@ -1106,7 +1085,6 @@ class I2b2HelperService implements InitializingBean {
 	hql += hqlBatched(splitIntoBatches(patientIds), args, 'o.patient.id', 'patientIds')
 	hql += ')'
 	List<Object[]> results = ObservationFact.executeQuery(hql, args) as List<Object[]>
-	    logger.trace 'results length: {}', results.length
 
 	for (Object[] result in results) {
 	    // If I already have this subject mark it in the subset column as belonging to both subsets
@@ -1163,15 +1141,9 @@ class I2b2HelperService implements InitializingBean {
 	String conceptCode = getConceptCodeFromKey(conceptKey)
 	String column
         if (valueLeafNodeFlag) {
-            logger.debug '----------------- this is a value Leaf Node'
-	    logger.debug 'conceptKey = {}; conceptCode = {}', conceptKey, conceptCode
-
-	    logger.trace 'resultInstanceId = {}', resultInstanceId
 	    column = 'NVAL_NUM'
         }
         else {
-	    logger.debug '----------------- this is a non-value, categorical, Leaf Node'
-	    logger.debug 'conceptKey = {}; conceptCode = {}', conceptKey, conceptCode
 	    column = 'TVAL_CHAR'
 	}
 
@@ -1204,8 +1176,6 @@ class I2b2HelperService implements InitializingBean {
 
     private void insertConceptDataIntoTable(String columnId, String conceptKey,
 	                                    String resultInstanceId, ExportTableNew table) {
-        logger.debug '----------------- insertConceptDataIntoTable'
-	logger.debug 'for columnid = {}', columnId
 	for (Map map in fetchConceptData(conceptKey, resultInstanceId)) {
 	    String subject = map.subject
 	    String value = map.value as String
@@ -1222,24 +1192,20 @@ class I2b2HelperService implements InitializingBean {
     }
 
     private List<Map> fetchAcrossTrialsData(String conceptKey, String resultInstanceId) {
-        logger.debug '----------------- fetchAcrossTrialsData'
 
 	boolean valueLeafNodeFlag = isValueConceptKey(conceptKey)
 	List<Map> dataList = []
 
+	String authStudiesString = getSqlInString(getAuthorizedStudies())
+
 	AcrossTrialsOntologyTerm itemProbe = (AcrossTrialsOntologyTerm) conceptsResourceService.getByKey(conceptKey)
 	String modifierCode = itemProbe.modifierDimension.code
 
-	logger.debug 'conceptKey = {}; modifierCode = {}; resultInstanceId = {}',
-	    conceptKey, modifierCode, resultInstanceId
-
 	String column
         if (valueLeafNodeFlag) {
-            logger.debug '----------------- this is a value Leaf Node'
 	    column = 'NVAL_NUM'
         }
         else {
-	    logger.debug '----------------- this is a non-value, categorical, Leaf Node'
 	    column = 'TVAL_CHAR'
 	}
 
@@ -1249,9 +1215,11 @@ class I2b2HelperService implements InitializingBean {
 			WHERE modifier_cd = ?
                     AND concept_cd != 'SECURITY'
 			AND PATIENT_NUM IN (
-				select distinct patient_num
-				from I2B2DEMODATA.qt_patient_set_collection
-				where result_instance_id = ?
+				select distinct ps.patient_num
+				from I2B2DEMODATA.qt_patient_set_collection ps
+                        	JOIN patient_trial pt ON pt.patient_num = ps.patient_num
+				where pt.trial IN (''' + authStudiesString + ''') AND 
+				result_instance_id = ?
 			)'''
 
 	eachRow(sql, [modifierCode, resultInstanceId]) { row ->
@@ -1265,8 +1233,6 @@ class I2b2HelperService implements InitializingBean {
 
     private void insertAcrossTrialsConceptDataIntoTable(String columnId, String conceptKey,
 	                                                String resultInstanceId, ExportTableNew table) {
-	logger.debug '----------------- insertAcrossTrialsConceptDataIntoTable <<<< ---- <<<<<'
-
 	for (Map map in fetchAcrossTrialsData(conceptKey, resultInstanceId)) {
 	    String subject = map.subject
 	    String value = map.value as String
@@ -1282,7 +1248,6 @@ class I2b2HelperService implements InitializingBean {
 		table.putRow subject, newrow
             }
         }
-        logger.debug '----------------- insertAcrossTrialsConceptDataIntoTable >>>>> ---- >>>>>>'
     }
 
     /**
@@ -1290,9 +1255,8 @@ class I2b2HelperService implements InitializingBean {
      */
     Map<String, Integer> getPatientDemographicDataForSubset(String col, String resultInstanceId) {
 
-	logger.trace 'in getPatientDemographicDataForSubset ...'
-	logger.trace 'args: col = {}, resultInstanceId = {}', col, resultInstanceId
 	checkQueryResultAccess resultInstanceId
+	String authStudiesString = getSqlInString(getAuthorizedStudies())
 
 	Map<String, Integer> results = [:]
 
@@ -1305,8 +1269,11 @@ class I2b2HelperService implements InitializingBean {
 			FROM I2B2DEMODATA.qt_patient_set_collection ps
 			JOIN I2B2DEMODATA.patient_dimension pd
                 ON ps.patient_num=pd.patient_num AND result_instance_id = ?
+                JOIN patient_trial pt ON pt.patient_num = ps.patient_num
+                WHERE pt.trial IN (''' + authStudiesString + ''')
         ) base
-		GROUP BY cat'''
+		GROUP BY cat
+		ORDER BY cat'''
 
 	eachRow(sql, [resultInstanceId]) { row ->
 	    String cat = rowGet(row, 0, String)
@@ -1324,8 +1291,6 @@ class I2b2HelperService implements InitializingBean {
      */
     private List<String> getConceptKeysInSubset(String resultInstanceId) {
 
-	logger.trace 'called getConceptKeysInSubset'
-
 	List<String> concepts = []
 	String sql = '''
 		SELECT REQUEST_XML
@@ -1337,7 +1302,6 @@ class I2b2HelperService implements InitializingBean {
         String xmlrequest = ''
 	eachRow(sql, [resultInstanceId]) { row ->
 	    xmlrequest = clobToString(rowGet(row, 'request_xml', Object))
-	    logger.trace 'REQUEST_XML:{}', xmlrequest
 
 	    Document doc = parseXml(xmlrequest)
 	    NodeList nodes = (NodeList) newXPath().evaluate('//item/item_key', doc, XPathConstants.NODESET)
@@ -1381,7 +1345,6 @@ class I2b2HelperService implements InitializingBean {
         // In the current ETL, deapp.de_xtrial_child_map, is not populated!
 
 	// get all distinct  concepts for analysis from both subsets into map
-	logger.debug 'lookupParentConcept {}', conceptPath
         try {
 	    String sql = '''
 			select parent_cd
@@ -1407,12 +1370,10 @@ class I2b2HelperService implements InitializingBean {
 	Set<String> childConcepts = []
 
         if (parentConcept == null) {
-	    logger.debug 'lookupChildConcepts called with parentConcept==null'
             return (childConcepts)
         }
 
 	if (!resultInstanceId1 && !resultInstanceId2) {
-	    logger.debug 'empty resultInstanceId fields'
             return (childConcepts)
         }
 
@@ -1462,9 +1423,6 @@ class I2b2HelperService implements InitializingBean {
 	Set<String> finalSet = []
 	Set<String> parentSet = []
 
-	logger.debug 'getDistinctConceptSet called with arguments: {} and {}',
-	    resultInstanceId1, resultInstanceId2
-
 	if (resultInstanceId1) {
 	    workingSet.addAll getConceptKeysInSubset(resultInstanceId1)
         }
@@ -1484,7 +1442,6 @@ class I2b2HelperService implements InitializingBean {
             }
         }
 
-	logger.debug 'getDistinctConceptSet returning set: {}', finalSet
 	finalSet
     }
 
@@ -1492,15 +1449,12 @@ class I2b2HelperService implements InitializingBean {
      * Gets the request xml for query def id
      */
     String getQueryDefinitionXMLFromQID(String qid) {
-	logger.trace 'Called getQueryDefinitionXMLFromQID'
 
         String xmlrequest = ''
 	String sqlt = '''select REQUEST_XML from I2B2DEMODATA.QT_QUERY_MASTER WHERE QUERY_MASTER_ID = ?'''
 	eachRow(sqlt, [qid]) { row ->
 	    def clob = rowGet(row, 'REQUEST_XML', Object)
-	    logger.trace 'in xml query {}', clob
 	    xmlrequest = clobToString(clob)
-	    logger.trace 'Request XML:{}', xmlrequest
 	}
 
 	xmlrequest
@@ -1510,7 +1464,6 @@ class I2b2HelperService implements InitializingBean {
      * Gets the request xml for a result instance id
      */
     private String getQueryDefinitionXML(String resultInstanceId) {
-	logger.trace 'Called getQueryDefinitionXML'
         String xmlrequest = ''
 
 	String sql = '''
@@ -1521,9 +1474,7 @@ class I2b2HelperService implements InitializingBean {
 		WHERE RESULT_INSTANCE_ID = ?'''
 	eachRow(sql, [resultInstanceId]) { row ->
 	    def clob = rowGet(row, 'REQUEST_XML', Object)
-	    logger.trace 'in xml query {}', clob
 	    xmlrequest = clobToString(clob)
-	    logger.trace 'Request XML:{}', xmlrequest
 	}
 
 	xmlrequest
@@ -1618,8 +1569,6 @@ class I2b2HelperService implements InitializingBean {
 
         String xmlrequest = getQueryDefinitionXML(resultInstanceId)
 
-	logger.trace 'Request XML:{}', xmlrequest
-
 	Document doc = parseXml(xmlrequest)
 	NodeList nodes = (NodeList) newXPath().evaluate('//item/item_key', doc, XPathConstants.NODESET)
 
@@ -1633,7 +1582,6 @@ class I2b2HelperService implements InitializingBean {
 	    if (conceptcds) {
 		concepts << conceptcds
 	    }
-	    logger.trace 'Found Concept_CDs: {} for key: {}', conceptcds, key
         }
 
 	concepts
@@ -1643,15 +1591,12 @@ class I2b2HelperService implements InitializingBean {
 
 	String xmlrequest = getQueryDefinitionXML(resultInstanceId)
 
-	logger.trace 'Request XML:{}', xmlrequest
-
 	List<String> concepts = []
 	Document doc = parseXml(xmlrequest)
 	NodeList nodes = (NodeList) newXPath().evaluate('//item/item_key', doc, XPathConstants.NODESET)
 	for (int i = 0; i < nodes.length; i++) {
 	    //should only return the exact concept_cd not the children
 	    String conceptcds = getConceptCodeFromKey(nodes.item(i).textContent)
-	    logger.trace 'found concept code:{}', conceptcds
 	    concepts << conceptcds
         }
 
@@ -1728,8 +1673,6 @@ class I2b2HelperService implements InitializingBean {
 
 		String query = createMRNAHeatmapBaseQuery(pathwayName, ids1, ids2, timepoint1,
 							  timepoint2, sample1, sample2, intensityType)
-		logger.debug 'mRNA heatmap query: {}', query
-
 		StringBuilder s = new StringBuilder()
 
 		StringBuilder cs = new StringBuilder()
@@ -1797,7 +1740,6 @@ class I2b2HelperService implements InitializingBean {
 		StringBuilder s = new StringBuilder()
 		String query = createRBMHeatmapQuery(pathwayName, ids1, ids2, timepoint1,
 						     timepoint2, rbmPanels1, rbmPanels2)
-		logger.debug 'RBM heatmap query: {}', query
 		List<GroovyRowResult> rows = new Sql(dataSource).rows(query, numColumnsClosure)
 
                 // create header
@@ -1824,8 +1766,6 @@ class I2b2HelperService implements InitializingBean {
             else if (datatype.toUpperCase() == 'PROTEIN') {
                 String query = createProteinHeatmapQuery(pathwayName, ids1, ids2,
 							 concepts1, concepts2, timepoint1, timepoint2)
-		logger.debug 'Protein heatmap query: {}', query
-
 		StringBuilder s = new StringBuilder()
 		List<GroovyRowResult> rows = new Sql(dataSource).rows(query, numColumnsClosure)
 
@@ -3578,8 +3518,6 @@ class I2b2HelperService implements InitializingBean {
     private String createRBMHeatmapQuery(String prefix, String ids, String pathwayName,
 	                                 String timepoint, String rbmPanels) {
 
-	logger.debug 'Pathway: {}', pathwayName
-
 	StringBuilder s = new StringBuilder()
 
 	if (timepoint) {
@@ -3604,7 +3542,6 @@ class I2b2HelperService implements InitializingBean {
 
 	if (pathwayName && !'SHOWALLANALYTES'.equalsIgnoreCase(pathwayName)) {
 	    String genes = getGenes(pathwayName)
-	    logger.debug 'Genes obtained for given pathway: {}', genes
 	    s << ' AND t1.gene_id IN (' << genes << ')'
         }
 
@@ -3614,18 +3551,10 @@ class I2b2HelperService implements InitializingBean {
     private String createProteinHeatmapQuery(String prefix, String pathwayName,
                                              String ids, String concepts, String timepoint) {
 
-	logger.debug 'createProteinHeatmapQuery called with concepts = {}', concepts
-
-	logger.debug 'createProteinHeatmapQuery created sql object'
-
 	String sql = '''
 			SELECT COUNT(*) as N
 			FROM DEAPP.DE_SUBJECT_SAMPLE_MAPPING
 			WHERE concept_code IN (''' + quoteCSV(concepts) + ')'
-
-	logger.debug 'createProteinHeatmapQuery created cntQuery = {}', sql
-
-	logger.debug 'createProteinHeatmapQuery defined cnt = {}', sql
 
 	int count = 0
 	new Sql(dataSource).query(sql) { ResultSet rs ->
@@ -3633,8 +3562,6 @@ class I2b2HelperService implements InitializingBean {
 		count = rs.toRowResult().N as int
             }
         }
-
-	logger.debug 'createProteinHeatmapQuery executed query to get count: {}', count
 
         StringBuilder s = new StringBuilder()
 
@@ -3705,10 +3632,7 @@ class I2b2HelperService implements InitializingBean {
     private String createProteinHeatmapQuery(String pathwayName, String ids1, String ids2, String concepts1,
 	                                     String concepts2, String timepoint1, String timepoint2) {
 
-	logger.debug 'Protein: called with ids1={} and ids2={}', ids1, ids2
-
         String columns = listHeatmapColumns('component', ids1, ids2, 'S1_', 'S2_') + ', star'
-	logger.debug 'Protein SELECT: {}', columns
 
 	String s1 = null
 	if (ids1) {
@@ -3720,7 +3644,6 @@ class I2b2HelperService implements InitializingBean {
         }
 
 	String subjects = getSubjectIds1(ids1, ids2, 'S1_', 'S2_') + ", '*' as star"
-	logger.debug 'Protein Pivot: {}', subjects
 
 	String sql
 	if (s1) {
@@ -3748,10 +3671,7 @@ class I2b2HelperService implements InitializingBean {
     private String createRBMHeatmapQuery(String pathwayName, String ids1, String ids2, String timepoint1,
 	                                 String timepoint2, String rbmPanels1, String rbmPanels2) {
 
-	logger.debug 'RBM: called with ids1={} and ids2={}', ids1, ids2
-
         String columns = listHeatmapColumns('antigen_name', ids1, ids2, 'S1_', 'S2_') + ', star'
-	logger.debug 'SELECT: {}', columns
 
 	String s1 = null
 	if (ids1) {
@@ -3762,7 +3682,6 @@ class I2b2HelperService implements InitializingBean {
 	    s2 = createRBMHeatmapQuery('S2_', ids2, pathwayName, timepoint2, rbmPanels2)
 	}
 	String subjects = getSubjectIds1(ids1, ids2, 'S1_', 'S2_') + ", '*' as star"
-	logger.debug 'RBM: {}', subjects
 
 	String sql
 	if (s1) {
@@ -3820,8 +3739,6 @@ class I2b2HelperService implements InitializingBean {
     private String createMRNAHeatmapBaseQuery(String pathwayName, String ids1, String ids2,
 	                                      String timepoint1, String timepoint2, String sample1,
 	                                      String sample2, String intensityType, boolean count = false) {
-
-	logger.debug 'mRNA: called with ids1={} and ids2={}', ids2
 
 	String columns = count ? ' COUNT(*) ' :
 	    listHeatmapColumns('probeset', ids1, ids2, 'S1_', 'S2_') + ', star'
@@ -3952,7 +3869,6 @@ class I2b2HelperService implements InitializingBean {
 	boolean okToUseValues = false
 	String normalunits = ''
 	if (xml) {
-	    logger.trace xml
             try {
 		Document doc = parseXml(xml)
 		XPath xpath = newXPath()
@@ -3974,7 +3890,6 @@ class I2b2HelperService implements InitializingBean {
     List<String> getGenesForHaploviewFromResultInstanceId(String resultInstanceId) {
 	checkQueryResultAccess resultInstanceId
 
-	logger.debug 'getting genes for happloview'
 	List<String> genes = []
 	String sql = '''
                 select distinct gene
@@ -3984,7 +3899,6 @@ class I2b2HelperService implements InitializingBean {
                 order by gene asc'''
 	eachRow(sql, [resultInstanceId as Long]) { row ->
 	    String gene = rowGet(row, 'gene', String)
-	    logger.trace 'IN ROW ITERATOR; Found:{}', gene
 	    genes << gene
         }
 
@@ -4058,6 +3972,49 @@ class I2b2HelperService implements InitializingBean {
 	}
 
 	false
+    }
+
+    /**
+     * Gets a list of studies the user is authorized to view
+     */
+    List<String> getAuthorizedStudies() {
+        boolean admin = securityService.principal().isAdminOrDseAdmin()
+        Map<String,String>  allStudies = getAllStudiesWithTokens()
+        Map<String, String> tokenmap = getSecureTokensWithAccessForUser()
+        List<String> authStudies = []
+
+        if (admin) {
+            allStudies.each { key, value ->
+                authStudies << key
+            }
+        }
+        else {
+            allStudies.each { key, value ->
+                if (value == 'EXP:PUBLIC') {
+                    authStudies<< key
+                } else if (tokenmap.containsKey('EXP:' + key)) {
+                    authStudies << key
+                }
+            }
+        }
+        return authStudies
+    }
+
+    String getSqlInString(inList) {
+        if (inList.getAt(0).isNumber())
+            return inList.join(',')
+        else
+            return inList.collect{"'$it'"}.join(',')
+    }
+
+    Map<String,String> getAllStudiesWithTokens() {
+        def studies = [:]
+        Sql sql = new Sql(dataSource)
+        String sqlt = 'SELECT sourcesystem_cd, secure_obj_token FROM i2b2metadata.i2b2_secure WHERE c_hlevel = 1'
+        sql.eachRow(sqlt, [], { row ->
+            studies.put(row.sourcesystem_cd, row.secure_obj_token);
+        })
+        return studies;
     }
 
     /**
@@ -4701,20 +4658,26 @@ class I2b2HelperService implements InitializingBean {
 
     List<String> trialsForResultSet(String resultInstanceId) {
 	checkQueryResultAccess resultInstanceId
+        Map<String, String> trials = [:]
+        List<String> authTrials = []
 
-	List<String> trials = []
 	String sql = '''
-		SELECT distinct trial
+		SELECT distinct trial, SECURE_OBJ_TOKEN
 		FROM I2B2DEMODATA.patient_trial pt
 		JOIN I2B2DEMODATA.qt_patient_set_collection psc
                     ON pt.patient_num=psc.patient_num
             WHERE psc.result_instance_id = ?
 				ORDER BY trial'''
 	eachRow(sql, [resultInstanceId]) { row ->
-	    trials << rowGet(row, 'trial', String)
+	    trials << [rowGet(row, 'trial', String), rowGet(row, 'secure_obj_token', String)]
 	}
 
-	trials
+        def trialsAccess = getAccess(trials, user)
+        trialsAccess.each { trial, access ->
+            if (access != 'Locked')
+                authTrials << trial
+        }
+	authTrials
     }
 
     private XPath newXPath() {
