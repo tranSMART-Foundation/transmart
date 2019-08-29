@@ -25,15 +25,15 @@ class MetacoreEnrichmentService implements InitializingBean {
     private String metacoreUrl
 
     @Value('${com.thomsonreuters.transmart.metacoreDefaultLogin:}')
-    private String metacoreDefaultLogin
+    private String metacoreLogin
 
     @Value('${com.thomsonreuters.transmart.metacoreDefaultPassword:}')
-    private String metacoreDefaultPassword
+    private String metacorePassword
 
     private Map<String, String> defaultMetacoreParams
 
     boolean systemMetacoreSettingsDefined() {
-	metacoreUrl && metacoreDefaultLogin && metacoreDefaultPassword
+	metacoreUrl && metacoreLogin && metacorePassword
     }
 
     boolean areSettingsConfigured() {
@@ -77,7 +77,7 @@ class MetacoreEnrichmentService implements InitializingBean {
     }
 
     Map<String, String> getMetacoreParams() {
-	if (!(defaultMetacoreParams.baseUrl && defaultMetacoreParams.login && defaultMetacoreParams.password)) {
+	if (!(defaultMetacoreParams?.baseUrl && defaultMetacoreParams?.login && defaultMetacoreParams?.password)) {
 	    defaultMetacoreParams = null
 	}
 
@@ -201,8 +201,8 @@ class MetacoreEnrichmentService implements InitializingBean {
 
     void afterPropertiesSet() {
 	defaultMetacoreParams = [
-	    baseUrl : metacoreUrl,
-	    login   : metacoreDefaultLogin,
-	    password: metacoreDefaultPassword].asImmutable()
+	    baseUrl : getSetting('metacoreUrl'),
+	    login   : getSetting('metacoreLogin'),
+	    password: getSetting('metacorePassword')].asImmutable()
     }
 }
