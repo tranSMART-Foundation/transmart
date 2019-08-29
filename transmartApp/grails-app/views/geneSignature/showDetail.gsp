@@ -2,8 +2,7 @@
 <html>
     <head>
 	<title>Gene Signature</title>
-	<asset:image rel="shortcut icon" href="transmart.ico"/>
-	<asset:link rel="icon" href="images/transmart.ico"/>
+	<asset:link rel="icon" href="transmart.ico" type="text.x-icon"/>
 	<asset:stylesheet href="main.css"/>
 	<asset:stylesheet href="ext/resources/css/ext-all.css"/>
 	<asset:stylesheet href="ext/resources/css/xtheme-gray.css"/>
