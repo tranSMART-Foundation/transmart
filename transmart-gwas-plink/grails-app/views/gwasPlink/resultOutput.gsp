@@ -21,6 +21,6 @@
     </g:else>
     <g:if test="${zipLink != null && zipLink.size() > 0}">
         <br />
-        <a class='AnalysisLink' href="${resource(file: zipLink)}" class="downloadLink">Download PLINK results</a>
+        <a class='AnalysisLink' href="${request.getContextPath()}${zipLink}" class="downloadLink">Download PLINK results</a>
     </g:if>
 </form>
