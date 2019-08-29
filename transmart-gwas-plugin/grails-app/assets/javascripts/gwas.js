@@ -1,7 +1,5 @@
 var REGION_DELIMITER = "^";
 
-console.log("defining gwas.js");
-
 //This function will kick off the webservice that generates the QQ plot.
 function gwasLoadQQPlot(analysisID) {
 	jQuery('#qqplot_results_' + analysisID).empty().addClass('ajaxloading');
@@ -712,7 +710,6 @@ function gwasShowSearchResults(tabToShow)	{
 		}
 	}
 	
-	console.log('gwas gwasShowSearchResults tab '+tabToShow);
 	// call method which retrieves facet counts and search results
 	gwasShowFacetResults(tabToShow);
 	
@@ -743,7 +740,6 @@ function gwasUpdateNodeIndividualFacetCount(node, count) {
 
 //Method to clear the facet results in the search tree
 function gwasClearFacetResults()	{
-    console.log('gwasClearFacetResults: getTree')
 	jQuery("#gwas-filter-div").dynatree();
 	var tree = jQuery("#gwas-filter-div").dynatree("getTree");
 	
@@ -765,7 +761,6 @@ function gwasClearFacetResults()	{
 //Method to load the facet results in the search tree and populate search results panel
 function gwasShowFacetResults(tabToShow)	{
 	
-	console.log('gwas showFacetResults '+tabToShow);
 	var savedSearchTermsArray;
 	var savedSearchTerms;
 	
@@ -810,11 +805,9 @@ function gwasShowFacetResults(tabToShow)	{
 		}
 	}
  
-	console.log('gwasShowFacetResults: getTree')
 	jQuery("#gwas-filter-div").dynatree();
-	var tree = jQuery("#gwas-filter-div").dynatree("getTree");
-
-	// create an array of the categories that come from the tree
+    var tree = jQuery("#gwas-filter-div").dynatree("getTree");
+    // create an array of the categories that come from the tree
 	var treeCategories = new Array();
 	tree.visit(  function(node) {
 		if (node.data.isCategory)  {
@@ -917,10 +910,15 @@ function gwasShowFacetResults(tabToShow)	{
                 if (html.indexOf("solrConnection") > -1) {
                     userMessage = "Server error - cannot connect to SOLR on the tranSMART server - is it running?"
                 }
-                userMessage = 'Error!  Status = ' + xhr.status + "; " + userMessage
-                alert(userMessage)
-                console.log(userMessage);
-                jQuery('#results-div').html(userMessage)
+                if(xhr.status == 200) {
+                    jQuery('#results-div').html('<i>No results to display</i>')
+		}
+		else {
+		    userMessage = 'Error!  Status = ' + xhr.status + "; " + userMessage
+                    alert(userMessage)
+                    console.log(userMessage);
+                    jQuery('#results-div').html(userMessage)
+		}
             }
     });
  }
@@ -974,7 +972,6 @@ function gwasAddSearchTerm(searchTerm, noUpdate)	{
 	var treeUpdated = false
 	
 	// find all nodes in tree with this key, and select them
-    console.log('gwasAddSearchTerm: getTree')
 	jQuery("#gwas-filter-div").dynatree();
 	var tree = jQuery("#gwas-filter-div").dynatree("getTree");
 	tree.visit(  function selectNode(node) {
@@ -989,14 +986,12 @@ function gwasAddSearchTerm(searchTerm, noUpdate)	{
 	// only refresh results if the tree was not updated (the onSelect also fires these event, so don't want to do 2x)
 	if (!treeUpdated && !noUpdate) {
 	    gwasShowSearchTemplate();
-	    console.log('gwasAddSearchTerm calling gwasShowSearchResults');
 	    gwasShowSearchResults();
 	}
 }
 
 function gwasUpdateSearch() {
     gwasShowSearchTemplate();
-    console.log('gwasUpdateSearch calling gwasShowSearchResults');
     gwasShowSearchResults();
 }
 
@@ -1029,7 +1024,6 @@ function gwasRemoveSearchTerm(ctrl,isPvalue)	{
 	var treeUpdated = false
 
 	// find all nodes in tree with this key and deSelect
-    console.log('gwasRemoveSearchTerm: getTree')
 	jQuery("#gwas-filter-div").dynatree();
 	var tree = jQuery("#gwas-filter-div").dynatree("getTree");
 
@@ -1044,7 +1038,6 @@ function gwasRemoveSearchTerm(ctrl,isPvalue)	{
 	// only refresh results if the tree was not updated (the onSelect also fires these event, so don't want to do 2x)
 	if (!treeUpdated) {
 	    gwasShowSearchTemplate();
-	    console.log('gwasRemoveSearchTerm calling gwasShowSearchResults');
 	    gwasShowSearchResults();
 	}
 }
@@ -3255,7 +3248,6 @@ function gwasClearSearch()	{
 	document.getElementById("search-categories").selectedIndex = 0;
 	jQuery('#search-ac').autocomplete('option', 'source', gwasSourceURL);
 		
-    console.log('gwasClearSearch: getTree')
 	jQuery("#gwas-filter-div").dynatree();
 	var tree = jQuery("#gwas-filter-div").dynatree("getTree");
 	
@@ -3271,7 +3263,6 @@ function gwasClearSearch()	{
 	allowOnSelectEvent = true;
 	
 	gwasShowSearchTemplate();
-	    console.log('gwasClearSearch calling gwasShowSearchResults');
 	gwasShowSearchResults(); //reload the full search results
 	
 }
@@ -3352,7 +3343,6 @@ function gwasSubtractNodes(nodes1, nodes2)  {
 }
 
 jQuery.ui.dynatree.nodedatadefaults["icon"] = false;
-console.log("about to call jQuery dynatree using gwasTreeURL")
 
 jQuery(function(){
     jQuery("#gwas-filter-div").dynatree({
@@ -3468,7 +3458,6 @@ jQuery(function(){
      	// Following call executes the gwasSyncNode function on all nodes in tree, except for root
      	node.tree.visit(gwasSyncNode, false); 
      	gwasShowSearchTemplate();
-	 console.log('gwas ... calling gwasShowSearchResults');
      	gwasShowSearchResults();        	
      },
      onClick: function(node, event) {
