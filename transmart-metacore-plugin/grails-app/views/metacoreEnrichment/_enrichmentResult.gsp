@@ -1,7 +1,7 @@
 <div class="enrichment" id="${prefix}metacoreEnrichmentResults" style="display: none">
-<table class="enrichment" id="${prefix}enrichment" width="100%" cellspacing="0" cellpadding="2">
+    <table class="enrichment" id="${prefix}enrichment" width="100%" cellspacing="0" cellpadding="2">
 	<tr>
-	<thead>
+	    <thead>
 		<th width="30">#</th>
 		<th>Name</th>
 		<th width="450" id="${prefix}scale"></th>
@@ -10,5 +10,5 @@
 	</tr>
 	</thead>
 	<tbody></tbody>
-</table>
+    </table>
 </div>
