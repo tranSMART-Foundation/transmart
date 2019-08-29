@@ -37,9 +37,7 @@ function highDimensionalConceptDropped(node, filter) {
 }
 
 function omicsFilterInfoReceived(result, request) {
-    console.log('omicsFilterInfoReceived result ' + result.responseText);
     omics_filter_info = JSON.parse(result.responseText);
-    omics_filter_info.filter = (omics_filter_info.filter == "true");
     if (omics_filter_info.filter_type != 'VCF') {
         Ext.Ajax.request({
             url: pageInfo.basePath + "/highDimensionFilter/filterDialog",
@@ -66,6 +64,7 @@ function omicsFilterInfoReceived(result, request) {
 }
 
 function omicsFilterWindowReceived(result, request) {
+
     var tabpanel = jQuery("#resultsTabPanel");
     var top = tabpanel.offset().top + tabpanel.height() / 2 - setvaluewin.height / 1.5;
     var left = tabpanel.offset().left + tabpanel.width() / 2 - setvaluewin.width / 2;
@@ -147,7 +146,6 @@ function addOmicsFilterAutocomplete() {
                 url: omics_filter_info.auto_complete_source,
                 dataType: "json",
                 data: {
-
                     term : request.term == '' ? '%' : request.term,
                     concept_key : omics_filter_info.concept_key,
                     search_property : jQuery("#highdimension-search-property").find("option:selected").val()
@@ -450,12 +448,12 @@ function showConceptDistributionHistogramForOmicsFilterComplete(result)
     var hist_div = jQuery("[id^=highdimension-filter-histogram]");
 
     if (result == null) {
-        //
         input_fields.prop('disabled', true);
         projection_select.prop('disabled', true);
         sliders.slider('option','disabled', true);
         return hist_div.html("<div class='x-mask-loading'><div class='conceptDistributionPlaceholder'/></div>");
     }
+
     var data = [];
     try {
         // grails JSON converter seems to print NaN and Infinity in JSON output, these are not JSON tokens so
