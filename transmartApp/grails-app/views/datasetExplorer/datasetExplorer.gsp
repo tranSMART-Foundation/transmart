@@ -7,8 +7,7 @@
 
 	<title>Dataset Explorer</title>
 
-	<asset:link href="transmart.ico" rel="shortcut icon" type="image/x-ico" />
-	<asset:link href="transmart.ico" rel="icon" type="image/x-ico" />
+	<asset:link href="transmart.ico" rel="icon" type="image/x-icon" />
 
 	<!-- Include jQuery, Ext and app-specific scripts: -->
 	<asset:stylesheet href="folderManagement.css"/>
