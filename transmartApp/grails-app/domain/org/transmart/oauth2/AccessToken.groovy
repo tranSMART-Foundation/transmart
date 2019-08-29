@@ -18,7 +18,7 @@ class AccessToken {
 
     static constraints = {
         additionalInformation nullable: true
-	authentication minSize: 1, maxSize: 1024 * 4
+	authentication minSize: 1, maxSize: 1024 * 32
 	authenticationKey blank: false, unique: true
 	clientId blank: false
 	refreshToken nullable: true

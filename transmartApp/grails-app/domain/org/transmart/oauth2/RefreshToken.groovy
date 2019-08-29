@@ -12,7 +12,7 @@ class RefreshToken {
     }
 
     static constraints = {
-	authentication minSize: 1, maxSize: 1024 * 4
+	authentication minSize: 1, maxSize: 1024 * 32
 	expiration nullable: true
 	value blank: false, unique: true
     }

@@ -7,7 +7,7 @@ class AuthorizationCode {
 
     static constraints = {
 	code blank: false, unique: true
-	authentication minSize: 1, maxSize: 1024 * 4
+	authentication minSize: 1, maxSize: 1024 * 32
     }
 
     static mapping = {
