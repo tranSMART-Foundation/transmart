@@ -6,8 +6,8 @@
 	<asset:stylesheet href="adminTab.css"/>
 
 	<asset:javascript src="jquery-plugin.js"/>
-	<asset:javascript src="extjs.min.js"/>
-	<asset:javascript src="session_time.js"/>
+<%--	<asset:javascript src="extjs.min.js"/> --%>
+<%--	<asset:javascript src="session_time.js"/> --%>
 	<asset:javascript src="adminTab.js"/>
 
 	<script type="text/javascript">
