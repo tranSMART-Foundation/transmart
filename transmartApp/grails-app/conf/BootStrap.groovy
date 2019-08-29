@@ -48,104 +48,101 @@ class BootStrap {
 	    logger.warn 'com.recomdata.transmart.data.export.rScriptDirectory should not be explicitly set, value "{}" ignored', val
 	}
 
-	File tsAppRScriptsDir = null
+	File tmAppRScriptsDir = null
 
 	// Find and copy or define directory for dataExportRscripts
-	// 1. Check parameter org.transmartproject.rmodules.deployment.dataexportRscripts
+	// 1. Check parameter RModules.deployment.dataexportRscripts
 	//    If found, copy scripts to this directory
 	// 2. Find production scripts in war file path
 	// 3. Find source directory if in development
 
-	String desRval = config.org.transmartproject.rmodules.deployment.dataexportRscripts
-	if (desRval) {
-	    // 1. Found parameter
-	    logger.info('Copy to org.transmartproject.rmodules.deployment.dataexportRscripts {}',
-			 config.org.transmartproject.rmodules.deployment.dataexportRscripts)
-	}
+	String desRval = config.RModules.deployment.dataexportRscripts
 
-	logger.info('Searching for dataExportRScripts in paths')
-	logger.info('servletContext.getRealPath("/"): {}', servletContext.getRealPath('/'))
-	logger.info('servletContext.getRealPath("/")../: {}', servletContext.getRealPath('/')+'../')
-	logger.info('servletContext.getResource("/")?.file: {}', servletContext.getResource('/')?.file)
-	logger.info('"webapps" + servletContext.contextPath: {}', 'webapps' + servletContext.contextPath)
-	logger.info('"web-app/": {}', 'web-app/')
-	String basePath = [
-	    servletContext.getRealPath('/'),
-	    servletContext.getRealPath('/') + '../',
-	    servletContext.getResource('/')?.file,
-	    'webapps' + servletContext.contextPath,
-	    'web-app/'
-	].find { String s ->
-	    s && (tsAppRScriptsDir = new File(s, 'dataExportRScripts')).isDirectory()
-	}
-	if (tsAppRScriptsDir && tsAppRScriptsDir.isDirectory()) {
-	    logger.info('basePath found dataExportRscripts directory {}', tsAppRScriptsDir.canonicalPath)
-	}
+	String pluginRmodules
+	String versionRmodules
+	String pluginSmartR
+	String pluginFractalis
+	String versionSmartR
+	String versionFractalis
 
-	try { // find location of data export R scripts
-	    if (Environment.current == Environment.PRODUCTION) {
-		logger.info('config.org.transmartproject.rmodules.deployment.dataexportRscripts {}',
-			    config.org.transmartproject.rmodules.deployment.dataexportRscripts)
-		File targetDirectory = config.org.transmartproject.rmodules.deployment.dataexportRscripts as File
-		logger.info('running in a production environment, try copyResources to {}', targetDirectory.canonicalPath)
-		if (copyResources('WEB-INF/dataExportRscripts', targetDirectory)) {
-		    logger.info('copyResources succeeded')
-		    tsAppRScriptsDir = targetDirectory
-		}
-	    } else {	// non-production environment
-		tsAppRScriptsDir = new File("src/main/resources/dataExportRScripts")
-		logger.info('Not in production environment, look for Rscripts in {}', tsAppRScriptsDir.canonicalPath)
+	File rmodulesScriptDir
+
+	// find plugin names
+        grailsApplication.mainContext.pluginManager.allPlugins.each {
+	    if(it.name == 'rdcRmodules' || it.name == 'rdc-rmodules') {
+		pluginRmodules = it.name
+		versionRmodules = it.version
+		logger.warn 'pluginRmodules found: {} version {}', pluginRmodules, versionRmodules
 	    }
-
-	    if (!tsAppRScriptsDir || !tsAppRScriptsDir.isDirectory()) {
-                throw new RuntimeException('Could not determine directory for dataExportRScripts')
+	    if(it.name == 'smartR' || it.name == 'smart-r') {
+		pluginSmartR = it.name
+		versionSmartR = it.version
+		logger.warn 'pluginSmartR found: {} version {}', pluginSmartR, versionSmartR
 	    }
-	    config.com.recomdata.transmart.data.export.rScriptDirectory = tsAppRScriptsDir.canonicalPath
-	    logger.info('com.recomdata.transmart.data.export.rScriptDirectory = "{}"',
-			config.com.recomdata.transmart.data.export.rScriptDirectory)
-        } catch(Exception e) {
-	    logger.warn('No location found for com.recomdata.transmart.data.export.rScriptDirectory: {}', e.message)
-        }
-
-	if (!tsAppRScriptsDir || !tsAppRScriptsDir.isDirectory()) {
-	    logger.warn('Could not find dataExportRscripts directory by name, trying parameters')
-	}
-	if (tsAppRScriptsDir && tsAppRScriptsDir.isDirectory()) {
-	    logger.info('Found dataExportRscripts directory {}', tsAppRScriptsDir.canonicalPath)
+	    if(it.name == 'transmartFractalis' || it.name == 'transmart-fractalis') {
+		pluginFractalis = it.name
+		versionFractalis = it.version
+		logger.warn 'pluginFractalis found: {} version {}', pluginFractalis, versionFractalis
+	    }
 	}
 
-        try { // find location of R scripts of RModules
+        try { // find location of R scripts of Rmodules, SmartR, Fractalis
 
-            def rmoduleScriptDir
+	    // Rmodules scripts are in an Rscripts directory
+	    // We need to point to them so that scripts can be launched
 
             if (Environment.current == Environment.PRODUCTION) {
-                def targetDirectory = config.org.transmartproject.rmodules.deployment.rscripts as File
-                if (copyResources('WEB-INF/Rscripts', targetDirectory)) {
-                    rmoduleScriptDir = targetDirectory
+		String sourceRscriptsPath = "plugins/rdc-rmodules-" + versionRmodules + '/Rscripts'
+                File targetRscriptsDirectory = config.RModules.deployment.rscripts as File
+                if (copyResources(sourceRscriptsPath, targetRscriptsDirectory)) {
+                    rmodulesScriptDir = targetRscriptsDirectory
                 }
             } else {
-                rmoduleScriptDir = new File('../Rmodules/src/main/resources/Rscripts')
+                rmodulesScriptDir = new File('../Rmodules/web-app/Rscripts')
             }
 
-            if (!rmoduleScriptDir || !rmoduleScriptDir.isDirectory()) {
-                throw new RuntimeException('Could not determine property for Rscript directory')
-            }
-
-            config.RModules.pluginScriptDirectory = rmoduleScriptDir.absolutePath
-            logger.info('RModules.pluginScriptDirectory = {}', config.RModules.pluginScriptDirectory)
+	    config.RModules.pluginScriptDirectory = rmodulesScriptDir.absolutePath
 
         } catch(Exception e) {
             logger.warn('No location found for RModules.pluginScriptDirectory: {}', e.message)
         }
 
-	// At this point we assume config.RModules exists
+
+	try { // find location of data export R scripts
+	    if (Environment.current == Environment.PRODUCTION) {
+		File targetExportDirectory = config.RModules.deployment.dataexportRscripts as File
+		if (copyResources('WEB-INF/dataExportRscripts', targetExportDirectory)) {
+		    logger.info('copyResources succeeded')
+		    tmAppRScriptsDir = targetExportDirectory
+		}
+	    } else {	// non-production environment
+		tmAppRScriptsDir = new File("src/main/resources/dataExportRScripts")
+	    }
+
+	    if (!tmAppRScriptsDir || !tmAppRScriptsDir.isDirectory()) {
+                throw new RuntimeException('Could not determine directory for dataExportRScripts')
+	    }
+
+	    config.com.recomdata.transmart.data.export.rScriptDirectory = tmAppRScriptsDir.canonicalPath
+
+        } catch(Exception e) {
+	    logger.warn('No location found for com.recomdata.transmart.data.export.rScriptDirectory: {}', e.message)
+        }
+
+	if (!tmAppRScriptsDir || !tmAppRScriptsDir.isDirectory()) {
+	    logger.warn('Could not find dataExportRscripts directory by name, trying parameters')
+	}
+
+	// Default values
+	// make sure configuration values are defined
+	// set default values if they are missing
+
+ 	// At this point we assume config.RModules exists
 	if (!config.RModules.containsKey('host')) {
 	    config.RModules.host = '127.0.0.1'
-	    logger.info('RModules.host fixed to localhost')
 	}
 	if (!config.RModules.containsKey('port')) {
 	    config.RModules.port = 6311
-	    logger.info('RModules.port fixed to default')
 	}
 
 	// Making sure we have default timeout and heartbeat values
@@ -192,14 +189,10 @@ class BootStrap {
 
     private boolean copyResources(String root, File targetDirectory) {
 	int ires = 0
-        logger.info('Copying resources from {} to {} ...', root, targetDirectory.absolutePath)
         ApplicationContext ctx = grailsApplication.getMainContext()
         def resources = ctx.getResources("${root}/**")
-	logger.info('resources from getMainContext size {}', resources.size())
-	logger.info('resources class {}', resources.getClass())
         try {
             if (!targetDirectory.exists()) {
-                logger.info('Creating directory {}', targetDirectory.absolutePath)
                 targetDirectory.mkdirs()
             }
 	    int iref = 0;
@@ -207,32 +200,21 @@ class BootStrap {
 		ires++
                 def resource = res as ServletContextResource
                 String filePath = resource.path - ('/' + root + '/')
-		logger.info('copyResource resource {}/{}', ires, resources.size())
-		logger.info('copyResource resource.path {}', resource.path)
-		logger.info('copyResource filePath {}', filePath)
                 File target = new File(targetDirectory, filePath)
 		File targetPath = new File(target.canonicalPath)
 		File targetDir = targetPath.getParentFile()
-		logger.info('copyResource target {}', target.canonicalPath)
-		logger.info('copyResource targetPath {}', targetPath.canonicalPath)
-                if (targetPath.exists()) {
-                    logger.info('Path already exists: {}', targetPath.absolutePath)
-                } else {
+                if (!targetPath.exists()) {
                     if (filePath.endsWith('/')) {
-                        logger.info('Creating directory {}', filePath.absolutePath)
                         target.mkdirs()
                     } else {
 			if(!targetDir.exists()){
-			    logger.info('Creating directory {} for new file', targetDir)
 			    targetDir.mkdirs()
 			}
-			logger.info('Creating file {}', target)
                         target.createNewFile()
                         if (!target.canWrite()) {
                             logger.error('File {} not writeable', target.absolutePath)
                             return false
                         } else {
-                            logger.info('Copying resource: {} to {}', resource.path, target.absolutePath)
                             target.withOutputStream { out_s ->
                                 out_s << resource.inputStream
                                 out_s.flush()
