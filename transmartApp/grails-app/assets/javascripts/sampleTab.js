@@ -6,7 +6,7 @@
 
 // require jquery-plugin.js
 // require extjs.min.js
-// require session_time.js
+//= require session_time.js
 
 //= require myJobs.js
 //= require sampleExplorer/sampleExplorerMenu.js
