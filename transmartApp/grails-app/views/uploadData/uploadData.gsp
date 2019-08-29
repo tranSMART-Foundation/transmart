@@ -4,8 +4,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-	<asset:image rel="shortcut icon" href="transmart.ico"/>
-	<asset:link rel="icon" href="images/transmart.ico"/>
+	<asset:link href="transmart.ico" rel="icon" type="image/x-icon"/>
 
 	<asset:stylesheet href="ext/resources/css/ext-all.css"/>
 	<asset:stylesheet href="ext/resources/css/xtheme-gray.css"/>
@@ -25,13 +24,15 @@
 	<![endif]-->
 		
         <asset:javascript src="jquery-plugin.js"/>
+        <asset:javascript src="jquery-ui.js"/>
         <asset:javascript src="extjs.min.js"/>
         <asset:javascript src="session_time.js"/>
-        <asset:javascript src="adminTab.js"/>
-
-	<asset:javascript src="ext-prototype-adapter.js"/>
-	<script type="text/javascript">$j = jQuery.noConflict();</script>
 	<asset:javascript src="uploadDataTab.js"/>
+<%--        <asset:javascript src="adminTab.js"/> --%>
+
+<%--	<asset:javascript src="ext/adapter/prototype/ext-prototype-adapter-all.js"/> --%>
+	<script type="text/javascript">$j = jQuery.noConflict();</script>
+
 	<asset:javascript src="uploadData.js"/>
 
 	<script charset="utf-8">
