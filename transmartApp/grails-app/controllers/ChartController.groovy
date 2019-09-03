@@ -101,7 +101,7 @@ class ChartController {
 	    'Concept:' + concept_key
 
         // We retrieve the highdimension parameters from the client, if they were passed
-        Map omicsparams = [:]
+        Map omicsParams = [:]
         params.findAll { k, v ->
             k.startsWith("omics_")
         }.each { k, v ->
@@ -208,6 +208,12 @@ class ChartController {
         }
 
 	if (concept_key) {
+            Map omicsParams = [:]
+            params.findAll { k, v ->
+                k.startsWith("omics_")
+            }.each { k, v ->
+                omicsParams[k] = v
+            }
 	    if (omicsParams) {
 		omicsParams.concept_key = concept_key
 		if (s1) {

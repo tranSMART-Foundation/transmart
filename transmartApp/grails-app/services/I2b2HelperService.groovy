@@ -605,6 +605,15 @@ class I2b2HelperService implements InitializingBean {
 	res
     }
 
+    /**
+     * Check if a map contains all the keys an omics_params map should contain
+     * @param params the map to check
+     * @return True if the map contains all necessary keys, false otherwise
+     */
+    def Boolean isValidOmicsParams(Map params) {
+        ['omics_selector', 'omics_projection_type', 'omics_property', 'omics_selector'].every {params?.containsKey(it)}
+    }
+
     private boolean nodeXmlRepresentsValueConcept(String xml) {
 	if (!xml) {
 	    return false
@@ -932,10 +941,11 @@ class I2b2HelperService implements InitializingBean {
 	String columnId = encodeAsSHA1(conceptKey)
 	String columnName = conceptKey.split('\\\\')[-1].replace(' ', '_')
 	String columnTooltip = keyToPath(conceptKey).replaceAll('[^a-zA-Z0-9_\\-\\\\]+', '_')
+        String columnType
 
         if (leafConceptFlag) {
 	    boolean valueLeafNodeFlag = isValueConceptKey(conceptKey)
-	    String columnType = valueLeafNodeFlag ? 'number' : 'string'
+	    columnType = valueLeafNodeFlag ? 'number' : 'string'
 
 	    // add the subject and columnId column to the table if its not there
 	    if (table.getColumn('subject') == null) {

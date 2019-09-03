@@ -56,7 +56,7 @@ class ChartService {
 
     @Autowired private HighDimensionQueryService highDimensionQueryService
     @Autowired private I2b2HelperService i2b2HelperService
-    HighDimensionResourceService highDimensionResourceService
+    @Autowired private HighDimensionResourceService highDimensionResourceService
 
     Map<Object, Map> getSubsetsFromRequest(GrailsParameterMap params) {
 	String result_instance_id1 = params.result_instance_id1 ?: null
