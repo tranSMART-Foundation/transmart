@@ -13,7 +13,7 @@ new.packages <- missing.packages(required.packages);
 if (!length(new.packages))
 	q();
 if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+    install.packages("BiocManager", repos=Sys.getenv("CRAN_MIRROR"))
 BiocManager::install()
 #source("http://bioconductor.org/biocLite.R");
 biocmanager.packages <-
@@ -21,7 +21,7 @@ biocmanager.packages <-
 								  "snpStats", "preprocessCore", "GO.db",
 								  "AnnotationDbi", "QDNAseq"));
 if (length(biocmanager.packages))
-	biocManager::install(biocmanager.packages);
+	BiocManager::install(biocmanager.packages);
 # 1.10.0 version contains an important fix.
 # We still need to install the old package with biocLite first to install all dependencies.
 # For some reasons below installations does not take care of installing dependencies first.
