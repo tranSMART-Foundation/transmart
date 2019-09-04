@@ -157,7 +157,7 @@ class BoxPlotController {
 		
 		sb << '<span class="AnalysisHeader">Pairwise t-Test p-Values</span><br /><br />'
 
-		for (String line in matrixInStr.readLines) {
+		for (String line in matrixInStr.readLines()) {
 			if (line.contains('name=')) {
 				//Extract the name from the text file.
 				String nameValue = line.substring(line.indexOf('name=') + 5).trim()
