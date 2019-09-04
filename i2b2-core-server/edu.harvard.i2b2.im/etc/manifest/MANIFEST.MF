@@ -1,4 +1,0 @@
-Class-Path: IM-Server.jar
-
-
-
