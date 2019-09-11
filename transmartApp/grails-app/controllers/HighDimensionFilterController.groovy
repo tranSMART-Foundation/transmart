@@ -113,11 +113,12 @@ class HighDimensionFilterController {
     private static final Map<String, String> searchableAnnotationPropertiesDictionary =
 	[geneSymbol     : 'Gene Symbol',
 	 cytoband       : 'Cytoband',
-	 name           : ' Region Name',
+	 name           : 'Region Name',
 	 hmdbId         : 'HMDB ID',
 	 biochemicalName: 'Biochemical Name',
 	 probeId        : 'Probe ID',
 	 mirnaId        : 'miRNA ID',
+	 transcriptId   : 'transcript ID',
 	 uniprotName    : 'Uniprot Name',
 	 peptide        : 'Peptide',
 	 antigenName    : 'Antigen Name',
