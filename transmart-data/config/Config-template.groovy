@@ -42,6 +42,8 @@ ui {
             // Currently, it is only used in special cases
             analysisJobs.hide = true
             workspace.hide = false
+	    xnatEnabled.show = false
+	    genePatternEnabled = false
         }
     }
     /*
@@ -274,6 +276,8 @@ environments {
         // The working directory for R scripts, where the jobs get created and
         // output files get generated
         RModules.tempFolderDirectory = jobsDirectory
+	RModules.deployment.rscripts = "/tmp/Rscripts"
+	RModules.deployment.dataexportRscripts = "/tmp/dataexportRscripts"
     }
     development {
         RModules.tempFolderDirectory = "/tmp"
