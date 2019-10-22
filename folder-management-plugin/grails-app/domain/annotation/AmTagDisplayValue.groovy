@@ -32,7 +32,11 @@ class AmTagDisplayValue implements Serializable {
     }
 
     static Collection<AmTagDisplayValue> findAllDisplayValue(String subjectUid, long amTagItemId) {
-	findAllBySubjectUidAndAmTagItem subjectUid, AmTagItem.load(amTagItemId)
+	// This does not work - fails to search for amTagItem.id
+	// reverting to the previous syntax
+	// Collection<AmTagDisplayValue> retval = findAllBySubjectUidAndAmTagItem subjectUid, AmTagItem.load(amTagItemId)
+        findAll 'from AmTagDisplayValue where subjectUid=:subjectUid and amTagItem.id=:amTagItemId',
+                [subjectUid: subjectUid, amTagItemId: amTagItemId]
     }
 
     /**
