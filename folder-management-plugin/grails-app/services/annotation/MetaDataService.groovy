@@ -10,8 +10,6 @@ class MetaDataService {
     static transactional = false
 
     List<ConceptCode> getViewValues(String fieldValue) {
-	logger.debug 'MetaDataService.getViewValues called'
-
 	List<Long> list = []
 	for (uniqueId in fieldValue.split('\\|')) {
 	    Long bioDataId = BioData.findByUniqueId(uniqueId)?.id
@@ -20,6 +18,11 @@ class MetaDataService {
             }
         }
 
-	ConceptCode.getAll list
+	if(list.size > 0) {
+	    ConceptCode.getAll list
+	}
+	else {
+	    []
+	}
     }
 }
