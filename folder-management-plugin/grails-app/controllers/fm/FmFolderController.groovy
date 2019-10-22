@@ -111,8 +111,6 @@ class FmFolderController {
     }
 
     def createAnalysis() {
-        logger.info 'createAnalysis called'
-
 	FmFolder parentFolder = FmFolder.get(params.folderId)
 	FmFolder folder = new FmFolder(folderType: FolderType.ANALYSIS.name(), parent: parentFolder)
 
@@ -169,8 +167,10 @@ class FmFolderController {
 	FmFolder parentFolder = FmFolder.get(params.folderId)
 	FmFolder folder = new FmFolder(folderType: FolderType.STUDY.name(), parent: parentFolder)
 	AmTagTemplate amTagTemplate = AmTagTemplate.findByTagTemplateType(FolderType.STUDY.name())
+	Experiment experiment = new Experiment()
+	
 	render template: 'createStudy', model: [
-	    bioDataObject   : new Experiment(),
+	    bioDataObject   : experiment,
 	    folder          : folder,
 	    amTagTemplate   : amTagTemplate,
 	    metaDataTagItems: amTagItemService.getDisplayItems(amTagTemplate.id)]
@@ -403,21 +403,21 @@ class FmFolderController {
 	render(getFolder(FolderType.FOLDER.name(), params.parentPath) as XML)
     }
 
-    def getAnalysises() {
+    def getAnalyses() {
 	render(getFolder(FolderType.ANALYSIS.name(), params.parentPath) as XML)
     }
 
-    def getAssayes() {
+    def getAssays() {
 	render(getFolder(FolderType.ASSAY.name(), params.parentPath) as XML)
     }
 
-    //service to call to get all the children of a folder, regardless their type
+    //service to call to get all the children of a folder, regardless of their type
     //need a parameter parentId corresponding to the parent identifier
     def getAllChildren() {
 	render(fmFolderService.getChildrenFolder(params.parentId) as XML)
     }
 
-    //service to call to get all experiments objects that are associated with a folder in fm_folder_association table
+    //service to call to get all experiment objects that are associated with a folder in fm_folder_association table
     def getExperiments() {
         render(contentType: 'text/xml') {
             experiments {
@@ -619,7 +619,6 @@ class FmFolderController {
     }
 
     private List<FmFolder> getFolder(String folderType, String parentPath) {
-	logger.debug 'getFolder({}, {})', folderType, parentPath
 	if (!parentPath) {
 	    FmFolder.executeQuery('''
 			from FmFolder as fd
@@ -679,8 +678,8 @@ class FmFolderController {
                 }
             }
             else {
-		logger.debug 'COLUMN {} is not to display in grid', amTagItem.displayName                    }
-
+		logger.debug 'COLUMN {} is not to display in grid', amTagItem.displayName
+            }
         }
 
 	for (folderObject in folders) {
@@ -783,6 +782,7 @@ class FmFolderController {
 	List<String> vendors
 	List<BioAssayPlatform> platforms
         Map searchHighlight
+	String folderTypeName = "UNKNOWN"
 
         if (folderId) {
             folder = FmFolder.get(folderId)
@@ -793,7 +793,22 @@ class FmFolderController {
                     return
                 }
 
-                bioDataObject = getBioDataObject(folder)
+		if(folder.folderType.equalsIgnoreCase(FolderType.PROGRAM.name())) {
+		    folderTypeName = 'PROGRAM'
+		}
+		else if(folder.folderType.equalsIgnoreCase(FolderType.STUDY.name())){
+		    folderTypeName = 'STUDY'
+		}
+		else if(folder.folderType.equalsIgnoreCase(FolderType.FOLDER.name())){
+		    folderTypeName = 'FOLDER'
+		}
+		else if(folder.folderType.equalsIgnoreCase(FolderType.ANALYSIS.name())){
+		    folderTypeName = 'ANALYSIS'
+		}
+		else if(folder.folderType.equalsIgnoreCase(FolderType.ASSAY.name())){
+		    folderTypeName = 'ASSAY'
+		}
+		bioDataObject = getBioDataObject(folder)
                 metaDataTagItems = getMetaDataItems(folder, false)
 
                 //If the folder is a study, check for subject-level data being available
@@ -833,7 +848,9 @@ class FmFolderController {
 	    jSONForGrids             : jsonForGrids,
             subjectLevelDataAvailable: subjectLevelDataAvailable,
             searchHighlight          : searchHighlight,
-	    useMongo                 : enableMongo]
+	    useMongo                 : enableMongo,
+	    folderTypeName           : folderTypeName
+	]
     }
 
     def analysisTable() {
@@ -966,7 +983,6 @@ class FmFolderController {
         }
 
         if (!bioDataObject) {
-            logger.info 'Unable to find bio data object. Setting folder to the biodata object '
             bioDataObject = folder
         }
 

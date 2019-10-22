@@ -1,9 +1,7 @@
-%{--TODO remove GORM calls and other calls that require these imports and do the work anywhere else (e.g. a taglib)--}%
-<%@page import='annotation.AmTagDisplayValue' %>
-<%@page import='com.recomdata.util.FolderType' %>
-<%@page import='org.apache.commons.lang.StringUtils' %>
-<%@page import='org.transmart.biomart.BioData' %>
-<%@page import='org.transmart.biomart.ConceptCode' %>
+<%@ page import='annotation.AmTagDisplayValue' %>
+<%@ page import='org.apache.commons.lang.StringUtils' %>
+<%@ page import='org.transmart.biomart.BioData' %>
+<%@ page import='org.transmart.biomart.ConceptCode' %>
 
 <script>
     $j(document).ready(function() {  
@@ -33,53 +31,43 @@
     <div>
         <div style="float: right">
             <%-- Add buttons here depending on folder type --%>
-                
             <sec:ifAnyGranted roles='ROLE_ADMIN'>
-                <g:if test="${folder.folderType.equalsIgnoreCase(FolderType.PROGRAM.name())}">
+		<g:if test="${folderTypeName == 'PROGRAM'}">
                     <span name="${folder.id}" class="greybutton buttonicon addstudy">Add new study</span>
                     <span name="${folder.id}" class="greybutton buttonicon addfolder">Add new folder</span>
 		    <g:if test="S{grailsApplication.config.ui.browse.delete.allowprogram}">
 		        <span name="${folder.id}" data-parent="${folder.parentId}" class="greybutton buttonicon deletefolder">
-                            Delete this ${folder.folderType.toLowerCase()}</span>
+                            Delete this ${folderTypeName.toLowerCase()}</span>
                     </g:if>
                 </g:if>
 
-                <g:if test="${folder.folderType.equalsIgnoreCase(FolderType.STUDY.name())}">
+                <g:if test="${folderTypeName == 'STUDY'}">
                     <span name="${folder.id}" class="greybutton buttonicon addanalysis">Add new analysis</span>
                     <span name="${folder.id}" class="greybutton buttonicon addassay">Add new assay</span>
                     <span name="${folder.id}" class="greybutton buttonicon addfolder">Add new folder</span>
 		    <g:if test="S{grailsApplication.config.ui.browse.delete.allowstudy}">
 		        <span name="${folder.id}" data-parent="${folder.parentId}" class="greybutton buttonicon deletefolder">
-                            Delete this ${folder.folderType.toLowerCase()}</span>
+                            Delete this ${folderTypeName.toLowerCase()}</span>
 		    </g:if>
                 </g:if>
                         
-                <g:if test="${folder.folderType.equalsIgnoreCase(FolderType.FOLDER.name()) ||
-                            folder.folderType.equalsIgnoreCase(FolderType.ASSAY.name()) ||
-                            folder.folderType.equalsIgnoreCase(FolderType.ANALYSIS.name())}">
-		    <%-- drop adding analysis under a folder in a Study --%>
-		    <%--
-			<g:if test="${folder.folderType.equalsIgnoreCase(FolderType.FOLDER.name()) &&
-                                    folder.parent?.folderType.equalsIgnoreCase(FolderType.STUDY.name())}">
-                            <span name="${folder.id}" class="greybutton buttonicon addanalysis">Add new analysis</span>
-			</g:if>
-			--%>
-		    <g:if test="${folder.folderType.equalsIgnoreCase(FolderType.FOLDER.name())}">
+                <g:if test="${['FOLDER', 'ANALYSIS', 'ASSAY'].contains(folderTypeName)}">
+		    <g:if test="${folderTypeName == 'FOLDER'}">
                         <span name="${folder.id}" class="greybutton buttonicon uploadfiles">Upload files</span>
                     </g:if>
                     <span name="${folder.id}" class="greybutton buttonicon addfolder">Add new folder</span>
                     <span name="${folder.id}" data-parent="${folder.parentId}" class="greybutton buttonicon deletefolder">
-                        Delete this ${folder.folderType.toLowerCase()}</span>
+                        Delete this ${folderTypeName.toLowerCase()}</span>
                 </g:if>
             </sec:ifAnyGranted>
-        </div>
+          </div>
         <h3 class="rdc-h3">
             <g:if test="${searchHighlight?.title?.length() > 0}">
-                ${StringUtils.capitalize(folder?.folderType.toLowerCase())}: ${searchHighlight.title}
+                ${org.apache.commons.lang.StringUtils.capitalize(folderTypeName.toLowerCase())}: ${searchHighlight.title}
             </g:if>
             <g:else>
                 <g:if test="${folder?.hasProperty('folderName')}">
-                    ${StringUtils.capitalize(folder?.folderType.toLowerCase())}: ${folder.folderName}
+                    ${org.apache.commons.lang.StringUtils.capitalize(folderTypeName.toLowerCase())}: ${folder.folderName}
 	        </g:if>
             </g:else>
         </h3>
@@ -159,26 +147,26 @@
                                     <g:if test="${amTagItem.tagItemSubtype == 'PICKLIST'}">
                                         <%-- Split multiple values by pipe --%>
                                         <g:each in="${fValue.split('\\|')}" var='term' status='t'>
-                                            <g:set var='bioDataId' value="${BioData.findByUniqueId(term)?.id}"/>
+                                            <g:set var='bioDataId' value="${org.transmart.biomart.BioData.findByUniqueId(term)?.id}"/>
                                             <g:if test="${t > 0}"><br/>
                                             </g:if>
-                                            <g:if test="${bioDataId}">${ConceptCode.get(bioDataId).codeName}</g:if>
+                                            <g:if test="${bioDataId}">${org.transmart.biomart.ConceptCode.get(bioDataId).codeName}</g:if>
                                             <g:else>${term}</g:else>
                                         </g:each>
                                     </g:if>
                                     <g:elseif test="${amTagItem.tagItemSubtype == 'MULTIPICKLIST'}">
                                         <%-- Split multiple values by pipe --%>
                                         <g:each in="${fValue.split('\\|')}" var='term' status='t'>
-					    <g:set var='bioDataId' value="${BioData.findByUniqueId(term)?.id}"/>
+					    <g:set var='bioDataId' value="${org.transmart.biomart.BioData.findByUniqueId(term)?.id}"/>
                                             <g:if test="${t > 0}"><br/></g:if>
-                                            <g:if test="${bioDataId}">${ConceptCode.get(bioDataId).codeName}</g:if>
+                                            <g:if test="${bioDataId}">${org.transmart.biomart.ConceptCode.get(bioDataId).codeName}</g:if>
                                             <g:else>${term}</g:else>
                                         </g:each>
                                     </g:elseif>
                                     <g:else>${fValue}</g:else>
                                 </g:if>
                                 <g:else>
-                                    <g:set var='tagValues' value="${AmTagDisplayValue.findAllDisplayValue(folder.uniqueId,amTagItem.id)}"/>
+                                    <g:set var='tagValues' value="${annotation.AmTagDisplayValue.findAllDisplayValue(folder.uniqueId,amTagItem.id)}"/>
                                     <g:if test="${tagValues}">
                                         <g:each var='tagValue' status='k' in="${tagValues}">
                                             <g:if test="${k > 0 && tagValue.displayValue}"><br/>
@@ -216,8 +204,8 @@
     </g:each>
 
     <%-- If this is an analysis, provide a div for analysis data --%>
-    <g:if test="${folder.folderType.equalsIgnoreCase(FolderType.ANALYSIS.name())}">
-        <center>
+    <g:if test="${folderTypeName == 'ANALYSIS'}">
+      <center>
 	    <div id="partialanalysiswarning" class="messagebox" style="display: none;">
 		Displaying results from the first 1000 rows
 		<span id="analysisgenefilteredwarning" style="display: none;">, filtered by the gene search</span>.
