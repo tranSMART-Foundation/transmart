@@ -1,7 +1,7 @@
 KETTLE_VERSION=8.2
 KETTLE_ZIP=8.2.0.0-342
 
-TRANSMART_RELEASE_BRANCH=release-16.4
+TRANSMART_RELEASE_BRANCH=release-19.0
 
 UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
 				tar gfortran g++ unzip libreadline-dev \
@@ -10,7 +10,7 @@ UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
 
 UBUNTU14_PACKAGES=php5-cli php5-json openjdk-7-jdk
 UBUNTU16_PACKAGES=php7.0-cli php7.0-json
-UBUNTU18_PACKAGES=php7.2-cli php7.2-json
+UBUNTU18_PACKAGES=php7.2-cli php7.2-json libbz2-dev liblzma-dev libcurl4-openssl-dev
 
 # Latest version of groovy-binary
 GROOVY_VERSION=2.4.3
