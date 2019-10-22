@@ -1,5 +1,5 @@
 echo "----------------------------------------------------------------------------------"
-echo "|  This script will install transmart app and data on Ubuntu 14.04               |"
+echo "|  This script will install transmart app and data on Ubuntu 18.04               |"
 echo "----------------------------------------------------------------------------------"
 echo "|  Note: this script uses the 'sudo' command which will time out after           |"
 echo "|  15 minutes; because of this, when actions take longer then 15 minutes,        |"

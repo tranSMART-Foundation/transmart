@@ -4,7 +4,7 @@
 # 
 #************************************************************************************
 #  Script to load all that is needed to run an example/demo
-#  version of tranSMART 16.4
+#  version of tranSMART 19.0
 #************************************************************************************
 
 # set up with 
@@ -47,7 +47,7 @@ if ! [ -d "$SCRIPTS_BASE/Scripts" ] ; then
 	echo "  sudo apt-get update"
 	echo "  sudo apt-get install -y git"
 	echo "  git clone https://github.com/tranSMART-Foundation/transmart.git"
-	echo "  git checkout -b release-16.4"
+	echo "  git checkout -b release-19.0"
 	exit 1
 else
 	echo "Script directory found: $SCRIPTS_BASE/Scripts"
@@ -87,12 +87,12 @@ cd $INSTALL_BASE
 sudo -v
 sudo apt-get -q install -y curl
 sudo apt-get -q install -y unzip
-if ! [ -e transmart-data-release-16.4.zip ] ; then
-    curl http://library.transmartfoundation.org/release/release16_4_0_artifacts/transmart-data-release-16.4.zip --output transmart-data-release-16.4.zip
+if ! [ -e transmart-data-release-19.0.zip ] ; then
+    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
 fi
 if ! [ -e transmart-data ] ; then
-	unzip transmart-data-release-16.4.zip
-	mv transmart-data-release-16.4 transmart-data
+	unzip transmart-data-release-19.0.zip
+	mv transmart-data-release-19.0 transmart-data
 fi
 
 echo "Finished setting up the transmart-date folder at $(date)"
@@ -355,10 +355,10 @@ fi
 
 cd war-files
 if ! [ -e transmart.war ]; then
-    curl http://library.transmartfoundation.org/release/release16_4_0_artifacts/transmart.war --output transmart.war
+    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart.war --output transmart.war
 fi
 if ! [ -e gwava.war ]; then
-    curl http://library.transmartfoundation.org/release/release16_4_0_artifacts/gwava.war --output gwava.war
+    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/gwava.war --output gwava.war
 fi
 sudo cp *.war /var/lib/tomcat8/webapps/
 
