@@ -1,6 +1,5 @@
-%{--TODO move GORM calls anywhere else (e.g. a taglib)--}%
-<%@page import='annotation.AmTagDisplayValue' %>
-<%@page import='org.transmart.biomart.ConceptCode' %>
+<%@ page import='annotation.AmTagDisplayValue' %>
+<%@ page import='org.transmart.biomart.ConceptCode' %>
 
 <%
     // TODO this is crap - move logic that uses services to a taglib
@@ -26,13 +25,13 @@
                 <g:if test="${amTagItem.tagItemType == 'FIXED'}">
                     <g:if test="${amTagItem.tagItemAttr && bioDataObject?.hasProperty(amTagItem.tagItemAttr)}" >
                         <g:if test="${amTagItem.tagItemSubtype == 'PICKLIST'}">
-                            <g:select from="${ConceptCode.findAllByCodeTypeName(amTagItem.codeTypeName,[sort: 'codeName'])}"
+                            <g:select from="${org.transmart.biomart.ConceptCode.findAllByCodeTypeName(amTagItem.codeTypeName,[sort: 'codeName'])}"
                                       name="${amTagItem.tagItemAttr}" value="${fieldValue(bean:bioDataObject,field:amTagItem.tagItemAttr)}"
                                       optionKey="uniqueId" optionValue="codeName"  noSelection="['':'-Select One-']"/>
                         </g:if>
                         <g:elseif test="${amTagItem.tagItemSubtype == 'MULTIPICKLIST'}">
                             <g:set var='fValue' value="${fieldValue(bean:bioDataObject,field:amTagItem.tagItemAttr)}"/>
-                            <g:set var='displayValues' value="${metaDataService.getViewValues(fValue)}"/>
+                            <g:set var='displayValues' value="${metaDataService.getViewValues(fValue.toString())}"/>
                             <g:render template="extTagSearchField"
                                       model="[fieldName: amTagItem.tagItemAttr, codeTypeName: amTagItem.codeTypeName,
                                              searchAction: 'extSearch', searchController: 'metaData', values: displayValues]"/>
@@ -55,7 +54,7 @@
                     <g:if test="${!amTagItem.editable}">not editable CUSTOM</g:if>
                     <g:else>
                         <g:if test="${folder.uniqueId && amTagItem.id}">
-                            <g:set var="tagValues" value="${AmTagDisplayValue.findAllBySubjectUidAndAmTagItem(folder.uniqueId, amTagItem)}"/>
+                            <g:set var="tagValues" value="${annotation.AmTagDisplayValue.findAllBySubjectUidAndAmTagItem(folder.uniqueId, amTagItem)}"/>
                         </g:if>
                         <g:if test="${amTagItem.tagItemSubtype == 'FREETEXT'}">
                             <g:if test="${(tagValues ? tagValues[0].displayValue : '')?.length()<100}">
@@ -69,7 +68,7 @@
                             <g:textArea size="100" cols="74" rows="10" name="amTagItem_${amTagItem.id}" value="${tagValues ? tagValues[0].displayValue : ''}"/>
                         </g:elseif>
                         <g:elseif test="${amTagItem.tagItemSubtype == 'PICKLIST'}">
-                            <g:select from="${ConceptCode.findAllByCodeTypeName(amTagItem.codeTypeName, [sort: 'codeName'])}"
+                            <g:select from="${org.transmart.biomart.ConceptCode.findAllByCodeTypeName(amTagItem.codeTypeName, [sort: 'codeName'])}"
                                       name="amTagItem_${amTagItem.id}" value="${tagValues ? tagValues[0].objectUid : ''}"
                                       optionKey="uniqueId" optionValue="codeName" noSelection="['':'-Select One-']"/>
                         </g:elseif>
@@ -82,7 +81,7 @@
                 </g:elseif>
                 <g:else>
                     <g:if test="${folder.uniqueId && amTagItem.id}">
-                        <g:set var="tagValues" value="${AmTagDisplayValue.findAllBySubjectUidAndAmTagItem(folder.uniqueId, amTagItem)}"/>
+                        <g:set var="tagValues" value="${annotation.AmTagDisplayValue.findAllBySubjectUidAndAmTagItem(folder.uniqueId, amTagItem)}"/>
                     </g:if>
                     <g:if test="${amTagItem.tagItemSubtype == 'COMPOUNDPICKLIST'}">
                         <g:render template="${amTagItem.guiHandler}"
