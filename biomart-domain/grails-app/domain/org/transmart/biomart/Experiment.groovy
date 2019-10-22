@@ -19,7 +19,9 @@
 package org.transmart.biomart
 
 import com.recomdata.util.IExcelProfile
+import groovy.util.logging.Slf4j
 
+@Slf4j('logger')
 class Experiment implements IExcelProfile {
     String accession
     String accessType
@@ -54,13 +56,16 @@ class Experiment implements IExcelProfile {
 	id generator: 'sequence', params: [sequence: 'BIOMART.SEQ_BIO_DATA_ID'], column: 'BIO_EXPERIMENT_ID'
         version false
 
-        bioMarkerType column: 'BIOMARKER_TYPE'
-	compounds joinTable: [name: 'BIOMART.BIO_DATA_COMPOUND', key: 'BIO_DATA_ID'], cache: true
-	diseases joinTable: [name: 'BIOMART.BIO_DATA_DISEASE', key: 'BIO_DATA_ID'], cache: true
-	files joinTable: [name: 'BIOMART.BIO_CONTENT_REFERENCE', key: 'BIO_DATA_ID', column: 'BIO_CONTENT_REFERENCE_ID'], cache: true
-	organisms joinTable: [name: 'BIOMART.BIO_DATA_TAXONOMY', key: 'BIO_DATA_ID'], cache: true
-	type column: 'BIO_EXPERIMENT_TYPE'
-	uniqueIds joinTable: [name: 'BIOMART.BIO_DATA_UID', key: 'BIO_DATA_ID']
+        columns {
+            id column: 'BIO_EXPERIMENT_ID'
+            bioMarkerType column: 'BIOMARKER_TYPE'
+	    compounds joinTable: [name: 'BIOMART.BIO_DATA_COMPOUND', key: 'BIO_DATA_ID'], cache: true
+	    diseases joinTable: [name: 'BIOMART.BIO_DATA_DISEASE', key: 'BIO_DATA_ID'], cache: true
+	    files joinTable: [name: 'BIOMART.BIO_CONTENT_REFERENCE', key: 'BIO_DATA_ID', column: 'BIO_CONTENT_REFERENCE_ID'], cache: true
+	    organisms joinTable: [name: 'BIOMART.BIO_DATA_TAXONOMY', key: 'BIO_DATA_ID'], cache: true
+	    type column: 'BIO_EXPERIMENT_TYPE'
+	    uniqueIds joinTable: [name: 'BIOMART.BIO_DATA_UID', key: 'BIO_DATA_ID']
+	}
     }
 
     static constraints = {
