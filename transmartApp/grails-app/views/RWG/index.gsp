@@ -10,7 +10,7 @@
 	<asset:link rel="icon" href="transmart.ico" type="image/x-icon" />
 
 	<asset:stylesheet href="browseTab.css" />
-	<asset:stylesheet href="jquery-cupertino.css" />
+	<%-- <asset:stylesheet href="jquery-cupertino.css" /> --%>
 
     </head>
 

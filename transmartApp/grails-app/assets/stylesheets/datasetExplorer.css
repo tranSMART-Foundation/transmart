@@ -630,3 +630,10 @@ li.x-tab-strip-active {
 #divjobstatus img {
     max-height: 15px;
 }
+
+
+span.ui-checkboxradio-icon {
+    display: none;
+    type: "radio"
+}
+

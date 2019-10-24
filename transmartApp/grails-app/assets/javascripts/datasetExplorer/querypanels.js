@@ -133,7 +133,7 @@ function setupQueryPanelClone(clone) {
 }
 
 /**
- * Empty all panels from their content
+ * Empty all panels' contents
  * @returns {void}
  */
 function clearQueryPanels()
@@ -144,7 +144,7 @@ function clearQueryPanels()
 }
 
 /**
- * Empty a panels from its content
+ * Empty one panel's content
  * @returns {void}
  */
 function clearQueryPanel(clone)
@@ -155,7 +155,7 @@ function clearQueryPanel(clone)
 }
 
 /**
- * Remove all un-necessary panels on the view
+ * Remove all unnecessary panels on the view
  * @returns {void}
  */
 function removeUselessPanels()
@@ -171,7 +171,7 @@ function removeUselessPanels()
 }
 
 /**
- * Adjust the height of panels to fit items
+ * Adjust the heights of panels to fit items
  * @returns {void}
  */
 function adjustPanelSize()
@@ -213,7 +213,12 @@ function refillQueryPanels(subsets) {
 
             if (_inversion)
                 _panelDOM.find("input[id^=panelExclude]").attr("checked", "checked")
-            _panelDOM.find(".panelRadio").buttonset("refresh")
+//          _panelDOM.find(".panelRadio").buttonset("refresh")
+            var panelRadio = _panelDOM.find(".panelRadio");
+            if (panelRadio.data("buttonset") == null) {
+                panelRadio.buttonset();
+            }
+            panelRadio.buttonset("refresh")
 
             _panel.find("item").each(function () {
                 _panelDOM.find(".panelBoxList").append(getPanelItemFromConcept(getConceptFromQueryItem(this)))

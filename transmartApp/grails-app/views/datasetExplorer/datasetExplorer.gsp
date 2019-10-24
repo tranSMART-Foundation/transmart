@@ -13,7 +13,7 @@
 	<asset:stylesheet href="folderManagement.css"/>
 
 	<asset:stylesheet href="analyseTab.css"/>
-	<asset:stylesheet href="jquery-plugin.css"/>
+	<%-- <asset:stylesheet href="jquery-plugin.css"/> --%>
 
 	<%-- We do not have a central template, so this only works in the database explorer for now --%>
 	<g:if test="${['true', true]*.equals(grailsApplication.config.com.recomdata.debug.jsCallbacks).any()}">
