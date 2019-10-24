@@ -121,7 +121,7 @@ grails.project.dependency.resolution = {
 	    //also remove xercesImpl because it breaks tomcat and is not otherwise needed
 	    excludes 'bcprov-jdk15', 'spring-security-config', 'spring-security-core', 'spring-security-web', 'xercesImpl'
 	}
-	compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
+////	compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
 
 	runtime 'com.jcraft:jsch:0.1.42'
 	runtime 'com.lowagie:itext:2.0.8', { transitive = false }
@@ -188,21 +188,21 @@ grails.project.dependency.resolution = {
 	String tmVersion = '19.0-SNAPSHOT'
 	if (!dm) {
 	    compile ':smart-r:'                   + tmVersion
-	    compile ':rdc-rmodules:'              + tmVersion
-	    compile ':transmart-core:'            + tmVersion
+////	    compile ':rdc-rmodules:'              + tmVersion
+////	    compile ':transmart-core:'            + tmVersion
 	    compile ':transmart-gwas:'            + tmVersion
 	    compile ':transmart-gwas-plink:'      + tmVersion
 	    compile ':dalliance-plugin:'          + tmVersion
 	    compile ':transmart-mydas:'           + tmVersion
 	    compile ':transmart-rest-api:'        + tmVersion
-	    compile ':transmart-shared:'          + tmVersion
+////	    compile ':transmart-shared:'          + tmVersion
 	    compile ':spring-security-auth0:'     + tmVersion
 	    compile ':galaxy-export-plugin:'      + tmVersion
 	    compile ':transmart-metacore-plugin:' + tmVersion
 	    compile ':transmart-xnat-importer:'   + tmVersion
 	    compile ':xnat-viewer:'               + tmVersion
 
-	    compile ':transmart-custom:'          + tmVersion
+////	    compile ':transmart-custom:'          + tmVersion
 	    compile ':transmart-fractalis:'       + tmVersion
 	    test ':transmart-core-db-tests:'      + tmVersion
 
