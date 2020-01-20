@@ -33,8 +33,11 @@ class CmsService {
     @Autowired private GrailsApplication grailsApplication
 
     void init() {
+	logger.debug 'Test customizationConfig.instanceType {}', customizationConfig.instanceType
 	for (CmsSection cmsSection in CmsSection.list()) {
+	    logger.debug 'CmsService init cmsSection name {} instanceType {}', cmsSection.name, cmsSection.instanceType
 	    if (customizationConfig.instanceType == cmsSection.instanceType) {
+		logger.debug 'Cms section found, evaluate closure {}', cmsSection.closure
 		GroovyShell groovyShell = new GroovyShell(grailsApplication.classLoader, new Binding())
 		renderers[newRendererCacheKey(cmsSection.name)] = (Closure) groovyShell.evaluate(cmsSection.closure)
 	    }
@@ -74,14 +77,23 @@ class CmsService {
 	response.setHeader 'ETag', 'W/"' + fileVersion(cmsFile) + '"'
 	response.setHeader 'Cache-Control', CACHE_CONTROL
 
+	logger.debug 'sendFile response without file contents {}', response
+	
 	FileCopyUtils.copy new ByteArrayInputStream(cmsFile.bytes), response.outputStream
     }
 
     String fileVersion(String name) {
+	logger.debug 'fileVersion for name {}', name
 	fileVersion findFile(name)
     }
 
     String fileVersion(CmsFile cmsFile) {
+	if(cmsFile) {
+	    logger.debug 'fileVersion from cmsFile name {} lastUpdated {}', cmsFile.name, cmsFile.lastUpdated.time
+	}
+	else {
+	    logger.debug 'fileVersion for null cmsFile return empty string'
+	}
 	cmsFile ? md5(cmsFile.name + '\n' + cmsFile.lastUpdated.time) : ''
     }
 
@@ -91,6 +103,7 @@ class CmsService {
 
     @CompileDynamic
     private CmsFile findFile(String name) {
+	logger.debug 'findFile by name {} and instanceType {}', name, customizationConfig.instanceType
 	CmsFile.findByNameAndInstanceType(name, customizationConfig.instanceType, [cache: true])
     }
 

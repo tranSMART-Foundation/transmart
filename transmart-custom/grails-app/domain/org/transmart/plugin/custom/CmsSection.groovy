@@ -13,6 +13,7 @@ class CmsSection {
 	table name: 'CMS_SECTION', schema: 'BIOMART_USER'
 	id generator: 'sequence', params: [sequence: 'BIOMART_USER.SEQ_CMS_SECTION_ID']
 	cache true
+	version false
 
 	closure type: 'text'
     }

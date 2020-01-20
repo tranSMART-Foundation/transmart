@@ -35,13 +35,13 @@ class CustomizationConfig {
     @Value('${com.recomdata.guestUserName:}')
     String guestUserName
 
-    @Value('${edu.harvard.transmart.instance.name:i2b2/tranSMART}')
+    @Value('${edu.harvard.transmart.instance.name:transmart}')
     String instanceName
 
-    @Value('${edu.harvard.transmart.instance.type:default}')
+    @Value('${edu.harvard.transmart.instance.type:transmart}')
     String instanceType
 
-    @Value('${loginBannerMessage:Please Login Below.}')
+    @Value('${loginBannerMessage:Please login below}')
     String loginBannerMessage
 
     @Value('${com.recomdata.contactUs:}')
