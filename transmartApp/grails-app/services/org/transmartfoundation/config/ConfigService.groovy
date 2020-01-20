@@ -93,6 +93,16 @@ class ConfigService {
 		desc: 'Auth0 base64 encoded'],
 	    'grails.plugin.springsecurity.auth0.loginCallback': [
 		desc: 'Auth0 login callback'],
+	    'grails.plugin.springsecurity.auth0.clientId': [
+		desc: 'Auth0 login callback'],
+	    'grails.plugin.springsecurity.auth0.clientSecret': [
+		desc: 'Auth0 login callback'],
+	    'edu.harvard.transmart.access.level1': [
+		desc: 'Roles assigned to new user: "auto" for STUDY_OWNER, else PUBLIC_USER'],
+	    'edu.harvard.transmart.email.logo': [
+		desc: 'Logo for email to display on new user page'],
+	    'edu.harvard.transmart.email.notify': [
+		desc: 'admin email to notify of new user registration by auth0'],
 	]
 
         Map browseParams = [
@@ -122,7 +132,7 @@ class ConfigService {
             'com.rwg.solr.update.path': [
                 desc: 'Browse solR data import path (remainder of URL)'],
             'transmartproject.mongoFiles.enableMongo': [
-                default:false,
+                default: false,
                 desc: 'If true, store Browse tab files in MongoDB, else use server filesystem'],
             'transmartproject.mongoFiles.useDriver': [
                 desc: 'if true, use local MongoDB local server'],
@@ -137,19 +147,19 @@ class ConfigService {
             'transmartproject.mongoFiles.apiKey': [
                 desc: 'Remote MongoDB server API key'],
             'ui.browse.delete.allowprogram': [
-                default:false,
+                default: false,
                 desc: 'If true, display \'Delete Program\' in Browse tab for admin users'],
             'ui.browse.delete.allowstudy': [
-                default:false,
+                default: false,
                 desc: 'If true, display \'Delete Study\' in Browse tab for admin users'],
         ]
 
         Map buildInfoParams = [
             'buildInfo.properties.include': [
-                default:[],
+                default: [],
                 desc: 'Groovy list of properties to add to the buildInfo panel e.g. \'app.grails.version\' and \'build.groovy\''],
             'buildInfo.properties.exclude': [
-                default:[],
+                default: [],
                 desc: 'Groovy list of properties to exclude from the buildInfo panel e.g. \'env.proc.cores\''],
         ]
 
@@ -271,7 +281,22 @@ class ConfigService {
                 desc: 'View to choose for study display'],
 	    'org.transmart.configFine': [
                 desc: 'Set to true on successful startup, last value in Config.groovy'],
-        ]
+	    'edu.harvard.transmart.googleanalytics.tracking': [
+		desc: '++TODO++'],
+	    'edu.harvard.transmart.instance.name': [
+		desc: '++TODO++'],
+	    'edu.harvard.transmart.instance.type': [
+		desc: '++TODO++'],
+	    'edu.harvard.transmart.instance.quickstarturl': [
+		desc: '++TODO++'],
+	    'edu.harvard.transmart.instance.userguideurl': [
+		desc: '++TODO++'],
+	    'loginBannerMessage': [
+		desc: '++TODO++'],
+	    'com.recomdata.userSignupEnabled': [
+		default: true,
+		desc: '++TODO++']
+	]
 
         Map gwasParams = [
             'com.recomdata.rwg.manhattanplots.cacheImages': [
@@ -282,7 +307,8 @@ class ConfigService {
                 desc: 'Server folder to store cached images while rendering to the user'],
             'com.recomdata.rwg.qqplots.temporaryImageFolderFullPath': [
                 desc: 'Server folder to store images while rendering to the user'],
-            'com.recomdata.gwas.usehg19table': [ default: false,
+            'com.recomdata.gwas.usehg19table': [
+		default: false,
                 desc: 'If true, use only hg19 human reference unless another version is specified'],
             'grails.plugin.transmartGwasPlink.plinkPath': [
                 desc: 'Full path to the plink executable for GWAS-plink plugin'],
@@ -349,25 +375,35 @@ class ConfigService {
         ]
 
         Map i2b2Params = [
-            'com.recomdata.i2b2.subject.domain': [ default: '(undefined)',
+            'com.recomdata.i2b2.subject.domain': [
+		default: '(undefined)',
                 desc: 'DatasetExplorer i2b2 server domain'],
-            'com.recomdata.i2b2.subject.projectid': [ default: '(undefined)',
+            'com.recomdata.i2b2.subject.projectid': [
+		default: '(undefined)',
                 desc: 'DatasetExplorer i2b2 server projectID'],
-            'com.recomdata.i2b2.subject.username': [ default: '(undefined)',
+            'com.recomdata.i2b2.subject.username': [
+		default: '(undefined)',
                 desc: 'DatasetExplorer i2b2 server username'],
-            'com.recomdata.i2b2.subject.password': [ default: '(undefined)',
+            'com.recomdata.i2b2.subject.password': [
+		default: '(undefined)',
                 desc: 'DatasetExplorer i2b2 server password'],
-            'org.transmartproject.i2b2.instance': [ default: '(undefined)',
+            'org.transmartproject.i2b2.instance': [
+		default: '(undefined)',
                 desc: 'I2b2 plugin server instance'],
-            'org.transmartproject.i2b2.instance.port': [ default: '(undefined)',
+            'org.transmartproject.i2b2.instance.port': [
+		default: '(undefined)',
                 desc: 'I2b2 plugin server instance port'],
-            'org.transmartproject.i2b2.user_id': [ default: '(undefined)',
+            'org.transmartproject.i2b2.user_id': [
+		default: '(undefined)',
                 desc: 'I2b2 server query userID'],
-            'org.transmartproject.i2b2.group_id': [ default: '(undefined)',
+            'org.transmartproject.i2b2.group_id': [
+		default: '(undefined)',
                 desc: 'I2b2 server query groupID'],
-            'org.transmartproject.i2b2.pool': [ default: '(undefined)',
+            'org.transmartproject.i2b2.pool': [
+		default: '(undefined)',
                 desc: 'I2b2 plugin server pool'],
-            'org.transmartproject.i2b2.waitTimeMilliseconds': [ default:600000,
+            'org.transmartproject.i2b2.waitTimeMilliseconds': [
+		default:600000,
                 desc: 'I2b2 plugin server wait time (ms)'],
         ]
 
@@ -491,7 +527,7 @@ class ConfigService {
         Map sampleParams = [
             'sampleExplorer.idfield': [
                 desc: 'Sample explorer solr ID field name'],
-            'edu.harvard.transmart.sampleBreakdownMap.id': [
+            'edu.harvard.transmart.sampleBreakdownMap.aliquot_id': [
                 desc: 'Identifier for sample breakdown'],
             'sampleExplorer.resultsGridHeight': [
                 desc: 'Sample explorer grid height'],
@@ -720,6 +756,8 @@ class ConfigService {
 	    // auth0
 	    else if(k == 'grails.plugin.springsecurity.auth0.active'){addConfig(auth0Params,k,v,'')}
             else if(k == 'grails.plugin.springsecurity.auth0.base64EncodedSecret'){addConfig(auth0Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.auth0.clientId'){addConfig(auth0Params,k,v,'')}
+            else if(k == 'grails.plugin.springsecurity.auth0.clientSecret'){addConfig(auth0Params,k,v,'')}
             else if(k == 'grails.plugin.springsecurity.auth0.loginCallback'){addConfig(auth0Params,k,v,'')}
 
             // browse
