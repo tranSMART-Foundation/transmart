@@ -134,7 +134,7 @@ BEGIN
        /* if sCount > 0 then
 		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
 		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 161;
 	end if;
 	*/
@@ -145,7 +145,7 @@ BEGIN
 	if pCount > 0 then
 		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
 		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 161;
 	end if;
   
@@ -162,7 +162,7 @@ BEGIN
 	if PCOUNT = 0 then
 		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_rbm_annotation',1,stepCt,'ERROR');
 		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 163;
 	end if;
 		
@@ -175,7 +175,7 @@ BEGIN
 	if pCount > 0 then
 		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
 		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-		perform CZ_END_AUDIT (JOBID,'FAIL');
+		perform tm_cz.cz_END_AUDIT (JOBID,'FAIL');
 		return 162;  
 	end if;
 	
@@ -190,7 +190,7 @@ BEGIN
 	if pCount > 0 then
 		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in TM_LZ.LT_SRC_RBM_SUBJ_SAMP_MAP',1,stepCt,'ERROR');
 		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 164;
 	end if;
 		
@@ -581,7 +581,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 		   
     stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in wt_qpcr_rbm_nodes',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create TISSUETYPE nodes in wt_qpcr_rbm_nodes',rowCt,stepCt,'Done');
 
 	begin
 	update tm_wz.WT_RBM_NODES
@@ -1013,7 +1013,7 @@ begin
 	end;
         
         stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
     
   
   --Build concept Counts

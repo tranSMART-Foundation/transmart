@@ -124,12 +124,12 @@ BEGIN
   IF(coalesce(jobID::text, '') = '' or jobID < 1)
   THEN
     newJobFlag := 1; -- True
-    select cz_start_audit (procedureName, databaseName, jobID) into jobId;
+    select tm_cz.cz_start_audit (procedureName, databaseName, jobID) into jobId;
   END IF;
     	
 	stepCt := 0;
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_metabolomics_data',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_metabolomics_data',0,stepCt,'Done');
 	
 	--	Get count of records in LT_SRC_METABOLOMIC_MAP
 	
@@ -142,9 +142,9 @@ BEGIN
 	where coalesce(platform::text, '') = '';
 	
 	if pCount > 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 161;
 	end if;
   
@@ -159,9 +159,9 @@ BEGIN
 	where platform in (select distinct m.platform from LT_SRC_METABOLOMIC_MAP m);
 	
 	if PCOUNT = 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_qpcr_metabolomics_annotation',1,stepCt,'ERROR');
-		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_qpcr_metabolomics_annotation',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		RETURN 163;
 	end if;
 		
@@ -172,9 +172,9 @@ BEGIN
 	where coalesce(tissue_type::text, '') = '';
 	
 	if pCount > 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		perform CZ_END_AUDIT (JOBID,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform tm_cz.cz_END_AUDIT (JOBID,'FAIL');
 		return 162;
 	end if;
 	
@@ -187,9 +187,9 @@ BEGIN
 		  having count(distinct platform) > 1)as s;
 	
 	if pCount > 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_METABOLOMIC_MAP',1,stepCt,'ERROR');
-		perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_METABOLOMIC_MAP',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		RETURN 164;
 	end if;
 		
@@ -239,7 +239,7 @@ BEGIN
 	end;
 
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_METABOLOMIC_MAP',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_METABOLOMIC_MAP',rowCt,stepCt,'Done');
 	
 	--	create records in patient_dimension for subject_ids if they do not exist
 	--	format of sourcesystem_cd:  trial:[site:]subject_cd
@@ -291,7 +291,7 @@ BEGIN
 	end;
 	
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',rowCt,stepCt,'Done');
 	
 	perform i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
 
@@ -316,7 +316,7 @@ BEGIN
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
 
 	select nextval('deapp.seq_metabolomics_partition_id') into partitionId;
 	
@@ -366,7 +366,7 @@ BEGIN
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP WT_METABOLOMIC_NODE_VALUES',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP WT_METABOLOMIC_NODE_VALUES',rowCt,stepCt,'Done');
 	
 	begin
 	insert into WT_METABOLOMIC_NODES
@@ -400,7 +400,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 		   
     stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_metabolomics_nodes',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_metabolomics_nodes',rowCt,stepCt,'Done');
 	
 	--	insert for platform node so platform concept can be populated
 	begin
@@ -436,7 +436,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 	
     stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
 
 	--	insert for ATTR1 node so ATTR1 concept can be populated in sample_type_cd
 	begin
@@ -474,7 +474,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 	
     stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
 	
 	--	insert for ATTR2 node so ATTR2 concept can be populated in timepoint_cd
 	begin
@@ -512,7 +512,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 		   
     stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
 	
 	--	insert for tissue_type node so tissue_type_cd can be populated
 	begin
@@ -549,7 +549,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 	
     stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create TISSUETYPE nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create TISSUETYPE nodes in WT_METABOLOMIC_NODES',rowCt,stepCt,'Done');
 	
 	begin
 	update WT_METABOLOMIC_NODES
@@ -567,7 +567,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 	
     stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_metabolomics_nodes',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_metabolomics_nodes',rowCt,stepCt,'Done');
 		
 --	add leaf nodes for metabolomics data  The cursor will only add nodes that do not already exist.
 
@@ -590,7 +590,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		stepCt := stepCt + 1;
 		tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
 		
-		perform cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 		
 		perform i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID);
 
@@ -620,7 +620,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 	
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update WT_METABOLOMIC_NODES with newly created concept_cds',rowCt,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update WT_METABOLOMIC_NODES with newly created concept_cds',rowCt,stepCt,'Done'); 
 	
   --Load the DE_SUBJECT_SAMPLE_MAPPING from wt_subject_metabolomics_data
 
@@ -770,7 +770,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 
 --	Insert records for patients and samples into observation_fact
 	begin
@@ -819,7 +819,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 	  
     stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
 	--	Insert sample facts 
 	begin
@@ -867,7 +867,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 	  
     stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
 	--Update I2b2 for correct data type
 	begin
@@ -887,7 +887,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 	
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',rowCt,stepCt,'Done');
 	
 
 
@@ -908,7 +908,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		return -16;
 	end;
     stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'insert distinct sample_cd in sample_dimension from de_subject_sample_mapping',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'insert distinct sample_cd in sample_dimension from de_subject_sample_mapping',rowCt,stepCt,'Done');
 
     ---- update c_metadataxml in i2b2
 	begin
@@ -941,7 +941,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		return -16;
 	end; 
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update c_columndatatype and c_metadataxml for numeric data types in I2B2METADATA i2b2',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update c_columndatatype and c_metadataxml for numeric data types in I2B2METADATA i2b2',rowCt,stepCt,'Done');
 	    
 	--UPDATE VISUAL ATTRIBUTES for Leaf Active (Default is folder)
 	begin
@@ -963,7 +963,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for leaf nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for leaf nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
   
   begin
     update i2b2metadata.i2b2 a
@@ -979,7 +979,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
         
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
     
   --Build concept Counts
   --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
@@ -987,7 +987,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
   
     perform i2b2_create_concept_counts(topNode ,jobID );
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
 	
 	--	delete each node that is hidden
 
@@ -999,7 +999,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		stepCt := stepCt + 1;
 		tText := 'Deleted node: ' || r_delNodes.c_fullname;
 		
-		perform cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
 	END LOOP;  	
 
@@ -1017,7 +1017,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
 
 --	tag data with probeset_id from reference.probeset_deapp
   
@@ -1124,7 +1124,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	execute sqlText;
 	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
-		perform cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP DE_SUBJECT_METABOLOMICS_DATA',rowCt,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP DE_SUBJECT_METABOLOMICS_DATA',rowCt,stepCt,'Done');
 
 	else
 		
@@ -1134,7 +1134,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		if dataType = 'R' or dataType = 'L' then
 			perform I2B2_METABOLOMICS_ZSCORE_CALC(TrialID, partitionName, partitionindx,partitioniD,sourceCD,'L',jobId,dataType,logBase);
 			stepCt := stepCt + 1;
-			perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
+			perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
 		end if;
 	
 	end if;
@@ -1142,11 +1142,11 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
     ---Cleanup OVERALL JOB if this proc is being run standalone
 	
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_metabolomic_data',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_metabolomic_data',0,stepCt,'Done');
 
 	IF newJobFlag = 1
 	THEN
-		perform cz_end_audit (jobID, 'SUCCESS');
+		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 
 	select 0 into rtn_code ;

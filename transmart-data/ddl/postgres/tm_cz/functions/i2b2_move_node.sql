@@ -48,11 +48,11 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	perform cz_start_audit (procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_move_node',0,stepCt,'Done');  
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_move_node',0,stepCt,'Done');  
     
     PERFORM parse_nth_value(topNode, 2, '\') into root_node ;
     
@@ -67,7 +67,7 @@ begin
 	set concept_path = replace(concept_path, old_path, new_path)
 	where concept_path like old_path || '%';
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',SQL%ROWCOUNT,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',SQL%ROWCOUNT,stepCt,'Done'); 
 	commit;
 	
 	--i2b2
@@ -75,7 +75,7 @@ begin
 	   set c_fullname = replace(c_fullname, old_path, new_path)
 	 where c_fullname like old_path || '%';
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',SQL%ROWCOUNT,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',SQL%ROWCOUNT,stepCt,'Done'); 
 	commit;
 	
 	--update level data
@@ -83,7 +83,7 @@ begin
 	   set c_hlevel = (length(c_fullname) - coalesce(length(replace(c_fullname, '\')),0)) / length('\') - 2 + root_level
 	 where c_fullname like new_path || '%';
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new level',SQL%ROWCOUNT,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new level',SQL%ROWCOUNT,stepCt,'Done'); 
 	commit;
 	
 	--Update tooltip and dimcode
@@ -92,7 +92,7 @@ begin
 	       c_tooltip = c_fullname
 	 where c_fullname like new_path || '%';
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new dimcode and tooltip',SQL%ROWCOUNT,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new dimcode and tooltip',SQL%ROWCOUNT,stepCt,'Done'); 
 	commit;
 
 	--if topNode != '' then
@@ -101,15 +101,15 @@ begin
 	end if;
     
     if newJobFlag = 1 then
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
 exception
     when others then
     --handle errors.
-	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 
 end;
 

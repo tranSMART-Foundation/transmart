@@ -37,11 +37,11 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(jobID IS NULL or jobID < 1) then
 	newJobFlag := 1; -- True
-	select cz_start_audit (procedureName, databaseName) into jobID;
+	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting I2B2_LOAD_PROTEOMICS_ANNOTATION',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting I2B2_LOAD_PROTEOMICS_ANNOTATION',0,stepCt,'Done');
 
     --	get  id_ref  from external table
     
@@ -49,7 +49,7 @@ begin
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_protein_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_protein_annotation',rowCt,stepCt,'Done');
     --	delete any existing data from deapp.de_protein_annotation
     begin
 	delete from deapp.de_subject_protein_data where protein_annotation_id in (select id from deapp.de_protein_annotation where gpl_id = gplId);
@@ -71,7 +71,7 @@ begin
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_protein_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_protein_annotation',rowCt,stepCt,'Done');
     begin
 	insert into  deapp.de_protein_annotation
 		     (gpl_id
@@ -100,7 +100,7 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Updated missing uniprot_id in de_protein_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing uniprot_id in de_protein_annotation',rowCt,stepCt,'Done');
 
     begin
         update DEAPP.DE_PROTEIN_ANNOTATION set uniprot_name = (select bio_marker_name
@@ -116,14 +116,14 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Update uniprot_name in DEAPP de_protein_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update uniprot_name in DEAPP de_protein_annotation',rowCt,stepCt,'Done');
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_proteomics_annotation',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_proteomics_annotation',0,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if; 
 
     return 1;
@@ -132,8 +132,8 @@ exception
     when others then
 	errorNumber := SQLSTATE;
 	errorMessage := SQLERRM;
-	perform cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 
 	return -16;
 

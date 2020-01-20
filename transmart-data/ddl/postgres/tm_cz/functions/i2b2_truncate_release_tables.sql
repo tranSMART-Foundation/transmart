@@ -40,11 +40,11 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	perform cz_start_audit(procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit(procedureName, databaseName, jobID);
     end if;
 
     stepCt := 0;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_truncate_release_tables',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_truncate_release_tables',0,stepCt,'Done');
     stepCt := stepCt + 1;
 
     tabSize = array_length(tabList, 1);
@@ -57,13 +57,13 @@ begin
 
 	    execute(tText);
 	    tText := 'Truncated ' || tabList[i];
-	    perform cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done');
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done');
 
 	end if;
 
     end loop;
 
-    perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_truncate_release_tables',tabSize,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_truncate_release_tables',tabSize,stepCt,'Done');
     stepCt := stepCt + 1;
 
 end;

@@ -181,7 +181,7 @@ BEGIN
 		 )
 	;
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Updated study data in BIOMART bio_clinical_trial',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated study data in BIOMART bio_clinical_trial',SQL%ROWCOUNT,stepCt,'Done');
 	commit;
 */
 	
@@ -308,7 +308,7 @@ BEGIN
 	      (select 1 from biomart.bio_clinical_trial x
 		   where m.study_id = x.trial_number);
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Inserted trial data in BIOMART bio_clinical_trial',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted trial data in BIOMART bio_clinical_trial',SQL%ROWCOUNT,stepCt,'Done');
 	commit;
 */
 	
@@ -965,7 +965,7 @@ BEGIN
 	where upper(t.tag_type) = 'COMPOUND';
 
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Delete existing Compound tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing Compound tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
 	commit;	
 	
 	insert into i2b2_tags
@@ -986,7 +986,7 @@ BEGIN
 	group by decode(x.rec_num,1,c.generic_name,c.brand_name);
 
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Insert Compound tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert Compound tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
 	commit;	
 					 
 	--	Insert trial data tags - DISEASE
@@ -995,7 +995,7 @@ BEGIN
 	where upper(t.tag_type) = 'DISEASE';
 
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Delete existing DISEASE tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing DISEASE tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
 	commit;	
 		
 	insert into i2b2_tags
@@ -1016,7 +1016,7 @@ BEGIN
 	group by c.prefered_name;
 
 	stepCt := stepCt + 1;
-	cz_write_audit(jobId,databaseName,procedureName,'Insert Disease tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert Disease tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
 	commit;	
 */
 	

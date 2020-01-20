@@ -60,21 +60,21 @@ BEGIN
 	IF (coalesce(jobID::text, '') = '' OR jobID < 1)
 		THEN
 		newJobFlag := 1; -- True
-		SELECT cz_start_audit(procedureName, databaseName) INTO jobID;
+		SELECT tm_cz.cz_start_audit(procedureName, databaseName) INTO jobID;
 	END IF;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Start FUNCTION', 0, stepCt, 'Done');
 	stepCt := 1;
 
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Term: ' || New_Term_in, 0, stepCt, 'Done');
 	stepCt := stepCt + 1;
 
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Category: ' || category_term_in, 0, stepCt, 'Done');
 	stepCt := stepCt + 1;
 
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Parent: ' || parent_term_in, 0, stepCt, 'Done');
 	stepCt := stepCt + 1;
 
@@ -131,15 +131,15 @@ BEGIN
 		Select category_term_in, New_Term_in, 'RWG:'|| category_term_in || ':' || New_Term_in, 'RWG_ADD_TAXONOMY_TERM', category_term_in from dual;
 		 */
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Term added to Searchapp.Search_Keyword', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 	END IF;
@@ -154,15 +154,15 @@ BEGIN
 		UPPER ( Keyword ) = UPPER ( New_Term_in )
 		AND UPPER ( data_category ) LIKE UPPER ( category_term_in );
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'New search keyword ID stored in Keyword_Id', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 
@@ -187,15 +187,15 @@ BEGIN
 			WHERE
 				x.search_keyword_id = Keyword_Id );
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Term added to Searchapp.Search_Keyword_Term', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 
@@ -230,15 +230,15 @@ BEGIN
 				WHERE
 					x.search_keyword_id = Keyword_Id );
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Term added to Searchapp.Search_Taxonomy', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 
@@ -267,15 +267,15 @@ BEGIN
 					x.child_id = New_Term_in_Id
 					AND x.parent_id = Parent_id );
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Term relationship added to Searchapp.Search_Taxonomy_Rels', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 	END IF;
@@ -283,14 +283,14 @@ BEGIN
 	---Cleanup OVERALL JOB if this proc is being run standalone
 	IF newJobFlag = 1
 		THEN
-		PERFORM cz_end_audit (jobID, 'SUCCESS');
+		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 EXCEPTION
 	WHEN OTHERS THEN
 	errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 END;
 $body$

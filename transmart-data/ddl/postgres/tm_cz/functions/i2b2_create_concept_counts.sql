@@ -1,3 +1,4 @@
+SET search_path = tm_cz, pg_catalog;
 --
 -- Name: i2b2_create_concept_counts(character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --

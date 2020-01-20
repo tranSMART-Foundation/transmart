@@ -52,7 +52,7 @@ begin
     stepCt := 0;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_rename_node',0,stepCt,'Done'); 
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_rename_node',0,stepCt,'Done'); 
     
     if old_node != ''  and old_node != '%' and new_node != ''  and new_node != '%' then
 
@@ -80,7 +80,7 @@ begin
 	end;
 		
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update concept_counts with new path',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_counts with new path',rowCt,stepCt,'Done');
 
 	--Update path in i2b2_tags
 	begin
@@ -103,7 +103,7 @@ begin
 	end;
 			
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update i2b2_tags with new path',rowCt,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2_tags with new path',rowCt,stepCt,'Done'); 
 
 	--Update specific name
 	--update concept_dimension
@@ -130,7 +130,7 @@ begin
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',rowCt,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',rowCt,stepCt,'Done'); 
 
 	--Update all paths, added updates to c_dimcode and c_tooltip instead of separate pass
 	begin
@@ -153,7 +153,7 @@ begin
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',rowCt,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',rowCt,stepCt,'Done'); 
 					
 	perform i2b2_load_security_data(jobID);
 

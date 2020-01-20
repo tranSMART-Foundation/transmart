@@ -34,7 +34,7 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	perform cz_start_audit (procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
     
     stepCt := 0;
@@ -46,7 +46,7 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Deleted existing study data in lz_src_sample_categories',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted existing study data in lz_src_sample_categories',rowCt,stepCt,'Done');
     commit;	
 
     /*	
@@ -88,7 +88,7 @@ begin
 	
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Added new sample_cds for study in I2B2DEMODATA patient_dimension',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Added new sample_cds for study in I2B2DEMODATA patient_dimension',rowCt,stepCt,'Done');
 	commit;
      */
 
@@ -116,21 +116,21 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Inserted sample data in lz_src_sample_categories',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted sample data in lz_src_sample_categories',rowCt,stepCt,'Done');
     commit;
 
     if newjobflag = 1
     then
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	end if;
 
 exception
     when others then
     --Handle errors.
-	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 	
     --End Proc
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 
 end;
 

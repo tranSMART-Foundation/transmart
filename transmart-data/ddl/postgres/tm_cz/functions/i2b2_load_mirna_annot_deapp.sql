@@ -35,11 +35,11 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(jobID is NULL or jobID < 1) then
 	newJobFlag := 1; -- True
-	select cz_start_audit (procedureName, databaseName) into jobID;
+	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_MIRNA_annot_deapp',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_MIRNA_annot_deapp',0,stepCt,'Done');
 
     begin
 	delete from mirna_annotation_deapp
@@ -58,7 +58,7 @@ begin
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from mirna_annotation_deapp',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from mirna_annotation_deapp',rowCt,stepCt,'Done');
 
     begin
         delete from deapp.de_qpcr_mirna_annotation
@@ -77,7 +77,7 @@ begin
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_qpcr_mirna_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_qpcr_mirna_annotation',rowCt,stepCt,'Done');
 
     begin
 	insert into mirna_probeset_deapp
@@ -109,7 +109,7 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into mirna_probeset_deapp',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into mirna_probeset_deapp',rowCt,stepCt,'Done');
     
     --	update organism for existing probesets in mirna_probeset_deapp
 
@@ -133,7 +133,7 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Update organism in mirna_probeset_deapp',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update organism in mirna_probeset_deapp',rowCt,stepCt,'Done');
     
     
     
@@ -170,7 +170,7 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into REFERENCE mirna_annotation_deapp',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into REFERENCE mirna_annotation_deapp',rowCt,stepCt,'Done');
     
     --	insert data into deapp.de_qpcr_mirna_annotation
 
@@ -205,7 +205,7 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_qpcr_mirna_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_qpcr_mirna_annotation',rowCt,stepCt,'Done');
     
     insert into biomart.mirna_bio_assay_feature_group
 		(feature_group_name
@@ -218,7 +218,7 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert probesets into biomart.mirna_bio_assay_feature_group',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert probesets into biomart.mirna_bio_assay_feature_group',rowCt,stepCt,'Done');
     
     --	insert probesets into biomart.mirna_bio_assay_data_annotation
     begin
@@ -247,23 +247,23 @@ begin
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT; 
-    perform cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.mirna_bio_assay_data_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.mirna_bio_assay_data_annotation',rowCt,stepCt,'Done');
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_MIRNA_annot_deapp',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_MIRNA_annot_deapp',0,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	perform cz_end_audit (jobID, 'SUCCESS'); 
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS'); 
     end if;
 
     return 1;
 exception 
     when others then
     --Handle errors.
-	perform cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
     --End Proc
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 
 	return -16;
 

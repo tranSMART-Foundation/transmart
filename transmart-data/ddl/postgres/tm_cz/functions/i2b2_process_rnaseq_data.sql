@@ -611,7 +611,7 @@ BEGIN
 		return -16;
 	end;
     stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create TISSUETYPE nodes in tm_wz.wt_mrna_nodes',rowCt,stepCt,'Done');
 
 	--	set node_name
 

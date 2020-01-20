@@ -53,12 +53,12 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	select cz_start_audit (procedureName, databaseName) into jobID;
+	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
     
     stepCt := 0;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobID,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done');
     
     --	create security records in observation_fact
     
@@ -84,7 +84,7 @@ begin
 	,'METADATA:' || TrialId;
 	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobID,databaseName,procedureName,'Insert trial/study into biomart.bio_experiment',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert trial/study into biomart.bio_experiment',rowCt,stepCt,'Done');
 	--commit;
     end if;
     
@@ -111,26 +111,26 @@ begin
 	     where v_bio_experiment_id = so.bio_data_id);
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobID,databaseName,procedureName,'Inserted trial/study into SEARCHAPP search_secure_object',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Inserted trial/study into SEARCHAPP search_secure_object',rowCt,stepCt,'Done');
     --commit;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobID,databaseName,procedureName,'End ' || procedureName,rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'End ' || procedureName,rowCt,stepCt,'Done');
     --commit;
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
 exception
     when others then
 	raise notice 'Error % %', SQLSTATE, SQLERRM;
     --Handle errors.
-	perform cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
 	
     --End Proc
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 
 end;
 

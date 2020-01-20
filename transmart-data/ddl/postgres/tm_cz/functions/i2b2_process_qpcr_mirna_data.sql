@@ -117,12 +117,12 @@ BEGIN
   IF(jobID IS NULL or jobID < 1)
   THEN
     newJobFlag := 1; -- True
-    select cz_start_audit (procedureName, databaseName) into jobID;
+    select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
   END IF;
     	
 	stepCt := 0;
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_qpcr_mirna_data',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_qpcr_mirna_data',0,stepCt,'Done');
 	
 	--	Get count of records in LT_SRC_MIRNA_SUBJ_SAMP_MAP
 	
@@ -136,9 +136,9 @@ BEGIN
 	where platform is null;
 	
 	if pCount > 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 161;
 	end if;
   
@@ -149,9 +149,9 @@ BEGIN
 	where gpl_id in (select distinct m.platform from LT_SRC_MIRNA_SUBJ_SAMP_MAP m);
 	
 	if PCOUNT = 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'Unmapped platform',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Unmapped platform',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 162;
 	end if;--mod
 	
@@ -160,9 +160,9 @@ BEGIN
 	where platform in (select distinct m.platform from LT_SRC_MIRNA_SUBJ_SAMP_MAP m);
 	
 	if PCOUNT = 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'No platform in de_gpl_info',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'No platform in de_gpl_info',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 163;
 	end if;
 		
@@ -173,9 +173,9 @@ BEGIN
 	where tissue_type is null;
 	
 	if pCount > 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'Missing tissue',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Missing tissue',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 164;
 	end if;
 	
@@ -188,9 +188,9 @@ BEGIN
 		  having count(distinct platform) > 1) t;
 	
 	if pCount > 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'Multiple platforms',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Multiple platforms',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 165;
 	end if;
 		
@@ -228,7 +228,7 @@ BEGIN
 	set trial_name=upper(trial_name);
 	
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_MIRNA_SUBJ_SAMP_MAP',rowCt,stepCt,'Done');	
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_MIRNA_SUBJ_SAMP_MAP',rowCt,stepCt,'Done');	
 	
 	--	create records in patient_dimension for subject_ids if they do not exist
 	--	format of sourcesystem_cd:  trial:[site:]subject_cd
@@ -281,7 +281,7 @@ BEGIN
 	pCount := rowCt;
 	
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension.',pCount,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension.',pCount,stepCt,'Done');
 	
 	begin
 		perform i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
@@ -313,7 +313,7 @@ BEGIN
 	end;
 	
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
 	
 	begin
 		execute('truncate table tm_wz.WT_QPCR_MIRNA_NODES');
@@ -373,7 +373,7 @@ BEGIN
 	
 	--  and decode(dataType,'R',sign(a.intensity_value),1) = 1;	--	take all values when dataType T, only >0 for dataType R
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_qpcr_mirna_node_values',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_qpcr_mirna_node_values',rowCt,stepCt,'Done');
 	
 	begin
 	insert into WT_QPCR_MIRNA_NODES
@@ -404,7 +404,7 @@ BEGIN
 	end;
 		   
     stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_mirna_nodes',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_mirna_nodes',rowCt,stepCt,'Done');
 	
 	
 	--	insert for platform node so platform concept can be populated
@@ -430,7 +430,7 @@ BEGIN
 	from  WT_QPCR_MIRNA_NODE_VALUES;
 		   
         stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in wt_qpcr_mirna_nodes',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in wt_qpcr_mirna_nodes',rowCt,stepCt,'Done');
 	exception
 	when others then
 		errorNumber := SQLSTATE;
@@ -473,7 +473,7 @@ BEGIN
 	end;
 		   
         stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_QPCR_MIRNA_NODES',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_QPCR_MIRNA_NODES',rowCt,stepCt,'Done');
 	
 	
 	--	insert for ATTR2 node so ATTR2 concept can be populated in timepoint_cd
@@ -510,7 +510,7 @@ BEGIN
 	end;
 		   
         stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_QPCR_MIRNA_NODES',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_QPCR_MIRNA_NODES',rowCt,stepCt,'Done');
 	
 	
 	--	insert for tissue_type node so tissue_type_cd can be populated
@@ -545,7 +545,7 @@ BEGIN
 	end;
 	 
         stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in wt_qpcr_mirna_nodes',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create TISSUETYPE nodes in wt_qpcr_mirna_nodes',rowCt,stepCt,'Done');
 	
 	begin			
 	update WT_QPCR_MIRNA_NODES
@@ -560,7 +560,7 @@ BEGIN
 	end;
 	
         stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_mirna_nodes',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_mirna_nodes',rowCt,stepCt,'Done');
 	
 		
 --	add leaf nodes for miRNA data  The cursor will only add nodes that do not already exist.
@@ -573,7 +573,7 @@ BEGIN
 			stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
 			tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
 		
-			perform cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
+			perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 		
 			perform i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID);
 		exception
@@ -606,7 +606,7 @@ BEGIN
 	end;
 	
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update WT_QPCR_MIRNA_NODES with newly created concept_cds',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update WT_QPCR_MIRNA_NODES with newly created concept_cds',rowCt,stepCt,'Done');
 	
 	 
 	
@@ -760,7 +760,7 @@ BEGIN
 	end;
 
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 
 --	Insert records for patients and samples into observation_fact
 	begin
@@ -809,7 +809,7 @@ BEGIN
 		return -16;
 	end;
         stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
     
 	--	Insert sample facts 
 	begin
@@ -861,7 +861,7 @@ BEGIN
 
 	--Update I2b2 for correct data type
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
     
 	begin
 	update i2b2 t
@@ -878,7 +878,7 @@ BEGIN
 		
 	 ---INSERT sample_dimension
       stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-      perform cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',rowCt,stepCt,'Done');
+      perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',rowCt,stepCt,'Done');
       
 	  begin
       INSERT INTO I2B2DEMODATA.SAMPLE_DIMENSION(SAMPLE_CD) 
@@ -894,7 +894,7 @@ BEGIN
 	end;
 
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'insert distinct sample_cd in sample_dimension from de_subject_sample_mapping',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'insert distinct sample_cd in sample_dimension from de_subject_sample_mapping',rowCt,stepCt,'Done');
 	
 
     ---- update c_metedataxml in i2b2
@@ -924,7 +924,7 @@ BEGIN
 	end;
 		  
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update c_columndatatype and c_metadataxml for numeric data types in I2B2METADATA i2b2',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update c_columndatatype and c_metadataxml for numeric data types in I2B2METADATA i2b2',rowCt,stepCt,'Done');
 
 	--UPDATE VISUAL ATTRIBUTES for Leaf Active (Default is folder)
 	begin
@@ -944,7 +944,7 @@ BEGIN
 	end;
 
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for leaf nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for leaf nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
 
 	begin
     update i2b2 a
@@ -960,7 +960,7 @@ BEGIN
 	end;
         
         stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
     
 	
 
@@ -971,7 +971,7 @@ BEGIN
   
         perform i2b2_create_concept_counts(topNode ,jobID );
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
 	
 	--	delete each node that is hidden
 	begin
@@ -983,7 +983,7 @@ BEGIN
 		stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
 		tText := 'Deleted node: ' || r_delNodes.c_fullname;
 		get diagnostics rowCt := ROW_COUNT;
-		perform cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
 	END LOOP;
 	exception
@@ -1008,7 +1008,7 @@ BEGIN
 		return -16;
 	end;
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
 
 --	tag data with probeset_id from reference.probeset_deapp
 
@@ -1057,13 +1057,13 @@ BEGIN
 	pExists := rowCt;
 	
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_mirna_probeset',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_mirna_probeset',rowCt,stepCt,'Done');
 	
 			
 	if pExists = 0 then
-		perform cz_write_audit(jobId,databasename,procedurename,'No probeset records',1,stepCt,'ERROR');
-		perform cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
-		perform cz_end_audit (jobId,'FAIL');
+		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'No probeset records',1,stepCt,'ERROR');
+		perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
+		perform tm_cz.cz_end_audit (jobId,'FAIL');
 		return 165;
 	end if;
 
@@ -1098,7 +1098,7 @@ BEGIN
 		from WT_SUBJECT_MIRNA_PROBESET --mod
 		where trial_name = TrialID    ;
 		stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-		perform cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP de_subject_mirna_data',rowCt,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP de_subject_mirna_data',rowCt,stepCt,'Done');
 		exception
 		when others then
 			errorNumber := SQLSTATE;
@@ -1120,7 +1120,7 @@ BEGIN
                         perform i2b2_mirna_zscore_calc(TrialID,'L',jobId,'L',logBase,sourceCD);----do log transform
                         end if;
 			stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-			perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
+			perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
 			exception
 			when others then
 				errorNumber := SQLSTATE;
@@ -1136,11 +1136,11 @@ BEGIN
     ---Cleanup OVERALL JOB if this proc is being run standalone
 	
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_QPCR_miRNA_DATA',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_QPCR_miRNA_DATA',0,stepCt,'Done');
 
 	IF newJobFlag = 1
 	THEN
-		perform cz_end_audit (jobID, 'SUCCESS');
+		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 	
 	return 0;
@@ -1148,9 +1148,9 @@ BEGIN
 	EXCEPTION
 	WHEN OTHERS THEN
 		--Handle errors.
-		perform cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+		perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
 		--End Proc
-		perform cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return 16;
 END;
 $$;

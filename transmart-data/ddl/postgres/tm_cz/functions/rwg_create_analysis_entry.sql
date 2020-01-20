@@ -45,15 +45,15 @@ BEGIN
 	IF (coalesce(jobID::text, '') = '' OR jobID < 1)
 		THEN
 		newJobFlag := 1; -- True
-		SELECT cz_start_audit(procedureName, databaseName) INTO jobID;
+		SELECT tm_cz.cz_start_audit(procedureName, databaseName) INTO jobID;
 	END IF;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Start FUNCTION', 0, stepCt, 'Done');
 	stepCt := 1;
 
 	-- If this flag is set to 'D', all study data from biomart.bio_assay_analysis and biomart.bio_assay_analysis_data
 	IF upper(delete_flag) = 'D' THEN
-		PERFORM cz_write_audit(jobId,databaseName,procedureName,'Start Delete bio_assay_analysis_data Loop',0,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start Delete bio_assay_analysis_data Loop',0,stepCt,'Done');
 		stepCt := stepCt + 1;	
 
 		FOR Cdeleterow IN Cdelete LOOP
@@ -64,15 +64,15 @@ BEGIN
 			WHERE
 				baad.bio_assay_analysis_id = cDeleteRow.bio_assay_analysis_id;
 			GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Delete records for analysis:  ' || cDeleteRow.bio_assay_analysis_id, rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 		END LOOP;
@@ -83,15 +83,15 @@ BEGIN
 			Biomart.bio_assay_analysis baa
 		WHERE UPPER ( baa.etl_id ) LIKE ( UPPER ( trialID ) || ':%' );
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Delete existing records from Biomart.bio_assay_analysis', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 	END IF;
@@ -129,15 +129,15 @@ BEGIN
 	WHERE
 		UPPER ( rwg.study_id ) = UPPER ( trialID );
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert records into Biomart.Bio_Assay_Analysis', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 
@@ -157,32 +157,32 @@ BEGIN
 	WHERE
 		UPPER ( rwg.study_id ) LIKE UPPER ( trialID );
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Update records in tm_lz.Rwg_Analysis with bio_assay_analysis_id ', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 
-	PERFORM cz_write_audit(jobId,databaseName,procedureName,'FUNCTION Complete',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'FUNCTION Complete',0,stepCt,'Done');
 	RETURN 0;
 
 	---Cleanup OVERALL JOB if this proc is being run standalone
 	IF newJobFlag = 1
 		THEN
-		PERFORM cz_end_audit (jobID, 'SUCCESS');
+		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 EXCEPTION
 	WHEN OTHERS THEN
 	errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 END;
 $body$

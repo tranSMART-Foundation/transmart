@@ -60,9 +60,9 @@ BEGIN
 	IF (coalesce(jobID::text, '') = '' OR jobID < 1)
 		THEN
 		newJobFlag := 1; -- True
-		SELECT cz_start_audit(procedureName, databaseName) INTO jobID;
+		SELECT tm_cz.cz_start_audit(procedureName, databaseName) INTO jobID;
 	END IF;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Start FUNCTION', 0, stepCt, 'Done');
 	stepCt := 1;
 
@@ -87,15 +87,15 @@ BEGIN
 	FROM TM_LZ.Rwg_Analysis
 	WHERE study_id =  Upper(trialID);
 
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Analysis count from TM_LZ.Rwg_Analysis =(see count)', analysisCount, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -112,15 +112,15 @@ BEGIN
 		analysis.bio_assay_analysis_id = baa.bio_assay_analysis_id --bio_assay_analysis_id in 'TM_LZ.Rwg_Analysis analysis' should already exist
 		AND UPPER ( analysis.study_id ) = UPPER ( trialID );
 
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Join analysis.Cohorts to Baa.Analysis_Name, Analysis count =(see count)', resultCount, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -134,15 +134,15 @@ BEGIN
 	DELETE FROM Biomart.Bio_Analysis_Cohort_Xref WHERE upper(study_id) = upper(trialID);
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Delete existing records from Biomart.Bio_Analysis_Cohort_Xref', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -154,15 +154,15 @@ BEGIN
 	FROM Biomart.Bio_Analysis_Attribute baa WHERE upper(study_id) = upper(trialID));
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Delete existing records from Biomart.Bio_Analysis_Attribute_Lineage', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -171,15 +171,15 @@ BEGIN
 	DELETE FROM Biomart.Bio_Analysis_Attribute  WHERE upper(study_id) = upper(trialID);
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Delete existing records from Biomart.Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -189,15 +189,15 @@ BEGIN
 	DELETE FROM Biomart.Bio_Assay_Cohort WHERE upper(study_id) = upper(trialID);
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Delete existing records from Biomart.Bio_Assay_Cohort', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -234,15 +234,15 @@ BEGIN
 		UPPER ( Study_Id ) = UPPER ( trialID );
 	
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert into Biomart.Bio_Assay_Cohort', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -255,7 +255,7 @@ BEGIN
 		LOOP
 
 		BEGIN
-		PERFORM cz_write_audit(jobId,databaseName,procedureName,'Starting Bio_Analysis_Cohort_Xref LOOP, pass: ',lcount,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting Bio_Analysis_Cohort_Xref LOOP, pass: ',lcount,stepCt,'Done');
 		INSERT INTO Biomart.Bio_Analysis_Cohort_Xref(
 			Study_Id,
 			Analysis_Cd,
@@ -274,15 +274,15 @@ BEGIN
 			AND Trim(Parse_Nth_Value(analysis.Cohorts,lcount,';')) IS NOT NULL;
 
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert COHORTS into  into Biomart.Bio_Analysis_Cohort_Xref', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -292,21 +292,21 @@ BEGIN
 	/*************************************/
 	/** POPULATE Bio_Analysis_Attribute **/
 	/*************************************/
-	--	delete study from cz_rwg_invalid_terms 20121220 JEA
+	--	delete study from tm_cz.cz_rwg_invalid_terms 20121220 JEA
 	BEGIN
-	DELETE FROM cz_rwg_invalid_terms
+	DELETE FROM tm_cz.cz_rwg_invalid_terms
 	WHERE upper(study_id) = upper(trialID);
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
-		'Delete existing data from cz_rwg_invalid_terms', rowCt, stepCt, 'Done');
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
+		'Delete existing data from tm_cz.cz_rwg_invalid_terms', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -319,19 +319,19 @@ BEGIN
 		errorMessage := 'RWG_ADD_SEARCH_TERM() failed. Arguments: ' ||
 				upper(trialID) || ', ' || i_study_data_category ||
 				', ' || i_study_category_display  || ', ' || jobId;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END IF;
 
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert study as search_term', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 
 	BEGIN
 	-- sample_type: check for any records that do not have a match in the taxonomy
-	INSERT INTO cz_rwg_Invalid_Terms(
+	INSERT INTO tm_cz.cz_rwg_invalid_terms(
 		Study_Id,
 		Category_Name,
 		Term_Name)
@@ -346,15 +346,15 @@ BEGIN
 			 WHERE Upper(Cohort.sample_type) = Upper(Tax.Term_Name));
 	
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'sample_type: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -380,22 +380,22 @@ BEGIN
 		AND Cohort.Study_Id =upper(trialID); 
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert SAMPLE_TYPE into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
 
 	-- disease: check for any records that do not have a match in the taxonomy
 	BEGIN
-	INSERT INTO Cz_Rwg_Invalid_Terms (
+	INSERT INTO tm_cz.cz_rwg_invalid_terms (
 		Study_Id,
 		Category_Name,
 		Term_Name )
@@ -417,15 +417,15 @@ BEGIN
 				UPPER ( Cohort.disease ) = UPPER ( Tax.Term_Name ) );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'disease: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -453,22 +453,22 @@ BEGIN
 		AND UPPER ( cohort.study_id ) = UPPER ( trialID ); 
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert disease into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
 
 	-- pathology: check for any records that do not have a match in the taxonomy
 	BEGIN
-	INSERT INTO Cz_Rwg_Invalid_Terms (
+	INSERT INTO tm_cz.cz_rwg_invalid_terms (
 		Study_Id,
 		Category_Name,
 		Term_Name )
@@ -489,15 +489,15 @@ BEGIN
 				UPPER ( Cohort.pathology ) = UPPER ( Tax.Term_Name ) );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'pathology: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -525,15 +525,15 @@ BEGIN
 		AND UPPER ( cohort.study_id ) = UPPER ( trialID );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert pathology into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -546,11 +546,11 @@ BEGIN
 	FOR lcount IN 1 .. dcount
 		LOOP	
 		stepCt := stepCt + 1;
-		PERFORM cz_write_audit(jobId,databaseName,procedureName,'Starting COHORT TREATMENT LOOP, pass: ',lcount,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting COHORT TREATMENT LOOP, pass: ',lcount,stepCt,'Done');
 
 		-- treatment: check for any records that do not have a match in the taxonomy
 		BEGIN
-		INSERT INTO Cz_Rwg_Invalid_Terms (
+		INSERT INTO tm_cz.cz_rwg_invalid_terms (
 			Study_Id,
 			Category_Name,
 			Term_Name )
@@ -597,15 +597,15 @@ BEGIN
 			AND UPPER ( cohort.study_id ) = UPPER ( trialid );
 
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert treatment into Bio_Analysis_Attribute (LOOP)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -614,12 +614,12 @@ BEGIN
 
 	stepCt := stepCt + 1;
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(Jobid,Databasename,Procedurename,'END TREATMENT LOOP',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'END TREATMENT LOOP',rowCt,stepCt,'Done');
 	-- END TREATMENT LOOP
 
 	-- organism: check for any records that do not have a match in the taxonomy
 	BEGIN
-	INSERT INTO Cz_Rwg_Invalid_Terms (
+	INSERT INTO tm_cz.cz_rwg_invalid_terms (
 		Study_Id,
 		Category_Name,
 		Term_Name )
@@ -640,15 +640,15 @@ BEGIN
 				UPPER ( Cohort.organism ) = UPPER ( Tax.Term_Name ) );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'organism: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -676,22 +676,22 @@ BEGIN
 		AND UPPER ( cohort.study_id ) = UPPER ( trialID );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert organism into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
 
 	-- data_type: check for any records that do not have a match in the taxonomy
 	BEGIN
-	INSERT INTO Cz_Rwg_Invalid_Terms (
+	INSERT INTO tm_cz.cz_rwg_invalid_terms (
 		Study_Id,
 		Category_Name,
 		Term_Name )
@@ -712,15 +712,15 @@ BEGIN
 				UPPER ( analysis.data_type ) = UPPER ( Tax.Term_Name ) );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'data_type: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -749,22 +749,22 @@ BEGIN
 		AND UPPER ( analysis.Study_Id ) = UPPER ( trialID );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert data_type into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
 
 	-- platform: check for any records that do not have a match in the taxonomy
 	BEGIN
-	INSERT INTO Cz_Rwg_Invalid_Terms (
+	INSERT INTO tm_cz.cz_rwg_invalid_terms (
 		study_id,
 		category_name,
 		term_name )
@@ -785,15 +785,15 @@ BEGIN
 				UPPER ( analysis.platform ) = UPPER ( Tax.Term_Name ) );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'platform: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -822,15 +822,15 @@ BEGIN
 		AND UPPER ( analysis.Study_Id ) = UPPER ( trialID );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert platform into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -844,11 +844,11 @@ BEGIN
 	FOR Lcount IN 1 .. Dcount
 		LOOP	 
 		stepCt := stepCt + 1;
-		PERFORM cz_write_audit(jobId,databaseName,procedureName,'Starting ANALYSIS_TYPE LOOP, pass: ',lcount,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting ANALYSIS_TYPE LOOP, pass: ',lcount,stepCt,'Done');
 
 		-- Analysis_Type: check for any records that do not have a match in the taxonomy
 		BEGIN
-		INSERT INTO Cz_Rwg_Invalid_Terms (
+		INSERT INTO tm_cz.cz_rwg_invalid_terms (
 			Study_Id,
 			Category_Name,
 			Term_Name )
@@ -899,15 +899,15 @@ BEGIN
 			AND TRIM ( Parse_Nth_Value ( analysis.Analysis_Type, Lcount, ';' ) ) IS NOT NULL;
 
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'LOOP: Insert ANALYSIS_TYPE into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -915,12 +915,12 @@ BEGIN
 
 	stepCt := stepCt + 1;
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(Jobid,Databasename,Procedurename,'END ANALYSIS_TYPE LOOP',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'END ANALYSIS_TYPE LOOP',rowCt,stepCt,'Done');
 	-- END ANALYSIS TYPE
 
 	-- search_area: check for any records that do not have a match in the taxonomy
 	BEGIN
-	INSERT INTO Cz_Rwg_Invalid_Terms (
+	INSERT INTO tm_cz.cz_rwg_invalid_terms (
 		Study_Id,
 		Category_Name,
 		Term_Name )
@@ -941,15 +941,15 @@ BEGIN
 				UPPER ( ext.search_area ) = UPPER ( Tax.Term_Name ) );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'search_area: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -976,22 +976,22 @@ BEGIN
 		AND UPPER ( ext.study_id ) = UPPER ( trialID );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert search_area into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
 
 	-- data source: check for any records that do not have a match in the taxonomy
 	BEGIN
-	INSERT INTO Cz_Rwg_Invalid_Terms (
+	INSERT INTO tm_cz.cz_rwg_invalid_terms (
 		Study_Id,
 		Category_Name,
 		Term_Name )
@@ -1012,15 +1012,15 @@ BEGIN
 				UPPER ( ext.data_source ) = UPPER ( Tax.Term_Name ) );
 	
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'data source: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -1047,22 +1047,22 @@ BEGIN
 		AND UPPER ( ext.study_id ) = UPPER ( trialID );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert DATA_SOURCE into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
 
 	-- study_design: check for any records that do not have a match in the taxonomy
 	BEGIN
-	INSERT INTO Cz_Rwg_Invalid_Terms (
+	INSERT INTO tm_cz.cz_rwg_invalid_terms (
 		Study_Id,
 		Category_Name,
 		Term_Name )
@@ -1083,15 +1083,15 @@ BEGIN
 				UPPER ( ext.experimental_design ) = UPPER ( Tax.Term_Name ) );
 	
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'study design: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -1122,15 +1122,15 @@ BEGIN
 		AND UPPER ( ext.study_id ) = UPPER ( trialID );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert study_design into Bio_Analysis_Attribute', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -1153,15 +1153,15 @@ BEGIN
 		AND baa.term_id = st.term_id;
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert attribute links into bio_analysis_attribute_lineage', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
@@ -1176,40 +1176,40 @@ BEGIN
 		UPPER ( baa.etl_id ) LIKE UPPER ( trialID || '%' );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Update ANALYSIS_UPDATE_DATE with LOCALTIMESTAMP', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 	END;
-	PERFORM cz_write_audit(jobId,databaseName,procedureName,'End FUNCTION',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End FUNCTION',0,stepCt,'Done');
 
 	---Cleanup OVERALL JOB if this proc is being run standalone    
 	IF newJobFlag = 1
 		THEN
-		PERFORM cz_end_audit (jobID, 'SUCCESS');
+		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 EXCEPTION
 	WHEN SQLSTATE 'AA001' then
 		stepCt := stepCt + 1;
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
-		PERFORM cz_write_audit(Jobid,Databasename,Procedurename,'ERR: Check for analysis in rwg_analysis not in biomart.bio_assay_analysis',rowCt,stepCt,'Done');
+		perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'ERR: Check for analysis in rwg_analysis not in biomart.bio_assay_analysis',rowCt,stepCt,'Done');
 		--Handle errors.
-		PERFORM cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
+		perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
 		--End Proc
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := 16;		
 	WHEN OTHERS THEN
 	errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		rtn_code := -16;
 		RETURN;
 END;

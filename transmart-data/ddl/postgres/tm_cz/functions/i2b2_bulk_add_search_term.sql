@@ -68,13 +68,13 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	perform cz_start_audit (procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
     	
     --stepCt := 0;
     --rowCt := 0;
   
-    --perform cz_write_audit(jobId,databaseName,procedureName,'Start Procedure',0,stepCt,'Done');
+    --perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start Procedure',0,stepCt,'Done');
     --stepCt := stepCt + 1;	
 
     keySize = array_length(keyArray, 1);
@@ -123,7 +123,7 @@ begin
 		   and upper(x.keyword) = upper(v_keyword_term)
          	   and upper(x.bio_data_id) = upper(v_bio_data_id));
 	get diagnostics rowCt := ROW_COUNT;	
-	perform cz_write_audit(Jobid,Databasename,Procedurename,v_keyword_term || ' added to searchapp.search_keyword',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,v_keyword_term || ' added to searchapp.search_keyword',rowCt,stepCt,'Done');
 	stepCt := stepCt + 1;	
 	commit;
 
@@ -134,7 +134,7 @@ begin
 	   and upper(data_category) = upper(v_data_category)
     	   and upper(bio_data_id) = upper(v_bio_data_id);
 	get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(Jobid,Databasename,Procedurename,'New search keyword ID stored in keyword_id',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'New search keyword ID stored in keyword_id',rowCt,stepCt,'Done');
 	stepCt := stepCt + 1;	
 
 	-- Insert the new term into searchapp.search_keyword_term 
@@ -152,26 +152,26 @@ begin
 		 where upper(x.keyword_term) = upper(v_keyword_term)
 		   and x.search_keyword_id = keyword_id);
 	get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(Jobid,Databasename,Procedurename,'Term added to searchapp.search_keyword_term',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'Term added to searchapp.search_keyword_term',rowCt,stepCt,'Done');
 	stepCt := stepCt + 1;	
 	commit;
 
     end loop;
 
-    perform cz_write_audit(Jobid,Databasename,Procedurename,'End '|| procedureName,0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'End '|| procedureName,0,stepCt,'Done');
     stepCt := stepCt + 1;  
 
     ---Cleanup OVERALL JOB if this proc is being run standalone    
     if newJobFlag = 1 then
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
   
 exception
     when others then
     --Handle errors.
-	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
   
 end;
  

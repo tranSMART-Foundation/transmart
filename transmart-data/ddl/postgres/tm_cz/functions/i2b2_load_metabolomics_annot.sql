@@ -38,11 +38,11 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(jobID IS NULL or jobID < 1) then
 	newJobFlag := 1; -- True
-	select cz_start_audit (procedureName, databaseName) into jobID;
+	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting I2B2_LOAD_METABOLOMICS_ANNOTATION',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting I2B2_LOAD_METABOLOMICS_ANNOTATION',0,stepCt,'Done');
 
     --    get  id_ref  from external table
     
@@ -70,7 +70,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
 
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_metabolite_sub_pway_metab',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_metabolite_sub_pway_metab',rowCt,stepCt,'Done');
 
     --    delete any existing data from de_metabolite_sub_pathways
     begin
@@ -85,7 +85,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
 
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_metabolite_sub_pathways',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_metabolite_sub_pathways',rowCt,stepCt,'Done');
 
     --    delete any existing data from de_metabolite_super_pathways
 
@@ -102,7 +102,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
 
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_metabolite_super_pathways',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_metabolite_super_pathways',rowCt,stepCt,'Done');
 
     --    delete any existing data from deapp.de_metabolite_annotation
     begin
@@ -118,7 +118,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
 
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_metabolite_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_metabolite_annotation',rowCt,stepCt,'Done');
 
     
     begin
@@ -149,7 +149,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;  
     
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_metabolite_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_metabolite_annotation',rowCt,stepCt,'Done');
     
     begin
 	insert into deapp.de_metabolite_super_pathways
@@ -173,7 +173,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_metabolite_super_pathways',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_metabolite_super_pathways',rowCt,stepCt,'Done');
     
     begin
         insert into  deapp.de_metabolite_sub_pathways
@@ -203,7 +203,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;		
     
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_metabolite_sub_pathways',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_metabolite_sub_pathways',rowCt,stepCt,'Done');
     
     begin
         insert into  deapp.de_metabolite_sub_pway_metab
@@ -226,7 +226,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_metabolite_sub_pway_metab',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_metabolite_sub_pway_metab',rowCt,stepCt,'Done');
     
     --    update biomarker_id if null
     
@@ -252,7 +252,7 @@ begin
 
     get diagnostics rowCt := ROW_COUNT;
     
-    perform cz_write_audit(jobId,databaseName,procedureName,'Updated missing metabolite in de_metabolomics_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing metabolite in de_metabolomics_annotation',rowCt,stepCt,'Done');
     
     --    insert probesets into biomart.bio_assay_feature_group
     begin
@@ -274,7 +274,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert peptides into biomart.mirna_bio_assay_feature_group',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert peptides into biomart.mirna_bio_assay_feature_group',rowCt,stepCt,'Done');
     
     --    insert probesets into biomart.mirna_bio_assay_data_annotation
     
@@ -303,7 +303,7 @@ begin
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.mirna_bio_assay_data_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.mirna_bio_assay_data_annotation',rowCt,stepCt,'Done');
     
     -- Inserts subpathways into search_keyword,
     -- subpathways into search_keyword_term,
@@ -334,7 +334,7 @@ begin
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert subpathways into search_keyword',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subpathways into search_keyword',rowCt,stepCt,'Done');
     
     begin
         INSERT INTO searchapp.search_keyword_term (
@@ -366,7 +366,7 @@ begin
           ) as s;
 
         stepCt := stepCt + 1;
-        perform cz_write_audit(jobId,databaseName,procedureName,'Insert subpathways into search_keyword_term',rowCt,stepCt,'Done');
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subpathways into search_keyword_term',rowCt,stepCt,'Done');
         
         INSERT INTO searchapp.search_keyword (
             keyword,
@@ -393,7 +393,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
 
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert superpathways into search_keyword',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert superpathways into search_keyword',rowCt,stepCt,'Done');
     
     begin
         insert into searchapp.search_keyword_term (
@@ -430,7 +430,7 @@ begin
     get diagnostics rowCt := ROW_COUNT;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert superpathways into search_keyword_term',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert superpathways into search_keyword_term',rowCt,stepCt,'Done');
     
     begin
 	insert into biomart.bio_marker (
@@ -455,7 +455,7 @@ begin
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT; 
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert into biomart.bio_marker',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into biomart.bio_marker',rowCt,stepCt,'Done');
     
     begin
         update deapp.de_metabolite_annotation annotation
@@ -471,14 +471,14 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     
-    perform cz_write_audit(jobId,databaseName,procedureName,'Update deapp.de_metabolite_annotation',rowCt,stepCt,'Done');                 
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update deapp.de_metabolite_annotation',rowCt,stepCt,'Done');                 
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'End I2B2_LOAD_METABOLOMICS_ANNOT',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End I2B2_LOAD_METABOLOMICS_ANNOT',0,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 1;

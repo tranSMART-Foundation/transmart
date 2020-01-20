@@ -70,8 +70,8 @@ begin
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
-    databaseName := 'TM_CZ';
-    procedureName := 'I2B2_LOAD_FROM_STAGE';
+    databaseName := 'tm_cz';
+    procedureName := 'i2b2_load_from_stage';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it

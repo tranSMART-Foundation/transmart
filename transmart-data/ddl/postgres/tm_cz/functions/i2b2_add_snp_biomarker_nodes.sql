@@ -73,11 +73,11 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	perform cz_start_audit (procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
     
     stepCt := 0;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_add_snp_node',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_add_snp_node',0,stepCt,'Done');
     stepCt := stepCt + 1;
 
     --	determine last node in ontPath
@@ -95,7 +95,7 @@ begin
     if pExists = 0 then 
 	perform i2b2_add_node(TrialId, regexp_replace(ont_path || '\','(\\){2,}', '\'), nodeName, jobID);
         stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Add node for ontPath',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Add node for ontPath',0,stepCt,'Done');
     end if;
 
     --	check if a node exists for the platform, if yes, then delete existing data, make sure all platforms in de_subject_snp_dataset have an
@@ -112,10 +112,10 @@ begin
     if pExists > 0 then
 	--	put message in log
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'One or more GPL platforms in de_subject_snp_dataset is not in de_gpl_info',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'One or more GPL platforms in de_subject_snp_dataset is not in de_gpl_info',0,stepCt,'Done');
 
 	--End Proc
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return;
     end if;
 
@@ -125,15 +125,15 @@ begin
 	
 	perform i2b2_delete_all_nodes(regexp_replace(ont_path || '\','(\\){2,}', '\') || r_addPlatform.title || '\', jobID);
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing SNP Platform for trial in I2B2METADATA i2b2',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing SNP Platform for trial in I2B2METADATA i2b2',0,stepCt,'Done');
 	
 	perform i2b2_add_node(TrialId, r_addPlatform.path, r_addPlatform.title, jobId);
 	tText := 'Added Platform: ' || r_addPlatform.path || '  Name: ' || r_addPlatform.title;
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
     end loop;
 
-    perform cz_write_audit(jobId,databaseName,procedureName,'Added SNP Platform nodes',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Added SNP Platform nodes',0,stepCt,'Done');
     stepCt := stepCt + 1;
     commit;
     
@@ -144,7 +144,7 @@ begin
 	perform i2b2_add_node(TrialId, r_addSample.sample_path, r_addSample.sample_name, jobId);
 	tText := 'Added Sample: ' || r_addSample.sample_path || '  Name: ' || r_addSample.sample_name;
  	get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,tText,RowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,RowCt,stepCt,'Done');
 	stepCt := stepCt + 1;
 
     end loop;		  
@@ -190,7 +190,7 @@ begin
 	      ,t.concept_cd
 	      ,t.sourcesystem_cd;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert trial into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
     stepCt := stepCt + 1;
     commit;
     
@@ -209,7 +209,7 @@ begin
      where d.trial_name = TrialId;
     
     stepCt := stepCt + 1;  get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Update concept_cd in DEAPP de_subject_snp_dataset',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_cd in DEAPP de_subject_snp_dataset',rowCt,stepCt,'Done');
     commit;
     
     --	Update visual attributes for leaf active (default is folder)
@@ -221,7 +221,7 @@ begin
 		 where b.c_fullname like (a.c_fullname || '%'))
 	   and a.c_fullname like regexp_replace(ont_path || '\','(\\){2,}', '\') || '%';
     stepCt := stepCt + 1;  get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Update leaf active attribute for trial in I2B2METADATA i2b2',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update leaf active attribute for trial in I2B2METADATA i2b2',rowCt,stepCt,'Done');
     commit;
     
     --	fill in tree
@@ -239,36 +239,36 @@ begin
 
     perform i2b2_fill_in_tree(TrialID,regexp_replace(nodeName || '\','(\\){2,}', '\'), jobID);
     stepCt := stepCt + 1;  get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Fill in tree for Biomarker Data for trial',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Fill in tree for Biomarker Data for trial',rowCt,stepCt,'Done');
     
     --Build concept Counts
     --Also marks any i2B2 records with no underlying data as Hidden, need to do at Biomarker level because there may be multiple platforms and patient count can vary
     
     perform i2b2_create_concept_counts(regexp_replace(nodeName || '\','(\\){2,}', '\'),jobID );
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
 
     --Reload Security: Inserts one record for every I2B2 record into the security table
 
     perform i2b2_load_security_data(jobId);
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_protein_data',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_protein_data',0,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
 exception
 
     when others then
     --Handle errors.
-	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
-	perform cz_end_audit (jobID, 'FAIL'); 
+	perform tm_cz.cz_end_audit (jobID, 'FAIL'); 
 
 end;
 

@@ -49,26 +49,26 @@ BEGIN
 	IF (coalesce(jobID::text, '') = '' OR jobID < 1)
 		THEN
 		newJobFlag := 1; -- True
-		SELECT cz_start_audit(procedureName, databaseName) INTO jobID;
+		SELECT tm_cz.cz_start_audit(procedureName, databaseName) INTO jobID;
 	END IF;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Start FUNCTION', 0, stepCt, 'Done');
 	stepCt := 1;
 
 	delete from TM_LZ.Rwg_Analysis where upper(study_id) =upper(trialID);
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 
-	perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing records from TM_LZ.Rwg_Analysis',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing records from TM_LZ.Rwg_Analysis',rowCt,stepCt,'Done');
 	stepCt := stepCt + 1;
 
 	delete from TM_LZ.Rwg_Cohorts where upper(study_id) =upper(trialID);
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 
-	perform cz_Write_Audit(Jobid,Databasename,Procedurename,'Delete existing records from TM_LZ.Rwg_Cohorts',rowCt,Stepct,'Done');
+	perform tm_cz.cz_Write_Audit(Jobid,Databasename,Procedurename,'Delete existing records from TM_LZ.Rwg_Cohorts',rowCt,Stepct,'Done');
 	stepCt := stepCt + 1;
 
 	delete from TM_LZ.Rwg_Samples where upper(study_id) =upper(trialID);
-	perform cz_Write_Audit(Jobid,Databasename,Procedurename,'Delete existing records from TM_LZ.Rwg_Samples',rowCt,Stepct,'Done');
+	perform tm_cz.cz_Write_Audit(Jobid,Databasename,Procedurename,'Delete existing records from TM_LZ.Rwg_Samples',rowCt,Stepct,'Done');
 	stepCt := stepCt + 1;
 
 	-- not used??
@@ -108,15 +108,15 @@ BEGIN
     FROM  TM_LZ.Rwg_Analysis_Ext
     WHERE upper(study_id) = upper(trialID);
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert records from TM_LZ.Rwg_Analysis_Ext to TM_LZ.Rwg_Analysis', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 
@@ -144,15 +144,15 @@ BEGIN
 				AND t.analysis_id = x.analysis_name );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Update bio_assay_analysis_id on existing rwg_analysis records', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 
@@ -182,15 +182,15 @@ BEGIN
 	where upper(study_id) = upper(trialID);
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert records from TM_LZ.Rwg_Cohorts_Ext to TM_LZ.Rwg_Cohorts', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 
@@ -209,21 +209,21 @@ BEGIN
 	WHERE upper(study_id) = upper(trialID);
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
-	PERFORM cz_write_audit(jobId, databaseName, procedureName,
+	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert records from TM_LZ.Rwg_Samples_Ext to TM_LZ.Rwg_Samples', rowCt, stepCt, 'Done');
 	stepCt := stepCt + 1;
 	EXCEPTION
 		WHEN OTHERS THEN
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 	END;
 
 	---Cleanup OVERALL JOB if this proc is being run standalone
 	IF newJobFlag = 1 THEN
-		PERFORM cz_end_audit(jobID, 'SUCCESS');
+		perform tm_cz.cz_end_audit(jobID, 'SUCCESS');
 	END IF;
 
 	RETURN 0;
@@ -231,8 +231,8 @@ EXCEPTION
 	WHEN OTHERS THEN
 	errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		PERFORM cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
-		PERFORM cz_end_audit (jobID, 'FAIL');
+		perform tm_cz.cz_error_handler(jobID, procedureName, errorNumber, errorMessage);
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		RETURN -16;
 END;
 

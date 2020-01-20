@@ -37,11 +37,11 @@ BEGIN
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	select cz_start_audit (procedureName, databaseName, jobID) into jobId;
+	select tm_cz.cz_start_audit (procedureName, databaseName, jobID) into jobId;
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_rbm_annotation',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_rbm_annotation',0,stepCt,'Done');
 
     --	get GPL id from external table
     
@@ -66,7 +66,7 @@ BEGIN
     end;	
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from REFERENCE antigen_deapp',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from REFERENCE antigen_deapp',rowCt,stepCt,'Done');
 
     
     --	delete any existing data from annotation_deapp
@@ -86,7 +86,7 @@ BEGIN
     end;	
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from annotation_deapp',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from annotation_deapp',rowCt,stepCt,'Done');
 
     --	delete any existing data from deapp.de_mrna_annotation
     begin
@@ -105,7 +105,7 @@ BEGIN
     end;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_mrna_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_mrna_annotation',rowCt,stepCt,'Done');
     
     --	insert any new probesets into probeset_deapp
     begin
@@ -133,7 +133,7 @@ BEGIN
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into antigen_deapp',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into antigen_deapp',rowCt,stepCt,'Done');
     
     --	insert data into annotation_deapp
     begin
@@ -168,7 +168,7 @@ BEGIN
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into REFERENCE annotation_deapp',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into REFERENCE annotation_deapp',rowCt,stepCt,'Done');
     
     --	insert data into deapp.de_rbm_annotation
     begin
@@ -203,7 +203,7 @@ BEGIN
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_rbm_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_rbm_annotation',rowCt,stepCt,'Done');
     
     --	update gene_id if null
     begin
@@ -234,7 +234,7 @@ BEGIN
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_rbm_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_rbm_annotation',rowCt,stepCt,'Done');
     
     --	update gene_symbol if null
     begin
@@ -265,7 +265,7 @@ BEGIN
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_rbm_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_rbm_annotation',rowCt,stepCt,'Done');
     
     --	insert probesets into biomart.bio_assay_feature_group
     begin
@@ -291,7 +291,7 @@ BEGIN
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert probesets into biomart.bio_assay_feature_group',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert probesets into biomart.bio_assay_feature_group',rowCt,stepCt,'Done');
     
     --	insert probesets into biomart.bio_assay_data_annotation
     begin
@@ -323,15 +323,15 @@ BEGIN
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.bio_assay_data_annotation',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.bio_assay_data_annotation',rowCt,stepCt,'Done');
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_rbm_annotation',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_rbm_annotation',0,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     IF newJobFlag = 1
     THEN
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 
     return 1;

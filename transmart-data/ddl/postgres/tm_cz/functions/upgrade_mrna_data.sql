@@ -52,11 +52,11 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	perform cz_start_audit (procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Start upgrade_mrna_data',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start upgrade_mrna_data',0,stepCt,'Done');
     commit;
     
     --	get trial_names for all gex data
@@ -64,7 +64,7 @@ begin
 
     
     stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Bulk Collect trial_names',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Bulk Collect trial_names',rowCt,stepCt,'Done');
     gexCt := 0;
     for i in 0 .. (gexSize - 1) loop
 	gexStudy := gex_study_array[i].trial_name;
@@ -89,7 +89,7 @@ begin
 		    'NOLOGGING COMPRESS TABLESPACE "TRANSMART" ';
 		execute(tText);
 		stepCt := stepCt + 1;
-		perform cz_write_audit(jobId,databaseName,procedureName,'Added ' || gexStudy || ':' || gexSource || ' partition to de_subject_microarray_data_new',0,stepCt,'Done');
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Added ' || gexStudy || ':' || gexSource || ' partition to de_subject_microarray_data_new',0,stepCt,'Done');
 	    end if;
 	end if;
 	
@@ -119,7 +119,7 @@ begin
 	   and sm.assay_id = sd.assay_id;
 	
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Inserted ' || gexStudy || ':' || gexSource || ' to new table',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted ' || gexStudy || ':' || gexSource || ' to new table',rowCt,stepCt,'Done');
 	
     end loop;
     
@@ -132,35 +132,35 @@ begin
     alter table deapp.de_subject_microarray_data rename to de_subject_microarray_data_old;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Rename old de_subject_microarray_data',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Rename old de_subject_microarray_data',0,stepCt,'Done');
 
     --	rename _new to de_subject_microarray_data
 
     alter table deapp.de_subject_microarray_data_new rename to de_subject_microarray_data;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Rename old de_subject_microarray_data',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Rename old de_subject_microarray_data',0,stepCt,'Done');
 
     --	add indexes to de_subject_microarray_data
 
     perform i2b2_mrna_index_maint('ADD',null,jobId);
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_audit',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_audit',0,stepCt,'Done');
 
     commit;
 
     --Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 hen
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
 exception
     when others then
     --Handle errors.
-	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	
 end;
 

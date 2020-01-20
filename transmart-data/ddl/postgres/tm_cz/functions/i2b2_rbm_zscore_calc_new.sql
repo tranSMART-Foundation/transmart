@@ -49,23 +49,23 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	perform cz_start_audit (procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
 
     stepCt := 0;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
 
     if runType != 'L' then
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
 			       ,rowCt,stepCt,'Done');
 	--Handle errors.
-	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 	--End Proc
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return;
     end if;
 
@@ -79,12 +79,12 @@ begin
 	if stgTrial != TrialId then
 	    stepCt := stepCt + 1;
 	    get diagnostics rowCt := ROW_COUNT;
-	    perform cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in WT_SUBJECT_RBM_PROBESET - procedure exiting'
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in WT_SUBJECT_RBM_PROBESET - procedure exiting'
 				   ,rowCt,stepCt,'Done');
 	    --Handle errors.
-	    perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	    perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 	    --End Proc
-	    perform cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return;
 	end if;
     end if;
@@ -101,12 +101,12 @@ begin
 	if idxExists = 0 then
 	    stepCt := stepCt + 1;
 	    get diagnostics rowCt := ROW_COUNT;
-	    perform cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_rbm_data - procedure exiting'
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_rbm_data - procedure exiting'
 				   ,rowCt,stepCt,'Done');
 	    --Handle errors.
-	    perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	    perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 	    --End Proc
-	    perform cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return;
 	end if;
     end if;
@@ -141,7 +141,7 @@ begin
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
 
     --	if dataType = L, use intensity_value as log_intensity
     --	if dataType = R, always use intensity_value
@@ -193,13 +193,13 @@ begin
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rbm_logs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rbm_logs',rowCt,stepCt,'Done');
 
     commit;
 
     EXECUTE('create index tm_wz.wt_subject_rbm_logs_i1 on tm_wz.wt_subject_rbm_logs (trial_name, probeset_id) nologging  tablespace "INDX"');
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_logs',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_logs',0,stepCt,'Done');
 
     --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
 
@@ -220,13 +220,13 @@ begin
 	      ,d.probeset_id;
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rbm_calcs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rbm_calcs',rowCt,stepCt,'Done');
 
     commit;
 
     EXECUTE('create index tm_wz.wt_subject_rbm_calcs_i1 on tm_wz.wt_subject_rbm_calcs (trial_name, probeset_id) nologging tablespace "INDX"');
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_calcs',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_calcs',0,stepCt,'Done');
 
     -- calculate zscore
 
@@ -259,7 +259,7 @@ begin
      where d.probeset_id = c.probeset_id;
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rbm_med',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rbm_med',rowCt,stepCt,'Done');
 
     commit;
 
@@ -271,10 +271,10 @@ begin
       if nbrRecs > 10000000 then
       i2b2_mrna_index_maint('DROP',,jobId);
       stepCt := stepCt + 1;
-      perform cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on DEAPP de_subject_rbm_data',0,stepCt,'Done');
+      perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on DEAPP de_subject_rbm_data',0,stepCt,'Done');
       else
       stepCt := stepCt + 1;
-      perform cz_write_audit(jobId,databaseName,procedureName,'Less than 10M records, index drop bypassed',0,stepCt,'Done');
+      perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Less than 10M records, index drop bypassed',0,stepCt,'Done');
       end if;
      */
 
@@ -370,7 +370,7 @@ begin
      */
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP de_subject_rbm_data',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP de_subject_rbm_data',rowCt,stepCt,'Done');
 
     commit;
 
@@ -378,7 +378,7 @@ begin
     /*
       i2b2_mrna_index_maint('ADD',,jobId);
       stepCt := stepCt + 1;
-      perform cz_write_audit(jobId,databaseName,procedureName,'Add indexes on DEAPP de_subject_rbm_data',0,stepCt,'Done');
+      perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Add indexes on DEAPP de_subject_rbm_data',0,stepCt,'Done');
      */
 
     --	cleanup tmp_ files
@@ -388,20 +388,20 @@ begin
     --execute immediate('truncate table tm_wz.wt_subject_rbm_med');
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then 
-	perform cz_end_audit (jobID, 'SUCCESS'); 
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS'); 
     end if;
 
 exception
     when others then
     --Handle errors.
-	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 
 
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 
 end;
 
@@ -465,7 +465,7 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	perform cz_start_audit (procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
 
     stepCt := 0;
@@ -504,14 +504,14 @@ begin
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
 
     if runType != 'L' then
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
 			      ,0,stepCt,'Done');
 	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	perform cz_end_audit (jobId,'FAIL');
+	perform tm_cz.cz_end_audit (jobId,'FAIL');
 	return;
     end if;
 
@@ -524,10 +524,10 @@ begin
 
 	if stgTrial != TrialId then
 	    stepCt := stepCt + 1;
-	    perform cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in WT_SUBJECT_RBM_PROBESET - procedure exiting'
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in WT_SUBJECT_RBM_PROBESET - procedure exiting'
 				  ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	    perform cz_end_audit (jobId,'FAIL');
+	    perform tm_cz.cz_end_audit (jobId,'FAIL');
 	    return;
 	end if;
     end if;
@@ -543,10 +543,10 @@ begin
 
 	if idxExists = 0 then
 	    stepCt := stepCt + 1;
-	    perform cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_rbm_data - procedure exiting'
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_rbm_data - procedure exiting'
 				  ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	    perform cz_end_audit (jobId,'FAIL');
+	    perform tm_cz.cz_end_audit (jobId,'FAIL');
 	    return;
 	end if;
     end if;
@@ -565,7 +565,7 @@ begin
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
 
     --	if dataType = L, use intensity_value as log_intensity
     --	if dataType = R, always use intensity_value
@@ -617,11 +617,11 @@ begin
 	    return;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rbm_logs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rbm_logs',rowCt,stepCt,'Done');
 
     EXECUTE('create index tm_wz.wt_subject_rbm_logs_i1 on tm_wz.wt_subject_rbm_logs (trial_name, probeset_id) nologging  tablespace "INDX"');
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_logs',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_logs',0,stepCt,'Done');
 
     --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
     begin
@@ -652,12 +652,12 @@ begin
 	    return;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rbm_calcs',SQL%ROWCOUNT,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rbm_calcs',SQL%ROWCOUNT,stepCt,'Done');
 
 
     EXECUTE('create index tm_wz.wt_subject_rbm_calcs_i1 on tm_wz.wt_subject_rbm_calcs (trial_name, probeset_id) nologging tablespace "INDX"');
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_calcs',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_calcs',0,stepCt,'Done');
 
     -- calculate zscore
     begin
@@ -696,7 +696,7 @@ begin
 	    return;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rbm_med',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rbm_med',rowCt,stepCt,'Done');
 
 
     -- insert into de_subject_rbm_data when dataType is T (transformed)
@@ -769,7 +769,7 @@ begin
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then 
-	perform cz_end_audit (jobID, 'SUCCESS'); 
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS'); 
     end if;
 
 end;
@@ -834,7 +834,7 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	perform cz_start_audit (procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
 
     stepCt := 0;
@@ -873,14 +873,14 @@ begin
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
 
     if runType != 'L' then
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
 			      ,0,stepCt,'Done');
 	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	perform cz_end_audit (jobId,'FAIL');
+	perform tm_cz.cz_end_audit (jobId,'FAIL');
 	return;
     end if;
 
@@ -893,10 +893,10 @@ begin
 
 	if stgTrial != TrialId then
 	    stepCt := stepCt + 1;
-	    perform cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in WT_SUBJECT_RBM_PROBESET - procedure exiting'
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in WT_SUBJECT_RBM_PROBESET - procedure exiting'
 				  ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	    perform cz_end_audit (jobId,'FAIL');
+	    perform tm_cz.cz_end_audit (jobId,'FAIL');
 	    return;
 	end if;
     end if;
@@ -912,10 +912,10 @@ begin
 
 	if idxExists = 0 then
 	    stepCt := stepCt + 1;
-	    perform cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_rbm_data - procedure exiting'
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_rbm_data - procedure exiting'
 				  ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	    perform cz_end_audit (jobId,'FAIL');
+	    perform tm_cz.cz_end_audit (jobId,'FAIL');
 	    return;
 	end if;
     end if;
@@ -932,7 +932,7 @@ begin
     execute('drop index if exists tm_wz.wt_subject_rbm_calcs_i1');
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
 
     --	if dataType = L, use intensity_value as log_intensity
     --	if dataType = R, always use intensity_value
@@ -983,11 +983,11 @@ begin
 	    return;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rbm_logs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rbm_logs',rowCt,stepCt,'Done');
 
     execute('create index wt_subject_rbm_logs_i1 on tm_wz.wt_subject_rbm_logs (trial_name, probeset_id) tablespace "indx"');
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_logs',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_logs',0,stepCt,'Done');
 
     --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
     begin
@@ -1018,12 +1018,12 @@ begin
 	    return;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rbm_calcs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rbm_calcs',rowCt,stepCt,'Done');
 
 
     execute('create index wt_subject_rbm_calcs_i1 on tm_wz.wt_subject_rbm_calcs (trial_name, probeset_id) tablespace "indx"');
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_calcs',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_rbm_calcs',0,stepCt,'Done');
 
     -- calculate zscore
     begin
@@ -1062,7 +1062,7 @@ begin
 	    return;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rbm_med',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rbm_med',rowCt,stepCt,'Done');
 
 
     -- insert into de_subject_rbm_data when dataType is T (transformed)
@@ -1117,7 +1117,7 @@ begin
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then 
-	perform cz_end_audit (jobID, 'SUCCESS'); 
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS'); 
     end if;
 
 end;

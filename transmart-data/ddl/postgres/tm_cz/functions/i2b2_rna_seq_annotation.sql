@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_rna_seq_annotation(bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_rna_seq_annotation( platformId character varying, currentjobid bigint DEFAULT NULL::bigint) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_rna_seq_annotation( platformId character varying, currentjobid bigint DEFAULT NULL::bigint) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -31,11 +31,11 @@ begin
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(coalesce(jobID::text, '') = '' or jobID < 1) then
 	newJobFlag := 1; -- True
-	select cz_start_audit (procedureName, databaseName, jobID) into jobId;
+	select tm_cz.cz_start_audit (procedureName, databaseName, jobID) into jobId;
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_rna_seq_annotation',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_rna_seq_annotation',0,stepCt,'Done');
     
     -- insert into deapp.de_rnaseq_annotation
     
@@ -44,9 +44,9 @@ begin
      where marker_type='RNASEQ'
        and platform = platformId;
     if gpl_rtn=0 then
-	perform cz_write_audit(jobId,databasename,procedurename,'Platform data missing from DEAPP.DE_GPL_INFO',1,stepCt,'ERROR');
+	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform data missing from DEAPP.DE_GPL_INFO',1,stepCt,'ERROR');
 	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	perform cz_end_audit (jobId,'FAIL');
+	perform tm_cz.cz_end_audit (jobId,'FAIL');
 	return 161;
     end if;
     
@@ -77,7 +77,7 @@ begin
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Insert data in de_rnaseq_annotation',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data in de_rnaseq_annotation',0,stepCt,'Done');
     
     begin
 	update deapp.de_rnaseq_annotation a
@@ -99,11 +99,11 @@ begin
     end;
     
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'End i2b2_rna_seq_annotation',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_rna_seq_annotation',0,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 0;

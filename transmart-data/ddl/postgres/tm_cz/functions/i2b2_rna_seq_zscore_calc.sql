@@ -1,3 +1,5 @@
+SET search_path = tm_cz, pg_catalog;
+
 --
 -- Name: i2b2_rna_seq_zscore_calc(character varying, character varying, character varying, numeric, character varying, numeric, character varying, bigint, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
@@ -57,7 +59,7 @@ BEGIN
     IF(coalesce(jobID::text, '') = '' or jobID < 1)
     THEN
 	newJobFlag := 1; -- True
-	perform cz_start_audit (procedureName, databaseName, jobID);
+	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
 	END IF;
 
     stepCt := 0;
@@ -69,27 +71,27 @@ BEGIN
     if pExists = 0 then
 	sqlText := 'create table ' || partitionName || ' ( constraint rnaseq_' || partitionId::text || '_check check ( partition_id = ' || partitionId::text ||
 	    ')) inherits (deapp.de_subject_rna_data)';
-	raise notice 'sqlText= %', sqlText;
+--	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create partition ' || partitionName,1,stepCt,'Done');
     else
 	sqlText := 'drop index if exists ' || partitionIndx || '_idx1';
-	raise notice 'sqlText= %', sqlText;
+--	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	sqlText := 'drop index if exists ' || partitionIndx || '_idx2';
-	raise notice 'sqlText= %', sqlText;
+--	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	sqlText := 'drop index if exists ' || partitionIndx || '_idx3';
-	raise notice 'sqlText= %', sqlText;
+--	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	sqlText := 'drop index if exists ' || partitionIndx || '_idx4';
-	raise notice 'sqlText= %', sqlText;
+--	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on ' || partitionName,1,stepCt,'Done');
 	sqlText := 'truncate table ' || partitionName;
-	raise notice 'sqlText= %', sqlText;
+--	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate ' || partitionName,1,stepCt,'Done');
@@ -97,22 +99,22 @@ BEGIN
 
     if runType != 'L' then
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
 			       ,0,stepCt,'Done');
 	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	perform cz_end_audit (jobId,'FAIL');
+	perform tm_cz.cz_end_audit (jobId,'FAIL');
 	return -16;
     end if;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
 
     if runType != 'L' then
 	stepCt := stepCt + 1;
-	perform cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
 			       ,0,stepCt,'Done');
-	perform cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-	perform cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
     end if;
 
@@ -122,10 +124,10 @@ BEGIN
 
 	if stgTrial != TrialId then
 	    stepCt := stepCt + 1;
-	    perform cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in wt_subject_rna_probeset - procedure exiting'
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in wt_subject_rna_probeset - procedure exiting'
 				   ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	    perform cz_end_audit (jobId,'FAIL');
+	    perform tm_cz.cz_end_audit (jobId,'FAIL');
 	    return -16;
 	end if;
     end if;
@@ -140,7 +142,7 @@ BEGIN
     EXECUTE('drop index if exists tm_wz.WT_SUBJECT_RNA_CALCS_I1');
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
 	
     --	if dataType = L, use intensity_value as log_intensity
     --	if dataType = R, always use intensity_value
@@ -190,7 +192,7 @@ BEGIN
     end;
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rna_logs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rna_logs',rowCt,stepCt,'Done');
 
     begin
 	EXECUTE('create index WT_SUBJECT_RNA_LOGS_I1 on tm_wz.wt_subject_rna_logs (trial_name, probeset_id) tablespace "indx"');
@@ -205,7 +207,7 @@ BEGIN
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_RNA_LOGS_I1',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_RNA_LOGS_I1',0,stepCt,'Done');
 		
     --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
     begin
@@ -236,7 +238,7 @@ BEGIN
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rna_calcs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rna_calcs',rowCt,stepCt,'Done');
 	
     begin
 	EXECUTE('create index WT_SUBJECT_RNA_CALCS_I1 on tm_wz.wt_subject_rna_calcs (trial_name, probeset_id) tablespace "indx"');
@@ -251,7 +253,7 @@ BEGIN
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_RNA_CALCS_I1',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_RNA_CALCS_I1',0,stepCt,'Done');
 
     -- calculate zscore
     begin
@@ -290,7 +292,7 @@ BEGIN
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rna_med',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rna_med',rowCt,stepCt,'Done');
 
     begin
 	sqlText := 'insert into ' || partitionName || 
@@ -306,7 +308,7 @@ BEGIN
 	    ',round(CASE WHEN m.zscore < -2.5 THEN -2.5 WHEN m.zscore >  2.5 THEN  2.5 ELSE round(m.zscore::numeric,5) END,5) ' ||
 	    ',m.patient_id ' ||
 	    'from tm_wz.wt_subject_rna_med m';
-	raise notice 'sqlText= %', sqlText;
+--	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -327,27 +329,27 @@ BEGIN
     EXECUTE('truncate table tm_wz.wt_subject_rna_med');
 
     stepCt := stepCt + 1;
-    perform cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
 	
     -- create indexes on partition
 
     sqlText := ' create index ' || partitionIndx || '_idx1 on ' || partitionName || ' using btree (partition_id) tablespace indx';
-    raise notice 'sqlText= %', sqlText;
+--    raise notice 'sqlText= %', sqlText;
     execute sqlText;
     sqlText := ' create index ' || partitionIndx || '_idx2 on ' || partitionName || ' using btree (assay_id) tablespace indx';
-    raise notice 'sqlText= %', sqlText;
+--    raise notice 'sqlText= %', sqlText;
     execute sqlText;
     sqlText := ' create index ' || partitionIndx || '_idx3 on ' || partitionName || ' using btree (probeset_id) tablespace indx';
-    raise notice 'sqlText= %', sqlText;
+--    raise notice 'sqlText= %', sqlText;
     execute sqlText;
     sqlText := ' create index ' || partitionIndx || '_idx4 on ' || partitionName || ' using btree (assay_id, probeset_id) tablespace indx';
-    raise notice 'sqlText= %', sqlText;
+--    raise notice 'sqlText= %', sqlText;
     execute sqlText;
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     IF newJobFlag = 1
     THEN
-	perform cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     END IF;
 
     return 1;

@@ -1,7 +1,8 @@
+SET search_path = tm_cz, pg_catalog;
 --
 -- Name: i2b2_load_security_data(numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_security_data(currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION i2b2_load_security_data(currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -125,7 +126,7 @@ $$;
 --
 -- Name: i2b2_load_security_data(character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_security_data(sourcesystemcd character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION i2b2_load_security_data(sourcesystemcd character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
