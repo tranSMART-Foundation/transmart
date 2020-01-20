@@ -9,7 +9,7 @@
 	<div style="text-align: center;">
 	    <div style="width: 400px; margin: 50px auto 50px auto;">
 		<img style="display: block; margin: 12px auto;" alt="Transmart"
-		     src="${resource(dir: 'images', file: grailsApplication.config.com.recomdata.largeLogo)}"/>
+		     src="${cms.link(name: 'transmartlogo.jpg')}"/>
 
 		<div style="text-align: center;"><h3>ATTENTION: Users of ${grailsApplication.config.com.recomdata.appTitle}</h3></div>
 

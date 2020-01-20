@@ -13,6 +13,14 @@
 	</style>
     </head>
     <body>
+	<g:logMsg>auth0/auth view</g:logMsg>
+	<g:logMsg>guestAutoLogin ${guestAutoLogin}</g:logMsg>
+	<g:logMsg>flash.message ${flash.message}</g:logMsg>
+	<g:logMsg>googleAnalyticsTracking ${googleAnalyticsTracking}</g:logMsg>
+	<g:logMsg>auth0ClientId ${auth0ClientId}</g:logMsg>
+	<g:logMsg>auth0Domain ${auth0Domain}</g:logMsg>
+	<g:logMsg>auth0CallbackUrl ${auth0CallbackUrl}</g:logMsg>
+
 	<g:render template='/layouts/navbar_nomenu' />
 	<div class="container" style="background-color: white;">
 	    <g:if test="${!auth0AdminExists}">
@@ -24,12 +32,13 @@
 		<table style="width: auto; border: 0; text-align: center; margin: auto;" align="center">
 		    <tr>
 			<td style="text-align: center; vertical-align: middle; margin-left: -40px;">
-			    <img src="${cms.link(name: 'transmartlogoHMS.jpg')}" alt="Transmart" />
+			    <img src="${cms.link(name: 'transmartlogo.jpg')}" alt="Transmart" />
 			</td>
 		    </tr>
 		    <tr id="bannerRow">
 			<td>
-			    <g:if test="${flash.message}"><div class="message">${flash.message}</div></g:if> &nbsp;
+			    <g:if test="${flash.message}"><div class="message">${flash.message}</div></g:if>
+			    <g:else><div class="message">No flash message</div></g:else> &nbsp;
 			</td>
 		    </tr>
 		    <tr id="loginWidgetRow">
@@ -62,10 +71,11 @@
 		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 		ga('create', '${googleAnalyticsTracking}', 'auto');
 		ga('send', 'pageview');
-		<script>
+		</script>
 	    </g:if>
 	    %{-- DI-817 If AutoLogin is enabled, do not display the Auth0 button list. --}%
 	    <g:if test="${!guestAutoLogin}">
+		Below is the list of Auth0 available buttons in a CMS section<br/>
 		<cms:section name='auth0.auth.js'>
 		    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js"/>
 		    <script type="text/javascript">
@@ -78,7 +88,9 @@
 	${auth0ConnectionJs.encodeAsRaw()}
 		    </script>
 		</cms:section>
+		<br/>Auth0 button list complete<br/>
 	    </g:if>
+	    auth.js included at the end<br/>
 	    <asset:javascript src="auth.js"/>
 	</content>
     </body>

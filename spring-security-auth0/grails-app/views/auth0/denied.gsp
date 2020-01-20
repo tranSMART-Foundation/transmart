@@ -6,7 +6,7 @@
     </head>
     <body>
 	<div>
-	    <img style="display: block; margin: 12px auto;" src="${resource(dir: 'images', file: grailsApplication.config.com.recomdata.searchtool.largeLogo)}"  alt="Transmart"/>
+	    <img style="display: block; margin: 12px auto;" src="${cms.image(name: 'transmartlogo.jpg')}" alt="Transmart"/>
 	    <br/>
 	    <br/>
 	    <center>
