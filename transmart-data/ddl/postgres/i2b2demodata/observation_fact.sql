@@ -4,19 +4,19 @@
 CREATE TABLE observation_fact (
     encounter_num int NOT NULL,
     patient_num int NOT NULL,
-    concept_cd character varying(250) NOT NULL,
+    concept_cd character varying(50) NOT NULL,
     provider_id character varying(50) NOT NULL,
     start_date timestamp NOT NULL,
     modifier_cd character varying(100) default '@' NOT NULL,
     instance_num int default (1) NOT NULL,
     valtype_cd character varying(50),
-    tval_char character varying(4000),
+    tval_char character varying(255),
     nval_num decimal(18,5),
-    valueflag_cd character varying(500),
+    valueflag_cd character varying(50),
     quantity_num decimal(18,5),
-    units_cd character varying(500),
+    units_cd character varying(50),
     end_date timestamp,
-    location_cd character varying(100),
+    location_cd character varying(50),
     observation_blob text,
     confidence_num decimal(18,5),
     update_date timestamp,
@@ -25,7 +25,7 @@ CREATE TABLE observation_fact (
     sourcesystem_cd character varying(50),
     upload_id int,
     text_search_index serial,	-- postgres-only in i2b2
-    sample_cd character varying(200)
+    sample_cd character varying(200) --new in transmart
 );
 
 --

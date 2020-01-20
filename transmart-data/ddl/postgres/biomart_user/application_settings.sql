@@ -15,3 +15,22 @@ CREATE TABLE application_settings (
 --
 ALTER TABLE ONLY application_settings
     ADD CONSTRAINT application_settings_pk PRIMARY KEY (id);
+
+--
+-- Name: tf_trg_application_settings_id(); Type: FUNCTION; Schema: biomart_user; Owner: -
+--
+CREATE FUNCTION tf_trg_application_settings_id() RETURNS trigger
+    LANGUAGE plpgsql
+AS $$
+begin
+    if new.id is null then
+        select nextval('biomart_user.application_settings_id_seq') into new.id ;
+    end if;
+    return new;
+end;
+$$;
+
+--
+-- Name: trg_application_settings_id; Type: TRIGGER; Schema: biomart_user; Owner: -
+--
+CREATE TRIGGER trg_application_settings_id BEFORE INSERT ON biomart_user.application_settings FOR EACH ROW EXECUTE PROCEDURE tf_trg_application_settings_id();

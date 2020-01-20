@@ -12,8 +12,8 @@ CREATE SEQUENCE concept_id
 -- Name: concept_dimension; Type: TABLE; Schema: i2b2demodata; Owner: -
 --
 CREATE TABLE concept_dimension (
-    concept_path character varying(4000) NOT NULL,
-    concept_cd character varying(50) NOT NULL, -- null in i2b2
+    concept_path character varying(700) NOT NULL,
+    concept_cd character varying(50) NOT NULL,
     name_char character varying(2000),
     concept_blob text,
     update_date timestamp,
