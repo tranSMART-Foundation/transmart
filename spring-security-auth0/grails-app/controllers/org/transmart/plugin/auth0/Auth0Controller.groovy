@@ -66,10 +66,13 @@ class Auth0Controller implements InitializingBean {
     def auth() {
 	nocache response
 
+	logger.debug 'auth request {}', request
+	logger.debug 'auth request querystring {}', request.queryString
+
 	boolean forcedFormLogin = request.queryString
 	if (customizationConfig.guestAutoLogin && !forcedFormLogin) {
 	    logger.info 'Automatic login with userid {}', customizationConfig.guestUserName
-	    AuthUser authUser = authService.authUser(customizationConfig.guestUserName)
+	    AuthUser authUser = userService.authUser(customizationConfig.guestUserName)
 	    if (authUser) {
 		securityService.authenticateAs authUser.username
 		if (authUser.authorities) {
@@ -85,9 +88,11 @@ class Auth0Controller implements InitializingBean {
 	}
 
 	if (securityService.loggedIn()) {
+	    logger.debug 'securityService.loggedIn() true: redirect auth0Config.redirectOnSuccess {}', auth0Config.redirectOnSuccess
 	    redirect uri: auth0Config.redirectOnSuccess
 	}
 	else {
+	    logger.debug 'securityService.loggedIn() false: view: authViewName {} buildAuthModel {}', authViewName, buildAuthModel()
 	    render view: authViewName, model: buildAuthModel()
 	}
     }
@@ -409,6 +414,7 @@ class Auth0Controller implements InitializingBean {
     protected Map buildAuthModel() {
 	String webtaskCSS = auth0Config.webtaskBaseUrl ? auth0Service.webtaskCSS() : ''
 	String webtaskJavaScript = auth0Config.webtaskBaseUrl ? auth0Service.webtaskJavaScript() : ''
+	logger.debug 'buildAuthModel webtaskCSS {} webtaskJavaScript {}', webtaskCSS, webtaskJavaScript
 	[auth0ConnectionCss: webtaskCSS,
 	 auth0ConnectionJs : webtaskJavaScript,
 	 auth0AdminExists: auth0AdminExists()] + authModel
@@ -433,7 +439,8 @@ class Auth0Controller implements InitializingBean {
     void afterPropertiesSet() {
 	authModel = [auth0CallbackUrl: auth0Config.auth0CallbackUrl,
 		     auth0ClientId   : auth0Config.auth0ClientId,
-		     auth0Domain     : auth0Config.auth0Domain,
-		     uiHeroImageUrl  : customizationConfig.uiHeroImageUrl]
+		     // not referenced in any other page
+		     //		     uiHeroImageUrl  : customizationConfig.uiHeroImageUrl,
+		     auth0Domain     : auth0Config.auth0Domain]
     }
 }
