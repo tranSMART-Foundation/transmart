@@ -1,4 +1,4 @@
-###########################################################################
+##########################################################################
 # Copyright 2008-2012 Janssen Research & Development, LLC.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,8 +42,8 @@ ForestPlot.loader <- function(
 	line.data<-read.delim(input.filename,header=T)
 	######################################################
 	
-	if(length(unique(line.data$X)) < 2) stop("||FRIENDLY||The Forest Plot test requires at least two groups for each variable. The intersection of the groups you selected for the independent variable with the data available in the dependent variable yielded only one group with a none zero number of subjects in the independent variable. Please verify your input and try again.")
-	if(length(unique(line.data$Y)) < 2) stop("||FRIENDLY||The Forest Plot requires at least two groups for each variable. The intersection of the groups you selected for the dependant variable with the data available in the independent variable yielded only one group with a none zero number of subjects in the dependant variable. Please verify your input and try again.")
+	if(length(unique(line.data$X)) < 2) stop("||FRIENDLY||The Forest Plot test requires at least two groups for each variable. The intersection of the groups you selected for the independent variable with the data available in the dependent variable yielded only one group with a non-zero number of subjects in the independent variable. Please verify your input and try again.")
+	if(length(unique(line.data$Y)) < 2) stop("||FRIENDLY||The Forest Plot requires at least two groups for each variable. The intersection of the groups you selected for the dependent variable with the data available in the independent variable yielded only one group with a non-zero number of subjects in the dependent variable. Please verify your input and try again.")
 	
 	#Make the concept paths pretty by taking out all but the last 2 levels. If the entry doesn't have any slashes, leave it be. It could be a "bin1234" or "Other".
 	
