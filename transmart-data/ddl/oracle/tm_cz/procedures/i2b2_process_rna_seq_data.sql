@@ -942,19 +942,19 @@ EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS=".,"';
 	(probeset_id
 --	,expr_id
 	,intensity_value
+	,assay_id
 	,patient_id
 --	,sample_cd
 --	,subject_id
 	,trial_name
-	,assay_id
 	) select md.probeset
 --		  ,sd.sample_cd
 		 , avg(md.intensity_value) as intensity_value
-		  ,sd.patient_id
+		 ,sd.assay_id
+		 ,sd.patient_id
 --		  ,sd.sample_cd
 --		  ,sd.subject_id
 		 ,TrialId as trial_name
-		  ,sd.assay_id
 	from de_subject_sample_mapping sd
 		,lt_src_RNA_SEQ_data md   
 		,probeset_deapp gs
