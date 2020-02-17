@@ -2,7 +2,7 @@
 -- Name: wt_subject_rna_probeset; Type: TABLE; Schema: tm_wz; Owner: -
 --
 CREATE TABLE wt_subject_rna_probeset (
-    probeset_id character varying(200),
+    probeset character varying(100),
     expr_id character varying(500),
     intensity_value double precision,
     num_calls int,

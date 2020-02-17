@@ -155,7 +155,7 @@ BEGIN
 	    ,log_intensity
 	    ,patient_id
 	    )
-	    select probeset_id
+	    select probeset
 	    ,intensity_value  
 	    ,assay_id 
 	    ,intensity_value
@@ -171,7 +171,7 @@ BEGIN
 			,log_intensity
 			,patient_id
 			)
-	    select probeset_id
+	    select probeset
 		   ,intensity_value 
 		   ,assay_id 
 		   ,CASE WHEN intensity_value <= 0 THEN ln(intensity_value + 0.001)/ln(logBase::double precision) ELSE ln(intensity_value)/ln(logBase::double precision) END
@@ -192,10 +192,10 @@ BEGIN
     end;
 
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rna_logs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in tm_wz wt_subject_rna_logs',rowCt,stepCt,'Done');
 
     begin
-	EXECUTE('create index WT_SUBJECT_RNA_LOGS_I1 on tm_wz.wt_subject_rna_logs (trial_name, probeset_id) tablespace "indx"');
+	EXECUTE('create index wt_subject_rna_logs_i1 on tm_wz.wt_subject_rna_logs (trial_name, probeset_id) tablespace "indx"');
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -207,7 +207,7 @@ BEGIN
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_RNA_LOGS_I1',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on tm_wz wt_subject_rna_logs_i1',0,stepCt,'Done');
 		
     --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
     begin
@@ -241,7 +241,7 @@ BEGIN
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rna_calcs',rowCt,stepCt,'Done');
 	
     begin
-	EXECUTE('create index WT_SUBJECT_RNA_CALCS_I1 on tm_wz.wt_subject_rna_calcs (trial_name, probeset_id) tablespace "indx"');
+	EXECUTE('create index wt_subject_rna_calcs_i1 on tm_wz.wt_subject_rna_calcs (trial_name, probeset_id) tablespace "indx"');
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -253,7 +253,7 @@ BEGIN
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_RNA_CALCS_I1',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on tm_wz wt_subject_rna_calcs_i1',0,stepCt,'Done');
 
     -- calculate zscore
     begin
@@ -324,9 +324,9 @@ BEGIN
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted data into ' || partitionName,rowCt,stepCt,'Done');
 
-    EXECUTE('truncate table tm_wz.wt_subject_rna_logs');
-    EXECUTE('truncate table tm_wz.wt_subject_rna_calcs');
-    EXECUTE('truncate table tm_wz.wt_subject_rna_med');
+--    EXECUTE('truncate table tm_wz.wt_subject_rna_logs');
+--    EXECUTE('truncate table tm_wz.wt_subject_rna_calcs');
+--    EXECUTE('truncate table tm_wz.wt_subject_rna_med');
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
@@ -346,7 +346,10 @@ BEGIN
 --    raise notice 'sqlText= %', sqlText;
     execute sqlText;
 
-    ---Cleanup OVERALL JOB if this proc is being run standalone
+    stepCt := stepCt + 1;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Created indexes on '||partitionName,4,stepCt,'Done');
+
+---Cleanup OVERALL JOB if this proc is being run standalone
     IF newJobFlag = 1
     THEN
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
