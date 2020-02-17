@@ -13,7 +13,8 @@ AS $$
     jobID bigint;
     errorNumber		character varying;
     errorMessage	character varying;
-    rowCt			numeric(18,0);
+    rowCt		numeric(18,0);
+    tText		varchar(1000);
     stepCt bigint;
 
 begin
@@ -41,13 +42,14 @@ begin
     
     select count(platform) into gpl_rtn
       from deapp.de_gpl_info
-     where marker_type='RNASEQ'
+     where marker_type='RNASEQCOG'
        and platform = platformId;
     if gpl_rtn=0 then
-	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform data missing from DEAPP.DE_GPL_INFO',1,stepCt,'ERROR');
-	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	perform tm_cz.cz_end_audit (jobId,'FAIL');
-	return 161;
+        tText := 'Platform data missing from DEAPP.DE_GPL_INFO for ' || platformId;
+       	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,tText,1,stepCt,'ERROR');
+       	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+       	perform tm_cz.cz_end_audit (jobId,'FAIL');
+       	return 161;
     end if;
     
     begin
@@ -60,9 +62,9 @@ begin
 	select distinct (a.transcript_id)
 			,platformId
 			,a.gene_symbol
-			,null
+			,case when a.gene_id is null then null when a.gene_id='' then null else a.gene_id::numeric end as gene_id
 			,a.organism
-	  from tm_lz.LT_RNASEQ_ANNOTATION a
+	  from tm_lz.lt_rnaseq_annotation a
 	 where a.transcript_id not in (select distinct transcript_id from deapp.DE_RNASEQ_ANNOTATION);
 	get diagnostics rowCt := ROW_COUNT;	
     exception
@@ -77,15 +79,18 @@ begin
     end;
     
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data in de_rnaseq_annotation',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data in de_rnaseq_annotation',rowCt,stepCt,'Done');
     
     begin
 	update deapp.de_rnaseq_annotation a
 	   set gene_id=
-	       (select distinct primary_external_id
+	       (select min(b.primary_external_id::numeric)
 		  from biomart.bio_marker b
-		 where b.bio_marker_name=a.gene_symbol limit 1)
-	 where a.GENE_ID is null;
+		 where b.bio_marker_name = a.gene_symbol
+		   and b.organism = a.organism
+		 limit 1)
+	 where a.gene_id is null
+	 and a.gene_symbol is not null;
 	get diagnostics rowCt := ROW_COUNT;	
     exception
 	when others then
@@ -99,7 +104,7 @@ begin
     end;
     
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_rna_seq_annotation',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update missing gene_id values in i2b2_rna_seq_annotation',rowCt,stepCt,'Done');
     
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
