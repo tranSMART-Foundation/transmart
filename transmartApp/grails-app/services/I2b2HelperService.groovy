@@ -339,7 +339,7 @@ class I2b2HelperService implements InitializingBean {
      * Determines if a concept key is a leaf or not (by conceptKey)
      */
     /*private */boolean isLeafConceptKey(String conceptKey) {
-        // profuse appoligies to future programmers reading this code; it is clearly a mess
+        // profuse apologies to future programmers reading this code; it is clearly a mess
         // and this is a patch on top of a mess; the correct solution is to rewrite all this code
         // to use the API and to rewrite the underlying object class to use the API.
         // A special case was made for across trials data, because, at this time of this change,
@@ -362,7 +362,7 @@ class I2b2HelperService implements InitializingBean {
      * Determines if a concept item is a leaf.
      */
     /*private */boolean isLeafConceptKey(AcrossTrialsOntologyTerm conceptItem) {
-        // profuse appoligies to future programmers reading this code; it is clearly a mess
+        // profuse apologies to future programmers reading this code; it is clearly a mess
         // and this is a patch on top of a mess; the correct solution is to rewrite all this code
         // to use the API and to rewrite the underlying object class to use the API.
         EnumSet probeSet = conceptItem.visualAttributes
@@ -378,7 +378,7 @@ class I2b2HelperService implements InitializingBean {
      * Determines if a concept item is a leaf or not
      */
     boolean isLeafConceptKey(I2b2 conceptItem) {
-        // profuse appoligies to future programmers reading this code; it is clearly a mess
+        // profuse apologies to future programmers reading this code; it is clearly a mess
         // and this is a patch on top of a mess; the correct solution is to rewrite all this code
         // to use the API and to rewrite the underlying object class to use the API.
 	conceptItem.cVisualattributes.contains 'L'
