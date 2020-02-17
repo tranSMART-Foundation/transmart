@@ -83,5 +83,11 @@ class AuthUserDetailsService implements GrailsUserDetailsService, InitializingBe
 	usernamePropertyName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 	userClass = grailsApplication.getDomainClass(
 	    SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz
+//	userClass = grailsApplication.getDomainClass(
+//	    SpringSecurityUtils.securityConfig.userLookup.userDomainClassName).clazz
+	logger.info 'Picking up userLookup.usernamePropertyName {}', SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
+	logger.info 'Picking up userLookup.userDomainClassName {}', SpringSecurityUtils.securityConfig.userLookup.userDomainClassName
+	userClass = grailsApplication.getDomainClass(
+	    SpringSecurityUtils.securityConfig.userLookup.userDomainClassName.toString()).clazz
     }
 }
