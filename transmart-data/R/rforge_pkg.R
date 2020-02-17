@@ -6,12 +6,12 @@ missing.packages <- function(required) {
 new.packages <- missing.packages(required.packages)
 if (!length(new.packages))
 	q();
-if (length(new.packages)) {
-	install.packages(new.packages, repos=Sys.getenv("CRAN_MIRROR"));
-}
-
 if (length(intersect(new.packages, c("Rserve")))) {
 	install.packages('Rserve',,'http://www.rforge.net/')
+}
+
+if (length(new.packages)) {
+	install.packages(new.packages, repos=Sys.getenv("CRAN_MIRROR"));
 }
 
 if (length(missing.packages(required.packages))) {
