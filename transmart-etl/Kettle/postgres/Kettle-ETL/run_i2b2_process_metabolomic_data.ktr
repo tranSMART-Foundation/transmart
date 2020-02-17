@@ -98,20 +98,24 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <row_threshold>0</row_threshold>
-      <message/>
-      <always_log_rows>Y</always_log_rows>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <row_threshold>0</row_threshold>
+    <message/>
+    <always_log_rows>Y</always_log_rows>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>938</xloc>
       <yloc>226</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Abort 2</name>
@@ -119,20 +123,24 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
       <row_threshold>0</row_threshold>
       <message>Invalid DATA_TYPE</message>
       <always_log_rows>Y</always_log_rows>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>271</xloc>
       <yloc>306</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Abort 3</name>
@@ -140,20 +148,24 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <row_threshold>0</row_threshold>
-      <message/>
-      <always_log_rows>Y</always_log_rows>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <row_threshold>0</row_threshold>
+    <message/>
+    <always_log_rows>Y</always_log_rows>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>923</xloc>
       <yloc>463</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Check for 0 return code</name>
@@ -161,27 +173,32 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Dummy (do nothing)</send_true_to>
-<send_false_to>Error in i2b2_process_metabolomic_data</send_false_to>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Dummy (do nothing)</send_true_to>
+    <send_false_to>Error in i2b2_process_metabolomic_data</send_false_to>
     <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>rtn_code</leftvalue>
- <function>=</function>
- <rightvalue/>
- <value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value> </condition>
+      <condition>
+	<negated>N</negated>
+	<leftvalue>rtn_code</leftvalue>
+	<function>=</function>
+	<rightvalue/>
+	<value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>
+      </condition>
     </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>768</xloc>
       <yloc>134</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Check for 0 return code 2</name>
@@ -189,27 +206,32 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Dummy (do nothing) 2</send_true_to>
-<send_false_to>Error in i2b2_process_metabolomic_data 2</send_false_to>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Dummy (do nothing) 2</send_true_to>
+    <send_false_to>Error in i2b2_process_metabolomic_data 2</send_false_to>
     <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>rtn_code</leftvalue>
- <function>=</function>
- <rightvalue/>
- <value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value> </condition>
+      <condition>
+	<negated>N</negated>
+	<leftvalue>rtn_code</leftvalue>
+	<function>=</function>
+	<rightvalue/>
+	<value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>
+      </condition>
     </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>712</xloc>
       <yloc>348</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Check for valid DATA_TYPE</name>
@@ -217,27 +239,32 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Filter rows</send_true_to>
-<send_false_to>Invalid DATA_TYPE</send_false_to>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Filter rows</send_true_to>
+    <send_false_to>Invalid DATA_TYPE</send_false_to>
     <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>data_type</leftvalue>
- <function>IN LIST</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>R;L;T</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+      <condition>
+	<negated>N</negated>
+	<leftvalue>data_type</leftvalue>
+	<function>IN LIST</function>
+	<rightvalue/>
+	<value><name>constant</name><type>String</type><text>R;L;T</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+      </condition>
     </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>264</xloc>
       <yloc>113</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Dummy (do nothing)</name>
@@ -245,17 +272,21 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>928</xloc>
       <yloc>133</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Dummy (do nothing) 2</name>
@@ -263,17 +294,21 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>887</xloc>
       <yloc>354</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Error in i2b2_process_metabolomic_data</name>
@@ -281,27 +316,31 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <logmessage>**********************************************
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <logmessage>**********************************************
 ***  Error running i2b2_process_metabolomic_data ****
 **********************************************</logmessage>
     <fields>
       <field>
         <name>rtn_code</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </field>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>777</xloc>
       <yloc>231</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Error in i2b2_process_metabolomic_data 2</name>
@@ -309,27 +348,31 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <logmessage>**********************************************
-***  Error running i2b2_process_metabolomic_inc_data ****
-**********************************************</logmessage>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <logmessage>**********************************************
+    ***  Error running i2b2_process_metabolomic_inc_data ****
+    **********************************************</logmessage>
     <fields>
       <field>
         <name>rtn_code</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </field>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>732</xloc>
       <yloc>483</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Execute i2b2_process_metabolomic_data</name>
@@ -337,10 +380,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <connection>TM_CZ</connection>
     <procedure>I2B2_PROCESS_METABOLOMIC_DATA</procedure>
     <lookup>
@@ -385,13 +428,17 @@
       <type>BigNumber</type>
     </result>
     <auto_commit>Y</auto_commit>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>616</xloc>
       <yloc>121</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Execute i2b2_process_metabolomic_data 2</name>
@@ -399,10 +446,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <connection>TM_CZ</connection>
     <procedure>I2B2_PROC_METABOLOMIC_INC_DATA</procedure>
     <lookup>
@@ -447,13 +494,17 @@
       <type>BigNumber</type>
     </result>
     <auto_commit>Y</auto_commit>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+     <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>542</xloc>
       <yloc>363</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Filter rows</name>
@@ -461,27 +512,32 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Write parameters 2</send_true_to>
-<send_false_to>Write parameters</send_false_to>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Write parameters 2</send_true_to>
+    <send_false_to>Write parameters</send_false_to>
     <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>inc_load</leftvalue>
- <function>=</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>Y</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+      <condition>
+	<negated>N</negated>
+	<leftvalue>inc_load</leftvalue>
+	<function>=</function>
+	<rightvalue/>
+	<value><name>constant</name><type>String</type><text>Y</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+      </condition>
     </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>390</xloc>
       <yloc>108</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Get Variables</name>
@@ -489,10 +545,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <name>study_id</name>
@@ -591,13 +647,17 @@
         <trim_type>both</trim_type>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+     <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>29</xloc>
       <yloc>141</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Invalid DATA_TYPE</name>
@@ -605,26 +665,30 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <logmessage>**** Invalid DATA_TYPE specified ****
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <logmessage>**** Invalid DATA_TYPE specified ****
 **** Must be R, L, or T          ****</logmessage>
     <fields>
       <field>
         <name>data_type</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </field>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>270</xloc>
       <yloc>220</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Uppercase fields</name>
@@ -632,10 +696,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <in_stream_name>source_cd</in_stream_name>
@@ -690,13 +754,17 @@
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+     <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>129</xloc>
       <yloc>142</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Write parameters</name>
@@ -704,13 +772,13 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <logmessage>*** i2b2_process_metabolomic_data ***
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <logmessage>*** i2b2_process_metabolomic_data ***
 ${TM_CZ_DB_SERVER}
 ${TM_CZ_DB_NAME}
 ${TM_CZ_DB_PORT}
@@ -737,15 +805,19 @@ ${TM_CZ_DB_PWD}</logmessage>
         </field>
       <field>
         <name>job_id</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </field>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>479</xloc>
       <yloc>116</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Write parameters 2</name>
@@ -753,13 +825,13 @@ ${TM_CZ_DB_PWD}</logmessage>
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <logmessage>*** i2b2_process_metabolomic_inc_data ***
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <logmessage>*** i2b2_process_metabolomic_inc_data ***
 ${TM_CZ_DB_SERVER}
 ${TM_CZ_DB_NAME}
 ${TM_CZ_DB_PORT}
@@ -768,37 +840,41 @@ ${TM_CZ_DB_PWD}</logmessage>
     <fields>
       <field>
         <name>study_id</name>
-        </field>
+      </field>
       <field>
         <name>top_node</name>
-        </field>
+      </field>
       <field>
         <name>data_type</name>
-        </field>
+      </field>
       <field>
         <name>source_cd</name>
-        </field>
+      </field>
       <field>
         <name>log_base</name>
-        </field>
+      </field>
       <field>
         <name>security_required</name>
-        </field>
+      </field>
       <field>
         <name>job_id</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </field>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>395</xloc>
       <yloc>362</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step_error_handling>
   </step_error_handling>
-   <slave-step-copy-partition-distribution>
-</slave-step-copy-partition-distribution>
-   <slave_transformation>N</slave_transformation>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
 </transformation>

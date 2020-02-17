@@ -11,29 +11,37 @@
     <parameters>
     </parameters>
     <log>
-<trans-log-table><connection/>
-<schema/>
-<table/>
-<size_limit_lines/>
-<interval/>
-<timeout_days/>
-<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STATUS</id><enabled>Y</enabled><name>STATUS</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name><subject/></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name><subject/></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name><subject/></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name><subject/></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name><subject/></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name><subject/></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>STARTDATE</id><enabled>Y</enabled><name>STARTDATE</name></field><field><id>ENDDATE</id><enabled>Y</enabled><name>ENDDATE</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>DEPDATE</id><enabled>Y</enabled><name>DEPDATE</name></field><field><id>REPLAYDATE</id><enabled>Y</enabled><name>REPLAYDATE</name></field><field><id>LOG_FIELD</id><enabled>Y</enabled><name>LOG_FIELD</name></field></trans-log-table>
-<perf-log-table><connection/>
-<schema/>
-<table/>
-<interval/>
-<timeout_days/>
-<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>SEQ_NR</id><enabled>Y</enabled><name>SEQ_NR</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>INPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>INPUT_BUFFER_ROWS</name></field><field><id>OUTPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>OUTPUT_BUFFER_ROWS</name></field></perf-log-table>
-<channel-log-table><connection/>
-<schema/>
-<table/>
-<timeout_days/>
-<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>LOGGING_OBJECT_TYPE</id><enabled>Y</enabled><name>LOGGING_OBJECT_TYPE</name></field><field><id>OBJECT_NAME</id><enabled>Y</enabled><name>OBJECT_NAME</name></field><field><id>OBJECT_COPY</id><enabled>Y</enabled><name>OBJECT_COPY</name></field><field><id>REPOSITORY_DIRECTORY</id><enabled>Y</enabled><name>REPOSITORY_DIRECTORY</name></field><field><id>FILENAME</id><enabled>Y</enabled><name>FILENAME</name></field><field><id>OBJECT_ID</id><enabled>Y</enabled><name>OBJECT_ID</name></field><field><id>OBJECT_REVISION</id><enabled>Y</enabled><name>OBJECT_REVISION</name></field><field><id>PARENT_CHANNEL_ID</id><enabled>Y</enabled><name>PARENT_CHANNEL_ID</name></field><field><id>ROOT_CHANNEL_ID</id><enabled>Y</enabled><name>ROOT_CHANNEL_ID</name></field></channel-log-table>
-<step-log-table><connection/>
-<schema/>
-<table/>
-<timeout_days/>
-<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>LOG_FIELD</id><enabled>N</enabled><name>LOG_FIELD</name></field></step-log-table>
+      <trans-log-table>
+        <connection/>
+	<schema/>
+	<table/>
+	<size_limit_lines/>
+	<interval/>
+	<timeout_days/>
+	<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STATUS</id><enabled>Y</enabled><name>STATUS</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name><subject/></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name><subject/></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name><subject/></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name><subject/></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name><subject/></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name><subject/></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>STARTDATE</id><enabled>Y</enabled><name>STARTDATE</name></field><field><id>ENDDATE</id><enabled>Y</enabled><name>ENDDATE</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>DEPDATE</id><enabled>Y</enabled><name>DEPDATE</name></field><field><id>REPLAYDATE</id><enabled>Y</enabled><name>REPLAYDATE</name></field><field><id>LOG_FIELD</id><enabled>Y</enabled><name>LOG_FIELD</name></field>
+      </trans-log-table>
+      <perf-log-table>
+        <connection/>
+	<schema/>
+	<table/>
+	<interval/>
+	<timeout_days/>
+	<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>SEQ_NR</id><enabled>Y</enabled><name>SEQ_NR</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>INPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>INPUT_BUFFER_ROWS</name></field><field><id>OUTPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>OUTPUT_BUFFER_ROWS</name></field>
+      </perf-log-table>
+      <channel-log-table>
+        <connection/>
+	<schema/>
+	<table/>
+	<timeout_days/>
+	<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>LOGGING_OBJECT_TYPE</id><enabled>Y</enabled><name>LOGGING_OBJECT_TYPE</name></field><field><id>OBJECT_NAME</id><enabled>Y</enabled><name>OBJECT_NAME</name></field><field><id>OBJECT_COPY</id><enabled>Y</enabled><name>OBJECT_COPY</name></field><field><id>REPOSITORY_DIRECTORY</id><enabled>Y</enabled><name>REPOSITORY_DIRECTORY</name></field><field><id>FILENAME</id><enabled>Y</enabled><name>FILENAME</name></field><field><id>OBJECT_ID</id><enabled>Y</enabled><name>OBJECT_ID</name></field><field><id>OBJECT_REVISION</id><enabled>Y</enabled><name>OBJECT_REVISION</name></field><field><id>PARENT_CHANNEL_ID</id><enabled>Y</enabled><name>PARENT_CHANNEL_ID</name></field><field><id>ROOT_CHANNEL_ID</id><enabled>Y</enabled><name>ROOT_CHANNEL_ID</name></field>
+      </channel-log-table>
+      <step-log-table>
+        <connection/>
+	<schema/>
+	<table/>
+	<timeout_days/>
+	<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>LOG_FIELD</id><enabled>N</enabled><name>LOG_FIELD</name></field>
+      </step-log-table>
     </log>
     <maxdate>
       <connection/>
@@ -61,10 +69,10 @@
     </slaveservers>
     <clusterschemas>
     </clusterschemas>
-  <created_user>-</created_user>
-  <created_date>2012/09/30 04:14:41.057</created_date>
-  <modified_user>-</modified_user>
-  <modified_date>2012/09/30 04:14:41.057</modified_date>
+    <created_user>-</created_user>
+    <created_date>2012/09/30 04:14:41.057</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2012/09/30 04:14:41.057</modified_date>
   </info>
   <notepads>
     <notepad>
@@ -170,27 +178,77 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Check missing column</from><to>Sort header columns</to><enabled>Y</enabled> </hop>  <hop> <from>Check missing column</from><to>Write to log 2</to><enabled>Y</enabled> </hop>  <hop> <from>List of valid column names</from><to>Sort std column names</to><enabled>Y</enabled> </hop>  <hop> <from>Merge Join</from><to>Check missing column</to><enabled>Y</enabled> </hop>  <hop> <from>Sort data header columns</from><to>Merge Join</to><enabled>Y</enabled> </hop>  <hop> <from>Sort header columns</from><to>Merge columns names with data</to><enabled>Y</enabled> </hop>  <hop> <from>Sort std column names</from><to>Merge Join</to><enabled>Y</enabled> </hop>  <hop> <from>Split field to rows</from><to>Remove double-quotes in column_value</to><enabled>Y</enabled> </hop>  <hop> <from>Split hdr into column names</from><to>Uppercase column_name</to><enabled>Y</enabled> </hop>  <hop> <from>Write to log 2</from><to>Abort 2</to><enabled>Y</enabled> </hop>  <hop> <from>Concatenate values for ext_data</from><to>Remove ` from ext_data</to><enabled>Y</enabled> </hop>  <hop> <from>Set column_value to ` if null</from><to>Concatenate values for ext_data</to><enabled>Y</enabled> </hop>  <hop> <from>Lookup data_type, column_name in IDX</from><to>EXT_DATA field</to><enabled>Y</enabled> </hop>  <hop> <from>EXT_DATA field</from><to>Map period to `</to><enabled>Y</enabled> </hop>  <hop> <from>Uppercase column_name</from><to>Sort data header columns</to><enabled>Y</enabled> </hop>  <hop> <from>Get BIO_ASSAY_ANALYSIS_ID</from><to>Lookup data_type, column_name in IDX</to><enabled>Y</enabled> </hop>  <hop> <from>Read GWAS header</from><to>Split hdr into column names</to><enabled>Y</enabled> </hop>  <hop> <from>Read GWAS File</from><to>Split field to rows</to><enabled>Y</enabled> </hop>  <hop> <from>Add EXT_DATA to data stream</from><to>Add seq for BIO_ASY_ANALYSIS_GWAS_ID</to><enabled>Y</enabled> </hop>  <hop> <from>Remove ` from ext_data</from><to>Add EXT_DATA to data stream</to><enabled>Y</enabled> </hop>  <hop> <from>Map period to `</from><to>Set column_value to ` if null</to><enabled>Y</enabled> </hop>  <hop> <from>EXT_DATA field</from><to>Flatten data back to single row</to><enabled>Y</enabled> </hop>  <hop> <from>Remove double-quotes in column_value</from><to>Sort data rows</to><enabled>Y</enabled> </hop>  <hop> <from>Sort data rows</from><to>Merge columns names with data</to><enabled>Y</enabled> </hop>  <hop> <from>Flatten data back to single row</from><to>Add EXT_DATA to data stream</to><enabled>Y</enabled> </hop>  <hop> <from>Merge columns names with data</from><to>Sort rows by rec_num</to><enabled>Y</enabled> </hop>  <hop> <from>Sort rows by rec_num</from><to>Get BIO_ASSAY_ANALYSIS_ID</to><enabled>Y</enabled> </hop>  <hop> <from>Get BIO_ASSAY_ANALYSIS_ID for delete</from><to>Delete BIO_ASSAY_ANALYSIS_GWAS</to><enabled>Y</enabled> </hop>  <hop> <from>Add constants</from><to>Read GWAS Step</to><enabled>Y</enabled> </hop>  <hop> <from>Block for auditing</from><to>Output steps metrics</to><enabled>Y</enabled> </hop>  <hop> <from>Get job_id</from><to>Add constants</to><enabled>Y</enabled> </hop>  <hop> <from>Group by</from><to>Set step number</to><enabled>Y</enabled> </hop>  <hop> <from>Output steps metrics</from><to>Sort metrics by step name</to><enabled>Y</enabled> </hop>  <hop> <from>Read GWAS Step</from><to>Set step_count for input records</to><enabled>Y</enabled> </hop>  <hop> <from>Read GWAS Step</from><to>Set step_count for output records</to><enabled>Y</enabled> </hop>  <hop> <from>Set database_name</from><to>Call cz_write_audit</to><enabled>Y</enabled> </hop>  <hop> <from>Set step number</from><to>Set step_number to integer</to><enabled>Y</enabled> </hop>  <hop> <from>Set step_count for input records</from><to>Skip log of 0 step_count</to><enabled>Y</enabled> </hop>  <hop> <from>Set step_count for output records</from><to>Skip log of 0 step_count</to><enabled>Y</enabled> </hop>  <hop> <from>Set step_number to integer</from><to>Get job_id</to><enabled>Y</enabled> </hop>  <hop> <from>Skip log of 0 step_count</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>Skip log of 0 step_count</from><to>Set database_name</to><enabled>Y</enabled> </hop>  <hop> <from>Sort metrics by step name</from><to>Group by</to><enabled>Y</enabled> </hop>  <hop> <from>Block for Delete</from><to>Read GWAS header</to><enabled>Y</enabled> </hop>  <hop> <from>Add seq for BIO_ASY_ANALYSIS_GWAS_ID</from><to>Insert to BIO_ASSAY_ANALYSIS_GWAS</to><enabled>Y</enabled> </hop>  </order>
+    <hop> <from>Check missing column</from><to>Sort header columns</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check missing column</from><to>Write to log 2</to><enabled>Y</enabled> </hop>
+    <hop> <from>List of valid column names</from><to>Sort std column names</to><enabled>Y</enabled> </hop>
+    <hop> <from>Merge Join</from><to>Check missing column</to><enabled>Y</enabled> </hop>
+    <hop> <from>Sort data header columns</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+    <hop> <from>Sort header columns</from><to>Merge columns names with data</to><enabled>Y</enabled> </hop>
+    <hop> <from>Sort std column names</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+    <hop> <from>Split field to rows</from><to>Remove double-quotes in column_value</to><enabled>Y</enabled> </hop>
+    <hop> <from>Split hdr into column names</from><to>Uppercase column_name</to><enabled>Y</enabled> </hop>
+    <hop> <from>Write to log 2</from><to>Abort 2</to><enabled>Y</enabled> </hop>
+    <hop> <from>Concatenate values for ext_data</from><to>Remove ` from ext_data</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set column_value to ` if null</from><to>Concatenate values for ext_data</to><enabled>Y</enabled> </hop>
+    <hop> <from>Lookup data_type, column_name in IDX</from><to>EXT_DATA field</to><enabled>Y</enabled> </hop>
+    <hop> <from>EXT_DATA field</from><to>Map period to `</to><enabled>Y</enabled> </hop>
+    <hop> <from>Uppercase column_name</from><to>Sort data header columns</to><enabled>Y</enabled> </hop>
+    <hop> <from>Get BIO_ASSAY_ANALYSIS_ID</from><to>Lookup data_type, column_name in IDX</to><enabled>Y</enabled> </hop>
+    <hop> <from>Read GWAS header</from><to>Split hdr into column names</to><enabled>Y</enabled> </hop>
+    <hop> <from>Read GWAS File</from><to>Split field to rows</to><enabled>Y</enabled> </hop>
+    <hop> <from>Add EXT_DATA to data stream</from><to>Add seq for BIO_ASY_ANALYSIS_GWAS_ID</to><enabled>Y</enabled> </hop>
+    <hop> <from>Remove ` from ext_data</from><to>Add EXT_DATA to data stream</to><enabled>Y</enabled> </hop>
+    <hop> <from>Map period to `</from><to>Set column_value to ` if null</to><enabled>Y</enabled> </hop>
+    <hop> <from>EXT_DATA field</from><to>Flatten data back to single row</to><enabled>Y</enabled> </hop>
+    <hop> <from>Remove double-quotes in column_value</from><to>Sort data rows</to><enabled>Y</enabled> </hop>
+    <hop> <from>Sort data rows</from><to>Merge columns names with data</to><enabled>Y</enabled> </hop>
+    <hop> <from>Flatten data back to single row</from><to>Add EXT_DATA to data stream</to><enabled>Y</enabled> </hop>
+    <hop> <from>Merge columns names with data</from><to>Sort rows by rec_num</to><enabled>Y</enabled> </hop>
+    <hop> <from>Sort rows by rec_num</from><to>Get BIO_ASSAY_ANALYSIS_ID</to><enabled>Y</enabled> </hop>
+    <hop> <from>Get BIO_ASSAY_ANALYSIS_ID for delete</from><to>Delete BIO_ASSAY_ANALYSIS_GWAS</to><enabled>Y</enabled> </hop>
+    <hop> <from>Add constants</from><to>Read GWAS Step</to><enabled>Y</enabled> </hop>
+    <hop> <from>Block for auditing</from><to>Output steps metrics</to><enabled>Y</enabled> </hop>
+    <hop> <from>Get job_id</from><to>Add constants</to><enabled>Y</enabled> </hop>
+    <hop> <from>Group by</from><to>Set step number</to><enabled>Y</enabled> </hop>
+    <hop> <from>Output steps metrics</from><to>Sort metrics by step name</to><enabled>Y</enabled> </hop>
+    <hop> <from>Read GWAS Step</from><to>Set step_count for input records</to><enabled>Y</enabled> </hop>
+    <hop> <from>Read GWAS Step</from><to>Set step_count for output records</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set database_name</from><to>Call cz_write_audit</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set step number</from><to>Set step_number to integer</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set step_count for input records</from><to>Skip log of 0 step_count</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set step_count for output records</from><to>Skip log of 0 step_count</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set step_number to integer</from><to>Get job_id</to><enabled>Y</enabled> </hop>
+    <hop> <from>Skip log of 0 step_count</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>
+    <hop> <from>Skip log of 0 step_count</from><to>Set database_name</to><enabled>Y</enabled> </hop>
+    <hop> <from>Sort metrics by step name</from><to>Group by</to><enabled>Y</enabled> </hop>
+    <hop> <from>Block for Delete</from><to>Read GWAS header</to><enabled>Y</enabled> </hop>
+    <hop> <from>Add seq for BIO_ASY_ANALYSIS_GWAS_ID</from><to>Insert to BIO_ASSAY_ANALYSIS_GWAS</to><enabled>Y</enabled> </hop>
+  </order>
+
   <step>
     <name>Abort 2</name>
     <type>Abort</type>
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <row_threshold>0</row_threshold>
-      <message>missing column</message>
-      <always_log_rows>Y</always_log_rows>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <row_threshold>0</row_threshold>
+    <message>missing column</message>
+    <always_log_rows>Y</always_log_rows>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>937</xloc>
       <yloc>234</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Add EXT_DATA to data stream</name>
@@ -198,26 +256,30 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>LEFT OUTER</join_type>
-<step1>Flatten data back to single row</step1>
-<step2>Remove ` from ext_data</step2>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <join_type>LEFT OUTER</join_type>
+    <step1>Flatten data back to single row</step1>
+    <step2>Remove ` from ext_data</step2>
     <keys_1>
       <key>rec_num</key>
     </keys_1>
     <keys_2>
       <key>rec_num</key>
     </keys_2>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>889</xloc>
       <yloc>1063</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Add constants</name>
@@ -225,10 +287,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <name>step_status</name>
@@ -264,13 +326,17 @@
         <precision>-1</precision>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1272</xloc>
       <yloc>206</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Add seq for BIO_ASY_ANALYSIS_GWAS_ID</name>
@@ -278,27 +344,31 @@
     <description/>
     <distribute>N</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <valuename>BIO_ASY_ANALYSIS_GWAS_ID</valuename>
-      <use_database>Y</use_database>
-      <connection>BIOMART</connection>
-      <schema/>
-      <seqname>SEQ_BIO_DATA_ID</seqname>
-      <use_counter>N</use_counter>
-      <counter_name/>
-      <start_at>1</start_at>
-      <increment_by>1</increment_by>
-      <max_value>999999999</max_value>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <valuename>BIO_ASY_ANALYSIS_GWAS_ID</valuename>
+    <use_database>Y</use_database>
+    <connection>BIOMART</connection>
+    <schema/>
+    <seqname>SEQ_BIO_DATA_ID</seqname>
+    <use_counter>N</use_counter>
+    <counter_name/>
+    <start_at>1</start_at>
+    <increment_by>1</increment_by>
+    <max_value>999999999</max_value>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>892</xloc>
       <yloc>1139</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Block for Delete</name>
@@ -306,23 +376,27 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <steps>
       <step>
         <name>Delete BIO_ASSAY_ANALYSIS_GWAS</name>
         <CopyNr>0</CopyNr>
-        </step>
-      </steps>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </step>
+    </steps>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>100</xloc>
       <yloc>132</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Block for auditing</name>
@@ -330,27 +404,31 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <steps>
       <step>
         <name>Read GWAS File</name>
         <CopyNr>0</CopyNr>
-        </step>
+      </step>
       <step>
         <name>Insert to BIO_ASSAY_ANALYSIS_GWAS</name>
         <CopyNr>0</CopyNr>
-        </step>
-      </steps>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </step>
+    </steps>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1230</xloc>
       <yloc>133</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Call cz_write_audit</name>
@@ -358,10 +436,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <connection>TM_CZ</connection>
     <procedure>CZ_WRITE_AUDIT</procedure>
     <lookup>
@@ -406,13 +484,17 @@
       <type>BigNumber</type>
     </result>
     <auto_commit>Y</auto_commit>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1811</xloc>
       <yloc>321</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Check missing column</name>
@@ -420,27 +502,31 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Write to log 2</send_true_to>
-<send_false_to>Sort header columns</send_false_to>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Write to log 2</send_true_to>
+    <send_false_to>Sort header columns</send_false_to>
     <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>column_name</leftvalue>
- <function>IS NULL</function>
- <rightvalue/>
- </condition>
+      <condition>
+	<negated>N</negated>
+	<leftvalue>column_name</leftvalue>
+	<function>IS NULL</function>
+	<rightvalue/>
+      </condition>
     </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>788</xloc>
       <yloc>112</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Concatenate values for ext_data</name>
@@ -448,38 +534,42 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>%%java.io.tmpdir%%</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>rec_num</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>ext_data</aggregate>
-          <subject>column_value</subject>
-          <type>CONCAT_STRING</type>
-          <valuefield>;</valuefield>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <all_rows>N</all_rows>
+    <ignore_aggregate>N</ignore_aggregate>
+    <field_ignore/>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>grp</prefix>
+    <add_linenr>N</add_linenr>
+    <linenr_fieldname/>
+    <give_back_row>N</give_back_row>
+    <group>
+      <field>
+        <name>rec_num</name>
+      </field>
+    </group>
+    <fields>
+      <field>
+        <aggregate>ext_data</aggregate>
+        <subject>column_value</subject>
+        <type>CONCAT_STRING</type>
+        <valuefield>;</valuefield>
+      </field>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>968</xloc>
       <yloc>865</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Delete BIO_ASSAY_ANALYSIS_GWAS</name>
@@ -487,10 +577,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <connection>BIOMART_STAGE</connection>
     <commit>100</commit>
     <lookup>
@@ -503,13 +593,17 @@
         <name2/>
       </key>
     </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>427</xloc>
       <yloc>40</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Dummy (do nothing)</name>
@@ -517,17 +611,21 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1580</xloc>
       <yloc>396</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>EXT_DATA field</name>
@@ -535,27 +633,31 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Map period to `</send_true_to>
-<send_false_to>Flatten data back to single row</send_false_to>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Map period to `</send_true_to>
+    <send_false_to>Flatten data back to single row</send_false_to>
     <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>FIELD_IDX</leftvalue>
- <function>IS NOT NULL</function>
- <rightvalue/>
- </condition>
+      <condition>
+	<negated>N</negated>
+	<leftvalue>FIELD_IDX</leftvalue>
+	<function>IS NOT NULL</function>
+	<rightvalue/>
+      </condition>
     </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>798</xloc>
       <yloc>674</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Flatten data back to single row</name>
@@ -563,90 +665,94 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <key_field>std_column_name</key_field>
-      <group>
-        <field>
-          <name>rec_num</name>
-          </field>
-        <field>
-          <name>etl_id</name>
-          </field>
-        <field>
-          <name>BIO_ASSAY_ANALYSIS_ID</name>
-          </field>
-        <field>
-          <name>load_type</name>
-          </field>
-        </group>
-      <fields>
-        <field>
-          <field_name>column_value</field_name>
-          <key_value>RS_ID</key_value>
-          <target_name>rs_id</target_name>
-          <target_type>String</target_type>
-          <target_format/>
-          <target_length>-1</target_length>
-          <target_precision>-1</target_precision>
-          <target_decimal_symbol/>
-          <target_grouping_symbol/>
-          <target_currency_symbol/>
-          <target_null_string/>
-          <target_aggregation_type>-</target_aggregation_type>
-          </field>
-        <field>
-          <field_name>column_value</field_name>
-          <key_value>P_VALUE</key_value>
-          <target_name>p_value_char</target_name>
-          <target_type>String</target_type>
-          <target_format/>
-          <target_length>-1</target_length>
-          <target_precision>-1</target_precision>
-          <target_decimal_symbol/>
-          <target_grouping_symbol/>
-          <target_currency_symbol/>
-          <target_null_string/>
-          <target_aggregation_type>-</target_aggregation_type>
-          </field>
-        <field>
-          <field_name>column_value</field_name>
-          <key_value>LOG_P_VALUE</key_value>
-          <target_name>log_p_value</target_name>
-          <target_type>Number</target_type>
-          <target_format/>
-          <target_length>-1</target_length>
-          <target_precision>-1</target_precision>
-          <target_decimal_symbol/>
-          <target_grouping_symbol/>
-          <target_currency_symbol/>
-          <target_null_string/>
-          <target_aggregation_type>-</target_aggregation_type>
-          </field>
-        <field>
-          <field_name>column_value</field_name>
-          <key_value>P_VALUE</key_value>
-          <target_name>p_value</target_name>
-          <target_type>Number</target_type>
-          <target_format/>
-          <target_length>-1</target_length>
-          <target_precision>-1</target_precision>
-          <target_decimal_symbol/>
-          <target_grouping_symbol/>
-          <target_currency_symbol/>
-          <target_null_string/>
-          <target_aggregation_type>-</target_aggregation_type>
-          </field>
-        </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <key_field>std_column_name</key_field>
+    <group>
+      <field>
+        <name>rec_num</name>
+      </field>
+      <field>
+        <name>etl_id</name>
+      </field>
+      <field>
+        <name>BIO_ASSAY_ANALYSIS_ID</name>
+      </field>
+      <field>
+        <name>load_type</name>
+      </field>
+    </group>
+    <fields>
+      <field>
+        <field_name>column_value</field_name>
+        <key_value>RS_ID</key_value>
+        <target_name>rs_id</target_name>
+        <target_type>String</target_type>
+        <target_format/>
+        <target_length>-1</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
+      </field>
+      <field>
+        <field_name>column_value</field_name>
+        <key_value>P_VALUE</key_value>
+        <target_name>p_value_char</target_name>
+        <target_type>String</target_type>
+        <target_format/>
+        <target_length>-1</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
+      </field>
+      <field>
+        <field_name>column_value</field_name>
+        <key_value>LOG_P_VALUE</key_value>
+        <target_name>log_p_value</target_name>
+        <target_type>Number</target_type>
+        <target_format/>
+        <target_length>-1</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
+      </field>
+      <field>
+        <field_name>column_value</field_name>
+        <key_value>P_VALUE</key_value>
+        <target_name>p_value</target_name>
+        <target_type>Number</target_type>
+        <target_format/>
+        <target_length>-1</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
+      </field>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>796</xloc>
       <yloc>780</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Get BIO_ASSAY_ANALYSIS_ID</name>
@@ -654,10 +760,10 @@
     <description/>
     <distribute>N</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <name>BIO_ASSAY_ANALYSIS_ID</name>
@@ -708,13 +814,17 @@
         <trim_type>none</trim_type>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>799</xloc>
       <yloc>494</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Get BIO_ASSAY_ANALYSIS_ID for delete</name>
@@ -722,10 +832,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <name>d_baa_id</name>
@@ -740,13 +850,17 @@
         <trim_type>none</trim_type>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>157</xloc>
       <yloc>40</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Get job_id</name>
@@ -754,10 +868,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <name>job_id</name>
@@ -808,13 +922,17 @@
         <trim_type>none</trim_type>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1415</xloc>
       <yloc>207</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Group by</name>
@@ -822,74 +940,78 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>%%java.io.tmpdir%%</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>Step name</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>Lines input</aggregate>
-          <subject>Lines input</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Lines output</aggregate>
-          <subject>Lines output</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Lines read</aggregate>
-          <subject>Lines read</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Lines rejected</aggregate>
-          <subject>Lines rejected</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Lines updated</aggregate>
-          <subject>Lines updated</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Lines written</aggregate>
-          <subject>Lines written</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Step id</aggregate>
-          <subject>Step id</subject>
-          <type>MIN</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <all_rows>N</all_rows>
+    <ignore_aggregate>N</ignore_aggregate>
+    <field_ignore/>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>grp</prefix>
+    <add_linenr>N</add_linenr>
+    <linenr_fieldname/>
+    <give_back_row>N</give_back_row>
+    <group>
+      <field>
+        <name>Step name</name>
+      </field>
+    </group>
+    <fields>
+      <field>
+        <aggregate>Lines input</aggregate>
+        <subject>Lines input</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+      <field>
+        <aggregate>Lines output</aggregate>
+        <subject>Lines output</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+      <field>
+        <aggregate>Lines read</aggregate>
+        <subject>Lines read</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+      <field>
+        <aggregate>Lines rejected</aggregate>
+        <subject>Lines rejected</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+      <field>
+        <aggregate>Lines updated</aggregate>
+        <subject>Lines updated</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+      <field>
+        <aggregate>Lines written</aggregate>
+        <subject>Lines written</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+      <field>
+        <aggregate>Step id</aggregate>
+        <subject>Step id</subject>
+        <type>MIN</type>
+        <valuefield/>
+      </field>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1673</xloc>
       <yloc>133</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Insert to BIO_ASSAY_ANALYSIS_GWAS</name>
@@ -897,10 +1019,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <connection>BIOMART_STAGE</connection>
     <schema/>
     <table>bio_assay_analysis_gwas</table>
@@ -919,46 +1041,50 @@
     <return_keys>N</return_keys>
     <return_field/>
     <fields>
-        <field>
-          <column_name>BIO_ASSAY_ANALYSIS_ID</column_name>
-          <stream_name>BIO_ASSAY_ANALYSIS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>BIO_ASY_ANALYSIS_GWAS_ID</column_name>
-          <stream_name>BIO_ASY_ANALYSIS_GWAS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>RS_ID</column_name>
-          <stream_name>RS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>P_VALUE_CHAR</column_name>
-          <stream_name>P_VALUE_CHAR</stream_name>
-        </field>
-        <field>
-          <column_name>ETL_ID</column_name>
-          <stream_name>ETL_ID</stream_name>
-        </field>
-        <field>
-          <column_name>EXT_DATA</column_name>
-          <stream_name>ext_data</stream_name>
-        </field>
-        <field>
-          <column_name>LOG_P_VALUE</column_name>
-          <stream_name>LOG_P_VALUE</stream_name>
-        </field>
-        <field>
-          <column_name>P_VALUE</column_name>
-          <stream_name>P_VALUE</stream_name>
-        </field>
+      <field>
+        <column_name>BIO_ASSAY_ANALYSIS_ID</column_name>
+        <stream_name>BIO_ASSAY_ANALYSIS_ID</stream_name>
+      </field>
+      <field>
+        <column_name>BIO_ASY_ANALYSIS_GWAS_ID</column_name>
+        <stream_name>BIO_ASY_ANALYSIS_GWAS_ID</stream_name>
+      </field>
+      <field>
+        <column_name>RS_ID</column_name>
+        <stream_name>RS_ID</stream_name>
+      </field>
+      <field>
+        <column_name>P_VALUE_CHAR</column_name>
+        <stream_name>P_VALUE_CHAR</stream_name>
+      </field>
+      <field>
+        <column_name>ETL_ID</column_name>
+        <stream_name>ETL_ID</stream_name>
+      </field>
+      <field>
+        <column_name>EXT_DATA</column_name>
+        <stream_name>ext_data</stream_name>
+      </field>
+      <field>
+        <column_name>LOG_P_VALUE</column_name>
+        <stream_name>LOG_P_VALUE</stream_name>
+      </field>
+      <field>
+        <column_name>P_VALUE</column_name>
+        <stream_name>P_VALUE</stream_name>
+      </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>891</xloc>
       <yloc>1217</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>List of valid column names</name>
@@ -966,10 +1092,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <name>std_column_name</name>
@@ -1004,13 +1130,17 @@
       <line> <item>EFFECT</item> </line>
       <line> <item>LOG_P_VALUE</item> </line>
     </data>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>266</xloc>
       <yloc>113</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Lookup data_type, column_name in IDX</name>
@@ -1018,10 +1148,10 @@
     <description/>
     <distribute>N</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <connection>BIOMART</connection>
     <cache>Y</cache>
     <cache_load_all>Y</cache_load_all>
@@ -1051,13 +1181,17 @@
         <type>Integer</type>
       </value>
     </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>798</xloc>
       <yloc>585</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Map period to `</name>
@@ -1065,10 +1199,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <field_to_use>column_value</field_to_use>
     <target_field/>
     <non_match_default/>
@@ -1078,13 +1212,17 @@
         <target_value>`</target_value>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>974</xloc>
       <yloc>675</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Merge Join</name>
@@ -1092,26 +1230,30 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>LEFT OUTER</join_type>
-<step1>Sort std column names</step1>
-<step2>Sort data header columns</step2>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <join_type>LEFT OUTER</join_type>
+    <step1>Sort std column names</step1>
+    <step2>Sort data header columns</step2>
     <keys_1>
       <key>std_column_name</key>
     </keys_1>
     <keys_2>
       <key>column_name</key>
     </keys_2>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>644</xloc>
       <yloc>112</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Merge columns names with data</name>
@@ -1119,26 +1261,30 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>INNER</join_type>
-<step1>Sort header columns</step1>
-<step2>Sort data rows</step2>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <join_type>INNER</join_type>
+    <step1>Sort header columns</step1>
+    <step2>Sort data rows</step2>
     <keys_1>
       <key>col_nbr</key>
     </keys_1>
     <keys_2>
       <key>col_nbr</key>
     </keys_2>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>795</xloc>
       <yloc>325</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Output steps metrics</name>
@@ -1146,38 +1292,42 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <steps>
       <step>
         <name>Read GWAS File</name>
         <copyNr>0</copyNr>
         <stepRequired>N</stepRequired>
-        </step>
+      </step>
       <step>
         <name>Insert to BIO_ASSAY_ANALYSIS_GWAS</name>
         <copyNr>0</copyNr>
         <stepRequired>N</stepRequired>
-        </step>
-      </steps>
-        <stepnamefield>Step name</stepnamefield>
-        <stepidfield>Step id</stepidfield>
-        <steplinesinputfield>Lines input</steplinesinputfield>
-        <steplinesoutputfield>Lines output</steplinesoutputfield>
-        <steplinesreadfield>Lines read</steplinesreadfield>
-        <steplinesupdatedfield>Lines updated</steplinesupdatedfield>
-        <steplineswrittentfield>Lines written</steplineswrittentfield>
-        <steplineserrorsfield>Lines rejected</steplineserrorsfield>
-        <stepsecondsfield>Duration</stepsecondsfield>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </step>
+    </steps>
+    <stepnamefield>Step name</stepnamefield>
+    <stepidfield>Step id</stepidfield>
+    <steplinesinputfield>Lines input</steplinesinputfield>
+    <steplinesoutputfield>Lines output</steplinesoutputfield>
+    <steplinesreadfield>Lines read</steplinesreadfield>
+    <steplinesupdatedfield>Lines updated</steplinesupdatedfield>
+    <steplineswrittentfield>Lines written</steplineswrittentfield>
+    <steplineserrorsfield>Lines rejected</steplineserrorsfield>
+    <stepsecondsfield>Duration</stepsecondsfield>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1403</xloc>
       <yloc>133</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Read GWAS File</name>
@@ -1185,10 +1335,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <filename>${INPUT_FILENAME}</filename>
     <filename_field/>
     <rownum_field>rec_num</rownum_field>
@@ -1215,13 +1365,17 @@
         <trim_type>none</trim_type>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>98</xloc>
       <yloc>326</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Read GWAS Step</name>
@@ -1229,27 +1383,32 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Set step_count for input records</send_true_to>
-<send_false_to>Set step_count for output records</send_false_to>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Set step_count for input records</send_true_to>
+    <send_false_to>Set step_count for output records</send_false_to>
     <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>Step name</leftvalue>
- <function>=</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>Read GWAS File</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+      <condition>
+	<negated>N</negated>
+	<leftvalue>Step name</leftvalue>
+	<function>=</function>
+	<rightvalue/>
+	<value><name>constant</name><type>String</type><text>Read GWAS File</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+      </condition>
     </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1272</xloc>
       <yloc>304</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Read GWAS header</name>
@@ -1257,10 +1416,10 @@
     <description/>
     <distribute>N</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <accept_filenames>N</accept_filenames>
     <passing_through_fields>N</passing_through_fields>
     <accept_field/>
@@ -1340,13 +1499,17 @@
     <rootUriNameFieldName/>
     <extensionFieldName/>
     <sizeFieldName/>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>100</xloc>
       <yloc>201</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Remove ` from ext_data</name>
@@ -1354,10 +1517,10 @@
     <description/>
     <distribute>N</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <in_stream_name>ext_data</in_stream_name>
@@ -1370,13 +1533,17 @@
         <case_sensitive>no</case_sensitive>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>970</xloc>
       <yloc>941</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Remove double-quotes in column_value</name>
@@ -1384,10 +1551,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <in_stream_name>column_value</in_stream_name>
@@ -1400,13 +1567,17 @@
         <case_sensitive>no</case_sensitive>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>472</xloc>
       <yloc>326</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Set column_value to ` if null</name>
@@ -1414,16 +1585,16 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <replaceAllByValue/>
-      <replaceAllMask/>
-      <selectFields>Y</selectFields>
-      <selectValuesType>N</selectValuesType>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <replaceAllByValue/>
+    <replaceAllMask/>
+    <selectFields>Y</selectFields>
+    <selectValuesType>N</selectValuesType>
     <valuetypes>
-      </valuetypes>
+    </valuetypes>
     <fields>
       <field>
         <name>column_value</name>
@@ -1431,13 +1602,17 @@
         <mask/>
         </field>
       </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>975</xloc>
       <yloc>779</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Set database_name</name>
@@ -1445,31 +1620,36 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-       <calculation><field_name>database_name</field_name>
-<calc_type>ADD3</calc_type>
-<field_a>STUDY_ID</field_a>
-<field_b>a_dash</field_b>
-<field_c>ANALYSIS_NAME</field_c>
-<value_type>String</value_type>
-<value_length>-1</value_length>
-<value_precision>-1</value_precision>
-<remove>N</remove>
-<conversion_mask/>
-<decimal_symbol/>
-<grouping_symbol/>
-<currency_symbol/>
-</calculation>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <calculation>
+      <field_name>database_name</field_name>
+      <calc_type>ADD3</calc_type>
+      <field_a>STUDY_ID</field_a>
+      <field_b>a_dash</field_b>
+      <field_c>ANALYSIS_NAME</field_c>
+      <value_type>String</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1683</xloc>
       <yloc>320</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Set step number</name>
@@ -1477,10 +1657,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <field_to_use>Step name</field_to_use>
     <target_field>step_number</target_field>
     <non_match_default>99</non_match_default>
@@ -1498,13 +1678,17 @@
         <target_value>12</target_value>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1683</xloc>
       <yloc>207</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Set step_count for input records</name>
@@ -1512,31 +1696,36 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-       <calculation><field_name>step_count</field_name>
-<calc_type>ADD</calc_type>
-<field_a>Lines input</field_a>
-<field_b>minus_1</field_b>
-<field_c/>
-<value_type>Integer</value_type>
-<value_length>-1</value_length>
-<value_precision>-1</value_precision>
-<remove>N</remove>
-<conversion_mask/>
-<decimal_symbol/>
-<grouping_symbol/>
-<currency_symbol/>
-</calculation>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <calculation>
+      <field_name>step_count</field_name>
+      <calc_type>ADD</calc_type>
+      <field_a>Lines input</field_a>
+      <field_b>minus_1</field_b>
+      <field_c/>
+      <value_type>Integer</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1416</xloc>
       <yloc>375</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Set step_count for output records</name>
@@ -1544,31 +1733,36 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-       <calculation><field_name>step_count</field_name>
-<calc_type>COPY_FIELD</calc_type>
-<field_a>Lines output</field_a>
-<field_b/>
-<field_c/>
-<value_type>Integer</value_type>
-<value_length>-1</value_length>
-<value_precision>-1</value_precision>
-<remove>N</remove>
-<conversion_mask/>
-<decimal_symbol/>
-<grouping_symbol/>
-<currency_symbol/>
-</calculation>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <calculation>
+      <field_name>step_count</field_name>
+      <calc_type>COPY_FIELD</calc_type>
+      <field_a>Lines output</field_a>
+      <field_b/>
+      <field_c/>
+      <value_type>Integer</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1415</xloc>
       <yloc>279</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Set step_number to integer</name>
@@ -1576,12 +1770,14 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>step_number</name>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <select_unspecified>N</select_unspecified>
+      <meta>
+        <name>step_number</name>
         <rename>step_number</rename>
         <type>Integer</type>
 	<format>#</format>
@@ -1594,13 +1790,19 @@
         <grouping_symbol/>
         <currency_symbol/>
         <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </meta>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1543</xloc>
       <yloc>207</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Skip log of 0 step_count</name>
@@ -1608,27 +1810,32 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Dummy (do nothing)</send_true_to>
-<send_false_to>Set database_name</send_false_to>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Dummy (do nothing)</send_true_to>
+    <send_false_to>Set database_name</send_false_to>
     <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>step_count</leftvalue>
- <function>=</function>
- <rightvalue/>
- <value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value> </condition>
+      <condition>
+	<negated>N</negated>
+	<leftvalue>step_count</leftvalue>
+	<function>=</function>
+	<rightvalue/>
+	<value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>
+      </condition>
     </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1530</xloc>
       <yloc>316</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Sort data header columns</name>
@@ -1636,17 +1843,17 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>${SORT_DIR}</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>${SORT_DIR}</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
     <fields>
       <field>
         <name>column_name</name>
@@ -1654,13 +1861,17 @@
         <case_sensitive>N</case_sensitive>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>647</xloc>
       <yloc>204</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Sort data rows</name>
@@ -1668,17 +1879,17 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>${SORT_DIR}</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>${SORT_DIR}</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
     <fields>
       <field>
         <name>col_nbr</name>
@@ -1686,13 +1897,17 @@
         <case_sensitive>N</case_sensitive>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>653</xloc>
       <yloc>326</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Sort header columns</name>
@@ -1700,17 +1915,17 @@
     <description/>
     <distribute>N</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>${SORT_DIR}</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>${SORT_DIR}</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
     <fields>
       <field>
         <name>col_nbr</name>
@@ -1718,13 +1933,17 @@
         <case_sensitive>N</case_sensitive>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>793</xloc>
       <yloc>247</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Sort metrics by step name</name>
@@ -1732,17 +1951,17 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>${SORT_DIR}</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>${SORT_DIR}</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
     <fields>
       <field>
         <name>Step name</name>
@@ -1750,13 +1969,17 @@
         <case_sensitive>N</case_sensitive>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>1549</xloc>
       <yloc>132</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Sort rows by rec_num</name>
@@ -1764,17 +1987,17 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>${SORT_DIR}</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>${SORT_DIR}</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
     <fields>
       <field>
         <name>rec_num</name>
@@ -1782,13 +2005,17 @@
         <case_sensitive>N</case_sensitive>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>797</xloc>
       <yloc>418</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Sort std column names</name>
@@ -1796,17 +2023,17 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>${SORT_DIR}</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>${SORT_DIR}</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
     <fields>
       <field>
         <name>std_column_name</name>
@@ -1814,13 +2041,17 @@
         <case_sensitive>N</case_sensitive>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>441</xloc>
       <yloc>115</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Split field to rows</name>
@@ -1828,24 +2059,28 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-   <splitfield>gwas_rec</splitfield>
-   <delimiter>$[09]</delimiter>
-   <newfield>column_value</newfield>
-   <rownum>Y</rownum>
-   <rownum_field>col_nbr</rownum_field>
-   <resetrownumber>Y</resetrownumber>
-   <delimiter_is_regex>N</delimiter_is_regex>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <splitfield>gwas_rec</splitfield>
+    <delimiter>$[09]</delimiter>
+    <newfield>column_value</newfield>
+    <rownum>Y</rownum>
+    <rownum_field>col_nbr</rownum_field>
+    <resetrownumber>Y</resetrownumber>
+    <delimiter_is_regex>N</delimiter_is_regex>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>289</xloc>
       <yloc>326</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Split hdr into column names</name>
@@ -1853,24 +2088,28 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-   <splitfield>gwas_hdr</splitfield>
-   <delimiter>$[09]</delimiter>
-   <newfield>column_name</newfield>
-   <rownum>Y</rownum>
-   <rownum_field>col_nbr</rownum_field>
-   <resetrownumber>Y</resetrownumber>
-   <delimiter_is_regex>N</delimiter_is_regex>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <splitfield>gwas_hdr</splitfield>
+    <delimiter>$[09]</delimiter>
+    <newfield>column_name</newfield>
+    <rownum>Y</rownum>
+    <rownum_field>col_nbr</rownum_field>
+    <resetrownumber>Y</resetrownumber>
+    <delimiter_is_regex>N</delimiter_is_regex>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>277</xloc>
       <yloc>201</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Uppercase column_name</name>
@@ -1878,10 +2117,10 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
       <field>
         <in_stream_name>column_name</in_stream_name>
@@ -1897,13 +2136,17 @@
         <remove_special_characters>none</remove_special_characters>
       </field>
     </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>482</xloc>
       <yloc>202</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step>
     <name>Write to log 2</name>
@@ -1911,29 +2154,33 @@
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <loglevel>log_level_basic</loglevel>
-      <displayHeader>Y</displayHeader>
-      <logmessage>Missing column</logmessage>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <logmessage>Missing column</logmessage>
     <fields>
       <field>
         <name>std_column_name</name>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      </field>
+    </fields>
+    <cluster_schema/>
+    <remotesteps>
+      <input>   </input>
+      <output>   </output>
+    </remotesteps>
+    <GUI>
       <xloc>929</xloc>
       <yloc>115</yloc>
       <draw>Y</draw>
-      </GUI>
-    </step>
+    </GUI>
+  </step>
 
   <step_error_handling>
   </step_error_handling>
-   <slave-step-copy-partition-distribution>
-</slave-step-copy-partition-distribution>
-   <slave_transformation>N</slave_transformation>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
 </transformation>
