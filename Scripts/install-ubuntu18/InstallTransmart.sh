@@ -233,7 +233,7 @@ if [ "$( checkInstallError "Database table folders needs by transmart not correc
 echo "Finished installing basic tools and dependencies at $(date)"
 
 echo "++++++++++++++++++++++++++++"
-echo "+  Install Tomcat 7"
+echo "+  Install Tomcat 8"
 echo "++++++++++++++++++++++++++++"
 
 sudo -v 
