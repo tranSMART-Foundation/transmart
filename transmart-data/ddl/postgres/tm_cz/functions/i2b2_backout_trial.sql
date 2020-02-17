@@ -103,7 +103,7 @@ begin
     rowCt := 0;
     stepCt := stepCt + 1;
     if (topNode is null OR length(topNode) = 0) then
-        -- Either due to erroneous trailid or inconsistent database content
+        -- Either due to erroneous trialid or inconsistent database content
         -- In case of erroneous trialid, the database does not contain any data associated with this trialid (trying to remove does not harm)
         -- In case of inconsistencies in the database, we still might try to remove data associate with this trialid.
 	auditMessage := 'Not able to retrieve top node associated with trial id: ' || trialid;
@@ -256,7 +256,7 @@ begin
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete expression data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 	
     end if;
     
@@ -300,7 +300,7 @@ begin
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete acgh data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 	
     end if;
 
@@ -343,7 +343,50 @@ begin
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete rnaseq data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+	
+    end if;
+
+    --	delete rnaseq expression data
+    
+    select count(*) into pExists
+      from deapp.de_subject_sample_mapping
+     where trial_name = TrialId
+       and platform = 'RNASEQCOG'
+       and trial_name = TrialId
+       and coalesce(omic_source_study,trial_name) = TrialId;
+
+    if pExists > 0 then
+	for v_partition_id in
+	    select distinct partition_id::text
+	    from deapp.de_subject_sample_mapping
+	    where trial_name = TrialId
+	    and platform = 'RNASEQCOG'
+	    and coalesce(omic_source_study,trial_name) = TrialId
+	    loop
+	    sqlTxt := 'drop table if exists deapp.de_subject_rnaseq_data_' || v_partition_id;
+	    execute sqlTxt;
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_rnaseq_data',rowCt,stepCt,'Done');
+	end loop;
+	
+	begin
+	    delete from deapp.de_subject_sample_mapping
+	     where trial_name = TrialID
+		   and platform = 'RNASEQCOG';
+	    get diagnostics rowCt := ROW_COUNT;
+	exception
+	    when others then
+		errorNumber := SQLSTATE;
+		errorMessage := SQLERRM;
+	    --Handle errors.
+		perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
+	    --End Proc
+		perform tm_cz.cz_end_audit (jobId, 'FAIL');
+		return -16;
+	end;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete rnaseq expression data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 	
     end if;
 
