@@ -44,6 +44,7 @@ begin
 
     truncate table i2b2metadata.i2b2_secure;
 
+    stepCt := 0;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate I2B2METADATA i2b2_secure',0,stepCt,'Done');
 
@@ -102,7 +103,7 @@ begin
 				  on b.sourcesystem_cd = f.modifier_cd;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert security data into I2B2METADATA i2b2_secure',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Reload security data into I2B2METADATA i2b2_secure',rowCt,stepCt,'Done');
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     perform tm_cz.cz_end_audit (jobID, 'SUCCESS') where coalesce(currentJobId, -1) <> jobId;
@@ -166,8 +167,9 @@ begin
     delete from i2b2metadata.i2b2_secure where sourcesystem_cd = sourcesystemCd;
 
     get diagnostics rowCt := ROW_COUNT;
+    stepCt := 0
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Clean-up I2B2METADATA i2b2_secure',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Clean-up I2B2METADATA i2b2_secure for '||sourcesystemcd,rowCt,stepCt,'Done');
 
     insert into i2b2metadata.i2b2_secure
 		(c_hlevel,
@@ -226,7 +228,7 @@ begin
 
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert security data into I2B2METADATA i2b2_secure',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert security data into I2B2METADATA i2b2_secure for '||sourcesystemcd,rowCt,stepCt,'Done');
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     perform tm_cz.cz_end_audit (jobID, 'SUCCESS') where coalesce(currentJobId, -1) <> jobId;
