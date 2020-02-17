@@ -182,6 +182,7 @@
 \i tm_cz/de_subj_sample_map_release.sql
 \i tm_cz/de_subject_mrna_data_release.sql
 \i tm_cz/de_subject_rbm_data_release.sql
+\i tm_cz/etl_settings.sql
 \i tm_cz/haploview_data_release.sql
 \i tm_cz/i2b2_release.sql
 \i tm_cz/i2b2_tags_release.sql
