@@ -1,7 +1,7 @@
 --
 -- Name: cz_write_audit(numeric, character varying, character varying, character varying, numeric, numeric, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cz_write_audit(jobid numeric, databasename character varying, procedurename character varying, stepdesc character varying, recordsmanipulated numeric, stepnumber numeric, stepstatus character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.cz_write_audit(jobId numeric, databaseName character varying, procedureName character varying, stepDesc character varying, recordsManipulated numeric, stepNumber numeric, stepStatus character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -25,8 +25,14 @@ AS $$
     lastTime    timestamp;
     currTime    timestamp;
     elapsedSecs numeric;
-    
+    debugValue	character varying(255);
+
 begin
+
+    select paramvalue
+      into debugValue
+      from tm_cz.etl_settings
+     where paramname in ('debug','DEBUG');
 
     select max(job_date)
       into lastTime
@@ -69,7 +75,12 @@ begin
             perform tm_cz.cz_write_error(jobId,SQLSTATE,SQLERRM,null,null);
             return -16;
     end;
-    
+
+    if (coalesce(debugValue,'no')) then
+        raise NOTICE 'CZ_WRITE_AUDIT job:% function:%.% step: % "%" records:% status:% date:% elapsed:%',
+	      jobId, databaseName,procedureName, stepNumber, stepDesc, recordsManipulated, stepStatus, currTime, elapsedSecs;
+    end if;
+	      
     return 1;
 end;
 $$;

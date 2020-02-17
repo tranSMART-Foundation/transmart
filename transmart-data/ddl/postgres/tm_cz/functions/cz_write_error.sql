@@ -1,7 +1,7 @@
 --
 -- Name: cz_write_error(numeric, character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cz_write_error(jobid numeric, errornumber character varying, errormessage character varying, errorstack character varying, errorbacktrace character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.cz_write_error(jobId numeric, errorNumber character varying, errorMessage character varying, errorStack character varying, errorBacktrace character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -20,10 +20,18 @@ AS $$
      * limitations under the License.
      ******************************************************************/
 
+    declare
+    debugValue	character varying(255);
+
 begin
 
     begin
-	insert into tm_cz.cz_job_error(
+        select paramvalue
+          into debugValue
+          from tm_cz.etl_settings
+         where paramname in ('debug','DEBUG');
+
+        insert into tm_cz.cz_job_error(
 	    job_id
 	    ,error_number
 	    ,error_message
@@ -31,15 +39,20 @@ begin
 	    ,error_backtrace
 	    ,seq_id)
 	select
-	    jobID
+	    jobId
 	    ,errorNumber
 	    ,errorMessage
 	    ,errorStack
 	    ,errorBackTrace
 	    ,max(seq_id) 
 	  from tm_cz.cz_job_audit 
-	 where job_id = jobid;
+	 where job_id = jobId;
 	
+        if (coalesce(debugValue,'no')) then
+            raise NOTICE 'CZ_WRITE_ERROR job:% error:% "%" stack: "%" backtrace "%"',
+	          jobId, errorNumber, errorMessage, errorStack, errorBacktrace;
+        end if;
+
     end;
     
     return 1;
