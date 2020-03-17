@@ -157,7 +157,7 @@
       <yloc>166</yloc>
       </entry>
     <entry>
-      <name>Load  QPCR MIRNA annotation file to LT_QPCR_MIRNA_ANNOTATION</name>
+      <name>Load QPCR MIRNA annotation file to LT_QPCR_MIRNA_ANNOTATION</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
@@ -313,7 +313,7 @@
   <hops>
     <hop>
       <from>Check if QPCR_MIRNA_annotation.txt file exists</from>
-      <to>Load  QPCR MIRNA annotation file to LT_QPCR_MIRNA_ANNOTATION</to>
+      <to>Load QPCR MIRNA annotation file to LT_QPCR_MIRNA_ANNOTATION</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -384,7 +384,7 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Load  QPCR MIRNA annotation file to LT_QPCR_MIRNA_ANNOTATION</from>
+      <from>Load QPCR MIRNA annotation file to LT_QPCR_MIRNA_ANNOTATION</from>
       <to>Check if MIRNA ANNOTATION_TITLE supplied</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>

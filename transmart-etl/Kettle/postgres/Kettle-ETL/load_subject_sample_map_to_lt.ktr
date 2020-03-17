@@ -408,7 +408,7 @@
       </field>
       <field>
         <column_name>SOURCE_CD</column_name>
-        <stream_name>source_cd</stream_name>
+        <stream_name>SOURCE_CD</stream_name>
       </field>
     </fields>
     <cluster_schema/>

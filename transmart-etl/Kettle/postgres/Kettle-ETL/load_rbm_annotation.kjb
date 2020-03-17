@@ -247,7 +247,7 @@
   <hops>
     <hop>
       <from>Check if rbm_annotation.txt file exists</from>
-      <to>Load  rbm annotation file to LT_SRC_RBM_ANNOTATION</to>
+      <to>Load rbm annotation file to LT_SRC_RBM_ANNOTATION</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -318,7 +318,7 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Load  rbm annotation file to LT_SRC_RBM_ANNOTATION</from>
+      <from>Load rbm annotation file to LT_SRC_RBM_ANNOTATION</from>
       <to>Check if RBM ANNOTATION_TITLE supplied</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>

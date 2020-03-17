@@ -64,7 +64,7 @@
         <parameter>
             <name>LOAD_TYPE</name>
             <default_value>L</default_value>
-            <description>L=Load lt_src_mrna_data using bulk loader and run i2b2_process_mrna_data, I=Insert data to lt_src_mrna_data and run i2b2_process_mrna_data, F=File only, i2b2_process_mrna_data will not be run</description>
+            <description>L=Load lt_src-proteomics_data using bulk loader and run i2b2_process_proteomics_data, I=Insert data to lt_src_proteomics_data and run i2b2_process_proteomics_data, F=File only, i2b2_process_proteomics_data will not be run</description>
         </parameter>
         <parameter>
             <name>LOG_BASE</name>
@@ -280,8 +280,10 @@
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
       <create_parent_folder>N</create_parent_folder>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <parallel>N</parallel>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>917</xloc>
@@ -344,8 +346,10 @@
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
       <create_parent_folder>N</create_parent_folder>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <parallel>N</parallel>
+      <parameters>
+         <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>910</xloc>

@@ -154,7 +154,7 @@
     <hop> <from>Remove SAMPLE_SUFFIX from sample_cd</from><to>Select values 2</to><enabled>Y</enabled> </hop>
     <hop> <from>Check for numeric values</from><to>Drop non-numeric data</to><enabled>Y</enabled> </hop>
     <hop> <from>Drop non-numeric data</from><to>Get sample variables</to><enabled>Y</enabled> </hop>
-    <hop> <from>Select values for mrna data</from><to>Check if LOAD_TYPE = L</to><enabled>Y</enabled> </hop>
+    <hop> <from>Select values for acgh data</from><to>Check if LOAD_TYPE = L</to><enabled>Y</enabled> </hop>
     <hop> <from>Join and drop any unmapped sample_cd</from><to>No remap for sample</to><enabled>Y</enabled> </hop>
     <hop> <from>No remap for sample</from><to>Select values</to><enabled>Y</enabled> </hop>
     <hop> <from>No remap for sample</from><to>Dropped samples</to><enabled>Y</enabled> </hop>
@@ -164,7 +164,7 @@
     <hop> <from>Get filename</from><to>Get stats from steps</to><enabled>Y</enabled> </hop>
     <hop> <from>Check if LOAD_TYPE = L</from><to>Bulk Loader</to><enabled>Y</enabled> </hop>
     <hop> <from>Get pivoted file</from><to>Check for numeric values</to><enabled>Y</enabled> </hop>
-    <hop> <from>Trim trial_name</from><to>Select values for mrna data</to><enabled>Y</enabled> </hop>
+    <hop> <from>Trim trial_name</from><to>Select values for acgh data</to><enabled>Y</enabled> </hop>
   </order>
 
   <step>
@@ -945,7 +945,7 @@ if (isnum_result) isnum_result = isNum(amp);
     </partitioning>
     <steps>
       <step>
-        <name>Insert to lt_src_mrna_data</name>
+        <name>Insert to lt_src_acgh_data</name>
         <copyNr>0</copyNr>
         <stepRequired>N</stepRequired>
       </step>
@@ -1528,7 +1528,7 @@ else
   </step>
 
   <step>
-    <name>Select values for mrna data</name>
+    <name>Select values for acgh data</name>
     <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
