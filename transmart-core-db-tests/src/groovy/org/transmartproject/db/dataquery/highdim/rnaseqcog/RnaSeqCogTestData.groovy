@@ -39,7 +39,7 @@ class RnaSeqCogTestData extends AbstractTestData {
 	DeGplInfo platform
 	List<PatientDimension> patients
 	List<DeSubjectSampleMapping> assays
-	List<DeRnaseqAnnotation> annotations
+	List<DeRnaAnnotation> annotations
 	List<DeSubjectRnaData> data
 
 	RnaSeqCogTestData() {
@@ -64,12 +64,12 @@ class RnaSeqCogTestData extends AbstractTestData {
 
 	private void createTestData() {
 		concept = HighDimTestData.createConcept('RNASEQCOGPUBLIC', 'concept code #1',
-				TRIAL_NAME, 'PROTEIN_CONCEPT')
+				TRIAL_NAME, 'RNASEQCOG_CONCEPT')
 
 		platform = new DeGplInfo(
 				title: 'Bogus RNA-Seq platform',
 				organism: 'Homo Sapiens',
-				markerType: 'RNASEQ')
+				markerType: 'RNASEQCOG')
 		platform.id = 'BOGUS_RNA-SEQ_PLATFORM' // ?? what should be here
 
 
@@ -91,8 +91,8 @@ class RnaSeqCogTestData extends AbstractTestData {
 		}
 	}
 
-	private DeRnaseqAnnotation createAnnotation(id, BioMarkerCoreDb gene) {
-		DeRnaseqAnnotation res = new DeRnaseqAnnotation(
+	private DeRnaAnnotation createAnnotation(id, BioMarkerCoreDb gene) {
+		DeRnaAnnotation res = new DeRnaAnnotation(
 				geneSymbol: gene.name,
 				geneId: gene.externalId,
 				platform: platform)
@@ -101,7 +101,7 @@ class RnaSeqCogTestData extends AbstractTestData {
 	}
 
 	private DeSubjectRnaData createDataEntry(DeSubjectSampleMapping assay,
-	                                         DeRnaseqAnnotation annotation,
+	                                         DeRnaAnnotation annotation,
 	                                         double intensity) {
 		new DeSubjectRnaData(
 				assay: assay,

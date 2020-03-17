@@ -113,7 +113,7 @@ class RnaSeqCogEndToEndRetrievalTests {
                 [], projection)
 
         assertThat Lists.newArrayList(result), contains(
-                testData.annotations.collect { DeRnaseqAnnotation annotation ->
+                testData.annotations.collect { DeRnaAnnotation annotation ->
                     allOf(
                             hasProperty('label',     is(annotation.id)),
                             hasProperty('bioMarker', is(annotation.geneSymbol)))
@@ -187,7 +187,7 @@ class RnaSeqCogEndToEndRetrievalTests {
             rnaSeqCogResource.retrieveData assayConstraints, [], projection
     }
 
-    def getDataMatcherForAnnotation(DeRnaseqAnnotation annotation,
+    def getDataMatcherForAnnotation(DeRnaAnnotation annotation,
                                     String property) {
         contains testData.data.
                 findAll { it.annotation == annotation }.

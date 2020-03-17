@@ -21,14 +21,15 @@ package org.transmartproject.db.dataquery.highdim.rnaseqcog
 
 import org.transmartproject.db.dataquery.highdim.DeGplInfo
 
-class DeRnaseqAnnotation implements Serializable {
+class DeRnaAnnotation implements Serializable {
 
     String geneId // the Entrez accession; "primary external id"
     String geneSymbol
     String transcriptId
+    String gplId
 
     // irrelevant
-    //String organism
+    String organism
 
     static transients = ['id']
 
@@ -43,13 +44,17 @@ class DeRnaseqAnnotation implements Serializable {
         id       name: 'transcriptId', generator: 'assigned'
         version  false
 
+        gplId       insertable: false, updateable: false
         platform column: 'gpl_id'
     }
 
     static constraints = {
-        geneId       nullable: true, maxSize: 50
-        geneSymbol   nullable: true, maxSize: 50
+        geneId       nullable: true, maxSize: 100
+        geneSymbol   nullable: true, maxSize: 100
         transcriptId maxSize: 50
+        platform     nullable: true
+        gplId        nullable: true, maxSize: 50
+        organism     nullable: true, maxSize: 200
 
         //organism nullable: true, maxSize: 30
     }

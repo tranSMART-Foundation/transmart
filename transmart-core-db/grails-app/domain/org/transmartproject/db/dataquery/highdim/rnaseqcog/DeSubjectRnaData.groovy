@@ -29,15 +29,15 @@ class DeSubjectRnaData implements Serializable {
     BigDecimal logIntensity
     BigDecimal rawIntensity
     BigDecimal zscore
+//    String     trialName
 
-    DeRnaseqAnnotation jAnnotation //due to criteria bug
+    DeRnaAnnotation jAnnotation //due to criteria bug
 
     // irrelevant
     //String     trialSource
-    //String     trialName
     //Long       patientId
 
-    static belongsTo = [annotation: DeRnaseqAnnotation,
+    static belongsTo = [annotation: DeRnaAnnotation,
 			assay:      DeSubjectSampleMapping,
 			patient:    PatientDimension]
 
@@ -47,8 +47,8 @@ class DeSubjectRnaData implements Serializable {
         version     false
 
         annotation  column: 'probeset_id' // poor name; no probes involved
-//        assay       column: 'assay_id'
-//        patient     column: 'patient_id'
+        assay       column: 'assay_id'
+        patient     column: 'patient_id'
 
         // here due to criteria bug
         jAnnotation column: 'probeset_id', insertable: false, updateable: false
@@ -63,7 +63,7 @@ class DeSubjectRnaData implements Serializable {
 
         // irrelevant
         //trialSource  nullable: true, maxSize: 200
-        //trialName    nullable: true, maxSize: 50
+        //trialName    nullable: true, maxSize: 100
         //patientId    nullable: true
     }
 }

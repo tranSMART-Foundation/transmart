@@ -20,6 +20,7 @@
 package org.transmartproject.db.dataquery.highdim.rnaseqcog
 
 import grails.orm.HibernateCriteriaBuilder
+import groovy.util.logging.Slf4j
 import org.hibernate.ScrollableResults
 import org.hibernate.engine.SessionImplementor
 import org.hibernate.sql.JoinFragment
@@ -48,11 +49,12 @@ import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
  * Module for RNA-seq, as implemented for Oracle by Cognizant.
  * This name is to distinguish it from the TraIT implementation.
  */
+@Slf4j('logger')
 class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
 
     final String name = 'rnaseq_cog'
     final String description = "Messenger RNA data (Sequencing)"
-    final List<String> platformMarkerTypes = ['RNASEQ']
+    final List<String> platformMarkerTypes = ['RNASEQCOG']
     final Map<String, Class> dataProperties = typesMap(DeSubjectRnaData,
 						       ['rawIntensity', 'logIntensity', 'zscore'])
     final Map<String, Class> rowProperties = typesMap(RnaSeqCogDataRow,
@@ -72,12 +74,12 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
             projections {
                 property 'assay.id',         'assayId'
 
-                property 'ann.id',           'annotationId'
+                property 'ann.id',           'annotationId'  // refers to transcriptId
                 property 'ann.geneSymbol',   'geneSymbol'
                 property 'ann.geneId',       'geneId'
             }
 
-            order 'ann.id',         'asc'
+            order 'ann.id',         'asc' // refers to transcriptId
             order 'ann.geneSymbol', 'asc'
             order 'assay.id',       'asc' // important! See assumption below
 
@@ -91,6 +93,7 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
     TabularResult transformResults(ScrollableResults results, List<AssayColumn> assays, Projection projection) {
 	Map assayIndexMap = createAssayIndexMap(assays)
 
+//	logger.info 'transformResults rnaseq_cog assayIndexMap {}', assayIndexMap.size()
 	DefaultHighDimensionTabularResult preliminaryResult = new DefaultHighDimensionTabularResult(
             rowsDimensionLabel:    'Transcripts',
             columnsDimensionLabel: 'Sample codes',
@@ -101,6 +104,7 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
             inSameGroup:           { a, b -> a.annotationId == b.annotationId && a.geneSymbol == b.geneSymbol },
             finalizeGroup:         { List list -> /* list of arrays with one element: a map */
                 def firstNonNullCell = list.find()
+//		logger.info 'preliminaryResult starts {}', firstNonNullCell[0]
                 new RnaSeqCogDataRow(
                     annotationId:  firstNonNullCell[0].annotationId,
                     geneSymbol:    firstNonNullCell[0].geneSymbol,
@@ -111,11 +115,16 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
             }
         )
 
+//	logger.info 'transformResults rnaseq_cog preliminaryResult indicesList{}', preliminaryResult.getIndicesList()
+
         new RepeatedEntriesCollectingTabularResult(
             tabularResult: preliminaryResult,
             collectBy: { it.annotationId },
             resultItem: { collectedList ->
                 if (collectedList) {
+//		    logger.info 'RepeatedEntries...Result {} ({})',collectedList[0], collectedList.size()
+//		    logger.info 'RepeatedEntries...genesymbol {} geneid {} Result {}',
+			collectedList*.geneSymbol.join('/'), collectedList*.geneId.join('/')
                     new RnaSeqCogDataRow(
                         annotationId:  collectedList[0].annotationId,
                         geneSymbol:    collectedList*.geneSymbol.join('/'),
@@ -134,7 +143,7 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
 
     protected List<DataRetrievalParameterFactory> createDataConstraintFactories() {
         [ standardDataConstraintFactory,
-         new SimpleAnnotationConstraintFactory(field: 'annotation', annotationClass: DeRnaseqAnnotation.class),
+         new SimpleAnnotationConstraintFactory(field: 'annotation', annotationClass: DeRnaAnnotation.class),
          new SearchKeywordDataConstraintFactory(correlationTypesRegistry,
 						'GENE', 'ann', 'geneId') ]
     }
@@ -147,18 +156,26 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
          new AllDataProjectionFactory(dataProperties, rowProperties)]
     }
 
-    List<String> searchAnnotation(String concept_code, String search_term, String search_property) {
-	if (!getSearchableAnnotationProperties().contains(search_property)) {
+    /*
+     * Search HDD concept annotation (by code) for a value (searchTerm) for a property (e.g. geneSymbol)
+     * to get a list of matching annotation rows
+     */
+    List<String> searchAnnotation(String conceptCode, String searchTerm, String searchProperty) {
+	if (!getSearchableAnnotationProperties().contains(searchProperty)) {
+//	    logger.info 'searchAnnotation rnaseq_cog no such property {}', searchProperty
             return []
 	}
 
-        DeRnaseqAnnotation.createCriteria().list {
-            dataRows {
-                'in'('assay', DeSubjectSampleMapping.createCriteria().listDistinct {eq('conceptCode', concept_code)} )
-            }
-            ilike(search_property, search_term + '%')
-            projections { distinct(search_property) }
-            order(search_property, 'ASC')
+//	logger.info 'searchAnnotation rnaseq_cog concept {} term {} property {}', conceptCode, searchTerm, searchProperty
+
+        DeRnaAnnotation.createCriteria().list {
+	    eq 'gplId', DeSubjectSampleMapping.createCriteria().get {
+		eq 'conceptCode', conceptCode
+                projections {distinct 'platform.id'}
+	    }
+            ilike(searchProperty, searchTerm + '%')
+            projections { distinct(searchProperty) }
+            order(searchProperty, 'ASC')
             maxResults 100
         }
     }
