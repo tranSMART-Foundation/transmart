@@ -1,11 +1,20 @@
 --
 -- Name: cz_write_info(numeric, numeric, numeric, character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cz_write_info(jobid numeric, messageid numeric, messageline numeric, messageprocedure character varying, infomessage character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.cz_write_info(jobid numeric, messageid numeric, messageline numeric, messageprocedure character varying, infomessage character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
 
+    declare
+
+    debugValue	character varying(255);
+
 begin
+    select paramvalue
+      into debugValue
+      from tm_cz.etl_settings
+     where paramname in ('debug','DEBUG');
+
     begin
 	insert into tm_cz.cz_job_message
 		    (job_id
@@ -25,6 +34,9 @@ begin
 	 where job_id = jobID;
     end;
     
+    if (coalesce(debugValue,'no')) then
+        raise NOTICE 'CZ_WRITE_INFO job:% id:% line:% procedure:% info:%',
+	      jobId, messageID, messageLine, messageProcedure, infoMessage;
     commit;
     return 1;
 
