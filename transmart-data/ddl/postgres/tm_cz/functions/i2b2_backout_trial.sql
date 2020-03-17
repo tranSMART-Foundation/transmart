@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_backout_trial(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_backout_trial(trialid character varying, path_string character varying, currentjobId numeric) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_backout_trial(trialid character varying, path_string character varying, currentjobId numeric) RETURNS integer
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
 
@@ -23,22 +23,24 @@ AS $$
 
     declare
  
-    pExists			integer;
-    sqlTxt			character varying;
-    topNode			character varying;
-    v_partition_id		text;
+    pExists		integer;
+    sqlTxt		character varying;
+    msgTxt		character varying;
+    topNode		character varying;
+    v_partition_id	text;
     secureObjId		bigint;
 
     --Audit variables
     newJobFlag		integer;
-    databaseName		VARCHAR(100);
-    procedureName		VARCHAR(100);
-    jobId 			numeric(18,0);
-    stepCt 			numeric(18,0);
-    rowCt			numeric(18,0);
+    databaseName	VARCHAR(100);
+    procedureName	VARCHAR(100);
+    jobId 		numeric(18,0);
+    stepCt 		numeric(18,0);
+    rowCt		numeric(18,0);
     errorNumber		character varying;
-    errorMessage	        character varying;
-    auditMessage	        character varying;
+    errorMessage	character varying;
+    auditMessage	character varying;
+    rtnCd		integer;
 
 begin
 
@@ -72,11 +74,12 @@ begin
     trialid := upper(trialid);
 
     -- The second argument for this stored procedure (path_string) is deprecated.
-    -- It's value is not independent of the value of the first argument (trialid) and
-    -- therefore could be retrieved for the database. This prevents that errors are introduced
-    -- in case inconsistent values are used for those arguments.
+    -- Its value is not independent of the value of the first argument (trialid) and
+    -- therefore could be retrieved from the database.
+    -- This prevents that errors are introduced in case inconsistent values are used for those arguments.
     -- For now, if a value is provided for path_string, it is checked against the information in the database
     -- and if there is no match, the procedure will be aborted.
+
     rowCt := 0;
     stepCt := stepCt + 1;
     if (path_string is not null AND length(path_string) > 0) then
@@ -85,6 +88,8 @@ begin
     end if;
 
     -- retrieve topNode for study with given trial id (trialid)
+    -- ========================================================
+
     begin
 	select c_fullname from i2b2metadata.i2b2 where sourcesystem_cd = trialid and c_hlevel = 1 into topNode;
 	get diagnostics rowCt := ROW_COUNT;
@@ -100,6 +105,8 @@ begin
     end;
 
     -- check validity of topNode value
+    -- ===============================
+
     rowCt := 0;
     stepCt := stepCt + 1;
     if (topNode is null OR length(topNode) = 0) then
@@ -111,6 +118,8 @@ begin
 	end if;
 
     -- check consistency between topNode and path_string
+    -- =================================================
+
     rowCt := 0;
     stepCt := stepCt + 1;
     if (path_string is not null AND length(path_string) > 0 AND topNode is not null AND path_string != topNode) then
@@ -124,6 +133,8 @@ begin
     end if;
 
     -- delete all i2b2 nodes
+    -- =====================
+
     rowCt := 0;
     stepCt := stepCt + 1;
     if (topNode is null OR length(topNode) = 0) then
@@ -136,11 +147,17 @@ begin
 	auditMessage := 'Start deleting all data for trial ' || trialid || ' and topNode ' || topNode;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
 
-	perform tm_cz.i2b2_delete_all_nodes(topNode,jobId);
+	select tm_cz.i2b2_delete_all_nodes(topNode,jobId) into rtnCd;
+	if(rtnCd <> 1) then
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to delete all nodes',0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
     end if;
 
-    --	delete clinical data
-    
+    -- delete clinical data
+    -- ====================
+
     begin
 	delete from tm_lz.lz_src_clinical_data
 	 where study_id = trialid;
@@ -158,8 +175,8 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from lz_src_clinical_data',rowCt,stepCt,'Done');
 
-    --	delete observation_fact SECURITY data, do before patient_dimension delete
-    
+    -- delete observation_fact SECURITY data, do before patient_dimension delete
+    -- =========================================================================
     begin
 	delete from i2b2demodata.observation_fact f
 	 where f.concept_cd = 'SECURITY'
@@ -180,7 +197,8 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete SECURITY data for trial from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
-    --	delete patient data
+    -- delete patient data
+    -- ===================
     
     begin
 	delete from i2b2demodata.patient_dimension
@@ -216,8 +234,12 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA patient_trial',rowCt,stepCt,'Done');
 
+    -- High-dimensional data types
+    -- ===========================
+
     --	delete gene expression data
-    
+    --  ===========================
+
     select count(*) into pExists
       from deapp.de_subject_sample_mapping
      where trial_name = TrialId
@@ -226,7 +248,7 @@ begin
        and coalesce(omic_source_study,trial_name) = TrialId;
 
     if pExists > 0 then
-
+        rowCt := 0;
 	for v_partition_id in
 	    select distinct partition_id::text
 	    from deapp.de_subject_sample_mapping
@@ -237,9 +259,10 @@ begin
 	    sqlTxt := 'drop table if exists deapp.de_subject_microarray_data_' || v_partition_id;
 	    execute sqlTxt;
 	    stepCt := stepCt + 1;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_microarray_data',rowCt,stepCt,'Done');
+	    msgTxt := 'Drop partition table '|| v_partition_id || ' for de_subject_microarray_data';
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,msgTxt,rowCt,stepCt,'Done');
 	end loop;
-	
+
 	begin
 	    delete from deapp.de_subject_sample_mapping
 	     where trial_name = TrialID
@@ -257,11 +280,12 @@ begin
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete expression data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
-	
+
     end if;
     
     --	delete acgh data
-    
+    --  ================
+
     select count(*) into pExists
       from deapp.de_subject_sample_mapping
      where trial_name = TrialId
@@ -270,6 +294,7 @@ begin
        and coalesce(omic_source_study,trial_name) = TrialId;
 
     if pExists > 0 then
+	rowCt := 0;
 
 	for v_partition_id in
 	    select distinct partition_id::text
@@ -281,9 +306,10 @@ begin
 	    sqlTxt := 'drop table if exists deapp.de_subject_acgh_data_' || v_partition_id;
 	    execute sqlTxt;
 	    stepCt := stepCt + 1;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_acgh_data',rowCt,stepCt,'Done');
+	    msgTxt := 'Drop partition table '|| v_partition_id || ' for de_subject_acgh_data';
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,msgTxt,rowCt,stepCt,'Done');
 	end loop;
-	
+
 	begin
 	    delete from deapp.de_subject_sample_mapping
 	     where trial_name = TrialID
@@ -301,11 +327,135 @@ begin
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete acgh data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
-	
+
     end if;
 
-    --	delete rnaseq data
-    
+    --	delete metabolomics data
+    -- =========================
+
+    select count(*) into pExists
+      from deapp.de_subject_sample_mapping
+     where trial_name = TrialId
+       and platform = 'METABOLOMICS'
+       and trial_name = TrialId
+       and coalesce(omic_source_study,trial_name) = TrialId;
+
+    if pExists > 0 then
+        rowCt := 0;
+	for v_partition_id in
+	    select distinct partition_id::text
+	    from deapp.de_subject_sample_mapping
+	    where trial_name = TrialId
+	    and platform = 'METABOLOMICS'
+	    and coalesce(omic_source_study,trial_name) = TrialId
+	    loop
+	    sqlTxt := 'drop table if exists deapp.de_subject_metabolomics_data_' || v_partition_id;
+	    execute sqlTxt;
+	    stepCt := stepCt + 1;
+	    msgTxt := 'Drop partition table '|| v_partition_id || ' for de_subject_metabolomics_data';
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,msgTxt,rowCt,stepCt,'Done');
+	end loop;
+
+	begin
+	    delete from deapp.de_subject_sample_mapping
+	     where trial_name = TrialID
+		   and platform = 'METABOLOMICS';
+	    get diagnostics rowCt := ROW_COUNT;
+	exception
+	    when others then
+		errorNumber := SQLSTATE;
+		errorMessage := SQLERRM;
+	    --Handle errors.
+		perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
+	    --End Proc
+		perform tm_cz.cz_end_audit (jobId, 'FAIL');
+		return -16;
+	end;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete metabolomics data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+
+    end if;
+
+    -- delete miRNA qPCR (or miRNAseq) data -- they use the same platform type
+    -- =======================================================================
+
+    select count(*) into pExists
+      from deapp.de_subject_sample_mapping
+     where trial_name = TrialId
+       and platform = 'MIRNA_QPCR'
+       and trial_name = TrialId
+       and coalesce(omic_source_study,trial_name) = TrialId;
+
+    if pExists > 0 then
+
+        delete from deapp.de_subject_mirna_data
+               where trial_name = TrialId;
+	get diagnostics rowCt := ROW_COUNT;
+
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop unpartitioned trial data from de_subject_mirna_data',rowCt,stepCt,'Done');
+
+	begin
+	    delete from deapp.de_subject_sample_mapping
+	     where trial_name = TrialID
+		   and platform = 'MIRNA_QPCR';
+	    get diagnostics rowCt := ROW_COUNT;
+	exception
+	    when others then
+		errorNumber := SQLSTATE;
+		errorMessage := SQLERRM;
+	    --Handle errors.
+		perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
+	    --End Proc
+		perform tm_cz.cz_end_audit (jobId, 'FAIL');
+		return -16;
+	end;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete mirnaqpcr expression data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+
+    end if;
+
+    -- delete (ms)proteomics data
+    -- =======================
+
+    select count(*) into pExists
+      from deapp.de_subject_sample_mapping
+     where trial_name = TrialId
+       and platform = 'PROTEIN'
+       and trial_name = TrialId
+       and coalesce(omic_source_study,trial_name) = TrialId;
+
+    if pExists > 0 then
+
+        delete from deapp.de_subject_protein_data
+               where trial_name = TrialId;
+	get diagnostics rowCt := ROW_COUNT;
+
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop unpartitioned trial data from de_subject_protein_data',rowCt,stepCt,'Done');
+
+	begin
+	    delete from deapp.de_subject_sample_mapping
+	     where trial_name = TrialID
+		   and platform = 'PROTEIN';
+	    get diagnostics rowCt := ROW_COUNT;
+	exception
+	    when others then
+		errorNumber := SQLSTATE;
+		errorMessage := SQLERRM;
+	    --Handle errors.
+		perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
+	    --End Proc
+		perform tm_cz.cz_end_audit (jobId, 'FAIL');
+		return -16;
+	end;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete proteomics data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+
+    end if;
+
+    -- delete rnaseq data with chromosomal regions
+    -- ===========================================
+
     select count(*) into pExists
       from deapp.de_subject_sample_mapping
      where trial_name = TrialId
@@ -314,6 +464,7 @@ begin
        and coalesce(omic_source_study,trial_name) = TrialId;
 
     if pExists > 0 then
+        rowCt := 0;
 	for v_partition_id in
 	    select distinct partition_id::text
 	    from deapp.de_subject_sample_mapping
@@ -324,9 +475,10 @@ begin
 	    sqlTxt := 'drop table if exists deapp.de_subject_rnaseq_data_' || v_partition_id;
 	    execute sqlTxt;
 	    stepCt := stepCt + 1;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_rnaseq_data',rowCt,stepCt,'Done');
+	    msgTxt := 'Drop partition table '|| v_partition_id || ' for de_subject_rnaseq_data';
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,msgTxt,rowCt,stepCt,'Done');
 	end loop;
-	
+
 	begin
 	    delete from deapp.de_subject_sample_mapping
 	     where trial_name = TrialID
@@ -344,11 +496,12 @@ begin
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete rnaseq data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
-	
+
     end if;
 
-    --	delete rnaseq expression data
-    
+    -- delete rnaseq expression data
+    -- =============================
+
     select count(*) into pExists
       from deapp.de_subject_sample_mapping
      where trial_name = TrialId
@@ -357,6 +510,7 @@ begin
        and coalesce(omic_source_study,trial_name) = TrialId;
 
     if pExists > 0 then
+        rowCt := 0;
 	for v_partition_id in
 	    select distinct partition_id::text
 	    from deapp.de_subject_sample_mapping
@@ -364,12 +518,12 @@ begin
 	    and platform = 'RNASEQCOG'
 	    and coalesce(omic_source_study,trial_name) = TrialId
 	    loop
-	    sqlTxt := 'drop table if exists deapp.de_subject_rnaseq_data_' || v_partition_id;
+	    sqlTxt := 'drop table if exists deapp.de_subject_rna_data_' || v_partition_id;
 	    execute sqlTxt;
 	    stepCt := stepCt + 1;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_rnaseq_data',rowCt,stepCt,'Done');
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_rna_data',rowCt,stepCt,'Done');
 	end loop;
-	
+
 	begin
 	    delete from deapp.de_subject_sample_mapping
 	     where trial_name = TrialID
@@ -387,10 +541,60 @@ begin
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete rnaseq expression data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
-	
+
     end if;
 
+    -- delete rbm data
+    -- ===============
+
+    select count(*) into pExists
+      from deapp.de_subject_sample_mapping
+     where trial_name = TrialId
+       and platform = 'RBM'
+       and trial_name = TrialId
+       and coalesce(omic_source_study,trial_name) = TrialId;
+
+    if pExists > 0 then
+	rowCt := 0;
+	for v_partition_id in
+	    select distinct partition_id::text
+	    from deapp.de_subject_sample_mapping
+	    where trial_name = TrialId
+	    and platform = 'RBM'
+	    and coalesce(omic_source_study,trial_name) = TrialId
+	    loop
+	    sqlTxt := 'drop table if exists deapp.de_subject_rbm_data_' || v_partition_id;
+	    execute sqlTxt;
+	    stepCt := stepCt + 1;
+	    msgTxt := 'Drop partition table '|| v_partition_id || ' for de_subject_rbm_data';
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,msgTxt,rowCt,stepCt,'Done');
+	end loop;
+
+	begin
+	    delete from deapp.de_subject_sample_mapping
+	     where trial_name = TrialID
+		   and platform = 'RBM';
+	    get diagnostics rowCt := ROW_COUNT;
+	exception
+	    when others then
+		errorNumber := SQLSTATE;
+		errorMessage := SQLERRM;
+	    --Handle errors.
+		perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
+	    --End Proc
+		perform tm_cz.cz_end_audit (jobId, 'FAIL');
+		return -16;
+	end;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete rbm data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
+
+    end if;
+
+    -- other tables associated with trials
+    -- ===================================
+
     -- delete from search_secure_object
+    -- ================================
 
     select count(*) into pExists
       from searchapp.search_secure_object
@@ -414,16 +618,21 @@ begin
 
     end if;
 
+    -- Checks for possible errors, or notes for deleted partially removed trial
+    -- ========================================================================
+
     -- Report potential erroneous value for trialid because topNode could not be found
-    if (topNode is null OR length(topNode) = 0)
-    then
+    -- ===============================================================================
+
+    if (topNode is null OR length(topNode) = 0) then
 	auditMessage := 'trialid argument possibly contained erroneous value ' || trialid;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
 	perform tm_cz.cz_end_audit (jobId, 'WARNING');
 	return -1;
-	end if;
+    end if;
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
+
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobId, 'SUCCESS');
     end if;
