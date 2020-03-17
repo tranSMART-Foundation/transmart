@@ -54,7 +54,7 @@
                     <g:if test="${!amTagItem.editable}">not editable CUSTOM</g:if>
                     <g:else>
                         <g:if test="${folder.uniqueId && amTagItem.id}">
-                            <g:set var="tagValues" value="${annotation.AmTagDisplayValue.findAllBySubjectUidAndAmTagItem(folder.uniqueId, amTagItem)}"/>
+                            <g:set var="tagValues" value="${annotation.AmTagDisplayValue.findAllDisplayValue(folder.uniqueId, amTagItem.id)}"/>
                         </g:if>
                         <g:if test="${amTagItem.tagItemSubtype == 'FREETEXT'}">
                             <g:if test="${(tagValues ? tagValues[0].displayValue : '')?.length()<100}">
@@ -81,7 +81,7 @@
                 </g:elseif>
                 <g:else>
                     <g:if test="${folder.uniqueId && amTagItem.id}">
-                        <g:set var="tagValues" value="${annotation.AmTagDisplayValue.findAllBySubjectUidAndAmTagItem(folder.uniqueId, amTagItem)}"/>
+                        <g:set var="tagValues" value="${annotation.AmTagDisplayValue.findAllDisplayValue(folder.uniqueId, amTagItem.id)}"/>
                     </g:if>
                     <g:if test="${amTagItem.tagItemSubtype == 'COMPOUNDPICKLIST'}">
                         <g:render template="${amTagItem.guiHandler}"
