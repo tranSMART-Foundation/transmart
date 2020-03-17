@@ -1,9 +1,7 @@
-SET search_path = tm_cz, pg_catalog;
-
 --
--- Name: i2b2_rna_seq_zscore_calc(character varying, character varying, character varying, numeric, character varying, numeric, character varying, bigint, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
+-- Name: i2b2_rna_zscore_calc(character varying, character varying, character varying, numeric, character varying, numeric, character varying, bigint, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE OR REPLACE FUNCTION tm_cz.i2b2_rna_seq_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base bigint DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_rna_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS numeric
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -22,7 +20,7 @@ DECLARE
     idxExists bigint;
     pExists	bigint;
     nbrRecs bigint;
-    logBase bigint;
+    logBase numeric;
     partitionName varchar(200);
     partitionindx varchar(200);
 
@@ -36,8 +34,14 @@ DECLARE
     errorNumber		character varying;
     errorMessage	character varying;
 
+    cleanTablesValue	character varying(255);
 
 BEGIN
+
+    select paramvalue
+      into cleanTablesValue
+      from tm_cz.etl_settings
+     where paramname in ('cleantables','CLEANTABLES');
 
     TrialId := trial_id;
     runType := run_type;
@@ -52,7 +56,7 @@ BEGIN
     jobID := currentJobID;
 
     databaseName := 'tm_cz';
-    procedureName := 'i2b2_rna_seq_zscore_calc';
+    procedureName := 'i2b2_rna_zscore_calc';
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -324,13 +328,15 @@ BEGIN
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted data into ' || partitionName,rowCt,stepCt,'Done');
 
---    EXECUTE('truncate table tm_wz.wt_subject_rna_logs');
---    EXECUTE('truncate table tm_wz.wt_subject_rna_calcs');
---    EXECUTE('truncate table tm_wz.wt_subject_rna_med');
+    if (coalesce(cleanTablesValue,'yes')) then
+        EXECUTE('truncate table tm_wz.wt_subject_rna_logs');
+        EXECUTE('truncate table tm_wz.wt_subject_rna_calcs');
+        EXECUTE('truncate table tm_wz.wt_subject_rna_med');
 
-    stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
-	
+	stepCt := stepCt + 1;
+    	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+    end if;
+
     -- create indexes on partition
 
     sqlText := ' create index ' || partitionIndx || '_idx1 on ' || partitionName || ' using btree (partition_id) tablespace indx';
