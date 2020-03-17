@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_process_mrna_data(character varying, character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_process_mrna_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_cd character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_mrna_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_cd character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 
@@ -59,7 +59,7 @@ Declare
 	partitioniD		numeric(18,0);
 	partitionName	varchar(100);
 	partitionIndx	varchar(100);
-        thisPatient     bigint;
+	rtnCd		integer;
 
 	--	cursor to add leaf nodes, cursor is used here because there are few nodes to be added
 
@@ -253,7 +253,13 @@ BEGIN
 	select length(tPath) - length(replace(tPath,'\','')) into pCount;
 
 	if pCount > 2 then
-		perform tm_cz.i2b2_fill_in_tree('', tPath, jobId);
+	    select tm_cz.i2b2_fill_in_tree('', tPath, jobId) into rtnCd;
+	    if(rtnCd <> 1) then
+	        tText := 'Failed to fill in tree '|| tPath;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
+		return -16;
+            end if;
 	end if;
 
 	--	uppercase study_id in tm_lz.lt_src_mrna_subj_samp_map in case curator forgot
@@ -621,13 +627,25 @@ BEGIN
 
     --Add nodes for all types (ALSO DELETES EXISTING NODE)
 
-		perform tm_cz.i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId);
-		stepCt := stepCt + 1;
-		tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
+	    select tm_cz.i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId) into rtnCd;
+	    stepCt := stepCt + 1;
+	    if(rtnCd <> 1) then
+                tText := 'Failed to add leaf node '|| r_addNodes.leaf_node;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
+		return -16;
+            end if;
+	    tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
 
-		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,1,stepCt,'Done');
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,1,stepCt,'Done');
 
-		perform tm_cz.i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID);
+	    select tm_cz.i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID) into rtnCd;
+	    if(rtnCd <> 1) then
+	        tText := 'Failed to fill in tree '|| r_addNodes.leaf_node;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
+		return -16;
+            end if;
 
 	END LOOP;
 
@@ -759,7 +777,7 @@ BEGIN
 	--	insert any site/subject/samples that are not in de_subject_sample_mapping
 
 	begin
-	insert into de_subject_sample_mapping
+	insert into deapp.de_subject_sample_mapping
 	(patient_id
 	,site_id
 	,subject_id
@@ -992,24 +1010,35 @@ BEGIN
 
     --	deletes hidden nodes for a trial one at a time
 
-		perform tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname);
+		select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
 		stepCt := stepCt + 1;
-		tText := 'Deleted node: ' || r_delNodes.c_fullname;
+		if(rtnCd <> 1) then
+		    tText := 'Failed to delete node '|| r_delNodes.c_fullname;
+		    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+		    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+		    return -16;
+                end if;
 
+		tText := 'Deleted node: ' || r_delNodes.c_fullname;
 		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done');
 
 	END LOOP;
 
     --Reload Security: Inserts one record for every I2B2 record into the security table
 
-    perform tm_cz.i2b2_load_security_data(jobId);
-	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
+    select tm_cz.i2b2_load_security_data(jobId) into rtnCd;
+    stepCt := stepCt + 1;
+    if(rtnCd <> 1) then
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
 
     if (dataType = 'R') then
         begin
             delete from tm_lz.lt_src_mrna_data
-	          where intensity_value <= 0;
+	          where intensity_value <= 0.0;
 	    get diagnostics rowCt := ROW_COUNT;
             exception
 	        when others then

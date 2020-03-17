@@ -1,15 +1,14 @@
 --
 -- Name: i2b2_load_rbm_data(character varying, character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-SET search_path = tm_cz, pg_catalog;
-CREATE OR REPLACE FUNCTION i2b2_load_rbm_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT NULL::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_rbm_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT NULL::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql
     AS $$
 DECLARE
 
 /*************************************************************************
 
-* This store procedure is for ETL  to load  RBM data for Sanofi
+* This stored procedure is for ETL  to load  RBM data for Sanofi
 * Date: 12/05/2013
 
 ******************************************************************/
@@ -39,7 +38,7 @@ DECLARE
   partTbl   	bigint;
   sampleCt		bigint;
   idxExists 	bigint;
-  logBase		bigint;
+  logBase		numeric;
   pCount		integer;
   sCount		integer;
   tablespaceName	varchar(200);
@@ -56,12 +55,13 @@ DECLARE
   stepCt bigint;
   rowCt			numeric(18,0);
   errorNumber		character varying;
-  errorMessage	character varying;
+  errorMessage		character varying;
+  rtnCd			integer;
 
 	addNodes CURSOR FOR
 	SELECT distinct t.leaf_node
           ,t.node_name
-	from  tm_wz.WT_RBM_NODES t
+	from  tm_wz.wt_rbm_nodes t
 	where not exists
 		 (select 1 from i2b2metadata.i2b2 x
 		  where t.leaf_node = x.c_fullname);
@@ -83,6 +83,7 @@ DECLARE
 
 
 BEGIN
+        rtnCd := 1;
 	TrialID := upper(trial_id);
 	secureStudy := upper(secure_study);
 	
@@ -156,10 +157,10 @@ BEGIN
 	where gpl_id in (select distinct m.platform from TM_LZ.LT_SRC_RBM_SUBJ_SAMP_MAP m);
 	
 	select count(*) into pCount
-	from DEAPP.DE_gpl_info
+	from deapp.de_gpl_info
 	where platform in (select distinct m.platform from TM_LZ.LT_SRC_RBM_SUBJ_SAMP_MAP m);
 	
-	if PCOUNT = 0 then
+	if pCount = 0 then
 		perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_rbm_annotation',1,stepCt,'ERROR');
 		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		perform tm_cz.cz_end_audit (jobId,'FAIL');
@@ -179,7 +180,7 @@ BEGIN
 		return 162;  
 	end if;
 	
-	--	check if there are multiple platforms, if yes, then platform must be supplied in LT_SRC_RBM_DATA
+	--	check if there are multiple platforms, if yes, then platform must be supplied in lt_src_rbm_data
 
 	select count(*) into pCount
 	from (select sample_cd
@@ -220,7 +221,13 @@ BEGIN
 	select length(tPath) - length(replace(tPath,'\','')) into pCount ;
 
 	if pCount > 2 then
-		perform tm_cz.i2b2_fill_in_tree(null, tPath, jobId);
+	    select tm_cz.i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
+	    if(rtnCd <> 1) then
+	        tText := 'Failed to fill in tree '|| tPath;
+                perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+                perform tm_cz.cz_end_audit (jobID, 'FAIL');
+               return -16;
+            end if;
 	end if;
 
 	--	uppercase study_id in lt_src_rbm_subj_samp_map in case curator forgot
@@ -350,14 +357,14 @@ BEGIN
 
 --	truncate tmp node table
 
-	EXECUTE('truncate table tm_wz.WT_RBM_NODES');
+	EXECUTE('truncate table tm_wz.wt_rbm_nodes');
 	
 --	load temp table with leaf node path, use temp table with distinct sample_type, ATTR2, platform, and title   this was faster than doing subselect
 --	from wt_subject_rbm_data
 
-	EXECUTE('truncate table tm_wz.WT_RBM_NODE_VALUES');
+	EXECUTE('truncate table tm_wz.wt_rbm_node_values');
 	begin
-	insert into tm_wz.WT_RBM_NODE_VALUES
+	insert into tm_wz.wt_rbm_node_values
 	(category_cd
 	,platform
 	,tissue_type
@@ -392,12 +399,11 @@ BEGIN
 		return -16;
 	end;
       
-	--  and decode(dataType,'R',sign(a.intensity_value),1) = 1;	--	take all values when dataType T, only >0 for dataType R
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_rbm_node_values',rowCt,stepCt,'Done');
 	
 	begin
-	insert into tm_wz.WT_RBM_NODES
+	insert into tm_wz.wt_rbm_nodes
 	(leaf_node
 	,category_cd
 	,platform
@@ -414,7 +420,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,attribute_1 as attribute_1
 		  ,attribute_2 as attribute_2
 		  ,'LEAF'
-	from  tm_wz.WT_RBM_NODE_VALUES;
+	from  tm_wz.wt_rbm_node_values;
 		   	get diagnostics rowCt := ROW_COUNT;
 	exception
 	when others then
@@ -432,7 +438,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	--	insert for platform node so platform concept can be populated
 	
 	begin
-	insert into tm_wz.WT_RBM_NODES
+	insert into tm_wz.wt_rbm_nodes
 	(leaf_node
 	,category_cd
 	,platform
@@ -450,7 +456,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'PLATFORM')+8),'ATTR1') > 1 then attribute_1 else null end as attribute_1
           ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'PLATFORM')+8),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 		  ,'PLATFORM'
-	from  tm_wz.WT_RBM_NODE_VALUES;
+	from  tm_wz.wt_rbm_node_values;
 		get diagnostics rowCt := ROW_COUNT;
 	exception
 	when others then
@@ -470,7 +476,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	--	insert for ATTR1 node so ATTR1 concept can be populated in sample_type_cd
 
 	begin
-	insert into tm_wz.WT_RBM_NODES
+	insert into tm_wz.wt_rbm_nodes
 	(leaf_node
 	,category_cd
 	,platform
@@ -488,7 +494,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,attribute_1 as attribute_1
           ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'ATTR1')+5),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 		  ,'ATTR1'
-	from  tm_wz.WT_RBM_NODE_VALUES
+	from  tm_wz.wt_rbm_node_values
 	where category_cd like '%ATTR1%'
 	  and (attribute_1 IS NOT NULL AND attribute_1::text <> '');
 	  	get diagnostics rowCt := ROW_COUNT;
@@ -504,12 +510,12 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 		   
     stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_RBM_NODES',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in wt_rbm_nodes',rowCt,stepCt,'Done');
 
 	
 	--	insert for ATTR2 node so ATTR2 concept can be populated in timepoint_cd
 	begin
-	insert into tm_wz.WT_RBM_NODES
+	insert into tm_wz.wt_rbm_nodes
 	(leaf_node
 	,category_cd
 	,platform
@@ -527,7 +533,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
           ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'ATTR2')+5),'ATTR1') > 1 then attribute_1 else null end as attribute_1
 		  ,attribute_2 as attribute_2
 		  ,'ATTR2'
-	from  tm_wz.WT_RBM_NODE_VALUES
+	from  tm_wz.wt_rbm_node_values
 	where category_cd like '%ATTR2%'
 	  and (attribute_2 IS NOT NULL AND attribute_2::text <> '');
 	  	get diagnostics rowCt := ROW_COUNT;
@@ -543,12 +549,12 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	end;
 		   
     stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_RBM_NODES',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in wt_rbm_nodes',rowCt,stepCt,'Done');
 
 	
 	--	insert for tissue_type node so tissue_type_cd can be populated
 	begin
-	insert into tm_wz.WT_RBM_NODES
+	insert into tm_wz.wt_rbm_nodes
 	(leaf_node
 	,category_cd
 	,platform
@@ -566,7 +572,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then attribute_1 else null end as attribute_1
           ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 		  ,'TISSUETYPE'
-	from  tm_wz.WT_RBM_NODE_VALUES
+	from  tm_wz.wt_rbm_node_values
 	where category_cd like '%TISSUETYPE%';
 		get diagnostics rowCt := ROW_COUNT;
 	exception
@@ -584,7 +590,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create TISSUETYPE nodes in wt_qpcr_rbm_nodes',rowCt,stepCt,'Done');
 
 	begin
-	update tm_wz.WT_RBM_NODES
+	update tm_wz.wt_rbm_nodes
 	set node_name=tm_cz.parse_nth_value(leaf_node,length(leaf_node)-length(replace(leaf_node,'\','')),'\');
 		get diagnostics rowCt := ROW_COUNT;
 	exception
@@ -608,8 +614,14 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 
     --Add nodes for all types (ALSO DELETES EXISTING NODE)
 		begin
-		perform tm_cz.i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId);
-			get diagnostics rowCt := ROW_COUNT;
+		select tm_cz.i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId) into rtnCd;
+		if(rtnCd <> 1) then
+                    tText := 'Failed to add leaf node '|| r_addNodes.leaf_node;
+                    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+                    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+                    return -16;
+                end if;
+		get diagnostics rowCt := ROW_COUNT;
 	exception
 	when others then
 		errorNumber := SQLSTATE;
@@ -620,18 +632,24 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
-		stepCt := stepCt + 1;
-		tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
-		
-		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
-		
-		perform tm_cz.i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID);
+
+	select tm_cz.i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID) into rtnCd;
+	stepCt := stepCt + 1;
+	if(rtnCd <> 1) then
+            tText := 'Failed to fill in tree '|| r_addNodes.leaf_node;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
+	tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
+
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
 	END LOOP;  
 	
 --	update concept_cd for nodes, this is done to make the next insert easier
 	begin
-	update tm_wz.WT_RBM_NODES t
+	update tm_wz.wt_rbm_nodes t
 	set concept_cd=(select c.concept_cd from i2b2demodata.concept_dimension c
 	                where c.concept_path = t.leaf_node 
 				   )
@@ -652,7 +670,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update WT_RBM_NODES with newly created concept_cds',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update wt_rbm_nodes with newly created concept_cds',rowCt,stepCt,'Done');
 
 	 
 
@@ -757,31 +775,31 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		--Joining to Pat_dim to ensure the ID's match. If not I2B2 won't work.
 		inner join i2b2demodata.patient_dimension b
 		  on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':', 'g') = b.sourcesystem_cd
-		inner join tm_wz.WT_RBM_NODES ln
+		inner join tm_wz.wt_rbm_nodes ln
 			on a.platform = ln.platform
 			and a.tissue_type = ln.tissue_type
 			and coalesce(a.attribute_1,'@') = coalesce(ln.attribute_1,'@')
 			and coalesce(a.attribute_2,'@') = coalesce(ln.attribute_2,'@')
 			and ln.node_type = 'LEAF'
-		inner join tm_wz.WT_RBM_NODES pn
+		inner join tm_wz.wt_rbm_nodes pn
 			on a.platform = pn.platform
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(pn.tissue_type,'@')
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(pn.attribute_1,'@')
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(pn.attribute_2,'@')
 			and pn.node_type = 'PLATFORM'	  
-		left outer join tm_wz.WT_RBM_NODES ttp
+		left outer join tm_wz.wt_rbm_nodes ttp
 			on a.tissue_type = ttp.tissue_type
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '@' end = coalesce(ttp.platform,'@')
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(ttp.attribute_1,'@')
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(ttp.attribute_2,'@')
 			and ttp.node_type = 'TISSUETYPE'		  
-		left outer join tm_wz.WT_RBM_NODES a1
+		left outer join tm_wz.wt_rbm_nodes a1
 			on a.attribute_1 = a1.attribute_1
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a1.platform,'@')
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a1.tissue_type,'@')
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(a1.attribute_2,'@')
 			and a1.node_type = 'ATTR1'		  
-		left outer join tm_wz.WT_RBM_NODES a2
+		left outer join tm_wz.wt_rbm_nodes a2
 			on a.attribute_2 = a1.attribute_2
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a2.platform,'@')
 			and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a2.tissue_type,'@')
@@ -910,7 +928,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	begin
 	update i2b2metadata.i2b2 t
 	set c_columndatatype = 'T', c_metadataxml = null, c_visualattributes='FA'
-	where t.c_basecode in (select distinct x.concept_cd from tm_wz.WT_RBM_NODES x);
+	where t.c_basecode in (select distinct x.concept_cd from tm_wz.wt_rbm_nodes x);
   	get diagnostics rowCt := ROW_COUNT;
 	exception
 	when others then
@@ -960,7 +978,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 					</ConvertingUnits></UnitValues><Analysis><Enums /><Counts />
 					<New /></Analysis>'||(select xmlelement(name "SeriesMeta",xmlforest(m.display_value as "Value",m.display_unit as "Unit",m.display_label as "DisplayName")) as hi
 		  from tm_lz.lt_src_rbm_display_mapping m where m.category_cd=ul.category_cd)||
-					'</ValueMetadata>') where n.c_fullname=(select leaf_node from tm_wz.WT_RBM_NODES where category_cd=ul.category_cd  and leaf_node=n.c_fullname);
+					'</ValueMetadata>') where n.c_fullname=(select leaf_node from tm_wz.wt_rbm_nodes where category_cd=ul.category_cd  and leaf_node=n.c_fullname);
 					
 					end loop;
 	get diagnostics rowCt := ROW_COUNT;
@@ -1030,8 +1048,14 @@ begin
 
     --	deletes hidden nodes for a trial one at a time
 	begin
-		perform tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname);
-			get diagnostics rowCt := ROW_COUNT;
+	    select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+	    if(rtnCd <> 1) then
+                tText := 'Failed to delete node '|| r_delNodes.c_fullname;
+                perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+                perform tm_cz.cz_end_audit (jobID, 'FAIL');
+                return -16;
+            end if;
+	    get diagnostics rowCt := ROW_COUNT;
 	exception
 	when others then
 		errorNumber := SQLSTATE;
@@ -1052,17 +1076,41 @@ begin
 
   --Reload Security: Inserts one record for every I2B2 record into the security table
 
-    perform tm_cz.i2b2_load_security_data(jobId);
-	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
+    select tm_cz.i2b2_load_security_data(jobId) into rtnCd;
+    stepCt := stepCt + 1;
+    if(rtnCd <> 1) then
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
+
+    if (dataType = 'R') then
+        begin
+            delete from tm_lz.lt_src_rbm_data
+	          where avalue <= 0.0;
+	    get diagnostics rowCt := ROW_COUNT;
+            exception
+	        when others then
+	            errorNumber := SQLSTATE;
+	            errorMessage := SQLERRM;
+	        --Handle errors.
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    --End Proc
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end;
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove unusable negative intensity_value from lt_src_rbm_data for dataType R',rowCt,stepCt,'Done');
+    end if;
 
 --	tag data with probeset_id from reference.probeset_deapp
   
-	EXECUTE ('truncate table tm_wz.WT_SUBJECT_RBM_PROBESET');
+	EXECUTE ('truncate table tm_wz.wt_subject_rbm_probeset');
 	
 	--	note: assay_id represents a unique subject/site/sample
 	begin
-	insert into tm_wz.WT_SUBJECT_RBM_PROBESET  --mod
+	insert into tm_wz.wt_subject_rbm_probeset  --mod
     (probeset
 --    ,expr_id
     ,intensity_value
@@ -1090,14 +1138,14 @@ begin
                   ,sd.gpl_id   --UAT_142 25/feb/14 changes
                   ,sd.tissue_type
     from deapp.de_subject_sample_mapping sd
-        ,tm_lz.LT_SRC_RBM_DATA md
+        ,tm_lz.lt_src_rbm_data md
     where sd.sample_cd = md.sample_id
      and sd.platform = 'RBM'
       and sd.trial_name =TrialId
       and sd.source_cd = sourceCd
      -- and sd.gpl_id = gs.id_ref   --check
     --and trim(substr(md.analyte,1,instr(md.analyte,'(')-1)) =trim(gs.antigen_name)
-    and (CASE WHEN dataType = 'R' THEN sign(md.avalue) ELSE 1 END) <> -1  --UAT 154 changes done on 19/03/2014
+--    and (CASE WHEN dataType = 'R' THEN sign(md.avalue) ELSE 1 END) <> -1  --UAT 154 changes done on 19/03/2014
     and sd.subject_id in (select subject_id from tm_lz.LT_SRC_RBM_SUBJ_SAMP_MAP)
     group by md.analyte
           ,sd.patient_id,sd.assay_id
@@ -1128,7 +1176,10 @@ begin
 	--	wt_subject_rbm_probeset as part of a Load.  
 
 		if dataType = 'R' or dataType = 'L' then
-			perform tm_cz.i2b2_rbm_zscore_calc_new(TrialID, partitionName, partitionindx,partitioniD,'L',jobId,dataType,logBase,sourceCD);
+			select tm_cz.i2b2_rbm_zscore_calc_new(TrialID, partitionName, partitionindx,partitioniD,'L',jobId,dataType,logBase,sourceCD) into rtnCd;
+			if(rtnCd <> 1) then
+			    return rtnCd;
+			end if;
 			stepCt := stepCt + 1;
 			perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
 		end if;
@@ -1143,7 +1194,7 @@ begin
 		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 
-	return 0 ; 
+	return 1;
 END;
  
 $$;

@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_mrna_zscore_calc(character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_mrna_zscore_calc(trial_id character varying, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS void
+CREATE or replace FUNCTION i2b2_mrna_zscore_calc(trial_id character varying, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -31,7 +31,7 @@ AS $$
     idxExists integer;
     pExists	integer;
     nbrRecs integer;
-    logBase integer;
+    logBase numeric;
     
     --Audit variables
     newJobFlag numeric(1);
@@ -77,7 +77,7 @@ begin
     	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     	--End Proc
     	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-    	return;
+        return -16;
     end if;
     
     --	For Load, make sure that the TrialId passed as parameter is the same as the trial in stg_subject_mrna_data
@@ -85,7 +85,7 @@ begin
 
     if runType = 'L' then
 	select distinct trial_name into stgTrial
-	from wt_subject_mrna_probeset;
+	from tm_wz.wt_subject_mrna_probeset;
 	
 	if stgTrial != TrialId then
 	    stepCt := stepCt + 1;
@@ -96,7 +96,7 @@ begin
     	    perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     	    --End Proc
     	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-    	    return;
+            return -16;
 	end if;
     end if;
     
@@ -106,7 +106,7 @@ begin
 
 	if runType = 'R' then
 	select count(*) into idxExists
-	from de_subject_microarray_data
+	from deapp.de_subject_microarray_data
 	where trial_name = TrialId;
 	
 	if idxExists = 0 then
@@ -117,7 +117,7 @@ begin
     	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     	--End Proc
     	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-    	return;
+        return -16;
 	end if;
 	end if;
      */
@@ -160,7 +160,7 @@ begin
     if dataType = 'L' then
 	/*	Remove Reload processing
 		if runType = 'R' then
-		insert into wt_subject_microarray_logs 
+		insert into tm_wz.wt_subject_microarray_logs
 		(probeset_id
 		,intensity_value
 		,assay_id
@@ -176,11 +176,11 @@ begin
 		,patient_id
 		,sample_id
 		,subject_id
-		from de_subject_microarray_data 
+		from deapp.de_subject_microarray_data
 		where trial_name =  TrialID;
 		else
 	 */
-	insert into wt_subject_microarray_logs 
+	insert into tm_wz.wt_subject_microarray_logs
 	(probeset_id
 	,intensity_value
 	,assay_id
@@ -196,13 +196,13 @@ begin
 	,patient_id
 	--	  ,sample_cd
 	--	  ,subject_id
-	from wt_subject_mrna_probeset
+	from tm_wz.wt_subject_mrna_probeset
 	where trial_name = TrialId;
 	--end if;
     else
 	/*	remove Reload processing
 		if runType = 'R' then
-		insert into wt_subject_microarray_logs 
+		insert into tm_wz.wt_subject_microarray_logs
 		(probeset_id
 		,intensity_value
 		,assay_id
@@ -214,15 +214,15 @@ begin
 		select probeset_id
 		,raw_intensity 
 		,assay_id  
-		,log(2,raw_intensity)
+		,log(2.0,raw_intensity)
 		,patient_id
 		,sample_id
 		,subject_id
-		from de_subject_microarray_data 
+		from deapp.de_subject_microarray_data
 		where trial_name =  TrialID;
 		else
 	 */
-	insert into wt_subject_microarray_logs 
+	insert into tm_wz.wt_subject_microarray_logs
 		    (probeset_id
 		    ,intensity_value
 		    ,assay_id
@@ -234,11 +234,11 @@ begin
 	select probeset_id
 	       ,intensity_value 
 	       ,assay_id 
-	       ,log(2,intensity_value)
+	       ,log(2.0,intensity_value)
 	       ,patient_id
 	    --		  ,sample_cd
 	    --		  ,subject_id
-	  from wt_subject_mrna_probeset
+	  from tm_wz.wt_subject_mrna_probeset
 	 where trial_name = TrialId;
 	--		end if;
     end if;
@@ -255,7 +255,7 @@ begin
     
     --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
 
-    insert into wt_subject_microarray_calcs
+    insert into tm_wz.wt_subject_microarray_calcs
 		(trial_name
 		,probeset_id
 		,mean_intensity
@@ -267,7 +267,7 @@ begin
 	   ,avg(log_intensity)
 	   ,median(log_intensity)
 	   ,stddev(log_intensity)
-      from wt_subject_microarray_logs d 
+      from tm_wz.wt_subject_microarray_logs d
      group by d.trial_name 
 	      ,d.probeset_id;
     stepCt := stepCt + 1;
@@ -282,7 +282,7 @@ begin
     
     -- calculate zscore
 
-    insert into wt_subject_microarray_med
+    insert into tm_wz.wt_subject_microarray_med
 		(probeset_id
 		,intensity_value
 		,log_intensity
@@ -306,8 +306,8 @@ begin
 	   ,d.patient_id
 	--	  ,d.sample_cd
 	--	  ,d.subject_id
-      from wt_subject_microarray_logs d 
-	   ,wt_subject_microarray_calcs c 
+      from tm_wz.wt_subject_microarray_logs d
+	   ,tm_wz.wt_subject_microarray_calcs c
      where d.probeset_id = c.probeset_id;
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
@@ -317,7 +317,7 @@ begin
     
     /*
       select count(*) into nbrRecs
-      from wt_subject_microarray_med;
+      from tm_wz.wt_subject_microarray_med;
       
       if nbrRecs > 10000000 then
       i2b2_mrna_index_maint('DROP',,jobId);
@@ -331,7 +331,7 @@ begin
     
 
 
-    insert into de_subject_microarray_data
+    insert into deapp.de_subject_microarray_data
 		(trial_source
 		,trial_name
 		,assay_id
@@ -358,7 +358,7 @@ begin
 	   ,m.patient_id
 	--	  ,m.sample_id
 	--	  ,m.subject_id
-      from wt_subject_microarray_med m;
+      from tm_wz.wt_subject_microarray_med m;
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP de_subject_microarray_data',rowCt,stepCt,'Done');
@@ -386,12 +386,15 @@ begin
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
+    return 1;
+
 exception
     when others then
     --handle errors.
 	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
 	
 end;
 
@@ -409,7 +412,7 @@ end;
 	,trial_name 
 	,timepoint  
 	,raw_intensity as log_intensity 
-	from de_subject_microarray_data
+	from deapp.de_subject_microarray_data
 	where 1=2;
 	
 	create index tmp_microarray_logs_i1 on wt_subject_microarray_logs (trial_name, probeset_id);
@@ -420,12 +423,12 @@ end;
 	,log_intensity as mean_intensity
 	,log_intensity as median_intensity 
 	,log_intensity as stddev_intensity 
-	from wt_subject_microarray_logs d 
+	from tm_wz.wt_subject_microarray_logs d
 	where 1=2;
 
 	create index tmp_microarray_calcs_i1 on wt_subject_microarray_calcs (trial_name, probeset_id);	
 
-	create table wt_subject_microarray_med parallel nologging compress as  
+	create table wt_subject_microarray_med parallel nologging compress as
 	select d.probeset_id
 	,d.raw_intensity  
 	,d.log_intensity  
@@ -440,11 +443,11 @@ end;
 	,c.stddev_intensity  
 	,c.median_intensity  
 	,d.log_intensity as zscore 
-	from wt_subject_microarray_logs d 
-	,wt_subject_microarray_calcs c
+	from tm_wz.wt_subject_microarray_logs d
+	,tm_wz.wt_subject_microarray_calcs c
 	where 1=2;
         
-	create table wt_subject_microarray_mcapped parallel nologging compress as 
+	create table wt_subject_microarray_mcapped parallel nologging compress as
 	select d.probeset_id 
 	,d.patient_id 
 	,d.trial_name 
@@ -459,7 +462,7 @@ end;
 	,d.stddev_intensity 
 	,d.median_intensity 
 	,d.zscore 
-	from wt_subject_microarray_med d
+	from tm_wz.wt_subject_microarray_med d
 	where 1=2;
 	
  */

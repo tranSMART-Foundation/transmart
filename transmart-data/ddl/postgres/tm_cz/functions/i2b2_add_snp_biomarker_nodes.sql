@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_add_snp_biomarker_nodes(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_add_snp_biomarker_nodes(trial_id character varying, ont_path character varying, currentjobid numeric DEFAULT 0) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_add_snp_biomarker_nodes(trial_id character varying, ont_path character varying, currentjobid numeric DEFAULT 0) RETURNS integer
     LANGUAGE plpgsql
 AS $$
     declare
@@ -29,7 +29,8 @@ AS $$
     jobID numeric;
     stepCt integer;
     rowCt  integer;
-    
+    rtnCd  integer;
+
     --	raise exception if platform not in de_gpl_info
     
 
@@ -93,8 +94,14 @@ begin
      where c_fullname = regexp_replace(ont_path || '\','(\\){2,}', '\');
     
     if pExists = 0 then 
-	perform i2b2_add_node(TrialId, regexp_replace(ont_path || '\','(\\){2,}', '\'), nodeName, jobID);
+	select i2b2_add_node(TrialId, regexp_replace(ont_path || '\','(\\){2,}', '\'), nodeName, jobID) into rtnCd;
         stepCt := stepCt + 1;
+	if(rtnCd <> 1) then
+            tText := 'Failed to add leaf node '|| nodeName;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Add node for ontPath',0,stepCt,'Done');
     end if;
 
@@ -116,20 +123,33 @@ begin
 
 	--End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	return;
+	return -16;
     end if;
 
     --	add SNP platform nodes
     
     for r_addPlatform in addPlatform loop
 	
-	perform i2b2_delete_all_nodes(regexp_replace(ont_path || '\','(\\){2,}', '\') || r_addPlatform.title || '\', jobID);
+	select i2b2_delete_all_nodes(regexp_replace(ont_path || '\','(\\){2,}', '\') || r_addPlatform.title || '\', jobID) into rtnCd;
 	stepCt := stepCt + 1;
+	if(rtnCd <> 1) then
+	    tText := 'Failed to delete all SNP platform nodes '||regexp_replace(ont_path || '\','(\\){2,}', '\') || r_addPlatform.title || '\';
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing SNP Platform for trial in I2B2METADATA i2b2',0,stepCt,'Done');
 	
-	perform i2b2_add_node(TrialId, r_addPlatform.path, r_addPlatform.title, jobId);
+	select i2b2_add_node(TrialId, r_addPlatform.path, r_addPlatform.title, jobId) into rtnCd;
+	stepCt := stepCt + 1;
+	if(rtnCd <> 1) then
+            tText := 'Failed to add leaf node '|| r_addPlatform.path;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
 	tText := 'Added Platform: ' || r_addPlatform.path || '  Name: ' || r_addPlatform.title;
-	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
+	get diagnostics rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
     end loop;
 
@@ -141,8 +161,14 @@ begin
     
     for r_addSample in addSample loop
 	
-	perform i2b2_add_node(TrialId, r_addSample.sample_path, r_addSample.sample_name, jobId);
-	tText := 'Added Sample: ' || r_addSample.sample_path || '  Name: ' || r_addSample.sample_name;
+	select i2b2_add_node(TrialId, r_addSample.sample_path, r_addSample.sample_name, jobId) into rtnCd;
+	if(rtnCd <> 1) then
+            tText := 'Failed to add leaf node '|| r_addSample.sample_path;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
+        tText := 'Added Sample: ' || r_addSample.sample_path || '  Name: ' || r_addSample.sample_name;
  	get diagnostics rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,RowCt,stepCt,'Done');
 	stepCt := stepCt + 1;
@@ -237,8 +263,14 @@ begin
        and ontPath like b.c_fullname || '%'
        and b.sourcesystem_cd = TrialId;
 
-    perform i2b2_fill_in_tree(TrialID,regexp_replace(nodeName || '\','(\\){2,}', '\'), jobID);
+    select i2b2_fill_in_tree(TrialID,regexp_replace(nodeName || '\','(\\){2,}', '\'), jobID) into rtnCd;
     stepCt := stepCt + 1;  get diagnostics rowCt := ROW_COUNT;
+    if(rtnCd <> 1) then
+        tText := 'Failed to fill in tree '|| regexp_replace(nodeName || '\','(\\){2,}', '\');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Fill in tree for Biomarker Data for trial',rowCt,stepCt,'Done');
     
     --Build concept Counts
@@ -250,7 +282,13 @@ begin
 
     --Reload Security: Inserts one record for every I2B2 record into the security table
 
-    perform i2b2_load_security_data(jobId);
+    select i2b2_load_security_data(jobId) into rtnCd;
+    if(rtnCd <> 1) then
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
 
@@ -262,6 +300,7 @@ begin
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
+   return 1;
 exception
 
     when others then
@@ -270,6 +309,7 @@ exception
     --End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL'); 
 
+    return -16;
 end;
 
 $$;

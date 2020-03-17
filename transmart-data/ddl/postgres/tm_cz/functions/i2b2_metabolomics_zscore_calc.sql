@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_metabolomics_zscore_calc(character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_metabolomics_zscore_calc(trial_id character varying, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_metabolomics_zscore_calc(trial_id character varying, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -66,7 +66,7 @@ begin
     	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     	--End Proc
     	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	return;
+	return -16;
     end if;
     
     --	For Load, make sure that the TrialId passed as parameter is the same as the trial in stg_subject_METABOLOMICS_data
@@ -85,7 +85,7 @@ begin
     	    perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     	    --End Proc
     	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
 	end if;
     end if;
 
@@ -120,7 +120,7 @@ begin
     	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     	--End Proc
     	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	return;
+	return -16;
 	end if;
 	
 	where trial_name = TrialId;
@@ -133,7 +133,7 @@ begin
     	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     	--End Proc
     	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	return;
+	return -16;
 	end if;
 	end if;
      */
@@ -406,7 +406,9 @@ begin
     IF newJobFlag = 1
     THEN
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
-	END IF;
+    END IF;
+
+    return 1;
 
 EXCEPTION
     when OTHERS THEN
@@ -415,7 +417,7 @@ EXCEPTION
 
 
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	
+	return -16;
 END;
 
 $$;
@@ -423,7 +425,7 @@ $$;
 --
 -- Name: i2b2_metabolomics_zscore_calc(character varying, character varying, character varying, numeric, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_metabolomics_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_metabolomics_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, source_cd character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -493,7 +495,7 @@ begin
 			       ,0,stepCt,'Done');
 	perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobId,'FAIL');
-	return;
+	return -16;
     end if;
     
     --	For Load, make sure that the TrialId passed as parameter is the same as the trial in stg_subject_METABOLOMICS_data
@@ -509,7 +511,7 @@ begin
 				   ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobId,'FAIL');
-	    return;
+	    return -16;
 	end if;
     end if;
 
@@ -528,7 +530,7 @@ begin
 				  ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobId,'FAIL');
-	    return;
+	    return -16;
 	end if;
     end if;
 
@@ -589,7 +591,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
 
     stepCt := stepCt + 1;
@@ -625,7 +627,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in tm_wz.wt_subject_metabolomics_calcs',rowCt,stepCt,'Done');
@@ -666,7 +668,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ WT_SUBJECT_METABOLOMICS_MED',rowCt,stepCt,'Done');
@@ -696,7 +698,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP DE_SUBJECT_METABOLOMICS_DATA',rowCt,stepCt,'Done');
 
@@ -718,6 +720,7 @@ begin
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
+    return 1;
 end;
 
 $$;

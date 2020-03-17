@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_move_study(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_move_study(old_path character varying, new_path character varying, currentjobid numeric) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_move_study(old_path character varying, new_path character varying, currentjobid numeric) RETURNS integer
 LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -34,6 +34,8 @@ AS $$
     rowCt			numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
+    tText		varchar(1000);
+    rtnCd		integer;
 
 begin
 
@@ -64,7 +66,7 @@ begin
     then 
 
 	--CONCEPT DIMENSION
-	update concept_dimension
+	update i2b2demodata.concept_dimension
 	set CONCEPT_PATH = replace(concept_path, old_path, new_path)
 	where concept_path like old_path || '%';
 	get diagnostics rowCt := ROW_COUNT;
@@ -76,7 +78,7 @@ begin
 
 
 	--I2B2
-	update i2b2
+	update i2b2metadata.i2b2
 	   set c_fullname = replace(c_fullname, old_path, new_path)
 	       ,c_dimcode = replace(c_fullname, old_path, new_path)
 	       ,c_tooltip = replace(c_fullname, old_path, new_path)
@@ -91,15 +93,22 @@ begin
 
 	--	concept_counts
 
-	update concept_counts
+	update i2b2demodata.concept_counts
 	   set concept_path = replace(concept_path, old_path, new_path)
 	       ,parent_concept_path = replace(parent_concept_path, old_path, new_path)
 	 where concept_path like old_path || '%';
 
 	--	fill in any upper levels
 
-	select i2b2_fill_in_tree(null, new_path, jobID);
-	END IF;
+	select i2b2_fill_in_tree(null, new_path, jobID) into rtnCd;
+	if(rtnCd <> 1) then
+	    tText := 'Failed to fill in tree '|| new_path;
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+	end if;
+end if;
 
 
 

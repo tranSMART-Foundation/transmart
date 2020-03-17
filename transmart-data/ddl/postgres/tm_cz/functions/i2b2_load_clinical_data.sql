@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_clinical_data(character varying, character varying, character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_clinical_data(trial_id character varying, top_node character varying, secure_study character varying DEFAULT 'N'::character varying, highlight_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_clinical_data(trial_id character varying, top_node character varying, secure_study character varying DEFAULT 'N'::character varying, highlight_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
   LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -51,6 +51,8 @@ AS $$
     r_update		record;  
     thisName		varchar(700);
     nChildren		integer;
+    rtnCd		integer;
+    tExplain 		text;
 
     --	cursor to define the path for delete_one_node  this will delete any nodes that are hidden after i2b2_create_concept_counts
 
@@ -275,7 +277,13 @@ begin
     if pCount > 2 then
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding upper-level nodes',0,stepCt,'Done');
-	perform tm_cz.i2b2_fill_in_tree(null, tPath, jobId);
+	select tm_cz.i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
+	if(rtnCd <> 1) then
+	    tText := 'Failed to fill in tree '|| tPath;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
     end if;
 
     select count(*) into pExists
@@ -285,7 +293,15 @@ begin
     --	add top node for study
 
     if pExists = 0 then
-	perform tm_cz.i2b2_add_node(TrialId, topNode, study_name, jobId);
+	select tm_cz.i2b2_add_node(TrialId, topNode, study_name, jobId) into rtnCd;
+	stepCt := stepCt + 1;
+	if(rtnCd <> 1) then
+            tText := 'Failed to add leaf node '|| topNode;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding top node for study',0,stepCt,'Done');
     end if;
 
     --	Set data_type, category_path, and usubjid 
@@ -913,8 +929,14 @@ begin
 
 	--	deletes unused leaf nodes for a trial one at a time
 
-	perform tm_cz.i2b2_delete_1_node(r_delUnusedLeaf.c_fullname);
+	select tm_cz.i2b2_delete_1_node(r_delUnusedLeaf.c_fullname) into rtnCd;
 	stepCt := stepCt + 1;
+	if(rtnCd <> 1) then
+	    tText := 'Failed to delete node '|| r_delUnusedLeaf.c_fullname;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted unused leaf node: ' || r_delUnusedLeaf.c_fullname,1,stepCt,'Done');
 
     end loop;
@@ -1146,8 +1168,8 @@ begin
 	
     begin
 	rowCt = 0;
-	for r_patient in addPatient loop
-	    thisPatient := r_patient.patient_num;
+--    for tExplain in
+--    EXPLAIN (ANALYZE, VERBOSE, BUFFERS)
 	    insert into i2b2demodata.observation_fact
 			(encounter_num
 			,patient_num
@@ -1165,8 +1187,8 @@ begin
 			,location_cd
 			,instance_num
 			)
-	    select thisPatient
-		   ,thisPatient
+	    select c.patient_num
+		   ,c.patient_num
 		   ,i.c_basecode
 		   ,coalesce(a.date_timestamp, 'infinity')
 		   ,coalesce(a.modifier_cd, '@')
@@ -1185,21 +1207,26 @@ begin
 		   ,'@'
                    ,1
 	      from tm_wz.wrk_clinical_data a
+		   ,i2b2demodata.patient_dimension c
 		   ,tm_wz.wt_trial_nodes t
 		   ,i2b2metadata.i2b2 i
-	     where a.usubjid = r_patient.sourcesystem_cd
+	     where a.usubjid = c.sourcesystem_cd  --TrialId:nnnn
+	       and a.study_id = i.sourcesystem_cd --TrialId
 	       and coalesce(a.category_cd,'@') = coalesce(t.category_cd,'@')
+	       and t.leaf_node = i.c_fullname
 	       and coalesce(a.data_label,'**NULL**') = coalesce(t.data_label,'**NULL**')
 	       and coalesce(a.visit_name,'**NULL**') = coalesce(t.visit_name,'**NULL**')
 	       and case when a.data_type = 'T' then a.data_value else '**NULL**' end = coalesce(t.data_value,'**NULL**')
-	       and t.leaf_node = i.c_fullname
 	       and not exists		-- don't insert if lower level node exists
 		   (select 1 from tm_wz.wt_trial_nodes x
 		     where (substr(x.leaf_node, 1, tm_cz.instr(x.leaf_node, '\', -2))) = t.leaf_node)
-	       and a.data_value is not null;
+	       and a.data_value is not null
+--	LOOP
+--	    raise notice 'explain: %', tExplain;
+--	END LOOP
+	       ;
 	    get diagnostics thisRowCt := ROW_COUNT;
 	    rowCt := rowCt + thisRowCt;
-	end loop;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -1215,7 +1242,13 @@ begin
 
     -- insert any missing nodes in the hierarchy now,
     -- so we can check parent and be sure of a match
-    perform tm_cz.i2b2_fill_in_tree(TrialId, topNodeEscaped, jobID);
+    select tm_cz.i2b2_fill_in_tree(TrialId, topNodeEscaped, jobID) into rtnCd;
+    if(rtnCd <> 1) then
+        tText := 'Failed to fill in tree '|| topNodeEscaped;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
 
     --	update c_visualattributes for all nodes in study, done to pick up node that changed c_columndatatype
 	
@@ -1270,18 +1303,31 @@ begin
 
 	--	deletes hidden nodes for a trial one at a time
 
-	perform tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname);
+	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
 	stepCt := stepCt + 1;
-	tText := 'Deleted node: ' || r_delNodes.c_fullname;
+	if(rtnCd <> 1) then
+	    tText := 'Failed to delete node '|| r_delNodes.c_fullname;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end if;
+	tText := 'Deleted hidden node: ' || r_delNodes.c_fullname;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
     end loop;
 
     perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
-    perform tm_cz.i2b2_load_security_data(jobID);
+    select tm_cz.i2b2_load_security_data(jobID) into rtnCd;
 	
-    stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_clinical_data',0,stepCt,'Done');
+     if(rtnCd <> 1) then
+       stepCt := stepCt + 1;
+       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
+
+   stepCt := stepCt + 1;
+   perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_clinical_data',0,stepCt,'Done');
 	
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then

@@ -1,11 +1,7 @@
 --
 -- Name: i2b2_process_metabolomic_data(character varying, character varying, character varying, character varying, bigint, character varying, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-
-SET search_path = tm_cz, pg_catalog;
-
-
-CREATE OR REPLACE FUNCTION i2b2_process_metabolomic_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base bigint DEFAULT 2, secure_study character varying DEFAULT 'N'::character varying, currentjobid bigint DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_metabolomic_data(trial_id character varying, top_node character varying, data_type character varying DEFAULT 'R'::character varying, source_code character varying DEFAULT 'STD'::character varying, log_base numeric DEFAULT 2, secure_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql
     AS $$
 
@@ -42,12 +38,11 @@ Declare
   partTbl   	bigint;
   sampleCt		bigint;
   idxExists 	bigint;
-  logBase		bigint;
+  logBase		numeric;
   pCount		integer;
   sCount		integer;
   tablespaceName	varchar(200);
   v_bio_experiment_id	bigint;
-  rtn_code		integer;
   partitioniD	numeric(18,0);
   partitionName	varchar(100);
   partitionIndx	varchar(100);
@@ -61,7 +56,8 @@ Declare
   rowCt			numeric(18,0);
   errorNumber		character varying;
   errorMessage	character varying;
-  
+  rtnCd		integer;
+
 	addNodes CURSOR FOR
 	SELECT distinct t.leaf_node
           ,t.node_name
@@ -219,7 +215,14 @@ BEGIN
 	select length(tPath) - length(replace(tPath,'\',null)) into pCount ;
 
 	if pCount > 2 then
-		perform i2b2_fill_in_tree(null, tPath, jobId);
+	    select i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
+	    if(rtnCd <> 1) then
+	        stepCt := stepCt + 1;
+		tText := 'Failed to fill in tree '|| tPath;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
+		return -16;
+            end if;
 	end if;
 
 	--	uppercase study_id in LT_SRC_METABOLOMIC_MAP in case curator forgot
@@ -575,7 +578,14 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 
     --Add nodes for all types (ALSO DELETES EXISTING NODE)
 		begin
-		perform i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId);
+		select i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId) into rtnCd;
+		if(rtnCd <> 1) then
+		    stepCt := stepCt + 1;
+		    tText := 'Failed to add leaf node '|| r_addNodes.leaf_node;
+		    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+		    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+		    return -16;
+		end if;
 		get diagnostics rowCt := ROW_COUNT;
 		exception
 	when others then
@@ -592,7 +602,14 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		
 		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 		
-		perform i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID);
+		select i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID) into rtnCd;
+		if(rtnCd <> 1) then
+		    stepCt := stepCt + 1;
+                    tText := 'Failed to fill in tree '|| r_addNodes.leaf_node;
+	            perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	            perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	            return -16;
+		end if;
 
 	END LOOP;  
 		
@@ -995,18 +1012,30 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 
     --	deletes hidden nodes for a trial one at a time
 
-		perform i2b2_delete_1_node(r_delNodes.c_fullname);
-		stepCt := stepCt + 1;
-		tText := 'Deleted node: ' || r_delNodes.c_fullname;
+	    select i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+	    stepCt := stepCt + 1;
+	    if(rtnCd <> 1) then
+	        tText := 'Failed to delete node '|| r_delNodes.c_fullname;
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
+		return -16;
+            end if;
+	    tText := 'Deleted node: ' || r_delNodes.c_fullname;
 		
-		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
 	END LOOP;  	
 
 
   --Reload Security: Inserts one record for every I2B2 record into the security table
 	begin
-    perform i2b2_load_security_data(jobId);
+    select i2b2_load_security_data(jobId) into rtnCd;
+    if(rtnCd <> 1) then
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
         exception
 	when others then
 		errorNumber := SQLSTATE;
@@ -1019,13 +1048,32 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load security data',0,stepCt,'Done');
 
---	tag data with probeset_id from reference.probeset_deapp
+    if (dataType = 'R') then
+        begin
+            delete from tm_lz.lt_src_metabolomic_data
+	          where intensity_value <= 0.0;
+	    get diagnostics rowCt := ROW_COUNT;
+            exception
+	        when others then
+	            errorNumber := SQLSTATE;
+	            errorMessage := SQLERRM;
+	        --Handle errors.
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    --End Proc
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+        end;
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove unusable negative intensity_value from lt_src_metabolomic_data for dataType R',rowCt,stepCt,'Done');
+    end if;
+
+    --	tag data with probeset_id from reference.probeset_deapp
   
-	EXECUTE ('truncate table tm_wz.WT_SUBJECT_MBOLOMICS_PROBESET');
+	EXECUTE ('truncate table tm_wz.wt_subject_mbolomics_probeset');
 	
 	--	note: assay_id represents a unique subject/site/sample
 	begin
-	insert into WT_SUBJECT_MBOLOMICS_PROBESET  --mod
+	insert into wt_subject_mbolomics_probeset  --mod
 	(probeset
 	,intensity_value
 	,patient_id
@@ -1040,12 +1088,11 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		  ,TrialId
 		  ,sd.assay_id
 	from deapp.de_subject_sample_mapping sd
-		,LT_SRC_METABOLOMIC_DATA md   
+		,lt_src_metabolomic_data md
 	where sd.sample_cd = md.expr_id
 	  and sd.platform = 'METABOLOMICS'
 	  and sd.trial_name =TrialId
 	  and sd.source_cd = sourceCd
-	 and (CASE WHEN dataType = 'R' THEN sign(md.intensity_value) ELSE 1 END) = 1 
 		group by md.biochemical, subject_id
 		,sd.patient_id, sd.assay_id;
 	get diagnostics rowCt := ROW_COUNT;
@@ -1105,7 +1152,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
                 'select ' || partitioniD::text || ', m.trial_name || '':'' || mpp.source_cd, ' ||
                   '''' || TrialId || '''' ||
                 ',d.Id ,m.assay_id ,m.subject_id ,m.intensity_value ' ||
-                  ' ,log(2,m.intensity_value) ' ||
+                  ' ,log(2.0,m.intensity_value) ' ||
 			  ',case when m.intensity_value < -2.5 ' ||
 			        'then -2.5 ' ||
 					'when m.intensity_value > 2.5 ' ||
@@ -1132,8 +1179,13 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	--	WT_SUBJECT_MBOLOMICS_PROBESET as part of a Load.  
 
 		if dataType = 'R' or dataType = 'L' then
-			perform I2B2_METABOLOMICS_ZSCORE_CALC(TrialID, partitionName, partitionindx,partitioniD,sourceCD,'L',jobId,dataType,logBase);
+			select tm_cz.i2b2_metabolomics_zscore_calc(TrialID, partitionName, partitionindx,partitioniD,sourceCD,'L',jobId,dataType,logBase) into rtnCd;
 			stepCt := stepCt + 1;
+			if(rtnCd <> 1) then
+			    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to calculate Z-Score',rowCt,stepCt,'Message');
+			    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+			    return -16;
+			end if;
 			perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
 		end if;
 	
@@ -1149,8 +1201,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
 	END IF;
 
-	select 0 into rtn_code ;
-	return 0;
+	return 1;
 
 END;
  

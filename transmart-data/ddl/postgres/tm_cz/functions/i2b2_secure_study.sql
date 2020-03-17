@@ -1,11 +1,7 @@
 --
--- Name: i2b2_secure_study(text, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
+-- Name: i2b2_secure_study(text, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-
-SET check_function_bodies = false;
-SET search_path = tm_cz, pg_catalog;
-
-CREATE OR REPLACE FUNCTION i2b2_secure_study(trial_id text, currentjobid bigint DEFAULT NULL::bigint) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_secure_study(trial_id text, currentjobid numeric DEFAULT NULL::bigint) RETURNS integer
     LANGUAGE plpgsql
 AS $$
     declare
@@ -33,6 +29,7 @@ AS $$
     jobID bigint;
     stepCt bigint;
     rowCt bigint;
+    rtnCd integer;
 
     v_bio_experiment_id	bigint;
     pExists				integer;
@@ -66,8 +63,14 @@ begin
     
     --	load i2b2_secure
     
-    perform i2b2_load_security_data(jobID);
-    
+    select i2b2_load_security_data(jobID) into rtnCd;
+    if(rtnCd <> 1) then
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
+
     --	check if entry exists for study in bio_experiment
     
     select count(*) into pExists

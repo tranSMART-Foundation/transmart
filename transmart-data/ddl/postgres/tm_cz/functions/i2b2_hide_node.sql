@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_hide_node(character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_hide_node(path character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_hide_node(path character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -31,7 +31,8 @@ AS $$
     rowCt			numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
-    
+    rtnCd		integer;
+
 begin
 
     stepCt := 0;
@@ -92,9 +93,9 @@ begin
 
     --	reload i2b2_secure for hidden nodes
     
-    perform tm_cz.load_security_data(jobId);
+    select tm_cz.load_security_data(jobId) into rtnCd;
     
-    return 1;
+    return rtnCd;
     
 end;
 

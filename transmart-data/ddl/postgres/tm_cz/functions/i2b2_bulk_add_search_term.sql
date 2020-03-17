@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_bulk_add_search_term(bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_bulk_add_search_term(currentjobid bigint DEFAULT NULL::bigint) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_bulk_add_search_term(currentjobid bigint DEFAULT NULL::bigint) RETURNS integer
     LANGUAGE plpgsql
 AS $$
     declare
@@ -165,14 +165,15 @@ begin
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
-  
+    return 1;
+
 exception
     when others then
     --Handle errors.
 	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-  
+    return -16;
 end;
  
 $$;

@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_rbm_zscore_calc_new(character varying, character varying, bigint, character varying, bigint, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_rbm_zscore_calc_new(trial_id character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid bigint DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base bigint DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_rbm_zscore_calc_new(trial_id character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -20,7 +20,7 @@ AS $$
     idxExists		bigint;
     pExists		bigint;
     nbrRecs		bigint;
-    logBase		bigint;
+    logBase		numeric;
 
     --Audit variables
     newJobFlag		numeric(1);
@@ -66,7 +66,7 @@ begin
 	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 	--End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	return;
+	return -16;
     end if;
 
     --	For Load, make sure that the TrialId passed as parameter is the same as the trial in stg_subject_mrna_data
@@ -85,7 +85,7 @@ begin
 	    perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 	    --End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
 	end if;
     end if;
 
@@ -107,7 +107,7 @@ begin
 	    perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
 	    --End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
 	end if;
     end if;
 
@@ -181,7 +181,7 @@ begin
 	select probeset
 	       ,intensity_value 
 	       ,assay_id 
-	       ,log(2,intensity_value)
+	       ,ln(intensity_value)/ln(logBase::double precision)
 	       ,patient_id
 	    --		  ,sample_cd
 	    --		  ,subject_id
@@ -395,6 +395,8 @@ begin
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS'); 
     end if;
 
+    return 1;
+
 exception
     when others then
     --Handle errors.
@@ -402,7 +404,7 @@ exception
 
 
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-
+	return -16;
 end;
 
 $$;
@@ -410,7 +412,7 @@ $$;
 --
 -- Name: i2b2_rbm_zscore_calc_new(character varying, character varying, character varying, character varying, bigint, character varying, bigint, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_rbm_zscore_calc_new(trial_id character varying, partition_name character varying, partition_indx character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid bigint DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base bigint DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_rbm_zscore_calc_new(trial_id character varying, partition_name character varying, partition_indx character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -431,7 +433,7 @@ AS $$
     idxExists		bigint;
     pExists		bigint;
     nbrRecs		bigint;
-    logBase		bigint;
+    logBase		numeric;
 
     --Audit variables
     newJobFlag		integer;
@@ -512,7 +514,7 @@ begin
 			      ,0,stepCt,'Done');
 	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	perform tm_cz.cz_end_audit (jobId,'FAIL');
-	return;
+	return -16;
     end if;
 
     --	For Load, make sure that the TrialId passed as parameter is the same as the trial in stg_subject_mrna_data
@@ -528,7 +530,7 @@ begin
 				  ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobId,'FAIL');
-	    return;
+	    return -16;
 	end if;
     end if;
 
@@ -547,7 +549,7 @@ begin
 				  ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobId,'FAIL');
-	    return;
+	    return -16;
 	end if;
     end if;
 
@@ -599,7 +601,7 @@ begin
 	    select probeset
 		   ,intensity_value 
 		   ,assay_id 
-		   ,log(2,intensity_value)
+		   ,ln(intensity_value)/ln(logBase::double precision)
 		   ,patient_id
 	      from wt_subject_rbm_probeset
 	     where trial_name = TrialId;
@@ -614,7 +616,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rbm_logs',rowCt,stepCt,'Done');
@@ -649,7 +651,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rbm_calcs',SQL%ROWCOUNT,stepCt,'Done');
@@ -693,7 +695,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rbm_med',rowCt,stepCt,'Done');
@@ -772,6 +774,8 @@ begin
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS'); 
     end if;
 
+    return 1;
+
 end;
 
 $$;
@@ -779,7 +783,7 @@ $$;
 --
 -- Name: i2b2_rbm_zscore_calc_new(character varying, character varying, character varying, numeric, character varying, bigint, character varying, bigint, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_rbm_zscore_calc_new(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, run_type character varying DEFAULT 'L'::character varying, currentjobid bigint DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base bigint DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_rbm_zscore_calc_new(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -800,7 +804,7 @@ AS $$
     idxExists		bigint;
     pExists		bigint;
     nbrRecs		bigint;
-    logBase		bigint;
+    logBase		numeric;
 
     --Audit variables
     newJobFlag		integer;
@@ -881,7 +885,7 @@ begin
 			      ,0,stepCt,'Done');
 	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	perform tm_cz.cz_end_audit (jobId,'FAIL');
-	return;
+	return -16;
     end if;
 
     --	For Load, make sure that the TrialId passed as parameter is the same as the trial in stg_subject_mrna_data
@@ -897,7 +901,7 @@ begin
 				  ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobId,'FAIL');
-	    return;
+	    return -16;
 	end if;
     end if;
 
@@ -916,7 +920,7 @@ begin
 				  ,0,stepCt,'Done');
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobId,'FAIL');
-	    return;
+	    return -16;
 	end if;
     end if;
 
@@ -966,7 +970,7 @@ begin
 	    select probeset
 		   ,intensity_value 
 		   ,assay_id 
-		   ,CASE WHEN intensity_value <= 0 THEN log(2,(intensity_value + 0.001)) ELSE log(2,intensity_value) END
+		   ,ln(intensity_value)/ln(logBase::double precision)
 		   ,patient_id
 	      from tm_wz.wt_subject_rbm_probeset
 	     where trial_name = TrialId;
@@ -980,7 +984,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_rbm_logs',rowCt,stepCt,'Done');
@@ -1015,7 +1019,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_rbm_calcs',rowCt,stepCt,'Done');
@@ -1059,7 +1063,7 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return;
+	    return -16;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rbm_med',rowCt,stepCt,'Done');
@@ -1119,6 +1123,8 @@ begin
     if newJobFlag = 1 then 
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS'); 
     end if;
+
+    return 1;
 
 end;
 

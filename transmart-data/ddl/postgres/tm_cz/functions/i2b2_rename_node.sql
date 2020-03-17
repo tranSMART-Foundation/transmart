@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_rename_node(character varying, character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_rename_node(trial_id character varying, old_node character varying, new_node character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_rename_node(trial_id character varying, old_node character varying, new_node character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -31,9 +31,11 @@ AS $$
     rowCt bigint;
     errorNumber    character varying;
     errorMessage  character varying;
+    rtnCd integer;
 
 begin
     
+    rtnCd := 1;
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -155,9 +157,9 @@ begin
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',rowCt,stepCt,'Done'); 
 					
-	perform i2b2_load_security_data(jobID);
+	select i2b2_load_security_data(jobID) into rtnCd;
 
-	return 0;
+	return rtnCd;
 
     end if;
 end;

@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_from_stage(character varying, character varying, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_from_stage(character varying, character varying, bigint) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_from_stage(character varying, character varying, bigint) RETURNS integer
     LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -56,6 +56,7 @@ AS $$
     
     r_stage_table	record;
     r_stage_columns record;
+    rtnCd	    integer;
 
 begin
 
@@ -200,10 +201,22 @@ begin
 	if pCount > 2 then
 	    stepCt := stepCt + 1;
 	    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Adding upper-level nodes',0,stepCt,'Done');
-	    perform i2b2_fill_in_tree(null, tPath, jobId);
+	    select i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
+	    if(rtnCd <> 1) then
+                tText := 'Failed to fill in tree '|| tPath;
+                perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+                perform tm_cz.cz_end_audit (jobID, 'FAIL');
+                return -16;
+            end if;
 	end if;
 
-	perform tm_cz.i2b2_load_security_data(jobId);
+	select tm_cz.i2b2_load_security_data(jobId) into rtnCd;
+    if(rtnCd <> 1) then
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
     end if;
 
     stepCt := stepCt + 1;

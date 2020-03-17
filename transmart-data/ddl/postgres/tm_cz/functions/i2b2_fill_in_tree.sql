@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_fill_in_tree(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_fill_in_tree(trial_id character varying, path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_fill_in_tree(trial_id character varying, path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -37,7 +37,8 @@ AS $$
     root_node varchar(1000);
     node_name varchar(1000);
     v_count numeric;
-    
+    rtnCd   integer;
+
     --Get the nodes
     cNodes cursor for
 		      --Trimming off the last node as it would never need to be added.
@@ -87,9 +88,16 @@ begin
 		auditText := 'Inserting ' || root_node;
 		stepCt := stepCt + 1;
 		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditText,0,stepCt,'Done');
-		perform tm_cz.i2b2_add_node(trial_id, root_node, node_name, jobId);
+		select tm_cz.i2b2_add_node(trial_id, root_node, node_name, jobId) into rtnCd;
+		if(rtnCd <> 1) then
+		    stepCt := stepCt + 1;
+                    auditText := 'Failed to add leaf node '|| root_node;
+	            perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditText,0,stepCt,'Message');
+	            perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	            return -16;
+                end if;
             end if;
-	    
+
 	end loop;
 
 	--reset variables

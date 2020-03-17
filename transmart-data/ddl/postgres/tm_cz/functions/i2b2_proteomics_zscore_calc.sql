@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_proteomics_zscore_calc(character varying, character varying, numeric, character varying, numeric, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_proteomics_zscore_calc(trial_id character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT NULL::numeric, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_proteomics_zscore_calc(trial_id character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT NULL::numeric, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2.0, source_cd character varying DEFAULT NULL::character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -117,7 +117,7 @@ begin
 	    select probeset
 		   ,intensity_value ----UAT 154 changes done on 19/03/2014
 		   ,assay_id 
-		   ,round(intensity_value,4)
+		   ,round(intensity_value::numeric,4)
 		   ,patient_id
 		-- ,sample_cd
 		   ,subject_id
@@ -142,7 +142,7 @@ begin
 	    select probeset
 		   ,intensity_value  ----UAT 154 changes done on 19/03/2014
 		   ,assay_id 
-		   ,round(log(2,intensity_value  + 0.001),4)  ----UAT 154 changes done on 19/03/2014
+		   ,round(log(2.0::numeric,intensity_value::numeric  + 0.001),4)  ----UAT 154 changes done on 19/03/2014
 		   ,patient_id
 		--		  ,sample_cd
 		   ,subject_id
@@ -262,8 +262,8 @@ begin
                ,m.subject_id
 	    --  ,decode(dataType,'R',m.intensity_value,'L',power(logBase, m.log_intensity),null)
                ,m.intensity_value as intensity  ---UAT 154 changes done on 19/03/2014
-               ,(case when m.zscore < -2.5 then -2.5 when m.zscore >  2.5 then  2.5 else round(m.zscore,5) end)	
-               ,round(m.log_intensity,4) as log_intensity
+               ,(case when m.zscore < -2.5 then -2.5 when m.zscore >  2.5 then  2.5 else round(m.zscore::numeric,5) end)
+               ,round(m.log_intensity::numeric,4) as log_intensity
                ,m.patient_id
 	  from wt_subject_proteomics_med m
 	       , deapp.de_protein_annotation d
@@ -285,7 +285,8 @@ begin
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
-    return 1;	
+
+    return 1;
 
 end;
 $$;
