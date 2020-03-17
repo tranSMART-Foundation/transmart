@@ -37,7 +37,7 @@ class AmTagItemService {
 
 	List<AmTagItem> amTagItems = AmTagItem.executeQuery('''
 		from AmTagItem ati
-		where viewInChildGrid=true
+		where viewInChildGrid=1
 		  and ati.amTagTemplate.id = :amTagTemplateId
 		order by displayOrder''', [amTagTemplateId: key])
 
@@ -57,7 +57,7 @@ class AmTagItemService {
 	List<AmTagItem> amTagItems = AmTagItem.executeQuery('''
 		from AmTagItem ati
 		where ati.amTagTemplate.id = :templateId
-		  and ati.editable = true
+		  and ati.editable = 1
 		order by ati.displayOrder''', [templateId: key])
 
 	logger.debug 'amTagItems = {} for key = {}', amTagItems, key
@@ -76,7 +76,7 @@ class AmTagItemService {
 
 	List<AmTagItem> amTagItems = AmTagItem.executeQuery('''
 		from AmTagItem ati
-		where required=true
+		where required=1
 		  and ati.amTagTemplate.id = :amTagTemplateId
 		order by displayOrder''', [amTagTemplateId: key])
 
