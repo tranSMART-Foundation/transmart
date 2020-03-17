@@ -18,6 +18,7 @@ package com.recomdata.transmart.data.association
 
 import com.recomdata.asynchronous.JobResultsService
 import grails.converters.JSON
+import groovy.util.logging.Slf4j
 import jobs.AcghFrequencyPlot
 import jobs.AcghGroupTest
 import jobs.AcghSurvivalAnalysis
@@ -46,6 +47,7 @@ import org.quartz.JobDataMap
 import org.quartz.JobDetail
 import org.quartz.impl.JobDetailImpl
 import org.quartz.impl.triggers.SimpleTriggerImpl
+import org.springframework.stereotype.Component
 import org.transmart.plugin.shared.SecurityService
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.users.User
@@ -56,20 +58,22 @@ import static jobs.misc.AnalysisQuartzJobAdapter.PARAM_JOB_CLASS
 import static jobs.misc.AnalysisQuartzJobAdapter.PARAM_USER_IN_CONTEXT
 import static jobs.misc.AnalysisQuartzJobAdapter.PARAM_USER_PARAMETERS
 
+@Component
+@Slf4j('logger')
 class RModulesController {
 
     private static final Map<String, String> lookup = [
+			ACGH             : 'acgh',
+			Chromosomal      : 'acgh',
 			'Gene Expression': 'mrna',
+			METABOLOMICS     : 'metabolite',
 			MIRNA_QPCR       : 'mirnaqpcr',
 			MIRNA_SEQ        : 'mirnaseq',
-			RBM              : 'rbm',
 			PROTEOMICS       : 'protein',
-			RNASEQ           : 'rnaseq_cog',
-			METABOLOMICS     : 'metabolite',
-			Chromosomal      : 'acgh',
-			acgh             : 'acgh',
-			rnaseq           : 'rnaseq',
+			RBM              : 'rbm',
 			RNASEQ_RCNT      : 'rnaseq',
+			RNASEQCOG        : 'rnaseq_cog',
+//			RNASEQ           : 'rnaseq',
 			VCF              : 'vcf'
     ].asImmutable()
 
@@ -152,6 +156,8 @@ class RModulesController {
     }
 
     static AnalysisConstraints createAnalysisConstraints(Map params) {
+	logger.info 'createAnalysisConstraints {}', params
+
         Map map = validateParamAnalysisConstraints(params) as Map
         map.data_type = lookup[map.data_type]
         new AnalysisConstraints(map: massageConstraints(map))
