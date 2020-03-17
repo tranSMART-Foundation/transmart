@@ -87,7 +87,7 @@ class RScriptsSynchronizer {
         RConnection rConnection = rConnectionProvider.get()
         try {
             RFileOutputStream os = rConnection.createFile(BUNDLE_FIX)
-            // buffering the output improves performance (o/wise writing just
+            // buffering the output improves performance (otherwise writing just
             // one byte would send a packet on itself) and goes around a bug
             // in RFileOutputStream::write(byte b), which always writes a NUL
             // byte, no matter the argument.
