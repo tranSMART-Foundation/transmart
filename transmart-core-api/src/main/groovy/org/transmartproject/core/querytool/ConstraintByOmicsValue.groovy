@@ -67,7 +67,7 @@ class ConstraintByOmicsValue {
     @CompileStatic
     static enum OmicsType {
         GENE_EXPRESSION ('Gene Expression'),
-        RNASEQ ('RNASEQ'),
+        RNASEQCOG ('RNASEQCOG'),
         RNASEQ_RCNT ('RNASEQ_RCNT'),
         PROTEOMICS ('PROTEOMICS'),
         CHROMOSOMAL ('Chromosomal'),
