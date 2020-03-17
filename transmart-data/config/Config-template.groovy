@@ -231,10 +231,6 @@ sampleExplorer {
     idfield = 'id'
 }
 
-edu.harvard.transmart.sampleBreakdownMap = [
-    "id":"Aliquots in Cohort"
-]
-
 // Solr configuration for the Sample Explorer
 com { recomdata { solr {
     maxNewsStories = 10
@@ -292,9 +288,9 @@ environments {
 
 /* {{{ SmartR Configuration */
 
-// directory to copy scripts - with server URL appended to allow for multiple servers
-smartR.remoteScriptsDirectory = "/tmp/smart_r_scripts"
-smartR.remoteSCRiptDirectory += transmartURL.replaceAll("\\W+","")
+// absolute path directory to copy scripts - with server URL appended to allow for multiple servers
+smartR.remoteScriptDirectory = "/tmp/smart_r_scripts"
+smartR.remoteScriptDirectory += transmartURL.replaceAll("\\W+","")
 
 environments {
     production {
