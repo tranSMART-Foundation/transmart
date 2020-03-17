@@ -71,7 +71,7 @@ function omicsFilterWindowReceived(result, request) {
 
     omicsfilterwin.setPosition(left, top);
     omicsfilterwin.show(viewport);
-    omicsfilterwin.setHeight(158); //set height back to old closed
+    omicsfilterwin.setHeight(175); //set height back to old closed
 
     jQuery("#highdimension-filter-main").html(result.responseText);
 

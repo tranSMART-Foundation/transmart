@@ -8,13 +8,14 @@ STATE = {
 // TODO : future refactoring should retrieve these values from gpl definitions in the database
 var HIGH_DIMENSIONAL_DATA = {
     "mrna"          : {"platform" : "MRNA_AFFYMETRIX",  "type" : "Gene Expression"},
+    "metabolite"    : {"platform" : "METABOLOMICS",     "type" : "METABOLOMICS"},
     "mirna_qpcr"    : {"platform" : "MIRNA_QPCR",       "type" : "MIRNA_QPCR"},
     "mirna_seq"     : {"platform" : "MIRNA_SEQ",        "type" : "MIRNA_SEQ"},
-    "rbm"           : {"platform" : "RBM",              "type" : "RBM"},
     "proteomics"    : {"platform" : "PROTEIN",          "type" : "PROTEOMICS"},
-    "snp"           : {"platform" : "SNP",              "type" : "SNP"},
-    "rnaseq"        : {"platform" : "RNA_AFFYMETRIX",   "type" : "RNASEQ"},
-    "metabolite"    : {"platform" : "METABOLOMICS",     "type" : "METABOLOMICS"}
+    "rbm"           : {"platform" : "RBM",              "type" : "RBM"},
+    "rnaseq"        : {"platform" : "RNASEQ",           "type" : "RNASEQ"},
+    "rnaseqcog"     : {"platform" : "RNASEQCOG",        "type" : "RNASEQCOG"},
+    "snp"           : {"platform" : "SNP",              "type" : "SNP"}
 };
 
 // Check if current platform is supported
