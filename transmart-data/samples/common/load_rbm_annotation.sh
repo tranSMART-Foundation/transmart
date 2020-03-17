@@ -28,6 +28,9 @@ if [ $ALREADY_LOADED = 't' ]; then
     exit 0
 fi
 
+echo "DATA_LOCATION '$DATA_LOCATION'"
+echo "GPL_ID '$GPL_ID'"
+
 # Start the upload
 $KITCHEN -norep -version                                                    \
 	 -file="$KETTLE_JOBS/load_rbm_annotation.kjb"                       \
