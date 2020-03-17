@@ -81,6 +81,34 @@ RmodulesView.prototype.get_parameters_for_mrna = function (constraints) {
     return constraints;
 };
 
+RmodulesView.prototype.get_parameters_for_rnaseq = function (constraints) {
+
+    // TODO : to be filled in with values expected by analysis job in the backend
+    constraints['dataConstraints']['gene_signatures'] = null;
+    constraints['dataConstraints']['genes'] = null;
+    constraints['dataConstraints']['disjunction'] = null;
+    constraints['dataConstraints']['pathways'] = null;
+    constraints['dataConstraints']['proteins'] = null;
+    constraints['dataConstraints']['homologenes'] = null;
+    constraints['dataConstraints']['gene_lists'] = null;
+
+    return constraints;
+};
+
+RmodulesView.prototype.get_parameters_for_rnaseqcog = function (constraints) {
+
+    // TODO : to be filled in with values expected by analysis job in the backend
+    constraints['dataConstraints']['gene_signatures'] = null;
+    constraints['dataConstraints']['genes'] = null;
+    constraints['dataConstraints']['disjunction'] = null;
+    constraints['dataConstraints']['pathways'] = null;
+    constraints['dataConstraints']['proteins'] = null;
+    constraints['dataConstraints']['homologenes'] = null;
+    constraints['dataConstraints']['gene_lists'] = null;
+
+    return constraints;
+};
+
 RmodulesView.fetch_concept_path = function RmodulesView_fetch_concept_type_(el) {
     var conceptId = el.getAttribute('conceptId').trim();
     var conceptIdPattern = /^\\\\[^\\]+(\\.*)$/;
@@ -143,11 +171,35 @@ RmodulesView.prototype.read_concept_variables = function () {
 };
 
 
+RmodulesView.prototype.get_parameters_for_acgh = function (constraints) {
+
+    // TODO : to be filled in with values expected by analysis job in the backend
+
+    return constraints;
+};
+
+RmodulesView.prototype.get_parameters_for_metabolomics = function (constraints) {
+
+    // TODO : to be filled in with values expected by analysis job in the backend
+
+    return constraints;
+};
+
 RmodulesView.prototype.get_parameters_for_mirna = function (constraints) {
 
     // TODO : to be filled in with values expected by analysis job in the backend
     constraints['dataConstraints']['disjunction'] = null;
     constraints['dataConstraints']['mirna'] = null;
+
+    return constraints;
+};
+
+RmodulesView.prototype.get_parameters_for_proteomics = function (constraints) {
+
+    // TODO : to be filled in with values expected by analysis job in the backend
+    constraints['dataConstraints']['genes'] = null;
+    constraints['dataConstraints']['disjunction'] = null;
+    constraints['dataConstraints']['proteins'] = null;
 
     return constraints;
 };
@@ -198,12 +250,15 @@ RmodulesView.prototype.get_analysis_constraints = function (jobType) {
     }
 
     var cases = {
+        'ACGH': this.get_parameters_for_acgh,
         'Gene Expression': this.get_parameters_for_mrna,
+        'METABOLOMICS': this.get_parameters_for_metabolomics,
         'MIRNA_QPCR': this.get_parameters_for_mirna,
         'MIRNA_SEQ': this.get_parameters_for_mirna,
+        'PROTEOMICS': this.get_parameters_for_proteomics,
         'RBM': this.get_parameters_for_rbm,
-        'PROTEOMICS': this.get_parameters_for_rbm,
-        'RNASEQ': this.get_parameters_for_mrna
+        'RNASEQ': this.get_parameters_for_rnaseq,
+        'RNASEQCOG': this.get_parameters_for_rnaseqcog
     };
 
     if (cases[_data_type]) {
