@@ -27,8 +27,8 @@
 \i tm_wz/wt_qpcr_mirna_nodes.sql
 \i tm_wz/wt_rbm_node_values.sql
 \i tm_wz/wt_rbm_nodes.sql
-\i tm_wz/wt_rna_seq_node_values.sql
-\i tm_wz/wt_rna_seq_nodes.sql
+\i tm_wz/wt_rna_node_values.sql
+\i tm_wz/wt_rna_nodes.sql
 \i tm_wz/wt_subject_acgh_region.sql
 \i tm_wz/wt_subject_info.sql
 \i tm_wz/wt_subject_mbolomics_probeset.sql

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>load_RNA_sequencing_data</name>
+  <name>load_rna_data</name>
     <description/>
     <extended_description/>
     <job_version/>
@@ -49,7 +49,7 @@
         <parameter>
             <name>LOAD_TYPE</name>
             <default_value>L</default_value>
-            <description>L=Load lt_src_rna_seq_data using bulk loader and run i2b2_process_RNA_sequencing_data, I=Insert data to lt_src_rna_seq_data and run i2b2_process_RNA_sequencing_data, F=File only, i2b2_process_RNA_sequencing_data will not be run</description>
+            <description>L=Load lt_src_rna_data using bulk loader and run i2b2_process_rna_data, I=Insert data to lt_src_rna_data and run i2b2_process_rna_data, F=File only, i2b2_process_rna_data will not be run</description>
         </parameter>
         <parameter>
             <name>LOG_BASE</name>
@@ -194,7 +194,7 @@
       <type>JOB</type>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>${Internal.Job.Filename.Directory}/load_all_RNA_sequencing_data.kjb</filename>
+      <filename>${Internal.Job.Filename.Directory}/load_all_rna_data.kjb</filename>
       <jobname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -252,12 +252,12 @@
       <yloc>282</yloc>
       </entry>
     <entry>
-      <name>run i2b2_process_RNA_sequencing_data</name>
+      <name>run i2b2_process_rna_data</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}/run_i2b2_process_RNA_sequencing_data.ktr</filename>
+      <filename>${Internal.Job.Filename.Directory}/run_i2b2_process_rna_data.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -289,7 +289,7 @@
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}/check_RNA_sequencing_filenames.ktr</filename>
+      <filename>${Internal.Job.Filename.Directory}/check_rna_filenames.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -388,7 +388,7 @@
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}/valid_RNA_sequencing_params.ktr</filename>
+      <filename>${Internal.Job.Filename.Directory}/valid_rna_params.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -536,7 +536,7 @@
     </hop>
     <hop>
       <from>Check for File Only load</from>
-      <to>run i2b2_process_RNA_sequencing_data</to>
+      <to>run i2b2_process_rna_data</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -562,7 +562,7 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>run i2b2_process_RNA_sequencing_data</from>
+      <from>run i2b2_process_rna_data</from>
       <to>End Audit</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>

@@ -1,7 +1,7 @@
 --
--- Name: lt_src_rna_seq_subj_samp_map; Type: TABLE; Schema: tm_lz; Owner: -
+-- Name: lt_src_rna_subj_samp_map; Type: TABLE; Schema: tm_lz; Owner: -
 --
-CREATE TABLE lt_src_rna_seq_subj_samp_map (
+CREATE TABLE lt_src_rna_subj_samp_map (
     trial_name character varying(100),
     site_id character varying(100),
     subject_id character varying(100),

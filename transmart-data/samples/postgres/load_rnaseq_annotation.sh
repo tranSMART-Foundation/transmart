@@ -30,9 +30,9 @@ fi
 
 # Start the upload
 $KITCHEN -norep -version                                                       \
-	 -file="$KETTLE_JOBS/load_rnaseq_annotation.kjb"                       \
+	 -file="$KETTLE_JOBS/load_rna_annotation.kjb"                       \
 	 -level="$KETTLE_LOG_LEVEL"                                            \
-	 -logfile="$PWD"/logs/load_rnaseq_annotation_$(date +"%Y%m%d%H%M").log \
+	 -logfile="$PWD"/logs/load_rna_annotation_$(date +"%Y%m%d%H%M").log \
 	 -param:ANNOTATION_TITLE="$ANNOTATION_TITLE"                           \
 	 -param:DATA_LOCATION="$DATA_LOCATION"                                 \
 	 -param:GPL_ID="$GPL_ID"                                               \

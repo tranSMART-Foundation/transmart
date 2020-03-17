@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>load_RNA_sequencing_expression_data_to_lz</name>
+    <name>load_rna_expression_data_to_lz</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -103,7 +103,7 @@
     <hop> <from>Check for 0 rows</from><to>Dummy (do nothing) 3</to><enabled>Y</enabled> </hop>
     <hop> <from>Check for 0 rows</from><to>Write to log</to><enabled>Y</enabled> </hop>
     <hop> <from>Check for numeric intensity</from><to>Drop non-numeric data</to><enabled>Y</enabled> </hop>
-    <hop> <from>Check if LOAD_TYPE = I</from><to>Insert to lt_src_RNA_sequencing_data</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check if LOAD_TYPE = I</from><to>Insert to lt_src_rna_data</to><enabled>Y</enabled> </hop>
     <hop> <from>Check if LOAD_TYPE = I</from><to>Text file output 2</to><enabled>Y</enabled> </hop>
     <hop> <from>Check if LOAD_TYPE = L</from><to>Bulk Loader</to><enabled>Y</enabled> </hop>
     <hop> <from>Check if LOAD_TYPE = L</from><to>Check if LOAD_TYPE = I</to><enabled>Y</enabled> </hop>
@@ -131,11 +131,11 @@
     <hop> <from>Select remap data for data filename</from><to>Sort remap by current_sample_cd</to><enabled>Y</enabled> </hop>
     <hop> <from>Select values</from><to>Get Variables</to><enabled>Y</enabled> </hop>
     <hop> <from>Select values 2</from><to>Get Variables</to><enabled>Y</enabled> </hop>
-    <hop> <from>Select values for RNA_sequencing data</from><to>Check if LOAD_TYPE = L</to><enabled>Y</enabled> </hop>
+    <hop> <from>Select values for rna data</from><to>Check if LOAD_TYPE = L</to><enabled>Y</enabled> </hop>
     <hop> <from>Sort by sample_cd</from><to>Join and drop any unmapped sample_cd</to><enabled>Y</enabled> </hop>
     <hop> <from>Sort remap by current_sample_cd</from><to>Join and drop any unmapped sample_cd</to><enabled>Y</enabled> </hop>
     <hop> <from>Sum output rows</from><to>Check for 0 rows</to><enabled>Y</enabled> </hop>
-    <hop> <from>Trim trial_name</from><to>Select values for RNA_sequencing data</to><enabled>Y</enabled> </hop>
+    <hop> <from>Trim trial_name</from><to>Select values for rna data</to><enabled>Y</enabled> </hop>
     <hop> <from>Write to log</from><to>Abort</to><enabled>Y</enabled> </hop>
   </order>
 
@@ -176,7 +176,7 @@
     </partitioning>
     <steps>
       <step>
-        <name>Insert to lt_src_RNA_sequencing_data</name>
+        <name>Insert to lt_src_rna_data</name>
         <CopyNr>0</CopyNr>
       </step>
       <step>
@@ -220,7 +220,7 @@
     <read_size>0</read_size>
     <errors>50</errors>
     <schema/>
-    <table>lt_src_rna_seq_data</table>
+    <table>lt_src_rna_data</table>
     <load_method>AUTO_END</load_method>
     <load_action>APPEND</load_action>
     <sqlldr>${SQLLDR_PATH}</sqlldr>
@@ -375,7 +375,7 @@ Alert(isNum(str2));
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <send_true_to>Insert to lt_src_RNA_sequencing_data</send_true_to>
+    <send_true_to>Insert to lt_src_rna_data</send_true_to>
     <send_false_to>Text file output 2</send_false_to>
     <compare>
       <condition>
@@ -930,7 +930,7 @@ Alert(isNum(str2));
 	<leftvalue>Step name</leftvalue>
 	<function>IN LIST</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>Bulk Loader;Insert to lt_src_RNA_sequencing_data</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value><name>constant</name><type>String</type><text>Bulk Loader;Insert to lt_src_rna_data</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -957,7 +957,7 @@ Alert(isNum(str2));
     </partitioning>
     <steps>
       <step>
-        <name>Insert to lt_src_RNA_sequencing_data</name>
+        <name>Insert to lt_src_rna_data</name>
         <copyNr>0</copyNr>
         <stepRequired>N</stepRequired>
       </step>
@@ -999,7 +999,7 @@ Alert(isNum(str2));
   </step>
 
   <step>
-    <name>Insert to lt_src_RNA_sequencing_data</name>
+    <name>Insert to lt_src_rna_data</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
@@ -1010,7 +1010,7 @@ Alert(isNum(str2));
     </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>lt_src_rna_seq_data</table>
+    <table>lt_src_rna_data</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -1486,7 +1486,7 @@ else
   </step>
 
   <step>
-    <name>Select values for RNA_sequencing data</name>
+    <name>Select values for rna data</name>
     <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
@@ -1806,7 +1806,7 @@ else
     <displayHeader>Y</displayHeader>
     <logmessage>**************************************************
 *                                                *
-*     NO ROWS WRITTEN TO LT_SRC_RNA_SEQUENCING_DATA        *
+*     NO ROWS WRITTEN TO LT_SRC_RNA_DATA         *
 *                                                *
 **************************************************</logmessage>
     <fields>

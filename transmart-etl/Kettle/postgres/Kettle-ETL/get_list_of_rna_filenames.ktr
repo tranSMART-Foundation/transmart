@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>get_list_of_RNA_sequencing_filenames</name>
+    <name>get_list_of_rna_filenames</name>
     <description/>
     <extended_description/>
     <trans_version/>

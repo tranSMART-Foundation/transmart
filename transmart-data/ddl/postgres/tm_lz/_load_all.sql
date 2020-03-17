@@ -6,7 +6,7 @@
 \i tm_lz/lt_metabolomic_display_mapping.sql
 \i tm_lz/lt_protein_annotation.sql
 \i tm_lz/lt_qpcr_mirna_annotation.sql
-\i tm_lz/lt_rnaseq_annotation.sql
+\i tm_lz/lt_rna_annotation.sql
 \i tm_lz/lt_snp_calls_by_gsm.sql
 \i tm_lz/lt_snp_copy_number.sql
 \i tm_lz/lt_snp_gene_map.sql
@@ -38,9 +38,8 @@
 \i tm_lz/lt_src_rbm_display_mapping.sql
 \i tm_lz/lt_src_rbm_subj_samp_map.sql
 \i tm_lz/lt_src_rna_display_mapping.sql
-\i tm_lz/lt_src_rna_seq_data.sql
-\i tm_lz/lt_src_rna_seq_subj_samp_map.sql
-\i tm_lz/lt_src_rnaseq_data.sql
+\i tm_lz/lt_src_rna_data.sql
+\i tm_lz/lt_src_rna_subj_samp_map.sql
 \i tm_lz/lt_src_sample_categories.sql
 \i tm_lz/lt_src_search_keyword.sql
 \i tm_lz/lt_src_study_metadata.sql

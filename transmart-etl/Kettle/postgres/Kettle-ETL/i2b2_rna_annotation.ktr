@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>i2b2_rna_seq_annotation</name>
+    <name>i2b2_rna_annotation</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -173,7 +173,7 @@
       <schema_name/>
     </partitioning>
     <connection>TM_CZ</connection>
-    <procedure>I2B2_RNA_SEQ_ANNOTATION</procedure>
+    <procedure>I2B2_RNA_ANNOTATION</procedure>
     <lookup>
       <arg>
         <name>platformId</name>
@@ -243,7 +243,7 @@
  <leftvalue>rtn_code</leftvalue>
  <function>=</function>
  <rightvalue/>
- <value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>
+ <value><name>constant</name><type>Number</type><text>1.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>
     </condition>
     </compare>
      <cluster_schema/>

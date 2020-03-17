@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>load_all_RNA_sequencing_data</name>
+  <name>load_all_rna_data</name>
     <description/>
     <extended_description/>
     <job_version/>
@@ -62,7 +62,7 @@
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}/get_list_of_RNA_sequencing_filenames.ktr</filename>
+      <filename>${Internal.Job.Filename.Directory}/get_list_of_rna_filenames.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -94,7 +94,7 @@
       <type>JOB</type>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>${Internal.Job.Filename.Directory}/load_RNA_sequencing_expression_one_study.kjb</filename>
+      <filename>${Internal.Job.Filename.Directory}/load_rna_expression_one_study.kjb</filename>
       <jobname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -119,10 +119,10 @@
       <yloc>88</yloc>
       </entry>
     <entry>
-      <name>truncate lt_src_rna_seq_data</name>
+      <name>truncate lt_src_rna_data</name>
       <description/>
       <type>SQL</type>
-      <sql>truncate table lt_src_rna_seq_data;</sql>
+      <sql>truncate table lt_src_rna_data;</sql>
       <useVariableSubstitution>F</useVariableSubstitution>
       <sqlfromfile>F</sqlfromfile>
       <sqlfilename/>
@@ -140,7 +140,7 @@
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}/load_RNA_sequencing_sample_map_to_lt.ktr</filename>
+      <filename>${Internal.Job.Filename.Directory}/load_rna_sample_map_to_lt.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -225,7 +225,7 @@
         </field>
         <field>
           <name>${DATA_LOCATION}</name>
-          <filemask>${STUDY_ID}_src_RNA_sequencing_data.txt</filemask>
+          <filemask>${STUDY_ID}_src_rna_data.txt</filemask>
         </field>
       </fields>
       <parallel>N</parallel>
@@ -358,7 +358,7 @@
     </hop>
     <hop>
       <from>Write audit with study_id</from>
-      <to>truncate lt_src_rna_seq_data</to>
+      <to>truncate lt_src_rna_data</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -366,7 +366,7 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>truncate lt_src_rna_seq_data</from>
+      <from>truncate lt_src_rna_data</from>
       <to>Load subject-sample map</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -402,7 +402,7 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>truncate lt_src_rna_seq_data</from>
+      <from>truncate lt_src_rna_data</from>
       <to>Write To Log</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>

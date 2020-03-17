@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>load_RNA_sequencing_sample_map_to_lt</name>
+    <name>load_rna_sample_map_to_lt</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -91,7 +91,22 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Check for required fields</from><to>Uppercase study_id</to><enabled>Y</enabled> </hop>  <hop> <from>Check for required fields</from><to>Write to log</to><enabled>Y</enabled> </hop>  <hop> <from>Read subject-sample map file</from><to>Check for required fields</to><enabled>Y</enabled> </hop>  <hop> <from>Select null or matching source_cd</from><to>Set null tissue_type to Unknown</to><enabled>Y</enabled> </hop>  <hop> <from>Select null or matching source_cd</from><to>Skip other source_cds</to><enabled>Y</enabled> </hop>  <hop> <from>Set null tissue_type to Unknown</from><to>Insert to lt_src_rna_sequencing_subj_samp_map</to><enabled>Y</enabled> </hop>  <hop> <from>Uppercase study_id</from><to>Get SOURCE_CD</to><enabled>Y</enabled> </hop>  <hop> <from>Write to log</from><to>Abort</to><enabled>Y</enabled> </hop>  <hop> <from>Get SOURCE_CD</from><to>Select null or matching source_cd</to><enabled>Y</enabled> </hop>  <hop> <from>Check for required fields in sample_mapping_file</from><to>Uppercase study_id 2</to><enabled>Y</enabled> </hop>  <hop> <from>Check for required fields in sample_mapping_file</from><to>Write to log 2</to><enabled>Y</enabled> </hop>  <hop> <from>Read sample_mapping_file</from><to>Check for required fields in sample_mapping_file</to><enabled>Y</enabled> </hop>  <hop> <from>Uppercase study_id 2</from><to>Insert to lt_src_display_mapping</to><enabled>Y</enabled> </hop>  <hop> <from>Write to log 2</from><to>Abort 2</to><enabled>Y</enabled> </hop>  </order>
+    <hop> <from>Read subject-sample map file</from><to>Check for required fields</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check for required fields</from><to>Uppercase study_id</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check for required fields</from><to>Write to log</to><enabled>Y</enabled> </hop>
+    <hop> <from>Uppercase study_id</from><to>Get SOURCE_CD</to><enabled>Y</enabled> </hop>
+    <hop> <from>Get SOURCE_CD</from><to>Select null or matching source_cd</to><enabled>Y</enabled> </hop>
+    <hop> <from>Select null or matching source_cd</from><to>Set null tissue_type to Unknown</to><enabled>Y</enabled> </hop>
+    <hop> <from>Select null or matching source_cd</from><to>Skip other source_cds</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set null tissue_type to Unknown</from><to>Insert to lt_src_rna_subj_samp_map</to><enabled>Y</enabled> </hop>
+    <hop> <from>Write to log</from><to>Abort</to><enabled>Y</enabled> </hop>
+
+    <hop> <from>Read sample_mapping_file</from><to>Check for required fields in sample_mapping_file</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check for required fields in sample_mapping_file</from><to>Uppercase study_id 2</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check for required fields in sample_mapping_file</from><to>Write to log 2</to><enabled>Y</enabled> </hop>
+    <hop> <from>Uppercase study_id 2</from><to>Insert to lt_src_rna_display_mapping</to><enabled>Y</enabled> </hop>
+    <hop> <from>Write to log 2</from><to>Abort 2</to><enabled>Y</enabled> </hop>
+  </order>
   <step>
     <name>Abort</name>
     <type>Abort</type>
@@ -219,7 +234,7 @@
   </step>
 
   <step>
-    <name>Insert to lt_src_rna_sequencing_subj_samp_map</name>
+    <name>Insert to lt_src_rna_subj_samp_map</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
@@ -230,7 +245,7 @@
     </partitioning>
     <connection>TM_LZ</connection>
     <schema/>
-    <table>lt_src_rna_seq_subj_samp_map</table>
+    <table>lt_src_rna_subj_samp_map</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -284,7 +299,7 @@
         </field>
         <field>
           <column_name>SOURCE_CD</column_name>
-          <stream_name>source_cd</stream_name>
+          <stream_name>SOURCE_CD</stream_name>
         </field>
     </fields>
     <cluster_schema/>
@@ -791,7 +806,7 @@
   </step>
 
   <step>
-    <name>Insert to lt_src_display_mapping</name>
+    <name>Insert to lt_src_rna_display_mapping</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>valid_RNA_sequencing_params</name>
+    <name>valid_rna_params</name>
     <description/>
     <extended_description/>
     <trans_version/>

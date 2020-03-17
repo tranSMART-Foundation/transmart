@@ -1,7 +1,7 @@
 --
--- Name: wt_rna_seq_nodes; Type: TABLE; Schema: tm_wz; Owner: -
+-- Name: wt_rna_nodes; Type: TABLE; Schema: tm_wz; Owner: -
 --
-CREATE TABLE wt_rna_seq_nodes (
+CREATE TABLE wt_rna_nodes (
     leaf_node character varying(2000),
     category_cd character varying(2000),
     platform character varying(2000),

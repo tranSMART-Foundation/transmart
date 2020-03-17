@@ -24,7 +24,7 @@
 \i deapp/de_rbm_annotation.sql
 \i deapp/de_rbm_data_annotation_join.sql
 \i deapp/de_rc_snp_info.sql
-\i deapp/de_rnaseq_annotation.sql
+\i deapp/de_rna_annotation.sql
 \i deapp/de_sample_snp_data.sql
 \i deapp/de_saved_comparison.sql
 \i deapp/de_snp_calls_by_gsm.sql
