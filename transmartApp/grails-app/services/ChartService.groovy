@@ -259,13 +259,13 @@ class ChartService {
 	    result.findAll { n, p -> p.exists }.each { n, p ->
 
                 // Getting the concept data
-                p.conceptData =
-                    resource.getDistribution(
+                p.conceptData = resource.getDistribution(
                     new ConstraintByOmicsValue(projectionType: result.commons.omics_params.omics_projection_type,
                                                property: result.commons.omics_params.omics_property,
                                                selector: result.commons.omics_params.omics_selector),
                     concept,
-                    (p.instance == '' ? null : p.instance as Long)).collect { k, v -> v }
+                    (p.instance == '' ? null : p.instance as Long)
+		).collect { k, v -> v }
 
 		if (p.instance) {
 		    p.patientCount = i2b2HelperService.getPatientSetSize(p.instance)
@@ -273,7 +273,6 @@ class ChartService {
 		else {
                     p.patientCount = i2b2HelperService.getPatientCountForConcept(concept)
 		}
-
                 p.conceptStats = BoxAndWhiskerCalculator.calculateBoxAndWhiskerStatistics(p.conceptData)
                 conceptHistogramHandle['Subset ' + n] = p.conceptData
                 conceptPlotHandle['Subset ' + n] = p.conceptStats
