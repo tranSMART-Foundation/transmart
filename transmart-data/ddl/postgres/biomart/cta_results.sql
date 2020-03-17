@@ -7,7 +7,7 @@ CREATE TABLE cta_results (
     keyword character varying(400),
     bio_marker_id int,
     bio_marker_name character varying(200),
-    gene_id character varying(200),
+    gene_id character varying(100),
     probe_id character varying(100),
     fold_change double precision,
     preferred_pvalue double precision,

@@ -3,7 +3,7 @@
 --
 CREATE TABLE de_subject_rna_data (
     trial_source character varying(200),
-    trial_name character varying(50),
+    trial_name character varying(100),
     probeset_id character varying(200),
     assay_id int,
     patient_id int,

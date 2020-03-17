@@ -4,7 +4,7 @@
 CREATE TABLE de_snp_data_by_patient (
     snp_data_by_patient_id int NOT NULL,
     snp_dataset_id int,
-    trial_name character varying(255),
+    trial_name character varying(100),
     patient_num int,
     chrom character varying(16),
     data_by_patient_chr text,

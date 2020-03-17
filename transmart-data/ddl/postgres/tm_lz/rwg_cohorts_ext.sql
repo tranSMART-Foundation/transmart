@@ -5,7 +5,7 @@ CREATE TABLE rwg_cohorts_ext (
     study_id character varying(500),
     cohort_id character varying(500),
     disease character varying(500),
-    sample_type character varying(500),
+    sample_type character varying(100),
     treatment character varying(500),
     organism character varying(500),
     pathology character varying(500),

@@ -2,7 +2,7 @@
 -- Name: lt_src_acgh_data; Type: TABLE; Schema: tm_lz; Owner: -
 --
 CREATE TABLE lt_src_acgh_data (
-    trial_name character varying(25),
+    trial_name character varying(100),
     region_name character varying(100),
     expr_id character varying(100),
     chip character varying(50),

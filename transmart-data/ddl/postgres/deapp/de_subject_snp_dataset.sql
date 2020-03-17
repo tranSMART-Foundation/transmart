@@ -6,11 +6,11 @@ CREATE TABLE de_subject_snp_dataset (
     dataset_name character varying(255),
     concept_cd character varying(255),
     platform_name character varying(255),
-    trial_name character varying(255),
+    trial_name character varying(100),
     patient_num int,
-    timepoint character varying(255),
-    subject_id character varying(255),
-    sample_type character varying(255),
+    timepoint character varying(250),
+    subject_id character varying(100),
+    sample_type character varying(100),
     paired_dataset_id int,
     patient_gender character varying(1)
 );

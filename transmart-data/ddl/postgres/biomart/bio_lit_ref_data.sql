@@ -6,7 +6,7 @@ CREATE TABLE bio_lit_ref_data (
     etl_id character varying(50),
     component character varying(100),
     component_class character varying(250),
-    gene_id character varying(50),
+    gene_id character varying(100),
     molecule_type character varying(50),
     variant character varying(250),
     reference_type character varying(50),

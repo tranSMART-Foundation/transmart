@@ -3,7 +3,7 @@
 --
 CREATE TABLE bio_sample (
     bio_sample_id int NOT NULL,
-    bio_sample_type character varying(200) NOT NULL,
+    bio_sample_type character varying(100) NOT NULL,
     characteristics character varying(1000),
     source_code character varying(200),
     experiment_id int,

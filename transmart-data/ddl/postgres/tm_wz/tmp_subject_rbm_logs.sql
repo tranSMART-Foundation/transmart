@@ -11,7 +11,7 @@ CREATE TABLE tmp_subject_rbm_logs (
     assay_id int,
     normalized_value double precision,
     concept_cd character varying(100),
-    timepoint character varying(100),
+    timepoint character varying(250),
     value decimal(18,4),
     log_intensity double precision
 );

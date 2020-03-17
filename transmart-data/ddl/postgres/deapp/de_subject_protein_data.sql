@@ -2,18 +2,18 @@
 -- Name: de_subject_protein_data; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_subject_protein_data (
-    trial_name character varying(50),
+    trial_name character varying(100),
     protein_annotation_id int,
     component character varying(100),
     patient_id int,
     gene_symbol character varying(100),
-    gene_id character varying(200), --defined as NUMBER(10,0) in oracle
+    gene_id character varying(100), --defined as NUMBER(10,0) in oracle
     assay_id int,
     subject_id character varying(100),
     intensity double precision,
     zscore double precision,
     log_intensity double precision,
-    timepoint character varying(100),
+    timepoint character varying(250),
     partition_id int
 );
 

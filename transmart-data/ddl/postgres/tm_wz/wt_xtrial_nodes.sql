@@ -3,7 +3,7 @@
 --
 CREATE TABLE wt_xtrial_nodes (
     xtrial_cd character varying(200),
-    trial_name character varying(200),
+    trial_name character varying(100),
     leaf_name character varying(200),
     data_type character varying(10),
     concept_cd character varying(200),

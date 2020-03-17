@@ -6,8 +6,8 @@ CREATE TABLE de_rbm_annotation (
     gpl_id character varying(50) NOT NULL,
     antigen_name character varying(200) NOT NULL,
     uniprot_id character varying(50),
-    gene_symbol character varying(50),
-    gene_id character varying(200),
+    gene_symbol character varying(100),
+    gene_id character varying(100),
     uniprot_name character varying(200)
 );
 

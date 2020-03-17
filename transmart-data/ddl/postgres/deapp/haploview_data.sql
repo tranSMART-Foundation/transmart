@@ -12,7 +12,7 @@ CREATE TABLE haploview_data (
     gene character varying(50),
     release int,
     release_date timestamp,
-    trial_name character varying(50),
+    trial_name character varying(100),
     snp_data text
 );
 

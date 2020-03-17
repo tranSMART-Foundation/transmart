@@ -3,7 +3,7 @@
 --
 CREATE TABLE wt_subject_rnaseq_calcs
 (
-  --WL--trial_name character varying(200),
+  --WL--trial_name character varying(100),
   region_id int,
   mean_readcount double precision,
   median_readcount double precision,

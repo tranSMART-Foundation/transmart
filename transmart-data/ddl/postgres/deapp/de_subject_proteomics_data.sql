@@ -2,7 +2,7 @@
 -- Name: de_subject_proteomics_data; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_subject_proteomics_data (
-    trial_name character varying(15),
+    trial_name character varying(100),
     protein_annotation_id int,
     component character varying(100),
     patient_id int,

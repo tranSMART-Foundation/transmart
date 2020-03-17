@@ -6,6 +6,6 @@ CREATE TABLE lt_qpcr_mirna_annotation (
     mirna_id character varying(100),
     sn_id character varying(100),
     organism character varying(1000),
-    gpl_id character varying(20)
+    gpl_id character varying(50)
 );
 

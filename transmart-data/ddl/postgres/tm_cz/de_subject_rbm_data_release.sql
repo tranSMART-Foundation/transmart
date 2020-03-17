@@ -2,7 +2,7 @@
 -- Name: de_subject_rbm_data_release; Type: TABLE; Schema: tm_cz; Owner: -
 --
 CREATE TABLE de_subject_rbm_data_release (
-    trial_name character varying(15),
+    trial_name character varying(100),
     antigen_name character varying(100),
     n_value int,
     patient_id int,
@@ -11,7 +11,7 @@ CREATE TABLE de_subject_rbm_data_release (
     assay_id int,
     normalized_value double precision,
     concept_cd character varying(100),
-    timepoint character varying(100),
+    timepoint character varying(250),
     data_uid character varying(100),
     value int,
     log_intensity double precision,

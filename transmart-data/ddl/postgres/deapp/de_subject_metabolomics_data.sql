@@ -3,7 +3,7 @@
 --
 CREATE TABLE de_subject_metabolomics_data (
     trial_source character varying(200),
-    trial_name character varying(200),
+    trial_name character varying(100),
     metabolite_annotation_id int,
     assay_id int,
     subject_id character varying(100),

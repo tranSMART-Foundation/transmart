@@ -7,7 +7,7 @@ CREATE TABLE wt_subject_rnaseq_logs
   readcount int,
   assay_id int,
   patient_id int,
-  trial_name character varying(200),
+  trial_name character varying(100),
   log_readcount int,
   raw_readcount int
 );

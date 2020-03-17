@@ -4,8 +4,8 @@
 CREATE TABLE de_pathway_gene (
     id int NOT NULL,
     pathway_id int,
-    gene_symbol character varying(200),
-    gene_id character varying(200)
+    gene_symbol character varying(100),
+    gene_id character varying(100)
 );
 
 --

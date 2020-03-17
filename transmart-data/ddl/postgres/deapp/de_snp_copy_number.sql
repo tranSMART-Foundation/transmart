@@ -3,7 +3,7 @@
 --
 CREATE TABLE de_snp_copy_number (
     patient_num int,
-    trial_name character varying(20),
+    trial_name character varying(100),
     snp_name character varying(50),
     chrom character varying(2),
     chrom_pos int,

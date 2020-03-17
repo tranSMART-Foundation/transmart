@@ -7,7 +7,7 @@ CREATE TABLE bio_assay (
     study character varying(200),
     protocol character varying(200),
     description text,
-    sample_type character varying(200),
+    sample_type character varying(100),
     experiment_id int NOT NULL,
     test_date timestamp,
     sample_receive_date timestamp,

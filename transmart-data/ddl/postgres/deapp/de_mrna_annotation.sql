@@ -2,7 +2,7 @@
 -- Name: de_mrna_annotation; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_mrna_annotation (
-    gpl_id character varying(100),
+    gpl_id character varying(50),
     probe_id character varying(100),
     gene_symbol character varying(100),
     probeset_id int,

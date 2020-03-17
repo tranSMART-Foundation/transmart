@@ -8,6 +8,6 @@ CREATE TABLE mirna_annotation_deapp (
     mirna_id character varying(100),
     probeset_id int,
     organism character varying(200),
-    gpl_id character varying(20)
+    gpl_id character varying(50)
 );
 

@@ -13,7 +13,7 @@ CREATE SEQUENCE de_two_region_event_gene_seq
 --
 CREATE TABLE de_two_region_event_gene (
     two_region_event_gene_id int DEFAULT nextval('de_two_region_event_gene_seq'::regclass) NOT NULL,
-    gene_id character varying(50) NOT NULL,
+    gene_id character varying(100) NOT NULL,
     event_id int NOT NULL,
     effect character varying(500)
 );

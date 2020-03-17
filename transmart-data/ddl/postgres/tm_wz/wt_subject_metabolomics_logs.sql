@@ -10,8 +10,8 @@ CREATE TABLE wt_subject_metabolomics_logs (
     patient_id int,
     sample_id int,
     subject_id character varying(100),
-    trial_name character varying(50),
-    timepoint character varying(100),
+    trial_name character varying(100),
+    timepoint character varying(250),
     log_intensity double precision
 );
 

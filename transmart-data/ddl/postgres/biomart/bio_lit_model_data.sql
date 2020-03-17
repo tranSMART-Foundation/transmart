@@ -18,7 +18,7 @@ CREATE TABLE bio_lit_model_data (
     cell_line character varying(250),
     body_substance character varying(250),
     component character varying(250),
-    gene_id character varying(250)
+    gene_id character varying(100)
 );
 
 --

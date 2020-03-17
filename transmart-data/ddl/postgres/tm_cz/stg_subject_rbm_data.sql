@@ -6,7 +6,7 @@ CREATE TABLE stg_subject_rbm_data (
     antigen_name character varying(100),
     value_text character varying(100),
     value_number int,
-    timepoint character varying(100),
+    timepoint character varying(250),
     assay_id character varying(100),
     sample_id character varying(100),
     subject_id character varying(100),

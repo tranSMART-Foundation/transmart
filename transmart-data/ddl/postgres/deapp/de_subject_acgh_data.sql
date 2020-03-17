@@ -2,7 +2,7 @@
 -- Name: de_subject_acgh_data; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_subject_acgh_data (
-    trial_name character varying(50),
+    trial_name character varying(100),
     region_id int NOT NULL,
     assay_id int NOT NULL,
     patient_id int,

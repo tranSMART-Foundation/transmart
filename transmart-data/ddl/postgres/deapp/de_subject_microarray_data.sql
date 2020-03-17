@@ -2,7 +2,7 @@
 -- Name: de_subject_microarray_data; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_subject_microarray_data (
-    trial_name character varying(50),
+    trial_name character varying(100),
     probeset_id int,
     assay_id int,
     patient_id int,

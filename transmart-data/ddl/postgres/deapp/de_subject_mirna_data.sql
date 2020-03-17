@@ -3,7 +3,7 @@
 --
 CREATE TABLE de_subject_mirna_data (
     trial_source character varying(200),
-    trial_name character varying(50),
+    trial_name character varying(100),
     assay_id int NOT NULL,
     patient_id int,
     raw_intensity double precision,
