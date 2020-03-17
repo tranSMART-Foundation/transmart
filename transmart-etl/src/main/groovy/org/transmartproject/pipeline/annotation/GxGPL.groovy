@@ -28,15 +28,10 @@
 
 package org.transmartproject.pipeline.annotation
 
-import org.apache.log4j.Logger;
-import java.util.Properties;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator
-
-import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j
+import java.util.Properties;
+import org.transmartproject.pipeline.util.Util
 
 
 @Slf4j('logger')
@@ -46,8 +41,6 @@ class GxGPL {
     String annotationTable, gplFilePattern
 
     static main(args) {
-
-	PropertyConfigurator.configure("conf/log4j.properties");
 
 	Util util = new Util()
 		

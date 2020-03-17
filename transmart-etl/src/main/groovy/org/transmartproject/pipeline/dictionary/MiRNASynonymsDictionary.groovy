@@ -29,7 +29,6 @@ package org.transmartproject.pipeline.dictionary
 
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j
-import org.apache.log4j.PropertyConfigurator
 import org.transmartproject.pipeline.util.Util
 
 
@@ -50,7 +49,6 @@ class MiRNASynonymsDictionary {
 
         def synonymsFileLocation = args[0]
         def organism = args.length > 1 ? args[1] : 'HOMO SAPIENS'
-        PropertyConfigurator.configure("conf/log4j.properties");
         File synonymsFile = new File(synonymsFileLocation)
         MiRNASynonymsDictionary dict = new MiRNASynonymsDictionary()
         dict.loadData(synonymsFile, organism)

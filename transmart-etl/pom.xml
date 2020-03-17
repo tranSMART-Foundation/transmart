@@ -169,10 +169,11 @@
         </dependency>
 
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
-        </dependency>
+   	    <type>pom</type>
+	</dependency>
 
         <dependency>
             <groupId>junit</groupId>
@@ -207,10 +208,10 @@
       </pluginRepository>
       <pluginRepository>
 	<id>Maven Plugin Repository</id>
-	<url>http://repo1.maven.org/maven2</url>
+	<url>https://repo1.maven.org/maven2</url>
       </pluginRepository>
       <pluginRepository>
-	<id>Maven Plugin Repository1</id>
+	<id>Oracle Plugin Repository1</id>
 	<url>http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html</url>
       </pluginRepository>
     </pluginRepositories>
@@ -228,7 +229,7 @@
 
     <properties>
         <slf4j.version>1.7.5</slf4j.version>
-        <log4j.version>1.2.17</log4j.version>
+        <log4j.version>2.8.2</log4j.version>
         <junit.version>4.11</junit.version>
         <groovy.version>2.4.5</groovy.version>
          <opencsv.version>2.3</opencsv.version>

@@ -42,8 +42,6 @@ class AffymetrixNetAffyCNAnnotation {
 
     static main(args) {
 
-//  PropertyConfigurator.configure("conf/log4j.properties");
-
 	AffymetrixNetAffyCNAnnotation cnAnno = new AffymetrixNetAffyCNAnnotation()
 
 	if(args.size() > 0){

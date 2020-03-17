@@ -48,8 +48,6 @@ class PlinkLoader {
 	
 	public static void main(String [] args){
 
-//		PropertyConfigurator.configure("conf/log4j.properties");
-		
 		// extract parameters
 		//Properties props = Util.loadConfiguration("PLINK.properties");
 		Properties props = Util.loadConfiguration("conf/SNP.properties")

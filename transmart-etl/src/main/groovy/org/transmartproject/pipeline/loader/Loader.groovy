@@ -52,8 +52,6 @@ class Loader {
 
     static main(args) {
 
-//	PropertyConfigurator.configure("conf/log4j.properties");
-
 	println new Date()
 
 	logger.info("Start loading property file ...")

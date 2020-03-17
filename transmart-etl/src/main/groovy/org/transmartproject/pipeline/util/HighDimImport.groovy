@@ -66,8 +66,6 @@ class HighDimImport {
 
     protected static void initDB() {
 
-//      PropertyConfigurator.configure("conf/log4j.properties");
-
         logger.info("Start loading property file Common.properties ...")
         Properties props = Util.loadConfiguration("conf/Common.properties");
 

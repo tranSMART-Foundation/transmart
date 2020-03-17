@@ -28,9 +28,6 @@
 
 package org.transmartproject.pipeline.omicsoft
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator
-
 import org.transmartproject.pipeline.transmart.BioAssayAnalysis
 import org.transmartproject.pipeline.transmart.BioAssayAnalysisData
 import org.transmartproject.pipeline.transmart.BioAssayAnalysisDataTea
@@ -58,8 +55,6 @@ import groovy.util.logging.Slf4j
 class OmicsoftLoader {
 
     static main(args) {
-
-	PropertyConfigurator.configure("conf/log4j.properties");
 
 	logger.info ("Start loading ...")
 

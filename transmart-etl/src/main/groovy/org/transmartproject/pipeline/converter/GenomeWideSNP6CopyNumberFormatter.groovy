@@ -45,8 +45,6 @@ class GenomeWideSNP6CopyNumberFormatter {
 
     static main(args) {
 
-//	PropertyConfigurator.configure("conf/log4j.properties");
-
 	GenomeWideSNP6CopyNumberFormatter cnf = new GenomeWideSNP6CopyNumberFormatter()
 
 	if(args.size() > 0){

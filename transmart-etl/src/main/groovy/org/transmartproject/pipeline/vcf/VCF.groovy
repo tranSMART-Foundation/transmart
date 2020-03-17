@@ -51,8 +51,6 @@ class VCF {
 	
     static main(args) {
 
-//	PropertyConfigurator.configure("conf/log4j.properties");
-		
 	logger.info("Start loading property file VCF.properties ...")
 	Properties props = Util.loadConfiguration("conf/VCF.properties");
 

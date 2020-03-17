@@ -41,8 +41,6 @@ class CARDSFormatter {
 
     static main(args) {
 
-//	PropertyConfigurator.configure("conf/log4j.properties");
-
 	CARDSFormatter cards = new CARDSFormatter()
 
 	if(args.size() > 0){

@@ -43,8 +43,6 @@ class AgilentGPL {
 
     static main(args) {
 
-//      PropertyConfigurator.configure("conf/log4j.properties");
-
 	Util util = new Util()
 
 	Properties props = Util.loadConfiguration("conf/loader.properties")

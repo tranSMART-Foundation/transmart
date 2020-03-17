@@ -43,8 +43,6 @@ class HMDBDictionary {
 
         def fileLocation = args[0]
 
-//        PropertyConfigurator.configure("conf/log4j.properties");
-
         File inputFile = new File(fileLocation)
         HMDBDictionary dict = new HMDBDictionary()
         dict.loadData(inputFile)

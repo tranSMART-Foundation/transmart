@@ -45,8 +45,6 @@ class Ingenuity {
 
     static main(args) {
 
-//	PropertyConfigurator.configure("conf/log4j.properties");
-
 	logger.info("Start loading property file loader.properties ...")
 	Properties props = Util.loadConfiguration("conf/loader.properties");
 

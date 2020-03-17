@@ -46,7 +46,6 @@ class MeSH {
 
     static main(args) {
 
-//	PropertyConfigurator.configure("conf/log4j.properties");
 	MeSH mesh = new MeSH()
 
 	if(args.size() > 0){

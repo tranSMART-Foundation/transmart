@@ -45,8 +45,6 @@ class MiRBaseDictionary {
         def miRNAFileLocation = args[0]
         def aliasesFileLocation = args[1]
 
-//        PropertyConfigurator.configure("conf/log4j.properties")
-
         File miRNAFile = new File(miRNAFileLocation)
         File aliasesFile = new File(aliasesFileLocation)
         MiRBaseDictionary dict = new MiRBaseDictionary()

@@ -45,8 +45,6 @@ class SNPFormatter {
 
     static main(args) {
 
-//	PropertyConfigurator.configure("conf/log4j.properties");
-
 	logger.info(new Date())
 	logger.info("Start processing SNP data ...")
 

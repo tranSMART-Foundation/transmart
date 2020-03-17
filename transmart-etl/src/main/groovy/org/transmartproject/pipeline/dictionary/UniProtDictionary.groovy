@@ -42,7 +42,6 @@ class UniProtDictionary {
 
         def fileLocation = args[0]
 
-//        PropertyConfigurator.configure("conf/log4j.properties")
         File file = new File(fileLocation)
         UniProtDictionary dict = new UniProtDictionary()
         dict.loadData(file)

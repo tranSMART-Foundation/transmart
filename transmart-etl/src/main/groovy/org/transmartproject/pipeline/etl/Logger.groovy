@@ -28,8 +28,6 @@
 package org.transmartproject.pipeline.etl
 
 
-import org.apache.log4j.PropertyConfigurator;
-
 enum LogType { MESSAGE, WARNING, ERROR, DEBUG, PROGRESS }
 
 class Logger {

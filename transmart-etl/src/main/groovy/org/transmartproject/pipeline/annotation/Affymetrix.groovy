@@ -33,9 +33,6 @@ import java.util.Properties;
 import org.transmartproject.pipeline.util.Util
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator
-
 
 @Slf4j('logger')
 class Affymetrix {
@@ -44,8 +41,6 @@ class Affymetrix {
     String annotationTable
 
     static main(args) {
-
-	PropertyConfigurator.configure("conf/log4j.properties");
 
 	Util util = new Util()
 	Affymetrix affy = new Affymetrix()

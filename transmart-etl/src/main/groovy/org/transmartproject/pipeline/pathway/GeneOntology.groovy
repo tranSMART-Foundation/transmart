@@ -49,8 +49,6 @@ class GeneOntology {
 
     static main(args) {
 
-//	PropertyConfigurator.configure("conf/log4j.properties");
-
 	logger.info("Start loading property file ...")
 	props = Util.loadConfiguration("conf/Pathway.properties");
 
