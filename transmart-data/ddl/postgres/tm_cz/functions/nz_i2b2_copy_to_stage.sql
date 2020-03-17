@@ -1,7 +1,7 @@
 --
 -- Name: nz_i2b2_copy_to_stage(character varying, character varying, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION nz_i2b2_copy_to_stage(character varying, character varying, bigint) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.nz_i2b2_copy_to_stage(character varying, character varying, bigint) RETURNS integer
     LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
 AS $$
     /*************************************************************************

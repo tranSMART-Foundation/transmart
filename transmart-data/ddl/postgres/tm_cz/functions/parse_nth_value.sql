@@ -1,7 +1,7 @@
 --
 -- Name: parse_nth_value(character varying, numeric, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION parse_nth_value(pvalue character varying, location numeric, delimiter character varying) RETURNS character varying
+CREATE OR REPLACE FUNCTION tm_cz.parse_nth_value(pvalue character varying, location numeric, delimiter character varying) RETURNS character varying
     LANGUAGE plpgsql
 AS $$
     /*************************************************************************

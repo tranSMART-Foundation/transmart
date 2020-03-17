@@ -1,7 +1,7 @@
 --
 -- Name: dropsyn(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION dropsyn() RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.dropsyn() RETURNS void
     LANGUAGE plpgsql
 AS $$
 

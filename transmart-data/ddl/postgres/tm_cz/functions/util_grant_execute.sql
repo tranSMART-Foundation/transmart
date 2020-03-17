@@ -1,7 +1,7 @@
 --
 -- Name: util_grant_execute(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION util_grant_execute(v_to_zone character varying DEFAULT NULL::character varying, v_type character varying DEFAULT 'TABLES,VIEWS'::character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.util_grant_execute(v_to_zone character varying DEFAULT NULL::character varying, v_type character varying DEFAULT 'TABLES,VIEWS'::character varying) RETURNS void
     LANGUAGE plpgsql
     AS $$
 DECLARE

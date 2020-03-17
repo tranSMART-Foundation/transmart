@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_proteomics_annot(numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_proteomics_annot(currentjobid numeric DEFAULT NULL::numeric) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_proteomics_annot(currentjobid numeric DEFAULT NULL::numeric) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -45,7 +45,7 @@ begin
 
     --	get  id_ref  from external table
     
-    select distinct gpl_id into gplId from lt_protein_annotation ;
+    select distinct gpl_id into gplId from tm_lz.lt_protein_annotation ;
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
@@ -84,7 +84,7 @@ begin
 			,d.uniprot_id
 			,p.bio_marker_id
 			,coalesce(d.organism,'Homo sapiens')
-	  from lt_protein_annotation d
+	  from tm_lz.lt_protein_annotation d
 	       ,biomart.bio_marker p
 	 where d.gpl_id = gplId
            and p.primary_external_id = d.uniprot_id 
@@ -103,9 +103,9 @@ begin
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing uniprot_id in de_protein_annotation',rowCt,stepCt,'Done');
 
     begin
-        update DEAPP.DE_PROTEIN_ANNOTATION set uniprot_name = (select bio_marker_name
-								 from BIOMART.BIO_MARKER
-								WHERE biomart.bio_marker.primary_external_id = deapp.de_protein_annotation.uniprot_id)
+        update deapp.de_protein_annotation set uniprot_name = (select bio_marker_name
+								 from biomart.bio_marker
+								where biomart.bio_marker.primary_external_id = deapp.de_protein_annotation.uniprot_id)
          where gpl_id = gplId;
     exception
 	when others then

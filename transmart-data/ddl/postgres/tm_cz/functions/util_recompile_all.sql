@@ -1,7 +1,7 @@
 --
 -- Name: util_recompile_all(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION util_recompile_all() RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.util_recompile_all() RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

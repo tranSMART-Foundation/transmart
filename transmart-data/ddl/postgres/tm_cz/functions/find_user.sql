@@ -1,7 +1,7 @@
 --
 -- Name: find_user(character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION find_user(user_type character varying) RETURNS character varying
+CREATE OR REPLACE FUNCTION tm_cz.find_user(user_type character varying) RETURNS character varying
     LANGUAGE plpgsql
 AS $$
     /*************************************************************************

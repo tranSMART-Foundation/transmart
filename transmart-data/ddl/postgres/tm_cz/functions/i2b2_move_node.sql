@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_move_node(character varying, character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_move_node(old_path character varying, new_path character varying, topnode character varying, currentjobid numeric DEFAULT 0) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_move_node(old_path character varying, new_path character varying, topnode character varying, currentjobid numeric DEFAULT 0) RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare
@@ -57,13 +57,13 @@ begin
     PERFORM parse_nth_value(topNode, 2, '\') into root_node ;
     
     select c_hlevel into root_level
-      from table_access
+      from i2b2metadata.table_access
      where c_name = root_node;
     
     if old_path != ''  or old_path != '%' or new_path != ''  or new_path != '%'
     then 
 	--concept dimension
-	update concept_dimension
+	update i2b2demodata.concept_dimension
 	set concept_path = replace(concept_path, old_path, new_path)
 	where concept_path like old_path || '%';
 	stepCt := stepCt + 1;
@@ -71,7 +71,7 @@ begin
 	commit;
 	
 	--i2b2
-	update i2b2
+	update i2b2metadata.i2b2
 	   set c_fullname = replace(c_fullname, old_path, new_path)
 	 where c_fullname like old_path || '%';
 	stepCt := stepCt + 1;
@@ -79,7 +79,7 @@ begin
 	commit;
 	
 	--update level data
-	update i2b2
+	update i2b2metadata.i2b2
 	   set c_hlevel = (length(c_fullname) - coalesce(length(replace(c_fullname, '\')),0)) / length('\') - 2 + root_level
 	 where c_fullname like new_path || '%';
 	stepCt := stepCt + 1;
@@ -87,7 +87,7 @@ begin
 	commit;
 	
 	--Update tooltip and dimcode
-	update i2b2
+	update i2b2metadata.i2b2
 	   set c_dimcode = c_fullname,
 	       c_tooltip = c_fullname
 	 where c_fullname like new_path || '%';

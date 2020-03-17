@@ -1,7 +1,7 @@
 --
 -- Name: util_truncate_table(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION util_truncate_table(v_tabname character varying DEFAULT NULL::character varying, v_dummyarg character varying DEFAULT 'Y'::character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.util_truncate_table(v_tabname character varying DEFAULT NULL::character varying, v_dummyarg character varying DEFAULT 'Y'::character varying) RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

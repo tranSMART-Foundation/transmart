@@ -1,7 +1,7 @@
 --
 -- Name: cz_start_audit(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cz_start_audit(jobname character varying, databasename character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.cz_start_audit(jobname character varying, databasename character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -55,7 +55,7 @@ $$;
 --
 -- Name: cz_start_audit(character varying, character varying, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cz_start_audit(jobname character varying, databasename character varying, jobid bigint) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.cz_start_audit(jobname character varying, databasename character varying, jobid bigint) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************

@@ -1,7 +1,7 @@
 --
 -- Name: cz_error_handler(numeric, character varying, character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cz_error_handler(jobid numeric, procedurename character varying, errornumber character varying, errormessage character varying) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.cz_error_handler(jobid numeric, procedurename character varying, errornumber character varying, errormessage character varying) RETURNS integer
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************

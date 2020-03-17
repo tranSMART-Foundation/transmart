@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_delete_all_nodes(character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_delete_all_nodes(path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_delete_all_nodes(path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************

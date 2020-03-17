@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_truncate_release_tables(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_truncate_release_tables() RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_truncate_release_tables() RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

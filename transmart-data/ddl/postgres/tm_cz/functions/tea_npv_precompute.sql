@@ -1,7 +1,7 @@
 --
 -- Name: tea_npv_precompute(double precision, double precision, double precision); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION tea_npv_precompute(foldchg double precision, mu double precision, sigma double precision) RETURNS double precision
+CREATE OR REPLACE FUNCTION tm_cz.tea_npv_precompute(foldchg double precision, mu double precision, sigma double precision) RETURNS double precision
     LANGUAGE plpgsql IMMUTABLE
 AS $$
     declare

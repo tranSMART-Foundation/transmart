@@ -1,7 +1,7 @@
 --
 -- Name: bio_asy_analysis_pltfm_uid(character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION bio_asy_analysis_pltfm_uid(platform_name character varying) RETURNS character varying
+CREATE OR REPLACE FUNCTION tm_cz.bio_asy_analysis_pltfm_uid(platform_name character varying) RETURNS character varying
     LANGUAGE plpgsql
 AS $$
 begin

@@ -1,7 +1,7 @@
 --
 -- Name: rename_program(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION rename_program(oldprogramname character varying, newprogramname character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.rename_program(oldprogramname character varying, newprogramname character varying) RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

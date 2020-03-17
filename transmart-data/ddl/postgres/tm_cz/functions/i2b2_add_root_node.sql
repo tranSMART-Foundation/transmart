@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_add_root_node(character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_add_root_node(root_node character varying, currentjobid numeric) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_add_root_node(root_node character varying, currentjobid numeric) RETURNS integer
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************

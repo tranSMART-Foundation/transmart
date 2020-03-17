@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_create_security_inc_trial(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_create_security_inc_trial(trial_id character varying, secured_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_security_inc_trial(trial_id character varying, secured_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -114,7 +114,7 @@ begin
 	       ,1
 	  from i2b2demodata.patient_dimension
 	 where sourcesystem_cd like TrialID || ':%'                 -- inc-change keep SECURITY concepts
-           and patient_num not in (select distinct patient_num from observation_fact where concept_cd='SECURITY'  )
+           and patient_num not in (select distinct patient_num from i2b2demodata.observation_fact where concept_cd='SECURITY'  )
                ;
 	get diagnostics rowCt := ROW_COUNT;	
     exception
@@ -163,7 +163,7 @@ begin
 	  from i2b2demodata.patient_dimension
 	 where sourcesystem_cd like TrialID || ':%'
             -- inc-change new patients only
-	   and patient_num not in (select patient_num from patient_trial) ;
+	   and patient_num not in (select patient_num from i2b2demodata.patient_trial) ;
 	get diagnostics rowCt := ROW_COUNT;	
     exception
 	when others then

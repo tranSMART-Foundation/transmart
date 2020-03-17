@@ -1,7 +1,7 @@
 --
 -- Name: cz_end_audit(numeric, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cz_end_audit(jobid numeric, jobstatus character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.cz_end_audit(jobid numeric, jobstatus character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     declare

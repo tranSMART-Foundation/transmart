@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_rbm_annotation(bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_rbm_annotation(currentjobid bigint DEFAULT NULL::bigint) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_rbm_annotation(currentjobid bigint DEFAULT NULL::bigint) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     DECLARE
@@ -45,13 +45,13 @@ BEGIN
 
     --	get GPL id from external table
     
-    select distinct gpl_id into gplId from TM_LZ.LT_SRC_RBM_ANNOTATION;
+    select distinct gpl_id into gplId from tm_lz.lt_src_rbm_annotation;
     
     
     --	delete any existing data from antigen_deapp
     
     begin
-	delete from antigen_deapp
+	delete from tm_cz.antigen_deapp
 	 where platform = gplId;
 	get diagnostics rowCt := ROW_COUNT;	
     exception
@@ -71,7 +71,7 @@ BEGIN
     
     --	delete any existing data from annotation_deapp
     begin
-	delete from annotation_deapp
+	delete from tm_cz.annotation_deapp
 	 where gpl_id = gplId;
 	get diagnostics rowCt := ROW_COUNT;	
     exception
@@ -90,7 +90,7 @@ BEGIN
 
     --	delete any existing data from deapp.de_mrna_annotation
     begin
-	delete from deapp.DE_RBM_ANNOTATION
+	delete from deapp.de_rbm_annotation
 	 where gpl_id = gplId;
 	get diagnostics rowCt := ROW_COUNT;	
     exception
@@ -109,14 +109,14 @@ BEGIN
     
     --	insert any new probesets into probeset_deapp
     begin
-	insert into antigen_deapp 
+	insert into tm_cz.antigen_deapp 
 		    (antigen_name
 		    ,platform)
 	select distinct antigen_name
 			,gpl_id
-	  from TM_LZ.LT_SRC_RBM_ANNOTATION t
+	  from tm_lz.lt_src_rbm_annotation t
 	 where not exists
-	       (select 1 from antigen_deapp x
+	       (select 1 from tm_cz.antigen_deapp x
 		 where t.gpl_id = x.platform
 		   and t.antigen_name = x.antigen_name
 	       );
@@ -137,7 +137,7 @@ BEGIN
     
     --	insert data into annotation_deapp
     begin
-	insert into annotation_deapp
+	insert into tm_cz.annotation_deapp
 		    (gpl_id
 		    ,probe_id
 		    ,gene_symbol
@@ -150,8 +150,8 @@ BEGIN
 			,d.gene_id
 			,p.antigen_id
 			,'Homo sapiens'
-	  from TM_LZ.LT_SRC_RBM_ANNOTATION d
-	       ,antigen_deapp p
+	  from tm_lz.lt_src_rbm_annotation d
+	       ,tm_cz.antigen_deapp p
 	 where d.antigen_name = p.antigen_name
 	   and d.gpl_id = p.platform
 	   and ((d.gene_id IS NOT NULL AND d.gene_id::text <> '') or (d.gene_symbol IS NOT NULL AND d.gene_symbol::text <> '')) ;
@@ -172,7 +172,7 @@ BEGIN
     
     --	insert data into deapp.de_rbm_annotation
     begin
-	insert into DEAPP.DE_RBM_ANNOTATION
+	insert into deapp.de_rbm_annotation
 		    (gpl_id
 		    ,id
 		    ,antigen_name
@@ -186,8 +186,8 @@ BEGIN
 			 ,d.uniprotid
 			 ,d.gene_symbol
 			 ,CASE WHEN d.gene_id = null THEN null ELSE d.gene_id::numeric END as gene_id
-	  from TM_LZ.LT_SRC_RBM_ANNOTATION d
-	       ,antigen_deapp p --check
+	  from tm_lz.lt_src_rbm_annotation d
+	       ,tm_cz.antigen_deapp p --check
 	 where d.antigen_name = p.antigen_name
 	   and d.gpl_id = p.platform;
 	get diagnostics rowCt := ROW_COUNT;
@@ -207,7 +207,7 @@ BEGIN
     
     --	update gene_id if null
     begin
-	update DEAPP.DE_RBM_ANNOTATION t
+	update deapp.de_rbm_annotation t
 	   set gene_id=(select min(b.primary_external_id)::numeric as gene_id
 			  from biomart.bio_marker b
 			 where t.gene_symbol = b.bio_marker_name
@@ -238,7 +238,7 @@ BEGIN
     
     --	update gene_symbol if null
     begin
-	update DEAPP.DE_RBM_ANNOTATION t 
+	update deapp.de_rbm_annotation t 
 	   set gene_symbol=(select min(b.bio_marker_name) as gene_symbol
 			      from biomart.bio_marker b
 			     where t.gene_id::varchar = b.primary_external_id
@@ -273,7 +273,7 @@ BEGIN
 		    (feature_group_name
 		    ,feature_group_type)
 	select distinct t.uniprotid, 'PROTEIN'
-	  from tm_lz.LT_SRC_RBM_ANNOTATION t
+	  from tm_lz.lt_src_rbm_annotation t
 	 where not exists
 	       (select 1 from biomart.bio_assay_feature_group x
 		 where t.uniprotid = x.feature_group_name)
@@ -300,7 +300,7 @@ BEGIN
 		    ,bio_marker_id)
 	select distinct fg.bio_assay_feature_group_id
 			,coalesce(bgs.bio_marker_id,bgi.bio_marker_id)
-	  from TM_LZ.LT_SRC_RBM_ANNOTATION t
+	  from tm_lz.lt_src_rbm_annotation t
 		   INNER JOIN biomart.bio_assay_feature_group fg on t.uniprotid = fg.feature_group_name
 		   LEFT OUTER JOIN biomart.bio_marker bgs on t.gene_symbol = bgs.bio_marker_name
 		   LEFT OUTER JOIN biomart.bio_marker bgi on t.gene_id::varchar = bgi.primary_external_id

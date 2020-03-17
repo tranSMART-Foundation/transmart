@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_mirna_annot_deapp(numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_mirna_annot_deapp(currentjobid numeric DEFAULT NULL::numeric) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_mirna_annot_deapp(currentjobid numeric DEFAULT NULL::numeric) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -42,7 +42,7 @@ begin
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_MIRNA_annot_deapp',0,stepCt,'Done');
 
     begin
-	delete from mirna_annotation_deapp
+	delete from tm_cz.mirna_annotation_deapp
 	 where id_ref in
 	       (select distinct id_ref
 		  from tm_lz.lt_qpcr_mirna_annotation)
@@ -80,7 +80,7 @@ begin
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_qpcr_mirna_annotation',rowCt,stepCt,'Done');
 
     begin
-	insert into mirna_probeset_deapp
+	insert into tm_cz.mirna_probeset_deapp
 		    (probeset
 		    ,organism
 		    ,platform)
@@ -89,7 +89,7 @@ begin
 			,gpl_id
 	  from tm_lz.lt_qpcr_mirna_annotation t
 	 where not exists
-	       (select 1 from mirna_probeset_deapp x
+	       (select 1 from tm_cz.mirna_probeset_deapp x
 		 where 
                      t.id_ref = x.probeset
                  and t.gpl_id = x.platform
@@ -114,7 +114,7 @@ begin
     --	update organism for existing probesets in mirna_probeset_deapp
 
     begin
-	update mirna_probeset_deapp p
+	update tm_cz.mirna_probeset_deapp p
 	   set organism=(select distinct t.organism
 			   from tm_lz.lt_qpcr_mirna_annotation t
 			  where p.probeset = t.id_ref
@@ -139,7 +139,7 @@ begin
     
     --	insert data into mirna_annotation_deapp
     begin
-	insert into mirna_annotation_deapp
+	insert into tm_cz.mirna_annotation_deapp
 		    (id_ref
 		    ,probe_id
 		    ,mirna_symbol
@@ -155,7 +155,7 @@ begin
 			,coalesce(d.organism,'Homo sapiens')
 			,d.gpl_id
 	  from tm_lz.lt_qpcr_mirna_annotation d
-	       ,mirna_probeset_deapp p
+	       ,tm_cz.mirna_probeset_deapp p
 	 where d.id_ref = p.probeset
 	   and p.platform = d.gpl_id
 	   and coalesce(d.organism,'Homo sapiens') = coalesce(p.organism,'Homo sapiens')
@@ -192,7 +192,7 @@ begin
 			,coalesce(d.organism,'Homo sapiens')
 			,d.gpl_id
 	  from tm_lz.lt_qpcr_mirna_annotation d
-	       ,mirna_probeset_deapp p
+	       ,tm_cz.mirna_probeset_deapp p
 	 where d.id_ref = p.probeset
 	   and p.platform = d.gpl_id
 	   and coalesce(d.organism,'Homo sapiens') = coalesce(p.organism,'Homo sapiens');	  

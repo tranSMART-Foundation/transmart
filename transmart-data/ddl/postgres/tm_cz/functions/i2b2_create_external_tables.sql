@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_create_external_tables(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_create_external_tables(tpmextfn character varying, catgextfn character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_external_tables(tpmextfn character varying, catgextfn character varying) RETURNS void
     LANGUAGE plpgsql
 AS $$
 
@@ -18,7 +18,7 @@ AS $$
 
 begin
 
-    --  recreate CATEGORY_EXTRNL tabls with CATGExtFN parameter (filename in external file system)
+    --  recreate CATEGORY_EXTRNL tables with CATGExtFN parameter (filename in external file system)
 
     sqltxt:='drop table i2b2_lz.category_extrnl';
 

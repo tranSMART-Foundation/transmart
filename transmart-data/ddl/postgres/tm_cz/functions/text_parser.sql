@@ -1,7 +1,7 @@
 --
 -- Name: text_parser(text); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION text_parser(text_to_parse text) RETURNS text[]
+CREATE OR REPLACE FUNCTION tm_cz.text_parser(text_to_parse text) RETURNS text[]
     LANGUAGE plpgsql
 AS $$
     declare

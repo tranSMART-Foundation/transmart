@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_mrna_index_maint(text, text, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_mrna_index_maint(run_type text DEFAULT 'DROP'::text, tablespace_name text DEFAULT 'INDX'::text, currentjobid bigint DEFAULT NULL::bigint) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_mrna_index_maint(run_type text DEFAULT 'DROP'::text, tablespace_name text DEFAULT 'INDX'::text, currentjobid bigint DEFAULT NULL::bigint) RETURNS void
     LANGUAGE plpgsql
 AS $$
 
@@ -142,9 +142,9 @@ begin
 	select count(*) 
 	  into idxExists
 	  from pg_indexes
-	 where tablename = 'DE_SUBJECT_MICROARRAY_DATA'
-	   and indexname = 'DE_MICROARRAY_DATA_IDX5'
-	   and owner = 'DEAPP';
+	 where tablename = 'de_subject_microarray_data'
+	   and indexname = 'de_microarray_data_idx5'
+	   and owner = 'deapp';
 	
 	if idxExists = 1 then
 	    EXECUTE('drop index deapp.de_microarray_data_idx5');

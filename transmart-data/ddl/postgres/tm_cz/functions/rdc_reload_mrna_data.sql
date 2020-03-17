@@ -1,7 +1,7 @@
 --
 -- Name: rdc_reload_mrna_data(text, text, text, bigint, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION rdc_reload_mrna_data(trial_id text, data_type text DEFAULT 'R'::text, source_cd text DEFAULT 'STD'::text, log_base bigint DEFAULT 2, currentjobid bigint DEFAULT NULL::bigint) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.rdc_reload_mrna_data(trial_id text, data_type text DEFAULT 'R'::text, source_cd text DEFAULT 'STD'::text, log_base numeric DEFAULT 2, currentjobid bigint DEFAULT NULL::bigint) RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare
@@ -27,7 +27,7 @@ AS $$
     partExists 		bigint;
     sampleCt		bigint;
     idxExists 		bigint;
-    logBase		bigint;
+    logBase		numeric;
     pCount		integer;
     sCount		integer;
     tablespaceName	varchar(200);

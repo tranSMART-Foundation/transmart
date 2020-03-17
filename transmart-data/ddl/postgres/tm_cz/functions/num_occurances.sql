@@ -1,7 +1,7 @@
 --
 -- Name: num_occurances(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION num_occurances(input_str character varying, search_str character varying) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.num_occurances(input_str character varying, search_str character varying) RETURNS integer
     LANGUAGE plpgsql
 AS $$
     declare

@@ -4,7 +4,7 @@
 
 SET search_path = tm_cz, pg_catalog;
 
-CREATE OR REPLACE FUNCTION i2b2_load_metabolomics_annot(currentjobid numeric DEFAULT NULL::numeric) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_metabolomics_annot(currentjobid numeric DEFAULT NULL::numeric) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************

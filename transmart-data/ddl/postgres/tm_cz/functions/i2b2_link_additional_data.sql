@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_link_additional_data(bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_link_additional_data(bigint) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_link_additional_data(bigint) RETURNS integer
     LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
 AS $$
     /*************************************************************************

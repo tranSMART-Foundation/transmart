@@ -1,7 +1,7 @@
 --
 -- Name: util_make_object_list(character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION util_make_object_list(v_whattype character varying DEFAULT NULL::character varying, OUT v_things character varying) RETURNS character varying
+CREATE OR REPLACE FUNCTION tm_cz.util_make_object_list(v_whattype character varying DEFAULT NULL::character varying, OUT v_things character varying) RETURNS character varying
     LANGUAGE plpgsql
 AS $$
     declare

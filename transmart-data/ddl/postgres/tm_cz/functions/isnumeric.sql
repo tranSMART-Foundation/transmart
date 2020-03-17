@@ -1,7 +1,7 @@
 --
 -- Name: isnumeric(character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION isnumeric(p_string character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.isnumeric(p_string character varying) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare

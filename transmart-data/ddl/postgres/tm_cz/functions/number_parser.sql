@@ -1,7 +1,7 @@
 --
 -- Name: number_parser(character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION number_parser(numbers_to_parse character varying) RETURNS numeric[]
+CREATE OR REPLACE FUNCTION tm_cz.number_parser(numbers_to_parse character varying) RETURNS numeric[]
     LANGUAGE plpgsql
 AS $$
     declare

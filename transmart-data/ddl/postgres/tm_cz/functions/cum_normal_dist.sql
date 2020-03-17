@@ -1,7 +1,7 @@
 --
 -- Name: cum_normal_dist(double precision, double precision, double precision); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cum_normal_dist(foldchg double precision, mu double precision, sigma double precision) RETURNS double precision
+CREATE OR REPLACE FUNCTION tm_cz.cum_normal_dist(foldchg double precision, mu double precision, sigma double precision) RETURNS double precision
     LANGUAGE plpgsql IMMUTABLE
 AS $$
     declare

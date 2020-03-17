@@ -1,7 +1,7 @@
 --
 -- Name: upgrade_mrna_data(bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION upgrade_mrna_data(currentjobid bigint DEFAULT 0::bigint) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.upgrade_mrna_data(currentjobid bigint DEFAULT 0::bigint) RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

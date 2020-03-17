@@ -1,7 +1,7 @@
 --
 -- Name: cz_info_handler(numeric, numeric, numeric, character varying, character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cz_info_handler(jobid numeric, messageid numeric, messageline numeric, messageprocedure character varying, infomessage character varying, stepnumber character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.cz_info_handler(jobid numeric, messageid numeric, messageline numeric, messageprocedure character varying, infomessage character varying, stepnumber character varying) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare 

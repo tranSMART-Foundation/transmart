@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_sample_categories(bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_sample_categories(currentjobid bigint DEFAULT NULL::bigint) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_sample_categories(currentjobid bigint DEFAULT NULL::bigint) RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare
@@ -41,8 +41,8 @@ begin
     
     --	delete any data for study in sample_categories_extrnl from lz_src_sample_categories
     
-    delete from lz_src_sample_categories
-     where trial_cd in (select distinct trial_cd from lt_src_sample_categories);
+    delete from tm_lz.lz_src_sample_categories
+     where trial_cd in (select distinct trial_cd from tm_lz.lt_src_sample_categories);
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
@@ -54,7 +54,7 @@ begin
 	--	format of sourcesystem_cd:  trial:S:[site:]subject_cd:sample_cd
 	--	if no sample_cd specified, then the patient_num of the trial:[site]:subject_cd should have already been created
 	
-	insert into patient_dimension
+	insert into i2b2demodata.patient_dimension
 	( patient_num,
 	sex_cd,
 	age_in_years_num,
@@ -94,7 +94,7 @@ begin
 
     --	Load data into lz_src_sample_categories table, joins to make sure study/trial exists and there's an entry in the patient_dimension
     
-    insert into lz_src_sample_categories
+    insert into tm_lz.lz_src_sample_categories
 		(trial_cd
 		,site_cd
 		,subject_cd
@@ -108,10 +108,10 @@ begin
 		    ,s.sample_cd
 		    ,replace(s.category_cd,'"',null)
 		    ,replace(s.category_value,'"',null)
-      from lt_src_sample_categories s
+      from tm_lz.lt_src_sample_categories s
      where replace(s.category_cd,'"',null) is not null
        and replace(s.category_value,'"',null) is not null
-       and s.trial_cd in (select distinct x.sourcesystem_cd from i2b2 x)
+       and s.trial_cd in (select distinct x.sourcesystem_cd from i2b2metadata.i2b2 x)
 	   ;
     
     stepCt := stepCt + 1;

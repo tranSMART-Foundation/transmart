@@ -1,7 +1,7 @@
 --
 -- Name: drop_table(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION drop_table(tabowner character varying, tabname character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.drop_table(tabowner character varying, tabname character varying) RETURNS void
     LANGUAGE plpgsql
 AS $$
     DECLARE

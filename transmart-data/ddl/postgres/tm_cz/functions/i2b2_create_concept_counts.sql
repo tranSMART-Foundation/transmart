@@ -1,8 +1,7 @@
-SET search_path = tm_cz, pg_catalog;
 --
 -- Name: i2b2_create_concept_counts(character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_create_concept_counts(path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_concept_counts(path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -109,11 +108,11 @@ begin
 	   set c_visualattributes = substr(c_visualattributes,1,1) || 'H' || substr(c_visualattributes,3,1)
 	 where c_fullname like path || '%' escape '`'
 	       and (not exists
-		    (select 1 from concept_counts nc
+		    (select 1 from i2b2demodata.concept_counts nc
 		      where c_fullname = nc.concept_path)
 		      or
 		      exists
-		      (select 1 from concept_counts zc
+		      (select 1 from i2b2demodata.concept_counts zc
 			where c_fullname = zc.concept_path
 			  and zc.patient_count = 0)
 	       )

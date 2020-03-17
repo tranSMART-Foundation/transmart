@@ -1,7 +1,7 @@
 --
 -- Name: jnj_init_cap(text); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION jnj_init_cap(text_to_parse text) RETURNS character varying
+CREATE OR REPLACE FUNCTION tm_cz.jnj_init_cap(text_to_parse text) RETURNS character varying
     LANGUAGE plpgsql
 AS $$
     declare

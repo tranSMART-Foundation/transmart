@@ -1,7 +1,7 @@
 --
 -- Name: rename_study(character varying, character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION rename_study(programname character varying, oldtitle character varying, newtitle character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.rename_study(programname character varying, oldtitle character varying, newtitle character varying) RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

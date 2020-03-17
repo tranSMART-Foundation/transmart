@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_delete_1_node(character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_delete_1_node(path character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_delete_1_node(path character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************

@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_chrom_region(character varying, character varying, character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_chrom_region(platform_title character varying DEFAULT ''::character varying,
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_chrom_region(platform_title character varying DEFAULT ''::character varying,
                                        data_type      character varying DEFAULT 'ACGH'::character varying,  -- valid values are ACGH and RNASEQ
                                        genome_release character varying DEFAULT ''::character varying,
                                        gene_annotation_id character varying DEFAULT ''::character varying,

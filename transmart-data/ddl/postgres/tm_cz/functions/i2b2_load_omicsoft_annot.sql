@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_omicsoft_annot(bigint, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_omicsoft_annot(analysis_id bigint, i_job_id bigint DEFAULT NULL::bigint, OUT rtn_code bigint) RETURNS bigint
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_omicsoft_annot(analysis_id bigint, i_job_id bigint DEFAULT NULL::bigint, OUT rtn_code bigint) RETURNS bigint
     LANGUAGE plpgsql
 AS $$
     declare
@@ -67,7 +67,7 @@ begin
 	probe_id
 	,'PROBESET'
       from tm_lz.lt_src_omicsoft_annot lz
-     where probe_id not in (select feature_group_name from BIOMART.bio_assay_feature_group);
+     where probe_id not in (select feature_group_name from biomart.bio_assay_feature_group);
     
     v_row_count := SQL%ROWCOUNT;
     
@@ -90,7 +90,7 @@ begin
 	,bm.bio_marker_id -- analysis
 	,'BAAD'
       from biomart.bio_assay_feature_group bafg
-	       join TM_LZ.lt_src_omicsoft_annot lz
+	       join tm_lz.lt_src_omicsoft_annot lz
 		       on lz.probe_id = bafg.feature_group_name
 	       join biomart.bio_marker bm
 		       on bm.bio_marker_name = lz.gene_symbol

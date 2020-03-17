@@ -1,7 +1,7 @@
 --
 -- Name: create_synonyms(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION create_synonyms(fromdb character varying, todb character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.create_synonyms(fromdb character varying, todb character varying) RETURNS void
     LANGUAGE plpgsql
 AS $$
     -- Attention:

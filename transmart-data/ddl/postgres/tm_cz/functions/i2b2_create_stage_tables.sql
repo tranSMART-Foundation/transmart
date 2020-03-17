@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_create_stage_tables(bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_create_stage_tables(bigint) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_stage_tables(bigint) RETURNS integer
     LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -19,6 +19,12 @@ AS $$
      * See the License for the specific language governing permissions and
      * limitations under the License.
      ******************************************************************/
+
+     /****************************************************************************
+     *
+     * References to _v_table so it is likely this was code for a Netezza project
+     *
+     *****************************************************************************/
 
     declare
 
@@ -103,7 +109,7 @@ begin
 
     end loop;
     
-    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End i2b2_create_release_tablese',0,stepCt,'Done');
+    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End i2b2_create_release_tables',0,stepCt,'Done');
     stepCt := stepCt + 1;
     
     ---Cleanup OVERALL JOB if this proc is being run standalone

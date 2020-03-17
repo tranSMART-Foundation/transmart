@@ -6,7 +6,7 @@
 -- Copyright 2000-2013 Gilles DAROLD. All rights reserved.
 -- DATASOURCE: dbi:Oracle:host=mydb.mydom.fr;sid=SIDNAME
 
-CREATE OR REPLACE FUNCTION rwg_load_heat_map_results (
+CREATE OR REPLACE FUNCTION tm_cz.rwg_load_heat_map_results (
   In_Study_Id In text
   ,currentJobID bigint DEFAULT null
 )  RETURNS bigint AS $body$

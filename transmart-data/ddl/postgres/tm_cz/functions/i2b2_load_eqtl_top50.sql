@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_eqtl_top50(numeric, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_eqtl_top50(i_bio_assay_analysis_id numeric, currentjobid numeric DEFAULT 0) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_eqtl_top50(i_bio_assay_analysis_id numeric, currentjobid numeric DEFAULT 0) RETURNS integer
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************

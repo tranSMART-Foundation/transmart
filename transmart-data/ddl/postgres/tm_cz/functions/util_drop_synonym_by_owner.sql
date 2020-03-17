@@ -1,7 +1,7 @@
 --
 -- Name: util_drop_synonym_by_owner(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION util_drop_synonym_by_owner(v_owner character varying, v_dropifempty character varying DEFAULT 'Y'::character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.util_drop_synonym_by_owner(v_owner character varying, v_dropifempty character varying DEFAULT 'Y'::character varying) RETURNS void
     LANGUAGE plpgsql
 AS $$
 

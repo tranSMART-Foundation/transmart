@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_table_bkp(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_table_bkp() RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_table_bkp() RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

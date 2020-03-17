@@ -1,7 +1,7 @@
 --
 -- Name: _final_median(anyarray); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION _final_median(anyarray) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz._final_median(anyarray) RETURNS numeric
     LANGUAGE sql IMMUTABLE
 AS $$
     select avg(val)
@@ -17,7 +17,7 @@ $$;
 --
 -- Name: _final_median(double precision[]); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION _final_median(double precision[]) RETURNS double precision
+CREATE OR REPLACE FUNCTION tm_cz._final_median(double precision[]) RETURNS double precision
     LANGUAGE sql IMMUTABLE
 AS $$
     select avg(val)

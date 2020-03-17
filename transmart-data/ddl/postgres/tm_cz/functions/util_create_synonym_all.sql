@@ -1,7 +1,7 @@
 --
 -- Name: util_create_synonym_all(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION util_create_synonym_all(v_fromzone character varying DEFAULT NULL::character varying, v_whattype character varying DEFAULT 'FUNCTIONS,TABLES,VIEWS'::character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.util_create_synonym_all(v_fromzone character varying DEFAULT NULL::character varying, v_whattype character varying DEFAULT 'FUNCTIONS,TABLES,VIEWS'::character varying) RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

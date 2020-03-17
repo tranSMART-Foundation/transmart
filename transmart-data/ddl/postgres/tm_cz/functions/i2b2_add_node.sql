@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_add_node(character varying, character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_add_node(trialid character varying, path character varying, path_name character varying, currentjobid numeric) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_add_node(trialid character varying, path character varying, path_name character varying, currentjobid numeric) RETURNS integer
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -174,7 +174,6 @@ exception
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
 
-	
 end;
 
 $$;

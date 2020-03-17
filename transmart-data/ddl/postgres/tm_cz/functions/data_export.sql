@@ -1,7 +1,7 @@
 --
 -- Name: data_export(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION data_export() RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.data_export() RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

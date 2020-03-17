@@ -1,7 +1,7 @@
 --
 -- Name: cz_audit_example(bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION cz_audit_example(currentjobid bigint) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.cz_audit_example(currentjobid bigint) RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

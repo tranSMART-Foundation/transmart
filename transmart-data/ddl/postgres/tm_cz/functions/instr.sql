@@ -1,7 +1,7 @@
 --
 -- Name: instr(character varying, character varying, integer, integer); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION instr(string character varying, string_to_search character varying, beg_index integer DEFAULT 1, occur_index integer DEFAULT 1) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.instr(string character varying, string_to_search character varying, beg_index integer DEFAULT 1, occur_index integer DEFAULT 1) RETURNS integer
     LANGUAGE plpgsql IMMUTABLE STRICT
 AS $$
     declare

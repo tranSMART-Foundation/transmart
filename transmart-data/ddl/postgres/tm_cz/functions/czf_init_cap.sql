@@ -1,7 +1,7 @@
 --
 -- Name: czf_init_cap(character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION czf_init_cap(text_to_parse character varying) RETURNS character varying
+CREATE OR REPLACE FUNCTION tm_cz.czf_init_cap(text_to_parse character varying) RETURNS character varying
     LANGUAGE plpgsql
 AS $$
     declare

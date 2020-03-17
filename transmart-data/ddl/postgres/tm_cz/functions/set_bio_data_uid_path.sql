@@ -1,7 +1,7 @@
 --
 -- Name: set_bio_data_uid_path(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION set_bio_data_uid_path() RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.set_bio_data_uid_path() RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

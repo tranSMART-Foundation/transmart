@@ -1,8 +1,7 @@
 --
 -- Name: set_bio_data_uid_dis(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-SET search_path = tm_cz, pg_catalog;
-CREATE OR REPLACE FUNCTION set_bio_data_uid_dis() RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.set_bio_data_uid_dis() RETURNS void
     LANGUAGE plpgsql
 AS $$
     declare

@@ -1,7 +1,7 @@
 --
 -- Name: rdc_init_cap(text); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION rdc_init_cap(text_to_parse text) RETURNS character varying
+CREATE OR REPLACE FUNCTION tm_cz.rdc_init_cap(text_to_parse text) RETURNS character varying
     LANGUAGE plpgsql
 AS $$
     declare

@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_show_node(character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_show_node(path character varying) RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_show_node(path character varying) RETURNS void
     LANGUAGE plpgsql
 AS $$
 begin
@@ -15,12 +15,12 @@ begin
     then
 
 	--i2b2
-	update i2b2
+	update i2b2metadata.i2b2
 	set c_visualattributes = 'FA'
 	where c_visualattributes like 'F%'
 	and c_fullname like path || '%';
 
-	update i2b2
+	update i2b2metadata.i2b2
 	   set c_visualattributes = 'LA'
 	 where c_visualattributes like 'L%'
 	       and c_fullname like path || '%';

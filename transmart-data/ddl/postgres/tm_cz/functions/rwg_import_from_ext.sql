@@ -7,7 +7,7 @@
 -- DATASOURCE: dbi:Oracle:host=mydb.mydom.fr;sid=SIDNAME
 
 
-CREATE OR REPLACE FUNCTION rwg_import_from_ext (
+CREATE OR REPLACE FUNCTION tm_cz.rwg_import_from_ext (
   trialID text
  ,currentJobID bigint DEFAULT null
 )

@@ -1,31 +1,30 @@
 --
 -- Name: load_kegg_content_data(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-SET search_path = tm_cz, pg_catalog;
-CREATE OR REPLACE FUNCTION load_kegg_content_data() RETURNS void
+CREATE OR REPLACE FUNCTION tm_cz.load_kegg_content_data() RETURNS void
     LANGUAGE plpgsql
 AS $$
 begin
 
     begin
 
-	delete from bio_content_reference
+	delete from biomart.bio_content_reference
 	 where bio_content_id in
 	       (select bio_file_content_id
-		  from bio_content
+		  from biomart.bio_content
 		 where repository_id in
 		       (select bio_content_repo_id
-			  from bio_content_repository
+			  from biomart.bio_content_repository
 			 where upper(repository_type)='KEGG')
 	       );
 	--806
-	delete from bio_content
+	delete from biomart.bio_content
 	 where repository_id =
 	       (select bio_content_repo_id
-		  from bio_content_repository
+		  from biomart.bio_content_repository
 		 where upper(repository_type)='KEGG');
 	--806
-	delete from bio_content_repository
+	delete from biomart.bio_content_repository
 	 where upper(repository_type)='KEGG';
 	--1
 	commit;
@@ -33,7 +32,7 @@ begin
 
     begin
 	-- populate bio_content_repository
-	insert into bio_content_repository(
+	insert into biomart.bio_content_repository(
 	    location
 	    ,active_y_n
 	    ,repository_type
@@ -50,7 +49,7 @@ begin
 
     begin
 
-	insert into bio_content(
+	insert into biomart.bio_content(
 	    --  file_name
 	    repository_id
 	    , location
@@ -62,8 +61,8 @@ begin
 	    bcr.bio_content_repo_id
 	    ,bcr.location||'dbget-bin/show_pathway?'|| bm.primary_external_id
 	    ,'Data'
-	  from bio_content_repository bcr
-	       ,bio_marker bm
+	  from biomart.bio_content_repository bcr
+	       ,biomart.bio_marker bm
 	 where upper(bcr.repository_type)='KEGG'
 	   and upper(bm.primary_source_code)='KEGG';
 	--806 rows inserted
@@ -72,7 +71,7 @@ begin
 
     begin
 
-	insert into bio_content_reference(
+	insert into biomart.bio_content_reference(
 	    bio_content_id
 	    ,bio_data_id
 	    ,content_reference_type
@@ -81,9 +80,9 @@ begin
 	    bc.bio_file_content_id
 	    ,path.bio_marker_id
 	    ,bcr.location_type
-	  from bio_content bc
-	       ,bio_marker path
-	       ,bio_content_repository bcr
+	  from biomart.bio_content bc
+	       ,biomart.bio_marker path
+	       ,biomart.bio_content_repository bcr
 	 where bc.repository_id = bcr.bio_content_repo_id
 	   and path.primary_external_id=substring(bc.location from length(bc.location)-7)
 	   and path.primary_source_code='KEGG';

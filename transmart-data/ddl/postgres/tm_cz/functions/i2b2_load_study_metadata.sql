@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_study_metadata(numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION i2b2_load_study_metadata(currentjobid numeric DEFAULT 0) RETURNS bigint
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_study_metadata(currentjobid numeric DEFAULT 0) RETURNS bigint
     LANGUAGE plpgsql SECURITY DEFINER
     AS $$
 /*************************************************************************
@@ -170,12 +170,12 @@ BEGIN
 			   ,m.geo_platform
 			   --,m.platform_name
 			   ,m.search_area
-		 from lt_src_study_metadata m
+		 from tm_lz.lt_src_study_metadata m
 		 where m.study_id is not null
 		   and b.trial_number = m.study_id
 		)
 	where exists
-	     (select 1 from lt_src_study_metadata x
+	     (select 1 from tm_lz.lt_src_study_metadata x
 		  where b.trial_number = x.study_id
 		    and x.study_id is not null
 		 )
@@ -300,7 +300,7 @@ BEGIN
 		  ,m.geo_platform
 		  --,m.platform_name
 		  ,m.search_area
-	from lt_src_study_metadata m
+	from tm_lz.lt_src_study_metadata m
 	    ,biomart.bio_experiment b
 	where m.study_id is not null
 	  and m.study_id = b.accession
@@ -961,24 +961,24 @@ BEGIN
 /*					 
 	--	Insert trial data tags - COMPOUND
 	
-	delete from i2b2_tags t
+	delete from i2b2metadata.i2b2_tags t
 	where upper(t.tag_type) = 'COMPOUND';
 
 	stepCt := stepCt + 1;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing Compound tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
 	commit;	
 	
-	insert into i2b2_tags
+	insert into i2b2metadata.i2b2_tags
 	(path, tag, tag_type, tags_idx)
 	select distinct min(o.c_fullname) as path
 		  ,decode(x.rec_num,1,c.generic_name,c.brand_name) as tag
 		  ,'Compound' as tag_type
 		  ,1 as tags_idx
-	from bio_experiment be
+	from biomart.bio_experiment be
 		,bio_data_compound bc
 		,bio_compound c
 		,i2b2 o
-		,(select rownum as rec_num from table_access where rownum < 3) x
+		,(select rownum as rec_num from i2b2metadata.table_access where rownum < 3) x
 	where be.bio_experiment_id = bc.bio_data_id
        and bc.bio_compound_id = c.bio_compound_id
        and be.accession = o.sourcesystem_cd
@@ -991,24 +991,24 @@ BEGIN
 					 
 	--	Insert trial data tags - DISEASE
 	
-	delete from i2b2_tags t
+	delete from i2b2metadata.i2b2_tags t
 	where upper(t.tag_type) = 'DISEASE';
 
 	stepCt := stepCt + 1;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing DISEASE tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
 	commit;	
 		
-	insert into i2b2_tags
+	insert into i2b2metadata.i2b2_tags
 	(path, tag, tag_type, tags_idx)
 	select distinct min(o.c_fullname) as path
 		   ,c.prefered_name
 		   ,'Disease' as tag_type
 		   ,1 as tags_idx
-	from bio_experiment be
+	from biomart.bio_experiment be
 		,bio_data_disease bc
 		,bio_disease c
 		,i2b2 o
-      --,(select rownum as rec_num from table_access where rownum < 3) x
+      --,(select rownum as rec_num from i2b2metadata.table_access where rownum < 3) x
 	where be.bio_experiment_id = bc.bio_data_id
       and bc.bio_disease_id = c.bio_disease_id
       and be.accession = o.sourcesystem_cd
