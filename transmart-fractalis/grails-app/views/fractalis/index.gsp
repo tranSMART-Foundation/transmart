@@ -2,7 +2,7 @@
 <html>
     <head>
 	<asset:stylesheet href="fractalis.css"/>
-	<asset:javascript href="fractalis.js"/>
+	<asset:javascript src="fractalis.js"/>
     </head>
 
     <body>
