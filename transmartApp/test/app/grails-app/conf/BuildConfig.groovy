@@ -15,10 +15,10 @@ grails.project.dependency.resolution = {
 	repositories {
 		inherits true
 
-		mavenLocal()
 		grailsPlugins()
 		grailsHome()
 		grailsCentral()
+		mavenLocal()
 		mavenCentral()
 	}
 

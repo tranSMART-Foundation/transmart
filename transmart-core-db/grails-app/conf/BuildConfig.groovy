@@ -12,8 +12,8 @@ grails.project.dependency.resolution = {
     legacyResolve false
 
     repositories {
-	mavenLocal() // Note: use 'grails maven-install' to install required plugins locally
 	grailsCentral()
+	mavenLocal()
 	mavenCentral()
 	mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
     }

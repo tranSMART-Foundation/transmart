@@ -10,8 +10,8 @@ grails.project.dependency.resolution = {
     log 'warn'
 
     repositories {
-	mavenLocal()
 	grailsCentral()
+	mavenLocal()
 	mavenCentral()
 	mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
     }

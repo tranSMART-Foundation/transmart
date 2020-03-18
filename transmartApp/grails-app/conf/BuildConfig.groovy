@@ -84,8 +84,8 @@ grails.project.dependency.resolution = {
 
     if (!dm) {
 	repositories {
-	    mavenLocal()
 	    grailsCentral()
+	    mavenLocal()
 	    mavenCentral()
 
 	    mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'

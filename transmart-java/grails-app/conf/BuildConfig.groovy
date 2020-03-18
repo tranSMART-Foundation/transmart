@@ -17,6 +17,7 @@ grails.project.dependency.resolution = {
     // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
     repositories {
         grailsCentral()
+        mavenLocal()
         mavenCentral()
 
         mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
