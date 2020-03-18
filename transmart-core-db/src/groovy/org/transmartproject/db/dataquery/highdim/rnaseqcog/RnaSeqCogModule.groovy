@@ -124,7 +124,7 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
                 if (collectedList) {
 //		    logger.info 'RepeatedEntries...Result {} ({})',collectedList[0], collectedList.size()
 //		    logger.info 'RepeatedEntries...genesymbol {} geneid {} Result {}',
-			collectedList*.geneSymbol.join('/'), collectedList*.geneId.join('/')
+//			collectedList*.geneSymbol.join('/'), collectedList*.geneId.join('/')
                     new RnaSeqCogDataRow(
                         annotationId:  collectedList[0].annotationId,
                         geneSymbol:    collectedList*.geneSymbol.join('/'),
