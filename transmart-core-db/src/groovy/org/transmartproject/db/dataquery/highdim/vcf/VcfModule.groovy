@@ -164,7 +164,7 @@ class VcfModule extends AbstractHighDimensionDataTypeModule {
             finalizeGroup:         { List list -> /* list of all the results belonging to a group defined by inSameGroup */
                 /* list of arrays with one element: a map */
                 /* we may have nulls if allowMissingAssays is true,
-                 *, but we're guaranteed to have at least one non-null */
+                 * but we're guaranteed to have at least one non-null */
                 def firstNonNullCell = list.find()
                 new VcfDataRow(
                     datasetId: firstNonNullCell[0].dataset_id,
