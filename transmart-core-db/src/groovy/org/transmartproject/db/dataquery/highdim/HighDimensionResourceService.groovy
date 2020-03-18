@@ -99,7 +99,7 @@ class HighDimensionResourceService implements HighDimensionResource {
     }
 
     AssayConstraint createAssayConstraint(Map<String, Object> params, String name) {
-	def res = assayConstraintFactory.createFromParameters(name, params, this.&createAssayConstraint)
+	AssayConstraint res = assayConstraintFactory.createFromParameters(name, params, this.&createAssayConstraint)
         if (!res) {
 	    throw new InvalidArgumentsException('Unsupported assay constraint: ' + name)
         }
@@ -129,7 +129,7 @@ class HighDimensionResourceService implements HighDimensionResource {
     }
 
     HighDimensionDataTypeResource getHighDimDataTypeResourceFromConcept(String conceptKey) {
-        def constraints = []
+        List<AssayConstraint> constraints = []
 
         constraints << createAssayConstraint(
             AssayConstraint.DISJUNCTION_CONSTRAINT,
