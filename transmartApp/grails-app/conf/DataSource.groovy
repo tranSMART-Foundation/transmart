@@ -7,7 +7,7 @@ dataSource_oauth2 {
     formatSql = true
     logSql = true
     password = ''
-    url = "jdbc:h2:~/.grails/oauth2db;MVCC=TRUE"
+    url = "jdbc:h2:~/.grails/oauth2db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE"
     username = 'sa'
 }
 
