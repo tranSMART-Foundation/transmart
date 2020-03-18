@@ -28,7 +28,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        String tmVersion = '19.0-SNAPSHOT'
+        String tmVersion = '19.0'
 
 	compile ':biomart-domain:' + tmVersion
 	compile ':transmart-shared:' + tmVersion

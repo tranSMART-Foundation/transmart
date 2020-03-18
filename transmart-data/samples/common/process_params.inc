@@ -9,7 +9,7 @@ fi
 
 # Check UPLOAD_DATA_TYPE value
 MOLECULAR_DATA_TYPES="rnaseq acgh expression mirna mirnaqpcr mirnaseq proteomics msproteomics metabolomics rbm vcf"
-SUPPORTED_DATA_TYPES="study clinical $MOLECULAR_DATA_TYPES annotation"
+SUPPORTED_DATA_TYPES="study clinical browse sample $MOLECULAR_DATA_TYPES annotation"
 if [ $(echo $SUPPORTED_DATA_TYPES | grep -c -w $UPLOAD_DATA_TYPE) -ne 1 ] ; then
     echo "Error process_params.inc: this UPLOAD_DATA_TYPE ($UPLOAD_DATA_TYPE) is not supported"
     exit 1

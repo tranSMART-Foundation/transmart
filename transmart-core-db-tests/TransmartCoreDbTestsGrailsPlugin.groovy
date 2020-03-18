@@ -20,23 +20,26 @@
 import org.transmartproject.db.test.H2Views
 
 class TransmartCoreDbTestsGrailsPlugin {
-    def version = '19.0-SNAPSHOT'
+    def version = '19.0'
     def grailsVersion = '2.5.4 > *'
 
     def title = 'Transmart Core Db Tests Plugin'
-    def author = 'Transmart Foundation'
+    def author = 'i2b2-Transmart Foundation'
     def authorEmail = 'support@transmartfoundation.org'
-    def description = 'Reuses logic for populating db with test data; also contains tests for core-db project to prevent circular plugin dependencies'
-    def documentation = 'http://transmartproject.org'
+    def description = '''\
+Reuses logic for populating db with test data; also contains tests for core-db project to prevent circular plugin dependencies
+'''
+    def documentation = 'https://wiki.transmartfoundation.org/'
     def license = 'GPL3'
-    def organization = [name: 'TODO', url: 'TODO']
+    def organization = [name: 'i2b2/tranSMART Foundation', url: 'https://www.transmartfoundation.org/']
     def developers = [
         [ name: 'Ruslan Forostianov', email: 'ruslan@thehyve.nl' ],
 	[name: 'Peter Kok', email: 'peter@thehyve.nl'],
-	[name: 'Burt Beckwith', email: 'burt_beckwith@hms.harvard.edu']
+	[name: 'Peter Rice',    email: 'ricepeterm@yahoo.co.uk'],
+    	[name: 'Burt Beckwith', email: 'burt_beckwith@hms.harvard.edu']
     ]
-    def issueManagement = [system: 'TODO', url: 'TODO']
-    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart-core-db']
+    def issueManagement = [system: 'JIRA', url: 'https://jira.transmartfoundation.org/browse/TRANSREL']
+    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart/tree/master/transmart-core-db-tests']
 
     def doWithSpring = {
         h2Views(H2Views)

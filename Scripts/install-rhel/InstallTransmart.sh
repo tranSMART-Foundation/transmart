@@ -3,7 +3,7 @@
 # Version: Wed Mar  9 21:27:31 EST 2016
 # 
 #**********************************************************************************
-#  Script to load all that is needed to run an example/demo version of tranSMART 16.4 on RHEL 7.2
+#  Script to load all that is needed to run an example/demo version of tranSMART 19.0 on RHEL 7.2
 #**********************************************************************************
 
 # set up with 
@@ -11,7 +11,7 @@
 #   sudo yum install -y git
 #   git clone https://github.com/tranSMART-Foundation/Scripts.git
 #   cd Scripts
-#   git checkout release-16.4
+#   git checkout release-19.0
 #   cd ..
 #
 # to run the install scripts
@@ -22,13 +22,13 @@
 #   Scripts/install-rhel/checks/checkAll.sh
 
 # Script Parameters
-TRANSMART_DATA_NAME="transmart-data-release-16.4"
+TRANSMART_DATA_NAME="transmart-data-release-19.0"
 TRANSMART_DATA_ZIP="$TRANSMART_DATA_NAME.zip"
 TRANSMART_DATA_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_DATA_ZIP"
 TRANSMART_DATA_SIG_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_DATA_ZIP.sig"
 TRANSMART_DATA_MD5_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_DATA_ZIP.md5"
 
-TRANSMART_ETL_NAME="tranSMART-ETL-release-16.4"
+TRANSMART_ETL_NAME="tranSMART-ETL-release-19.0"
 TRANSMART_ETL_ZIP="$TRANSMART_ETL_NAME.zip"
 TRANSMART_ETL_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_ETL_ZIP"
 TRANSMART_ETL_SIG_URL="http://library.transmartfoundation.org/release/release16_4_0_artifacts/$TRANSMART_ETL_ZIP.sig"

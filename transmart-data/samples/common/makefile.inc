@@ -28,6 +28,7 @@ DUMMY := $(shell $(MAKE) -C ../studies datasets)
 $(info Finished fetching datasets)
 endif
 
+LOAD_BROWSE_TARGETS := $(shell php ../studies/enumerate.php load_targets browse)
 LOAD_CLINICAL_TARGETS := $(shell php ../studies/enumerate.php load_targets clinical)
 LOAD_ANNOTATION_TARGETS := $(shell php ../studies/enumerate.php load_targets annotation)
 LOAD_REF_ANNOTATION_TARGETS := $(shell php ../studies/enumerate.php load_targets ref_annotation)
@@ -41,6 +42,7 @@ LOAD_MIRNASEQ_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_target
 LOAD_METABOLOMICS_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets metabolomics)
 LOAD_RBM_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets rbm)
 LOAD_RNASEQ_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets rnaseq)
+LOAD_SAMPLE_TARGETS := $(shell php ../studies/enumerate.php load_targets sample)
 LOAD_VCF_PARAMS_TARGETS := $(patsubst ../studies/%/vcf.params,load_vcf_%, $(VCF_PARAMS_FILES))
 
 KETTLE_TARGETS := $(LOAD_CLINICAL_TARGETS) $(LOAD_EXPRESSION_PARAMS_TARGETS) $(LOAD_ACGH_PARAMS_TARGETS) $(LOAD_PROTEOMICS_PARAMS_TARGETS) $(LOAD_MSPROTEOMICS_PARAMS_TARGETS) $(LOAD_MIRNA_PARAMS_TARGETS) $(LOAD_MIRNAQPCR_PARAMS_TARGETS) $(LOAD_MIRNASEQ_PARAMS_TARGETS) $(LOAD_METABOLOMICS_PARAMS_TARGETS) $(LOAD_RBM_PARAMS_TARGETS) $(LOAD_RNASEQ_PARAMS_TARGETS)
@@ -48,7 +50,9 @@ KETTLE_TARGETS := $(LOAD_CLINICAL_TARGETS) $(LOAD_EXPRESSION_PARAMS_TARGETS) $(L
 $(KETTLE_TARGETS): kettle-home/kettle.properties
 #these ones are here just for autocompletion:
 $(LOAD_ANNOTATION_TARGETS):
+$(LOAD_BROWSE_TARGETS):
 $(LOAD_REF_ANNOTATION_TARGETS):
+$(LOAD_SAMPLE_TARGETS):
 $(LOAD_VCF_PARAMS_TARGETS):
 
 kettle-home/kettle.properties: gen_kettle_properties.php
@@ -190,9 +194,19 @@ parse_vcf_%: ../studies/%/vcf.params ../studies/%/vcf
 			../common/_scripts/vcf/parse_vcf.sh $<
 
 load_vcf_%: ../studies/%/vcf.params parse_vcf_%
-	STUDY_ID=$* PSQL='$(PSQL_COMMAND) -d $(PGDATABASE)' \
+	STUDY_ID=$* PSQL='$(PSQL_COMMAND) -d $(PGDATABASE)'\
 			DATA_LOCATION="$(realpath ../studies/$*/vcf)" \
 			./load_vcf.sh $<
+
+load_browse_%: ../studies/%/browse.params
+	STUDY_ID=$* PSQL='$(PSQL_COMMAND) -d $(PGDATABASE)' \
+	DATA_LOCATION="$(realpath ../studies/$*/browse) \"
+	./load_browse.sh $<
+
+load_sample_%: ../studies/%/sample.params
+	STUDY_ID=$* PSQL='$(PSQL_COMMAND) -d $(PGDATABASE)' \
+	DATA_LOCATION="$(realpath ../studies/$*/sample) \"
+	./load_sample.sh $<
 
 clean:
 	rm -f logs/*.log kettle-home/kettle.properties

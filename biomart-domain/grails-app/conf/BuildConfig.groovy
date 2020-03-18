@@ -27,7 +27,7 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.13'
     }
     plugins {
-        String tmVersion = '19.0-SNAPSHOT'
+        String tmVersion = '19.0'
 
         compile ':transmart-java:' + tmVersion
 

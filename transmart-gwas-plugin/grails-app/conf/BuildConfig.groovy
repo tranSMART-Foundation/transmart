@@ -22,7 +22,7 @@ grails.project.dependency.resolution = {
         mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
     }
 
-    String tmVersion = '19.0-SNAPSHOT'
+    String tmVersion = '19.0'
 
     dependencies {
     	// needed to support folder-management

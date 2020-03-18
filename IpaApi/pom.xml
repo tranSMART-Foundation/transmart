@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ittm_solutions.ipacore</groupId>
   <artifactId>IpaApi</artifactId>
-  <version>19.0-SNAPSHOT</version>
+  <version>19.0</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <plugins>

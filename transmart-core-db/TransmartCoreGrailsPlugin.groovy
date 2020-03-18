@@ -26,26 +26,26 @@ import org.transmartproject.db.ontology.DefaultConceptsResource
 import org.transmartproject.db.support.DatabasePortabilityService
 
 class TransmartCoreGrailsPlugin {
-    def version = '19.0-SNAPSHOT'
+    def version = '19.0'
     def grailsVersion = '2.5.4 > *'
-    def pluginExcludes = [
-        'grails-app/views/error.gsp'
-    ]
 
     def title = 'Transmart Core DB Plugin'
     def author = 'Transmart Foundation'
     def authorEmail = 'support@transmartfoundation.org'
-    def description = 'A runtime dependency for tranSMART that implements the Core API'
-    def documentation = 'http://github.com/tranSMART-Foundation/transmart'
+    def description = '''\
+A runtime dependency for tranSMART that implements the Core API
+'''
+    def documentation = 'https://wiki.transmartfoundation.org/'
     def license = 'GPL3'
-    def organization = [name: 'i2b2-tranSMART Foundation', url: 'http://transmartfoundation.org/']
+    def organization = [name: 'i2b2-tranSMART Foundation', url: 'https://www.transmartfoundation.org/']
     def developers = [
-        [name: 'Kees van Bochove',  email: 'kees@thehyve.nl'],
-        [name: 'Gustavo Lopes',  email: 'gustavo@thehyve.nl'],
-	[name: 'Burt Beckwith', email: 'burt_beckwith@hms.harvard.edu']
+        [name: 'Kees van Bochove', email: 'kees@thehyve.nl'],
+        [name: 'Gustavo Lopes',    email: 'gustavo@thehyve.nl'],
+	[name: 'Peter Rice',       email: 'ricepeterm@yahoo.co.uk'],
+    	[name: 'Burt Beckwith',    email: 'burt_beckwith@hms.harvard.edu']
     ]
-    def issueManagement = [system: 'JIRA', url: 'http://jira.transmartfoundation.org/']
-    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart']
+    def issueManagement = [system: 'JIRA', url: 'https://jira.transmartfoundation.org/browse/TRANSREL']
+    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart/tree/master/transmart-core-db']
 
     def doWithSpring = {
         xmlns context:'http://www.springframework.org/schema/context'

@@ -1,3 +1,5 @@
+String tmVersion = '19.0'
+
 grails.project.work.dir = 'target'
 
 grails.project.target.level = 1.8
@@ -33,8 +35,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-	runtime ':biomart-domain:19.0-SNAPSHOT'
-	runtime ':transmart-shared:19.0-SNAPSHOT'
+	runtime ':biomart-domain:'   + tmVersion
+	runtime ':transmart-shared:' + tmVersion
 
 	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false

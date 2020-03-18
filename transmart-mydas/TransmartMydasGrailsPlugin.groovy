@@ -1,41 +1,18 @@
 class TransmartMydasGrailsPlugin {
-    // the plugin version
-    def version = '19.0-SNAPSHOT'
-    // the version or versions of Grails the plugin is designed for
+    def version = '19.0'
     def grailsVersion = '2.5.4 > *'
-    // resources that are excluded from plugin packaging
-    def pluginExcludes = [
-        'grails-app/views/error.gsp'
-    ]
-
-    // TODO Fill in these fields
-    def title = 'Transmart Mydas Plugin' // Headline display name of the plugin
+    def title = 'Transmart Mydas Plugin'
     def author = 'Ruslan Forostianov'
-//    def authorEmail = 'ruslan@thehyve.nl'
-    def authorEmail = 'support@transmartfoundation.org'
+    def authorEmail = 'ruslan@thehyve.nl'
     def description = '''\
-Brief summary/description of the plugin.
+TranSMART front-end to MYDAS
 '''
-
-    // URL to the plugin's documentation
-    def documentation = 'http://github.com/tranSMART-Foundation/transmart'
-
-    // Extra (optional) plugin metadata
-
-    // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = 'APACHE'
-
-    // Details of company behind the plugin (if there is one)
-//    def organization = [ name: 'My Company', url: 'http://www.my-company.com/' ]
-
-    // Any additional developers beyond the author specified above.
-//    def developers = [ [ name: 'Joe Bloggs', email: 'joe@bloggs.net' ]]
-
-    // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: 'JIRA', url: 'http://jira.grails.org/browse/GPMYPLUGIN' ]
-
-    // Online location of the plugin's browseable source code.
-//    def scm = [ url: 'http://svn.codehaus.org/grails-plugins/' ]
+    def documentation = 'https://wiki.transmartfoundation.org/'
+    def license = 'APACHE'
+    def organization = [name: 'i2b2/tranSMART Foundation', url: 'https://www.transmartfoundation.org/']
+    def developers = [[name: 'Peter Rice',    email: 'ricepeterm@yahoo.co.uk']]
+    def issueManagement = [system: 'JIRA', url: 'https://jira.transmartfoundation.org/browse/TRANSREL']
+    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart/tree/master/transmart-mydas']
 
     def doWithWebDescriptor = {xml ->
         def servletElement = xml.'servlet'
@@ -43,8 +20,8 @@ Brief summary/description of the plugin.
         def lastServlet = servletElement[servletElement.size() - 1]
         lastServlet + {
             'servlet' {
-                'servlet-name'("MydasServlet")
-                'servlet-class'("uk.ac.ebi.mydas.controller.MydasServlet")
+                'servlet-name'('MydasServlet')
+                'servlet-class'('uk.ac.ebi.mydas.controller.MydasServlet')
             }
         }
 
@@ -53,8 +30,8 @@ Brief summary/description of the plugin.
         def lastMapping = mappingElement[mappingElement.size() - 1]
         lastMapping + {
             'servlet-mapping' {
-                'servlet-name'("MydasServlet")
-                'url-pattern'("/das/*")
+                'servlet-name'('MydasServlet')
+                'url-pattern'('/das/*')
             }
         }
     }

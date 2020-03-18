@@ -1,25 +1,19 @@
 class BiomartDomainGrailsPlugin {
-    // the plugin version
-    def version = '19.0-SNAPSHOT'
-    // the version or versions of Grails the plugin is designed for
+    def version = '19.0'
     def grailsVersion = '2.5,4 > *'
-    // the other plugins this plugin depends on
-    def dependsOn = [:]
-    // resources that are excluded from plugin packaging
-    def pluginExcludes = [
-        'grails-app/views/error.gsp'
-    ]
-
-    // TODO Fill in these fields
     def author = 'David Newton'
     def authorEmail = 'davinewton@deloitte.com'
     def title = 'tranSMART Biomart Domain Objects'
-    def description = '''\\
+    def description = '''\
 Domain objects for the tranSMART Biomart schema
 '''
-
-    // URL to the plugin's documentation
-    def documentation = ''
+    def documentation = 'https://wiki.transmartfoundation.org/'
+    def license = 'GPL3'
+    def organization = [name: 'i2b2/tranSMART Foundation', url: 'https://www.transmartfoundation.org/']
+    def developers = [[name: 'Peter Rice',    email: 'ricepeterm@yahoo.co.uk'],
+		      [name: 'Burt Beckwith', email: 'burt_beckwith@hms.harvard.edu']]
+    def issueManagement = [system: 'JIRA', url: 'https://jira.transmartfoundation.org/browse/TRANSREL']
+    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart/tree/master/biomart-domain']
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before

@@ -1,3 +1,5 @@
+String tmVersion  = '19.0'
+
 grails.project.work.dir = 'target'
 
 grails.project.target.level = 1.8
@@ -39,8 +41,8 @@ grails.project.dependency.resolution = {
     plugins {
 	compile ':asset-pipeline:2.14.1.1'
 
-        compile ':transmart-legacy-db:19.0-SNAPSHOT'
-        compile ':transmart-shared:19.0-SNAPSHOT'
+        compile ':transmart-legacy-db:' + tmVersion
+        compile ':transmart-shared:'    + tmVersion
 
         build ':tomcat:8.0.50'
 	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
@@ -52,7 +54,7 @@ grails.project.dependency.resolution = {
 	// not included in 18.1 beta
 //	runtime ':resources:1.2.14'
 
-        compile ':rdc-rmodules:19.0-SNAPSHOT'
+        compile ':rdc-rmodules:' + tmVersion
     }
 
 

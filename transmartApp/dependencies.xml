@@ -641,8 +641,8 @@
     <dependency group='org.owasp.esapi' name='esapi' version='2.0.1'>
       <jar>/home/pmr/.m2/repository/org/owasp/esapi/esapi/2.0.1/esapi-2.0.1.jar</jar>
     </dependency>
-    <dependency group='org.transmartproject' name='transmart-core-api' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.0-SNAPSHOT/transmart-core-api-19.0-SNAPSHOT.jar</jar>
+    <dependency group='org.transmartproject' name='transmart-core-api' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.0/transmart-core-api-19.0.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='cache-ehcache' version='1.0.5'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/cache-ehcache/1.0.5/cache-ehcache-1.0.5.zip</jar>

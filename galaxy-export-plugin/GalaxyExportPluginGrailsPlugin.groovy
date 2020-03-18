@@ -2,42 +2,20 @@ class GalaxyExportPluginGrailsPlugin {
 
     public static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
-    // the plugin version
-    def version = '19.0-SNAPSHOT'
-    // the version or versions of Grails the plugin is designed for
+    def version = '19.0'
     def grailsVersion = '2.5.4 > *'
-    // resources that are excluded from plugin packaging
-    def pluginExcludes = [
-            'grails-app/views/error.gsp'
-    ]
-
-    // TODO Fill in these fields
-    def title = 'Galaxy Export Plugin' // Headline display name of the plugin
+    def title = 'Galaxy Export Plugin'
     def author = 'Transmart Foundation'
     def authorEmail = 'support@transmartfoundation.org'
     def description = '''\
-Brief summary/description of the plugin.
+Provides a Galaxy Export tab to load data into a Galaxy instance
 '''
-
-    // URL to the plugin's documentation
-    def documentation = 'http://github.com/tranSMART-Foundation/transmart'
-
-    // Extra (optional) plugin metadata
-
-    // License: one of 'APACHE', 'GPL2', 'GPL3'
+    def documentation = 'https://wiki.transmartfoundation.org/'
     def license = 'GPL3'
-
-    // Details of company behind the plugin (if there is one)
-//    def organization = [ name: 'My Company', url: 'http://www.my-company.com/' ]
-
-    // Any additional developers beyond the author specified above.
-    def developers = [ [ name: 'Axel Oehmichen', email: 'ao1011@imperial.ac.uk' ]]
-
-    // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: 'JIRA', url: 'http://jira.grails.org/browse/GPMYPLUGIN' ]
-
-    // Online location of the plugin's browseable source code.
-//    def scm = [ url: 'http://svn.codehaus.org/grails-plugins/' ]
+    def developers = [[ name: 'Axel Oehmichen', email: 'ao1011@imperial.ac.uk' ],
+		      [ name: 'Peter Rice',     email: 'ricepeterm@yahoo.co.uk']]
+    def issueManagement = [system: 'JIRA', url: 'https://jira.transmartfoundation.org/browse/TRANSREL']
+    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart/tree/master/galaxy-export-plugin']
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before

@@ -10,18 +10,20 @@ import org.transmart.plugin.auth0.Auth0Config
 import org.transmart.plugin.auth0.Auth0Service
 
 class SpringSecurityAuth0GrailsPlugin {
-    String version = '19.0-SNAPSHOT'
+    String version = '19.0'
     String grailsVersion = '2.5.4 > *'
     String title = 'Spring Security Auth0 Plugin'
     String author = 'Burt Beckwith'
     String authorEmail = 'burt_beckwith@hms.harvard.edu'
-    String description = 'Auth0 security for Transmart.'
-    String documentation = 'TODO'
+    String description = '''\
+Auth0 security for Transmart
+'''
+    String documentation = 'https://wiki.transmartfoundation.org/'
     String license = 'APACHE'
     def loadAfter = ['springSecurityCore']
-    def organization = [name: 'TODO', url: 'TODO']
-    def issueManagement = [url: 'TODO']
-    def scm = [url: 'TODO']
+    def organization = [name: 'i2b2/tranSMART Foundation', url: 'https://www.transmartfoundation.org/']
+    def issueManagement = [system: 'JIRA', url: 'https://jira.transmartfoundation.org/browse/TRANSREL']
+    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart/tree/master/spring-security-auth0']
 
     def doWithSpring = {
 	def conf = SpringSecurityUtils.securityConfig

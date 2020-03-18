@@ -1,3 +1,5 @@
+String tmVersion = '19.0'
+
 grails.project.work.dir = 'target'
 
 grails.project.target.level = 1.8
@@ -19,12 +21,12 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
-	compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
+	compile 'org.transmartproject:transmart-core-api:' + tmVersion
     }
 
     plugins {
 	compile ':hibernate:3.6.10.19'
-	compile ':transmart-shared:19.0-SNAPSHOT'
+	compile ':transmart-shared:' + tmVersion
 
 	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
 	    export = false

@@ -1,3 +1,5 @@
+String tmVersion = '19.0'
+
 grails.project.work.dir = 'target'
 
 grails.project.source.level = 1.8
@@ -19,8 +21,8 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         compile 'net.sf.opencsv:opencsv:2.3'
-        compile 'uk.ac.ebi.mydas:mydas:1.7.0.transmart-19.0-SNAPSHOT'
-        compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
+        compile 'uk.ac.ebi.mydas:mydas:1.7.0.transmart-'   + tmVersion
+        compile 'org.transmartproject:transmart-core-api:' + tmVersion
 	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
    }
 

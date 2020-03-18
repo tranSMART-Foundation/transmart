@@ -1,5 +1,5 @@
 # barrowed from the file R/cran_pkg.R in transmart-data
-# specifically, https://github.com/tranSMART-Foundation/transmart/blob/release-16.4/transmart-data/R/cran_pkg.R
+# specifically, https://github.com/tranSMART-Foundation/transmart/tree/master/transmart-data/R/cran_pkg.R
 
 required.packages <- c("reshape", "reshape2", "ggplot2", "data.table", "Cairo",
 		"snowfall", "gplots", "foreach", "doParallel", "visreg",

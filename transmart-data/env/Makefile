@@ -125,8 +125,8 @@ update_etl:
 	echo "for release build transmart-etl is not automatically updated from git, because it is assumed to be already loaded from a zip file"
 
 update_etl_git:
-	curl -L -f "http://library.transmartfoundation.org/beta/beta16_4_0_artifacts/transmart-etl-release-16.4.zip" > transmart-etl-release-16.4.zip
-	unzip -u transmart-etl-release-16.4.zip
+	curl -L -f "http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-etl-release-19.0.zip" > transmart-etl-release-19.0.zip
+	unzip -u transmart-etl-release-19.0.zip
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 
 KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip 

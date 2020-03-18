@@ -21,16 +21,20 @@ import org.springframework.stereotype.Component
 import org.transmartproject.core.users.User
 
 class RdcRmodulesGrailsPlugin {
-    def version = '19.0-SNAPSHOT'
+    def version = '19.0'
     def grailsVersion = '2.5.4 > *'
     def title = 'R Modules Plugin'
     def author = 'Sai Kumar Munikuntla'
     def authorEmail = 'smunikuntla@recomdata.com'
-    def description = 'tranSMART R-modules for Advanced Workflows'
-    def documentation = 'https://github.com/transmart/Rmodules'
+    def description = '''\
+tranSMART R-modules for Advanced Workflows
+'''
+    def documentation = 'https://wiki.transmartfoundation.org/'
     def license = 'GPL3'
-    def issueManagement = [system: 'TODO', url: 'TODO']
-    def scm = [url: 'https://github.com/transmart/Rmodules']
+    def organization = [name: 'i2b2/tranSMART Foundation', url: 'https://www.transmartfoundation.org/']
+    def developers = [[name: 'Peter Rice',    email: 'ricepeterm@yahoo.co.uk']]
+    def issueManagement = [system: 'JIRA', url: 'https://jira.transmartfoundation.org/browse/TRANSREL']
+    def scm = [url: 'https://github.com/tranSMART-Foundation/transmart/tree/master/Rmodules']
 
     def doWithSpring = {
         xmlns context: 'http://www.springframework.org/schema/context'

@@ -1,3 +1,5 @@
+String tmVersion = '19.0'
+
 def defaultVMSettings = [
         maxMemory: 768,
         minMemory: 64,
@@ -71,7 +73,7 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
-	compile 'org.transmartproject:transmart-core-api:19.0-SNAPSHOT'
+	compile 'org.transmartproject:transmart-core-api:' + tmVersion
 
 	test 'org.hamcrest:hamcrest-library:1.3'
         test 'org.hamcrest:hamcrest-core:1.3'
@@ -107,8 +109,8 @@ grails.project.dependency.resolution = {
 
     plugins {
     	compile ':hibernate:3.6.10.19', { export = false }
-	compile ':transmart-core:19.0-SNAPSHOT'
-	compile ':transmart-shared:19.0-SNAPSHOT'
+	compile ':transmart-core:' + tmVersion
+	compile ':transmart-shared:' + tmVersion
         build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false
         }

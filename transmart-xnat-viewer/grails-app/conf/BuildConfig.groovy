@@ -1,11 +1,11 @@
+tmVersion = '19.0'
+
 grails.project.class.dir = 'target/classes'
 grails.project.test.class.dir = 'target/test-classes'
 grails.project.test.reports.dir = 'target/test-reports'
 
 grails.project.target.level = 1.8
 grails.project.source.level = 1.8
-
-tmVersion = '19.0-SNAPSHOT'
 
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required

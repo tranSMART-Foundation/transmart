@@ -1,3 +1,5 @@
+String tmVersion = '19.0'
+
 grails.project.class.dir = 'target/classes'
 grails.project.test.class.dir = 'target/test-classes'
 grails.project.test.reports.dir = 'target/test-reports'
@@ -47,7 +49,7 @@ grails.project.dependency.resolution = {
 
     plugins {
         compile ':plugin-config:0.2.1'
-        compile ':rdc-rmodules:19.0-SNAPSHOT'
+        compile ':rdc-rmodules:' + tmVersion
 	compile ':asset-pipeline:2.14.1.1'
 
         build ':release:3.1.2',

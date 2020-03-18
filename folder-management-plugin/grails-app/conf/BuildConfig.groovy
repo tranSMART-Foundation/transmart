@@ -1,3 +1,5 @@
+String tmVersion = '19.0'
+
 grails.project.work.dir = 'target'
 
 grails.project.source.level = 1.8
@@ -31,11 +33,11 @@ grails.project.dependency.resolution = {
 
     plugins {
 	compile ':asset-pipeline:2.14.1.1'
-        compile ':search-domain:19.0-SNAPSHOT'
-	compile ':transmart-core:19.0-SNAPSHOT'
+        compile ':search-domain:'       + tmVersion
+	compile ':transmart-core:'      + tmVersion
 
-//        compile ':transmart-legacy-db:19.0-SNAPSHOT'
-//        compile ':spring-security-core:2.0.0'
+//      compile ':transmart-legacy-db:' + tmVersion
+//      compile ':spring-security-core:2.0.0'
         compile ':quartz:1.0.2'
 
         build ':release:3.1.2', ':rest-client-builder:2.1.1', {
