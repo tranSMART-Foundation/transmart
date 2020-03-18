@@ -72,7 +72,7 @@ class DeSubjectRnaseqData implements RnaSeqValues, Serializable {
         patient                nullable: true
         readcount              nullable: true
         region                 nullable: true
-        trialName              nullable: true, maxSize: 50
+        trialName              nullable: true, maxSize: 100
         zscore                 nullable: true
     }
 }

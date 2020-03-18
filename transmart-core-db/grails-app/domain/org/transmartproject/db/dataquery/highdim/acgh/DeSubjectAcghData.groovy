@@ -81,7 +81,7 @@ class DeSubjectAcghData implements AcghValues, Serializable {
         probabilityOfLoss          nullable: true, scale:   17
         probabilityOfNormal        nullable: true, scale:   17
         segmentCopyNumberValue     nullable: true, scale:   17
-        trialName                  nullable: true, maxSize: 50
+        trialName                  nullable: true, maxSize: 100
     }
 
     CopyNumberState getCopyNumberState() {

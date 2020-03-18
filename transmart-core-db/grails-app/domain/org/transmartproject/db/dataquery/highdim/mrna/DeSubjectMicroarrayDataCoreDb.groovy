@@ -28,8 +28,8 @@ class DeSubjectMicroarrayDataCoreDb implements Serializable {
 
     BigDecimal logIntensity // log2(rawIntensity)
     BigDecimal rawIntensity
-    String     trialName
     BigDecimal zscore
+    String     trialName
 
     /* not mapped (only used in Oracle?) */
     //String     trialSource
@@ -67,11 +67,11 @@ class DeSubjectMicroarrayDataCoreDb implements Serializable {
         patient      nullable: true
         probe        nullable: true
         rawIntensity nullable: true
-        trialName    nullable: true, maxSize: 50
+        trialName    nullable: true, maxSize: 100
         zscore       nullable: true
         //trialSource  nullable: true, maxSize: 200
         //sampleId     nullable: true
-        //subjectId    nullable: true, maxSize: 50
+        //subjectId    nullable: true, maxSize: 100
         //newRaw       nullable: true, scale:   4
         //newLog       nullable: true, scale:   4
         //newZscore    nullable: true, scale:   4

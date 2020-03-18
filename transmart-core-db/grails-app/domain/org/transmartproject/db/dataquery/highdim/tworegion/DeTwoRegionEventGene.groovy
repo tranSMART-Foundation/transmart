@@ -19,7 +19,7 @@ class DeTwoRegionEventGene implements Serializable, EventGene {
 
     static constraints = {
         effect nullable: true, maxSize: 500
-        geneId nullable: true, maxSize: 50
+        geneId nullable: true, maxSize: 100
     }
 
     static mapping = {

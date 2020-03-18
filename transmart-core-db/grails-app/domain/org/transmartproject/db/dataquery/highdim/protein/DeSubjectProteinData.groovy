@@ -70,10 +70,10 @@ class DeSubjectProteinData implements Serializable {
         zscore       nullable: true, scale: 4
 
         // irrelevant:
-        //trialName       nullable: true, maxSize: 15
+        //trialName       nullable: true, maxSize: 100
         //component       nullable: true, maxSize: 200
         //patientId       nullable: true
-        //subjectId       nullable: true, maxSize: 10
+        //subjectId       nullable: true, maxSize: 100
         //geneSymbol      nullable: true, maxSize: 100
         //geneId          nullable: true
         //timepoint       nullable: true, maxSize: 20

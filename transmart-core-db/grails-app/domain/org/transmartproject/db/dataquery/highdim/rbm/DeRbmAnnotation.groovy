@@ -43,8 +43,8 @@ class DeRbmAnnotation {
 
     static constraints = { 
         antigenName maxSize:  800
-        geneId      nullable: true, maxSize: 400
-        geneSymbol  nullable: true, maxSize: 200
+        geneId      nullable: true, maxSize: 100
+        geneSymbol  nullable: true, maxSize: 100
 	gplId       maxSize:  50
         platform    nullable: true
         uniprotId   nullable: true, maxSize: 200

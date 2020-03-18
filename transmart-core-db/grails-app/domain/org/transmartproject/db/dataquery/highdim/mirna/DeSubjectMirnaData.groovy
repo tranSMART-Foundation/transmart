@@ -64,7 +64,7 @@ class DeSubjectMirnaData implements Serializable {
         rawIntensity nullable: true, scale: 4
         zscore       nullable: true, scale: 4
         //trialSource  nullable: true, maxSize: 200
-        //trialName    nullable: true, maxSize: 50
+        //trialName    nullable: true, maxSize: 100
         //patient      nullable: true
     }
 }
