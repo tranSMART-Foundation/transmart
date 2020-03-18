@@ -12,7 +12,7 @@ import org.springframework.core.io.Resource
 class FractalisController {
     def assetResourceLocator
 
-    private static final List<String> scripts = ['fractalis.js', 'resources/fractal.min.js'].asImmutable()
+    private static final List<String> scripts = ['fractalis.js'].asImmutable()
     private static final List<String> styles = ['fractalis.css'].asImmutable()
 
     @Value('${fractalis.dataSource:}')
@@ -24,6 +24,9 @@ class FractalisController {
     @Value('${fractalis.resourceName:}')
     private String resourceName
 
+    @Value('${fractalis.version:1.3.0}')
+    private String version
+
     def i2b2HelperService
 
     def index() {}
@@ -34,17 +37,24 @@ class FractalisController {
     def loadScripts() {
 
 	List rows = []
+	Resource assetRes
 
 	// for all js files
 	for (String script in scripts) {
-	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
+	    assetRes = assetResourceLocator.findAssetForURI(script)
 	    logger.info 'loading Fractalis script {} asset {}', script, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: "script"]
 	}
 
+	// fractalis script for required version
+	assetRes = assetResourceLocator.findAssetForURI("resources/fractalis-${version}.js")
+	logger.info 'loading Fractalis version {} script {} asset {}',
+	    version, "resources/fractalis-${version}.js", assetRes.getPath()
+	rows << [path: servletContext.contextPath + assetRes.getPath(), type: "script"]
+
 	// for all css files
 	for (String style in styles) {
-	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
+	    assetRes = assetResourceLocator.findAssetForURI(style)
 	    logger.info 'loading Fractalis style {} asset {}', style, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: "css"]
 	}
@@ -63,11 +73,15 @@ class FractalisController {
 
 	String subjectIDs1 = ''
 	String subjectIDs2 = ''
+
+	logger.debug 'settings request.JSON {}', request.JSON
 	if (resultInstanceID1?.trim()) {
 	    subjectIDs1 = i2b2HelperService.getSubjects(resultInstanceID1)
+	    logger.debug 'patients subset1 {}: {}', resultInstanceID1, subjectIDs1
 	}
 	if (resultInstanceID2?.trim()) {
 	    subjectIDs2 = i2b2HelperService.getSubjects(resultInstanceID2)
+	    logger.debug 'patients subset1 {}: {}', resultInstanceID2, subjectIDs2
 	}
 
 	render([subjectIDs1: subjectIDs1, subjectIDs2: subjectIDs2] as JSON)
@@ -75,6 +89,7 @@ class FractalisController {
 
     def settings() {
 	Authentication auth = SecurityContextHolder.context.authentication
+	logger.debug 'settings dataSource {} node {} resourceName {} token {}', dataSource, node, resourceName, auth.getJwtToken()
 	if (!auth.respondsTo('getJwtToken')) {
 	    throw new RuntimeException('Unable to retrieve Auth0 token.')
 	}
