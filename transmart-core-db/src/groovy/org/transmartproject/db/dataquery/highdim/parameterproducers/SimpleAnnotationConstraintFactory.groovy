@@ -1,5 +1,6 @@
 package org.transmartproject.db.dataquery.highdim.parameterproducers
 
+import groovy.util.logging.Slf4j
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
@@ -12,6 +13,7 @@ import org.transmartproject.db.i2b2data.ConceptDimension
 /**
  * @author Denny Verbeeck (dverbeec@its.jnj.com)
  */
+@Slf4j('logger')
 class SimpleAnnotationConstraintFactory extends AbstractMethodBasedParameterFactory {
 
     String field
