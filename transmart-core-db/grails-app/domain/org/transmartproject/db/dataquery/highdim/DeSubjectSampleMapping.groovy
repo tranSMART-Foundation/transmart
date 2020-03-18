@@ -99,7 +99,7 @@ class DeSubjectSampleMapping implements Assay {
         timepointName    nullable: true, maxSize: 100
         tissueTypeCd     nullable: true, maxSize: 50
         tissueTypeName   nullable: true, maxSize: 100
-        trialName        nullable: true, maxSize: 30
+        trialName        nullable: true, maxSize: 100
 	}
 
     //  region Properties with values generated on demand
