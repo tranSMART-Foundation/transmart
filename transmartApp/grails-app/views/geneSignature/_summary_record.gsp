@@ -7,8 +7,8 @@
 		    title: 'Gene Signature Detail [${gs.name?.replaceAll("'","\\\\'").encodeAsHTML()}]',
 		    url: '${dtlLink}'
 		    })">
-            <img alt="detail" style="vertical-align:middle;"
-		 src="${resource(dir: 'images', file: 'grid.png')}">&nbsp;${gs.name?.replaceAll("'", "\\\\'").encodeAsHTML()}
+            <asset:image alt="detail" style="vertical-align:middle;"
+		 	 src="grid.png" />&nbsp;${gs.name?.replaceAll("'", "\\\\'").encodeAsHTML()}
     </a></td>
     <td>${gs.createdByAuthUser.userRealName?.encodeAsHTML()}</td>
     <td><g:formatDate format="yyyy-MM-dd" date="${gs.dateCreated}"/></td>

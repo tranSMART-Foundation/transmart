@@ -54,12 +54,12 @@
 					</div>
 					<div id="${expAnalysisResult.experimentId}_fclose"
                                              style="visibility: hidden; display: none; width: 16px;">
-                                            <img alt="" src="${resource(dir: 'images', file: 'folder-minus.gif')}" style="vertical-align: middle;"/>
+                                            <asset:image alt="" src="folder-minus.gif" style="vertical-align: middle;"/>
 					</div>
 
 					<div id="${expAnalysisResult.experimentId}_fopen"
                                              style="display: inline; width: 16px;">
-                                            <img alt="" src="${resource(dir: 'images', file: 'folder-plus.gif')}" style="vertical-align: middle;"/>
+                                            <asset:image alt="" src="folder-plus.gif" style="vertical-align: middle;"/>
 					</div>
                                         </a>
                                         <a onclick="showDialog('TrialDet_${expAnalysisResult.experimentId}', {
@@ -71,7 +71,7 @@
 							url: '${createLink(action:'expDetail', id:expAnalysisResult.experimentId)}'
 							}]);"
                                            onmouseout="delayedTask.cancel();">
-					    <img alt="" src="${resource(dir: 'images', file: 'view_detailed.png')}" style="vertical-align: top;"/>
+					    <asset:image alt="" src="view_detailed.png" style="vertical-align: top;"/>
 					    <b><span style="color: #339933;">${expAnalysisResult.experiment.accession}:</span>
 						&nbsp;&nbsp;${expAnalysisResult.experiment.title}
 					    </b>

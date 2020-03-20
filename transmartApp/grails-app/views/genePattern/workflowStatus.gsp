@@ -19,7 +19,7 @@
 
     <body>
 	<div id="divwfstatus" style="background:#fff;height:100%;padding:5px; font:12px tahoma, arial, helvetica, sans-serif;">
-	    <div>Initializing workflow &nbsp;&nbsp;<img src="${resource(dir: 'images', file: 'loading-balls.gif')}"/></div>
+	    <div>Initializing workflow &nbsp;&nbsp;<asset:image src="loading-balls.gif"/></div>
 	</div>
     </body>
 </html>

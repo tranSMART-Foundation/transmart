@@ -5,10 +5,10 @@
 	    <td>
 		${it.name}
 		<g:if test="${it.isCompleted()}">&nbsp;&nbsp;
-		    <img src="${resource(dir: 'images', file: 'green_check.png')}"/>
+		    <asset:image src="green_check.png"/>
 		</g:if>
 		<g:elseif test="${it.isRunning()}">
-                    <img src="${resource(dir: 'images', file: 'loading-balls.gif')}"/>
+                    <asset:image src="loading-balls.gif"/>
 		</g:elseif>
 	    </td>
 	</tr>

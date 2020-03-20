@@ -10,7 +10,7 @@
 	    <h2>
 		Variable Selection
 		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.scatterPlot ?: "JavaScript:D2H_ShowHelp(1512,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-		    <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
+		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
 		</a>
 	    </h2>
 

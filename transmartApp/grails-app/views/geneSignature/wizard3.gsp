@@ -145,7 +145,7 @@
 				<td colspan="2" style="font-weight: bold; font-size: 12px;">
 				    File Upload Information (tab delimited text only, no .xls Excel files):&nbsp;&nbsp;
 				    <a style="font-style:italic;" href="${resource(dir:'images',file:'gene_sig_samples.txt')}" target="_blank">
-					<img alt="examples" src="${resource(dir:'images',file:'text.png')}"/>&nbsp;See Samples
+					<asset:image alt="examples" src="text.png"/>&nbsp;See Samples
 				    </a>
 				</td>
 			    </tr>
@@ -153,7 +153,7 @@
 		<g:else>
 		    <p style="font-weight: bold;">File Upload Information (tab delimited text only, no .xls Excel files):&nbsp;&nbsp;
 			<a style="font-style:italic;" href="${resource(dir:'images',file:'gene_sig_samples.txt')}" target="_blank">
-			    <img alt="examples" src="${resource(dir:'images',file:'text.png')}"/>&nbsp;See Samples
+			    <asset:image alt="examples" src="text.png"/>&nbsp;See Samples
 			</a>
 		    </p>
 		    <table class="detail" style="width: 100%">

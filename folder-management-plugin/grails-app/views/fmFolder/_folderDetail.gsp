@@ -126,7 +126,7 @@
                     <th class="columnheader">Value
                         %{--Restrict edits to administrators--}%
                         <sec:ifAnyGranted roles='ROLE_ADMIN'>
-                            <img align="right" class="editmetadata" name="${folder?.id}" src="${resource(dir:'images', file:'pencil.png')}"/>
+                            <asset:image align="right" class="editmetadata" name="${folder?.id}" src="pencil.png"/>
                         </sec:ifAnyGranted>
                     </th>
                 </tr>

@@ -24,8 +24,8 @@
 
 	    <h2>OAuth clients &nbsp;&nbsp;
 		<a target="_blank" href="${grailsApplication.config.com.recomdata.adminHelpURL ?: "JavaScript:D2H_ShowHelp('1259','${grailsApplication.config.com.recomdata.adminHelpURL}','wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-          q<img src="${resource(dir:'images',file:'help/helpicon_white.jpg')}"
-		alt="Help" border=0 width=18pt style="vertical-align:middle;margin-left:5pt;"/>
+          q<asset:image src="help/helpicon_white.jpg"
+			alt="Help" border="0" width="18pt" style="vertical-align:middle;margin-left:5pt;"/>
 		</a>
 	    </h2>
 

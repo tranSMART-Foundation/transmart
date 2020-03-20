@@ -30,13 +30,13 @@
 				       : "toggleDetailDiv('${folder.id}', folderContentsURL + '?id=${folder.id}&auto=false', false, false, true);"}" />
 
 				<a id="toggleDetail_${folder.id}" href="#" onclick="${toggleJsFunc}">
-				    <img alt="expand/collapse" id="imgExpand_${folder.id}" src="${resource(dir: 'images', file: 'folderplus.png')}"/>
+				    <asset:image alt="expand/collapse" id="imgExpand_${folder.id}" src="folderplus.png"/>
 				    <span class="foldericon ${folderIconType}"></span>
 				</a>
 			    </g:if>
 			    <g:else>
 				<a id="toggleDetail_${folder.id}" href="#">
-				    <img alt="expand/collapse" id="imgExpand_${folder.id}" src="${resource(dir: 'images', file: 'folderleaf.png')}"/>
+				    <asset:image alt="expand/collapse" id="imgExpand_${folder.id}" src="folderleaf.png"/>
 				    <span class="foldericon ${folderIconType}"></span>
 				</a>
 			    </g:else>

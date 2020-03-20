@@ -1,5 +1,5 @@
 <div id="oncoprint" style="padding-top:10px; padding-bottom:10px; padding-left:10px; border: 1px solid #CCC;">
-    <img id="outer_loader_img" src="${resource(dir: 'images', file: 'ajax-loader.gif')}" style="display: none;"/>
+    <asset:image id="outer_loader_img" src="ajax-loader.gif" style="display: none;"/>
     <div style="" id="everything">
 	<h4 style="display:inline;">GenePrint
 	    <!--TODO: implement: <small>(<a href="faq.jsp#what-are-geneprints">What are GenePrints?</a>)</small>-->
@@ -217,7 +217,7 @@
 	      </div>
 	  </script>
 
-	  <img id="inner_loader_img" src="${resource(dir: 'images', file: 'ajax-loader.gif')}" style="display:none;"/>
+	  <asset:image id="inner_loader_img" src="ajax-loader.gif" style="display:none;"/>
 
 	  <div id="oncoprint_body"></div>
 

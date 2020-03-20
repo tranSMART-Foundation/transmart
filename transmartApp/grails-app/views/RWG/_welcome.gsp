@@ -28,8 +28,8 @@
                              style="height:35px;vertical-align:middle;margin-bottom: 12px;">
                     </g:if>
 		    <g:else>
-                        <img src="${resource(dir: 'images', file: 'project_logo.png')}" alt="${projectName}"
-                             style="height:35px;vertical-align:middle;margin-bottom: 12px;">
+                        <asset:image src="project_logo.png" alt="${projectName}"
+                             style="height:35px;vertical-align:middle;margin-bottom: 12px;"/>
                     </g:else>
 		</a>
             </g:if>
@@ -44,8 +44,8 @@
                              style="height:35px;vertical-align:middle;margin-bottom: 12px;">
                     </g:if>
 		    <g:else>
-		        <img src="${resource(dir: 'images', file: 'provider_logo.png')}" alt="${providerName}"
-                             style="height:35px;vertical-align:middle;margin-bottom: 12px;">
+		        <asset:image src="provider_logo.png" alt="${providerName}"
+                             style="height:35px;vertical-align:middle;margin-bottom: 12px;"/>
 		    </g:else>
 		</a>
             </g:if>

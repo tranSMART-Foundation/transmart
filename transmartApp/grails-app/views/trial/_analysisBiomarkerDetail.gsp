@@ -9,10 +9,10 @@
                     [&nbsp;
                     <g:if test="${analysisvalue.valueMetric!= null && analysisvalue.valueMetric!=0}">
 			<g:if test="${analysisvalue.valueMetric>0}">
-			    <img alt="signature up" src="${resource(dir:'images',file:'up_arrow.PNG')}" />
+			    <asset:image alt="signature up" src="up_arrow.PNG" />
 			</g:if>
 			<g:else>
-			    <img alt="signature down" src="${resource(dir:'images',file:'down_arrow.PNG')}" />
+			    <asset:image alt="signature down" src="down_arrow.PNG" />
 			</g:else>
                     </g:if>
 
@@ -21,10 +21,10 @@
 		    <!--  gene expression/regulation status -->
                     <g:if test="${data.foldChangeRatio!= null}">
 			<g:if test="${data.foldChangeRatio>=0}">
-			    <img alt="fc up" src="${resource(dir:'images',file:'up_arrow.PNG')}" />
+			    <asset:image alt="fc up" src="up_arrow.PNG" />
 			</g:if>
 			<g:else>
-			    <img alt="fc down" src="${resource(dir:'images',file:'down_arrow.PNG')}" />
+			    <asset:image alt="fc down" src="down_arrow.PNG" />
 			</g:else>
                     </g:if>
                     <g:else>NA</g:else>

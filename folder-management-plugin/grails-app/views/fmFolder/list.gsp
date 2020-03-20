@@ -44,7 +44,7 @@
                             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 				<td>
 				    <g:link action='show' id="${fmFolderInstance.id}">
-					<img src="${resource(dir:'images/skin',file:'information.png',plugin:'rdc-core')}" alt="Detail link" border="0"/>
+					<asset:image src="skin/information.png" alt="Detail link" border="0"/>
 				    </g:link>
 				</td>
 				<td>${fmFolderInstance.folderName}</td>

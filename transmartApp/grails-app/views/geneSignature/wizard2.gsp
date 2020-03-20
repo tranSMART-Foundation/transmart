@@ -219,7 +219,7 @@
 					    <g:textField name='experimentTypeCellLineText' readonly='readonly' size='80%'/>
 					</g:else>
 					&nbsp;<a onclick="showCellLineLookup();">
-					    <img alt="Cell Line Lookup" src="${resource(dir:'images',file:'filter.png')}"/>
+					    <asset:image alt="Cell Line Lookup" src="filter.png"/>
 					</a>
 					</div>
 				    </td>

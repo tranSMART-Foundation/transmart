@@ -120,8 +120,8 @@
 				    </g:if>
 				</g:else>
 			    
-				<td style="text-align: center;"><img alt="remove item" onclick="javascript:removeNewItem(${n});"
-								     src="${resource(dir:'images',file:'remove.png')}" /></td>
+				<td style="text-align: center;"><asset:image alt="remove item" onclick="javascript:removeNewItem(${n});"
+									     src="remove.png" /></td>
 			    </tr>
 			</g:while>
 		    </tbody>

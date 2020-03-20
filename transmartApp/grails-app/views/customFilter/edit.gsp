@@ -10,8 +10,8 @@
 	    <span class="menuButton"><g:link class="list" action="list">Saved Filters</g:link></span>
 	    <% topicID = "1022" %>
 	    <a HREF='JavaScript:D2H_ShowHelp(<%=topicID%>,helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP )'>
-		<img src="${resource(dir: 'images', file: 'help/helpbutton.jpg')}" alt="Help" border=0 width=18pt
-		     style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;float:right"/>
+		<asset:image src="help/helpbutton.jpg" alt="Help" border="0" width="18pt"
+			     style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;float:right"/>
 	    </a>
 	</div>
 

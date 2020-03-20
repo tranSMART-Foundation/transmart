@@ -6,7 +6,7 @@
                     Summary Statistics
                     <g:if test="${grailsApplication.config.org.transmartproject.helpUrls.summaryStatistics}">
 			<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.summaryStatistics}">
-                            <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help"/>
+                            <asset:image src="help/helpicon_white.jpg" alt="Help"/>
 			</a>
                     </g:if>
 		</div>

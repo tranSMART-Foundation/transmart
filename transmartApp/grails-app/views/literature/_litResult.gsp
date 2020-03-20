@@ -89,11 +89,11 @@
 					<div style="float:none;">
                                             <a onclick="toggleDetail('${jubrifdivid}')">
 						<div id="${jubrifdivid}_fclose" style="visibility:hidden; display:none;width:16px;">
-                                                    <img src="${resource(dir: 'images', file: 'folder-minus.gif')}" style="vertical-align:middle;"/>
+                                                    <asset:image src="folder-minus.gif" style="vertical-align:middle;"/>
 						</div>
 
 						<div id="${jubrifdivid}_fopen" style="display:inline;width:16px;">
-                                                    <img src="${resource(dir: 'images', file: 'folder-plus.gif')}" style="vertical-align:middle;"/>
+                                                    <asset:image src="folder-plus.gif" style="vertical-align:middle;"/>
 						</div>
 						<g:if test="${jubData.reference.referenceTitle}">
                                                     <g:set var="descr" value="${jubData.reference.referenceTitle}"/>
@@ -116,7 +116,7 @@
 						<g:if test="${jubData.reference.referenceId?.startsWith('NCT')}">
                                                     <a style="border: none;" target="_blank" title="Clinical Trials"
                                                        href="http://www.clinicaltrials.gov/ct2/show/${jubData.reference.referenceId}">
-							<img alt="CT" src="${resource(dir: 'images', file: 'clinicaltrials.png')}"/>
+							<asset:image alt="CT" src="clinicaltrials.png"/>
 							&nbsp;Reference
                                                     </a>
 						</g:if>
@@ -124,7 +124,7 @@
                                                     <a style="border: none;"
                                                        href="http://www.controlled-trials.com/${jubData.reference.referenceId}"
                                                        target="_blank" title="Controlled Trials">
-							<img alt="ISRCTN" src="${resource(dir: 'images', file: 'controlledtrials.png')}"/>
+							<asset:image alt="ISRCTN" src="controlledtrials.png"/>
 							&nbsp;Reference
                                                     </a>
 						</g:elseif>
@@ -132,7 +132,7 @@
                                                     <a style="border: none;"
                                                        href="http://www.ncbi.nlm.nih.gov/pubmed/${jubData.reference.referenceId}"
                                                        target="_blank" title="PubMed ID">
-							<img alt="PubMed" src="${resource(dir: 'images', file: 'ncbi.png')}"/>
+							<asset:image alt="PubMed" src="ncbi.png"/>
 							&nbsp;Reference
                                                     </a>
 						</g:else>

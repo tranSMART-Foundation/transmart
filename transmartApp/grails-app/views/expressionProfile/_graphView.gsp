@@ -14,7 +14,7 @@
         <tr><td style="text-align: center;"><center>
 		    <g:set var="printURL" value="${createLink(action:'printChart') + '?' + epr.graphURL.substring(epr.graphURL.indexOf('filename='))}" />
 		    <a href="#" onclick="window.open('${printURL}','_boxplot','width=850,height=600,resizable=yes,scrollbars=yes,location=no,menubar=yes');">
-			<img src="${resource(dir:'images',file:'print.png')}" />
+			<asset:image src="print.png" />
 			Print Chart
 		    </a>
         </td></tr>
@@ -44,7 +44,7 @@
 					title: '${ds.experiment.accession}',
 					url: '${createLink(controller:'experimentAnalysis', action:'expDetail', id:ds.experimentId)}'
 					});">
-				<img alt="Experiment Detail" src="${resource(dir:'images',file:'view_detailed.png')}"/>&nbsp;
+				<asset:image alt="Experiment Detail" src="view_detailed.png"/>&nbsp;
 				<span style="font-weight: bold; color: #339933; white-space: nowrap;">${ds.experiment.accession}:</span>
 				&nbsp;&nbsp;${ds.experiment.title}
 			    </a>

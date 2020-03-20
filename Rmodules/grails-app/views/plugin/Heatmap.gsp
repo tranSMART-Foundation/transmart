@@ -10,7 +10,8 @@
 	    <h2>
 		Variable Selection
 		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatMap ?: "JavaScript:D2H_ShowHelp(1505,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-		    <img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
+ 		    <asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
+				 width="18pt" style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
 		</a>
 	    </h2>
 
@@ -34,7 +35,8 @@
 			Max rows to display:
 			<g:if test="${grailsApplication.config.org.transmartproject.helpUrls.heatMapMaxRows}">
 			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatMapMaxRows}">
-				<img src="${resource(dir: 'images/help', file: 'helpicon_white.jpg')}" alt="Help"/>
+				<asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
+					     width="18pt" style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
 			    </a>
 			</g:if>
 		    </label>

@@ -41,13 +41,13 @@
 							    toggleDetail('${trialresult.trial.trialNumber}')">
 						    <div id="${trialresult.trial.trialNumber}_fclose"
 							 style="visibility: hidden; display: none; width: 16px;">
-							<img alt="" src="${resource(dir: 'images', file: 'folder-minus.gif')}"
+							<asset:image alt="" src="folder-minus.gif"
 							     style="vertical-align: middle;"/>
 						    </div>
 
 						    <div id="${trialresult.trial.trialNumber}_fopen"
 							 style="display: inline; width: 16px;">
-							<img alt="" src="${resource(dir: 'images', file: 'folder-plus.gif')}"
+							<asset:image alt="" src="folder-plus.gif"
 							     style="vertical-align: middle;"/>
 						    </div>
 						</a>
@@ -60,7 +60,7 @@
 								url: '${createLink(action:'expDetail',id:trialresult.trialId)}'
 								}]);"
 						   onmouseout="delayedTask.cancel();">
-						    <img alt="" src="${resource(dir: 'images', file: 'view_detailed.png')}"
+						    <asset:image alt="" src="view_detailed.png"
 							 style="vertical-align: top;"/>
 						    <b><span style="color: #339933;">${trialresult.trial.trialNumber}</span>:&nbsp;&nbsp;${trialresult.trial.title}
 						    </b>
@@ -95,7 +95,7 @@
 				    <tr>
 					<td style="padding-left: 20px;">
 					    <div id="${trialresult.trial.trialNumber}_detail_loading" style="display:none">
-						<img src="${resource(dir: 'images', file: 'loader-small.gif')}" alt=""/>Loading...
+						<asset:image src="loader-small.gif" alt=""/>Loading...
 					    </div>
 					    <div id="${trialresult.trial.trialNumber}_detail" class="gtb1" style="display: none;"></div>
 					</td>

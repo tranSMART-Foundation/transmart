@@ -7,7 +7,7 @@
                          alt="tranSMART" style="position: relative; top: 8px;"/>
                 </td>
                 <td style="width: 10px; vertical-align:middle;padding-left:0px; padding-right:0px;">
-                    <img src="${resource(dir: 'images', file: 'c-med.gif')}" alt="arrow"
+                    <asset:image src="c-med.gif" alt="arrow"
                          style="position: relative; top: 8px;"/>
                 </td>
                 <td valign="middle" style="vertical-align:middle; border:1px; padding-rigtht:0px; font-size:11px"
@@ -81,8 +81,8 @@
                 </td>
                 <td>
                     <a target="_blank" HREF="${grailsApplication.config.org.transmartproject.helpUrls.search ?: "JavaScript:D2H_ShowHelp('1005',helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
-                        <img src="${resource(dir: 'images', file: 'help/helpicon_white.jpg')}" alt="Help" border=0
-                             width=18pt style="margin-top:10pt;margin-bottom:10pt;margin-right:18pt;"/>
+                        <asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
+                             width="18pt" style="margin-top:10pt;margin-bottom:10pt;margin-right:18pt;"/>
                     </a>
                 </td>
             </tr>
@@ -114,7 +114,7 @@
                 </g:link>
             </td>
             <td style="vertical-align: middle;">
-                <img src="${resource(dir: 'images', file: 'c-med.gif')}" alt=">"/>
+                <asset:image src="c-med.gif" alt="arrow" />
             </td>
             <td style="vertical-align: middle;">
                 <div id="search-text"></div>

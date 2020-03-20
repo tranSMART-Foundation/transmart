@@ -256,7 +256,7 @@
 						</g:if>
 						<td><g:textArea name="biomarker_${n}" class="biomarkerEntry" value="${bioMarkerValue}"/></td>
 						<td><div class="geneCheckIcon" id="geneCheckIcon${n}">&nbsp;</div></td>
-						<td style="text-align: center;"><img class="biomarkerDelete" name="biomarker_${n}" alt="remove item" src="${resource(dir:'images',file:'remove.png')}" /></td>
+						<td style="text-align: center;"><asset:image class="biomarkerDelete" name="biomarker_${n}" alt="remove item" src="remove.png" /></td>
 
 					    </tr>
 					    <%n++%>

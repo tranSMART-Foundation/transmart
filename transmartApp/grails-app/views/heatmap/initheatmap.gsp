@@ -6,7 +6,7 @@
 
     <body onLoad="init()">
 	<div style="margin-top:100px;text-align: center;">
-	    <img src="${resource(dir: 'images', file: 'loader-large.gif')}" alt="loading"/>
+	    <asset:image src="loader-large.gif" alt="loading"/>
 	</div>
 
 	<div style="margin-top:20px; text-align: center;"><b>Generating Heatmap...</b>

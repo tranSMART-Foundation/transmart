@@ -19,7 +19,7 @@
 		<td>
 		    <center>
 			<a href="#" onclick="window.print();">
-			    <img src="${resource(dir: 'images', file: 'print.png')}"/>
+			    <asset:image src="print.png"/>
 			    Print
 			</a>
 		    </center>

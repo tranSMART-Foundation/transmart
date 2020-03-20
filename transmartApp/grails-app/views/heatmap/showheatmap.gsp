@@ -37,7 +37,7 @@
                     style="text-align: center; padding: 0 0 0 0; white-space: nowrap;">
                     Gene Expression Comparison<br>
                     <div id="comHeatmapContainer">
-			<img src="${resource(dir: 'images', file: 'loader-mid.gif')}" alt="loading"/>
+			<asset:image src="loader-mid.gif" alt="loading"/>
                     </div>
                 </td>
             </g:if>
@@ -46,7 +46,7 @@
                     align="center" style="text-align: center; padding: 0 0 0 0; white-space: nowrap;">
 		    Gene Expression Correlation<br>
                     <div id="corHeatmapContainer">
-			<img src="${resource(dir: 'images', file: 'loader-mid.gif')}" alt="loading"/>
+			<asset:image src="loader-mid.gif" alt="loading"/>
 		    </div>
                 </td>
             </g:if>

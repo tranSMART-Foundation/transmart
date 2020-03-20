@@ -9,10 +9,10 @@
 		    <tr>
 			<td style="height: 20px!important;">${jobStatus}
 			    <g:if test="${i < statusIndex}">
-				<img src="${resource(dir: 'images', file: 'green_check.png')}"/>
+				<asset:image src="green_check.png"/>
 			    </g:if>
 			    <g:elseif test="${i == statusIndex}">
-				<img src="${resource(dir: 'images', file: 'loading-balls.gif')}"/>
+				<asset:image src="loading-balls.gif"/>
 			    </g:elseif>
 			</td>
 		    </tr>

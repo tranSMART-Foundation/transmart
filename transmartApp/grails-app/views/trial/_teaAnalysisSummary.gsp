@@ -17,7 +17,7 @@
                                 <!-- display TEA score if calculated -->
                                     <g:if test="${ar.teaScore}">
                                         <span style="font-weight:bold;">
-                                            [ <img alt="TEA" src="${resource(dir:'images',file:'tea_pot.ico')}"/>
+                                            [ <asset: alt="TEA" src="tea_pot.ico"/>
                                         <!--  regulation status -->
                                             <g:if test="${ar.bTeaScoreCoRegulated}">
                                                 <span style="font-style: italic; color: red">
@@ -47,7 +47,7 @@
 							url: '${createLink(action:'expDetail',id:ar.experimentId)}'
 							}]);"
                                            onmouseout="delayedTask.cancel();">
-                                            <img alt="Study Dtl" src="${resource(dir:'images',file:'view_detailed.png')}"
+                                            <asset:image alt="Study Dtl" src="view_detailed.png"
 						 style="vertical-align: top;"/>&nbsp;
 					    <span style="font-weight: bold; color: #339933;">${ar.experimentAccession}</span>
 					</a>
@@ -60,7 +60,7 @@
 						url: '${createLink(controller:'trial', action:'showAnalysis', id:ar.analysisId)}'
 						})"
                                        id="AnalysisDetail_${anadivid}_anchor">
-                                        <img alt="Analysis" src="${resource(dir:'images',file:'analysis.png')}"
+                                        <asset:image alt="Analysis" src="analysis.png"
 					     style="vertical-align: top;"/> ${content}
 				    </a>
                                 </div>
@@ -69,7 +69,7 @@
                             <!--  content links -->
                             <td width="10%" align="right">&nbsp;
 				<g:link class='normal' action='downloadanalysisexcel' id="${analysis.id}">
-                                    <img alt="download analysis" src="${resource(dir:'images',file:'Excel-16.gif')}"/>Excel
+                                    <asset:image alt="download analysis" src="Excel-16.gif"/>Excel
 				</g:link>
                             </td>
 
@@ -77,7 +77,7 @@
                             <!--
                             <sec:ifNotGranted roles="ROLE_PUBLIC_USER">
                                 <g:link class='normal' action='downloadanalysisgpe' id="${analysisId}">
-                                    <img alt="download analysis" src="${resource(dir:'images',file:'impex.png')}"/>Pathway Studio
+                                    <asset:image alt="download analysis" src="impex.png"/>Pathway Studio
 				</g:link>
                             </sec:ifNotGranted>
                             -->
@@ -95,11 +95,11 @@
                                 <td colspan="3" width="100%">
                                     <a onclick="toggleDetail('${bmDivId}')">
                                         <div id="${bmDivId}_fclose" style="visibility: hidden; display: none; width: 16px;">
-                                            <img alt="-" src="${resource(dir:'images',file:'folder-minus.gif')}"
+                                            <asset:image alt="-" src="folder-minus.gif"
 						 style="vertical-align: middle;"/>
                                         </div>
                                         <div id="${bmDivId}_fopen" style="display: inline; width: 16px;">
-                                            <img alt="+" src="${resource(dir:'images',file:'folder-plus.gif')}"
+                                            <asset:image alt="+" src="folder-plus.gif"
 						 style="vertical-align: middle;"/>
                                         </div>
                                         <b>BioMarkers</b>
@@ -121,10 +121,10 @@
                                             <g:createFilterDetailsLink id="${analysisvalue.bioMarkerId}" label="${analysisvalue.bioMarker?.name}" type='gene'/>
                                             <g:if test="${analysisvalue.analysisData?.foldChangeRatio!=null}"> (Fold Change:${analysisvalue.analysisData?.foldChangeRatio})
                                                 <g:if test="${analysisvalue.analysisData?.foldChangeRatio>0}">
-                                                    <img alt="signature up" src="${resource(dir:'images',file:'up_arrow.PNG')}"/>
+                                                    <asset:image alt="signature up" src="up_arrow.PNG"/>
                                                 </g:if>
                                                 <g:else>
-                                                    <img alt="signature down" src="${resource(dir:'images',file:'down_arrow.PNG')}"/>
+                                                    <asset:image alt="signature down" src="down_arrow.PNG"/>
                                                 </g:else>
                                             </g:if>
                                             <g:if test="${analysisvalue.analysisData.rvalue!=null}"> (R Value:${analysisvalue.analysisData.rvalue})</g:if>

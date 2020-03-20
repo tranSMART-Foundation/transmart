@@ -40,7 +40,7 @@ var assayCount = 3
 						    params="[eleId:overlayDiv, experimentId:experimentInstance.id]" 
 						    before="initLoadingDialog('${overlayDiv}')"
 						    onComplete="centerDialog('${overlayDiv}')">
-			    <img align="right" src="${resource(dir:'images', file:'pencil.png')}"/></g:remoteLink>
+			    <asset:image align="right" src="pencil.png"/></g:remoteLink>
                     </th>
 		</tr>
             </thead>
@@ -71,14 +71,14 @@ var assayCount = 3
 						</g:if>
 						<g:elseif test="${file.content.type=='Dataset Explorer Node Link'&&search==1}">
                                                     <g:link controller="datasetExplorer" params="[path: file.content.location]">Dataset Explorer
-							<img src="${resource(dir:'images', file:'internal-link.gif')}"/>
+							<asset:image src="internal-link.gif"/>
 						    </g:link>
 						</g:elseif>
                                             </g:each>
 					</g:if>
 					<g:if test="${searchId!=null}">
                                             | <g:link controller="search" action="newSearch" id="${searchId}">Search analyzed Data
-						<img src="${resource(dir:'images', file:'internal-link.gif')}"/>
+						<asset:image src="internal-link.gif"/>
 					    </g:link>
 					</g:if>
                                     </g:if>
@@ -113,7 +113,7 @@ var assayCount = 3
                     <th>&nbsp;</th>
                     <th align="right">
 			<div align="right">Subject1&nbsp;Level&nbsp;Data&nbsp;is&nbsp;available&nbsp;
-                            <a href="#subjectFake" onclick="showTab('analyze')"><img src="${resource(dir:'images', file:'application_go.png')}"/></a>
+                            <a href="#subjectFake" onclick="showTab('analyze')"><asset:image src="application_go.png"/></a>
 			</div>
                     </th>
 		</tr>

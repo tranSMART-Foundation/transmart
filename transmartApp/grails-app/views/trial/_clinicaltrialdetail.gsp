@@ -19,14 +19,16 @@
                             <g:elseif test="${file.content.type == 'Dataset Explorer Node Link' && search == 1}">
 				<g:link controller="datasetExplorer" params="[path: file.content.location]">
 				    Dataset Explorer
-				    <img src="${resource(dir: 'images', file: 'internal-link.gif')}"/>
+				    <asset:image src="internal-link.gif"/>
 				</g:link>
                             </g:elseif>
 			</g:each>
                     </g:if>
                     <g:if test="${searchId != null}">
-			| <g:link controller="search" action="newSearch" id="${searchId}">Search analyzed Data <img
-														   src="${resource(dir: 'images', file: 'internal-link.gif')}"/></g:link>
+			| <g:link controller="search" action="newSearch" id="${searchId}">
+			      Search analyzed Data
+			      <asset:image src="internal-link.gif"/>
+			  </g:link>
                     </g:if>
 		</td>
             </tr>

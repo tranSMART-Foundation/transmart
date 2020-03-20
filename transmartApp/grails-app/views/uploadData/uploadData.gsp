@@ -399,7 +399,7 @@
 
 <!-- Browse dialog -->
 <div id="divBrowseStudies" title="Studies" style="display: none;">
-    <img src="${resource(file:'ajax-loader.gif', dir:'images')}"/>
+    <asset:image src="ajax-loader.gif"/>
 </div>
 </body>
 </html>
