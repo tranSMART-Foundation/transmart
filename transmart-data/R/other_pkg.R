@@ -17,7 +17,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install()
 #source("http://bioconductor.org/biocLite.R");
 biocmanager.packages <-
-		intersect(new.packages, c("impute", "multtest", "CGHbase", "edgeR",
+		intersect(new.packages, c("impute", "multtest", "CGHbase", "edgeR", "DESeq2", "limma",
 								  "snpStats", "preprocessCore", "GO.db",
 								  "AnnotationDbi", "QDNAseq"));
 if (length(biocmanager.packages))
@@ -26,9 +26,9 @@ if (length(biocmanager.packages))
 # We still need to install the old package with biocLite first to install all dependencies.
 # For some reasons below installations does not take care of installing dependencies first.
 download.file(
-		url="http://bioconductor.org/packages/release/bioc/src/contrib/QDNAseq_1.20.0.tar.gz",
-		dest="/tmp/QDNAseq_1.20.0.tar.gz", method="internal");
-install.packages("/tmp/QDNAseq_1.20.0.tar.gz",
+		url="http://bioconductor.org/packages/release/bioc/src/contrib/QDNAseq_1.22.0.tar.gz",
+		dest="/tmp/QDNAseq_1.22.0.tar.gz", method="internal");
+install.packages("/tmp/QDNAseq_1.22.0.tar.gz",
 		repos=NULL, type="source");
 
 if (length(intersect(new.packages, c("CGHtest")))) {
