@@ -1,7 +1,7 @@
 <div class='vis-toolBar' >
     <div id="btnResultsExport" class='vis-toolbar-item'>
 	<a href="${createLink(controller:'gwasSearch', action:'getTableResults', params:[export: true, type: type])}">
-	    <img alt="" src="${resource(dir:'/images',file:'internal-link.gif')}" /> Export as CSV
+	    <asset:image alt="" src="internal-link.gif" /> Export as CSV
 	</a>
     </div>
 </div>
@@ -39,12 +39,12 @@
 		    <g:if test="${col.sortField.equals(sortField)}">
 			<g:if test="${order.equals('desc')}">
 			    <th class="sorting" tabindex="0" rowspan="1" colspan="1" style="width: 100px; cursor: pointer;" onclick="gwasLoadTableResultsGrid({sortField: '${col.sortField}', order: 'asc'})">
-				${col.sTitle} <img src="${resource([file:'desc.gif', dir:'images'])}"/>
+				${col.sTitle} <asset:image src="desc.gif"/>
 			    </th>
 			</g:if>
 			<g:else>
 			    <th class="sorting" tabindex="0" rowspan="1" colspan="1" style="width: 100px; cursor: pointer;" onclick="gwasLoadTableResultsGrid({sortField: '${col.sortField}', order: 'desc'})">
-				${col.sTitle} <img src="${resource([file:'asc.gif', dir:'images'])}"/>
+				${col.sTitle} <asset:image src="asc.gif"/>
 			    </th>
 			</g:else>
 		    </g:if>

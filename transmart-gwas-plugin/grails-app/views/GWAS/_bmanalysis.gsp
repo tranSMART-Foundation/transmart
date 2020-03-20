@@ -21,7 +21,7 @@
 		        <input type="hidden" id="analysis_results_${analysisId}_state" value="0"/>
 
 			<a href="#" onclick="gwasShowDetailDialog('${createLink(controller:'trial', action:'showAnalysis', id:analysisId)}', '${analysis.name.replace("'", "\\'")}');">
-	                    <img alt="Analysis" src="${resource(dir:'images',file:'analysis.png')}" style="vertical-align: top;margin-top: -2px;"/>
+	                    <asset:image alt="Analysis" src="analysis.png" style="vertical-align: top;margin-top: -2px;"/>
 			</a>                          
 	            </g:form>
                 </td>
@@ -34,8 +34,8 @@
 		<td style="color:red;font-weight:bold">${sensitiveDesc}</td>
                 <td onclick="${onAnalysisClick}" style="text-align:right; vertical-align:middle"  class="td-link">
                     <g:ifPlugin name='transmart-gwas'>
-                        <img alt="expand/collapse" id="imgExpand_${analysisId}"
-			     src="${resource(dir:'images',file:'down_arrow_small2.png')}"
+                        <asset:image alt="expand/collapse" id="imgExpand_${analysisId}"
+			     src="down_arrow_small2.png"
 			     style="vertical-align: middle; padding-left:10px; padding-right:10px;"/>
                     </g:ifPlugin>
                 </td>
@@ -59,7 +59,7 @@
 			<%-- <g:if test="${canExport==true}"> --%>
                         <div id="btnResultsExport_${analysisId}" class='vis-toolbar-item'>
 			    <a href="${createLink([controller:'gwasSearch', action:'getAnalysisResults', params:[export: true, analysisId: analysisId]])}">
-				<img alt="" src="${resource(dir:'images',file:'internal-link.gif')}"/> Export as CSV
+				<asset:image alt="" src="internal-link.gif"/> Export as CSV
 			    </a>
 			</div>
                         <div id="resultsExportOpts_${analysisId}" class='menuOptList' style="display:none;">
@@ -79,7 +79,7 @@
                     <div class='vis-toolBar'>
 			<div id="btnqqplotExport_${analysisId}" class='vis-toolbar-item' onclick="">
                             <a href="" target="_blank" id="qqplot_export_${analysisId}">
-				<img alt="" src="${resource(dir:'images',file:'internal-link.gif')}"/> Export as PNG
+				<asset:image alt="" src="internal-link.gif"/> Export as PNG
                             </a>
 			</div>
 			<div id ="qqplot_results_${analysisId}" class="heatmap_analysis"></div>
@@ -90,7 +90,7 @@
                     <div class='vis-toolBar'>
 			<div id="btnmanhattanplotExport_${analysisId}" class='vis-toolbar-item' onclick="">
                             <a href="" target="_blank" id="manhattanplot_export_${analysisId}">
-				<img alt="" src="${resource(dir:'images',file:'internal-link.gif')}"/> Export as PNG
+				<asset:image alt="" src="internal-link.gif"/> Export as PNG
                             </a>
 			</div>
 

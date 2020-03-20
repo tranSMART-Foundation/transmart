@@ -30,12 +30,12 @@
 			<g:if test="${col.sortField == sortField}">
 			    <g:if test="${order == 'desc'}">
 				<th class="sorting" tabindex="0" rowspan="1" colspan="1" style="width: 100px; cursor: pointer;" onclick="gwasLoadAnalysisResultsGrid(${analysisId}, {sortField: '${col.sortField}', order: 'asc'})">
-				    ${col.sTitle} <img src="${resource([file:'desc.gif', dir:'images'])}"/>
+				    ${col.sTitle} <asset:image src="desc.gif"/>
 				</th>
 			    </g:if>
 			    <g:else>
 				<th class="sorting" tabindex="0" rowspan="1" colspan="1" style="width: 100px; cursor: pointer;" onclick="gwasLoadAnalysisResultsGrid(${analysisId}, {sortField: '${col.sortField}', order: 'desc'})">
-				    ${col.sTitle} <img src="${resource([file:'asc.gif', dir:'images'])}"/>
+				    ${col.sTitle} <asset:image src="asc.gif"/>
 				</th>
 			    </g:else>
 			</g:if>
@@ -63,7 +63,7 @@
 			<g:if test="${colNum == 1}">
 			    <td class="">
 				<a href="${link}" target="_blank"><span class="filter-item filter-item-gene">${data}</span></a>
-				<img alt="" src="${resource(dir:'images',file:'linkext7.gif')}" />
+				<asset:image alt="" src="linkext7.gif" />
 			    </td>
 			</g:if>
 			<g:else>

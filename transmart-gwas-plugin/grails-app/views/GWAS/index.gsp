@@ -189,7 +189,7 @@
 
 	  	<%-- <div id="searchResultOptions_holder">
 		     <div id="searchResultOptions_btn" class='toolbar-item'>
-			 Options <img alt="" style='vertical-align:middle;' src="${resource(dir:'images',file:'tiny_down_arrow.png')}"/>
+			 Options <asset:image alt="" style='vertical-align:middle;' src="tiny_down_arrow.png"/>
 		     </div>
 		     <div id="searchResultOptions" class='auto-hide' style="display:none;">
 			 <ul>
