@@ -10,7 +10,7 @@
 	    %{--help and title--}%
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.lineGraph ?: "JavaScript:D2H_ShowHelp(1291,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.lineGraph ?: '/transmartmanual/advanced_workflow.html#line-graph'}">
 		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
 		</a>
 	    </h2>

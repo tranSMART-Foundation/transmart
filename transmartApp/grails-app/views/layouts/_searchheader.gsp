@@ -80,7 +80,7 @@
 
                 </td>
                 <td>
-                    <a target="_blank" HREF="${grailsApplication.config.org.transmartproject.helpUrls.search ?: "JavaScript:D2H_ShowHelp('1005',helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+                    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.search ?: '/transmartmanual/index.html'}">
                         <asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
                              width="18pt" style="margin-top:10pt;margin-bottom:10pt;margin-right:18pt;"/>
                     </a>

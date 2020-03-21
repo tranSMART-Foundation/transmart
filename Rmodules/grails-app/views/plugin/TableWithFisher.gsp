@@ -10,7 +10,7 @@
 	    %{--help and title--}%
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.tableWithFisher ?: "JavaScript:D2H_ShowHelp(1272,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.tableWithFisher ?: '/transmartmanual/advanced_workflow.html#table-with-fisher-test'}">
 		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
 		</a>
 	    </h2>

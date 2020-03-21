@@ -11,7 +11,7 @@
 	    %{--help and title--}%
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.boxPlot ?: "JavaScript:D2H_ShowHelp(1310,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.boxPlot ?: 'transmartmanual/advanced_workflow.html#box-plot-with-anova'}">
 		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
 		</a>
 	    </h2>

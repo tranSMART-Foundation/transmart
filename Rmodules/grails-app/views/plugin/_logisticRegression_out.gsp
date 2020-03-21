@@ -31,7 +31,7 @@
 		    <th>
 			<span class='AnalysisHeader'>
 			    Logistic Regression
-			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.logisticRegression ?: "JavaScript:D2H_ShowHelp(1350,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.logisticRegression ?: '/transmartmanual/advanced_workflow.html#logistic-regression'}">
 				<asset:image src="help/helpicon_white.jpg" alt="Help" border="0" width="18pt"
 				     style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
 			    </a>			

@@ -9,7 +9,7 @@
 
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.hierarchicalClustering ?: "JavaScript:D2H_ShowHelp(1506,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.hierarchicalClustering ?: 'transmartmanual/advanced_workflow.html#hierarchical-clustering'}">
 		    <asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
 		     width="18pt" style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
 		</a>
@@ -34,7 +34,7 @@
 		    <label for="txtMaxDrawNumber">
 			Max rows to display:
 			<g:if test="${grailsApplication.config.org.transmartproject.helpUrls.hierarchicalClusteringMaxRows}">
-			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.hierarchicalClusteringMaxRows}">
+			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.hierarchicalClusteringMaxRows ?: '/transmartmanual/advanced_workflow.html#max-rows-to-display'}">
 				<asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
 					     width="18pt" style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
 			    </a>

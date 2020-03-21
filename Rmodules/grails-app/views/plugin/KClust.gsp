@@ -9,7 +9,7 @@
 
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClustering ?: "JavaScript:D2H_ShowHelp(1507,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClustering ?: '/transmartmanual/advanced_workflow.html#k-means-clustering'}">
 		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
 		</a>
 	    </h2>
@@ -36,7 +36,7 @@
 		    <label for="txtMaxDrawNumber">
 			Max rows to display:
 			<g:if test="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClusteringMaxRows}">
-			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClusteringMaxRows}">
+			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClusteringMaxRows ?: '/transmartmanual/advanced_workflow.html#max-rows-to-display'}">
 				<asset:image src="help/helpicon_white.jpg" alt="Help"/>
 			    </a>
 			</g:if>

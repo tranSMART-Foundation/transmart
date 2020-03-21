@@ -9,7 +9,7 @@
 
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.pca ?: "JavaScript:D2H_ShowHelp(1511,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.pca ?: '/transmartmanual/advanced_workflow.html#pca'}">
 		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
 		</a>
 	    </h2>

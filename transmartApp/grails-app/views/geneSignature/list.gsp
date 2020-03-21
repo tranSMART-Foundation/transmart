@@ -27,7 +27,7 @@
 
 		<p style="text-align: right;"><span class="button"><g:actionSubmit class="edit" action="createWizard" value="New Signature"/></span></p>
 
-		<h1>Gene Signature Lists &nbsp;&nbsp;<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.geneSignatureList ?: "JavaScript:D2H_ShowHelp('1259','${grailsApplication.config.com.recomdata.adminHelpURL}','wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+		<h1>Gene Signature Lists &nbsp;&nbsp;<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.geneSignatureList ?: '/transmartmanual/gene_lists.html'}">
 			<asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
 				     width="18pt" style="vertical-align:middle;margin-left:5pt;"/>
 		</a></h1>
@@ -89,7 +89,7 @@
 		<br>
 
 		<p style="text-align: right;"><span class="button"><g:actionSubmit class="edit" action="createListWizard" value="New Gene/RSID List"/></span></p>
-		<h1>Gene/RSID Signature Lists &nbsp;&nbsp;<a target="_blank" HREF="${grailsApplication.config.org.transmartproject.helpUrls.rsIdSignatureList ?: "JavaScript:D2H_ShowHelp('1259','${grailsApplication.config.com.recomdata.adminHelpURL}','wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+		<h1>Gene/RSID Signature Lists &nbsp;&nbsp;<a target="_blank" HREF="${grailsApplication.config.org.transmartproject.helpUrls.rsIdSignatureList ?: '/transmartmanual/gene_lists.html'}">
 			<asset:image src="help/helpicon_white.jpg" alt="Help"
 				     border="0" width="18pt" style="vertical-align:middle;margin-left:5pt;"/>
 		</a></h1>
@@ -134,12 +134,6 @@
 		</table>
 	    </g:form>
 	</div>
-
-	<asset:javascript src="help/D2H_ctxt.js"/>
-
-	<script>
-	    helpURL = '${grailsApplication.config.com.recomdata.adminHelpURL}';
-	</script>
 
 	<script>
     function handleActionItem(actionItem, id) {

@@ -9,7 +9,7 @@
 
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.scatterPlot ?: "JavaScript:D2H_ShowHelp(1512,helpURL,'wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.scatterPlot ?: '/transmartmanual/advanced_workflow.html#scatter-plot-with-linear-regression'}">
 		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
 		</a>
 	    </h2>

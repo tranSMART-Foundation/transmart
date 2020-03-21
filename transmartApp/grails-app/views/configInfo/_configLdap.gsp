@@ -1,5 +1,5 @@
 <h2>Ldap &nbsp;&nbsp;
-    <a target="_blank" href="${grailsApplication.config.com.recomdata.adminHelpURL ?: "JavaScript:D2H_ShowHelp('1259','${grailsApplication.config.com.recomdata.adminHelpURL}','wndExternal',CTXT_DISPLAY_FULLHELP )"}">
+    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.adminConfig ?: '/transmartmanual/admin.html#package-and-configuration'}" >
         <asset:image src="help/helpicon_white.jpg"
 	             alt="Help" border="0" width="18pt" style="vertical-align:middle;margin-left:5pt;"/>
     </a>
