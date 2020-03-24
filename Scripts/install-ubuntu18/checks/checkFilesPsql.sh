@@ -2,7 +2,7 @@
 
 # ********************************************************************************
 # This script checks for and reports missing files and directories that are required
-# for the tranSAMRT install and data loading
+# for the tranSMART install and data loading
 # ********************************************************************************
 
 function checkForPostgresTablespaceFolder {
@@ -61,7 +61,7 @@ fi
 
 echo "checking for the individual tablespace folders"
 returnValue=0
-for folderName in biomart deapp indx search_app transmart
+for folderName in indx transmart i2b2 i2b2_index
 do
 	if ! checkForPostgresTablespaceFolder $folderName; then
 		echo "  Something is wrong with the postgres tablespace folder $folderName"

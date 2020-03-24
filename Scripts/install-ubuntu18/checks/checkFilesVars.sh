@@ -2,7 +2,7 @@
 
 # ********************************************************************************
 # This script checks for and reports missing files and directories that are required
-# for the tranSAMRT install and data loading
+# for the tranSMART install and data loading
 # ********************************************************************************
 
 base="$INSTALL_BASE/transmart-data"

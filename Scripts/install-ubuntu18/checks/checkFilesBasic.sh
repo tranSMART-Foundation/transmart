@@ -2,7 +2,7 @@
 
 # ********************************************************************************
 # This script checks for and reports missing files and directories that are required
-# for the tranSAMRT install and data loading
+# for the tranSMART install and data loading
 # ********************************************************************************
 
 echo "-------------------------------------"
@@ -26,7 +26,7 @@ if [ ! -e "$filepath" ]; then
 	returnValue=1
 fi
 
-for envDir in data-integration tranSMART-ETL
+for envDir in data-integration transmart-etl
 do
 	filepath="$baseEnv/$envDir"
 	if [ ! -e "$filepath" ]; then

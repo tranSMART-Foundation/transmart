@@ -37,9 +37,9 @@ function checkInstallError {
 if [ -z "$SCRIPTS_BASE" ] ; then SCRIPTS_BASE="$HOME/transmart" ; fi
 
 echo "Starting at $(date)"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++"
 echo "+  Checking locations of Script Directory"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++"
 if ! [ -d "$SCRIPTS_BASE/Scripts" ] ; then
 	echo "This script assumes that the Scripts directory is installed at $SCRIPTS_BASE/Scripts"
 	echo "It does not appear to be there. Please fix that and restart this script."
@@ -54,9 +54,9 @@ else
 fi
 echo "Finished checking locations of Script Directory at $(date)"
 
-echo "++++++++++++++++++++++++++++"
-echo "+  set up working dir (tranSMART install base) "
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  set up working dir (tranSMART install base)"
+echo "++++++++++++++++++++++++++++++++++++++++++++++"
 
 if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
 export INSTALL_BASE
@@ -74,14 +74,15 @@ source welcome.sh
 sudo -k
 sudo -v
 
-echo "++++++++++++++++++++++++++++"
-echo "+  install make "
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++"
+echo "+  install make"
+echo "+++++++++++++++"
+# gmake on ubuntu18 is simply called 'make'
 sudo apt-get -q install -y make
 
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++"
 echo "+  set up the transmart-data folder"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE
 sudo -v
@@ -97,9 +98,9 @@ fi
 
 echo "Finished setting up the transmart-date folder at $(date)"
 
-echo "++++++++++++++++++++++++++++"
-echo "+  Install of basic tools and dependencies "
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++"
+echo "+  Install of basic tools and dependencies"
+echo "++++++++++++++++++++++++++++++++++++++++++"
 
 # sudo make -C env ubuntu_deps_root
 #   In the makefile target, ubuntu_deps_root, causes a
@@ -128,9 +129,9 @@ echo " "
 
 echo "Finished setting ubuntu dependencies (with root) at $(date)"
 
-echo "++++++++++++++++++++++++++++"
-echo "+  Dependency: Install of tranSMART-ETL"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++"
+echo "+  Dependency: Install of transmart-etl"
+echo "+++++++++++++++++++++++++++++++++++++++"
 
 # make -C env ubuntu_deps_regular
 #   In the makefile target, ubuntu_deps_regular, causes a
@@ -142,13 +143,13 @@ make -C env update_etl_git
 # verify ETL folder
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesETLFolder.sh
-if [ "$( checkInstallError "The directory transmart-data/tranSMART-ETL was not installed properly; redo install" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "The directory transmart-data/env/transmart-etl was not installed properly; redo install" )" ] ; then exit -1; fi
 
 echo "make -C env update_etl - finished at $(date)"
 
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "+  Dependency: Install of data-integration"
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++"
 
 # (2)
 sudo -v
@@ -157,13 +158,13 @@ make -C env data-integration
 # verify data-integration folder
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesDataIntegrationFolder.sh
-if [ "$( checkInstallError "The directory transmart-data/data-integration was not installed properly; redo install" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "The directory transmart-data/env/data-integration was not installed properly; redo install" )" ] ; then exit -1; fi
 
 echo "make -C env data-integration - finished at $(date)"
 
-echo "++++++++++++++++++++++++++++"
-echo "+  Dependency: Install of vars          "
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++"
+echo "+  Dependency: Install of vars"
+echo "++++++++++++++++++++++++++++++"
 
 # (3)
 sudo -v
@@ -174,15 +175,14 @@ cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesVars.sh
 if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
 
+# source the vars file to set the path for groovy below
+. ./vars
+
 echo "make -C env ../vars - finished at $(date)"
 
-# (4) -- this last step is replaced by the sdk calls below
-# make -C env groovy
-echo " "
-
-echo "++++++++++++++++++++++++++++"
-echo "+  Dependency: Install of grails, groovy"
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  Dependency: Install of ant, maven, groovy"
+echo "++++++++++++++++++++++++++++++++++++++++++++"
 
 echo "Finished setting ubuntu dependencies (without root) at $(date)"
 sudo -v
@@ -190,29 +190,23 @@ sudo apt-get -q install -y ant
 sudo apt-get -q install -y maven
 echo "Finished install of ant and maven at $(date)"
 
-# No longer need to remove this as the make step that creates it is not skipped!
-# rm $INSTALL_BASE/transmart-data/env/groovy
+make -C env groovy
+echo "make -C env groovy - finished at $(date)"
 
-curl -s get.sdkman.io | bash
-echo "Y" > AnswerYes.txt
-source $HOME/.sdkman/bin/sdkman-init.sh
-sdk install grails 2.3.11 < AnswerYes.txt
-sdk install groovy 2.4.5 < AnswerYes.txt
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
-./checkSdkmanApps.sh
-if [ "$( checkInstallError "groovy and/or grails not installed correctly; redo install" )" ] ; then exit -1; fi
+./checkGroovy.sh
+if [ "$( checkInstallError "groovy not installed correctly; redo install" )" ] ; then exit -1; fi
 
-echo "Finished install of groovy and grails at $(date)"
+echo "Finished install of groovy at $(date)"
 
-echo "++++++++++++++++++++++++++++"
-echo "+  Checks on install of tools and dependencies          "
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  Checks on install of tools and dependencies"
+echo "++++++++++++++++++++++++++++++++++++++++++++++"
 
 # fix files for postgres
 echo "Patch dir permits for TABLESPACES"
 sudo -v
 cd $INSTALL_BASE/transmart-data
-. ./vars
 sudo chmod 700 $TABLESPACES/*
 
 echo "Checks on basic load"
@@ -232,9 +226,9 @@ if [ "$( checkInstallError "Database table folders needs by transmart not correc
 
 echo "Finished installing basic tools and dependencies at $(date)"
 
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++"
 echo "+  Install Tomcat 8"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++"
 
 sudo -v 
 cd $HOME
@@ -249,22 +243,9 @@ if [ "$( checkInstallError "Tomcat install failed; redo install" )" ] ; then exi
 
 echo "Finished installing tomcat at $(date)"
 
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++"
 echo "+  Install R, Rserve and other packages"
-echo "++++++++++++++++++++++++++++"
-
-# could be install from apt-get when version 3.1+ becomes available
-# as of Dec 23 2015 - current install is 3.0.2 - >=3.1.0 required
-# Specifically: https://cran.r-project.org/web/packages/plyr/plyr.pdf
-
-#sudo -v
-#sudo apt-get install -y r-base=3.0.2-1ubuntu1
-#cd $INSTALL_BASE/transmart-data/R
-#R_MIRROR="http://cran.utstat.utoronto.ca/"
-#R_EXEC=$(which R)
-#sudo CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f cran_pkg.R
-#sudo CRAN_MIRROR=$(R_MIRROR) $(R_EXEC) -f other_pkg.R
-# also set up install_rserve_init (see below)
+echo "+++++++++++++++++++++++++++++++++++++++"
 
 base="$INSTALL_BASE/transmart-data"
 baseR="$base/R"

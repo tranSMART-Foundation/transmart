@@ -2,7 +2,7 @@
 
 # ********************************************************************************
 # This script checks for and reports incompatible version numbers in the 
-# linux command lines that are needed for the tranSAMRT install and data loading
+# linux command lines that are needed for the tranSMART install and data loading
 # ********************************************************************************
 
 function checkURL {

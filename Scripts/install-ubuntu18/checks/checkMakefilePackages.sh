@@ -2,7 +2,7 @@
 
 # ********************************************************************************
 # This script checks for and reports missing items in the list of basic
-# linux command lines that are needed for the tranSAMRT install and data loading
+# linux command lines that are needed for the tranSMART install and data loading
 # ********************************************************************************
 
 # # ------------------ helper function -------------------
