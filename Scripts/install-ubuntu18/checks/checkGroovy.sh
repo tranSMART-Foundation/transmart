@@ -2,23 +2,21 @@
 
 # ********************************************************************************
 # This script checks for and reports missing items in the list of basic
-# linux command lines that are needed for the tranSAMRT install and data loading
+# linux command lines that are needed for the tranSMART install and data loading
 # ********************************************************************************
 
 # # ------------------ helper function -------------------
 . ./basicsHelper.sh
 
-echo "-------------------------------------"
+echo "---------------------------------------------------------------------------------"
 echo "|  Checking for basic command-line tools; if any of the following does not exist,"
 echo "|  then recheck the instructions for installing the missing items"
-echo "-------------------------------------"
+echo "---------------------------------------------------------------------------------"
 
-# Just in case this is run after the load, without a new login 
-# sets up grails and groovy; normally in profile for login
-source $HOME/.sdkman/bin/sdkman-init.sh
+# Depends on the path set up by sourceing transmart-data/vars
 
 probe=0
-for command in groovy grails
+for command in groovy
 do
     if ! checkForCommandLineTool "$command"; then
         probe=1
