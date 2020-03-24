@@ -35,8 +35,8 @@ else
     fi
 fi
 
-# check R version, exactly 3.1.2
-desiredRVersion="3.1.2"
+# check R version, exactly 3.6.1
+desiredRVersion="3.6.1"
 RVersion=$(R --version | awk -F '^R version ' '{print $2}')
 reportCheckExact "R" $desiredRVersion $RVersion
 returnFlag=$?
@@ -51,7 +51,7 @@ results=$?
 if (( ! $results )); then
     echo "OK; Rserve and the other packages required appear to be available"
 else
-    echo "One or more required package is missing from R;"
+    echo "One or more required package(s) is missing from R;"
     echo "  see probeRserve.R for a method of checking the details."
 fi 
 

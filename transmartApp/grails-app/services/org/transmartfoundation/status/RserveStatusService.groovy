@@ -18,12 +18,15 @@ class RserveStatusService {
     private static final String SIMPLE_EXPRESSION = 'rnorm(10)'
     private static final String REQUIRED_PACKAGES_NAME = 'required.packages'
     private static final String[] REQUIRED_PACKAGES =
-	['reshape2', 'ggplot2', 'data.table', 'Cairo',
-	 'snowfall', 'gplots', 'Rserve', 'foreach', 'doParallel', 'visreg',
-         'pROC', 'jsonlite', 'RUnit',
-         'WGCNA', 'impute', 'multtest', 'CGHbase', 'CGHtest','CGHtestpar',
-         'edgeR', 'snpStats', 'preprocessCore',
-	 'GO.db', 'AnnotationDbi', 'QDNAseq']
+	['reshape', 'reshape2', 'ggplot2', 'data.table', 'Cairo',
+	 'snowfall', 'gplots', 'foreach', 'doParallel', 'visreg',
+         'pROC', 'jsonlite', 'RUnit', 'shiny',
+	 'Rserve',
+         'WGCNA', 'impute', 'multtest',
+	 'CGHbase', 'CGHtest','CGHtestpar',
+         'edgeR', 'DESeq2', 'limma',
+	 'snpStats', 'preprocessCore', 'GO.db',
+	 'AnnotationDbi', 'QDNAseq']
     private static final String MISSING_PACKAGES_EXPRESSION =
 	'required.packages[!(required.packages %in% installed.packages()[,"Package"])]'
 
