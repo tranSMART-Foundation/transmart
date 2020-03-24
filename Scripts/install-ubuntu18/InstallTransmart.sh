@@ -280,13 +280,14 @@ if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1;
 echo "Finished installing R and R packages at $(date)"
 
 
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+  Set up basic PostgreSQL; supports transmart login"
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 # only load database if not already loaded
 set +e
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
+sudo -u postgres psql -c "create role transmartadmin superuser createdb createrole login password 'transmart'"
 ./checkPsqlDataLoad.sh quiet
 returnCode=$?
 set -e
