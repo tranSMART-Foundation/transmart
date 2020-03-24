@@ -33,25 +33,18 @@ reportCheckOrHigher "php" $desiredPhpVersion $phpVersion
 
 let "returnFlag=$returnFlag + $?"
 
-# check psql version, 9.2 or higher
-desiredPsqlVersion="9.2"
+# check psql version, 10.0 or higher
+desiredPsqlVersion="10.0"
 version=$(psql --version)
 psqlVersion=$( echo "$version" | awk -F '^psql .PostgreSQL. ' '{print $2}')
 reportCheckOrHigher "psql" $desiredPsqlVersion $psqlVersion
 
 let "returnFlag=$returnFlag + $?"
 
-# check groovy version, 2.1 or higher
-desiredGroovyVersion="2.1"
+# check groovy version, 2.4 or higher
+desiredGroovyVersion="2.4"
 groovyVersion=$(groovy --version | awk -F '^Groovy Version: ' '{print $2}')
 reportCheckOrHigher "groovy" $desiredGroovyVersion $groovyVersion
-
-let "returnFlag=$returnFlag + $?"
-
-# check grails version, exactly 2.3.11
-desiredGrailsVersion="2.3.11"
-grailsVersion=$(grails --version | awk -F '^Grails version: ' '{print $2}')
-reportCheckExact "grails" $desiredGrailsVersion $grailsVersion
 
 let "returnFlag=$returnFlag + $?"
 
