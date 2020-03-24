@@ -1,8 +1,8 @@
 PGHOST=localhost
 PGPORT=5432
 PGDATABASE=transmart
-PGUSER=postgres
-PGPASSWORD=
+PGUSER=transmartadmin
+PGPASSWORD=transmart
 
 PGSQL_BIN="/usr/bin/"
 TABLESPACES=/var/lib/postgresql/tablespaces/
