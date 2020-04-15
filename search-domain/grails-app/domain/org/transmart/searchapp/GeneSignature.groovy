@@ -22,8 +22,10 @@ package org.transmart.searchapp
 import com.recomdata.util.ExcelGenerator
 import com.recomdata.util.ExcelSheet
 import com.recomdata.util.IDomainExcelWorkbook
+
 import groovy.util.logging.Slf4j
 
+import org.hibernate.Hibernate
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.CellLine
 import org.transmart.biomart.Compound
@@ -56,7 +58,7 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
     ConceptCode foldChgMetricConceptCode
     Date lastUpdated
     AuthUser modifiedByAuthUser
-    Boolean multipleTestingCorrection
+    Boolean multipleTestingCorrection = false
     String name
     ConceptCode normMethodConceptCode
     String normMethodOther
@@ -167,20 +169,16 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      * parse comma separated Ids into a list
      */
     List<String> getPmIdsAsList() {
-	logger.info 'getPmIdsAsList "{}"', pmIds
 	if (pmIds == null) {
 	    return []
         }
 
 	List<String> ids = pmIds.split(',')*.trim()
-	logger.info 'pmIdList {}', ids
 
 	ids
     }
 
     GeneSignature clone() {
-
-	logger.info 'clone'
 
         GeneSignature clone = new GeneSignature()
 	copyPropertiesTo clone
@@ -192,8 +190,6 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      * create a Map with the properties and values for each property similar to a request map
      */
     Map createParamMap() {
-	logger.info 'createParamMap'
-
 	[name                           : name,
 	 description                    : description,
 	 uploadFile                     : uploadFile,
@@ -241,7 +237,6 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
      * copy properties from this instance to the specified object
      */
     void copyPropertiesTo(GeneSignature gs) {
-	logger.info 'GeneSignature copyPropertiesTo'
 	gs.analysisMethodConceptCode = analysisMethodConceptCode
 	gs.analysisMethodOther = analysisMethodOther
 	gs.analystName = analystName
@@ -283,6 +278,31 @@ class GeneSignature implements Cloneable, IDomainExcelWorkbook {
 	gs.uniqueId = uniqueId
 	gs.uploadFile = uploadFile
         gs.versionNumber = versionNumber
+
+	/*
+	 * this is called from a controller so we need to encourage
+	 * fetching the following data until all calls are through a service
+	 */
+
+	Hibernate.initialize gs.analysisMethodConceptCode
+	Hibernate.initialize gs.analyticCatConceptCode
+	Hibernate.initialize gs.experimentTypeConceptCode
+	Hibernate.initialize gs.foldChgMetricConceptCode
+	Hibernate.initialize gs.normMethodConceptCode
+	Hibernate.initialize gs.ownerConceptCode
+	Hibernate.initialize gs.pValueCutoffConceptCode
+	Hibernate.initialize gs.sourceConceptCode
+	Hibernate.initialize gs.speciesConceptCode
+	Hibernate.initialize gs.speciesMouseSrcConceptCode
+	Hibernate.initialize gs.tissueTypeConceptCode
+	Hibernate.initialize gs.createdByAuthUser
+	Hibernate.initialize gs.modifiedByAuthUser
+	Hibernate.initialize gs.treatmentCompound
+	Hibernate.initialize gs.experimentTypeCellLine
+	Hibernate.initialize gs.fileSchema
+	Hibernate.initialize gs.parentGeneSignature
+	Hibernate.initialize gs.techPlatform
+
     }
 
     /**
