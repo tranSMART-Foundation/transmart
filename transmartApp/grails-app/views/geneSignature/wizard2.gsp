@@ -172,13 +172,14 @@
 			    <g:select name='techPlatform.id' from="${wizard.platforms}"
 				      value="${existingValues.'techPlatform.id'}"
 				      noSelection="['null':'select tech platform']"
-				      optionValue="${{it?.vendor + ' - ' + it?.array + ' [' + it?.accession + ']'}}"
+				      optionValue="${{it?.vendor + ' - ' + (it?.array ?: (it.platformTechnology ? (it.platformType + ' by ' + it.platformTechnology) : it.platformType)) + ' [' + it?.accession + ']'}}"
 				      optionKey='id'
 				      onChange="javascript: toggleOtherDiv(this, 'platform_other_div');"/>
 			    <div id="platform_other_div" style="display: none;">
 				<label>please provide 'other' accession #<g:requiredIndicator/>:</label>
 				<br/><input type="text" name="techPlatformOther" size="100%"/>
 			    </div>
+			</td>
 		    </tr>
 		    <tr class="prop">
 			<td class="name">Tissue Type</td>
