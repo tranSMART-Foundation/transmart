@@ -29,6 +29,10 @@
 		<title>Gene List Create</title>
 	</g:else>
 
+    </head>
+
+    <body>
+
 	<script disposition="head">$j = jQuery.noConflict();</script>
 
 	<script disposition="head">
@@ -111,7 +115,7 @@
             return foundEntry;
         }
 
-		function validate() {
+	function validate() {
 
             var errorMsg = "";
 			// list name required
@@ -129,7 +133,7 @@
 
             alert("Please correct the following errors:\n" + errorMsg);
             return false;
-		}
+	}
 
         function createNewInputIfRequired(index) {
             var removeImage = "${resource(dir:'images',file:'remove.png')}"
@@ -175,10 +179,6 @@
 
         }
 	</script>
-    </head>
-
-    <body>
-
 	<div class="body">
 	    <!-- initialize -->
 	    <g:set var="gs" value="${wizard.geneSigInst.properties}" />
@@ -220,7 +220,7 @@
 			<tr>
 			    <td class="name">Enter List Manually
 				<br/>
-				<span class="infotext">Type or copy and paste a list of genes and/or SNPs here. The form will expand as needed. Pasted lists should be comma or new line separated.</span>
+				<span class="infotext">Type or copy and paste a list of genes and/or SNPs here. The form will expand as needed. Pasted lists should be comma or new line separated.</br>All genes that match the gene symbol from any species will be included.</span>
 			    </td>
 			    <td>
 				<table class="detail" width="300" id="biomarkerList">
