@@ -40,10 +40,9 @@ ui {
             dataExportJobs.hide = false
             // Note: by default the analysisJobs panel is NOT shown
             // Currently, it is only used in special cases
-            analysisJobs.hide = true
+            analysisJobs.show = false
             workspace.hide = false
-	    xnatEnabled.show = false
-	    genePatternEnabled = false
+	    xnatViewer.show = false
         }
     }
     /*
@@ -241,8 +240,8 @@ com { recomdata { solr {
 
 /* {{{ Dataset Explorer configuration */
 com { recomdata { datasetExplorer {
-    // set to 'true' (quotes included) to enable gene pattern integration
-    genePatternEnabled = 'false'
+    // set to true (no quotes to enable gene pattern integration
+    genePatternEnabled = false
     // The tomcat URL that gene pattern is deployed within -usually it's proxyed through apache
     genePatternURL = 'http://23.23.185.167'
     // Gene Pattern real URL with port number
@@ -416,7 +415,7 @@ grails { plugin { springsecurity {
             '/css/**'                     : ['IS_AUTHENTICATED_ANONYMOUSLY'],
             '/js/**'                      : ['IS_AUTHENTICATED_ANONYMOUSLY'],
             '/grails-errorhandler'        : ['IS_AUTHENTICATED_ANONYMOUSLY'],
-            '/images/analysisFiles/**'    : ['IS_AUTHENTICATED_REMEMBERED'],
+            '/analysisFiles/**'           : ['IS_AUTHENTICATED_REMEMBERED'],
             '/images/**'                  : ['IS_AUTHENTICATED_ANONYMOUSLY'],
             '/static/**'                  : ['IS_AUTHENTICATED_ANONYMOUSLY'],
             '/search/loadAJAX**'          : ['IS_AUTHENTICATED_ANONYMOUSLY'],
