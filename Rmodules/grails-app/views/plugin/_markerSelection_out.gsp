@@ -6,8 +6,9 @@
     </div>
 
     <g:each var='location' in="${imageLocations}">
+        <g:logMsg>markerselection_out getContextPath '${request.getContextPath()}' location '${location}'</g:logMsg>
         <a onclick="window.open('${request.getContextPath()}${location}', '_blank')">
-            <g:img file="${request.getContextPath()}${location}" class='img-result-size'/>
+            <img src="${request.getContextPath()}${location}" class='img-result-size' />
         </a>
     </g:each>
 

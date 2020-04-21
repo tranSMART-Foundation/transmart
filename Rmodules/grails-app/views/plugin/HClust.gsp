@@ -33,12 +33,9 @@
 
 		    <label for="txtMaxDrawNumber">
 			Max rows to display:
-			<g:if test="${grailsApplication.config.org.transmartproject.helpUrls.hierarchicalClusteringMaxRows}">
-			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.hierarchicalClusteringMaxRows ?: '/transmartmanual/advanced_workflow.html#max-rows-to-display'}">
-				<asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
-					     width="18pt" style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
-			    </a>
-			</g:if>
+			<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.hierarchicalClusteringMaxRows ?: '/transmartmanual/advanced_workflow.html#max-rows-to-display'}">
+			    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
+			</a>
 		    </label>
 
 		    <input type="text" id="txtMaxDrawNumber"/>

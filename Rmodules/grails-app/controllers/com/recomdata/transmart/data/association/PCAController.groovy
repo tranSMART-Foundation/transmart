@@ -1,7 +1,9 @@
 package com.recomdata.transmart.data.association
 
+import groovy.util.logging.Slf4j
 import java.util.regex.Matcher
 
+@Slf4j('logger')
 class PCAController {
 
     RModulesOutputRenderService RModulesOutputRenderService
@@ -83,11 +85,14 @@ class PCAController {
 
     private Closure parseGeneList = { String inStr, String currentComponent ->
 
+	logger.info 'parseGeneList inStr "{}"', inStr
+	logger.info 'currentComponent {}', currentComponent
+	
 	StringBuilder sb = new StringBuilder()
 
 	sb << '<td valign="top"><table class="AnalysisResults"><tr><th colspan="2">Component ' << currentComponent << '</th></tr>'
 
-	for (String line in inStr) {
+	inStr.eachLine() { line ->
 	    String[] resultArray = line.split('\t')
 	    sb << '<tr><td>' << resultArray[0] << '</td><td>' << resultArray[1] << '</td></tr>'
 	}

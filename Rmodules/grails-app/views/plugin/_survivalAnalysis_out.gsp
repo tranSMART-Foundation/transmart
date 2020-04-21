@@ -30,7 +30,7 @@
 	    <br/>	
 	    <span class='AnalysisHeader'>Survival Curve</span><br/><br/>
 	    <g:each var='location' in="${imageLocation}">
-		<g:img file="${request.getContextPath()}${location}"/>
+		<img src="${request.getContextPath()}${location}"/>
 	    </g:each>
 	    <br/>
 	    <br/>	

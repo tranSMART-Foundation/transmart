@@ -29,7 +29,7 @@
 	    <span class='AnalysisHeader'>Scatter Plot</span><br/>
 
 	    <g:each var='location' in="${imageLocations}">
-		<g:img file="${request.getContextPath()}${location}" width='600' height='600'/> <br/>
+		<img src="${request.getContextPath()}${location}" width='600' height='600'/> <br/>
 	    </g:each>
 
 	    <br/>

@@ -192,6 +192,7 @@ function renderCohortSummary(){
 					   "Please go back to the Comparison tab and make a cohort selection.").addClass("warning");
     } else {
         // hide warning & show cohort Summary
+        Ext.get('cohortSummary').hide();
         Ext.fly('cohortSummary').update(cohortsSummary);
         Ext.get('cohortWarningMsg').hide();
         Ext.get('cohortSummary').show();
@@ -649,38 +650,38 @@ function clearDataAssociation()
 
 function loadCommonHighDimFormObjects(formParams, divName)
 {
-    formParams[divName + "timepoints"]      = window[divName + 'timepoints1'];
+    formParams[divName + "timepoints"]    = window[divName + 'timepoints1'];
     formParams[divName + "samples"]       = window[divName + 'samples1'];
     formParams[divName + "rbmPanels"]     = window[divName + 'rbmPanels1'];
     formParams[divName + "platforms"]     = window[divName + 'platforms1'];
-    formParams[divName + "gpls"]        = window[divName + 'gpls1'];
+    formParams[divName + "gpls"]          = window[divName + 'gpls1'];
     formParams[divName + "gplsValue"]     = window[divName + 'gplsValue1'];
     formParams[divName + "tissues"]       = window[divName + 'tissues1'];
 
-    formParams[divName + "timepoints2"]     = window[divName + 'timepoints2'];
+    formParams[divName + "timepoints2"]   = window[divName + 'timepoints2'];
     formParams[divName + "samples2"]      = window[divName + 'samples2'];
-    formParams[divName + "rbmPanels2"]      = window[divName + 'rbmPanels2'];
-    formParams[divName + "platforms2"]      = window[divName + 'platforms2'];
-    formParams[divName + "gpls2"]       = window[divName + 'gpls2'];
-    formParams[divName + "gplsValue2"]      = window[divName + 'gplsValue2'];
+    formParams[divName + "rbmPanels2"]    = window[divName + 'rbmPanels2'];
+    formParams[divName + "platforms2"]    = window[divName + 'platforms2'];
+    formParams[divName + "gpls2"]         = window[divName + 'gpls2'];
+    formParams[divName + "gplsValue2"]    = window[divName + 'gplsValue2'];
     formParams[divName + "tissues2"]      = window[divName + 'tissues2'];
 
     formParams[divName + "probesAggregation"] = window[divName + 'probesAggregation'];
     formParams[divName + "SNPType"]       = window[divName + 'SNPType'];
-    formParams[divName + "PathwayName"]     = window[divName + 'pathwayName'];
+    formParams[divName + "PathwayName"]   = window[divName + 'pathwayName'];
 
     var mrnaData = false
     var mirnaData = false
     var snpData = false
 
     var tempGeneList    = window[divName + 'pathway'];
-    var tempMarkerType    = window[divName + 'markerType'];
-    var tempGPL       = window[divName + 'gplValues'];
+    var tempMarkerType  = window[divName + 'markerType'];
+    var tempGPL         = window[divName + 'gplValues'];
 
     var tempPlatform    = window[divName + 'platforms1'] + "," + window[divName + 'platforms2'];
-    var tempSampleType    = window[divName + 'samplesValues'];
-    var tempTissueType    = window[divName + 'tissuesValues'];
-    var tempTime      = window[divName + 'timepointsValues'];
+    var tempSampleType  = window[divName + 'samplesValues'];
+    var tempTissueType  = window[divName + 'tissuesValues'];
+    var tempTime        = window[divName + 'timepointsValues'];
 
     //If we are using High Dimensional data we need to create variables that represent genes from both independent
     //and dependent selections (In the event they are both of a single high dimensional type).
@@ -689,15 +690,15 @@ function loadCommonHighDimFormObjects(formParams, divName)
     {
         //The genes entered into the search box were GEX genes.
         var fullGEXGeneList   = tempGeneList;
-        var fullGEXSampleType   = String(tempSampleType);
-        var fullGEXTissueType   = String(tempTissueType);
-        var fullGEXTime     = String(tempTime);
-        var fullGEXGPL      = String(tempGPL);
+        var fullGEXSampleType = String(tempSampleType);
+        var fullGEXTissueType = String(tempTissueType);
+        var fullGEXTime       = String(tempTime);
+        var fullGEXGPL        = String(tempGPL);
 
         if(fullGEXSampleType == ",")  fullGEXSampleType = ""
         if(fullGEXTissueType == ",")  fullGEXTissueType = ""
-        if(fullGEXTime == ",")      fullGEXTime = ""
-        if(fullGEXGPL == ",")       fullGEXGPL = ""
+        if(fullGEXTime == ",")        fullGEXTime = ""
+        if(fullGEXGPL == ",")         fullGEXGPL = ""
 
         //This flag will tell us to write the GEX text file.
         mrnaData = true;
@@ -707,10 +708,10 @@ function loadCommonHighDimFormObjects(formParams, divName)
         // type needs to be aligned with what has been defined in the gpl info table
 
         formParams["gexpathway"]                = fullGEXGeneList;
-        formParams["gextime"]                 = fullGEXTime;
+        formParams["gextime"]                   = fullGEXTime;
         formParams["gextissue"]                 = fullGEXTissueType;
         formParams["gexsample"]                 = fullGEXSampleType;
-        formParams["gexgpl"]                  = fullGEXGPL;
+        formParams["gexgpl"]                    = fullGEXGPL;
 
         formParams["mrnaData"]                  = mrnaData;
     }
@@ -720,23 +721,23 @@ function loadCommonHighDimFormObjects(formParams, divName)
     {
         //The genes entered into the search box were SNP genes.
         var fullSNPGeneList   = tempGeneList;
-        var fullSNPSampleType   = String(tempSampleType);
-        var fullSNPTissueType   = String(tempTissueType);
-        var fullSNPTime     = String(tempTime);
-        var fullSNPGPL      = String(tempGPL);
+        var fullSNPSampleType = String(tempSampleType);
+        var fullSNPTissueType = String(tempTissueType);
+        var fullSNPTime       = String(tempTime);
+        var fullSNPGPL        = String(tempGPL);
 
         if(fullSNPSampleType == ",")  fullSNPSampleType = ""
         if(fullSNPTissueType == ",")  fullSNPTissueType = ""
-        if(fullSNPTime == ",")      fullSNPTime = ""
-        if(fullSNPGPL == ",")       fullSNPGPL = ""
+        if(fullSNPTime == ",")        fullSNPTime = ""
+        if(fullSNPGPL == ",")         fullSNPGPL = ""
 
         //This flag will tell us to write the SNP text file.
         snpData = true;
 
-        formParams["snppathway"]                = fullSNPGeneList;
+        formParams["snppathway"]              = fullSNPGeneList;
         formParams["snptime"]                 = fullSNPTime;
-        formParams["snptissue"]                 = fullSNPTissueType;
-        formParams["snpsample"]                 = fullSNPSampleType;
+        formParams["snptissue"]               = fullSNPTissueType;
+        formParams["snpsample"]               = fullSNPSampleType;
         formParams["snpgpl"]                  = fullSNPGPL;
         formParams["snpData"]                 = snpData;
     }
@@ -745,13 +746,13 @@ function loadCommonHighDimFormObjects(formParams, divName)
     {
         //This flag will tell us to write the GEX text file.
         mirnaData = true;
-        formParams["mirnaData"]                 = mrnaData;
+        formParams["mirnaData"]               = mrnaData;
     }
 
     //If we don't have a platform, fill in Clinical.
     if(tempPlatform == null || tempPlatform == "") tempMarkerType = "CLINICAL"
 
     formParams[divName + "Type"]              = tempMarkerType;
-    formParams[divName + "Pathway"]             = tempGeneList;
+    formParams[divName + "Pathway"]           = tempGeneList;
 }
 

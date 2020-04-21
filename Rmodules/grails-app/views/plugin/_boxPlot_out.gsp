@@ -31,7 +31,7 @@
 	    <span class='AnalysisHeader'>Box Plot</span><br/><br/>
 
             <g:each var='location' in="${imageLocations}">
-		<g:img file="${request.getContextPath()}${location}" width='600' height='600'/>
+		<img src="${request.getContextPath()}${location}" width='600' height='600'/>
             </g:each>
 
 	    <br/>

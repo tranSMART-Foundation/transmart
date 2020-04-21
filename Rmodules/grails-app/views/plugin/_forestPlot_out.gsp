@@ -50,7 +50,7 @@
 			    <tr>
 				<td>
 				    <g:each var='location' in="${imageLocations}">
-					<g:img file="${request.getContextPath()}${location}" width='800' height='600'/> <br/>
+					<img src="${request.getContextPath()}${location}" width='800' height='600'/> <br/>
 				    </g:each>
 				</td>
 				<td>${statisticByStratificationTable}</td>

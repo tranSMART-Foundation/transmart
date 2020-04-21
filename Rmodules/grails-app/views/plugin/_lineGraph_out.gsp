@@ -2,7 +2,7 @@
 
 <p>
     <g:each var='location' in="${imageLocations}">
-        <g:img file="${request.getContextPath()}${location}" class='img-result-size'/> <br/>
+        <img src="${request.getContextPath()}${location}" class='img-result-size'/> <br/>
     </g:each>
 
     <g:if test="${zipLink}">

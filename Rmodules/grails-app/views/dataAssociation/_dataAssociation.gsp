@@ -12,17 +12,17 @@
 	    <span>Analysis:</span>
 	    <span id="selectedAnalysis" class="warning">WARNING: Analysis is not selected</span>
 
-	    %{-- TBD: help hyperlink
-	    <a href='JavaScript:D2H_ShowHelp(1503,helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP )'>
-		<iasset:image src="help/helpicon_white.jpg" alt="Help" border="0"
+	    <a href='/transmartmanual/advanced_workflow.html'>
+		<asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
 		     width="18pt" style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
-	    </a>--}%
+	    </a>
 	
 	    <input type="hidden" id="analysis" name="analysis"/>
 	</label>
 	<hr style="height: 1px;"/>
 	%{--display selected cohort--}%
-	<label for="cohortSummary">
+	<g:logMsg>render dataAssociation empty page</g:logMsg>
+        <label for="cohortSummary">
 	    <span>Cohorts:</span>
 	    <span id="cohortWarningMsg" class="warning"></span>
 	    <div id="cohortSummary"></div>

@@ -40,8 +40,7 @@
 		</tr>
 		<tr>
 		    <g:each var='location' in="${imageLocations}">
-			%{--<img src='${location}'  width="700" height="700" alt="Logistic Regression"/> <br/>--}%
-			<g:img file="${location}" width='700' height='700'/> <br/>
+			<img src="${request.getContextPath()}${location}" width='700' height='700' alt='Logistic Regression'/> <br/>
 		    </g:each>
 		</tr>				
 		<tr>

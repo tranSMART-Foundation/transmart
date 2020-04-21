@@ -310,7 +310,7 @@ HighDimensionalData.prototype.generate_view = function () {
                     id: 'help',
                     qtip: 'Click for context sensitive help',
                     handler: function (event, toolEl, panel) {
-                        D2H_ShowHelp('1126', helpURL, "wndExternal", CTXT_DISPLAY_FULLHELP);
+                        window.open(GLOBAL.HelpHighdimensionalURL, '_blank').focus();
                     }
                 }
             ]

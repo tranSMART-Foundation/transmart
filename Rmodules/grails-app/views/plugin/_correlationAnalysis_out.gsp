@@ -4,7 +4,7 @@
     <p>${correlationData}</p>
 
     <g:each var='location' in="${imageLocations}">
-        <g:img file="${request.getContextPath()}${location}"/>
+        <img src="${request.getContextPath()}${location}"/>
     </g:each>
 
     <g:if test="${zipLink}">

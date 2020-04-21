@@ -7,11 +7,16 @@
         <br><br>
     </div>
 
+    <g:logMsg>Heatmap getContextPath ${request.getContextPath()}</g:logMsg>
+    <g:logMsg>Heatmap imageLocations ${imageLocations}</g:logMsg>
+
     <g:each var='location' in="${imageLocations}">
         <a onclick="window.open('${request.getContextPath()}${location}', '_blank')">
             <img src="${request.getContextPath()}${location}" class='img-result-size'/>
         </a>
     </g:each>
+
+    <g:logMsg>Heatmap ziplink ${ziplink}</g:logMsg>
 
     <g:if test="${zipLink}">
         <a class='AnalysisLink' class='downloadLink' href="${request.getContextPath()}${zipLink}">Download raw R data</a>

@@ -27,10 +27,12 @@ class DataAssociationController {
      * Load the initial DataAssociation page.
      */
     def defaultPage() {
+	logger.info 'defaultPage called to render dataAssociation.gsp path {}', pluginContextPath
         render template: 'dataAssociation', contextPath: pluginContextPath
     }
 
     def variableSelection(String analysis) {
+	logger.info 'variableSelection {} view ../plugin/{}', analysis, pluginService.findPluginModuleByModuleName(analysis).formPage
         render view: '../plugin/' + pluginService.findPluginModuleByModuleName(analysis).formPage
     }
 
@@ -42,11 +44,13 @@ class DataAssociationController {
 
 	for (String script in scripts) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
+	    logger.info 'loadScripts script {} at {}', script, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
 	}
 
 	for (String style in styles) {	
 	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
+	    logger.info 'loadScripts style {} at {}', style, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
 	}
 

@@ -8,7 +8,7 @@
 
     <g:each var='location' in="${imageLocations}">
 	<a onclick="window.open('${request.getContextPath()}${location}', '_blank')">
-            <g:img file="${request.getContextPath()}${location}" class='img-result-size'/>
+            <img src="${request.getContextPath()}${location}" class='img-result-size'/>
 	</a>
     </g:each>
 

@@ -42,7 +42,7 @@ class PDFController {
 	    String css = 'file://' + servletContext.getRealPath('') + '/css/datasetExplorer.css'
 	    String html = "<html><head><link rel='stylesheet' type='text/css' href='" + css +
 		"' media='print'/></head><body>" + htmlStr + '</body></html>'
-	    String finalHtml = StringUtils.replace(html.toString(), '/transmart/images/analysisFiles',
+	    String finalHtml = StringUtils.replace(html.toString(), '/transmart/analysisFiles',
 						   'file://' + tempFolderDirectory)
 	    logger.info 'generatePDF replacing "{}" ==> "{}"', html, finalHtml
 
