@@ -11,27 +11,24 @@ var GWASPlinkAdd
         return null;
     }
 
-
-    var gwasPlinkPanel = new Ext.Panel(
-        {
-            id: "gwasPlink",
-            title: "GWAS Plink",
-            layout: "fit",
-            autoLoad: {
-                url: plinkViewUrl,
-                scripts: true,
-                nocache: true,
-                discardUrl: true,
-                method: 'POST'
-            },
-            listeners: {
-                activate: function (p) {
-                    // p.body.mask("Loading...", 'x-mask-loading');
-                    // p.body.unmask();
-                }
+    var gwasPlinkPanel = new Ext.Panel({
+        id: "gwasPlink",
+        layout: "fit",
+        title: "GWAS Plink",
+        autoLoad: {
+            url: plinkViewUrl,
+            scripts: true,
+            nocache: true,
+            discardUrl: true,
+            method: 'POST'
+        },
+        listeners: {
+            activate: function (p) {
+                // p.body.mask("Loading...", 'x-mask-loading');
+                // p.body.unmask();
             }
         }
-    );
+    });
 
     var analysisId = 'gwasPlink';
     var analysisName = 'GWAS Plink';
