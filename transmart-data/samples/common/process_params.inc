@@ -83,6 +83,12 @@ if [ -f "$localparams" ] ; then
     echo "Info $(basename $0): Sourced local params file $localparams"
 fi
 
+localparams="$UPLOAD_DATA_TYPE/$UPLOAD_DATA_TYPE.params"
+if [ -f "$localparams" ] ; then
+    source $localparams
+    echo "Info $(basename $0): Sourced local params file $localparams"
+fi
+
 # If a params file name is passed as an argument to this script, source it last,
 # as its content should overrule default parameter values found in the optional parameter files
 if [ ! -z "$PARAMS_FILENAME" ]; then
