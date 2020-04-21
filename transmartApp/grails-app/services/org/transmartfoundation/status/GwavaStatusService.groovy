@@ -1,9 +1,11 @@
 package org.transmartfoundation.status
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Value
 
 @CompileStatic
+@Slf4j('logger')
 class GwavaStatusService {
 
     static transactional = false
