@@ -2,12 +2,6 @@ package org.transmartfoundation.config
 
 class ConfigParams {
 
-/*
-	String url
-	boolean connected
-	int rwgNumberOfRecords
-	Date lastProbe
-*/
     Map adminParams
     Map analysisParams
     Map analyzeParams
@@ -19,11 +13,13 @@ class ConfigParams {
     Map contactParams
     Map dataSourceParams
     Map exportParams
+    Map fractalisParams
     Map galaxyParams
     Map generalParams
     Map gwasParams
     Map gwavaParams
     Map helpParams
+    Map hibernateParams
     Map i2b2Params
     Map kerberosParams
     Map ldapParams
@@ -31,6 +27,7 @@ class ConfigParams {
     Map loginParams
     Map metacoreParams
     Map oauthParams
+    Map oauth2Params
     Map rmodulesParams
     Map samlParams
     Map sampleParams

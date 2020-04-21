@@ -5,7 +5,7 @@
     </a>
 </h2>
 
-<table id="configSampl"  class="detail" style="width: 100%">
+<table id="configSample"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Sample (${configParams.sampleParams.size()})"
 	divPrefix="config_sample" status="open" colSpan="${3}"/>
@@ -21,7 +21,7 @@
             <tr>
 	        <td>${paramData.key}</td>
 		<g:if test="${paramData.value.value != null}">
-		    <td>${paramData.value.value}</td>
+		    <td nowrap>${paramData.value.value}</td>
 		</g:if>
 		<g:elseif test="${paramData.value.default != null}">
 		    <td>Default: ${paramData.value.default}</td>

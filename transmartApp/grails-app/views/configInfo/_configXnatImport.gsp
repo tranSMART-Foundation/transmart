@@ -13,7 +13,7 @@
     <tbody id="config_xnat_import_detail" style="display: block;">
         <tr>
 	    <th>Parameter</th>
-	    <th>Value</th>
+	    <th Value</th>
 	    <th width="100%">Description</th>
 	</tr>
 
@@ -21,7 +21,7 @@
             <tr>
 	        <td>${paramData.key}</td>
 		<g:if test="${paramData.value.value != null}">
-		    <td>${paramData.value.value}</td>
+		    <td nowrap>${paramData.value.value}</td>
 		</g:if>
 		<g:elseif test="${paramData.value.default != null}">
 		    <td>Default: ${paramData.value.default}</td>

@@ -21,10 +21,10 @@
             <tr>
 	        <td>${paramData.key}</td>
 		<g:if test="${paramData.value.value != null}">
-		    <td>${paramData.value.value}</td>
+		    <td nowrap>${paramData.value.value}</td>
 		</g:if>
 		<g:elseif test="${paramData.value.default != null}">
-		    <td>Default: ${paramData.value.default}</td>
+		    <td nowrap>Default: ${paramData.value.default}</td>
 		</g:elseif>
 		<g:else>
 		    <td>&nbsp;</td>

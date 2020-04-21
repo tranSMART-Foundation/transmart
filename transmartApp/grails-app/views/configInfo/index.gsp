@@ -1,3 +1,5 @@
+%{-- expressionCodec setting is required for the <br> tags inserted in table values to be rendered as HTML --}%
+<%@ page expressionCodec="none" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -15,9 +17,11 @@
     vertical-align: top;
 }
 
+%{--
 .detail td a:hover {
     white-space: normal;
 }
+--}%
 	</style>
 
 	<div class="body">
@@ -47,11 +51,13 @@
 	    <g:render template="configContact"/>
 	    <g:render template="configDataSource"/>
 	    <g:render template="configExport"/>
+	    <g:render template="configFractalis"/>
 	    <g:render template="configGalaxy"/>
 	    <g:render template="configGeneral"/>
 	    <g:render template="configGwas"/>
 	    <g:render template="configGwava"/>
 	    <g:render template="configHelp"/>
+	    <g:render template="configHibernate"/>
 	    <g:render template="configI2b2"/>
 	    <g:render template="configKerberos"/>
 	    <g:render template="configLdap"/>
@@ -59,6 +65,7 @@
 	    <g:render template="configLogin"/>
 	    <g:render template="configMetacore"/>
 	    <g:render template="configOauth"/>
+	    <g:render template="configOauth2"/>
 	    <g:render template="configRmodules"/>
 	    <g:render template="configSaml"/>
 	    <g:render template="configSample"/>

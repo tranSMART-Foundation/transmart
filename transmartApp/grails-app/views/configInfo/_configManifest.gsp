@@ -4,12 +4,19 @@
     </a>
 </h2>
 
+%{--
+	very long list of files in the Manifest, closed by default
+
+	define status="closed" in tableHeaderToggle
+	define style="display: none;" in tbody
+--}%
+
 <table id="configManifest"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Manifest (${configParams.manifestParams.size()})"
 	divPrefix="config_manifest" status="closed" colSpan="${3}"/>
 
-    <tbody id="config_manifest_detail" style="display: block;">
+    <tbody id="config_manifest_detail" style="display: none;">
         <tr>
 	    <th>Parameter</th>
 	    <th>Value</th>

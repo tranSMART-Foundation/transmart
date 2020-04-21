@@ -1,23 +1,23 @@
-<h2>Contact &nbsp;&nbsp;
+<h2>Fractalis &nbsp;&nbsp;
     <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.adminConfig ?: '/transmartmanual/admin.html#package-and-configuration'}" >
         <asset:image src="help/helpicon_white.jpg"
 		     alt="Help" border="0" width="18pt" style="vertical-align:middle;margin-left:5pt;"/>
     </a>
 </h2>
 
-<table id="configContact"  class="detail" style="width: 100%">
+<table id="configFractalis"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
-        label="Contact (${configParams.contactParams.size()})"
-	divPrefix="config_contact" status="open" colSpan="${3}"/>
+        label="Fractalis (${configParams.fractalisParams.size()})"
+	divPrefix="config_fractalis" status="open" colSpan="${3}"/>
 
-    <tbody id="config_contact_detail" style="display: block;">
+    <tbody id="config_fractalis_detail" style="display: block;">
         <tr>
 	    <th>Parameter</th>
 	    <th>Value</th>
 	    <th width="100%">Description</th>
 	</tr>
 
-        <g:each in="${configParams.contactParams}" var="paramData">
+        <g:each in="${configParams.fractalisParams}" var="paramData">
             <tr>
 	        <td>${paramData.key}</td>
 		<g:if test="${paramData.value.value != null}">
