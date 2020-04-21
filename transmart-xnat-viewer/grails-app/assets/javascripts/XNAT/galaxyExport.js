@@ -106,7 +106,7 @@ function galaxyjobsstoreLoaded()
             tooltip:'Click for Jobs help',
             iconCls: "contextHelpBtn",
             handler: function(event, toolEl, panel){
-                D2H_ShowHelp("1456",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );
+                window.open(GLOBAL.HelpGalaxyURL, '_blank').focus();
             }
         }]
     });

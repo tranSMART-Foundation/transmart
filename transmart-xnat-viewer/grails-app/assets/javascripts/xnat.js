@@ -11,11 +11,11 @@ var EWB = {
 
 	analysisImagePanel = new Ext.Panel({
             id : 'analysisImagePanel',
-            title : 'Image View',
             region : 'center',
-            split : true,
             height : 90,
+            split : true,
             layout: 'fit',
+            title : 'Image View',
             listeners: {
                 activate: function (p) {
                     if (isSubsetQueriesChanged(p.subsetQueries) || !Ext.get('analysis_title')) {
