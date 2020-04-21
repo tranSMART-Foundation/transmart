@@ -5,9 +5,9 @@
 # for the tranSMART install and data loading
 # ********************************************************************************
 
-echo "-------------------------------------"
-echo "|  Checking for required files and folders for the R install"
-echo "-------------------------------------"
+echo "------------------------------------------------------------"
+echo "|  Checking for required folders and files for the R install"
+echo "------------------------------------------------------------"
 
 base="$INSTALL_BASE/transmart-data"
 baseR="$base/R"

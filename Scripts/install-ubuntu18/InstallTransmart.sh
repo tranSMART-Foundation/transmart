@@ -89,7 +89,8 @@ sudo -v
 sudo apt-get -q install -y curl
 sudo apt-get -q install -y unzip
 if ! [ -e transmart-data-release-19.0.zip ] ; then
-    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
+    curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
+#    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
 fi
 if ! [ -e transmart-data ] ; then
 	unzip transmart-data-release-19.0.zip
@@ -270,7 +271,7 @@ source /etc/profile.d/Rpath.sh
 sudo -v
 cd $INSTALL_BASE/transmart-data
 source ./vars
-sudo TABLESPACES=$TABLESPACES TRANSMART_USER="tomcat8" make -C R install_rserve_init
+sudo TABLESPACES=$TABLESPACES RSERVE_USER="tomcat8" make -C R install_rserve_init
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesR.sh
@@ -306,6 +307,27 @@ if [ "$( checkInstallError "Loading database failed; clear database and run inst
 
 echo "Finished setting up the PostgreSQL database at $(date)"
 
+echo "++++++++++++++++++++++++++++"
+echo "+  Set up solr service files"
+echo "++++++++++++++++++++++++++++"
+
+
+sudo -v
+cd $INSTALL_BASE/transmart-data
+source ./vars
+
+# install solr
+make -C solr solr
+
+# create solr service
+sudo TABLESPACES=$TABLESPACES SOLR_USER="$USER" make -C solr install_solr_init
+
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
+./checkFilesSolr.sh
+if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
+./checkR.sh
+if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
+echo "Finished installing solr and solr service at $(date)"
 
 echo "++++++++++++++++++++++++++++"
 echo "+  Set up configuration files"
@@ -315,9 +337,9 @@ cd $INSTALL_BASE/transmart-data
 sudo -v
 source ./vars
 make -C config install
-sudo mkdir -p /usr/share/tomcat8/.grails/transmartConfig/
-sudo cp $HOME/.grails/transmartConfig/*.groovy /usr/share/tomcat8/.grails/transmartConfig/
-sudo chown -R tomcat8:tomcat8 /usr/share/tomcat8/.grails
+sudo mkdir -p /var/lib/tomcat8/.grails/transmartConfig/
+sudo cp $HOME/.grails/transmartConfig/*.groovy /var/lib/tomcat8/.grails/transmartConfig/
+sudo chown -R tomcat8:tomcat8 /var/lib/tomcat8/.grails
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesConfig.sh
@@ -337,10 +359,12 @@ fi
 
 cd war-files
 if ! [ -e transmart.war ]; then
-    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart.war --output transmart.war
+    curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmartApp-release-19.0.war --output transmart.war
+#    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart.war --output transmart.war
 fi
 if ! [ -e gwava.war ]; then
-    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/gwava.war --output gwava.war
+    curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/gwava-release-19.0.war --output gwava.war
+#    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/gwava.war --output gwava.war
 fi
 sudo cp *.war /var/lib/tomcat8/webapps/
 
@@ -350,18 +374,18 @@ if [ "$( checkInstallError "transmart war file not set up correctly, see install
 
 echo "Finished installing war files at $(date)"
 
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++"
 echo "+  Load, configure and start SOLR"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE/transmart-data
 sudo -v
 source ./vars
-#  (TODO)  Should check to see if it is already running
-make -C solr start > $INSTALL_BASE/transmart-data/solr.log 2>&1 & 
-echo "Sleeping - waiting for SOLR to start (10 minutes)"
-sleep 10m
-make -C solr rwg_full_import sample_full_import
+
+sudo systemctl start solr
+echo "Sleeping - waiting for SOLR to start (2 minutes)"
+sleep 2m
+make -C solr rwg_full_import sample_full_import browse_full_import
 echo "Finished loading, configuring and starting SOLR at $(date)"
 
 echo "++++++++++++++++++++++++++++"
@@ -373,8 +397,11 @@ echo "++++++++++++++++++++++++++++"
 #  (TODO)  Should check to see if it is already running
 sudo -v
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18
-# rserve runs as user transmart
-# using /etc/init.d/rserve
+# rserve runs as user tomcat8
+# defined in /etc/default/rserve
+# service started using /etc/init.d/rserve
+# which take users from sourcing /etc/default/rserve
+# and writes to 
 sudo systemctl start rserve
 echo "Finished starting RServe at $(date)"
 
@@ -383,7 +410,7 @@ echo "+  start Tomcat"
 echo "++++++++++++++++++++++++++++"
 
 #  (TODO)  Should check to see if it is already running
-sudo service tomcat8 restart
+sudo ssystemctl restart tomcat8
 echo "Finished starting Tomcat8 at $(date)"
 echo "Sleeping - waiting for tomcat/transmart to start (3 minutes)"
 sleep 3m
