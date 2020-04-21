@@ -393,18 +393,19 @@ var metacoreTabLoaded = false;
 var metacoreEnrichmentPanel = new Ext.Panel(
     {
         id: 'metacoreEnrichmentPanel',
-        title: 'MetaCore Enrichment Analysis',
         region: 'center',
-        split: true,
         height: 90,
+        split: true,
+        autoScroll: true,
         layout: 'fit',
+        collapsible: true,
+        title: 'MetaCore Enrichment Analysis',
         //autoLoad : getExportJobs,
         tbar: new Ext.Toolbar({
             id: 'metacoreEnrichmentWorkflowToolbar',
             title: 'Analysis menu',
             items: []
         }),
-        autoScroll: true,
         autoLoad: {
             url: pageInfo.basePath + '/metacoreEnrichment/index',
             method: 'GET',
@@ -425,8 +426,7 @@ var metacoreEnrichmentPanel = new Ext.Panel(
             deactivate: function () {
                metacoreTabActivated = false;
             }
-        },
-        collapsible: true
+        }
     }
 );
 
