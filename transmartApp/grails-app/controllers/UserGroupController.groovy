@@ -1,6 +1,6 @@
 import command.UserGroupCommand
 import grails.converters.JSON
-import grails.transaction.Transactional
+//import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmart.plugin.shared.UtilService
@@ -39,7 +39,7 @@ class UserGroupController {
         }
     }
 
-    @Transactional // TODO move tx work to service
+//    @Transactional // TODO move tx work to service
     def delete(UserGroup userGroup) {
 	if (userGroup) {
 	    List<SecureObjectAccess> accessList = SecureObjectAccess.findAllByPrincipal(userGroup)
