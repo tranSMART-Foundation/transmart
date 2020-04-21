@@ -1,4 +1,12 @@
+<h2>
+    DatasetExplorer Comparison Tab
+    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.analyzeComparison ?: '/transmartmanual/analyze.html#defining-the-cohorts'}">
+	<asset:image src="help/helpicon_white.jpg" alt="Help"/>
+    </a>
+</h2>
+
 <table id="queryTable" border="0">
+
     <tr>
         <td>Subset 1</td>
         <td>Subset 2</td>
@@ -95,7 +103,6 @@
 
 <script>
     prepareQueryPanels();
-    setupDragAndDrop();
     if (GLOBAL.restoreSubsetId) {
         applySubsets(GLOBAL.restoreSubsetId);
     }
