@@ -10,18 +10,6 @@ else {
 }
 
 
-//grails.assets.minifyJs = true
-
-//grails.assets.minifyOptions = [
-//    languageMode: 'ES5', // tried ECMASCRIPT6
-//    targetLanguage: 'ES5', //Can go from ES5 to ES6 for those bleeding edgers
-//    optimizationLevel: 'SIMPLE', //Or ADVANCED or WHITESPACE_ONLY
-//    excludes: ["**/ext-all.js","**/fractalis.js","**/fractalis.unminified.js"]
-//]
-////grails.assets.minify.js.excludes = ["**/fractalis.js","**/fractalis.unminified.js"]
-//
-//grails.assets.excludes = ["tiny_mce/src/*.js"] // excluded from processing if included by the require tree.
-
 /**
  * Running externalized configuration
  * Assuming the following configuration files
@@ -43,7 +31,6 @@ List<String> defaultConfigFiles
 if (Environment.current != Environment.TEST) {
     defaultConfigFiles = [
 	"$userHome/.grails/${appName}Config/Config.groovy",
-	"$userHome/.grails/${appName}Config/RModulesConfig.groovy",
 	"$userHome/.grails/${appName}Config/DataSource.groovy"
     ]
 }
@@ -56,12 +43,9 @@ else {
 for (String filePath in defaultConfigFiles) {
     File f = new File(filePath)
     if (f.exists()) {
-	if (f.name == 'RModulesConfig.groovy') {
-			console.warn 'RModulesConfig.groovy is deprecated, it has been merged into Config.groovy. Loading it anyway.'
-        }
 	grails.config.locations << 'file:' + filePath
     }
-    else if (f.name != 'RModulesConfig.groovy') {
+    else {
 	console.info "Configuration file $filePath does not exist."
     }
 }
@@ -312,33 +296,3 @@ log4j.main = {
 
     warn 'org.codehaus.groovy.grails.commons.cfg.ConfigurationHelper'
 }
-
-/**
- * Here you can set custom help pages for different pages.
- * You could open these pages by clicking the blue question mark icon.
- */
-/*
-org.transmartproject.helpUrls.geneSignatureList='http://www.example.com/'
-org.transmartproject.helpUrls.rsIdSignatureList='http://www.example.com/'
-org.transmartproject.helpUrls.search='http://www.example.com/'
-
-org.transmartproject.helpUrls.logisticRegression='http://www.example.com/'
-org.transmartproject.helpUrls.boxPlot='http://www.example.com/'
-org.transmartproject.helpUrls.correlationAnalysis='http://www.example.com/'
-org.transmartproject.helpUrls.hierarchicalClustering='http://www.example.com/'
-org.transmartproject.helpUrls.heatMap='http://www.example.com/'
-org.transmartproject.helpUrls.kMeansClustering='http://www.example.com/'
-org.transmartproject.helpUrls.lineGraph='http://www.example.com/'
-org.transmartproject.helpUrls.markerSelection='http://www.example.com/'
-org.transmartproject.helpUrls.pca='http://www.example.com/'
-org.transmartproject.helpUrls.scatterPlot='http://www.example.com/'
-org.transmartproject.helpUrls.survivalAnalysis='http://www.example.com/'
-org.transmartproject.helpUrls.tableWithFisher='http://www.example.com/'
-org.transmartproject.helpUrls.summaryStatistics='http://www.example.com/'
-
-org.transmartproject.helpUrls.hierarchicalClusteringMaxRows='http://www.example.com/'
-org.transmartproject.helpUrls.heatMapMaxRows='http://www.example.com/'
-org.transmartproject.helpUrls.kMeansClusteringMaxRows='http://www.example.com/'
-
-org.transmartproject.helpUrls.hiDomePopUp='http://www.example.com/'
-*/
