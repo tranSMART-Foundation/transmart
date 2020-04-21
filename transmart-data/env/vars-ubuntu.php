@@ -6,8 +6,8 @@ PGPASSWORD=transmart
 
 PGSQL_BIN="/usr/bin/"
 TABLESPACES=/var/lib/postgresql/tablespaces/
-KETTLE_JOBS_PSQL=<?= realpath(__DIR__), "/tranSMART-ETL/Kettle/postgres/Kettle-ETL/", "\n" ?>
-R_JOBS_PSQL=<?= realpath(__DIR__), "/tranSMART-ETL/Kettle/postgres/R/", "\n" ?>
+KETTLE_JOBS_PSQL=<?= realpath(__DIR__), "/transmart-etl/Kettle/postgres/Kettle-ETL/", "\n" ?>
+R_JOBS_PSQL=<?= realpath(__DIR__), "/transmart-etl/Kettle/postgres/R/", "\n" ?>
 KITCHEN=<?= realpath(__DIR__), "/data-integration/kitchen.sh", "\n" ?>
 
 PATH=<?= realpath(__DIR__) ?>:$PATH
