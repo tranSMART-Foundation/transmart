@@ -49,7 +49,7 @@ class CmsTagLib {
 	String name = assertAttribute('name', attrs, 'link')
 	logger.debug 'Cms image name {} fileVersion {}', name, cmsService.fileVersion(name)
 	CmsFile file = cmsService.findFile(name)
-	logger.debug 'data:{}'+';base64,{}', file.contentType, file.bytes.encodeBase64().toString()
+//	logger.debug 'data:{}'+';base64,{}', file.contentType, file.bytes.encodeBase64().toString()
 	out << 'data:'+file.contentType+';base64,'+file.bytes.encodeBase64().toString()
     }
 
