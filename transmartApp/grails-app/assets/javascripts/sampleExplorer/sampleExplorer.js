@@ -50,7 +50,7 @@ function toggleMainCategorySelection(searchTerm,searchCategory)
     //Ext.getCmp('addsubset').setVisible(true);
 
     //Change the help menu for this page.
-    Ext.getCmp("sampleExplorerHelpButton").setHandler(function(){D2H_ShowHelp("1439",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );})
+    Ext.getCmp("sampleExplorerHelpButton").setHandler(function(){window.open(GLOBAL.HelpSampleURL, '_blank').focus();})
 }
 
 /**
@@ -243,7 +243,7 @@ function loadDataSetGrid()
      GLOBAL.tabs = new Ext.TabPanel({
      renderTo: 'site_content',
      activeTab : 0,
-     deferredRender: false,
+     layoutConfig: { deferredRender: false },
      autoTabs : false,
      layoutOnTabChange: true,
      items : [{}]
