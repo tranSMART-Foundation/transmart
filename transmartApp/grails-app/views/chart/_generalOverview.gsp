@@ -4,11 +4,9 @@
             <td colspan="2" align="center">
 		<div class="analysistitle" id="analysis_title">
                     Summary Statistics
-                    <g:if test="${grailsApplication.config.org.transmartproject.helpUrls.summaryStatistics}">
-			<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.summaryStatistics}">
-                            <asset:image src="help/helpicon_white.jpg" alt="Help"/>
-			</a>
-                    </g:if>
+		    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.analyzeSummary ?: '/transmartmanual/summary_statistics.html'}">
+			<asset:image src="help/helpicon_white.jpg" alt="Help"/>
+		    </a>
 		</div>
             </td>
 	</tr>
@@ -49,3 +47,7 @@
 	</tr>
     </tbody>
 </table>
+
+<script>
+    setupDragAndDrop();
+</script>
