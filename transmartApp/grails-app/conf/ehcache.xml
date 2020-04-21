@@ -126,16 +126,28 @@
     <cache name="org.hibernate.cache.UpdateTimestampsCache"
            maxElementsInMemory="10000"
            timeToIdleSeconds="300"
-            />
+           />
 
     <cache name="org.hibernate.cache.StandardQueryCache"
            maxElementsInMemory="10000"
            timeToIdleSeconds="300"
-            />
+           />
 
     <cache name="org.transmart.audit.StudyIdService"
         maxElementsInMemory="10000"
         timeToIdleSeconds="300"
         />
 
+    <cache name="org.transmart.plugin.custom.CmsFile"
+           maxElementsInMemory="100"
+           timeToIdleSeconds="300"
+           />
+    <cache name="org.transmart.plugin.custom.CmsSection"
+           maxElementsInMemory="10"
+           timeToIdleSeconds="300"
+           />
+    <cache name="org.transmart.plugin.custom.Settings"
+           maxElementsInMemory="100"
+           timeToIdleSeconds="300"
+           />
 </ehcache>
