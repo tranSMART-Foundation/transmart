@@ -4,6 +4,9 @@ include ../lib/makefile.inc
 
 SOLR_DL=http://files.thehyve.net/solr
 SOLR_VERSION=4.5.0
+SOLR_PREFIX ?= $(realpath .)
+SOLR_LOG ?= $(realpath .)/solr.log
+
 ifdef ORACLE
   JDBC_DRIVER=$(JDBC_DRIVER_ORA)
   JDBC_DRIVER_PATH=$(JDBC_DRIVER_ORA_PATH)
@@ -79,10 +82,29 @@ $(FULL_IMPORT_TARGETS):
 $(DELTA_IMPORT_TARGETS):
 	curl -f "http://localhost:8983/solr/$(patsubst %_delta_import,%,$@)/dataimport?command=delta-import"
 
+# must be run as root
+$(SOLR_LOG):
+	mkdir -p '$(dir $@)'
+	touch '$@'
+	chown $(SOLR_USER).$(SOLR_USER) '$@'
+
+write_default_solr:
+	@test -n '$(SOLR_USER)' || { \
+		echo 'Define $$SOLR_USER' 2>&1 ; false; }
+	echo 'SOLR_USER=$(SOLR_USER)' > /etc/default/solr
+	echo 'SOLR_LOG="$(SOLR_LOG)"' >> /etc/default/solr
+
+install_solr_init: /etc/init.d/solr
+/etc/init.d/solr: write_default_solr $(SOLR_LOG)
+	SOLR_PREFIX='$(SOLR_PREFIX)' SOLR_LOG=$(SOLR_LOG) php \
+		-d variables_order=E -d open_basedir=/ \
+		solr.php > $@
+	chmod +x '$@'
+
 clean:
 	rm -rf $(EXAMPLE_FILES) $(ROOT_FILES) solr solr-$(SOLR_VERSION).tgz
 
 clean_cores:
 	find solr -maxdepth 1 -mindepth 1 -type d ! -name bin ! -name collection1 -exec rm -r {} \;
 
-.PHONY: start solr_home clean solr/%/conf/data-config.xml
+.PHONY: start solr_home clean solr/%/conf/data-config.xml write_default_solr
