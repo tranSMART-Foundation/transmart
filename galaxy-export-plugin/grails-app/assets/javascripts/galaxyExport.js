@@ -2,17 +2,17 @@
 window.addGalaxyPanel = function(parentPanel, config) {
     GalaxyPanel = new Ext.Panel({
         id: 'GalaxyPanel',
-        title: 'Galaxy Export',
         region: 'center',
-        split: true,
         height: 90,
+        split: true,
         layout: 'fit',
+        collapsible: true,
+        title: 'Galaxy Export',
         listeners: {
             activate: function(p) {
                 getJobsDataForGalaxy();
             }
-        },
-        collapsible: true
+        }
     });
     parentPanel.add(GalaxyPanel)
 }
@@ -124,7 +124,7 @@ function galaxyjobsstoreLoaded()
             tooltip:'Click for Jobs help',
             iconCls: "contextHelpBtn",
             handler: function(event, toolEl, panel){
-                D2H_ShowHelp("1456",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );
+                window.open(GLOBAL.HelpGalaxyURL, '_blank').focus();
             }
         }]
     });
