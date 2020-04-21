@@ -34,9 +34,9 @@ Ext.app.PickList = Ext.extend(Ext.Panel, {
 		
 		var label = new Ext.Panel({
 			id: this.initialConfig.id + "-label",
-			border: false,
-			autoHeight: true,
 			width: 62,
+			autoHeight: true,
+			border: false,
 			html: this.initialConfig.label
 		});
 		
