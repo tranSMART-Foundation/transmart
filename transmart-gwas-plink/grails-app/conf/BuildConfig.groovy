@@ -45,6 +45,11 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'org.anarres.lzo:lzo-core:1.0.5'
+
+        build 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.1', {
+            excludes 'groovy', 'nekohtml'
+        }
+        build 'org.apache.httpcomponents:httpclient:4.4.1'
     }
 
     plugins {
