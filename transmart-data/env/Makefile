@@ -10,7 +10,7 @@ UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
 
 UBUNTU14_PACKAGES=php5-cli php5-json openjdk-7-jdk
 UBUNTU16_PACKAGES=php7.0-cli php7.0-json
-UBUNTU18_PACKAGES=php7.2-cli php7.2-json libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev
+UBUNTU18_PACKAGES=php7.2-cli php7.2-json libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev
 
 # Latest version of groovy-binary
 GROOVY_VERSION=2.4.3
