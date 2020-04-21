@@ -25,7 +25,11 @@ grails.project.dependency.resolution = {
         compile 'com.github.jmchilton.blend4j:blend4j:0.1.2' 
 
 	compile 'org.json:json:20090211'
-	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
+
+        build 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.1', {
+            excludes 'groovy', 'nekohtml'
+        }
+        build 'org.apache.httpcomponents:httpclient:4.4.1'
 
 	// not included in 18.1 beta
 	runtime 'org.postgresql:postgresql:42.2.2.jre7', {
@@ -36,6 +40,8 @@ grails.project.dependency.resolution = {
             transitive = false
             export = false
         }
+
+	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
     }
 
     plugins {

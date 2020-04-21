@@ -45,6 +45,11 @@ grails.project.dependency.resolution = {
 //	compile 'com.lowagie:itext:2.0.8' //latest 4.2.2
 //	compile 'org.xhtmlrenderer:core-renderer:R8'
 
+        build 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.1', {
+            excludes 'groovy', 'nekohtml'
+        }
+        build 'org.apache.httpcomponents:httpclient:4.4.1'
+
 	// runtime instead of test due to technical limitations (referenced from resources.groovy)
         runtime 'org.gmock:gmock:0.8.3', {
             transitive = false
@@ -59,7 +64,8 @@ grails.project.dependency.resolution = {
         compile ':quartz:1.0.2'
 	compile ':spring-security-core:2.0.0'
 
-	compile ':transmart-shared:' + tmVersion
+	compile ':transmart-metacore-plugin:' + tmVersion
+	compile ':transmart-shared:'          + tmVersion
 
 	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
 	    export = false

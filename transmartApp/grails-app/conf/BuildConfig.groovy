@@ -199,7 +199,7 @@ grails.project.dependency.resolution = {
 ////	    compile ':transmart-shared:'          + tmVersion
 	    compile ':spring-security-auth0:'     + tmVersion
 	    compile ':galaxy-export-plugin:'      + tmVersion
-	    compile ':transmart-metacore-plugin:' + tmVersion
+////	    compile ':transmart-metacore-plugin:' + tmVersion
 	    compile ':transmart-xnat-importer:'   + tmVersion
 	    compile ':xnat-viewer:'               + tmVersion
 
