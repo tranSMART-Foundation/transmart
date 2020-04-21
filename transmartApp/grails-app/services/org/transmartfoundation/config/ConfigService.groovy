@@ -31,7 +31,7 @@ class ConfigService {
 
         Map analysisParams = [
             'com.recomdata.datasetExplorer.genePatternEnabled': [
-		default: false
+		default: false,
                 desc: 'If true, GenePattern is enabled'],
             'com.recomdata.datasetExplorer.genePatternURL': [
                 desc: 'GenePattern URL for gene pattern service, usually proxyed through Apache'],
