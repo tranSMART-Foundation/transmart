@@ -626,6 +626,7 @@ begin
 
     if (topNode is null OR length(topNode) = 0) then
 	auditMessage := 'trialid argument possibly contained erroneous value ' || trialid;
+	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
 	perform tm_cz.cz_end_audit (jobId, 'WARNING');
 	return -1;
