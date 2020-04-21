@@ -5,13 +5,13 @@ window.addFractalisPanel = parentPanel => parentPanel.insert(4, fractalisPanel)
 
 const fractalisPanel = new Ext.Panel({
     id: 'fractalisPanel',
-    title: 'Data Analysis (Fractalis)',
+    height: 90,
     region: 'center',
     split: true,
-    height: 90,
     layout: 'fit',
-    collapsible: true,
     autoScroll: true,
+    collapsible: true,
+    title: 'Data Analysis (Fractalis)',
     autoLoad: {
 	url: window.pageInfo.basePath + '/fractalis/index',
 	method: 'POST',
