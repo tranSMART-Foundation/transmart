@@ -25,7 +25,7 @@ class DatasetExplorerController {
     @Value('${com.recomdata.datasetExplorer.genePatternURL:}')
     private String genePatternUrl
 
-    @Value('${com.recomdata.datasetExplorer.enableGenePattern:false}')
+    @Value('${com.recomdata.datasetExplorer.genePatternEnabled:false}')
     private boolean enableGenePattern
 
     @Value('${com.recomdata.search.genepathway:}')
@@ -33,6 +33,51 @@ class DatasetExplorerController {
 
     @Value('${com.recomdata.adminHelpURL:}')
     private String adminHelpUrl
+
+    @Value('${org.transmartproject.helpUrls.index:}')
+    private String helpManualUrl
+
+    @Value('${org.transmartproject.helpUrls.analysisjobs:}')
+    private String helpAnalysisjobsUrl
+
+    @Value('${org.transmartproject.helpUrls.analyze:}')
+    private String helpAnalyzeUrl
+
+    @Value('${org.transmartproject.helpUrls.dataexport:}')
+    private String helpDataexportUrl
+
+    @Value('${org.transmartproject.helpUrls.exportjobs:}')
+    private String helpExportjobsUrl
+
+    @Value('${org.transmartproject.helpUrls.galaxy:}')
+    private String helpGalaxyUrl
+
+    @Value('${org.transmartproject.helpUrls.gridview:}')
+    private String helpGridviewUrl
+
+    @Value('${org.transmartproject.helpUrls.gwas:}')
+    private String helpGwasUrl
+
+    @Value('${org.transmartproject.helpUrls.highdimensional:}')
+    private String helpHighdimensionalUrl
+
+    @Value('${org.transmartproject.helpUrls.query:}')
+    private String helpQueryUrl
+
+    @Value('${org.transmartproject.helpUrls.sample:}')
+    private String helpSampleUrl
+
+    @Value('${org.transmartproject.helpUrls.savequery:}')
+    private String helpSavequeryUrl
+
+    @Value('${org.transmartproject.helpUrls.summary:}')
+    private String helpSummaryUrl
+
+    @Value('${org.transmartproject.helpUrls.tree:}')
+    private String helpTreeUrl
+
+    @Value('${org.transmartproject.helpUrls.workspace:}')
+    private String helpWorkspaceUrl
 
     @Value('${org.transmartproject.helpUrls.hiDomePopUp:}')
     private String hidomePopupHelpUrl
@@ -76,7 +121,7 @@ class DatasetExplorerController {
     @Value('${ui.tabs.browse.hide:false}')
     private String hideBrowse
 
-    @Value('${ui.tabs.datasetExplorer.xnatEnabled.show:false}')
+    @Value('${ui.tabs.datasetExplorer.xnatViewer.show:false}')
     private boolean xnatEnabled
 
     @Autowired private I2b2HelperService i2b2HelperService
@@ -120,6 +165,7 @@ class DatasetExplorerController {
 	    enableGenePattern       : enableGenePattern.toString(),
 	    searchGenepathway       : searchGenepathway,
 	    adminHelpUrl            : adminHelpUrl,
+	    helpManualUrl           : helpManualUrl,
 	    hidomePopupHelpUrl      : hidomePopupHelpUrl,
 	    contactUs               : contactUs,
 	    appTitle                : appTitle,

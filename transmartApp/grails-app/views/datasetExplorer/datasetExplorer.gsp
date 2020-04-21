@@ -79,8 +79,23 @@
             Binning: false,
             ManualBinning: false,
             NumberOfBins: 4,
-            HelpURL: '${adminHelpUrl}',
-            hiDomePopUpHelpURL: '${hiDomePopUpHelpUrl}',
+            HelpManualURL: "${helpManualUrl}",
+            HelpAnalysisjobsURL: "${helpAnalysisjobsUrl ?: helpManualUrl + 'advanced_workflow.html#viewing-recent-analysis-jobs'}",
+            HelpAnalyzeURL: "${helpAnalyzeUrl ?: helpManualUrl + 'analyze.html'}",
+            HelpDataexportURL: "${helpDataexportUrl ?: helpManualUrl + 'analyze.html#exporting-cohort-data'}",
+            HelpExportjobsURL: "${helpExportjobsUrl ?: helpManualUrl + 'analyze.html#the-export-jobs-list'}",
+            HelpGalaxyURL: "${helpGalaxyUrl ?: helpManualUrl + 'analyze.html#exporting-data-directly-into-galaxy'}",
+            HelpGridviewURL: "${helpGridviewUrl ?: helpManualUrl + 'grid_view.html'}",
+            HelpGwasURL: "${helpGwasUrl ?: helpManualUrl + 'gwas.html'}",
+            HelpHighdimensionalURL: "${helpHighdimensionalUrl ?: helpManualUrl + 'advanced_workflow.html#high-dimensional-data'}",
+            HelpQueryURL: "${helpQueryUrl ?: helpManualUrl + 'analyze.html#defining-the-cohorts'}",
+            HelpSampleURL: "${helpSampleUrl ?: helpManualUrl + 'sample_explorer.html'}",
+            HelpSavequeryURL: "${helpSavequeryUrl ?: helpManualUrl + 'analyze.html#saving-subset-definitions'}",
+            HelpSummaryURL: "${helpSummaryUrl ?: helpManualUrl + 'summary_statistics.html'}",
+            HelpTreeURL: "${helpTreeUrl ?: helpManualUrl + 'analyze.html#the-navigation-tree'}",
+            HelpWorkspaceURL: "${helpWorkspaceUrl ?: helpManualUrl + 'analyze.html#retrieving-saved-subset-definitions'}",
+            HelpURL: "${helpManualpUrl}",
+            hiDomePopUpHelpURL: "${hiDomePopUpHelpUrl ?: helpManualUrl + 'hidome.html'}",
             ContactUs: '${contactUs}',
             AppTitle: '${appTitle}',
             BuildVersion: 'Build Version: <g:meta name="environment.BUILD_NUMBER"/> - <g:meta name="environment.BUILD_ID"/>',
@@ -114,7 +129,7 @@
         var searchPage = "datasetExplorer";
         var dseOpenedNodes = "${dseOpenedNodes}";
         var dseClosedNodes = "${dseClosedNodes}";
-        var helpURL = '${adminHelpUrl}';
+        var helpURL = "${helpManualUrl}";
 
         Ext.BLANK_IMAGE_URL = "${assetPath(src:'s.gif')}";
         Ext.Ajax.timeout = 1800000;
