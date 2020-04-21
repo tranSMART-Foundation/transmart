@@ -25,13 +25,13 @@
 
 window.smartRPanel = new Ext.Panel({
     id: 'smartRPanel',
-    title: 'SmartR',
     region: 'center',
-    split: true,
     height: 90,
-    layout: 'fit',
-    collapsible: true,
+    split: true,
+    layout: 'fit', 
     autoScroll: true,
+    collapsible: true,
+    title: 'SmartR',
     tbar: new Ext.Toolbar({
         id: 'smartRToolbar',
         title: 'R Scripts',
