@@ -39,7 +39,7 @@ function setDataAssociationAvailableFlag(el, success, response, options) {
                 }
             },
             failure: function (result, request) {
-                alert("Unable to process the export: " + result.responseText);
+                alert("Unable to process the dataAssociation/loadScripts export: " + result.responseText);
             }
         });
     }
@@ -60,7 +60,7 @@ function loadScripts(scripts) {
         } else if (file.type === 'css') { // if css
             $j('head').append($j('<link rel="stylesheet" type="text/css" />').attr('href', file.path));
         } else {
-            console.error("Unknown file type.");
+            console.error('loadScripts: Unknown file type '+file.type);
         }
     }
 }
@@ -92,12 +92,13 @@ Ext.onReady(function () {
         id: 'westPanel',
         region: 'west',
         width: 320,
-        minwidth: 280,
+        minButtonWidth: 280,
         split: true,
         border: true,
         layout: 'border'
     });
-    
+
+    // commented out where it was used below in centerMainPanel
     var tb = new Ext.Toolbar({
         id: 'maintoolbar',
         title: 'maintoolbar',
@@ -306,10 +307,10 @@ Ext.onReady(function () {
             new Ext.Toolbar.Button({
                 id: 'dataExplorerHelpButton',
                 iconCls: 'contextHelpBtn',
-                qtip: 'Click for Dataset Explorer Help',
+                tooltip: 'Click for Dataset Explorer Help',
                 disabled: false,
                 handler: function () {
-                    D2H_ShowHelp("1258",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP);
+		    window.open(GLOBAL.HelpAnalyzeURL, '_blank').focus();
                 }
             })
         ]
@@ -318,15 +319,15 @@ Ext.onReady(function () {
     centerMainPanel = new Ext.Panel({
         id: 'centerMainPanel',
         region: 'center',
-        // tbar: tb,
         layout: 'border'
+        // tbar: tb
     });
 
     centerPanel = new Ext.Panel({
         id: 'centerPanel',
         region: 'center',
         width: 500,
-        minwidth: 150,
+        minButtonWidth: 150,
         split: true,
         border: true,
         layout: 'fit'
@@ -338,11 +339,14 @@ Ext.onReady(function () {
 
     queryPanel = new Ext.Panel({
         id: 'queryPanel',
-        title: 'Comparison',
         region: 'north',
         height: 340,
         autoScroll: true,
         split: true,
+        collapsible: true,
+        titleCollapse: false,
+        animCollapse: false,
+        title: 'Comparison',
         autoLoad: {
             url: pageInfo.basePath+'/datasetExplorer/queryPanelsLayout',
             scripts: true,
@@ -350,9 +354,6 @@ Ext.onReady(function () {
             discardUrl: true,
             method: 'POST'
         },
-        collapsible: true,
-        titleCollapse: false,
-        animCollapse: false,
         listeners: {
             activate: function() {
                 GLOBAL.Analysis="Advanced";
@@ -377,14 +378,14 @@ Ext.onReady(function () {
         },
         collapsible: false,
         //height: 300,
-        deferredRender: false,
+        layoutConfig: { deferredRender: false },
         activeTab: 0,
         tools: [
             {
                 id: 'help',
                 qtip:'Click for Generate Summary Statistics help',
                 handler: function(event, toolEl, panel) {
-                    D2H_ShowHelp("1074",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP);
+                    window.open(GLOBAL.HelpSummaryURL, '_blank').focus();
                 },
                 hidden:true
             }
@@ -397,7 +398,7 @@ Ext.onReady(function () {
 
     analysisGridPanel = new Ext.Panel({
         id: 'analysisGridPanel',
-        title: 'Grid View',
+        title: 'Grid View Tab',
         region: 'center',
         split: true,
         height: 90,
@@ -431,7 +432,6 @@ Ext.onReady(function () {
         id: 'analysisPanel',
         title: 'Summary Statistics',
         region: 'center',
-        fitToFrame: true,
         listeners: {
             activate: function (p) {
                 if (isSubsetQueriesChanged(p.subsetQueries) || !Ext.get('analysis_title')) {
@@ -482,6 +482,7 @@ Ext.onReady(function () {
         split: true,
         height: 90,
         layout: 'fit',
+        collapsible: true,
         listeners: {
             activate: function(p) {
                 if (isSubsetQueriesChanged(p.subsetQueries) || !Ext.get('dataTypesGridPanel')) {
@@ -498,8 +499,7 @@ Ext.onReady(function () {
                     onWindowResize();
                 }
             }
-        },
-        collapsible: true
+        }
     });
 
     // ******************
@@ -508,24 +508,25 @@ Ext.onReady(function () {
 
     dataAssociationPanel = new Ext.Panel({
         id: 'dataAssociationPanel',
-        title: 'Advanced Workflow',
         region: 'center',
-        split: true,
         height: 90,
+        autoScroll: true,
+        split: true,
         layout: 'fit',
+        collapsible: true,
+        title: 'Advanced Workflow',
+        autoLoad: {
+            url: pageInfo.basePath+'/dataAssociation/defaultPage',
+            method: 'POST',
+            callback: setDataAssociationAvailableFlag,
+            evalScripts: true
+        },
         tbar: new Ext.Toolbar({
             id: 'advancedWorkflowToolbar',
             title: 'Advanced Workflow actions',
             items: []
         }),
-        autoScroll: true,
-        autoLoad: {
-            url: pageInfo.basePath+'/dataAssociation/defaultPage',
-            method: 'POST',
-            callback: setDataAssociationAvailableFlag,
-            evalScripts:true
-        },
-            listeners: {
+        listeners: {
             activate: function (p) {
                 /**
                  * routines when activating advanced workflow tab
@@ -549,8 +550,7 @@ Ext.onReady(function () {
                     onWindowResize();
                 }
             }
-        },
-        collapsible: true
+        }
     });
 
     // ******************
@@ -559,11 +559,12 @@ Ext.onReady(function () {
 
     analysisExportJobsPanel = new Ext.Panel({
         id: 'analysisExportJobsPanel',
-        title: 'Export Jobs',
         region: 'center',
-        split: true,
         height: 90,
+        split: true,
         layout: 'fit',
+        collapsible: true,
+        title: 'Export Jobs',
         listeners: {
             activate: function(p) {
                 p.body.mask("Loading...", 'x-mask-loading');
@@ -571,8 +572,7 @@ Ext.onReady(function () {
             },
             deactivate: function() {
             }
-        },
-        collapsible: true
+        }
     });
 
     /**
@@ -581,27 +581,28 @@ Ext.onReady(function () {
      */
     analysisJobsPanel = new Ext.Panel({
         id: 'analysisJobsPanel',
-        title: 'Analysis Jobs',
         region: 'center',
-        split: true,
         height: 90,
+        split: true,
+        collapsible: true,
         layout: 'fit',
+        title: 'Analysis Jobs',
         listeners: {
             activate: function(p) {
                 getJobsData(p);
             }
-        },
-        collapsible: true
+        }
     });
 
     workspacePanel = new Ext.Panel({
         id: 'workspacePanel',
         title: 'Workspace',
         region: 'center',
-        split: true,
         height: 90,
-        layout: 'fit',
         autoScroll: false,
+        split: true,
+        layout: 'fit',
+        collapsible: true,
         listeners: {
             activate: function(p) {
                 renderWorkspace(p);
@@ -609,14 +610,13 @@ Ext.onReady(function () {
             deactivate: function() {
 
             }
-        },
-        collapsible: true
+        }
     });
 
     sampleExplorerPanel = new Ext.Panel({
-        id: "sampleExplorer",
-        title:"Sample Details",
+        id: "sampleExplorerPanel",
         layout: "fit",
+        title:"Sample Details",
         listeners: {
             activate: function(p) {
                 p.body.mask("Loading...", 'x-mask-loading');
@@ -695,13 +695,10 @@ Ext.onReady(function () {
                     if (data) {
                         loadResources()
                     } else {
-			console.log("Plugin " + pluginName + " not active");
                         def.reject('not active');
                     }
                 })
                 .fail(function() {
-                    console.log('Could not determine whether plugin ' + pluginName +
-				' is active');
 		    def.reject.apply(def, arguments);
                 });
         } else {
@@ -714,7 +711,14 @@ Ext.onReady(function () {
         });
     }
 
-    /* load the legacy hardcoded tabs: only dalliance uses this method in 19.0 */
+    /* load the legacy hardcoded tabs: only dalliance uses this method in 16.3 */
+
+    loadPlugin('rdc-rmodules', '/dataAssociation/loadScripts', function () {
+	if(!dataAssociationPanel.rendered) {
+	    dataAssociationPanel.enable();
+	}
+    }, true);
+
     loadPlugin('dalliance-plugin', '/dalliance/loadScripts', function () {
         loadDalliance(resultsTabPanel);
         Ext.getCmp('dallianceBrowser').on('deactivate', function() {
@@ -764,19 +768,19 @@ Ext.onReady(function () {
     southCenterPanel = new Ext.Panel({
         id: 'southCenterPanel',
         region: 'center',
-        layout: 'border',
         split: true,
+        layout: 'border',
         tbar: tb2
     });
 
     exportPanel = new Ext.Panel({
         id: 'exportPanel',
-        title: 'Compare/Export',
         region: 'east',
-        html: '<div style="text-align:center;font:12pt arial;width:100%;height:100%;"><table style="width:100%;height:100%;"><tr><td align="center" valign="center">Drag subsets to this panel to compare and export them</td></tr></table></div>',
-        split: true,
         width: 300,
         height: 90,
+        split: true,
+        title: 'Compare/Export',
+        html: '<div style="text-align:center;font:12pt arial;width:100%;height:100%;"><table style="width:100%;height:100%;"><tr><td align="center" valign="center">Drag subsets to this panel to compare and export them</td></tr></table></div>',
         buttons: [
             {
                 text: 'Compare',
@@ -965,7 +969,7 @@ Ext.onReady(function () {
                     id: 'help',
                     qtip: 'Click for context sensitive help',
                     handler: function (event, toolEl, panel) {
-                        D2H_ShowHelp("1239", helpURL, "wndExternal", CTXT_DISPLAY_FULLHELP);
+                        window.open(GLOBAL.HelpQueryURL, '_blank').focus();
                     }
                 }
             ]
@@ -975,18 +979,16 @@ Ext.onReady(function () {
         setvaluewin.hide();
     }
 
-    // preload geneexpr filter dialog
+    // preload HiDome filter dialog
 
-    omicsfilterpanel = new Ext.Panel(
-        {
-            id: 'omicsfilterPanel',
-            region: 'center',
-            height: 80,
-            width: 100,
-            split: false,
-            html: '<div id="highdimension-filter-main"></div>'
-        }
-    );
+    omicsfilterpanel = new Ext.Panel({
+        id: 'omicsfilterPanel',
+        region: 'center',
+        height: 80,
+        width: 100,
+        split: false,
+        html: '<div id="highdimension-filter-main"></div>'
+    });
 
     if (!this.omicsfilterwin) {
         var omicsFilterWinButtons = [
@@ -1019,20 +1021,19 @@ Ext.onReady(function () {
                 iconCls : 'contextHelpBtn'
             });
         }
-        omicsfilterwin = new Ext.Window(
-            {
-                id: 'omicsFilterWindow',
-                title: '',
-                layout: 'border',
-                height: 350,
-                closable: false,
-                plain: true,
-                modal: true,
-                border: false,
-                items: [omicsfilterpanel],
-                buttons: omicsFilterWinButtons,
-                tools: []
-            });
+        omicsfilterwin = new Ext.Window({
+            id: 'omicsFilterWindow',
+            title: '',
+            layout: 'border',
+            height: 350,
+            closable: false,
+            plain: true,
+            modal: true,
+            border: false,
+            items: [omicsfilterpanel],
+            buttons: omicsFilterWinButtons,
+            tools: []
+        });
 
         omicsfilterwin.show();
         omicsfilterwin.hide();
@@ -1084,34 +1085,34 @@ function hasMultipleTimeSeries() {
 function createOntPanel() {
     // make tab panel, search panel, ontTree and combine them
     ontTabPanel = new Ext.Panel({
-        id: 'ontPanel',
-        region: 'center',
+        id: 'ontTabPanel',
         defaults: {
             hideMode: 'offsets'
         },
-        collapsible: false,
-        height: 300,
+        region: 'center',
         width: 250,
-        deferredRender: false,
-        split: true
+        height: 300,
+        split: true,
+        collapsible: false,
+        layoutConfig: { deferredRender: false }
     });
 
     ontSearchByCodePanel = new Ext.Panel({
-        id: 'searchByCodePanel',
-        title: 'Search by Codes',
-        region: 'center'
+        id: 'ontSearchByCodePanel',
+        region: 'center',
+        title: 'Search by Codes'
     });
 
     searchByNamePanel = new Ext.Panel({
-        title: 'Search by Names',
         id: 'searchByNamePanel',
         region: 'center',
         height: 500,
         width: 250,
         border: true,
-        bodyStyle: 'background:lightgrey;',
+        split: true,
         layout: 'border',
-        split: true
+        bodyStyle: 'background:lightgrey;',
+        title: 'Search by Names'
     });
 
     // make the ontSearchByNamePanel
@@ -1122,11 +1123,11 @@ function createOntPanel() {
     searchByNameForm = new Ext.Panel({
         id: 'searchByNameForm',
         region: 'north',
-        bodyStyle: 'background:#eee;padding: 10px;',
-        html: shtml,
         height: 70,
         border: true,
-        split: false
+        split: false,
+        bodyStyle: 'background:#eee;padding: 10px;',
+        html: shtml
     });
 
     // shorthand
@@ -1413,7 +1414,6 @@ function setupOntTree(id_in, title_in) {
                 success: function (result, request) {
                 },
                 failure: function (result, request) {
-                    console.log(result);
                 },
                 timeout: '600000'
             });
@@ -1542,7 +1542,7 @@ function getSubCategories(ontresponse) {
         {
             id:'contextHelp-button',
             handler: function(event, toolEl, panel) {
-                D2H_ShowHelp((id_in === "navigateTermsPanel") ? "1066": "1091",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP);
+                window.open(GLOBAL.HelpTreeURL, '_blank').focus();
             },
             iconCls: "contextHelpBtn"
         }
@@ -1573,9 +1573,9 @@ function getSubCategories(ontresponse) {
 
 function setupDragAndDrop() {
 
-    // Drag and drop for panels is now setup in querypanel.js
+    // Drag and drop for Comparison tab panels is now setup in querypanel.js
 
-    /* Set up Drag and Drop for the analysis Panel */
+    /* Set up Drag and Drop for the Summary Statistics analysis Panel */
     var qcd = Ext.get(analysisPanel.body);
 
     dts = new Ext.dd.DropTarget(qcd, {
@@ -2212,7 +2212,7 @@ function showSNPViewerSelection() {
                 id: 'help',
                 qtip: 'Click for context sensitive help',
                 handler: function(event, toolEl, panel) {
-                    D2H_ShowHelp("1360",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP);
+                    window.open(GLOBAL.HelpManualURL, '_blank').focus();
                 }
             }
         ]
@@ -2334,7 +2334,7 @@ function showIgvSelection() {
                 id: 'help',
                 qtip: 'Click for context sensitive help',
                 handler: function(event, toolEl, panel) {
-                    D2H_ShowHelp("1427",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP);
+                    window.open(GLOBAL.HelpManualURL, '_blank').focus();
                 }
             }
         ]
@@ -2455,8 +2455,7 @@ function showPlinkSelection() {
                 id: 'help',
                 qtip: 'Click for context sensitive help',
                 handler: function(event, toolEl, panel) {
-                    // 1360 needs to be changed for PLINK
-                    D2H_ShowHelp("1360",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP);
+                    window.open(GLOBAL.HelpManualURL, '_blank').focus();
                 }
             }
         ]
@@ -2532,8 +2531,7 @@ function showGwasSelection() {
                 id:'help',
                 qtip:'Click for context sensitive help',
                 handler: function(event, toolEl, panel) {
-                    // 1360 needs to be changed for PLINK
-                    D2H_ShowHelp("1360",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP);
+                    window.open(GLOBAL.HelpGwasURL, '_blank').focus();
                 }
             }
         ]
@@ -2933,25 +2931,26 @@ function storeLoaded(jsonStore, rows, paramsObject) {
     }
 
     var bbar = new Ext.Toolbar({ height: 25 });
+    var tbar = new Ext.Toolbar({ height: 25 });
 
     if (paramsObject && paramsObject.params) {
         jQuery.get(pageInfo.basePath + '/dataExport/isCurrentUserAllowedToExport?' + paramsObject.params, function(data) {
-				var exportCsvButton = new Ext.Button ({
-					text: 'Export to CSV',
-					listeners: {
-						click: function () {
-							var a = document.createElement('a');
-							a.href = 'data:text/csv;base64,' + Base64.encode(grid.getCsv());
-							a.setAttribute('type', 'hidden');
-							a.download = 'grid_view.csv';
-							document.body.appendChild(a);
-							a.click();
-							jQuery(a).remove();
-							jQuery.post(pageInfo.basePath + '/chart/reportGridTableExport', paramsObject.params);
-						}
-					}
-				});
-				bbar.add(exportCsvButton);
+	    var exportCsvButton = new Ext.Button ({
+		text: 'Export to CSV',
+		listeners: {
+		    click: function () {
+			var a = document.createElement('a');
+			a.href = 'data:text/csv;base64,' + Base64.encode(grid.getCsv());
+			a.setAttribute('type', 'hidden');
+			a.download = 'grid_view.csv';
+			document.body.appendChild(a);
+			a.click();
+			jQuery(a).remove();
+			jQuery.post(pageInfo.basePath + '/chart/reportGridTableExport', paramsObject.params);
+		    }
+		}
+	    });
+	    bbar.add(exportCsvButton);
             if (data.result) {
                 var exportButton = new Ext.Button ({
                     text: 'Export to Excel',
@@ -2983,12 +2982,38 @@ function storeLoaded(jsonStore, rows, paramsObject) {
         });
     }
 
+    var tbar = new Ext.Toolbar({
+	id: 'gridViewToolbar',
+	items: [
+	    new Ext.Toolbar.Button ({
+		id: 'gridViewHelpButton',
+		text: 'Click for Grid View Help',
+		tabIndex: 1,
+		tooltip: 'Grid View Help',
+                disabled: false,
+		handler: function() {
+		    window.open(GLOBAL.HelpGridviewURL, '_blank').focus();
+		}
+	    }),
+	    new Ext.Toolbar.Button ({
+		id: 'gridViewHelpIcon',
+		icon: 'help/helpicon_white.jpg',
+                disabled: false,
+		tabIndex: 2,
+		tooltip: 'Tooltip for Grid View Help Icon',
+		handler: function() {
+		    window.open(GLOBAL.HelpManualURL, '_blank').focus();
+		}
+	    })
+	]
+    });
     grid = new GridViewPanel({
         id: 'gridView',
-        title: 'Grid View',
+        title: 'Grid View Panel',
         viewConfig: {
             forceFit: true
         },
+        tbar: tbar,
         bbar: bbar,
         frame:true,
         layout: 'fit',
@@ -3260,7 +3285,7 @@ function showHaploviewGeneSelection() {
                 id:'help',
                 qtip:'Click for context sensitive help',
                 handler: function(event, toolEl, panel) {
-                    D2H_ShowHelp("1174",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP);
+                    window.open(GLOBAL.HelpManualURL, '_blank').focus();
                 }
             }
         ]
@@ -3425,11 +3450,11 @@ function saveComparisonComplete(result) {
         closable: true,
         tools: [
             {
-                id: 'sampleExplorerHelpButton',
+                id: 'savedComparisonHelpButton',
                 qtip: 'Click for Saved Comparison Window Help',
                 disabled: false,
                 handler: function () {
-                    D2H_ShowHelp("1474",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP);
+		    window.open(GLOBAL.HelpSavequeryURL, '_blank').focus();
                 }
             }
         ],

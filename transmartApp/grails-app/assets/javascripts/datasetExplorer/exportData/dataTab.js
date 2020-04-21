@@ -49,7 +49,7 @@ CustomGridPanel.prototype.dropZonesChecker = function () {
                         && rd.subset1.ontologyTermKeys.indexOf(data.node.id) < 0
                         && rd.subset2.ontologyTermKeys
                         && rd.subset2.ontologyTermKeys.indexOf(data.node.id) < 0
-                            //TODO We could check for folders
+                    //TODO We could check for folders
                         || (data.node.attributes.visualattributes.indexOf('HIGH_DIMENSIONAL') >= 0 && rd.dataTypeId == 'CLINICAL');
                 };
                 var getDropHandler = function(target, rd) {
@@ -198,7 +198,7 @@ DataExport.prototype.displayResult = function (records, options, success) {
                             tooltip:'Click for Data Export help',
                             iconCls: "contextHelpBtn",
                             handler: function(event, toolEl, panel){
-                                D2H_ShowHelp("1312",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );
+                                window.open(GLOBAL.HelpDataexportURL, '_blank').focus();
                             }
                         }
                     )]

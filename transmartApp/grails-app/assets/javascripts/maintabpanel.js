@@ -93,8 +93,8 @@ function createSearchTabs(toolbar) {
                         }
                     }
                 ]
-             } ,             
-             {
+            },
+            {
                 id: "tab3",
                 iconCls: "profTab",
                 title: "mRNA Profiles (" + pageData.profile.count + ")",
@@ -146,7 +146,7 @@ function createSearchTabs(toolbar) {
             {
                 id:"tab5",
                 iconCls: "docTab",
-                   title: "Documents (" + pageData.doc.count + ")",
+                title: "Documents (" + pageData.doc.count + ")",
                 listeners: {
                     activate: activateTab
                 },
@@ -206,7 +206,7 @@ function createSearchTabs(toolbar) {
                 defaultSrc: pageData.genego.resultsUrl,
                 tabTip: pageData.genego.credentials
             }
-            
+
         ]
     });
     return tabpanel;
@@ -216,79 +216,79 @@ function createSearchTabs(toolbar) {
 function createMainToolbar() {
 
     var toolbar = new Ext.Toolbar([
-           {
-               id: "filters-show-button",
-               text: "Show Filters",
-               handler: showFilters,
-               cls: "x-btn-text-icon",
-               iconCls: "filtersBtn"
-           }, {
-               id: "filters-hide-button",
-               text: "Hide Filters",
-               handler: showFilters,
-               cls: "x-btn-text-icon",
-               hidden: true,
-               iconCls: "filtersBtn"
-           }, {
-               id: "summary-show-button",
-               text: "Show Summary",
-               handler: showSummary,
-               cls: "x-btn-text-icon",
-               iconCls: "summaryBtn"
-           }, {
-               id: "summary-hide-button",
-               text: "Show Search Results",
-               handler: showSummary,
-               cls: "x-btn-text-icon",
-               hidden: true,
-               iconCls: "summaryBtn"
-           }, {
-               id: "heatmap-button",
-               text: "Heatmap",
-               handler: showHeatmap,
-               cls: "x-btn-text-icon",
-               iconCls: "heatmapBtn"
-           },
-           {
-               id: "tea-button",
-               text: "Analysis View",
-               handler: showTEAView,
-               cls: "x-btn-text-icon",
-               iconCls: "teaBtn"
-           },
-           {
-               id: "studyview-button",
-               text: "Study View",
-               handler: showStudyView,
-               cls: "x-btn-text-icon",
-               iconCls: "studyBtn"
-           },
-           {
-               id: "exportsummary-button",
-               text: "Export Results",
-               handler: exportSummary,
-               cls: "x-btn-text-icon",
-               iconCls: "exportSummaryBtn"
-           },
-           {
-               id: "exportresnet-button",
-               text: "Export to ResNet",
-               handler: exportResNet,
-               cls: "x-btn-text-icon",
-               iconCls: "exportResNetBtn"               
-           },
-           {
-				id:'contextHelp-button',
-			    handler: function(event, toolEl, panel){
-			    	D2H_ShowHelp(filterContextHelpId,helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );
-			    },
-	            cls: "x-btn-text-icon",
-	            iconCls: "contextHelpBtn"  
-		   },
-		   {
-               xtype: "tbfill"
-           }
-       ]);
+        {
+            id: "filters-show-button",
+            text: "Show Filters",
+            handler: showFilters,
+            cls: "x-btn-text-icon",
+            iconCls: "filtersBtn"
+        }, {
+            id: "filters-hide-button",
+            text: "Hide Filters",
+            handler: showFilters,
+            cls: "x-btn-text-icon",
+            hidden: true,
+            iconCls: "filtersBtn"
+        }, {
+            id: "summary-show-button",
+            text: "Show Summary",
+            handler: showSummary,
+            cls: "x-btn-text-icon",
+            iconCls: "summaryBtn"
+        }, {
+            id: "summary-hide-button",
+            text: "Show Search Results",
+            handler: showSummary,
+            cls: "x-btn-text-icon",
+            hidden: true,
+            iconCls: "summaryBtn"
+        }, {
+            id: "heatmap-button",
+            text: "Heatmap",
+            handler: showHeatmap,
+            cls: "x-btn-text-icon",
+            iconCls: "heatmapBtn"
+        },
+        {
+            id: "tea-button",
+            text: "Analysis View",
+            handler: showTEAView,
+            cls: "x-btn-text-icon",
+            iconCls: "teaBtn"
+        },
+        {
+            id: "studyview-button",
+            text: "Study View",
+            handler: showStudyView,
+            cls: "x-btn-text-icon",
+            iconCls: "studyBtn"
+        },
+        {
+            id: "exportsummary-button",
+            text: "Export Results",
+            handler: exportSummary,
+            cls: "x-btn-text-icon",
+            iconCls: "exportSummaryBtn"
+        },
+        {
+            id: "exportresnet-button",
+            text: "Export to ResNet",
+            handler: exportResNet,
+            cls: "x-btn-text-icon",
+            iconCls: "exportResNetBtn"               
+        },
+        {
+	    id:'contextHelp-button',
+	    handler: function(event, toolEl, panel){
+		window.open(GLOBAL.HelpManualURL, '_blank').focus();
+	    },
+	    cls: "x-btn-text-icon",
+	    iconCls: "contextHelpBtn"  
+	},
+	{
+            xtype: "tbfill"
+        }
+    ]);
     return toolbar;
 }
 
@@ -313,10 +313,10 @@ function activateTab(tab) {
         }
         setButtonVisibility("exportsummary", true);
         setButtonVisibility("exportresnet", false);
-        
+
         var contextHelpVisibility = false;
         if(pageData.trial.analysisCount>0 || pageData.trial.count>0){
-        	contextHelpVisibility = true;
+            contextHelpVisibility = true;
         }
         setButtonVisibility("contextHelp", contextHelpVisibility);
         filterContextHelpId = (pageData.trial.analysisCount>0) ? "1027" : "1028";
@@ -328,24 +328,24 @@ function activateTab(tab) {
         if(pageData.pretrial.count>0){
             setButtonVisibility("studyview", true);
         } else {
-        	setButtonVisibility("studyview", false);
+            setButtonVisibility("studyview", false);
         }
 
         // tea analysis view
         if(pageData.pretrial.mRNAAnalysisCount>0){
             setButtonVisibility("tea", true);
         } else {
-        	setButtonVisibility("tea", false);
+            setButtonVisibility("tea", false);
         }
         setButtonVisibility("summary", false);
         setButtonVisibility("heatmap", false);
         setButtonVisibility("exportsummary", true);
         setButtonVisibility("exportresnet", false);
         setButtonVisibility("contextHelp", true);
-        
+
         var contextHelpVisibility = false;
         if(pageData.pretrial.mRNAAnalysisCount>0 || pageData.pretrial.count>0){
-        	contextHelpVisibility = true;
+            contextHelpVisibility = true;
         }
         setButtonVisibility("contextHelp", contextHelpVisibility);
         filterContextHelpId = (pageData.pretrial.mRNAAnalysisCount>0) ? "1023" : "1023";
@@ -366,14 +366,14 @@ function activateTab(tab) {
         setButtonVisibility("summary", pageData.jubilant.litJubOncAltCount > 0);
         setButtonVisibility("heatmap", false);
         if (pageData.jubilant.count < 1) 	{
-        	setButtonVisibility("exportsummary", false);
+            setButtonVisibility("exportsummary", false);
         } else	{
-        	setButtonVisibility("exportsummary", true);
+            setButtonVisibility("exportsummary", true);
         }
         if (pageData.hideInternal==true || pageData.jubilant.count < 1)  {
-        	setButtonVisibility("exportresnet", false);
+            setButtonVisibility("exportresnet", false);
         } else	{
-        	setButtonVisibility("exportresnet", true);
+            setButtonVisibility("exportresnet", true);
         }
         setButtonVisibility("studyview", false);
         setButtonVisibility("tea",false);
@@ -434,90 +434,90 @@ function activateTab(tab) {
  * @item: The item for which help is provided.
  */
 function showContextSpecificHelp(activetab, button){
-	var contextHelpButton = Ext.getCmp("contextHelp-button");
+    var contextHelpButton = Ext.getCmp("contextHelp-button");
     switch (activetab.getId()) {
     case "tab1":
-		switch (button.id){
-		case "filters-show-button":
-				filterContextHelpId = "1025";
-				contextHelpButton.setVisible(true);
-		break;
-		case "filters-hide-button":
-				contextHelpButton.setVisible(false);
-		break;
-		case "tea-button":
-				filterContextHelpId="1027";
-				contextHelpButton.setVisible(true);
-		break;
-		case "studyview-button":
-				filterContextHelpId="1028";
-				contextHelpButton.setVisible(true);
-		break;
-		default:
-			contextHelpButton.setVisible(false);
-		}
+	switch (button.id){
+	case "filters-show-button":
+	    filterContextHelpId = "1025";
+	    contextHelpButton.setVisible(true);
+	    break;
+	case "filters-hide-button":
+	    contextHelpButton.setVisible(false);
+	    break;
+	case "tea-button":
+	    filterContextHelpId="1027";
+	    contextHelpButton.setVisible(true);
+	    break;
+	case "studyview-button":
+	    filterContextHelpId="1028";
+	    contextHelpButton.setVisible(true);
+	    break;
+	default:
+	    contextHelpButton.setVisible(false);
+	}
 
 	break;
     case "tab2":
     	switch (button.id){
-		case "filters-show-button":
-			filterContextHelpId = "1033";
-			contextHelpButton.setVisible(true);
-		break;
-		case "filters-hide-button":
-			contextHelpButton.setVisible(false);
-		break;
-		case "tea-button":
-			filterContextHelpId="1034";
-			contextHelpButton.setVisible(true);
-		break;
-		case "studyview-button":
-			filterContextHelpId="1035";
-			contextHelpButton.setVisible(true);
-		break;
-		default:
-			contextHelpButton.setVisible(false);
+	case "filters-show-button":
+	    filterContextHelpId = "1033";
+	    contextHelpButton.setVisible(true);
+	    break;
+	case "filters-hide-button":
+	    contextHelpButton.setVisible(false);
+	    break;
+	case "tea-button":
+	    filterContextHelpId="1034";
+	    contextHelpButton.setVisible(true);
+	    break;
+	case "studyview-button":
+	    filterContextHelpId="1035";
+	    contextHelpButton.setVisible(true);
+	    break;
+	default:
+	    contextHelpButton.setVisible(false);
     	}
-    break;
+	break;
     case "tab4":
     	switch(button.id){
     	case "filters-show-button":
-			filterContextHelpId = "1043";
-			contextHelpButton.setVisible(true);
-		break;
+	    filterContextHelpId = "1043";
+	    contextHelpButton.setVisible(true);
+	    break;
     	case "filters-hide-button":
-    		filterContextHelpId = "1042";
-			contextHelpButton.setVisible(true);
-		break;
+    	    filterContextHelpId = "1042";
+	    contextHelpButton.setVisible(true);
+	    break;
     	case "summary-show-button":
-			filterContextHelpId = "1319";
-			contextHelpButton.setVisible(true);
-		break;
-		case "summary-hide-button":
-			filterContextHelpId = "1042";
-			contextHelpButton.setVisible(true);
-		break;
-		default:
-			contextHelpButton.setVisible(false);
+	    filterContextHelpId = "1319";
+	    contextHelpButton.setVisible(true);
+	    break;
+	case "summary-hide-button":
+	    filterContextHelpId = "1042";
+	    contextHelpButton.setVisible(true);
+	    break;
+	default:
+	    contextHelpButton.setVisible(false);
     	}
-    break;
+	break;
     case "tab5":
     	switch(button.id){
     	case "filters-show-button":
-			filterContextHelpId = "1049";
-			contextHelpButton.setVisible(true);
-		break;
+	    filterContextHelpId = "1049";
+	    contextHelpButton.setVisible(true);
+	    break;
     	case "filters-hide-button":
-    		filterContextHelpId = "1047";
-			contextHelpButton.setVisible(true);
-		break;
-		default:
-			contextHelpButton.setVisible(false);
+    	    filterContextHelpId = "1047";
+	    contextHelpButton.setVisible(true);
+	    break;
+	default:
+	    contextHelpButton.setVisible(false);
     	}
-    break;
+	break;
     default:
     	contextHelpButton.setVisible(false);
-	}
+    }
 }
 
 function showFilters(button) {
@@ -538,8 +538,8 @@ function showFilters(button) {
     var hideFiltersButton = Ext.getCmp("filters-hide-button");
     if (showFiltersButton != null) {
     	if (activetab.id == "tab1" || activetab.id == "tab2")	{
-    	//	var exportSummaryButton = Ext.getCmp( "exportsummary-button");
-    	//	exportSummaryButton.setVisible(showFiltersButton.hidden);
+    	    //	var exportSummaryButton = Ext.getCmp( "exportsummary-button");
+    	    //	exportSummaryButton.setVisible(showFiltersButton.hidden);
     	} else if(activetab.id == "tab4") {
             var showSummaryButton = Ext.getCmp("summary-show-button");
             var hideSummaryButton = Ext.getCmp( "summary-hide-button");
@@ -548,10 +548,10 @@ function showFilters(button) {
             showSummaryButton.setVisible(showFiltersButton.hidden);
             exportSummaryButton.setVisible(showFiltersButton.hidden);
             if (pageData.jubilant.litJubOncIntCount > 0 || pageData.jubilant.litJubAsthmaCount > 0)	{
-        		exportResnetButton.setVisible(showFiltersButton.hidden);
-        	} else	{
-        		exportResnetButton.setVisible(false);
-        	}
+        	exportResnetButton.setVisible(showFiltersButton.hidden);
+            } else	{
+        	exportResnetButton.setVisible(false);
+            }
 
             hideSummaryButton.setVisible(false);
         }
@@ -577,12 +577,12 @@ function showSummary(button) {
             } else {
                 sum = Ext.getCmp("jubilant-summary-gridpanel");
             }
-//            var datatype = getResultType();
-//            var titles = {
-//                "JUBILANT_ONCOLOGY_ALTERATION":"Jubilant Oncology Alteration Summary",
-//                "JUBILANT_ONCOLOGY_INHIBITOR":"Jubilant Oncology Inhibitor Summary",
-//                "JUBILANT_ONCOLOGY_INTERACTION":"Jubilant Oncology Interaction Summary"
-//            };
+//          var datatype = getResultType();
+//          var titles = {
+//              "JUBILANT_ONCOLOGY_ALTERATION":"Jubilant Oncology Alteration Summary",
+//              "JUBILANT_ONCOLOGY_INHIBITOR":"Jubilant Oncology Inhibitor Summary",
+//              "JUBILANT_ONCOLOGY_INTERACTION":"Jubilant Oncology Interaction Summary"
+//          };
             sum.setTitle("Jubilant Oncology Alteration Summary");
             sum.getStore().load({params: {offset:0, max:20}});
         }
@@ -642,23 +642,23 @@ function showHeatmap(button) {
 }
 
 function exportSummary(button) {
-	var tabpanel = Ext.getCmp("tab-panel");
+    var tabpanel = Ext.getCmp("tab-panel");
     var activetab = tabpanel.getActiveTab();
     var layout = activetab.getLayout();
     var activeitem = layout.activeItem;
     switch (activetab.getId()) {
     case "tab1":
     	if (activeitem.id.indexOf("-tea-") > -1) {
-    		window.location = pageData.downloadTrialAnalysisUrl;
+    	    window.location = pageData.downloadTrialAnalysisUrl;
     	} else	{
-    		window.location = pageData.downloadTrialStudyUrl;
+    	    window.location = pageData.downloadTrialStudyUrl;
     	}
     	break;
     case "tab2":
     	if (activeitem.id.indexOf("-tea-")	> -1)	{
-    		window.location = pageData.downloadEaTEAUrl;
+    	    window.location = pageData.downloadEaTEAUrl;
     	} else	{
-    		window.location = pageData.downloadEaUrl;
+    	    window.location = pageData.downloadEaUrl;
     	}
     	break;
     case "tab4":
@@ -690,14 +690,14 @@ function createJubSummary() {
             }
         },
         fields: [
-         {name: 'dataType'},
-         {name: 'alterationType'},
-         {name: 'totalFrequency'},
-         {name: 'totalAffectedCases'},
-         {name: 'summary'},
-         {name: 'target'},
-         {name: 'variant'},
-         {name: 'diseaseSite'}
+            {name: 'dataType'},
+            {name: 'alterationType'},
+            {name: 'totalFrequency'},
+            {name: 'totalAffectedCases'},
+            {name: 'summary'},
+            {name: 'target'},
+            {name: 'variant'},
+            {name: 'diseaseSite'}
         ],
         proxy: new Ext.data.ScriptTagProxy({ url: pageData.jubSummaryUrl })
     });
@@ -720,7 +720,7 @@ function createJubSummary() {
         trackMouseOver: false,
         disableSelection: true,
         columns: [
-               {header: "Data Type", width: 75, sortable: true, dataIndex: 'dataType', menuDisabled: true},
+            {header: "Data Type", width: 75, sortable: true, dataIndex: 'dataType', menuDisabled: true},
             {header: "Alteration Type", width: 150, sortable: true, dataIndex: 'alterationType', menuDisabled: true},
             {header: "Disease Site", width: 200, sortable: true, dataIndex: 'diseaseSite', menuDisabled: true},
             {id: "summary", header: "Summary", width: 300, sortable: true, dataIndex: 'summary', menuDisabled: true},
@@ -750,12 +750,11 @@ function selectJubilantPanel(index) {
 }
 
 function onItemCheck(item, checked){
-    
 }
 
 function popupWindow(mylink, windowname) {
     if (!window.focus)
-    return true;
+	return true;
 
     var href;
     if (typeof(mylink) == 'string')
@@ -783,25 +782,25 @@ function showDialog(id, value) {
     var win = Ext.getCmp(id + '-win');
 
     if(win==null){
-    win = new Ext.Window({
-        id: id + '-win',
-        animateTarget: id,
-        autoScroll: true,
-        width: 550,
-        height: 350,
-        closeAction: 'hide',
-        bodyBorder: false,
-        plain: true,
-        constrain: true,
-        title: value.title,
-       // contentEl: value.element
-        autoLoad: {
-            url: value.url,
-            nocache: false,
-            discardUrl: false,
-            method: "POST"
-        }
-    });
+	win = new Ext.Window({
+            id: id + '-win',
+            animateTarget: id,
+            autoScroll: true,
+            width: 550,
+            height: 350,
+            closeAction: 'hide',
+            bodyBorder: false,
+            plain: true,
+            constrain: true,
+            title: value.title,
+	    // contentEl: value.element
+            autoLoad: {
+		url: value.url,
+		nocache: false,
+		discardUrl: false,
+		method: "POST"
+            }
+	});
     }
 
     win.show();
@@ -819,28 +818,29 @@ function showDialogDiv(id, value) {
     var win = Ext.getCmp(id + '-win');
 
     if(win==null){
- win = new Ext.Window({
-     id: id + '-win',
-     animateTarget: id,
-     autoScroll: true,
-     width: 550,
-     height: 350,
-     closeAction: 'hide',
-     bodyBorder: false,
-     plain: true,
-     constrain: true,
-     title: value.title,
-     contentEl: value.element
- });
+	win = new Ext.Window({
+	    id: id + '-win',
+	    animateTarget: id,
+	    autoScroll: true,
+	    width: 550,
+	    height: 350,
+	    closeAction: 'hide',
+	    bodyBorder: false,
+	    plain: true,
+	    constrain: true,
+	    title: value.title,
+	    contentEl: value.element
+	});
     }
 
- win.show();
- win.toFront();
- var atitle = id+'_anchor';
-// alert(atitle);
+    win.show();
+    win.toFront();
+    var atitle = id+'_anchor';
+//  alert(atitle);
 //  var anchor = document.getElementById(value.title+'_anchor');
- win.alignTo(atitle,'bl-tl?');
+    win.alignTo(atitle,'bl-tl?');
 }
+
 function selectOnChange(url, id, name, value) {
     return new Ajax.Updater(id, url, {asynchronous:true, evalScripts:true, parameters:name + '=' + value});
 }
@@ -858,19 +858,19 @@ function validateDocumentFilters() {
     var form = document.documentfilters;
     if (form != null) {
         if (!form.repository_biomarker.checked &&
-        		!form.repository_conferences.checked &&
-                !form.repository_dip.checked &&
-                !form.repository_jubilant_oncology.checked) {
+            !form.repository_conferences.checked &&
+            !form.repository_dip.checked &&
+            !form.repository_jubilant_oncology.checked) {
             alert("Please select at least one Repository.");
             return false;
         }
         if (!form.type_excel.checked &&
-                !form.type_html.checked &&
-                !form.type_pdf.checked &&
-                !form.type_powerpoint.checked &&
-                !form.type_text.checked &&
-                !form.type_word.checked &&
-                !form.type_other.checked) {
+            !form.type_html.checked &&
+            !form.type_pdf.checked &&
+            !form.type_powerpoint.checked &&
+            !form.type_text.checked &&
+            !form.type_word.checked &&
+            !form.type_other.checked) {
             alert("Please select at least one Document Type.");
             return false;
         }

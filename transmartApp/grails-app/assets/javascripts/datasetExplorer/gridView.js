@@ -142,7 +142,7 @@ Ext.override(Ext.grid.GridPanel, {
             '</ss:Names>' +
             '<ss:Table x:FullRows="1" x:FullColumns="1"' +
             ' ss:ExpandedColumnCount="' + visibleColumnCount +
-            '" ss:ExpandedRowCount="' + (this.store.getCount() + 2) + '">' +
+            '" ss:ExpandedRowCount="' + (this.store.getCount() + 2) + '">'+ 
             colXml +
             '<ss:Row ss:Height="38">' +
             '<ss:Cell ss:StyleID="title" ss:MergeAcross="' + (visibleColumnCount - 1) + '">' +
