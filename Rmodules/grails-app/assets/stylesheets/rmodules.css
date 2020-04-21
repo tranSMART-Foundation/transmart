@@ -4,7 +4,7 @@
 
 #analysisForm fieldset {border: 0;}
 #analysisForm label {float: left; clear: left; margin: 11px 10px 0 0; width: 150px; text-align: right;}
-#analysisForm .inputFields input:not([type=checkbox]) {width: 225px; height: 20px; padding: 5px 5px 0 5px; margin: 0 0 10px 0; font: inherit;}
+#analysisForm .inputFields input:not([type=checkbox]) {width: 225px; height: 20px; padding: 0px 0px 0 0px; margin: 0 0 10px 0; font: inherit;}
 #analysisForm .inputFields {margin: 20px 0 20px 0}
 #analysisForm .chkGroupBySubject {margin: 20px 0 20px 0}
 
