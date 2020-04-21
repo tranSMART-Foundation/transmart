@@ -1,63 +1,63 @@
-<g:if test="${gs.experimentTypeConceptCode?.bioConceptCode == 'IN_VIVO_ANIMAL' || gs.experimentTypeConceptCode?.bioConceptCode == 'IN_VIVO_HUMAN'}">
-    <tr>
-        <td style="border: none;">'in vivo' model:&nbsp;${gs.experimentTypeInVivoDescr}</td>
+          <g:if test="${gs.experimentTypeConceptCode?.bioConceptCode == 'IN_VIVO_ANIMAL' || gs.experimentTypeConceptCode?.bioConceptCode == 'IN_VIVO_HUMAN'}">
+	    <tr>
+	      <td style="border: none;">'in vivo' model:&nbsp;${gs.experimentTypeInVivoDescr}</td>
+	    </tr>
+	  </g:if>
+	  <tr>
+	    <td style="border: none;">ATCC designation:&nbsp;${gs.experimentTypeATCCRef}</td>
+	  </tr>
+	</table>
+      </td>
     </tr>
-</g:if>
-<tr>
-    <td style="border: none;">ATCC designation:&nbsp;${gs.experimentTypeATCCRef}</td>
-</tr>
-</table>
-</td>
-</tr>
-</tbody>
+  </tbody>
 </table>
 
 <table class="detail" style="width: 100%">
-    <g:tableHeaderToggle label="Analysis Meta-Data" divPrefix="${gs.id}_analysis" colSpan="2"/>
+  <g:tableHeaderToggle label="Analysis Meta-Data" divPrefix="${gs.id}_analysis" colSpan="2"/>
 
-    <tbody id="${gs.id}_analysis_detail" style="display: none;">
-	<tr class="prop">
-            <td class="name">Analysis Performed By:</td>
-            <td class="value">${gs.analystName}</td>
-	</tr>
-	<tr class="prop">
-            <td class="name">Normalization Method:</td>
-            <td class="value">
-		<g:if test="${gs.normMethodConceptCodeId == 1}">${gs.normMethodOther}</g:if>
-		<g:else>${gs.normMethodConceptCode?.codeName}</g:else>
-            </td>
-	</tr>
-	<tr class="prop">
-            <td class="name">Analytic Category:</td>
-            <td class="value">
-		<g:if test="${gs.analyticCatConceptCodeId == 1}">${gs.analyticCatOther}</g:if>
-		<g:else>${gs.analyticCatConceptCode?.codeName}</g:else>
-            </td>
-	</tr>
-	<tr class="prop">
-            <td class="name">Analysis Method:</td>
-            <td class="value">
-		<g:if test="${gs.analysisMethodConceptCodeId == 1}">${gs.analysisMethodOther}</g:if>
-		<g:else>${gs.analysisMethodConceptCode?.codeName}</g:else>
-            </td>
-	</tr>
-	<tr class="prop">
-            <td class="name">Multiple Testing Correction:</td>
-            <td class="value"><g:if test="${gs.multipleTestingCorrection != null}">${gs.multipleTestingCorrection == 1 ? 'Yes' : 'No'}</g:if></td>
-	</tr>
-	<tr class="prop">
-            <td class="name">P-value Cutoff:</td>
-            <td class="value">${gs.pValueCutoffConceptCode?.codeName}</td>
-	</tr>
-	<tr class="prop">
-            <td class="name">Fold-change metric:</td>
-            <td class="value">${gs.foldChgMetricConceptCode?.codeName}</td>
-	</tr>
-	<tr class="prop">
-            <td class="name">Original upload file:</td>
-            <td class="value">${gs.uploadFile}</td>
-	</tr>
-    </tbody>
+  <tbody id="${gs.id}_analysis_detail" style="display: none;">
+    <tr class="prop">
+      <td class="name">Analysis Performed By:</td>
+      <td class="value">${gs.analystName}</td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Normalization Method:</td>
+      <td class="value">
+	<g:if test="${gs.normMethodConceptCodeId == 1}">${gs.normMethodOther}</g:if>
+	<g:else>${gs.normMethodConceptCode?.codeName}</g:else>
+      </td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Analytic Category:</td>
+      <td class="value">
+	<g:if test="${gs.analyticCatConceptCodeId == 1}">${gs.analyticCatOther}</g:if>
+	<g:else>${gs.analyticCatConceptCode?.codeName}</g:else>
+      </td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Analysis Method:</td>
+      <td class="value">
+	<g:if test="${gs.analysisMethodConceptCodeId == 1}">${gs.analysisMethodOther}</g:if>
+	<g:else>${gs.analysisMethodConceptCode?.codeName}</g:else>
+      </td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Multiple Testing Correction:</td>
+      <td class="value"><g:if test="${gs.multipleTestingCorrection != null}">${gs.multipleTestingCorrection == 1 ? 'Yes' : 'No'}</g:if></td>
+    </tr>
+    <tr class="prop">
+      <td class="name">P-value Cutoff:</td>
+      <td class="value">${gs.pValueCutoffConceptCode?.codeName}</td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Fold-change metric:</td>
+      <td class="value">${gs.foldChgMetricConceptCode?.codeName}</td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Original upload file:</td>
+      <td class="value">${gs.uploadFile}</td>
+    </tr>
+  </tbody>
 </table>
 
 <table style="width: 100%">

@@ -1,4 +1,4 @@
-/*************************************************************************
+ /*************************************************************************
  * tranSMART - translational medicine data mart
  *
  * Copyright 2008-2012 Janssen Research & Development, LLC.
@@ -19,7 +19,6 @@
 
 import com.recomdata.genesignature.FileSchemaException
 import com.recomdata.search.query.Query
-import de.DeMrnaAnnotation
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import org.hibernate.SQLQuery
@@ -35,6 +34,8 @@ import org.transmart.searchapp.AuthUser
 import org.transmart.searchapp.GeneSignature
 import org.transmart.searchapp.GeneSignatureItem
 import org.transmart.searchapp.SearchKeyword
+import org.transmartproject.db.dataquery.highdim.mrna.DeMrnaAnnotationCoreDb
+import org.transmartproject.db.dataquery.highdim.rnaseqcog.DeRnaAnnotation
 import org.transmartproject.db.support.DatabasePortabilityService
 
 import static org.transmartproject.db.support.DatabasePortabilityService.DatabaseType.ORACLE
@@ -60,7 +61,6 @@ class GeneSignatureService {
      * verify file matches indicated schema
      */
     void verifyFileFormat(MultipartFile file, Long schemaColCt, String metricType) throws FileSchemaException {
-	logger.info 'verifyFileFormat() called with schemaColCt: {}; metricType: {}', schemaColCt, metricType
         BufferedReader br = null
 
         // check column count
@@ -153,20 +153,24 @@ class GeneSignatureService {
 
 	for (String geneSymbol in markers) {
 	    List<Object[]> marker = lookupBioAssociations(geneSymbol)
-	    if (!marker) {
+	    if (!marker) {	// SNP RSIDs processed first
 		String snpUid = lookupSnpBioAssociations(geneSymbol)
                 if (snpUid) {
 		    gsItems << new GeneSignatureItem(bioDataUniqueId: snpUid)
                     continue
                 }
+		logger.warn 'WARN: loadGeneSigItemsFromList invalid gene symbol: {}', geneSymbol
 		invalidSymbols << geneSymbol
                 continue
             }
+
+	    // anything else is a gene biomarker
             for (int j = 0; j < marker.size(); j++) {
 		Long bioMarkerId = marker[j][0]
 		String uniqueId = marker[j][1]
 		gsItems << new GeneSignatureItem(bioMarker: BioMarker.load(bioMarkerId),
-						 bioDataUniqueId: uniqueId, foldChgMetric: foldChg)
+						 bioDataUniqueId: uniqueId,
+						 foldChgMetric: foldChg)
             }
         }
 
@@ -174,7 +178,6 @@ class GeneSignatureService {
 	if (invalidSymbols) {
 	    FileSchemaException.ThrowInvalidGenesFileSchemaException(invalidSymbols)
 	}
-	logger.info 'created ({}) GeneSignatureItem records', gsItems.size()
 
 	gsItems
     }
@@ -183,16 +186,12 @@ class GeneSignatureService {
      * parse file and create associated gene sig item records
      */
     private List<GeneSignatureItem> loadGeneSigItemsFromFile(MultipartFile file, String organism,
-	                                                     String metricType, String fileSchemaName,
+	                                                     String metricType, String fileSchemaName, String domainKey,
 	                                                     GeneSignature gs) throws FileSchemaException {
         BufferedReader br = null
 	List<GeneSignatureItem> gsItems = []
 	SortedSet<String> invalidSymbols = new TreeSet<>()
 	String origFile = file.originalFilename
-
-        // metric type
-	logger.debug '\nINFO: Parsing: {} for organism: {} [Type: {}]',
-	    origFile, organism, metricType
 
         try {
 	    br = new BufferedReader(new InputStreamReader(file.inputStream))
@@ -234,17 +233,42 @@ class GeneSignatureService {
 
                 // lookup gene symbol or probeset id
                 if (fileSchemaName.toUpperCase() =~ /GENE /) {
-		    Object[] marker = lookupBioAssociations(geneSymbol, organism)
-		    if (!marker) {
-			invalidSymbols << geneSymbol
-                        continue
-                    }
+		    if(domainKey == GeneSignature.DOMAIN_KEY_GL) { // gene list: iterate over all genes from any organism
+			List<Object[]> marker = lookupBioAssociations(geneSymbol)
+			if (!marker) {	// SNP RSIDs processed first
+			    String snpUid = lookupSnpBioAssociations(geneSymbol)
+			    if (snpUid) {
+				gsItems << new GeneSignatureItem(bioDataUniqueId: snpUid)
+				continue
+			    }
+			    logger.warn 'WARN: loadGeneSigItemsFromFile invalid gene symbol: {}', geneSymbol
+			    invalidSymbols << geneSymbol
+			    continue
+			}
 
-		    Long bioMarkerId = marker[0]
-		    String uniqueId = marker[1]
+			// anything else is a gene biomarker
+			for (int j = 0; j < marker.size(); j++) {
+			    Long bioMarkerId = marker[j][0]
+			    String uniqueId = marker[j][1]
+			    gsItems << new GeneSignatureItem(bioMarker: BioMarker.load(bioMarkerId),
+							     bioDataUniqueId: uniqueId,
+							     foldChgMetric: foldChg)
+			}
+		    }
+		    else {	// gene signature with known organism, 
+			Object[] marker = lookupBioAssociations(geneSymbol, organism)
+			if (!marker) {
+			    logger.warn 'WARN: loadGeneSigItemsFromFile invalid gene symbol: {}', geneSymbol
+			    invalidSymbols << geneSymbol
+                            continue
+			}
 
-		    gsItems << new GeneSignatureItem(bioMarker: BioMarker.load(bioMarkerId),
-						     bioDataUniqueId: uniqueId, foldChgMetric: foldChg)
+			Long bioMarkerId = marker[0]
+			String uniqueId = marker[1]
+
+			gsItems << new GeneSignatureItem(bioMarker: BioMarker.load(bioMarkerId),
+							 bioDataUniqueId: uniqueId, foldChgMetric: foldChg)
+		    }
                 }
                 else if (fileSchemaName.toUpperCase() =~ /PROBESET /) {
 		    Map marker = lookupProbesetBioAssociations_probeIds(geneSymbol, gs.techPlatform.accession)
@@ -257,7 +281,7 @@ class GeneSignatureService {
 
 		    Long probesetId = marker.probesetId
 		    String bioDataUniqueId = 'GENE:' + marker.geneId
-		    BioMarker bioMarkerId = marker.bioMarkerId
+		    BioMarker bioMarkerId = BioMarker.load(marker.bioMarkerId)
 		    gsItems << new GeneSignatureItem(
                         probesetId: probesetId,
                         foldChgMetric: foldChg,
@@ -270,7 +294,6 @@ class GeneSignatureService {
 	    if (invalidSymbols) {
 		FileSchemaException.ThrowInvalidGenesFileSchemaException(invalidSymbols)
             }
-	    logger.info 'created ({}) GeneSignatureItem records', gsItems.size()
 
 	    gsItems
         }
@@ -314,15 +337,8 @@ class GeneSignatureService {
         String inClause = delItems.toString()
         inClause = inClause.replace('[', '')
         inClause = inClause.replace(']', '')
-	logger.info 'in clause: {}', inClause
 
-	logger.info 'associated GeneSignature id {}', gs.id
-
-	GeneSignatureItem.executeUpdate '''
-				delete GeneSignatureItem i
-				where i.id IN (:delItems)
-				  and i.geneSignature = :geneSignature''',
-	[delItems: delItems, geneSignature: gs]
+	GeneSignatureItem.executeUpdate 'delete GeneSignatureItem i where i.id in (' + inClause +') and i.geneSignature.id = '+ gs.id
 
         // load fresh gs and modify
         gs = GeneSignature.get(gs.id)
@@ -340,11 +356,8 @@ class GeneSignatureService {
      * add gene signature items
      */
     @Transactional
-    GeneSignature addGenSigItems(GeneSignature gs, List<String> geneSymbols,
-	                         List<String> probes, List<Double> valueMetrics) {
-
-	logger.debug ' service addGenSigItems() called >> gs: {}; symbols: {}; metrics: {}',
-	    gs, geneSymbols, valueMetrics
+    int addGenSigItems(GeneSignature gs, List<String> geneSymbols,
+	               List<String> probes, List<Double> valueMetrics) {
 
 	String organism = gs.techPlatform?.organism
 	long fileSchemaId = gs.fileSchemaId
@@ -365,37 +378,58 @@ class GeneSignatureService {
 	    String symbol = iter.next()
 	    Double foldChgMetric = valueMetrics ? valueMetrics[i] : null
             i++
-	    logger.info '[iter:{}] trying to add gene symbol: {} with foldChgMetric: {}',
-		i, symbol, foldChgMetric
 
-	    def marker
             // check for invalid symbols
 	    if (fileSchemaId == 3) {
-		marker = lookupProbesetBioAssociations(symbol, gs.techPlatform.accession)
-	    }
-	    else {
-		marker = lookupBioAssociations(symbol, organism)
-            }
+		List<Long> probesetMarker = lookupProbesetBioAssociations(symbol, gs.techPlatform.accession)
 
-	    if (!marker) {
-		invalidSymbols << symbol
-		continue
-            }
+		if (!probesetMarker) {
+		    logger.warn 'WARN: AddGeneSigItems invalid probeset: {}', symbol
+		    invalidSymbols << symbol
+		    continue
+		}
 
-            if (fileSchemaId == 3) {
                 // create item instance
-		Long annot = DeMrnaAnnotation.findByProbesetId(marker[0]).probesetId
+		Long annot = DeMrnaAnnotationCoreDb.findByProbesetId(probeMarker[0]).probesetId
                 if (annot != null) {
 		    gsItems << new GeneSignatureItem(probesetId: annot, foldChgMetric: foldChgMetric)
                 }
-            }
-	    else  {
-		Long bioMarkerId = marker[0]
-		String uniqueId = marker[1]
-		gsItems << new GeneSignatureItem(bioMarker: BioMarker.load(bioMarkerId),
-						 bioDataUniqueId: uniqueId, foldChgMetric: foldChgMetric)
 	    }
-        }
+	    else {
+		if(organism == '') {
+		    // all genes matching the name, need to loop over them
+		    List<Object[]> anygeneMarkers = lookupBioAssociations(symbol)
+
+		    if (!anygeneMarkers) {
+			logger.warn 'WARN: AddGeneSigItems invalid gene symbol: {}', symbol
+			invalidSymbols << symbol
+			continue
+		    }
+
+		    for(Object[] anygeneMarker in anygeneMarkers) {
+			Long bioMarkerId = anygeneMarker[0]
+			String uniqueId = anygeneMarker[1]
+			gsItems << new GeneSignatureItem(bioMarker: BioMarker.load(bioMarkerId),
+							 bioDataUniqueId: uniqueId, foldChgMetric: foldChgMetric)
+		    }
+		}
+		else {
+		    // named gene for named organism
+		    Object[] orggeneMarker = lookupBioAssociations(symbol, organism)
+
+		    if (!orggeneMarker) {
+			logger.warn 'WARN: AddGeneSigItems invalid {} gene symbol: {}', organism, symbol
+			invalidSymbols << symbol
+			continue
+		    }
+
+		    Long bioMarkerId = orggeneMarker[0]
+		    String uniqueId = orggeneMarker[1]
+		    gsItems << new GeneSignatureItem(bioMarker: BioMarker.load(bioMarkerId),
+						     bioDataUniqueId: uniqueId, foldChgMetric: foldChgMetric)
+		}
+            }
+	}
 
         // check for invalid gene symbols
 	if (invalidSymbols) {
@@ -410,22 +444,20 @@ class GeneSignatureService {
 	for (it in gsItems) {
 	    gs.addToGeneSigItems it
 	}
-	logger.info 'added ({}) GeneSignatureItem records', gsItems.size()
 
         gs.validate()
-	GeneSignature saved = gs
 	if (!gs.hasErrors()) {
-	    saved = gs.save()
+	    gs.save()
 	}
 
-	saved
+	gsItems.size()
     }
 
     /**
      * create new GeneSignature and all dependendant objects from wizard
      */
     @Transactional
-    GeneSignature saveWizard(GeneSignature gs, MultipartFile file) {
+    GeneSignature saveWizard(GeneSignature gs, MultipartFile file, String domainKey) {
 
 	String metricType = gs.foldChgMetricConceptCode?.bioConceptCode
 	String organism = gs.techPlatform?.organism
@@ -433,7 +465,7 @@ class GeneSignatureService {
 
         // load gs items (could be from a cloned object)
 	if (file) {
-	    for (it in loadGeneSigItemsFromFile(file, organism, metricType, fileSchemaName, gs)) {
+	    for (it in loadGeneSigItemsFromFile(file, organism, metricType, fileSchemaName, domainKey, gs)) {
 		gs.addToGeneSigItems it
 	    }
         }
@@ -447,15 +479,22 @@ class GeneSignatureService {
         }
 
         // save gs, items, and search link
-	GeneSignature savedInst = gs.save(flush: true)
+	GeneSignature savedInst
+	savedInst = gs.save(flush: true)
+	
         if (!savedInst) {
+	    logger.error 'ERROR saving GeneSignature'
+	    gs.errors.allErrors.each {
+		logger.error 'ERROR: {}', it
+	    }
 	    return gs // error saving
         }
 
 	GeneSignature nsave = savedInst
 	if (!savedInst.uniqueId) {
 	    // need to refresh this object
-	    savedInst.updateUniqueId()
+            if(domainKey == GeneSignature.DOMAIN_KEY_GL) {savedInst.updateUniqueIdList()}
+	    else{savedInst.updateUniqueId()}
         }
 
         // link objects to search
@@ -478,10 +517,10 @@ class GeneSignatureService {
 	    String fileSchemaName = gs.fileSchema?.name
 
             // parse items
-	    List<GeneSignatureItem> gsItems = loadGeneSigItemsFromFile(file, organism, metricType, fileSchemaName, gs)
+	    List<GeneSignatureItem> gsItems = loadGeneSigItemsFromFile(file, organism, metricType, fileSchemaName,
+								       GeneSignature.DOMAIN_KEY, gs)
 
             // delete current items
-            logger.info 'deleting original items'
 	    GeneSignatureItem.executeUpdate '''
 			delete GeneSignatureItem i
 			where i.geneSignature.id = :currentId''',
@@ -611,13 +650,32 @@ class GeneSignatureService {
     List<Long> lookupProbesetBioAssociations(String probeset, String platform) {
 	Query query = new Query(mainTableAlias: 'bf')
 
-	query.addTable 'de.DeMrnaAnnotation a'
+	query.addTable 'DeMrnaAnnotationCoreDb a'
 	query.addCondition "a.gplId='" + platform + "'"
 	query.addCondition "a.probeId ='" + probeset.replace(' ', '') + "'"
 	query.addSelect 'a.probesetId'
 
-	DeMrnaAnnotation.executeQuery query.generateSQL()
+	List<Long> markers = DeMrnaAnnotationCoreDb.executeQuery query.generateSQL()
+
+	if (!markers || markers.size() > 1) {
+	    query = new Query(mainTableAlias: 'bf')
+
+	    query.addTable 'DeRnaAnnotation a'
+	    query.addCondition "a.gplId='" + platform + "'"
+	    query.addCondition "a.transcriptId ='" + probeset.replace(' ', '') + "'"
+	    query.addSelect 'a.probesetId'
+
+	    markers = DeRnaAnnotation.executeQuery query.generateSQL()
+	}
+
+        // check for none or ambiguity
+	if (!markers) {
+	    return null
+	}
+
+	markers
     }
+
 
     /**
      * fixed for working with probe_Ids in gene signatures -- 2014.10.31
@@ -625,20 +683,42 @@ class GeneSignatureService {
      */
     private Map lookupProbesetBioAssociations_probeIds(String probeset, String platform) {
 	Query query = new Query(mainTableAlias: 'bf')
-        
-	query.addTable 'de.DeMrnaAnnotation a'
+
+	query.addTable 'DeMrnaAnnotationCoreDb a'
 	query.addTable 'BioMarker b'
 	query.addSelect 'a.gplId'
 	query.addSelect 'a.probeId'
 	query.addSelect 'a.geneId'
-	query.addSelect 'a.probesetId'
+	query.addSelect 'a.id'
 	query.addSelect 'b.id'
 	query.addCondition "a.gplId='" + platform + "'"
 	query.addCondition "a.probeId ='" + probeset.replace(' ', '') + "'"
 	query.addCondition 'CAST(a.geneId as string) = b.primaryExternalId'
 
-	List<Object[]> marker = DeMrnaAnnotation.executeQuery(query.generateSQL())
-	Object[] mm = marker[0]
+	List<Object[]> markers = DeMrnaAnnotationCoreDb.executeQuery(query.generateSQL())
+
+	if(!markers || markers.size() < 1) {
+	    query = new Query(mainTableAlias: 'bf')
+
+	    query.addTable 'DeRnaAnnotation a'
+	    query.addTable 'BioMarker b'
+	    query.addSelect 'a.gplId'
+	    query.addSelect 'a.transcriptId'
+	    query.addSelect 'a.geneId'
+	    query.addSelect 'a.transcriptId'
+	    query.addSelect 'b.id'
+	    query.addCondition "a.gplId='" + platform + "'"
+	    query.addCondition "a.transcriptId ='" + probeset.replace(' ', '') + "'"
+	    query.addCondition 'CAST(a.geneId as string) = b.primaryExternalId'
+
+	    markers = DeRnaAnnotation.executeQuery(query.generateSQL())
+	}
+
+	if(!markers || markers.size() < 1) {
+	    return null
+	}
+
+	Object[] mm = markers[0]
 
 	[gplId: mm[0], probeId: mm[1], geneId: mm[2], probesetId: mm[3], bioMarkerId: mm[4]]
     }

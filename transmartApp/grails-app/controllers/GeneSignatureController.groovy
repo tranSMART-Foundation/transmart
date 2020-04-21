@@ -149,16 +149,12 @@ class GeneSignatureController {
 	    clone.experimentTypeCellLine = null
 	}
 
-        // this is hack, don't know how to get around this!
-	logger.debug 'experimentTypeCellLine: {}; null? {}',
-	    clone.experimentTypeCellLine, clone.experimentTypeCellLine == null
-
 	setSessionWizard new WizardModelDetails(
 	    loggedInUser: securityService.principal(),
 	    geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_EDIT,
 	    editId: geneSig.id)
 
-	redirect action: 'edit1'
+	redirect action: 'edit1', params: ["id": geneSig.id, "page": 1]
     }
 
     /**
@@ -347,7 +343,8 @@ class GeneSignatureController {
     def save() {
 	WizardModelDetails wizard = sessionWizard()
 	GeneSignature gs = wizard.geneSigInst
-	assert null == gs.id
+	Map existingValues = [:]
+	assert null == gs.properties.id
 
 	bindGeneSigData gs
 
@@ -361,12 +358,12 @@ class GeneSignatureController {
 	    file = null
 	}
 	if (loadFile) {
-	    gs.uploadFile = file.originalFilename
+	    gs.properties.uploadFile = file.originalFilename
 
             // check for empty file
             if (file.empty) {
-		flash.message = "The file:'$gs.uploadFile' you uploaded is empty"
-		Map existingValues = createExistingValues(3, wizard.geneSigInst)
+		flash.message = "The file:'$gs.properties.uploadFile' you uploaded is empty"
+		existingValues = createExistingValues(3, wizard.geneSigInst)
 		render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
 		return
             }
@@ -380,7 +377,7 @@ class GeneSignatureController {
             }
             catch (FileSchemaException e) {
 		flash.message = e.message
-		Map existingValues = createExistingValues(3, wizard.geneSigInst)
+		existingValues = createExistingValues(3, wizard.geneSigInst)
 		render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
 		return
             }
@@ -388,14 +385,13 @@ class GeneSignatureController {
         else {
             // load items from cloned object
             GeneSignature parentGS = GeneSignature.get(wizard.cloneId)
-	    gs.uploadFile = parentGS.uploadFile
-	    logger.info 'INFO: loading parent of clone "{}"', parentGS.name
+	    gs.properties.uploadFile = parentGS.uploadFile
             geneSignatureService.cloneGeneSigItems(parentGS, gs)
         }
 
         // good to go, call save service
         try {
-            gs = geneSignatureService.saveWizard(gs, file)
+            gs = geneSignatureService.saveWizard(gs, file, GeneSignature.DOMAIN_KEY)
             if (gs.hasErrors()) {
                 flash.message = 'Could not save Gene Signature'
 		render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
@@ -410,17 +406,20 @@ class GeneSignatureController {
 
 	    removeSessionWizard()
 
-	    flash.message = "GeneSignature '$gs.name' was created on: $gs.dateCreated"
+	    flash.message = "GeneSignature '$gs.name' was " +
+		(params.boolean('isEdit') ? 'edited' : 'created') + " on: $gs.dateCreated"
 	    redirect action: 'list'
 	}
 	catch (FileSchemaException e) {
+	    logger.error 'Message: {}', e.message
 	    flash.message = e.message
-	    Map existingValues = createExistingValues(3, wizard.geneSigInst)
+	    existingValues = createExistingValues(3, wizard.geneSigInst)
 	    render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
 	}
 	catch (RuntimeException e) {
+	    logger.error 'RuntimeException {}: {}', e.getClass().name, e.message
 	    flash.message = 'Runtime exception ' + e.getClass().name + ':<br>' + e.message
-	    Map existingValues = createExistingValues(3, wizard.geneSigInst)
+	    existingValues = createExistingValues(3, wizard.geneSigInst)
 	    render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
         }
     }
@@ -431,9 +430,11 @@ class GeneSignatureController {
     def saveList() {
 	WizardModelDetails wizard = sessionWizard()
 	GeneSignature gs = wizard.geneSigInst
-	gs.list = true
+	Map existingValues = [:]
+
+	gs.properties.list = true
         if (!params.boolean('isEdit')) {
-	    assert null == gs.id
+	    assert null == gs.properties.id
         }
         else {
 	    for (i in GeneSignatureItem.findAllByGeneSignature(gs)) {
@@ -441,12 +442,17 @@ class GeneSignatureController {
             }
             gs.geneSigItems.clear()
         }
+
+	// For a list the other signature values are placeholders
+	// these must exist in the database for values required in a GeneSignature
+
         // species
 	gs.speciesConceptCode = ConceptCode.findByCodeTypeNameAndBioConceptCode(
 	    'OTHER', 'OTHER')
 
         // technology platforms
-	gs.techPlatform = BioAssayPlatform.findByName('Multiple or Unknown')
+	gs.techPlatform = BioAssayPlatform.findByName(
+	    'None')
         
         // p value cutoffs
 	gs.pValueCutoffConceptCode = ConceptCode.findByCodeTypeNameAndBioConceptCode(
@@ -463,7 +469,7 @@ class GeneSignatureController {
 
         // get file
 	MultipartFile file = request.getFile('uploadFile')
-	gs.name = params.name
+	gs.properties.name = params.name
 
         // load file contents, if clone check for file presence
 	boolean loadFile = file?.originalFilename?.trim()
@@ -471,11 +477,11 @@ class GeneSignatureController {
 	    file = null
 	}
 	if (loadFile) {
-	    gs.uploadFile = file.originalFilename
+	    gs.properties.uploadFile = file.originalFilename
 
             // check for empty file
             if(file.empty) {
-		flash.message = "The file:'$gs.uploadFile' you uploaded is empty"
+		flash.message = "The file:'$gs.properties.uploadFile' you uploaded is empty"
 		render view: 'wizard_list', model: [wizard: wizard]
 		return
             }
@@ -493,48 +499,66 @@ class GeneSignatureController {
             }
         }
         else {
-	    gs.uploadFile = 'Manual Item Entry'
+	    gs.properties.uploadFile = 'Manual Item Entry'
             // load items from list rather than file
+            List<String> markers = []
 	    params.each { String key, val ->
 		key = key.trim()
-                List<String> markers = []
 		if (key.startsWith('biomarker_') && val) {
 		    markers << val.trim()
                 }
-		List<GeneSignatureItem> gsItems = geneSignatureService.loadGeneSigItemsFromList(markers)
-		List<String> geneSigUniqueIds = gs.geneSigItems*.bioDataUniqueId
-		for (GeneSignatureItem gsi in gsItems) {
-		    if (!geneSigUniqueIds?.contains(gsi.bioDataUniqueId)) {
-			gs.addToGeneSigItems gsi
-                    }
+            }
+	    List<GeneSignatureItem> gsItems
+	    try {
+		gsItems = geneSignatureService.loadGeneSigItemsFromList(markers)
+	    }
+	    catch (FileSchemaException e) {
+		logger.error 'Message {}', e.message
+		flash.message = e.message
+		existingValues = createExistingValues(3, wizard.geneSigInst)
+		render view: 'wizard_list', model: [wizard: wizard, existingValues: existingValues]
+		return;
+	    }
+
+	    List<String> geneSigUniqueIds = gs.geneSigItems*.bioDataUniqueId
+	    for (GeneSignatureItem gsi in gsItems) {
+		if (!geneSigUniqueIds?.contains(gsi.bioDataUniqueId)) {
+		    gs.addToGeneSigItems gsi
                 }
             }
         }
 
         // good to go, call save service
         try {
-            gs = geneSignatureService.saveWizard(gs, file)
+            gs = geneSignatureService.saveWizard(gs, file, GeneSignature.DOMAIN_KEY_GL)
+            if (gs.hasErrors()) {
+                flash.message = 'Could not save Gene/RSID List'
+		render view: 'wizard_list', model: [wizard: wizard]
+                return
+            }
 
             auditLogService.report(
 		'New Gene_RSID List', request,
 		action: actionName,
 		user: currentUserBean,
                 filename: file?.originalFilename,
-                size: gs.geneSigItems.size()
+                size: gs.geneSigItems?.size()
             )
 
 	    removeSessionWizard()
 
-	    flash.message = "GeneSignature '$gs.name' was " +
+	    flash.message = "Gene/RSID List '$gs.name' was " +
 		(params.boolean('isEdit') ? 'edited' : 'created') + " on: $gs.dateCreated"
 	    redirect action: 'list'
 
 	}
 	catch (FileSchemaException e) {
+	    logger.error 'Message: {}', e.message
 	    flash.message = e.message
 	    render view: 'wizard_list', model: [wizard: wizard]
 	}
 	catch (RuntimeException e) {
+	    logger.error 'RuntimeException {}: {}', e.getClass().name, e.message
 	    flash.message = 'Runtime exception ' + e.getClass().name + ':<br>' + e.message
 	    render view: 'wizard_list', model: [wizard: wizard]
         }
@@ -558,7 +582,6 @@ class GeneSignatureController {
 
         // refresh items if new file uploaded
 	MultipartFile file = request.getFile('uploadFile')
-	logger.debug ' update wizard file:"{}"', file?.originalFilename
 
         // file validation
 	if (file?.originalFilename) {
@@ -600,6 +623,7 @@ class GeneSignatureController {
 	    render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
 	}
 	catch (RuntimeException e) {
+	    logger.error 'RuntimeException {}: {}', e.getClass().name, e.message
 	    flash.message = 'Runtime exception ' + e.getClass().name + ':<br>' + e.message
 	    Map existingValues = createExistingValues(3, wizard.geneSigInst)
 	    render view: 'wizard3', model: [wizard: wizard, existingValues: existingValues]
@@ -650,8 +674,6 @@ class GeneSignatureController {
      */
     def addItems(GeneSignature gs) {
 
-	logger.debug ' adding items to gs: {}', gs.name
-
         // reset
         flash.message = null
 
@@ -673,7 +695,6 @@ class GeneSignatureController {
 		String valueMetric = params['foldChgMetric_' + itemNum]
 		geneSymbols << symbol
 
-		logger.debug ' parsing symbol: "{}" with valueMetric: {}', symbol, valueMetric
                 // parse fold chg metric
 		if (valueMetric?.trim()) {
                     try {
@@ -694,7 +715,6 @@ class GeneSignatureController {
 		String valueMetric = params['foldChgMetric_' + itemNum]
 		probes << symbol
 
-		logger.debug ' parsing symbol: "{}" with valueMetric: {}', symbol, valueMetric
                 // parse fold chg metric
 		if (valueMetric?.trim()) {
                     try {
@@ -712,7 +732,7 @@ class GeneSignatureController {
 
         // any symbols to add?
 	if (!error && !geneSymbols && !probes) {
-	    setFlashWarning 'You did not enter any new item(s) to add'
+	    setFlashWarning 'You did not enter any new item(s) to add</br>Click "Expand to Add Items" to update the list'
 	    error = true
         }
 
@@ -737,17 +757,21 @@ class GeneSignatureController {
         // add new items if no error
 	if (!error) {
             try {
-		geneSignatureService.addGenSigItems gs, geneSymbols, probes, valueMetrics
-		flash.message = '<div class="message">' + geneSymbols.size() +
+		int added = geneSignatureService.addGenSigItems gs, geneSymbols, probes, valueMetrics
+		if(added == geneSymbols.size())
+		    flash.message = '<div class="message">' + geneSymbols.size() +
 		    ' gene signature item(s) were added to "' + gs.name + '"</div>'
+		else
+		    flash.message = '<div class="message">' + added +
+		    ' gene signature item(s) were added for ' + geneSymbols.size() + ' gene(s) to "' + gs.name + '"</div>'
             }
 	    catch (FileSchemaException e) {
-		logger.error 'message>> {}', e.message, e
+		logger.error 'Message {}: {}', e.getClass().name, e.message
 		setFlashWarning e.message
 		error = true
 	    }
 	    catch (RuntimeException e) {
-		logger.error 'RuntimeException>>{}', e.message, e
+		logger.error 'RuntimeException {}: {}', e.getClass().name, e.message
 		setFlashWarning 'Runtime exception ' + e.getClass().name + ':<br>' + e.message
 		error = true
             }
@@ -771,7 +795,6 @@ class GeneSignatureController {
 		newParams['foldChgMetric_' + i] = it
                 i++
             }
-	    logger.debug ' redirect params>> {}', newParams
 	    redirect action: 'showEditItems', params: newParams
         }
         else {
@@ -873,7 +896,6 @@ class GeneSignatureController {
 	    }
 
             // match on species
-	    logger.debug ' speciesFilter {}', speciesFilter
             cellLines = CellLine.findAllBySpeciesIlike(speciesFilter + '%', [sort: 'cellLineName'])
         }
 
@@ -886,18 +908,18 @@ class GeneSignatureController {
     private void bindGeneSigData(GeneSignature gs) {
         // skip if page param not specified
 	long pageNum = params.long('page', -1)
+
 	if (pageNum == -1) {
 	    return
 	}
 
 	if (pageNum == 3) {
 	    if (params.multipleTestingCorrection == null) {
-		params.multipleTestingCorrection = ''
+		params.multipleTestingCorrection = false
 	    }
         }
 
 	bindData gs, params
-	logger.info 'bound params from page {}:\n{}', pageNum, params
     }
 
     /**
@@ -939,7 +961,8 @@ class GeneSignatureController {
 		wizard.platforms = BioAssayPlatform.executeQuery('''
 					from BioAssayPlatform as p
 					where p.vendor is not null
-					order by p.vendor, p.array''')
+					order by p.vendor, p.array, p.accession''')
+//					and p.accession in (select distinct id from DeGplInfo)
 
                 // compounds
 		wizard.compounds = Compound.executeQuery('''
@@ -1043,7 +1066,7 @@ class GeneSignatureController {
 
     def checkGene(String geneName) {
 	SearchKeywordTerm skt = SearchKeywordTerm.findByKeywordTerm(geneName?.toUpperCase())
-        SearchKeyword sk = skt.searchKeyword
+        SearchKeyword sk = skt?.searchKeyword
 	if (sk && (sk?.dataCategory == 'GENE' || sk?.dataCategory == 'SNP')) {
             render '{"found": "' + sk.dataCategory + '"}'
         }

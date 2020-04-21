@@ -167,7 +167,7 @@
                             jQuery('#geneCheckIcon' + index).removeClass('loading').addClass('success').text(jqXHR.found);
                         }
                         else {
-                            jQuery('#geneCheckIcon' + index).removeClass('loading').addClass('failure').text('');
+                            jQuery('#geneCheckIcon' + index).removeClass('loading').addClass('failure').text('*error*');
                         }
                     },
                     "error": function (jqXHR, error, e) {
@@ -220,7 +220,13 @@
 			<tr>
 			    <td class="name">Enter List Manually
 				<br/>
-				<span class="infotext">Type or copy and paste a list of genes and/or SNPs here. The form will expand as needed. Pasted lists should be comma or new line separated.</br>All genes that match the gene symbol from any species will be included.</span>
+				<span class="infotext">
+				    <p>Type or copy and paste a list of genes and/or SNPs here.
+					The form will expand as needed.</p>
+				    <p>Pasted lists should be comma or new line separated.</p>
+				    <p>All genes that match the gene symbol from any species will be included.</p>
+				    <p>Check each entry is marked as 'GENE' or 'SNP' and correct any marked as '*error*' before saving</p>
+				</span>
 			    </td>
 			    <td>
 				<table class="detail" width="300" id="biomarkerList">
