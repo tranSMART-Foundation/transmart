@@ -66,6 +66,7 @@ class RecomTagLib {
                     break
             }
         }
+
 	out << '<a style="border: none" target="_blank" onclick="popupWindow(\''
         out << url
         out << "', 'documentWindow');\">"
@@ -318,24 +319,12 @@ class RecomTagLib {
 	    'visibility: visible; display: block; vertical-align: middle;' :
 	    'visibility: hidden; display: none; vertical-align: middle;'
 
-	StringBuilder outlog = new StringBuilder()
-
-	outlog << '<thead><tr><th colSpan="' << colSpan << '" class="tableToggle">'
-	outlog << '<a id="' << divPrefix << '_fopen" style="' << openStyle << '" '
-	outlog << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Open' src=\"${assetPath(src:'sorted_desc.gif')}\" /></a> "
-	outlog << "<a id='" << divPrefix << "_fclose' style='" << closedStyle << "' "
-	outlog << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Close' src=\"${assetPath(src:'sorted_asc.gif)')}\" /></a> "
-	outlog << "</th></tr></thead>"
-	
-	logger.info 'status {} tableHeader {}', status, outlog
-
 	out << '<thead><tr><th colSpan="' << colSpan << '" class="tableToggle">'
 	out << '<a id="' << divPrefix << '_fopen" style="' << openStyle << '" '
 	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Open' src=\"${assetPath(src:'sorted_desc.gif')}\" /></a> "
 	out << "<a id='" << divPrefix << "_fclose' style='" << closedStyle << "' "
 	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Close' src=\"${assetPath(src:'sorted_asc.gif)')}\" /></a> "
 	out << "</th></tr></thead>"
-
     }
 
     def fieldDate = { attrs, body ->
