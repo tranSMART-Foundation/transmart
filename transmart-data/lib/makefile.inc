@@ -32,6 +32,12 @@ NETTY_JAR_PATH   := $(LIB_DIR)$(NETTY_JAR)
 $(NETTY_JAR_PATH):
 	curl -f $(NETTY_JAR_DL)/$(NETTY_JAR) > $@
 
+SCHEMA_SPY_VERSION=6.1.0
+SCHEMA_SPY_JAR=schemaSpy_$(SCHEMA_SPY_VERSION).jar
+SCHEMA_SPY_JAR_PATH  := $(LIB_DIR)$(SCHEMA_SPY_JAR)
+$(SCHEMA_SPY_JAR_PATH):
+	curl -L -f "https://github.com/schemaspy/schemaspy/releases/download/v6.1.0/schemaspy-6.1.0.jar" > $@
+
 .DELETE_ON_ERROR:
 
 # vim: ft=make list
