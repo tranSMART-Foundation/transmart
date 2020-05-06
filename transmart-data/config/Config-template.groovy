@@ -156,7 +156,8 @@ com.recomdata.appTitle = "tranSMART v" + org.transmart.originalConfigBinding.app
 // Location of the help pages. Should be an absolute URL.
 // Currently, these are distribution with transmart,
 // so it can also point to that location copy.
-com.recomdata.adminHelpURL = "$transmartURL/help/adminHelp/default.htm"
+def tmurl       = new URL(transmartURL)
+com.recomdata.adminHelpURL = "$url.protocol://$url.host${url.port != -1 ? ":$url.port" : ''}/transmartmanual/"
 
 environments { development {
     com.recomdata.bugreportURL = 'https://jira.transmartfoundation.org'
