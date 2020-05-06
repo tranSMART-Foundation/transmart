@@ -1038,7 +1038,7 @@ td.prop, td.name {line-height: normal;}
 
 .searchcombobox-disabled {
 	color: #000000 !important;
-	background-image:url(../js/ext/resources/images/default/grid/loading.gif) !important;
+	background-image:url(../ext/resources/images/default/grid/loading.gif) !important;
 	background-repeat:no-repeat; background-position:left center;
 	padding-left:20px !important;
 }
