@@ -48,5 +48,5 @@ CREATE SEQUENCE seq_cz_job_master
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
-    CACHE 2;
+    CACHE 1;
 
