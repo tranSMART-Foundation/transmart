@@ -10,6 +10,7 @@ import groovyx.net.http.Method
 import org.apache.http.entity.mime.HttpMultipartMode
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.InputStreamBody
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 import org.transmart.mongo.MongoUtils
@@ -19,7 +20,7 @@ import org.transmart.plugin.shared.UtilService
 class UploadFilesService {
 
     FmFolderService fmFolderService
-    UtilService utilService
+    @Autowired private UtilService utilService
 
     @Value('${transmartproject.mongoFiles.enableMongo:false}')
     private boolean enableMongo
@@ -109,10 +110,17 @@ class UploadFilesService {
 		if (outputStream) {
 		    byte[] fileBytes = new byte[1024]
                     int nread
-		    while ((nread = fileToUpload.inputStream.read(fileBytes)) != -1) {
-			outputStream.write fileBytes, 0, nread
+                    InputStream istr = fileToUpload.getInputStream()
+		    try {
+			while ((nread = istr.read(fileBytes)) != -1) {
+			    outputStream.write fileBytes, 0, nread
+			}
+                    } catch (Exception e) {
+			throw e
+                    } finally {
+			istr.close()
+			outputStream.close()
                     }
-                    outputStream.close()
 		    fmFolderService.indexFile fmFile
 		    logger.debug 'File successfully loaded: {}', fmFile.id
                     return 'File successfully loaded'
