@@ -101,7 +101,7 @@
 
 <div id="hiddenDragDiv" style="display:none"></div>
 
-<script>
+<script type="text/javascript">
     prepareQueryPanels();
     if (GLOBAL.restoreSubsetId) {
         applySubsets(GLOBAL.restoreSubsetId);
