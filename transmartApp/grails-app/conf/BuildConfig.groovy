@@ -121,6 +121,7 @@ grails.project.dependency.resolution = {
 	compile('org.springframework.security.extensions:spring-security-saml2-core:1.0.0.RELEASE') {
 	    //excludes of spring security necessary because they are for an older version (3.1 branch)
 	    //also remove xercesImpl because it breaks tomcat and is not otherwise needed
+	    // exclude 'bcprov-jdk15' to avoid a nasty cyclic dependency that prevents tomcat starting
 	    excludes 'bcprov-jdk15', 'spring-security-config', 'spring-security-core', 'spring-security-web', 'xercesImpl'
 	}
 ////	compile 'org.transmartproject:transmart-core-api:' + tmVersion
@@ -151,10 +152,10 @@ grails.project.dependency.resolution = {
 
 	//        // spring security version should be in sync with that brought with
 	//        // grails-spring-security-core
-	//        runtime 'org.springframework.security:spring-security-config:3.2.3.RELEASE',
-	//                'org.springframework.security:spring-security-web:3.2.3.RELEASE', {
-	//            transitive = false
-	//        }
+	runtime 'org.springframework.security:spring-security-config:3.2.9.RELEASE',
+	    'org.springframework.security:spring-security-web:3.2.9.RELEASE', {
+	    transitive = false
+	}
 
 	//        test 'junit:junit:4.11', {
 	//            transitive = false /* don't bring hamcrest */
