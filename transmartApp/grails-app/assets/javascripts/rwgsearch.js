@@ -17,15 +17,12 @@ var allowOnSelectEvent = true;
 var uploader;
 // Method to add the categories for the select box
 function addSelectCategories()	{
-    console.log ('addSelectCategories');
     if (sessionSearchCategory == "") { sessionSearchCategory = "ALL"; }
 	
     jQuery("#search-categories").append(jQuery("<option></option>").attr("value", "ALL").text("All").attr('id', 'allCategory'));
 	
     jQuery("#search-categories").change(function() {
-	console.log ('before autocomplete a: '+sourceURL + "?category=" + this.options[this.selectedIndex].value);
 	jQuery('#search-ac').autocomplete('option', 'source', sourceURL + "?category=" + this.options[this.selectedIndex].value);
-	console.log ('after autocomplete a');
 	jQuery.ajax({
 	    url:updateSearchCategoryURL,
 	    data: {id: jQuery("#search-categories").val()}
@@ -46,9 +43,7 @@ function addSelectCategories()	{
 	jQuery("#allCategory").after(jQuery("<option></option>").attr("value", "text").text("Free Text"));
 
 	jQuery("#search-categories").val(sessionSearchCategory);
-	console.log ('before autocomplete b: '+sourceURL + "?category=" + jQuery('#search-categories').val());
 	jQuery('#search-ac').autocomplete('option', 'source', sourceURL + "?category=" + jQuery('#search-categories').val());
-	console.log ('after autocomplete b');
     });
 	
 }
@@ -85,27 +80,22 @@ function addFilterCategories() {
 
 //Method to add the autocomplete for the search keywords
 function addSearchAutoComplete()	{
-    console.log('addSearchAutoComplete');
     jQuery("#search-ac").autocomplete({
 	disabled: true,
 	position:{my:"left top",at:"left bottom",collision:"none"},
 	source: sourceURL,
 	minLength:1,
 	select: function(event, ui) {
-	    console.log('addSearchAutoComplete select event '+event.which);
 	    if (ui.item != null && ui.item != "") {
-		console.log('ui.item '+ui.item);
 		searchParam={id:ui.item.id,display:ui.item.category,keyword:ui.item.label,category:ui.item.categoryId};
 		addSearchTerm(searchParam);
 	    }
 
 	    //If category is ALL, add this as free text as well
 	    var category = jQuery("#search-categories").val();
-	    console.log('category: '+category);
 	    return false;
 	}
     }).data("ui-autocomplete")._renderItem = function( ul, item ) {
-	console.log('addSearchAutoComplete renderItem');
 	var resulta = '<a><span class="category-' + item.category.toLowerCase() + '">' + item.category + '&gt;</span>&nbsp;<b>' + item.label + '</b>&nbsp;';
 	if (item.synonyms != null) {
 	    resulta += (item.synonyms + '</a>');
@@ -122,9 +112,7 @@ function addSearchAutoComplete()	{
 		
     // Capture the enter key on the slider and fire off the search event on the autocomplete
     jQuery("#search-categories").keypress(function(event)	{
-	console.log('search-categories event '+event.which);
 	if (event.which == 13)	{
-	    console.log('Enter event: fire off search');
 	    jQuery("#search-ac").autocomplete('search');
 	}
     });
@@ -132,7 +120,6 @@ function addSearchAutoComplete()	{
     jQuery('#search-ac').keypress(function(event) {
 	var category = jQuery("#search-categories").val();
 	var categoryText = jQuery('#search-categories option:selected').text();
-	console.log('search-ac event '+event.which+' category ' +category + ' categoryText ' + categoryText);
 
 	if (event.which == 13 && (category == 'DATANODE' || category == 'text' || category == 'ALL')) {
 	    var val = jQuery('#search-ac').val();
@@ -165,8 +152,6 @@ function addSearchTerm(searchTerm, noUpdate, openInAnalyze,datasetExplorerPath)	
     var category = searchTerm.display == undefined ? "TEXT" : searchTerm.display;
     category = category + "|" + (searchTerm.category == undefined ? "TEXT" : searchTerm.category);
 
-    console.log('addSearchTerm category: ' + category);
-	
     var text = (searchTerm.text == undefined ? (searchTerm.keyword == undefined ? searchTerm : searchTerm.keyword) : searchTerm.text);
     var id = searchTerm.id == undefined ? -1 : searchTerm.id;
     var key = category + ";" + text + ";" + id;
@@ -313,7 +298,6 @@ function showSearchTemplate()	{
 //Method to load the search results in the search results panel and facet counts into tree
 //This occurs whenever a user add/removes a search term
 function showSearchResults(openInAnalyze, datasetExplorerPath)	{
-    console.log('showSearchResults');
     // clear stored probe Ids for each analysis
     analysisProbeIds = new Array();  
 	
@@ -331,7 +315,6 @@ function showSearchResults(openInAnalyze, datasetExplorerPath)	{
 
 //Method to load the facet results in the search tree and populate search results panel
 function showFacetResults(openInAnalyze, datasetExplorerPath)	{
-    console.log('showFacetResults openInAnalyze '+openInAnalyze+' datasetExplorerPath '+datasetExplorerPath);
     if(openInAnalyze == undefined){
 	openInAnalyze = false;
     }
@@ -351,7 +334,6 @@ function showFacetResults(openInAnalyze, datasetExplorerPath)	{
 	savedSearchTerms = currentSearchTerms.join(",,,");
 	savedSearchTermsArray = savedSearchTerms.split(",,,");
     }
-    console.log('savedSearchTerms '+savedSearchTerms);
     // Generate list of categories/terms to send to facet search
     // create a string to send into the facet search, in form Cat1:Term1,Term2&Cat2:Term3,Term4,Term5&...
 
@@ -597,11 +579,9 @@ function toggleSidebar() {
 
     var leftPointingArrow = (jQuery('#sidebartoggle').css('background-image').indexOf("-right") < 0);
     var sidebarIsVisible = (jQuery(element + ':visible').size() > 0);
-    //console.log("toggleSidebar: leftPointingArrow = " + leftPointingArrow + ", sidebarIsVisible = " + sidebarIsVisible);
 
     // This fixes problems with ExtJS in case of rapid consecutive clicks, double-click. JIRA TRANSREL-18.
     if (leftPointingArrow != sidebarIsVisible) { // it is still fading
-	//    console.log("Too fast.")
         return;
     }
 
