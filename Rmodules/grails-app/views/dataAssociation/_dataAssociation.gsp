@@ -24,7 +24,10 @@
 	<g:logMsg>render dataAssociation empty page</g:logMsg>
         <label for="cohortSummary">
 	    <span>Cohorts:</span>
-	    <span id="cohortWarningMsg" class="warning"></span>
+	    <span id="cohortWarningMsg" class="warning">
+	      WARNING: You have not selected a study and the analysis will not work.
+	      Please go back to the Comparison tab and make a cohort selection.
+	    </span>
 	    <div id="cohortSummary"></div>
 	</label>
     </div>
