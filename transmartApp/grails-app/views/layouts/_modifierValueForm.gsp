@@ -66,13 +66,6 @@
           
      </div>
 
-     <div id="divModifierString" style="text-align:left; padding: 20px;display:none;">
-         <input id='chkEnableModifierValues' type='checkbox' onclick='toggleValueConstraint();'/>
-	 Click here to constrain by value <br/><br/>
-         <select id='modifierValueList' multiple disabled>
-	 </select>
-     </div>
-     
      <br/>
      
      <input type='button' class="flatbutton" value='Apply Modifier' id="btnModifierValuesDone"/>

@@ -8,8 +8,6 @@ class ModifierDimension {
     String id
     Date importData
     Clob modifierBlob
-    Long modifierLevel
-    String modifierNodeType
     String modifierPath
     String nameChar
     String sourcesystemCd
