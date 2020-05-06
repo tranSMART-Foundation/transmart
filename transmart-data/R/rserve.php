@@ -1,6 +1,5 @@
 <?php
 $rdir = "$_ENV[R_PREFIX]/lib/R";
-$c = $_ENV['RSERVE_CONF'];
 $l = $_ENV['RSERVE_LOG'];
 ?>
 #!/bin/bash
@@ -16,30 +15,38 @@ $l = $_ENV['RSERVE_LOG'];
 ### END INIT INFO
 
 # Variables to be defined in /etc/default/rserve
-# RSERVE_USER (required) username to execute rserve process
-# RSERVE_LOG
-# RSERVE_CONF
+# RSERVE_USER   (required) username to execute rserve process
+# RSERVE_LOG    logfile name
+# R_DAEMON      R binary if not the transmart-data/R path (to start service)
+# RSERVE_DAEMON Rserve binary if not the transmart-data/R path (to stop service)
+# RLIB          R lib directory if not the transmart-data/R path
 
 if [[ -f /etc/default/rserve ]]; then
         . /etc/default/rserve
 fi
-if [[ -z $RSERVE_USER ]]; then
+if [[ -z "$RSERVE_USER" ]]; then
     echo '$RSERVE_USER not defined' >&2
     exit 1
 fi
-if [[ -z $RSERVE_LOG ]]; then
+if [[ -z "$RSERVE_LOG" ]]; then
     RSERVE_LOG="<?= $l ?>"
 fi
-if [[ -z $RSERVE_CONF ]]; then
-    RSERVE_CONF="<?= $c ?>"
+
+if [[ -z "$R_DAEMON" ]]; then
+    R_DAEMON="<?= $rdir ?>"/bin/R
+fi
+
+if [[ -z "$RSERVE_DAEMON" ]]; then
+    RSERVE_DAEMON="<?= $rdir ?>"/bin/Rserve
+fi
+
+if [[ -z "$RLIB" ]]; then
+    RLIB="<?= $rdir ?>"/lib
 fi
 
 NAME="rserve"
-DESC="R execution server for tranSMART"
-DAEMON="<?= $rdir ?>/bin/Rserve"
-
-export R_HOME="<?= $rdir ?>"
-export LD_LIBRARY_PATH="<?= $rdir ?>/lib"
+DESC="R execution server for tranSMART 19"
+DAEMON="<?= $rdir ?>/bin/R"
 
 . /lib/lsb/init-functions
 
@@ -51,7 +58,8 @@ running() {
 
 start_rserve() {
   touch ${PID} && chown ${RSERVE_USER}:${RSERVE_USER} ${PID}
-  sudo --user ${RSERVE_USER} ${RDAEMON} CMD Rserve --quiet --RS-pidfile ${PID} --vanilla >>$RSERVE_LOG 2>&1
+  touch ${RSERVE_LOG} && chown ${RSERVE_USER}:${RSERVE_USER} ${RSERVE_LOG}
+  sudo --user ${RSERVE_USER} LD_LIBRARY_PATH="${RLIB}" "${R_DAEMON}" CMD Rserve --RS-pidfile ${PID} --vanilla >>$RSERVE_LOG 2>&1
   EXIT_VAL=$?
   if [ $EXIT_VAL -eq 0 ]; then
     echo "Rserve started"
@@ -61,8 +69,8 @@ start_rserve() {
 }
 
 stop_rserve() {
-  start-stop-daemon --stop --quiet --pidfile ${PID} \
-        --exec ${DAEMON} || true
+  start-stop-daemon --stop --retry 10 --quiet --pidfile ${PID} --remove-pidfile \
+        --exec ${RSERVE_DAEMON} || true
 }
 
 status_rserve() {
