@@ -41,8 +41,9 @@ public class FileSchemaException extends RuntimeException {
      * Constructs an error message for invalid gene symbols that could not be mapped to the warehouse schema.
      */
     public static void ThrowInvalidGenesFileSchemaException(Collection<String> invalidGenes) throws FileSchemaException {				
-        StringBuilder msg = new StringBuilder("The following gene symbols could not be mapped, please fix or remove:<br><br>");
-        msg.append("<ul style='list-style-type: disc; list-style-position: inside;'>");
+        StringBuilder msg = new StringBuilder("The following gene symbols could not be mapped; " +
+                "it is possible that they are not known in the selected platform (meta-data); " +
+                "please fix or remove:<br><br>");
         for (String invalidGene : invalidGenes) {
             msg.append("<li>").append(invalidGene).append("</li>");
         }
