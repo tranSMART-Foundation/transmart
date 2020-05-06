@@ -2,8 +2,8 @@
 -- Name: plink_data; Type: TABLE; Schema: gwas_plink; Owner: -
 --
 CREATE TABLE plink_data (
-	plink_data_id integer NOT NULL,
-	study_id      character varying(50) default nextval('seq_plink_data_id'::regclass) not null,
+	plink_data_id integer default nextval('seq_plink_data_id'::regclass) NOT NULL,
+	study_id      character varying(50) not null,
 	bed           oid,
 	bim           oid,
 	fam           oid
