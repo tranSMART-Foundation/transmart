@@ -179,14 +179,14 @@ function getChildConceptPatientCountsComplete(result, node) {
             child.setText(child.text + " (" + count + ")");
         }
 
-        if ((access != undefined && access != 'Locked') ||
+        if (access != 'Locked' ||
             key.indexOf('\\\\xtrials\\') === 0 || // across trials node should never be locked
-            GLOBAL.IsAdmin) //if im an admin or there is an access level other than locked leave node unlocked
-        {
-            //leave node unlocked must have some read access
-        }
+            GLOBAL.IsAdmin) //if i am an admin or there is an access level other than locked leave node unlocked
+            {
+		//default node to 'unlocked'
+		//leave node unlocked must have some read access
+            }
         else {
-            //default node to locked
             //child.setText(child.text+" <b>Locked</b>");
             child.attributes.access = 'locked';
             child.disable();
