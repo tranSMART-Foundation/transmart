@@ -12,14 +12,14 @@
 }
 .x-progress-inner {
     height:18px;
-    background: #e0e8f3 url(../images/default/qtip/bg.gif) repeat-x;
+    background: #e0e8f3 url(../ext/resources/images/default/qtip/bg.gif) repeat-x;
     position:relative;
 }
 .x-progress-bar {
     height:18px;
     float:left;
     width:0;
-    background:#9CBFEE url( ../images/default/progress/progress-bg.gif ) repeat-x left center;
+    background:#9CBFEE url( ../ext/resources/images/default/progress/progress-bg.gif ) repeat-x left center;
     border-top:1px solid #D1E4FD;
     border-bottom:1px solid #7FA9E4;
     border-right:1px solid #7FA9E4;

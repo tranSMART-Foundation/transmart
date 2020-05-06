@@ -10,7 +10,7 @@
 	border: 1px solid #718bb7;
 	z-index: 15000;
 	zoom: 1;
-	background: #f0f0f0 url(../images/default/menu/menu.gif) repeat-y;
+	background: #f0f0f0 url(../ext/resources/images/default/menu/menu.gif) repeat-y;
 	padding: 2px;
 }
 .x-menu a {
@@ -40,7 +40,7 @@
 	padding:1px;
 }
 .x-menu-item-arrow{
-	background:transparent url(../images/default/menu/menu-parent.gif) no-repeat right;
+	background:transparent url(../ext/resources/images/default/menu/menu-parent.gif) no-repeat right;
 }
 .x-menu-sep {
 	display:block;
@@ -78,7 +78,7 @@
 	cursor:pointer;
 }
 .x-menu-item-active {
-	background: #ebf3fd url(../images/default/menu/item-over.gif) repeat-x left bottom;
+	background: #ebf3fd url(../ext/resources/images/default/menu/item-over.gif) repeat-x left bottom;
 	border:1px solid #aaccf6;
 	padding: 0;
 }
@@ -97,18 +97,18 @@
 }
 
 .x-menu-check-item .x-menu-item-icon{
-	background: transparent url(../images/default/menu/unchecked.gif) no-repeat center;
+	background: transparent url(../ext/resources/images/default/menu/unchecked.gif) no-repeat center;
 }
 
 .x-menu-item-checked .x-menu-item-icon{
-	background-image:url(../images/default/menu/checked.gif);
+	background-image:url(../ext/resources/images/default/menu/checked.gif);
 }
 .x-menu-group-item .x-menu-item-icon{
 	background: transparent;
 }
 
 .x-menu-item-checked .x-menu-group-item .x-menu-item-icon{
-    background: transparent url(../images/default/menu/group-checked.gif) no-repeat center;
+    background: transparent url(../ext/resources/images/default/menu/group-checked.gif) no-repeat center;
 }
 
 .x-menu-plain {

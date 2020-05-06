@@ -102,7 +102,7 @@
 	padding-bottom:3px;
 	border-top:0 none;
     font-weight:normal;
-    background: transparent url(../images/default/panel/light-hd.gif) repeat-x 0 -9px;
+    background: transparent url(../ext/resources/images/default/panel/light-hd.gif) repeat-x 0 -9px;
 }
 
 .x-layout-collapsed{
@@ -151,11 +151,11 @@
 }
         
 .x-layout-split-h{
-    background-image:url(../images/default/s.gif);
+    background-image:url(../ext/resources/images/default/s.gif);
     background-position: left;
 }
 .x-layout-split-v{
-    background-image:url(../images/default/s.gif);
+    background-image:url(../ext/resources/images/default/s.gif);
     background-position: top;
 }
 
@@ -196,48 +196,48 @@
 
 .x-layout-split-west .x-layout-mini {
     top:48%;
-    background-image:url(../images/default/layout/mini-left.gif);
+    background-image:url(../ext/resources/images/default/layout/mini-left.gif);
 }
 .x-layout-split-east .x-layout-mini {
     top:48%;
-    background-image:url(../images/default/layout/mini-right.gif);
+    background-image:url(../ext/resources/images/default/layout/mini-right.gif);
 }
 .x-layout-split-north .x-layout-mini {
     left:48%;
     height:5px;
     width:35px;
-    background-image:url(../images/default/layout/mini-top.gif);
+    background-image:url(../ext/resources/images/default/layout/mini-top.gif);
 }
 .x-layout-split-south .x-layout-mini {
     left:48%;
     height:5px;
     width:35px;
-    background-image:url(../images/default/layout/mini-bottom.gif);
+    background-image:url(../ext/resources/images/default/layout/mini-bottom.gif);
 }
 
 
 .x-layout-cmini-west .x-layout-mini {
     top:48%;
-    background-image:url(../images/default/layout/mini-right.gif);
+    background-image:url(../ext/resources/images/default/layout/mini-right.gif);
 }
 
 .x-layout-cmini-east .x-layout-mini {
     top:48%;
-    background-image:url(../images/default/layout/mini-left.gif);
+    background-image:url(../ext/resources/images/default/layout/mini-left.gif);
 }
 
 .x-layout-cmini-north .x-layout-mini {
     left:48%;
     height:5px;
     width:35px;
-    background-image:url(../images/default/layout/mini-bottom.gif);
+    background-image:url(../ext/resources/images/default/layout/mini-bottom.gif);
 }
 
 .x-layout-cmini-south .x-layout-mini {
     left:48%;
     height:5px;
     width:35px;
-    background-image:url(../images/default/layout/mini-top.gif);
+    background-image:url(../ext/resources/images/default/layout/mini-top.gif);
 }
 
 .x-layout-cmini-west, .x-layout-cmini-east {

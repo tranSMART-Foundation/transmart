@@ -11,7 +11,7 @@
     background:white;
 }
 .x-html-editor-tb .x-btn-text {
-    background:transparent url(../images/default/editor/tb-sprite.gif) no-repeat;
+    background:transparent url(../ext/resources/images/default/editor/tb-sprite.gif) no-repeat;
 }
 .x-html-editor-tb .x-edit-bold .x-btn-text {
     background-position:0 0;

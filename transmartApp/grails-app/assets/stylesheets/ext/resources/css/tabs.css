@@ -42,13 +42,13 @@ ul.x-tab-strip {
 
 ul.x-tab-strip-top{
 	padding-top: 1px;
-	background: url(../images/default/tabs/tab-strip-bg.gif) #cedff5 repeat-x bottom;
+	background: url(../ext/resources/images/default/tabs/tab-strip-bg.gif) #cedff5 repeat-x bottom;
 	border-bottom: 1px solid #8db2e3;
 }
 
 ul.x-tab-strip-bottom{
 	padding-bottom: 1px;
-	background: url(../images/default/tabs/tab-strip-btm-bg.gif) #cedff5 repeat-x top;
+	background: url(../ext/resources/images/default/tabs/tab-strip-btm-bg.gif) #cedff5 repeat-x top;
 	border-top: 1px solid #8db2e3;
 	border-bottom: 0 none;
 }
@@ -191,17 +191,17 @@ ul.x-tab-strip li.x-tab-edge {
 
 
 .x-tab-strip-top .x-tab-right {
-	background: transparent url(../images/default/tabs/tabs-sprite.gif) no-repeat 0 -51px;
+	background: transparent url(../ext/resources/images/default/tabs/tabs-sprite.gif) no-repeat 0 -51px;
     padding-left:10px;
 }
 
 .x-tab-strip-top .x-tab-left {
-	background: transparent url(../images/default/tabs/tabs-sprite.gif) no-repeat right -351px;
+	background: transparent url(../ext/resources/images/default/tabs/tabs-sprite.gif) no-repeat right -351px;
     padding-right:10px;
 }
 
 .x-tab-strip-top .x-tab-strip-inner {
-	background: transparent url(../images/default/tabs/tabs-sprite.gif) repeat-x 0 -201px;
+	background: transparent url(../ext/resources/images/default/tabs/tabs-sprite.gif) repeat-x 0 -201px;
 }
 
 .x-tab-strip-top .x-tab-strip-over .x-tab-right {
@@ -227,19 +227,19 @@ ul.x-tab-strip li.x-tab-edge {
 }
 
 .x-tab-strip-bottom .x-tab-right {
-	background: url(../images/default/tabs/tab-btm-inactive-right-bg.gif) no-repeat bottom right;
+	background: url(../ext/resources/images/default/tabs/tab-btm-inactive-right-bg.gif) no-repeat bottom right;
 }
 
 .x-tab-strip-bottom .x-tab-left {
-	background: url(../images/default/tabs/tab-btm-inactive-left-bg.gif) no-repeat bottom left;
+	background: url(../ext/resources/images/default/tabs/tab-btm-inactive-left-bg.gif) no-repeat bottom left;
 }
 
 .x-tab-strip-bottom .x-tab-strip-active .x-tab-right {
-	background: url(../images/default/tabs/tab-btm-right-bg.gif) no-repeat bottom left;
+	background: url(../ext/resources/images/default/tabs/tab-btm-right-bg.gif) no-repeat bottom left;
 }
 
 .x-tab-strip-bottom .x-tab-strip-active .x-tab-left {
-	background: url(../images/default/tabs/tab-btm-left-bg.gif) no-repeat bottom right;
+	background: url(../ext/resources/images/default/tabs/tab-btm-left-bg.gif) no-repeat bottom right;
 }
 .x-tab-strip-bottom .x-tab-left {
     padding:0 10px;
@@ -259,7 +259,7 @@ ul.x-tab-strip li.x-tab-edge {
 }
 
 .x-tab-strip .x-tab-strip-closable a.x-tab-strip-close {
-	background-image:url(../images/default/tabs/tab-close.gif);
+	background-image:url(../ext/resources/images/default/tabs/tab-close.gif);
     opacity:.6;
     -moz-opacity:.6;
     background-repeat:no-repeat;
@@ -277,7 +277,7 @@ ul.x-tab-strip li.x-tab-edge {
     -moz-opacity:.8;
 }
 .x-tab-strip .x-tab-strip-closable a.x-tab-strip-close:hover{
-	background-image:url(../images/default/tabs/tab-close.gif);
+	background-image:url(../ext/resources/images/default/tabs/tab-close.gif);
     opacity:1;
     -moz-opacity:1;
 }
@@ -294,7 +294,7 @@ ul.x-tab-strip li.x-tab-edge {
 }
 
 .x-tab-scroller-left {
-    background: transparent url(../images/default/tabs/scroll-left.gif) no-repeat -18px 0;
+    background: transparent url(../ext/resources/images/default/tabs/scroll-left.gif) no-repeat -18px 0;
     border-bottom: 1px solid #8db2e3;
     width:18px;
     position:absolute;
@@ -314,7 +314,7 @@ ul.x-tab-strip li.x-tab-edge {
     cursor:default;
 }
 .x-tab-scroller-right {
-    background: transparent url(../images/default/tabs/scroll-right.gif) no-repeat 0 0;
+    background: transparent url(../ext/resources/images/default/tabs/scroll-right.gif) no-repeat 0 0;
     border-bottom: 1px solid #8db2e3;
     width:18px;
     position:absolute;

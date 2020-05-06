@@ -19,29 +19,29 @@
  */
 
 .x-box-tl {
-	background: transparent url(../images/default/box/corners.gif) no-repeat 0 0;
+	background: transparent url(../ext/resources/images/default/box/corners.gif) no-repeat 0 0;
     zoom:1;
 }
 
 .x-box-tc {
 	height: 8px;
-	background: transparent url(../images/default/box/tb.gif) repeat-x 0 0;
+	background: transparent url(../ext/resources/images/default/box/tb.gif) repeat-x 0 0;
 	overflow: hidden;
 }
 
 .x-box-tr {
-	background: transparent url(../images/default/box/corners.gif) no-repeat right -8px;
+	background: transparent url(../ext/resources/images/default/box/corners.gif) no-repeat right -8px;
 }
 
 .x-box-ml {
-	background: transparent url(../images/default/box/l.gif) repeat-y 0;
+	background: transparent url(../ext/resources/images/default/box/l.gif) repeat-y 0;
 	padding-left: 4px;
 	overflow: hidden;
     zoom:1;
 }
 
 .x-box-mc {
-	background: #eee url(../images/default/box/tb.gif) repeat-x 0 -16px;
+	background: #eee url(../ext/resources/images/default/box/tb.gif) repeat-x 0 -16px;
 	padding: 4px 10px;
 	font-family: "Myriad Pro","Myriad Web","Tahoma","Helvetica","Arial",sans-serif;
 	color: #393939;
@@ -56,24 +56,24 @@
 }
 
 .x-box-mr {
-	background: transparent url(../images/default/box/r.gif) repeat-y right;
+	background: transparent url(../ext/resources/images/default/box/r.gif) repeat-y right;
 	padding-right: 4px;
 	overflow: hidden;
 }
 
 .x-box-bl {
-	background: transparent url(../images/default/box/corners.gif) no-repeat 0 -16px;
+	background: transparent url(../ext/resources/images/default/box/corners.gif) no-repeat 0 -16px;
     zoom:1;
 }
 
 .x-box-bc {
-	background: transparent url(../images/default/box/tb.gif) repeat-x 0 -8px;
+	background: transparent url(../ext/resources/images/default/box/tb.gif) repeat-x 0 -8px;
 	height: 8px;
 	overflow: hidden;
 }
 
 .x-box-br {
-	background: transparent url(../images/default/box/corners.gif) no-repeat right -24px;
+	background: transparent url(../ext/resources/images/default/box/corners.gif) no-repeat right -24px;
 }
 
 .x-box-tl, .x-box-bl {
@@ -87,11 +87,11 @@
 }
 
 .x-box-blue .x-box-bl, .x-box-blue .x-box-br, .x-box-blue .x-box-tl, .x-box-blue .x-box-tr {
-	background-image: url(../images/default/box/corners-blue.gif);
+	background-image: url(../ext/resources/images/default/box/corners-blue.gif);
 }
 
 .x-box-blue .x-box-bc, .x-box-blue .x-box-mc, .x-box-blue .x-box-tc {
-	background-image: url(../images/default/box/tb-blue.gif);
+	background-image: url(../ext/resources/images/default/box/tb-blue.gif);
 }
 
 .x-box-blue .x-box-mc {
@@ -103,9 +103,9 @@
 }
 
 .x-box-blue .x-box-ml {
-	background-image: url(../images/default/box/l-blue.gif);
+	background-image: url(../ext/resources/images/default/box/l-blue.gif);
 }
 
 .x-box-blue .x-box-mr {
-	background-image: url(../images/default/box/r-blue.gif);
+	background-image: url(../ext/resources/images/default/box/r-blue.gif);
 }

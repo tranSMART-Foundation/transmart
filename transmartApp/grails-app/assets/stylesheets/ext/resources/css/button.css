@@ -80,12 +80,12 @@
 .x-btn-left{
 	width:3px;
 	height:21px;
-	background:url(../images/default/button/btn-sprite.gif) no-repeat 0 0;
+	background:url(../ext/resources/images/default/button/btn-sprite.gif) no-repeat 0 0;
 }
 .x-btn-right{
 	width:3px;
 	height:21px;
-	background:url(../images/default/button/btn-sprite.gif) no-repeat 0 -21px;
+	background:url(../ext/resources/images/default/button/btn-sprite.gif) no-repeat 0 -21px;
 }
 .x-btn-left i, .x-btn-right i{
 	display:block;
@@ -95,7 +95,7 @@
     line-height:1px;
 }
 .x-btn-center{
-	background:url(../images/default/button/btn-sprite.gif) repeat-x 0 -42px;
+	background:url(../ext/resources/images/default/button/btn-sprite.gif) repeat-x 0 -42px;
 	vertical-align: middle;
 	text-align:center;
 	padding:0 5px;
@@ -132,30 +132,30 @@
     height:21px;
     padding:0 !important;
     display:block;
-    background:transparent url(../images/default/button/btn-arrow.gif) no-repeat left 3px;
+    background:transparent url(../ext/resources/images/default/button/btn-arrow.gif) no-repeat left 3px;
 }
 .x-btn-with-menu  .x-btn-center {
     padding-right:2px !important;
 }
 .x-btn-with-menu  .x-btn-center em {
     display:block;
-    background:transparent url(../images/default/toolbar/btn-arrow.gif) no-repeat right 0;
+    background:transparent url(../ext/resources/images/default/toolbar/btn-arrow.gif) no-repeat right 0;
 	padding-right:10px;
 }
 
 .x-btn-text-icon .x-btn-with-menu .x-btn-center em {
     display:block;
-    background:transparent url(../images/default/toolbar/btn-arrow.gif) no-repeat right 3px;
+    background:transparent url(../ext/resources/images/default/toolbar/btn-arrow.gif) no-repeat right 3px;
 	padding-right:10px;
 }
 
 /* Toggle button styles */
 .x-btn-pressed .x-btn-left{
-	background: url(../images/default/button/btn-sprite.gif) no-repeat 0 -63px;
+	background: url(../ext/resources/images/default/button/btn-sprite.gif) no-repeat 0 -63px;
 }
 .x-btn-pressed .x-btn-right{
-	background: url(../images/default/button/btn-sprite.gif) no-repeat 0 -84px;
+	background: url(../ext/resources/images/default/button/btn-sprite.gif) no-repeat 0 -84px;
 }
 .x-btn-pressed .x-btn-center{
-	background: url(../images/default/button/btn-sprite.gif) repeat-x 0 -126px;
+	background: url(../ext/resources/images/default/button/btn-sprite.gif) repeat-x 0 -126px;
 }

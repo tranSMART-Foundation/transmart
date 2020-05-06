@@ -37,13 +37,13 @@
 }
 /* some default icons for leaf/folder */
 .x-tree-node-expanded .x-tree-node-icon{
-	background-image:url(../images/default/tree/folder-open.gif);
+	background-image:url(../ext/resources/images/default/tree/folder-open.gif);
 }
 .x-tree-node-leaf .x-tree-node-icon{
-	background-image:url(../images/default/tree/leaf.gif);
+	background-image:url(../ext/resources/images/default/tree/leaf.gif);
 }
 .x-tree-node-collapsed .x-tree-node-icon{
-	background-image:url(../images/default/tree/folder.gif);
+	background-image:url(../ext/resources/images/default/tree/folder.gif);
 }
 /* checkboxes */
 .ext-ie input.x-tree-node-cb {
@@ -62,7 +62,7 @@ input.x-tree-node-cb {
 }
 /* loading icon */
 .x-tree-node-loading .x-tree-node-icon{
-	background-image:url(../images/default/tree/loading.gif) !important;
+	background-image:url(../ext/resources/images/default/tree/loading.gif) !important;
 }
 .x-tree-node-loading a span{
 	 font-style: italic;
@@ -89,7 +89,7 @@ input.x-tree-node-cb {
 	background-image:url(../images/default/tree/elbow-end-plus.gif);
 }
 .x-tree-lines .x-tree-elbow-end-minus{
-	background-image:url(../images/default/tree/elbow-end-minus.gif);
+	background-image:url(../mages/default/tree/elbow-end-minus.gif);
 }
 .x-tree-lines .x-tree-elbow-line{
 	background-image:url(../images/default/tree/elbow-line.gif);
