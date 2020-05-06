@@ -1,4 +1,4 @@
-# WCGNA is in CRAN but depends on several packages not in cran (impute, GO.db,
+# WGCNA is in CRAN but depends on several packages not in cran (impute, GO.db,
 # AnnotationDbi), which is something that really should not happen with a sane
 # repository.
 # Anyway, that's why it is installed here
