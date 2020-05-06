@@ -752,8 +752,8 @@ BEGIN
 	,valueflag_cd
 	,provider_id
 	,location_cd
-	,UNITS_CD
-  ,instance_num
+	,units_cd
+	,instance_num
     )
     select distinct m.patient_id
 		  ,m.concept_code
@@ -793,8 +793,8 @@ BEGIN
 	,valueflag_cd
 	,provider_id
 	,location_cd
-	,UNITS_CD
-  ,instance_num
+	,units_cd
+	,instance_num
     )
     select distinct m.sample_id
 		  ,m.concept_code

@@ -838,7 +838,7 @@ BEGIN
 	cz_write_audit(jobId,databaseName,procedureName,'Updated name and data type in i2b2 if changed',SQL%ROWCOUNT,stepCt,'Done');
     commit;
 			   
---modified for performace
+--modified for performance
 	insert /*+ parallel(i2b2, 8) */ into I2B2
     (c_hlevel
 	,c_fullname
@@ -973,7 +973,7 @@ SET  --Static XML String
 
 
 
-	-- insert data in to sample dimentions - Changes made for requirements 1 and 2 
+	-- insert data in to sample dimensions - Changes made for requirements 1 and 2 
 
  INSERT INTO I2B2DEMODATA.SAMPLE_DIMENSION(SAMPLE_CD) 
   SELECT DISTINCT SAMPLE_CD FROM 
@@ -983,7 +983,7 @@ SET  --Static XML String
     
   
     --Insert into observation_fact
-	--  -- Performace fix set nologging  and modified query , added sample code
+	--  -- Performance fix set nologging  and modified query , added sample code
 	insert into observation_fact nologging
 	(patient_num,
      concept_cd,
@@ -997,8 +997,7 @@ SET  --Static XML String
      PROVIDER_ID,
      location_cd,
      instance_num,
-     start_date,
-     sample_cd
+     start_date
 	)
 	select /*+ parallel(wrk_clinical_data, 4) */ distinct c.patient_num,
 		   i.c_basecode,
@@ -1017,7 +1016,6 @@ SET  --Static XML String
 		   '@',
         row_number() over (partition by i.c_basecode, c.patient_num order by a.visit_date) as instance_num
         ,to_date(a.visit_date,'YYYY/MM/DD HH24:mi')
-        ,a.sample_cd
 	from wrk_clinical_data a
 		,patient_dimension c
 		,wt_trial_nodes t
@@ -1146,7 +1144,7 @@ SET  --Static XML String
 	i2b2_create_security_inc_trial(TrialId, secureStudy, jobID);
 	i2b2_load_security_data(jobID);
   
-  -- Performace fix recreated INDEX
+  -- Performance fix recreated INDEX
   -- execute immediate('CREATE UNIQUE INDEX "I2B2DEMODATA"."OB_FACT_PK" ON "I2B2DEMODATA"."OBSERVATION_FACT" ("ENCOUNTER_NUM", "PATIENT_NUM", "CONCEPT_CD", "PROVIDER_ID", "START_DATE", "MODIFIER_CD")');
   -- execute immediate('CREATE INDEX "I2B2DEMODATA"."IDX_OB_FACT_1" ON "I2B2DEMODATA"."OBSERVATION_FACT" ( "CONCEPT_CD" )');
   -- execute immediate('CREATE INDEX "I2B2DEMODATA"."IDX_OB_FACT_2" ON "I2B2DEMODATA"."OBSERVATION_FACT" ("CONCEPT_CD", "PATIENT_NUM", "ENCOUNTER_NUM")');

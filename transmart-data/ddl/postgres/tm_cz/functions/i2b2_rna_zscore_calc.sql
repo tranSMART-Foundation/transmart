@@ -178,7 +178,8 @@ BEGIN
 	    select probeset
 		   ,intensity_value 
 		   ,assay_id 
-		   ,CASE WHEN intensity_value <= 0 THEN ln(intensity_value + 0.001)/ln(logBase::double precision) ELSE ln(intensity_value)/ln(logBase::double precision) END
+		   ,round((CASE WHEN intensity_value <= 0 THEN 0
+			   ELSE ln(intensity_value)/ln(logBase::double precision) END)::numeric,5)
 		   ,patient_id
 	      from tm_wz.wt_subject_rna_probeset
 	     where trial_name = TrialId;

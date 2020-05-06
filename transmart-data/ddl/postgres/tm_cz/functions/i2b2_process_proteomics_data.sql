@@ -750,8 +750,7 @@ BEGIN
 	,provider_id
 	,location_cd
 	,units_cd
-         ,sample_cd
-        ,INSTANCE_NUM
+        ,instance_num
         
     )
     select distinct m.patient_id
@@ -767,8 +766,7 @@ BEGIN
 		  ,'@'
 		  ,'@'
 		  ,'' -- no units available
-                   ,m.sample_cd
-                   ,1
+		  ,1
      from deapp.de_subject_sample_mapping m
     where m.trial_name = TrialID 
 	  and m.source_cd = sourceCD
@@ -800,8 +798,7 @@ BEGIN
 	,provider_id
 	,location_cd
 	,units_cd
-         ,sample_cd
-        ,INSTANCE_NUM
+        ,instance_num
     )
     select distinct m.sample_id
 		  ,m.concept_code
@@ -816,7 +813,6 @@ BEGIN
 		  ,'@'
 		  ,'@'
 		  ,'' -- no units available
-                   ,m.sample_cd
                   ,1
      from deapp.de_subject_sample_mapping m
     where m.trial_name = TrialID 

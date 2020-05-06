@@ -709,7 +709,7 @@ dbms_output.put_line('E2');
 	,provider_id
 	,location_cd
 	,units_cd
-        ,INSTANCE_NUM
+        ,instance_num
     )
     select distinct m.patient_id
 		  ,m.concept_code

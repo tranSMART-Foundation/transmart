@@ -115,9 +115,8 @@ begin
 	    select probeset_id
 		   ,intensity_value
 		   ,assay_id 
-		   ,round((case when intensity_value<=0 then 0
-                           when intensity_value>0 then log(logBase,intensity_value)
-                           else 0 end)::numeric,5)
+		   ,round((case when intensity_value <=0 then 0
+                           else ln(intensity_value)/ln(logBase::double precision) end)::numeric,5)
 		   ,patient_id
 	      from tm_wz.wt_subject_mirna_probeset
 	     where trial_name = TrialId;

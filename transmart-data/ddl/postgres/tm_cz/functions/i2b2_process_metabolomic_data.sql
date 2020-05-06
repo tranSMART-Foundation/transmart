@@ -804,7 +804,7 @@ category_cd,'PLATFORM',title),'ATTR1',coalesce(attribute_1,'')),'ATTR2',coalesce
 	,provider_id
 	,location_cd
 	,units_cd
-        ,INSTANCE_NUM
+        ,instance_num
     )
     select distinct m.patient_id
 		  ,m.concept_code

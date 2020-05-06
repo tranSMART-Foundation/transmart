@@ -924,7 +924,7 @@ BEGIN
      sourcesystem_cd,
      import_date,
      valueflag_cd,
-     PROVIDER_ID,
+     provider_id,
      location_cd,
      instance_num,
      start_date

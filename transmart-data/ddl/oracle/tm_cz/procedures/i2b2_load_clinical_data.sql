@@ -998,8 +998,7 @@ SET  --Static XML String
      PROVIDER_ID,
      location_cd,
      instance_num,
-     start_date,
-     sample_cd
+     start_date
 	)
 	select /*+ parallel(wrk_clinical_data, 4) */ distinct c.patient_num,
 		   i.c_basecode,
@@ -1018,7 +1017,6 @@ SET  --Static XML String
 		   '@',
         row_number() over (partition by i.c_basecode, c.patient_num order by a.visit_date) as instance_num
         ,to_date(a.visit_date,'YYYY/MM/DD HH24:mi')
-        ,a.sample_cd
 	from wrk_clinical_data a
 		,patient_dimension c
 		,wt_trial_nodes t

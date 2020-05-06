@@ -857,7 +857,7 @@ begin
 	if pCount > 0 then
             stepCt := stepCt + 1;
             perform tm_cz.cz_write_audit(jobId,databaseName, procedureName,
-					'You cannot upload different datatype for concept then already in database.', pCount, stepCt, 'Done');    
+					'You cannot upload a different datatype for a concept already in the database.', pCount, stepCt, 'Error');
             perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
             perform tm_cz.cz_end_audit (jobID, 'FAIL');
             return -16;     
