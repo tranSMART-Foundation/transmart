@@ -8,6 +8,7 @@ SCHEMAS = \
 		  i2b2pm \
 		  i2b2workdata \
 		  biomart_user \
+		  biomart_stage \
 		  biomart \
 		  deapp \
 		  tm_lz \
