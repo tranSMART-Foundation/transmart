@@ -59,25 +59,32 @@ function createAdvancedWorkflowMenu(result) {
         });
 
         // add components to the advanced workflow toolbar
-        Ext.getCmp('advancedWorkflowToolbar')
-            .add(
-                {
-                    text : 'Analysis',
-                    iconCls : 'comparebutton',
-                    disabled : false,
-                    menu : advMenu
-                }
-                ,'->',
-                {
+	var awtb = Ext.getCmp('advancedWorkflowToolbar');
+	awtb.on('render' , function(){
+            awtb.addButton(
+		new Ext.Toolbar.Button({
+		    id : 'analysiscomparebutton',
+		    text : 'Analysis',
+		    iconCls : 'comparebutton',
+		    disabled : false,
+		    buttonAlign: 'left',
+		    menu : advMenu
+		})
+	    );
+	    awtb.add('->');
+	    awtb.addButton(
+		new Ext.Toolbar.Button({
                     text: 'Save to PDF',
                     iconCls: 'savepdfbutton',
                     hidden: false,
                     id: 'savetopdfbtn',
+		    buttonAlign: 'right',
                     handler: function() {
-                        generatePdfFromHTML('dataAssociationPanel', 'DataAssociation.pdf');
+			generatePdfFromHTML('dataAssociationPanel', 'DataAssociation.pdf');
                     }
-                }
-            );
+		})
+	    );
+	});
     }
 }
 
@@ -100,7 +107,6 @@ function createAdvancedWorkflowMenuItems(modules) {
  * @param jobName
  */
 function loadAnalysisPage(itemId, isCompletedJob, jobName) {
-
     // get analysis module attribute
     var module = findModuleById(itemId);
 
@@ -170,6 +176,7 @@ function onItemClick(item) {
       }
       });*/
 }
+
 function renderCohortSummary(){
     var cohortsSummary=""
 
@@ -183,25 +190,24 @@ function renderCohortSummary(){
         }
 
     }
-
-    if ("" == cohortsSummary){
-        // hide cohort Summary & show warning
-        Ext.get('cohortSummary').hide();
-        Ext.get('cohortWarningMsg').show();
-        Ext.fly('cohortWarningMsg').update("WARNING: You have not selected a study and the analysis will not work. " +
-					   "Please go back to the Comparison tab and make a cohort selection.").addClass("warning");
-    } else {
-        // hide warning & show cohort Summary
-        Ext.get('cohortSummary').hide();
-        Ext.fly('cohortSummary').update(cohortsSummary);
-        Ext.get('cohortWarningMsg').hide();
-        Ext.get('cohortSummary').show();
+    if(Ext.getCmp('dataAssociationPanel').rendered) {
+	if ("" == cohortsSummary){
+            // hide cohort Summary & show warning
+            Ext.get('cohortSummary').hide();
+            Ext.get('cohortWarningMsg').show();
+            Ext.fly('cohortWarningMsg').update("WARNING: You have not selected a study and the analysis will not work. " +
+					       "Please go back to the Comparison tab and make a cohort selection.").addClass("warning");
+	} else {
+            // hide warning & show cohort Summary
+            Ext.get('cohortSummary').hide();
+            Ext.fly('cohortSummary').update(cohortsSummary);
+            Ext.get('cohortWarningMsg').hide();
+            Ext.get('cohortSummary').show();
+	}
     }
-
 }
 
-function checkPreviousAnalysis()
-{
+function checkPreviousAnalysis() {
     //If the user clicks submit but they've run a analysis recently check with them to make sure they want to clear the results.
     if(GLOBAL.AnalysisRun)
     {
@@ -224,6 +230,7 @@ function loadPluginView(){
 
     var selectedAnalysis = document.getElementById("analysis").value;
     selectedAnalysis = selectedAnalysis.charAt(0).toUpperCase()+selectedAnalysis.substring(1);
+
     var loadViewName = "load"+selectedAnalysis+"View";
     window[loadViewName]();
 }
@@ -460,8 +467,7 @@ function readConceptVariables(divIds){
     return variableConceptPath;
 }
 
-function submitJob(formParams)
-{
+function submitJob(formParams) {
     //Make sure at least one subset is filled in.
     if(isSubsetEmpty(1) && isSubsetEmpty(2))
     {
@@ -568,7 +574,7 @@ function checkPluginJobStatus(jobName)
 }
 
 function loadModuleOutput()
-{
+    {
     var selectedAnalysis = document.getElementById("analysis").value;
     selectedAnalysis = selectedAnalysis.charAt(0).toUpperCase()+selectedAnalysis.substring(1);
 
@@ -632,20 +638,21 @@ function setupCategoricalItemsList (strDivSource, strDivTarget) {
 
 function clearDataAssociation()
 {
-    //Remove the output screen.
-    document.getElementById("analysisOutput").innerHTML = "";
-    //Remove the variable selection screen.
-    document.getElementById("variableSelection").innerHTML = "";
-
     //Whenever we switch views, make the binning toggle false. All the analysis pages default to this state.
     GLOBAL.Binning = false
     GLOBAL.ManualBinning = false
     GLOBAL.NumberOfBins = 4
     GLOBAL.AnalysisRun = false
 
-    //Set the message below the cohort summary that lets the user know they need to select a cohort.
-    renderCohortSummary();
+    if(Ext.getCmp('dataAssociationPanel').rendered) {
+	//Remove the output screen.
+	document.getElementById("analysisOutput").innerHTML = "";
+	//Remove the variable selection screen.
+	document.getElementById("variableSelection").innerHTML = "";
 
+	//Set the message below the cohort summary that lets the user know they need to select a cohort.
+	renderCohortSummary();
+    }
 }
 
 function loadCommonHighDimFormObjects(formParams, divName)
