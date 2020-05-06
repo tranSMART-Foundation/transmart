@@ -25,7 +25,7 @@ NAME="solr"
 # Daemon name, where is the actual executable
 DAEMON=/usr/bin/java
 # Read about the available options at: http://docs.oracle.com/javase/1.3/docs/tooldocs/solaris/java.html
-DAEMON_ARGS="-Xmx1024m -DSTOP.PORT=8079 -DSTOP.KEY=stopkey -Dsolr.solr.home=multicore -jar start.jar"
+DAEMON_ARGS="-Xmx1024m -DSTOP.PORT=8079 -DSTOP.KEY=stopkey -Dsolr.solr.home=solr -jar start.jar"
 # pid file for the daemon
 PIDFILE=/var/run/$NAME.pid
 # script name
@@ -68,6 +68,7 @@ do_start()
         #   2 if daemon could not be started
         start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
                 || return 1
+	touch ${SOLR_LOG} && chown ${SOLR_USER}:${SOLR_USER} ${SOLR_LOG}
         start-stop-daemon --start --user ${SOLR_USER} --quiet --pidfile $PIDFILE --chdir $SOLR_HOME --background --make-pidfile --exec $DAEMON >>$SOLR_LOG 2>&1 -- \
                 $DAEMON_ARGS \
                 || return 2
