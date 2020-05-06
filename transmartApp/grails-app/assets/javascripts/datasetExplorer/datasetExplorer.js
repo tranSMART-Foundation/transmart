@@ -81,7 +81,7 @@ Ext.onReady(function () {
 
     Ext.QuickTips.init();
 
-    //set ajax to 600*1000 milliseconds
+    //set session simeout to 1800*1000 milliseconds (30 minutes)
     Ext.Ajax.timeout = 1800000;
 
     // this overrides the above
@@ -398,7 +398,7 @@ Ext.onReady(function () {
 
     analysisGridPanel = new Ext.Panel({
         id: 'analysisGridPanel',
-        title: 'Grid View Tab',
+        title: 'Grid View',
         region: 'center',
         split: true,
         height: 90,
@@ -420,7 +420,10 @@ Ext.onReady(function () {
                 fn: function (el) {
                     onWindowResize();
                 }
-            }
+            },
+            render: function() {
+		setupDropTargetGridView()
+	    }
         }
     });
 
@@ -448,7 +451,10 @@ Ext.onReady(function () {
                 fn: function (el) {
                     onWindowResize();
                 }
-            }
+            },
+            render: function() {
+		setupDropTargetSummary()
+	    }
         },
         autoScroll: true,
         html: '<div style="text-align:center;font:12pt arial;width:100%;height:100%;">' +
@@ -674,7 +680,7 @@ Ext.onReady(function () {
         });
     }
 
-    var pluginPromises = []; // contain { promise: , bootstrap: }
+    var pluginPromises = []; // contain { promise: , bootstrap:}
     function loadPlugin(pluginName, scriptsUrl, bootstrap, legacy) {
         var def = jQuery.Deferred();
         function loadResources() {
@@ -707,7 +713,7 @@ Ext.onReady(function () {
 
         pluginPromises.push({
             promise: def.promise(),
-            bootstrap: bootstrap,
+            bootstrap: bootstrap
         });
     }
 
@@ -759,7 +765,6 @@ Ext.onReady(function () {
             });
         });
     })();
-
 
     if (GLOBAL.galaxyEnabled) {
         resultsTabPanel.add(GalaxyPanel);
@@ -1571,14 +1576,11 @@ function getSubCategories(ontresponse) {
     onWindowResize();
 }
 
-function setupDragAndDrop() {
+function setupDropTargetSummary() {
+    /* Set up Drag and Drop for the Summary Statistics Panel */
+    var mcd = Ext.get(analysisPanel.body);
 
-    // Drag and drop for Comparison tab panels is now setup in querypanel.js
-
-    /* Set up Drag and Drop for the Summary Statistics analysis Panel */
-    var qcd = Ext.get(analysisPanel.body);
-
-    dts = new Ext.dd.DropTarget(qcd, {
+    dts = new Ext.dd.DropTarget(mcd, {
         ddGroup: 'makeQuery'
     });
 
@@ -1586,11 +1588,13 @@ function setupDragAndDrop() {
         buildAnalysis(data.node);
         return true;
     };
+}
 
-    /* set up drag and drop for GridView */
-    var mcd = Ext.get(analysisGridPanel.body);
+function setupDropTargetGridView() {
+    /* Set up Drag and Drop for the Grid View Panel */
+    var qcd = Ext.get(analysisGridPanel.body);
 
-    dtg = new Ext.dd.DropTarget(mcd, {
+    dtg = new Ext.dd.DropTarget(qcd, {
         ddGroup: 'makeQuery'
     });
 
@@ -1598,7 +1602,6 @@ function setupDragAndDrop() {
         buildAnalysis(data.node);
         return true;
     };
-
 }
 
 function getValue(node, defaultvalue) {
@@ -2007,7 +2010,9 @@ function updateAnalysisPanel(html, insert) {
         div.append(jQuery(html).attr('id', uniq));
         div.parent().scrollTop(jQuery('#' + uniq).prop('offsetTop'));
     } else {
-        analysisPanel.body.update(html, false, null);
+        if(analysisPanel.rendered){
+	    analysisPanel.body.update(html, false, null);
+	};
     }
 }
 
@@ -2986,21 +2991,11 @@ function storeLoaded(jsonStore, rows, paramsObject) {
 	id: 'gridViewToolbar',
 	items: [
 	    new Ext.Toolbar.Button ({
-		id: 'gridViewHelpButton',
-		text: 'Click for Grid View Help',
-		tabIndex: 1,
-		tooltip: 'Grid View Help',
-                disabled: false,
-		handler: function() {
-		    window.open(GLOBAL.HelpGridviewURL, '_blank').focus();
-		}
-	    }),
-	    new Ext.Toolbar.Button ({
 		id: 'gridViewHelpIcon',
 		icon: 'help/helpicon_white.jpg',
                 disabled: false,
 		tabIndex: 2,
-		tooltip: 'Tooltip for Grid View Help Icon',
+		tooltip: 'Grid View Help',
 		handler: function() {
 		    window.open(GLOBAL.HelpManualURL, '_blank').focus();
 		}
@@ -3009,7 +3004,7 @@ function storeLoaded(jsonStore, rows, paramsObject) {
     });
     grid = new GridViewPanel({
         id: 'gridView',
-        title: 'Grid View Panel',
+        title: 'Grid View',
         viewConfig: {
             forceFit: true
         },
@@ -3478,7 +3473,9 @@ function clearQuery() {
     if (confirm("Are you sure you want to clear your current selections and analysis ?")) {
         clearAnalysisPanel();
         clearQueryPanels();
-        clearDataAssociation();
+        if(dataAssociationPanel.rendered) {
+	    clearDataAssociation();
+	};
     }
 }
 

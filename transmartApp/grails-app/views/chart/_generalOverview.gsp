@@ -48,6 +48,3 @@
     </tbody>
 </table>
 
-<script>
-    setupDragAndDrop();
-</script>
