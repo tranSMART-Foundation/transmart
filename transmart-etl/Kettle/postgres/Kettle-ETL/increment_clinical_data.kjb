@@ -413,7 +413,7 @@
       <yloc>243</yloc>
       </entry>
     <entry>
-      <name>End  Audit</name>
+      <name>End Audit</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
@@ -597,7 +597,7 @@
     </hop>
     <hop>
       <from>run i2b2_load_clinical_inc_data</from>
-      <to>End  Audit</to>
+      <to>End Audit</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
