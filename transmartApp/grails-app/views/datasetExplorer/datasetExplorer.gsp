@@ -193,7 +193,5 @@
 	<span id="visualizerSpan0"></span>
 	<span id="visualizerSpan1"></span>
 
-	<!-- This implements the Help functionality -->
-	<asset:javascript src="help/D2H_ctxt.js"/>
     </body>
 </html>
