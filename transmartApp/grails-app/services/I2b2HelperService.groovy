@@ -933,7 +933,7 @@ class I2b2HelperService implements InitializingBean {
 	// As the column headers only show the (in many cases ambiguous) leaf part of the concept path,
 	// showing the full concept path in the tooltip is much more informative.
 	// As no tooltip text is passed on to the GridView code, the value of the string columnId is used
-	// and shown as the tooltip text when hoovering over the column header in GridView.
+	// and shown as the tooltip text when hovering over the column header in GridView.
 	// Explicitly passing a tooltip text to the GridView code removes the necessity to use this columnId value.
 	// Removal of some undesired non-alpha-numeric characters from tooltip string
 	// prevents display errors in GridView (drop down menu, columns not showing or cells not being filled).
@@ -4020,7 +4020,7 @@ class I2b2HelperService implements InitializingBean {
     Map<String,String> getAllStudiesWithTokens() {
         def studies = [:]
         Sql sql = new Sql(dataSource)
-        String sqlt = 'SELECT sourcesystem_cd, secure_obj_token FROM i2b2metadata.i2b2_secure WHERE c_hlevel = 1'
+        String sqlt = 'SELECT sourcesystem_cd, secure_obj_token FROM i2b2metadata.i2b2_secure WHERE c_visualattributes like \'%S\''
         sql.eachRow(sqlt, [], { row ->
             studies.put(row.sourcesystem_cd, row.secure_obj_token);
         })
@@ -4062,7 +4062,7 @@ class I2b2HelperService implements InitializingBean {
 			SELECT sourcesystem_cd, secure_obj_token
 			FROM i2b2metadata.i2b2_SECURE
 			WHERE sourcesystem_cd IN (''' + listToIN(studyIds) + ''')
-			AND c_hlevel = 1'''
+			AND c_visualattributes like \'%S\''''
 	eachRow(sql) { row ->
 	    String code = rowGet(row, 'sourcesystem_cd', String)
 	    tokens[code] = rowGet(row, 'secure_obj_token', String)
