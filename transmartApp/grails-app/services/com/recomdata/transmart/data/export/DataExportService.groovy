@@ -52,8 +52,9 @@ class DataExportService {
     @Transactional(readOnly = true)
     def exportData(JobDataMap jobDataMap) {
 	def checkboxList = jobDataMap.checkboxList
-	Assert.isTrue((checkboxList.getClass().isArray() && !checkboxList) ||
-		      (checkboxList instanceof List && !checkboxList), 'Please select the data to Export.')
+
+	Assert.isTrue((checkboxList.getClass().isArray() && checkboxList) ||
+		      (checkboxList instanceof List && checkboxList), 'Please select the data to Export.')
 
 	String jobName = jobDataMap.jobName
 	String jobTmpDirectory = jobDataMap.jobTmpDirectory
@@ -104,21 +105,17 @@ class DataExportService {
 									 selection[subset][selectedFile.toLowerCase()].selector, studyDir)
                                 break
                             case highDimensionResourceService.knownTypes:
-				logger.info 'Exporting {} using core api', selectedFile
-
                                 // For now we ignore the information about the platforms to 
                                 // export. All data that matches the selected concepts
                                 // is exported
 				for (format in highDimDataTypes[subset][selectedFile].keySet()) {
-				    logger.info '  Using format {}', format
 				    retVal = highDimExportService.exportHighDimData(jobName,
 										    resultInstanceIdMap[subset] as long, selection[subset][selectedFile].selector,
 										    selectedFile, format, studyDir)
                                 }
-				logger.info 'Exported {} using core api', selectedFile
 
                                 //filesDoneMap is used for building the Clinical Data query
-								filesDoneMap['MRNA.TXT'] = true
+				filesDoneMap['MRNA.TXT'] = true
                                 break
                             case 'MRNA_DETAILED.TXT':
 				String pathway = jobDataMap.gexpathway

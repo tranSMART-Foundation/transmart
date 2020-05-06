@@ -56,7 +56,7 @@ class DataExportController {
 	checkJobAccess jobname
 
 	utilService.sendDownload response, 'application/zip', jobname + '.zip',
-	    exportService.downloadFile(params)
+	    exportService.downloadFile(jobname)
     }
 
     /**
@@ -65,7 +65,7 @@ class DataExportController {
      */
     def createnewjob() {
 	response.contentType = 'text/json'
-	response.outputStream << exportService.createExportDataAsyncJob(params).toString()
+	response.outputStream << exportService.createExportDataAsyncJob(params.analysis,params.result_instance_id1,params.result_instance_id2).toString()
     }
 
     /**
