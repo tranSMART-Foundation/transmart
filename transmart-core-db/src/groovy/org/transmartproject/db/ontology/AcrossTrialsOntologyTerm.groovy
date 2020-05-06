@@ -29,10 +29,10 @@ import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.L
 @CompileStatic
 class AcrossTrialsOntologyTerm extends AbstractAcrossTrialsOntologyTerm {
 
-    ModifierDimensionView modifierDimension
+    DeXtrialNodeView deXtrialNode
 
     Integer getLevel() {
-        modifierDimension.level + 1 /* because of ACROSS_TRIALS_BEFORE */
+        deXtrialNode.level + 1 /* because of ACROSS_TRIALS_BEFORE */
     }
 
     String getKey() {
@@ -40,15 +40,15 @@ class AcrossTrialsOntologyTerm extends AbstractAcrossTrialsOntologyTerm {
     }
 
     String getFullName() {
-        "\\${ACROSS_TRIALS_TOP_TERM_NAME}${modifierDimension.path}"
+        "\\${ACROSS_TRIALS_TOP_TERM_NAME}${deXtrialNode.path}"
     }
 
     String getName() {
-        modifierDimension.name
+        deXtrialNode.name
     }
 
     String getCode() {
-        modifierDimension.code
+        deXtrialNode.code
     }
 
     String getTooltip() {
@@ -56,10 +56,10 @@ class AcrossTrialsOntologyTerm extends AbstractAcrossTrialsOntologyTerm {
     }
 
     EnumSet<OntologyTerm.VisualAttributes> getVisualAttributes() {
-        EnumSet.of modifierDimension.nodeType == 'F' ? FOLDER : LEAF
+        EnumSet.of deXtrialNode.nodeType == 'F' ? FOLDER : LEAF
     }
 
     def getMetadata() {
-        [okToUseValues: modifierDimension.valueType == 'N']
+        [okToUseValues: deXtrialNode.valueType == 'N']
     }
 }

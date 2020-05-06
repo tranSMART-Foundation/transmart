@@ -77,7 +77,7 @@ abstract class AbstractAcrossTrialsOntologyTerm implements OntologyTerm, Metadat
         String pathPrefix = conceptKey.conceptFullName.length > 1 ?
             "\\${conceptKey.conceptFullName[1..-1].join '\\'}\\" : null
 
-        ModifierDimensionView.withCriteria {
+        DeXtrialNodeView.withCriteria {
             if (pathPrefix) {
 		like 'path', Utils.asLikeLiteral(pathPrefix) + '%'
             }
@@ -85,7 +85,7 @@ abstract class AbstractAcrossTrialsOntologyTerm implements OntologyTerm, Metadat
                 eq 'level',
 		    level - 1L /* "Across Trials" */ + 1L /* children */
             }
-        }.collect { new AcrossTrialsOntologyTerm(modifierDimension: it) }
+        }.collect { new AcrossTrialsOntologyTerm(deXtrialNode: it) }
     }
 
     List<Patient> getPatients() {
@@ -102,7 +102,7 @@ abstract class AbstractAcrossTrialsOntologyTerm implements OntologyTerm, Metadat
     }
 
     String getDimensionTableName() {
-        'modifier_dimension'
+        'deapp.de_xtrial_node'
     }
 
     String getColumnName() {

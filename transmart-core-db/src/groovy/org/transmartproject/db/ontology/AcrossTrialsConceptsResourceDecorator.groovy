@@ -60,13 +60,13 @@ class AcrossTrialsConceptsResourceDecorator implements ConceptsResource {
 	}
 	else { // > 1
 	    String modifierPath = buildModifierPath(fullName)
-	    ModifierDimensionView modifier = ModifierDimensionView.get(modifierPath)
-            if (!modifier) {
+	    DeXtrialNodeView xtrialNode = DeXtrialNodeView.get(modifierPath)
+            if (!xtrialNode) {
 		throw new NoSuchResourceException(
 		    'Could not find across trials node with modifier_path ' + modifierPath)
             }
 
-            new AcrossTrialsOntologyTerm(modifierDimension: modifier)
+            new AcrossTrialsOntologyTerm(deXtrialNode: xtrialNode)
         }
     }
 

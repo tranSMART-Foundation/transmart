@@ -31,7 +31,7 @@ import org.transmartproject.core.querytool.QueryDefinition
 import org.transmartproject.db.ontology.AcrossTrialsOntologyTerm
 import org.transmartproject.db.ontology.AcrossTrialsTestData
 import org.transmartproject.db.ontology.I2b2Secure
-import org.transmartproject.db.ontology.ModifierDimensionView
+import org.transmartproject.db.ontology.DeXtrialNodeView
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.is
@@ -64,8 +64,8 @@ class UserAccessLevelAcrossTrialTests {
         /* add entry in I2b2Secure to make sure we're not allowing the thing
          * because of the "public by default" behavior */
         OntologyTerm term = new AcrossTrialsOntologyTerm(
-                modifierDimension: ModifierDimensionView.get(
-                        acrossTrialsTestData.modifierDimensions[0].path))
+                deXtrialNode: DeXtrialNodeView.get(
+                        acrossTrialsTestData.deXtrialNodes[0].path))
 
         I2b2Secure i2b2x = createI2b2Secure(
                 fullName: term.fullName,

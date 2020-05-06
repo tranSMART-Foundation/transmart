@@ -20,8 +20,7 @@ CREATE TABLE concept_dimension (
     download_date timestamp,
     import_date timestamp,
     sourcesystem_cd character varying(50),
-    upload_id int,
-    table_name character varying(255) --not in i2b2
+    upload_id int
 );
 
 --

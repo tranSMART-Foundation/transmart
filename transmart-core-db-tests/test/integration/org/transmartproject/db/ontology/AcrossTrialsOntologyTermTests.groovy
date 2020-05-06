@@ -71,11 +71,11 @@ class AcrossTrialsOntologyTermTests {
 
     @Test
     void testOntologyTermProperties() {
-        def modifier = ModifierDimensionView.get('\\Demographics\\Sex\\Female\\')
-        assertThat modifier, is(notNullValue())
+        def xtrialNode = DeXtrialNodeView.get('\\Demographics\\Sex\\Female\\')
+        assertThat xtrialNode, is(notNullValue())
 
         OntologyTerm term =
-                new AcrossTrialsOntologyTerm(modifierDimension: modifier)
+                new AcrossTrialsOntologyTerm(deXtrialNode: xtrialNode)
 
         assertThat term, FastMatchers.propsWith(
                 level: 3,

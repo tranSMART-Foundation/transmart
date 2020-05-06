@@ -66,7 +66,7 @@ class H2Views {
 			createSubPathwayCorrelView()
 			createSuperPathwayCorrelView()
 			createI2b2TrialNodes()
-			createModifierDimensionView()
+			createDeXtrialNodeView()
 			createDeVariantSummaryDetailGene()
 		}
 		finally {
@@ -374,29 +374,29 @@ class H2Views {
                         AND length (A.c_fullname) = B.min_length);'''
 	}
 
-	void createModifierDimensionView() {
-		if (handleCurrentState('I2B2DEMODATA', 'MODIFIER_DIMENSION_VIEW')) {
+	void createDeXtrialNodeView() {
+		if (handleCurrentState('DEAPP', 'DE_XTRIAL_NODE_VIEW')) {
 			return
 		}
 
-		logger.info 'Creating I2B2DEMODATA.MODIFIER_DIMENSION_VIEW'
+		logger.info 'Creating DEAPP.DE_XTRIAL_NODE_VIEW'
 
 		sql.execute '''
-            CREATE VIEW I2B2DEMODATA.MODIFIER_DIMENSION_VIEW AS
+            CREATE VIEW DEAPP.DE_XTRIAL_NODE_VIEW AS
             SELECT
-                MD.modifier_path,
-                MD.modifier_cd,
-                MD.name_char,
-                MD.sourcesystem_cd,
-                MD.modifier_level,
-                MD.modifier_node_type,
-                MM.valtype_cd,
-                MM.std_units,
-                MM.visit_ind
+                XN.modifier_path,
+                XN.modifier_cd,
+                XN.name_char,
+                XN.sourcesystem_cd,
+                XN.modifier_level,
+                XN.modifier_node_type,
+                XM.valtype_cd,
+                XM.std_units,
+                XM.visit_ind
             FROM
-                I2B2DEMODATA.MODIFIER_DIMENSION MD
-                LEFT JOIN I2B2DEMODATA.MODIFIER_METADATA MM ON (
-                    MD.modifier_cd = MM.modifier_cd)'''
+                DEAPP.DE_XTRIAL_NODE XN
+                LEFT JOIN DEAPP.DE_XTRIAL_METADATA XM ON (
+                    XN.modifier_cd = XM.modifier_cd)'''
 	}
 
 	void createDeVariantSummaryDetailGene() {

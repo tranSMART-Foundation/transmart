@@ -59,7 +59,7 @@ class PatientDimension implements Patient {
 
         age           column:    'age_in_years_num'
         maritalStatus column:    'marital_status_cd'
-        patientBlob  sqlType:   'text'
+        patientBlob  sqlType:    'text'
         race          column:    'race_cd'
         religion      column:    'religion_cd'
     }

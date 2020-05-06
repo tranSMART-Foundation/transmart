@@ -10,9 +10,7 @@ CREATE TABLE modifier_dimension (
     download_date timestamp,
     import_date timestamp,
     sourcesystem_cd character varying(50),
-    upload_id int,
-    modifier_node_type character varying(10),	--not in i2b2
-    modifier_level int				--not in i2b2
+    upload_id int
 );
 
 --

@@ -64,7 +64,8 @@
 \i deapp/de_variant_subject_detail.sql
 \i deapp/de_variant_subject_idx.sql
 \i deapp/de_variant_subject_summary.sql
-\i deapp/views/de_variant_summary_detail_gene.sql
+\i deapp/de_xtrial_metadata.sql
+\i deapp/de_xtrial_node.sql
 \i deapp/de_xtrial_parent_names.sql
 \i deapp/de_xtrial_child_map.sql
 \i deapp/deapp_annotation.sql
@@ -74,3 +75,5 @@
 \i deapp/kegg_def.sql
 \i deapp/ricerca.sql
 \i deapp/_misc.sql
+\i deapp/views/de_variant_summary_detail_gene.sql
+\i deapp/views/de_xtrial_node_view.sql

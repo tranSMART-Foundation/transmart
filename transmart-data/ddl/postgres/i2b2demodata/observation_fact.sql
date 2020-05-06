@@ -24,8 +24,7 @@ CREATE TABLE observation_fact (
     import_date timestamp,
     sourcesystem_cd character varying(50),
     upload_id int,
-    text_search_index serial,	-- postgres-only in i2b2
-    sample_cd character varying(200) --new in transmart
+    text_search_index serial	-- postgres-only in i2b2
 );
 
 --

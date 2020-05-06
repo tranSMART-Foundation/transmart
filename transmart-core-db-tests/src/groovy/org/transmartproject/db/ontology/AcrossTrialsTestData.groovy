@@ -44,7 +44,7 @@ class AcrossTrialsTestData extends AbstractTestData {
 	List<PatientDimension> patients
 	List<ObservationFact> facts
 	AccessLevelTestData accessLevelTestData
-	List<ModifierDimensionCoreDb> modifierDimensions
+	List<DeXtrialNode> deXtrialNodes
 	List<ModifierMetadataCoreDb> modifierMetadatas
 
 	static AcrossTrialsTestData createDefault() {
@@ -57,7 +57,7 @@ class AcrossTrialsTestData extends AbstractTestData {
 		list << createModifier('\\Demographics\\Sex\\Male\\', MODIFIER_MALE, 'L')
 
 		AcrossTrialsTestData result = new AcrossTrialsTestData()
-		result.modifierDimensions = list*.dimension
+		result.deXtrialNodes = list*.deXtrialNode
 		result.modifierMetadatas = list*.metadata
 
 		TableAccess tableAccess = ConceptTestData.createTableAccess(
@@ -143,12 +143,12 @@ class AcrossTrialsTestData extends AbstractTestData {
 		             visitInd : 'N' as char]
 
 		new DimensionAndMetadata(
-				dimension: new ModifierDimensionCoreDb(props),
+				deXtrialNode: new DeXtrialNode(props),
 				metadata: new ModifierMetadataCoreDb(props))
 	}
 
 	void saveAll() {
-		saveAll modifierDimensions, logger
+		saveAll deXtrialNodes, logger
 		saveAll modifierMetadatas, logger
 		conceptTestData.saveAll()
 		saveAll patients, logger
@@ -161,7 +161,7 @@ class AcrossTrialsTestData extends AbstractTestData {
 	}
 
 	private static class DimensionAndMetadata {
-		ModifierDimensionCoreDb dimension
+		DeXtrialNode deXtrialNode
 		ModifierMetadataCoreDb metadata
 	}
 }

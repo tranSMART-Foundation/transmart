@@ -29,7 +29,7 @@ import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.db.dataquery.clinical.variables.AcrossTrialsTerminalVariable
 import org.transmartproject.db.i2b2data.ObservationFact
 import org.transmartproject.db.i2b2data.PatientDimension
-import org.transmartproject.db.ontology.ModifierDimensionView
+import org.transmartproject.db.ontology.DeXtrialNodeView
 
 import static org.transmartproject.db.ontology.AbstractAcrossTrialsOntologyTerm.ACROSS_TRIALS_TOP_TERM_NAME
 import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
@@ -103,7 +103,7 @@ class AcrossTrialsDataQuery {
             }
         }
 
-        def res = ModifierDimensionView.withCriteria {
+        def res = DeXtrialNodeView.withCriteria {
             projections {
                 property 'path'
                 property 'code'
@@ -112,9 +112,9 @@ class AcrossTrialsDataQuery {
             'in' 'path', conceptPaths.keySet()
         }
 
-        for (modifier in res) {
-            String path = modifier[0]
-	    String code = modifier[1]
+        for (xtrialNode in res) {
+            String path = xtrialNode[0]
+	    String code = xtrialNode[1]
 	    conceptPaths[path].modifierCode = code
         }
 
