@@ -157,7 +157,7 @@ com.recomdata.appTitle = "tranSMART v" + org.transmart.originalConfigBinding.app
 // Currently, these are distribution with transmart,
 // so it can also point to that location copy.
 def tmurl       = new URL(transmartURL)
-com.recomdata.adminHelpURL = "$url.protocol://$url.host${url.port != -1 ? ":$url.port" : ''}/transmartmanual/"
+com.recomdata.adminHelpURL = "$tmurl.protocol://$tmurl.host${tmurl.port != -1 ? ":$tmurl.port" : ''}/transmartmanual/"
 
 environments { development {
     com.recomdata.bugreportURL = 'https://jira.transmartfoundation.org'
