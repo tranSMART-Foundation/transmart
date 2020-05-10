@@ -4,7 +4,7 @@ include ../makefile.inc
 # with RSERVE_USER defined as the user to run the server (e.g. tomcat8)
 
 R_MIRROR ?= http://cran.ma.imperial.ac.uk
-R_VERSION = 3.6.1
+R_VERSION = 4.0.0
 R_SOURCE = R-$(R_VERSION)
 R_PREFIX ?= $(realpath .)/root
 R_EXEC = $(R_PREFIX)/lib/R/bin/R
@@ -14,7 +14,7 @@ RSERVE_LOG ?= /var/log/tomcat8/rserve-transmart.log
 R_FLAGS ?= -O2 -march=native
 
 $(R_SOURCE):
-	curl -f $(R_MIRROR)/src/base/R-3/$@.tar.gz | $(TAR_COMMAND) xzf -
+	curl -f $(R_MIRROR)/src/base/R-4/$@.tar.gz | $(TAR_COMMAND) xzf -
 
 build/Makefile: $(R_SOURCE)
 	mkdir -p build && cd build && \
