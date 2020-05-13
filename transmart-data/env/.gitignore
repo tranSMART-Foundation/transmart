@@ -1,4 +1,5 @@
-/pdi-ce-4.4.0-stable.tar.gz
+/pdi-ce-*.tar.gz
+/pdi-ce-*.zip
 /tranSMART-ETL
 /data-integration
 /groovy
