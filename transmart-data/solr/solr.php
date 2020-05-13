@@ -68,7 +68,8 @@ do_start()
         #   2 if daemon could not be started
         start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
                 || return 1
-	touch ${SOLR_LOG} && chown ${SOLR_USER}:${SOLR_USER} ${SOLR_LOG}
+	touch ${SOLR_LOG}
+	chown ${SOLR_USER}:${SOLR_USER} ${SOLR_LOG}
         start-stop-daemon --start --user ${SOLR_USER} --quiet --pidfile $PIDFILE --chdir $SOLR_HOME --background --make-pidfile --exec $DAEMON >>$SOLR_LOG 2>&1 -- \
                 $DAEMON_ARGS \
                 || return 2
