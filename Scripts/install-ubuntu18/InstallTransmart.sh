@@ -14,10 +14,11 @@
 #
 # to run the install scripts
 #   cd $HOME
-#   ./transmart/Scripts/install-ubuntu18/InstallTransmart.sh
+#   cd transmart
+#   ./Scripts/install-ubuntu18/InstallTransmart.sh
 #
 # to run the checking scripts
-#   ./transmart/Scripts/install-ubuntu18/checks/checkAll.sh
+#   ./Scripts/install-ubuntu18/checks/checkAll.sh
 
 # on error; stop/exit
 set -e
@@ -370,9 +371,9 @@ sudo cp *.war /var/lib/tomcat8/webapps/
 cd ..
 
 rm -rf transmartmanual
-curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual.zip
-unzip transmart-manual.zip
-sudo mv transmartmanual /var/lib/tomcat8/webapps
+curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual-release-19.0.zip
+unzip transmart-manual-release-19.0.zip
+sudo mv transmart-manual-release-19.0 /var/lib/tomcat8/webapps/transmartmanual
 sudo chown -R tomcat8.tomcat8 /var/lib/tomcat8/webapps/transmartmanual
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
