@@ -77,8 +77,8 @@ begin
     end;
 
     if (coalesce(debugValue,'no')) then
-        raise NOTICE 'CZ_WRITE_AUDIT job:% function:%.% step: % "%" records:% status:% date:% elapsed:%',
-	      jobId, databaseName,procedureName, stepNumber, stepDesc, recordsManipulated, stepStatus, currTime, elapsedSecs;
+        raise NOTICE 'CZ_WRITE_AUDIT job:% function:%.% step: % records:%  status:%  date:%  elapsed:%        %',
+	      jobId, databaseName,procedureName, stepNumber, recordsManipulated, stepStatus, currTime, elapsedSecs, stepDesc;
     end if;
 	      
     return 1;
