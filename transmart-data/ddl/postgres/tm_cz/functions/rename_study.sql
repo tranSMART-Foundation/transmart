@@ -19,20 +19,16 @@ begin
     regex2 := '\\' || programname || '\\' || newtitle|| '\\' || '\1';
     
     update i2b2metadata.i2b2
-       set c_fullname=regexp_replace(c_fullname, regex1, regex2);
-    update i2b2metadata.i2b2
-       set c_dimcode=regexp_replace(c_dimcode, regex1, regex2);
-    update i2b2metadata.i2b2
-       set c_tooltip=regexp_replace(c_tooltip, regex1, regex2);
+       set c_fullname=regexp_replace(c_fullname, regex1, regex2),
+           c_dimcode=regexp_replace(c_dimcode, regex1, regex2),
+           c_tooltip=regexp_replace(c_tooltip, regex1, regex2);
     update i2b2metadata.i2b2
        set c_name=newTitle where c_fullname=newTopNode;
     
     update i2b2metadata.i2b2_secure
-       set c_fullname=regexp_replace(c_fullname, regex1, regex2);
-    update i2b2metadata.i2b2_secure
-       set c_dimcode=regexp_replace(c_dimcode, regex1, regex2);
-    update i2b2metadata.i2b2_secure
-       set c_tooltip=regexp_replace(c_tooltip, regex1, regex2);
+       set c_fullname=regexp_replace(c_fullname, regex1, regex2),
+           c_dimcode=regexp_replace(c_dimcode, regex1, regex2),
+           c_tooltip=regexp_replace(c_tooltip, regex1, regex2);
     update i2b2metadata.i2b2_secure
        set c_name=newTitle where c_fullname=newTopNode;
     

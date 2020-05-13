@@ -22,8 +22,17 @@ AS $$
 
     declare
 
+    oldPath		varchar(2000);
+    newPath		varchar(2000);
+    oldPathWild		varchar(2000);
     root_node		varchar(2000);
-    root_level	integer;
+    root_level		integer;
+
+    oldLevel		integer;
+    newLevel		integer;
+    oldStudyNode	varchar(2000);
+    newStudyNode	varchar(2000);
+    newParent		varchar(2000);
 
     --Audit variables
     newJobFlag		integer;
@@ -56,7 +65,36 @@ begin
 	select tm_cz.cz_start_audit (procedureName, databaseName) into jobId;
 	END IF;
 
-    select tm_cz.parse_nth_value(path, 2, '\') into root_node;
+    -- Fix possible missed backslashes in provided paths
+
+    oldPath := regexp_replace('\' || old_path || '\','(\\){2,}', '\', 'g');
+    newPath := regexp_replace('\' || new_path || '\','(\\){2,}', '\', 'g');
+
+    select length(oldPath)-length(replace(oldPath,'\','')) into oldLevel;
+    select length(newPath)-length(replace(newPath,'\','')) into newLevel;
+    select ltrim(substr(newPath, 1,instr(newPath, '\',-1,2))) into newParent;
+
+    if newLevel < 3 then
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'New path specified must contain at least 2 nodes',0,stepCt,'Msg');
+	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
+    if oldLevel < 3 then
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Old path specified must contain at least 2 nodes',0,stepCt,'Msg');
+	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
+
+    select tm_cz.parse_nth_value(oldPath, oldLevel, '\') into oldStudyNode;
+    select tm_cz.parse_nth_value(newPath, newLevel, '\') into newStudyNode;
+
+    oldPathWild := regexp_replace(oldPath, '_','`_') || '%';
+
+    select tm_cz.parse_nth_value(newPath, 2, '\') into root_node;
 
     select c_hlevel into root_level
       from i2b2metadata.table_access
@@ -64,29 +102,71 @@ begin
 
     if old_path != ''  or old_path != '%' or new_path != ''  or new_path != '%'
     then 
-
+	
 	--CONCEPT DIMENSION
+	select count(*) into rowCt from i2b2demodata.concept_dimension
+	where sourcesystem_cd = 'GSE34466';
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Count concept_dimension with sourcesystem_cd',rowCt,stepCt,'Done');
+
+	select count(*) into rowCt from i2b2demodata.concept_dimension
+	where concept_path like oldPathWild escape '`';
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Count concept_dimension with old path',rowCt,stepCt,'Done');
+
+	select count(*) into rowCt from i2b2demodata.concept_dimension
+	where concept_path like oldPathWild escape '`';
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Count concept_dimension with new path',rowCt,stepCt,'Done');
+
 	update i2b2demodata.concept_dimension
-	set CONCEPT_PATH = replace(concept_path, old_path, new_path)
-	where concept_path like old_path || '%';
+	set concept_path = replace(concept_path, oldPath, newPath)
+	where concept_path like oldPathWild escape '`';
 	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',rowCt,stepCt,'Done');
 
+	update i2b2demodata.concept_dimension
+	   set name_char=newStudyNode where concept_path=newPath;
+	get diagnostics rowCt := ROW_COUNT;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension name for new study path',rowCt,stepCt,'Done');
 
 
 
 
 	--I2B2
 	update i2b2metadata.i2b2
-	   set c_fullname = replace(c_fullname, old_path, new_path)
-	       ,c_dimcode = replace(c_fullname, old_path, new_path)
-	       ,c_tooltip = replace(c_fullname, old_path, new_path)
-	       ,c_hlevel =  (length(replace(c_fullname, old_path, new_path)) - COALESCE(length(replace(replace(c_fullname, old_path, new_path), '\')),0)) / length('\') - 2 + root_level
-	 where c_fullname like old_path || '%';
+	   set c_fullname = replace(c_fullname, oldPath, newPath)
+	       ,c_dimcode = replace(c_fullname, oldPath, newPath)
+	       ,c_tooltip = replace(c_fullname, oldPath, newPath)
+	       ,c_hlevel =  (length(replace(c_fullname, oldPath, newPath)) - COALESCE(length(replace(replace(c_fullname, oldPath, newPath), '\','')),0)) / length('\') - 2 + root_level
+	 where c_fullname like oldPathWild escape '`';
 	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',rowCt,stepCt,'Done');
+
+	update i2b2metadata.i2b2
+	   set c_name=newStudyNode where c_fullname=newPath;
+	get diagnostics rowCt := ROW_COUNT;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 name for new study node',rowCt,stepCt,'Done');
+
+	update i2b2metadata.i2b2_secure
+	   set c_fullname = replace(c_fullname, oldPath, newPath)
+	       ,c_dimcode = replace(c_fullname, oldPath, newPath)
+	       ,c_tooltip = replace(c_fullname, oldPath, newPath)
+	       ,c_hlevel =  (length(replace(c_fullname, oldPath, newPath)) - COALESCE(length(replace(replace(c_fullname, oldPath, newPath), '\','')),0)) / length('\') - 2 + root_level
+	 where c_fullname like oldPathWild escape '`';
+	get diagnostics rowCt := ROW_COUNT;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2_secure with new path',rowCt,stepCt,'Done');
+
+	update i2b2metadata.i2b2
+	   set c_name=newStudyNode where c_fullname=newPath;
+	get diagnostics rowCt := ROW_COUNT;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2_secure name for new study node',rowCt,stepCt,'Done');
 
 
 
@@ -94,22 +174,35 @@ begin
 	--	concept_counts
 
 	update i2b2demodata.concept_counts
-	   set concept_path = replace(concept_path, old_path, new_path)
-	       ,parent_concept_path = replace(parent_concept_path, old_path, new_path)
-	 where concept_path like old_path || '%';
+	   set concept_path = replace(concept_path, oldPath, newPath)
+	       ,parent_concept_path = replace(parent_concept_path, oldPath, newPath)
+	 where concept_path like oldPathWild escape '`';
+	get diagnostics rowCt := ROW_COUNT;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_counts with new path',rowCt,stepCt,'Done');
+	update i2b2demodata.concept_counts
+	   set parent_concept_path = newParent
+	 where concept_path = newPath;
+	get diagnostics rowCt := ROW_COUNT;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_counts study parent',rowCt,stepCt,'Done');
 
+
+	-- No other concept_counts update needed for the study node
+				     
 	--	fill in any upper levels
 
-	select i2b2_fill_in_tree(null, new_path, jobID) into rtnCd;
+	select i2b2_fill_in_tree(null, newPath, jobID) into rtnCd;
 	if(rtnCd <> 1) then
-	    tText := 'Failed to fill in tree '|| new_path;
+	    tText := 'Failed to fill in tree '|| newPath;
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
 	end if;
-end if;
-
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Fill in upper levels of tree for new path',0,stepCt,'Done');
+    end if;
 
 
 
