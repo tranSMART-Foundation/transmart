@@ -196,6 +196,12 @@ make -C env groovy
 echo "make -C env groovy - finished at $(date)"
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
+./checkJava.sh
+if [ "$( checkInstallError "java not installed correctly; install" )" ] ;
+then sudo apt-get install openjdk-8-jdk openjdk-8-jre   ;
+fi
+
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkGroovy.sh
 if [ "$( checkInstallError "groovy not installed correctly; redo install" )" ] ; then exit -1; fi
 
