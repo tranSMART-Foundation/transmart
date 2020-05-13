@@ -1,20 +1,20 @@
 #!/bin/bash
 
-# ******************************************************************************
+# **********************************************************************************
 # This script checks for and reports missing items in the in the context
 # of PostgreSQL - are PostgreSQL and psql installed; is PostgreSQL running;
 # does psql respond to queries; has the transmart user loging table been loaded;
-# are the admin and guest accounts established; has the GSP8581 database been loaded
-# ******************************************************************************
+# are the admin and guest accounts established; has the GSE8581 database been loaded
+# **********************************************************************************
 
 # # ------------------ helper function -------------------
 . ./basicsHelper.sh
 
-echo "-------------------------------------"
-echo "|  Checking for PostgreSQL basics: "
-echo "|    are PostgreSQL and psql installed; "
-echo "|   is PostgreSQL running."
-echo "-------------------------------------"
+echo "---------------------------------------"
+echo "|  Checking for PostgreSQL basics:"
+echo "|    are PostgreSQL and psql installed;"
+echo "|    is PostgreSQL running."
+echo "---------------------------------------"
 
 echo "checking to see if PostgreSQL has been installed"
 if ! checkForCommandLineTool "psql"; then

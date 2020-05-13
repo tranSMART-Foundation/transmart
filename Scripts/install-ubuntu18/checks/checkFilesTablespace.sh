@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# ********************************************************************************
+# **********************************************************************************
 # This script checks for and reports missing files and directories that are required
 # for the tranSMART install and data loading
 # this is a preliminary check; see checkFilesPsql.sh for full check
-# ********************************************************************************
+# **********************************************************************************
 
 function checkForPostgresTablespaceFolder {
 

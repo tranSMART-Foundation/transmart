@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# ********************************************************************************
+# ******************************************************************************
 # This script checks for and reports incompatible version numbers in the 
 # linux command lines that are needed for the tranSMART install and data loading
-# ********************************************************************************
+# ******************************************************************************
 
 function checkURL {
     curl -s -o "/dev/null" $1

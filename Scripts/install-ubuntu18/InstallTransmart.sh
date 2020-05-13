@@ -177,6 +177,7 @@ cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesVars.sh
 if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
 
+cd $INSTALL_BASE/transmart-data
 # source the vars file to set the path for groovy below
 . ./vars
 
@@ -196,16 +197,18 @@ make -C env groovy
 echo "make -C env groovy - finished at $(date)"
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
-./checkJava.sh
-if [ "$( checkInstallError "java not installed correctly; install" )" ] ;
-then sudo apt-get install openjdk-8-jdk openjdk-8-jre   ;
-fi
-
-cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkGroovy.sh
 if [ "$( checkInstallError "groovy not installed correctly; redo install" )" ] ; then exit -1; fi
 
 echo "Finished install of groovy at $(date)"
+
+set +e
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
+./checkJava.sh
+if [ "$( checkInstallError "java not installed correctly; install" )" ] ;
+then sudo apt-get -q install -y openjdk-8-jdk openjdk-8-jre   ;
+fi
+set -e
 
 echo "++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+  Checks on install of tools and dependencies"
