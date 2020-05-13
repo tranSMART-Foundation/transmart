@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "$SCRIPTS_BASE" ] ; then SCRIPTS_BASE="$HOME" ; fi
+if [ -z "$SCRIPTS_BASE" ] ; then SCRIPTS_BASE="$HOME/transmart" ; fi
 
 echo "Starting at $(date)"
 echo "++++++++++++++++++++++++++++"
