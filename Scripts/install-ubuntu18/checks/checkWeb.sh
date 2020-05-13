@@ -21,17 +21,18 @@ function checkURL {
     return 0	
 }
 
-# ---------------------------
+# ----------------------------------------------------
 # Check to see that the expected web sites are running
-# ---------------------------
+# ----------------------------------------------------
 
-echo "-------------------------------------"
+echo "-------------------------------------------------------"
 echo "|  Check to see that the expected web sites are running"
-echo "-------------------------------------"
+echo "-------------------------------------------------------"
 
 solrUrl="http://localhost:8983/solr/#/"
 gwavaUrl="http://localhost:8080/gwava/"
 transmartUrl="http://localhost:8080/transmart"
+manualUrl="http://localhost:8080/transmartmanual"
 
 checkURL $solrUrl
 solrResults=$?
@@ -41,6 +42,9 @@ gwavaResults=$?
 
 checkURL $transmartUrl
 transmartResults=$?
+
+checkURL $manualUrl
+manualResults=$?
 
 exitResults=0
 if [ $solrResults -ne 0 ]; then
@@ -62,6 +66,13 @@ if [ $transmartResults -ne 0 ]; then
 	exitResults=1
 else
 	echo "The tranSMART web site ($transmartUrl) is running"
+fi
+
+if [ $manualResults -ne 0 ]; then
+	echo "The tranSMART manual web pages (expected at $manualUrl) are not available; see detailed instructions to install them"
+	exitResults=1
+else
+	echo "The tranSMART manual web pages are available"
 fi
 
 probe=$(curl -L $transmartUrl | grep "title" | grep "Transmart")
