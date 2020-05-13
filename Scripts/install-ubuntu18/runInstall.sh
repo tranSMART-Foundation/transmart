@@ -10,10 +10,7 @@ SCRIPTS_BASE="$INSTALL_BASE"
 
 export INSTALL_BASE SCRIPTS_BASE
 
-mkdir -p "$INSTALL_BASE"
-mkdir -p "$SCRIPTS_BASE"
-
-cd "$SCRIPTS_BASE"
+cd "$HOME"
 git clone https://github.com/tranSMART-Foundation/transmart.git
 cd transmart/Scripts
 git checkout release-19.0
