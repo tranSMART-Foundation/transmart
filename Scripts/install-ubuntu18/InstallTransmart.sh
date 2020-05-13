@@ -399,6 +399,10 @@ cd $INSTALL_BASE/transmart-data
 sudo -v
 source ./vars
 
+# load the new services for solr and rserve
+sudo systemctl daemon-reload
+
+sudo systemctl enable solr
 sudo systemctl start solr
 echo "Sleeping - waiting for SOLR to start (2 minutes)"
 sleep 2m
@@ -409,9 +413,6 @@ echo "++++++++++++++++++++++++++++"
 echo "+  start Rserve"
 echo "++++++++++++++++++++++++++++"
 
-# the (commented out) service command is the correct way to do this
-# and unfortunately, this does not work either.
-#  (TODO)  Should check to see if it is already running
 sudo -v
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18
 # rserve runs as user tomcat8
@@ -419,6 +420,7 @@ cd $SCRIPTS_BASE/Scripts/install-ubuntu18
 # service started using /etc/init.d/rserve
 # which take users from sourcing /etc/default/rserve
 # and writes to 
+sudo systemctl enable rserve
 sudo systemctl start rserve
 echo "Finished starting RServe at $(date)"
 
@@ -427,7 +429,7 @@ echo "+  start Tomcat"
 echo "++++++++++++++++++++++++++++"
 
 #  (TODO)  Should check to see if it is already running
-sudo ssystemctl restart tomcat8
+sudo systemctl restart tomcat8
 echo "Finished starting Tomcat8 at $(date)"
 echo "Sleeping - waiting for tomcat/transmart to start (3 minutes)"
 sleep 3m
