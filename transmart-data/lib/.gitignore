@@ -2,3 +2,4 @@
 /postgresql-*.jar
 /xdb.jar
 /netty-*.jar
+/schemaSpy*.jar
