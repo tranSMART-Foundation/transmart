@@ -367,6 +367,13 @@ if ! [ -e gwava.war ]; then
 #    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/gwava.war --output gwava.war
 fi
 sudo cp *.war /var/lib/tomcat8/webapps/
+cd ..
+
+rm -rf transmartmanual
+curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual.zip
+unzip transmart-manual.zip
+sudo mv transmartmanual /var/lib/tomcat8/webapps
+sudo chown -R tomcat8.tomcat8 /var/lib/tomcat8/webapps/transmartmanual
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 sudo ./checkFilesTomcatWar.sh
