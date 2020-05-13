@@ -2,14 +2,14 @@
 -- The strategy for permissions will be:
 -- – Assign all permissions to the owner.
 -- – If a table owner does not match the schema name, assign all permissions
---   the role with the same name as the schema.
+--     to the role with the same name as the schema.
 -- – Assign all permissions on all objects to tm_cz, which even needs to
---   drop and create tables in some cases.
+--     drop and create tables in some cases.
 -- — Assign read/usage permissions on all tables, views, sequences and
---   functions to biomart_user on all non-ETL schemas.
+--     functions to biomart_user on all non-ETL schemas.
 -- – Assign insert,delete,update permissions on all tables on searchapp.
 -- – Assign insert,delete,update permissions on a manually defined set of
---   tables to biomart_user, as required by the tranSMART application.
+--    tables to biomart_user, as required by the tranSMART application.
 -- – Assign misc permissions.
 
 -- {{{ assign_permissions_1
