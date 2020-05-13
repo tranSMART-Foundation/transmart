@@ -61,7 +61,7 @@ KETTLE_JOBS_ORA=/path/to/transmart-etl/Kettle/oracle/Kettle-ETL/
 
 KITCHEN=/path/to/data-integration/kitchen.sh
 
-R_JOBS_PSQL=/path/to/tranSMART-ETL/Kettle/postgres/R/
+R_JOBS_PSQL=/path/to/transmart-etl/Kettle/postgres/R/
 
 KETTLE_JOBS=$KETTLE_JOBS_PSQL
 
