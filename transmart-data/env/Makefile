@@ -127,6 +127,9 @@ update_etl:
 update_etl_git:
 	curl -L -f "http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-etl-release-19.0.zip" > transmart-etl-release-19.0.zip
 	unzip -u transmart-etl-release-19.0.zip
+	rm -rf transmart-etl
+	mv transmart-etl-release-19.0 transmart-etl
+
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 
 KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip 
