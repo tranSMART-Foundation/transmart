@@ -141,7 +141,11 @@ echo "+++++++++++++++++++++++++++++++++++++++"
 # (1)
 sudo -v
 cd $INSTALL_BASE/transmart-data
-make -C env update_etl_git
+
+if ! [ -d "$INSTALL_BASE/transmart-data/env/transmart-etl" ] ; then
+    make -C env update_etl_git
+fi
+     
 # verify ETL folder
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesETLFolder.sh
@@ -383,6 +387,7 @@ cd ..
 rm -rf transmartmanual
 curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual-release-19.0.zip
 unzip transmart-manual-release-19.0.zip
+sudo rm -rf /var/lib/tomcat8/webapps/transmartmanual
 sudo mv transmart-manual-release-19.0 /var/lib/tomcat8/webapps/transmartmanual
 sudo chown -R tomcat8.tomcat8 /var/lib/tomcat8/webapps/transmartmanual
 
@@ -417,10 +422,8 @@ echo "++++++++++++++++++++++++++++"
 sudo -v
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18
 # rserve runs as user tomcat8
-# defined in /etc/default/rserve
-# service started using /etc/init.d/rserve
-# which take users from sourcing /etc/default/rserve
-# and writes to 
+# service started using /etc/systemd/system/rserve.service
+# and writes to /var/log/tomcat8/rserve-transmart.log
 sudo systemctl enable rserve
 sudo systemctl start rserve
 echo "Finished starting RServe at $(date)"
