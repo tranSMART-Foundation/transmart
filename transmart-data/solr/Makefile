@@ -101,6 +101,14 @@ install_solr_init: /etc/init.d/solr
 		solr.php > $@
 	chmod +x '$@'
 
+install_solr_unit: /etc/systemd/system/solr.service
+/etc/systemd/system/solr.service: $(SOLR_LOG)
+	SOLR_PREFIX='$(SOLR_PREFIX)' SOLR_LOG="file:$(SOLR_LOG)" \
+		SOLR_USER=$(SOLR_USER) php \
+		-d variables_order=E -d open_basedir=/ solr.service.php > $@
+	systemctl daemon-reload
+
+
 clean:
 	rm -rf $(EXAMPLE_FILES) $(ROOT_FILES) solr solr-$(SOLR_VERSION).tgz
 
