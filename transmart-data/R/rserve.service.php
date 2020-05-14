@@ -1,7 +1,8 @@
 <?php
-$u = $_ENV['TRANSMART_USER'];
+$u = $_ENV['RSERVE_USER'];
 $r = "$_ENV[R_PREFIX]/bin/R";
 $c = $_ENV['RSERVE_CONF'];
+$l = $_ENV['RSERVE_LOG'];
 ?>
 [Unit]
 Description=Rserve (TCP/IP server for running R expressions)
@@ -13,7 +14,7 @@ User=<?= $u, "\n" ?>
 TimeoutSec=15s
 Restart=always
 Nice=19
-StandardOutput=null
+StandardOutput=<?= $l, "\n" ?>
 # test this for production:
 #ReadOnlyDirectories=/
 #ReadWriteDirectories=/var/cache/jobs

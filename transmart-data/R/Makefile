@@ -8,8 +8,9 @@ R_VERSION = 4.0.0
 R_SOURCE = R-$(R_VERSION)
 R_PREFIX ?= $(realpath .)/root
 R_EXEC = $(R_PREFIX)/lib/R/bin/R
+RSERVE_USER ?= tomcat8
 RSERVE_CONF ?= $(realpath .)/Rserv_nodaemon.conf
-RSERVE_LOG ?= /var/log/tomcat8/rserve-transmart.log
+RSERVE_LOG ?= /var/log/${RSERVE_USER}/rserve-transmart.log
 
 R_FLAGS ?= -O2 -march=native
 
@@ -85,7 +86,7 @@ install_rserve_upstart: /etc/init/rserve.conf
 
 install_rserve_unit: /etc/systemd/system/rserve.service
 /etc/systemd/system/rserve.service: $(RSERVE_CONF)
-	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) RSERVE_LOG=$(RSERVE_LOG) \
+	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) RSERVE_LOG="file:$(RSERVE_LOG)" \
 		RSERVE_USER=$(RSERVE_USER) php \
 		-d variables_order=E -d open_basedir=/ rserve.service.php > $@
 	systemctl daemon-reload
