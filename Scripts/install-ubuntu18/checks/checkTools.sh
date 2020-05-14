@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# ********************************************************************************
+# ****************************************************************
 # This script to see that the required tool processes are running:
 # SOLR, tomcat, Rserve
-# ********************************************************************************
+# ****************************************************************
 
-echo "-------------------------------------"
+echo "---------------------------------------------------------"
 echo "|  Checking that the required tool processes are running:"
 echo "|  SOLR, tomcat, Rserve"
-echo "-------------------------------------"
+echo "---------------------------------------------------------"
 
 solrRunning=$(ps aux | grep "start.jar" | grep "java")
 tomcatRunning=$(ps aux | grep "tomcat" | grep "catalina")
@@ -17,10 +17,8 @@ rserveRunning=$(ps aux | grep "Rserve" | grep "R/root")
 exitReturn=0
 if [ -z "$solrRunning" ]; then 
 	echo "The SOLR process does not appear to be running; start it"
-	echo "  with the commands:"
-	echo "  cd ~/transmart/transmart-data"
-    echo "  . ./vars"
-    echo "  make -C solr start > ~/transmart/transmart-data/solr.log 2>&1 &"
+	echo "  with the command:"
+	echo "  sudo systemctl start solr"
 	exitReturn=1
 else 
 	echo "The SOLR process is running"
@@ -28,7 +26,7 @@ fi
 
 if [ -z "$tomcatRunning" ]; then 
 	echo "The tomcat8 process does not appear to be running; start it"
-	echo "  with the command: sudo service tomcat8 restart"
+	echo "  with the command: sudo systemctl restart tomcat8"
 	exitReturn=1
 else 
 	echo "The tomcat8 process is running"
@@ -36,9 +34,8 @@ fi
 
 if [ -z "$rserveRunning" ]; then 
 	echo "The Rserve process does not appear to be running; start it"
-	echo "  with the commands:"
-	echo "    cd ~/transmart/transmart-data"
-	echo "    sudo -u tomcat8 bash -c 'source vars; make -C R start_Rserve' "
+	echo "  with the command:"
+	echo "    sudo systemctl start rserve"
 	exitReturn=1
 else 
 	echo "The Rserve process is running"

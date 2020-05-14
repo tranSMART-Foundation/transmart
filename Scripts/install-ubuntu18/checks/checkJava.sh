@@ -8,15 +8,13 @@
 # # ------------------ helper function -------------------
 . ./basicsHelper.sh
 
-echo "--------------------------------------------------------------------"
-echo "|  Checking for basic command-line tools; that are installed by make"
-echo "|  if any of the following does not exist,"
-echo "|  then recheck the instructions for installing the missing items;"
-echo "|  also ref: installTransmart.sh,'Install of basic tools'"
-echo "--------------------------------------------------------------------"
+echo "---------------------------------------------------------------------------------"
+echo "|  Checking for basic command-line tools; if any of the following does not exist,"
+echo "|  then recheck the instructions for installing the missing items"
+echo "---------------------------------------------------------------------------------"
 
 probe=0
-for command in git make java tar rsync php g++ gfortran
+for command in java javac
 do
     if ! checkForCommandLineTool "$command"; then
         probe=1

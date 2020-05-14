@@ -14,10 +14,11 @@
 #
 # to run the install scripts
 #   cd $HOME
-#   ./transmart/Scripts/install-ubuntu18/InstallTransmart.sh
+#   cd transmart
+#   ./Scripts/install-ubuntu18/InstallTransmart.sh
 #
 # to run the checking scripts
-#   ./transmart/Scripts/install-ubuntu18/checks/checkAll.sh
+#   ./Scripts/install-ubuntu18/checks/checkAll.sh
 
 # on error; stop/exit
 set -e
@@ -176,6 +177,7 @@ cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesVars.sh
 if [ "$( checkInstallError "vars file (transmart-data/vars) not set up properly; redo install" )" ] ; then exit -1; fi
 
+cd $INSTALL_BASE/transmart-data
 # source the vars file to set the path for groovy below
 . ./vars
 
@@ -199,6 +201,14 @@ cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 if [ "$( checkInstallError "groovy not installed correctly; redo install" )" ] ; then exit -1; fi
 
 echo "Finished install of groovy at $(date)"
+
+set +e
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
+./checkJava.sh
+if [ "$( checkInstallError "java not installed correctly; install" )" ] ;
+then sudo apt-get -q install -y openjdk-8-jdk openjdk-8-jre   ;
+fi
+set -e
 
 echo "++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+  Checks on install of tools and dependencies"
@@ -370,9 +380,9 @@ sudo cp *.war /var/lib/tomcat8/webapps/
 cd ..
 
 rm -rf transmartmanual
-curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual.zip
-unzip transmart-manual.zip
-sudo mv transmartmanual /var/lib/tomcat8/webapps
+curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual-release-19.0.zip
+unzip transmart-manual-release-19.0.zip
+sudo mv transmart-manual-release-19.0 /var/lib/tomcat8/webapps/transmartmanual
 sudo chown -R tomcat8.tomcat8 /var/lib/tomcat8/webapps/transmartmanual
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
@@ -389,6 +399,10 @@ cd $INSTALL_BASE/transmart-data
 sudo -v
 source ./vars
 
+# load the new services for solr and rserve
+sudo systemctl daemon-reload
+
+sudo systemctl enable solr
 sudo systemctl start solr
 echo "Sleeping - waiting for SOLR to start (2 minutes)"
 sleep 2m
@@ -399,9 +413,6 @@ echo "++++++++++++++++++++++++++++"
 echo "+  start Rserve"
 echo "++++++++++++++++++++++++++++"
 
-# the (commented out) service command is the correct way to do this
-# and unfortunately, this does not work either.
-#  (TODO)  Should check to see if it is already running
 sudo -v
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18
 # rserve runs as user tomcat8
@@ -409,6 +420,7 @@ cd $SCRIPTS_BASE/Scripts/install-ubuntu18
 # service started using /etc/init.d/rserve
 # which take users from sourcing /etc/default/rserve
 # and writes to 
+sudo systemctl enable rserve
 sudo systemctl start rserve
 echo "Finished starting RServe at $(date)"
 
@@ -417,7 +429,7 @@ echo "+  start Tomcat"
 echo "++++++++++++++++++++++++++++"
 
 #  (TODO)  Should check to see if it is already running
-sudo ssystemctl restart tomcat8
+sudo systemctl restart tomcat8
 echo "Finished starting Tomcat8 at $(date)"
 echo "Sleeping - waiting for tomcat/transmart to start (3 minutes)"
 sleep 3m

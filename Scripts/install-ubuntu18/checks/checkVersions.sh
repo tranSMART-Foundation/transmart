@@ -12,11 +12,11 @@
 # Check the version of those command line element that need specific versions
 # ---------------------------
 
-echo "-------------------------------------"
+echo "-----------------------------------------------------------------"
 echo "|  Checking for incompatible version of basic command-line tools;"
-echo "|  If any problems are reported, then recheck the instructions, "
+echo "|  If any problems are reported, then recheck the instructions,"
 echo "|  and install or re-installing the missing items"
-echo "-------------------------------------"
+echo "-----------------------------------------------------------------"
 
 returnFlag=0
 # check java version, 1.8 or higher

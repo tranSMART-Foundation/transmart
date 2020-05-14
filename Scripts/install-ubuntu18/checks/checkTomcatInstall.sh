@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# ********************************************************************************
-# This script checks for tomcat and modes to tomcat configuration
-# ********************************************************************************
+# **************************************************************
+# This script checks for tomcat and mods to tomcat configuration
+# **************************************************************
 
-echo "-------------------------------------"
+echo "------------------------------------------------------------------------"
 echo "|  Checking for tomcat install and modifications to tomcat configuration"
-echo "-------------------------------------"
+echo "------------------------------------------------------------------------"
 
 if ! [ -e /etc/default/tomcat8 ] ; then
     echo "It appears that tomcat is not installed"
@@ -31,7 +31,8 @@ if ! [ $results ] ; then
     exit 1
 fi
 
+echo "-----------------------------------------"
 echo "|  tomcat install and configuration is ok"
-echo "-------------------------------------"
+echo "-----------------------------------------"
 
 exit 0

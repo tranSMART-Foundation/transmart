@@ -5,9 +5,9 @@
 # for the tranSMART install and data loading
 # ********************************************************************************
 
-echo "-------------------------------------"
+echo "------------------------------------------------------------"
 echo "|  Checking for required files and folders from basic set up"
-echo "-------------------------------------"
+echo "------------------------------------------------------------"
 
 base="$INSTALL_BASE/transmart-data"
 baseEnv="$base/env"
@@ -39,7 +39,7 @@ done
 
 if [ 0 = $returnValue ] ; then
 	echo "|  ALL Required files and folders from basic set up are present"
-	echo "-------------------------------------"
+	echo "---------------------------------------------------------------"
 fi
 
 exit $returnValue

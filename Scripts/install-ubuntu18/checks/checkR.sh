@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# ******************************************************************************
+# ********************************************************************
 # This script checks for and reports missing items in the context of R
-# ******************************************************************************
+# ********************************************************************
 
 # # ------------------ helper function -------------------
 . ./versionCompare.sh
@@ -10,11 +10,11 @@
 base="$INSTALL_BASE/transmart-data"
 pathForRBin="$base/R/root/bin"
 
-echo "-------------------------------------"
+echo "--------------------------------------------------------------"
 echo "|  Checking for basics and packages required by R;"
 echo "|    if anything is reproted as missing, then recheck"
 echo "|    the detailed instructions to installing the missing items"
-echo "-------------------------------------"
+echo "--------------------------------------------------------------"
 
 echo "Checking for R bin on path"
 pathToExecutable=$(which R)

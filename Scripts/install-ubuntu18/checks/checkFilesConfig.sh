@@ -5,9 +5,9 @@
 # for the tranSMART install and data loading
 # ********************************************************************************
 
-echo "-------------------------------------"
+echo "-------------------------------------------------------------"
 echo "|  Checking for required transmart/grails configuration files"
-echo "-------------------------------------"
+echo "-------------------------------------------------------------"
 
 baseConfig="/var/lib/tomcat8/.grails/transmartConfig"
 
