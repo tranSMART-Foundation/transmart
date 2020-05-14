@@ -281,7 +281,7 @@ source /etc/profile.d/Rpath.sh
 sudo -v
 cd $INSTALL_BASE/transmart-data
 source ./vars
-sudo TABLESPACES=$TABLESPACES RSERVE_USER="tomcat8" make -C R install_rserve_init
+sudo TABLESPACES=$TABLESPACES RSERVE_USER="tomcat8" make -C R install_rserve_unit
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesR.sh
@@ -298,6 +298,7 @@ echo "++++++++++++++++++++++++++++++++++++++++++++++++++++"
 # only load database if not already loaded
 set +e
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
+sudo -u postgres psql -c "drop role if exists transmartadmin"
 sudo -u postgres psql -c "create role transmartadmin superuser createdb createrole login password 'transmart'"
 ./checkPsqlDataLoad.sh quiet
 returnCode=$?
@@ -330,7 +331,7 @@ source ./vars
 make -C solr solr
 
 # create solr service
-sudo TABLESPACES=$TABLESPACES SOLR_USER="$USER" make -C solr install_solr_init
+sudo TABLESPACES=$TABLESPACES SOLR_USER="$USER" make -C solr install_solr_unit
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesSolr.sh
