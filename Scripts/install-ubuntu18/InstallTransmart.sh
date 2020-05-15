@@ -333,6 +333,8 @@ source ./vars
 
 # install solr
 make -C solr solr
+# create solr core targets
+make -C solr solr_home
 
 # create solr service
 sudo TABLESPACES=$TABLESPACES SOLR_USER="$USER" make -C solr install_solr_unit
@@ -384,7 +386,7 @@ fi
 sudo cp *.war /var/lib/tomcat8/webapps/
 cd ..
 
-rm -rf transmartmanual
+rm -rf transmart-manual-release-19.0
 curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual-release-19.0.zip
 unzip transmart-manual-release-19.0.zip
 sudo rm -rf /var/lib/tomcat8/webapps/transmartmanual
