@@ -124,11 +124,12 @@ update_repos = if [ ! -d $(1) ]; then \
 update_etl:
 	echo "for release build transmart-etl is not automatically updated from git, because it is assumed to be already loaded from a zip file"
 
-update_etl_git:
+update_etl_git: transmart-etl-release-19.0.zip
+	test -d transmart-etl || unzip -u transmart-etl-release-19.0.zip
+	test -d transmart-etl || mv transmart-etl-release-19.0 transmart-etl
+
+transmart-etl-release-19.0.zip:
 	curl -L -f "http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-etl-release-19.0.zip" > transmart-etl-release-19.0.zip
-	unzip -u transmart-etl-release-19.0.zip
-	rm -rf transmart-etl
-	mv transmart-etl-release-19.0 transmart-etl
 
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 
