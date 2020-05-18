@@ -341,9 +341,9 @@ sudo TABLESPACES=$TABLESPACES SOLR_USER="$USER" make -C solr install_solr_unit
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkFilesSolr.sh
-if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "solR install failed; redo install" )" ] ; then exit -1; fi
 ./checkR.sh
-if [ "$( checkInstallError "R install failed; redo install" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "solR install failed; redo install" )" ] ; then exit -1; fi
 echo "Finished installing solr and solr service at $(date)"
 
 echo "++++++++++++++++++++++++++++"
