@@ -22,7 +22,7 @@ returnFlag=0
 # check java version, 1.8 or higher
 desiredjavaVersion="1.8"
 javaVersion=$(java -version 2>&1 | awk -F '"' '{print $2}')
-reportCheckOrHigher "java" $desiredjavaVersion $javaVersion
+reportCheckExactAny "java" $desiredjavaVersion $javaVersion
 
 let "returnFlag=$returnFlag + $?"
 

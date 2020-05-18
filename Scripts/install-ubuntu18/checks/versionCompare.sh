@@ -14,6 +14,7 @@ function vercomp () {
     fi
     local IFS=.
     local i ver1=($1) ver2=($2)
+    local j=${#ver1[@]}
     # fill empty fields in ver1 with zeros
     for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
     do
@@ -21,6 +22,10 @@ function vercomp () {
     done
     for ((i=0; i<${#ver1[@]}; i++))
     do
+	if (( i >= j ))
+	then
+	    return 1
+	fi
         if [[ -z ${ver2[i]} ]]
         then
             # fill empty fields in ver2 with zeros
@@ -28,11 +33,11 @@ function vercomp () {
         fi
         if ((10#${ver1[i]} > 10#${ver2[i]}))
         then
-            return 1
+            return 2
         fi
         if ((10#${ver1[i]} < 10#${ver2[i]}))
         then
-            return 2
+            return 3
         fi
     done
     return 0
@@ -49,10 +54,10 @@ function reportCheckOrHigher () {
     type=$1
     desiredVersion=$2
     givenVersion=$3
-	check $desiredVersion $givenVersion
+    check $desiredVersion $givenVersion
     versionTest=$?
-	okFlag=0
-    if [ "$versionTest" -eq 2 ] || [ "$versionTest" -eq 0 ]; then
+    okFlag=0
+    if [ "$versionTest" != 2 ]; then
         echo "The $type version, $givenVersion, is good!"
     else 
         echo "Expected $type version $desiredVersion or higher; currently $givenVersion; needs to be upgraded."
@@ -65,12 +70,31 @@ function reportCheckExact () {
     type=$1
     desiredVersion=$2
     givenVersion=$3
-	check $desiredVersion $givenVersion
+    check $desiredVersion $givenVersion
     versionTest=$?
-	okFlag=0
+    okFlag=0
     if [ "$versionTest" -eq 0 ]; then
         echo "The $type version, $givenVersion, is good!"
-    elif [ "$versionTest" -eq 2 ]; then
+    elif [ "$versionTest" -eq 3 ]; then
+        echo "Expected $type version $desiredVersion exactly; currently $givenVersion; needs to be downgraded."
+		okFlag=1
+    else
+        echo "Expected $type version $desiredVersion exactly; currently $givenVersion; needs to be upgraded."
+        okFlag=1
+    fi
+    return $okFlag
+}
+
+function reportCheckExactAny () {
+    type=$1
+    desiredVersion=$2
+    givenVersion=$3
+    check $desiredVersion $givenVersion
+    versionTest=$?
+    okFlag=0
+    if [ "$versionTest" -eq 0 ] || [ "$versionTest" -eq 1 ]; then
+        echo "The $type version, $givenVersion, is good!"
+    elif [ "$versionTest" -eq 3 ]; then
         echo "Expected $type version $desiredVersion exactly; currently $givenVersion; needs to be downgraded."
 		okFlag=1
     else
