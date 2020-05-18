@@ -89,6 +89,19 @@ cd $INSTALL_BASE
 sudo -v
 sudo apt-get -q install -y curl
 sudo apt-get -q install -y unzip
+
+echo "+++++++++++++++++++++++++++++"
+echo " checking java 8 is installed"
+echo "+++++++++++++++++++++++++++++"
+
+set +e
+cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
+./checkJava.sh
+if [ "$( checkInstallError "java not installed correctly; install" )" ] ;
+then sudo apt-get -q install -y openjdk-8-jdk openjdk-8-jre   ;
+fi
+set -e
+
 if ! [ -e transmart-data-release-19.0.zip ] ; then
     curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
 #    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
@@ -98,7 +111,7 @@ if ! [ -e transmart-data ] ; then
 	mv transmart-data-release-19.0 transmart-data
 fi
 
-echo "Finished setting up the transmart-date folder at $(date)"
+echo "Finished setting up the transmart-data folder at $(date)"
 
 echo "++++++++++++++++++++++++++++++++++++++++++"
 echo "+  Install of basic tools and dependencies"
@@ -114,8 +127,7 @@ sudo make -C env install_ubuntu_packages18
 sudo make -C env install_ubuntu_packages
 # verify these packages
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
-./checkMakefilePackages.sh
-if [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
+./checkMakefilePackages.sh [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
 echo "sudo make -C env install_ubuntu_packages - finished at $(date)"
 
 # (2)
@@ -205,14 +217,6 @@ cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 if [ "$( checkInstallError "groovy not installed correctly; redo install" )" ] ; then exit -1; fi
 
 echo "Finished install of groovy at $(date)"
-
-set +e
-cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
-./checkJava.sh
-if [ "$( checkInstallError "java not installed correctly; install" )" ] ;
-then sudo apt-get -q install -y openjdk-8-jdk openjdk-8-jre   ;
-fi
-set -e
 
 echo "++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+  Checks on install of tools and dependencies"
