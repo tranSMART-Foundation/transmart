@@ -12,7 +12,7 @@ echo "--------------------------------------------------------------------"
 echo "|  Checking for basic command-line tools; that are installed by make"
 echo "|  if any of the following does not exist,"
 echo "|  then recheck the instructions for installing the missing items;"
-echo "|  also ref: installTransmart.sh,'Install of basic tools'"
+echo "|  also ref: InstallTransmart.sh,'Install of basic tools'"
 echo "--------------------------------------------------------------------"
 
 probe=0

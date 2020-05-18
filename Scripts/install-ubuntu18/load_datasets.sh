@@ -45,7 +45,7 @@ export INSTALL_BASE
 if ! [ -d "$INSTALL_BASE/transmart-data" ] ; then
 	echo "This script assumes that the transmart-data directory is installed at $INSTALL_BASE/transmart-data"
 	echo "It does not appear to be there. Please fix that and restart this script."
-	echo "see the 'set up the transmart-data folder' step of installTransmart.sh"
+	echo "see the 'set up the transmart-data folder' step of InstallTransmart.sh"
 	exit 1
 fi
 
