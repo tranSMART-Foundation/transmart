@@ -97,9 +97,10 @@ echo "+++++++++++++++++++++++++++++"
 set +e
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkJava.sh
-if [ "$( checkInstallError "java not installed correctly; install" )" ] ;
-then sudo apt-get -q install -y openjdk-8-jdk openjdk-8-jre   ;
+if [ "$( checkInstallError "java not installed correctly; install" )" ] ; then
+    sudo apt-get -q install -y openjdk-8-jdk openjdk-8-jre
 fi
+cd $INSTALL_BASE/
 set -e
 
 if ! [ -e transmart-data-release-19.0.zip ] ; then
@@ -107,7 +108,7 @@ if ! [ -e transmart-data-release-19.0.zip ] ; then
 #    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
 fi
 if ! [ -e transmart-data ] ; then
-	unzip transmart-data-release-19.0.zip
+	unzip -q transmart-data-release-19.0.zip
 	mv transmart-data-release-19.0 transmart-data
 fi
 
@@ -392,7 +393,7 @@ cd ..
 
 rm -rf transmart-manual-release-19.0
 curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual-release-19.0.zip
-unzip transmart-manual-release-19.0.zip
+unzip -q transmart-manual-release-19.0.zip
 sudo rm -rf /var/lib/tomcat8/webapps/transmartmanual
 sudo mv transmart-manual-release-19.0 /var/lib/tomcat8/webapps/transmartmanual
 sudo chown -R tomcat8.tomcat8 /var/lib/tomcat8/webapps/transmartmanual
