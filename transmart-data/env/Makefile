@@ -72,7 +72,7 @@ $(GROOVY_ZIP):
 	curl -L "$(GROOVY_URL)" > $@
 
 $(GROOVY_BIN): $(GROOVY_ZIP)
-	unzip $<
+	unzip -q $<
 	touch $@
 
 groovy: $(GROOVY_BIN)
@@ -125,7 +125,7 @@ update_etl:
 	echo "for release build transmart-etl is not automatically updated from git, because it is assumed to be already loaded from a zip file"
 
 update_etl_git: transmart-etl-release-19.0.zip
-	test -d transmart-etl || unzip -u transmart-etl-release-19.0.zip
+	test -d transmart-etl || unzip -qu transmart-etl-release-19.0.zip
 	test -d transmart-etl || mv transmart-etl-release-19.0 transmart-etl
 
 transmart-etl-release-19.0.zip:
@@ -144,13 +144,13 @@ $(KETTLE_ORACLE_DRIVER): $(JDBC_DRIVER_ORA_PATH) data-integration/.keep
 data-integration-oracle: data-integration-oracle/.keep $(KETTLE_ORACLE_DRIVER)
 .PHONY: data-integration-oracle
 data-integration-oracle/.keep: $(KETTLE_ARCHIVE)
-	unzip $<
+	unzip -q $<
 	touch '$@'
 
 data-integration: data-integration/.keep
 .PHONY: data-integration
 data-integration/.keep: $(KETTLE_ARCHIVE)
-	unzip $<
+	unzip -q $<
 	touch '$@'
 
 /var/lib/postgresql/tablespaces:
