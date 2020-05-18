@@ -128,7 +128,8 @@ sudo make -C env install_ubuntu_packages18
 sudo make -C env install_ubuntu_packages
 # verify these packages
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
-./checkMakefilePackages.sh [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
+./checkMakefilePackages.sh
+if [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
 echo "sudo make -C env install_ubuntu_packages - finished at $(date)"
 
 # (2)
