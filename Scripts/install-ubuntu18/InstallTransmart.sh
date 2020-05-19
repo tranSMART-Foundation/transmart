@@ -81,10 +81,6 @@ echo "+++++++++++++++"
 # gmake on ubuntu18 is simply called 'make'
 sudo apt-get -q install -y make
 
-echo "+++++++++++++++++++++++++++++++++++"
-echo "+  set up the transmart-data folder"
-echo "+++++++++++++++++++++++++++++++++++"
-
 cd $INSTALL_BASE
 sudo -v
 sudo apt-get -q install -y curl
@@ -100,9 +96,13 @@ cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 if [ "$( checkInstallError "java not installed correctly; install" )" ] ; then
     sudo apt-get -q install -y openjdk-8-jdk openjdk-8-jre
 fi
-cd $INSTALL_BASE/
 set -e
 
+echo "+++++++++++++++++++++++++++++++++++"
+echo "+  set up the transmart-data folder"
+echo "+++++++++++++++++++++++++++++++++++"
+
+cd $INSTALL_BASE/
 if ! [ -e transmart-data-release-19.0.zip ] ; then
     curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
 #    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
@@ -321,6 +321,7 @@ else
 	cd $INSTALL_BASE/transmart-data
 	source ./vars
 	make -j4 postgres
+	make update_datasets
 fi
 cd $SCRIPTS_BASE/Scripts/install-ubuntu18/checks
 ./checkPsqlDataLoad.sh
@@ -467,9 +468,10 @@ echo "++++++++++++++++++++++++++++"
 
 echo "Finished install of basic transmart system at $(date)"
 
-echo "--------------------------------------------"
-echo "To load datasets, use the these two files in the Scripts directory: "
-echo "    datasetsList.txt - the list of posible datasets to load, and"
+echo "-----------------------------------------------------------------"
+echo "To load datasets, use the these two files in"
+echo "the Scripts/install-ubuntu18  directory: "
+echo "    datasetsList.txt - the list of possible datasets to load, and"
 echo "    load_datasets.sh - the script to load the datasets. "
 echo ""
 echo "First, in the file datasetsList.txt, un-comment the lines that "
@@ -481,5 +483,5 @@ echo "    ./Scripts/install-ubuntu18/load_datasets.sh"
 echo ""
 echo "-- Note that loading the same dataset twice is not recommended" 
 echo "   and may produce unpredictable results"
-echo "--------------------------------------------"
+echo "-----------------------------------------------------------------"
 
