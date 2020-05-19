@@ -4,7 +4,7 @@
 # This script checks for and reports missing items in the in the context
 # of PostgreSQL - are PostgreSQL and psql installed; is PostgreSQL running;
 # does psql respond to queries; has the transmart user loging table been loaded;
-# are the admin and guest accounts established; has the GSP8581 database been loaded
+# are the admin and guest accounts established; has the GSE8581 database been loaded
 # ******************************************************************************
 
 # special case with no echo (any argument will suppress echoes
@@ -18,7 +18,7 @@ if [ $runWithEcho -eq 0 ]  ; then
 	echo "|  Checking for transmart database access: "
 	echo "|    does 'biomart' use exist "
 	echo "|    are the transmart users set up: admin and guest  "
-	echo "|    in the demo dataset GSE8581 loaded  "
+	echo "|    is the demo dataset GSE8581 loaded  "
 	echo "-------------------------------------"
 fi
 
@@ -47,7 +47,7 @@ results=$(sudo -u postgres psql postgres --command="\du biomart" | grep biomart)
 if [ -z "$results" ]; then
 	if [ "$runWithEcho" -eq 0 ]  ; then
 		echo "The transmart database user 'biomart' does not exist;"
-		echo "  it is likely that you did not initialisze the trasnamrt database."
+		echo "  it is likely that you did not initialize the transmart database."
 		echo "  See install instructions to do so."
 	fi
 	exit 1
@@ -60,7 +60,7 @@ results=$(sudo -u postgres psql transmart --command="select username from search
 if [ -z "$results" ]; then
 	if [ "$runWithEcho" -eq 0 ]  ; then
 		echo "The transmartApp user 'admin' does not exist;"
-		echo "  it is likely that you did not initialisze the trasnamrt database."
+		echo "  it is likely that you did not initialize the transmart database."
 		echo "  See install instructions to do so."
 	fi
 	exit 1
