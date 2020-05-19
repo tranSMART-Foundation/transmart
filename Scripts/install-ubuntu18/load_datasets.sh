@@ -3,9 +3,9 @@
 if [ -z "$SCRIPTS_BASE" ] ; then SCRIPTS_BASE="$HOME/transmart" ; fi
 
 echo "Starting at $(date)"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++"
 echo "+  Checking locations of Script Directory"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++"
 if ! [ -d "$SCRIPTS_BASE/Scripts" ] ; then
 	echo "This script assumes that the Scripts directory is installed at $SCRIPTS_BASE/Scripts"
 	echo "It does not appear to be there. Please fix that and restart this script."
@@ -19,12 +19,13 @@ else
 fi
 echo "Finished checking locations of Script Directory at $(date)"
 
-echo "--------------------------------------------"
-echo "To load datasets, use the these two files in the Scripts directory: "
+echo "----------------------------------------------------------------"
+echo "To load datasets, use the these two files"
+echo "in the Scripts/install-ubuntu18 directory:"
 echo "    datasetsList.txt - the list of posible datasets to load, and"
 echo "    load_datasets.sh - the script to load the datasets. "
 echo ""
-echo "First, in the file datasetsList.txt, un-comment the lines that "
+echo "First, in the file datasetsList.txt, un-comment the lines that"
 echo "corresponding to the data sets you wish to load. "
 echo ""
 echo "Then run the file load_datasets.sh with:"
@@ -33,11 +34,11 @@ echo "    ./Scripts/install-ubuntu18/load_datasets.sh"
 echo ""
 echo "-- Note that loading the same dataset twice is not recommended" 
 echo "   and may produce unpredictable results"
-echo "--------------------------------------------"
+echo "----------------------------------------------------------------"
 
-echo "++++++++++++++++++++++++++++"
-echo "+  Checking locations of working dir (tranSMART install base) "
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  Checking locations of working dir (tranSMART install base)"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 if [ -z "$INSTALL_BASE" ] ; then INSTALL_BASE="$HOME/transmart" ; fi
 export INSTALL_BASE
@@ -51,15 +52,9 @@ fi
 
 echo "transmart-data is at this location: $INSTALL_BASE/transmart-data"
 
-echo "++++++++++++++++++++++++++++"
-echo "+  set up groovy and grails "
-echo "++++++++++++++++++++++++++++"
-source $HOME/.sdkman/bin/sdkman-init.sh
-echo "done"
-
-echo "++++++++++++++++++++++++++++"
-echo "+  Load studies from the uncommented lines in datasetsList.txt "
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  Load studies from the uncommented lines in datasetsList.txt"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE/transmart-data
 
