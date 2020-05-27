@@ -758,8 +758,8 @@
     <dependency group='com.fasterxml.jackson.core' name='jackson-annotations' version='2.4.0'>
       <jar>/home/pmr/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.4.0/jackson-annotations-2.4.0.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.0-SNAPSHOT/rdc-rmodules-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.0/rdc-rmodules-19.0.zip</jar>
     </dependency>
     <dependency group='org.mapdb' name='mapdb' version='0.9.10'>
       <jar>/home/pmr/.m2/repository/org/mapdb/mapdb/0.9.10/mapdb-0.9.10.jar</jar>
@@ -767,14 +767,14 @@
     <dependency group='org.xhtmlrenderer' name='core-renderer' version='R8'>
       <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.xhtmlrenderer/core-renderer/jars/core-renderer-R8.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-core' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.0-SNAPSHOT/transmart-core-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-core' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.0/transmart-core-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-gwas' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas/19.0-SNAPSHOT/transmart-gwas-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-gwas' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas/19.0/transmart-gwas-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='search-domain' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/search-domain/19.0-SNAPSHOT/search-domain-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='search-domain' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/search-domain/19.0/search-domain-19.0.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='mail' version='1.0.7'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/mail/1.0.7/mail-1.0.7.zip</jar>
@@ -785,8 +785,8 @@
     <dependency group='javax.mail' name='javax.mail-api' version='1.5.1'>
       <jar>/home/pmr/.m2/repository/javax/mail/javax.mail-api/1.5.1/javax.mail-api-1.5.1.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='folder-management' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/folder-management/19.0-SNAPSHOT/folder-management-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='folder-management' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/folder-management/19.0/folder-management-19.0.zip</jar>
     </dependency>
     <dependency group='org.apache.james' name='apache-mime4j' version='0.6'>
       <jar>/home/pmr/.m2/repository/org/apache/james/apache-mime4j/0.6/apache-mime4j-0.6.jar</jar>
@@ -794,11 +794,11 @@
     <dependency group='org.mongodb' name='mongo-java-driver' version='2.10.1'>
       <jar>/home/pmr/.m2/repository/org/mongodb/mongo-java-driver/2.10.1/mongo-java-driver-2.10.1.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-legacy-db' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-legacy-db/19.0-SNAPSHOT/transmart-legacy-db-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-legacy-db' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-legacy-db/19.0/transmart-legacy-db-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-gwas-plink' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas-plink/19.0-SNAPSHOT/transmart-gwas-plink-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-gwas-plink' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas-plink/19.0/transmart-gwas-plink-19.0.zip</jar>
     </dependency>
     <dependency group='org.anarres.lzo' name='lzo-core' version='1.0.5'>
       <jar>/home/pmr/.m2/repository/org/anarres/lzo/lzo-core/1.0.5/lzo-core-1.0.5.jar</jar>
@@ -809,14 +809,14 @@
     <dependency group='org.grails.plugins' name='plugin-config' version='0.2.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/plugin-config/0.2.1/plugin-config-0.2.1.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='dalliance-plugin' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/dalliance-plugin/19.0-SNAPSHOT/dalliance-plugin-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='dalliance-plugin' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/dalliance-plugin/19.0/dalliance-plugin-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-mydas' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-mydas/19.0-SNAPSHOT/transmart-mydas-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-mydas' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-mydas/19.0/transmart-mydas-19.0.zip</jar>
     </dependency>
-    <dependency group='uk.ac.ebi.mydas' name='mydas' version='1.7.0.transmart-19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/uk/ac/ebi/mydas/mydas/1.7.0.transmart-19.0-SNAPSHOT/mydas-1.7.0.transmart-19.0-SNAPSHOT.jar</jar>
+    <dependency group='uk.ac.ebi.mydas' name='mydas' version='1.7.0.transmart-19.0'>
+      <jar>/home/pmr/.m2/repository/uk/ac/ebi/mydas/mydas/1.7.0.transmart-19.0/mydas-1.7.0.transmart-19.0.jar</jar>
     </dependency>
     <dependency group='uk.ac.ebi.das' name='jdas' version='1.0.4'>
       <jar>/home/pmr/.m2/repository/uk/ac/ebi/das/jdas/1.0.4/jdas-1.0.4.jar</jar>
@@ -827,14 +827,14 @@
     <dependency group='xpp3' name='xpp3' version='1.1.3.4.O'>
       <jar>/home/pmr/.m2/repository/xpp3/xpp3/1.1.3.4.O/xpp3-1.1.3.4.O.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-rest-api' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-rest-api/19.0-SNAPSHOT/transmart-rest-api-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-rest-api' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-rest-api/19.0/transmart-rest-api-19.0.zip</jar>
     </dependency>
     <dependency group='org.javassist' name='javassist' version='3.16.1-GA'>
       <jar>/home/pmr/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-shared' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.0-SNAPSHOT/transmart-shared-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-shared' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.0/transmart-shared-19.0.zip</jar>
     </dependency>
     <dependency group='com.auth0' name='java-jwt' version='3.2.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/java-jwt/3.2.0/java-jwt-3.2.0.jar</jar>
@@ -842,8 +842,8 @@
     <dependency group='org.bouncycastle' name='bcprov-jdk15on' version='1.55'>
       <jar>/home/pmr/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.55/bcprov-jdk15on-1.55.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='spring-security-auth0' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-auth0/19.0-SNAPSHOT/spring-security-auth0-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='spring-security-auth0' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-auth0/19.0/spring-security-auth0-19.0.zip</jar>
     </dependency>
     <dependency group='com.auth0' name='mvc-auth-commons' version='1.0.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/mvc-auth-commons/1.0.0/mvc-auth-commons-1.0.0.jar</jar>
@@ -872,8 +872,8 @@
     <dependency group='net.java.dev.javacc' name='javacc' version='4.1'>
       <jar>/home/pmr/.m2/repository/net/java/dev/javacc/javacc/4.1/javacc-4.1.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='galaxy-export-plugin' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/galaxy-export-plugin/19.0-SNAPSHOT/galaxy-export-plugin-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='galaxy-export-plugin' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/galaxy-export-plugin/19.0/galaxy-export-plugin-19.0.zip</jar>
     </dependency>
     <dependency group='com.github.jmchilton.blend4j' name='blend4j' version='0.1.2'>
       <jar>/home/pmr/.m2/repository/com/github/jmchilton/blend4j/blend4j/0.1.2/blend4j-0.1.2.jar</jar>
@@ -914,17 +914,17 @@
     <dependency group='org.json' name='json' version='20090211'>
       <jar>/home/pmr/.m2/repository/org/json/json/20090211/json-20090211.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.0-SNAPSHOT/transmart-metacore-plugin-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.0/transmart-metacore-plugin-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-xnat-importer' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-xnat-importer/19.0-SNAPSHOT/transmart-xnat-importer-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-xnat-importer' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-xnat-importer/19.0/transmart-xnat-importer-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='biomart-domain' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/biomart-domain/19.0-SNAPSHOT/biomart-domain-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='biomart-domain' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/biomart-domain/19.0/biomart-domain-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-java' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-java/19.0-SNAPSHOT/transmart-java-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-java' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-java/19.0/transmart-java-19.0.zip</jar>
     </dependency>
     <dependency group='com.thoughtworks.xstream' name='xstream' version='1.3'>
       <jar>/home/pmr/.m2/repository/com/thoughtworks/xstream/xstream/1.3/xstream-1.3.jar</jar>
@@ -935,14 +935,14 @@
     <dependency group='jfree' name='jcommon' version='1.0.14'>
       <jar>/home/pmr/.m2/repository/jfree/jcommon/1.0.14/jcommon-1.0.14.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='xnat-viewer' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/xnat-viewer/19.0-SNAPSHOT/xnat-viewer-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='xnat-viewer' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/xnat-viewer/19.0/xnat-viewer-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-custom' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.0-SNAPSHOT/transmart-custom-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-custom' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.0/transmart-custom-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-fractalis' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-fractalis/19.0-SNAPSHOT/transmart-fractalis-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-fractalis' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-fractalis/19.0/transmart-fractalis-19.0.zip</jar>
     </dependency>
   </compile>
   <test>
@@ -1489,8 +1489,8 @@
     <dependency group='xml-apis' name='xml-apis' version='1.4.01'>
       <jar>/home/pmr/.m2/repository/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar</jar>
     </dependency>
-    <dependency group='org.transmartproject' name='transmart-core-api' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.0-SNAPSHOT/transmart-core-api-19.0-SNAPSHOT.jar</jar>
+    <dependency group='org.transmartproject' name='transmart-core-api' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.0/transmart-core-api-19.0.jar</jar>
     </dependency>
     <dependency group='com.jcraft' name='jsch' version='0.1.42'>
       <jar>/home/pmr/.m2/repository/com/jcraft/jsch/0.1.42/jsch-0.1.42.jar</jar>
@@ -1672,8 +1672,8 @@
     <dependency group='org.grails.plugins' name='resources' version='1.2.14'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/resources/1.2.14/resources-1.2.14.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.0-SNAPSHOT/rdc-rmodules-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.0/rdc-rmodules-19.0.zip</jar>
     </dependency>
     <dependency group='org.mapdb' name='mapdb' version='0.9.10'>
       <jar>/home/pmr/.m2/repository/org/mapdb/mapdb/0.9.10/mapdb-0.9.10.jar</jar>
@@ -1681,14 +1681,14 @@
     <dependency group='org.xhtmlrenderer' name='core-renderer' version='R8'>
       <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.xhtmlrenderer/core-renderer/jars/core-renderer-R8.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-core' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.0-SNAPSHOT/transmart-core-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-core' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.0/transmart-core-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-gwas' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas/19.0-SNAPSHOT/transmart-gwas-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-gwas' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas/19.0/transmart-gwas-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='search-domain' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/search-domain/19.0-SNAPSHOT/search-domain-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='search-domain' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/search-domain/19.0/search-domain-19.0.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='mail' version='1.0.7'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/mail/1.0.7/mail-1.0.7.zip</jar>
@@ -1702,8 +1702,8 @@
     <dependency group='javax.mail' name='javax.mail-api' version='1.5.1'>
       <jar>/home/pmr/.m2/repository/javax/mail/javax.mail-api/1.5.1/javax.mail-api-1.5.1.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='folder-management' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/folder-management/19.0-SNAPSHOT/folder-management-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='folder-management' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/folder-management/19.0/folder-management-19.0.zip</jar>
     </dependency>
     <dependency group='org.apache.james' name='apache-mime4j' version='0.6'>
       <jar>/home/pmr/.m2/repository/org/apache/james/apache-mime4j/0.6/apache-mime4j-0.6.jar</jar>
@@ -1711,11 +1711,11 @@
     <dependency group='org.mongodb' name='mongo-java-driver' version='2.10.1'>
       <jar>/home/pmr/.m2/repository/org/mongodb/mongo-java-driver/2.10.1/mongo-java-driver-2.10.1.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-legacy-db' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-legacy-db/19.0-SNAPSHOT/transmart-legacy-db-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-legacy-db' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-legacy-db/19.0/transmart-legacy-db-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-gwas-plink' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas-plink/19.0-SNAPSHOT/transmart-gwas-plink-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-gwas-plink' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas-plink/19.0/transmart-gwas-plink-19.0.zip</jar>
     </dependency>
     <dependency group='org.anarres.lzo' name='lzo-core' version='1.0.5'>
       <jar>/home/pmr/.m2/repository/org/anarres/lzo/lzo-core/1.0.5/lzo-core-1.0.5.jar</jar>
@@ -1726,14 +1726,14 @@
     <dependency group='org.grails.plugins' name='plugin-config' version='0.2.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/plugin-config/0.2.1/plugin-config-0.2.1.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='dalliance-plugin' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/dalliance-plugin/19.0-SNAPSHOT/dalliance-plugin-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='dalliance-plugin' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/dalliance-plugin/19.0/dalliance-plugin-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-mydas' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-mydas/19.0-SNAPSHOT/transmart-mydas-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-mydas' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-mydas/19.0/transmart-mydas-19.0.zip</jar>
     </dependency>
-    <dependency group='uk.ac.ebi.mydas' name='mydas' version='1.7.0.transmart-19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/uk/ac/ebi/mydas/mydas/1.7.0.transmart-19.0-SNAPSHOT/mydas-1.7.0.transmart-19.0-SNAPSHOT.jar</jar>
+    <dependency group='uk.ac.ebi.mydas' name='mydas' version='1.7.0.transmart-19.0'>
+      <jar>/home/pmr/.m2/repository/uk/ac/ebi/mydas/mydas/1.7.0.transmart-19.0/mydas-1.7.0.transmart-19.0.jar</jar>
     </dependency>
     <dependency group='uk.ac.ebi.das' name='jdas' version='1.0.4'>
       <jar>/home/pmr/.m2/repository/uk/ac/ebi/das/jdas/1.0.4/jdas-1.0.4.jar</jar>
@@ -1744,14 +1744,14 @@
     <dependency group='xpp3' name='xpp3' version='1.1.3.4.O'>
       <jar>/home/pmr/.m2/repository/xpp3/xpp3/1.1.3.4.O/xpp3-1.1.3.4.O.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-rest-api' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-rest-api/19.0-SNAPSHOT/transmart-rest-api-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-rest-api' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-rest-api/19.0/transmart-rest-api-19.0.zip</jar>
     </dependency>
     <dependency group='org.javassist' name='javassist' version='3.16.1-GA'>
       <jar>/home/pmr/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-shared' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.0-SNAPSHOT/transmart-shared-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-shared' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.0/transmart-shared-19.0.zip</jar>
     </dependency>
     <dependency group='com.auth0' name='java-jwt' version='3.2.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/java-jwt/3.2.0/java-jwt-3.2.0.jar</jar>
@@ -1759,8 +1759,8 @@
     <dependency group='org.bouncycastle' name='bcprov-jdk15on' version='1.55'>
       <jar>/home/pmr/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.55/bcprov-jdk15on-1.55.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='spring-security-auth0' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-auth0/19.0-SNAPSHOT/spring-security-auth0-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='spring-security-auth0' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-auth0/19.0/spring-security-auth0-19.0.zip</jar>
     </dependency>
     <dependency group='com.auth0' name='mvc-auth-commons' version='1.0.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/mvc-auth-commons/1.0.0/mvc-auth-commons-1.0.0.jar</jar>
@@ -1789,8 +1789,8 @@
     <dependency group='net.java.dev.javacc' name='javacc' version='4.1'>
       <jar>/home/pmr/.m2/repository/net/java/dev/javacc/javacc/4.1/javacc-4.1.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='galaxy-export-plugin' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/galaxy-export-plugin/19.0-SNAPSHOT/galaxy-export-plugin-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='galaxy-export-plugin' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/galaxy-export-plugin/19.0/galaxy-export-plugin-19.0.zip</jar>
     </dependency>
     <dependency group='com.github.jmchilton.blend4j' name='blend4j' version='0.1.2'>
       <jar>/home/pmr/.m2/repository/com/github/jmchilton/blend4j/blend4j/0.1.2/blend4j-0.1.2.jar</jar>
@@ -1831,17 +1831,17 @@
     <dependency group='org.json' name='json' version='20090211'>
       <jar>/home/pmr/.m2/repository/org/json/json/20090211/json-20090211.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.0-SNAPSHOT/transmart-metacore-plugin-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.0/transmart-metacore-plugin-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-xnat-importer' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-xnat-importer/19.0-SNAPSHOT/transmart-xnat-importer-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-xnat-importer' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-xnat-importer/19.0/transmart-xnat-importer-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='biomart-domain' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/biomart-domain/19.0-SNAPSHOT/biomart-domain-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='biomart-domain' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/biomart-domain/19.0/biomart-domain-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-java' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-java/19.0-SNAPSHOT/transmart-java-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-java' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-java/19.0/transmart-java-19.0.zip</jar>
     </dependency>
     <dependency group='com.thoughtworks.xstream' name='xstream' version='1.3'>
       <jar>/home/pmr/.m2/repository/com/thoughtworks/xstream/xstream/1.3/xstream-1.3.jar</jar>
@@ -1852,17 +1852,17 @@
     <dependency group='jfree' name='jcommon' version='1.0.14'>
       <jar>/home/pmr/.m2/repository/jfree/jcommon/1.0.14/jcommon-1.0.14.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='xnat-viewer' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/xnat-viewer/19.0-SNAPSHOT/xnat-viewer-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='xnat-viewer' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/xnat-viewer/19.0/xnat-viewer-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-custom' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.0-SNAPSHOT/transmart-custom-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-custom' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.0/transmart-custom-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-fractalis' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-fractalis/19.0-SNAPSHOT/transmart-fractalis-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-fractalis' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-fractalis/19.0/transmart-fractalis-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-core-db-tests' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core-db-tests/19.0-SNAPSHOT/transmart-core-db-tests-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-core-db-tests' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core-db-tests/19.0/transmart-core-db-tests-19.0.zip</jar>
     </dependency>
   </test>
   <runtime>
@@ -2367,8 +2367,8 @@
     <dependency group='xml-apis' name='xml-apis' version='1.4.01'>
       <jar>/home/pmr/.m2/repository/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar</jar>
     </dependency>
-    <dependency group='org.transmartproject' name='transmart-core-api' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.0-SNAPSHOT/transmart-core-api-19.0-SNAPSHOT.jar</jar>
+    <dependency group='org.transmartproject' name='transmart-core-api' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.0/transmart-core-api-19.0.jar</jar>
     </dependency>
     <dependency group='com.jcraft' name='jsch' version='0.1.42'>
       <jar>/home/pmr/.m2/repository/com/jcraft/jsch/0.1.42/jsch-0.1.42.jar</jar>
@@ -2538,8 +2538,8 @@
     <dependency group='org.grails.plugins' name='resources' version='1.2.14'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/resources/1.2.14/resources-1.2.14.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.0-SNAPSHOT/rdc-rmodules-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.0/rdc-rmodules-19.0.zip</jar>
     </dependency>
     <dependency group='org.mapdb' name='mapdb' version='0.9.10'>
       <jar>/home/pmr/.m2/repository/org/mapdb/mapdb/0.9.10/mapdb-0.9.10.jar</jar>
@@ -2547,14 +2547,14 @@
     <dependency group='org.xhtmlrenderer' name='core-renderer' version='R8'>
       <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.xhtmlrenderer/core-renderer/jars/core-renderer-R8.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-core' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.0-SNAPSHOT/transmart-core-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-core' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.0/transmart-core-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-gwas' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas/19.0-SNAPSHOT/transmart-gwas-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-gwas' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas/19.0/transmart-gwas-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='search-domain' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/search-domain/19.0-SNAPSHOT/search-domain-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='search-domain' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/search-domain/19.0/search-domain-19.0.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='mail' version='1.0.7'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/mail/1.0.7/mail-1.0.7.zip</jar>
@@ -2568,8 +2568,8 @@
     <dependency group='javax.mail' name='javax.mail-api' version='1.5.1'>
       <jar>/home/pmr/.m2/repository/javax/mail/javax.mail-api/1.5.1/javax.mail-api-1.5.1.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='folder-management' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/folder-management/19.0-SNAPSHOT/folder-management-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='folder-management' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/folder-management/19.0/folder-management-19.0.zip</jar>
     </dependency>
     <dependency group='org.apache.james' name='apache-mime4j' version='0.6'>
       <jar>/home/pmr/.m2/repository/org/apache/james/apache-mime4j/0.6/apache-mime4j-0.6.jar</jar>
@@ -2577,11 +2577,11 @@
     <dependency group='org.mongodb' name='mongo-java-driver' version='2.10.1'>
       <jar>/home/pmr/.m2/repository/org/mongodb/mongo-java-driver/2.10.1/mongo-java-driver-2.10.1.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-legacy-db' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-legacy-db/19.0-SNAPSHOT/transmart-legacy-db-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-legacy-db' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-legacy-db/19.0/transmart-legacy-db-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-gwas-plink' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas-plink/19.0-SNAPSHOT/transmart-gwas-plink-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-gwas-plink' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas-plink/19.0/transmart-gwas-plink-19.0.zip</jar>
     </dependency>
     <dependency group='org.anarres.lzo' name='lzo-core' version='1.0.5'>
       <jar>/home/pmr/.m2/repository/org/anarres/lzo/lzo-core/1.0.5/lzo-core-1.0.5.jar</jar>
@@ -2592,14 +2592,14 @@
     <dependency group='org.grails.plugins' name='plugin-config' version='0.2.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/plugin-config/0.2.1/plugin-config-0.2.1.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='dalliance-plugin' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/dalliance-plugin/19.0-SNAPSHOT/dalliance-plugin-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='dalliance-plugin' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/dalliance-plugin/19.0/dalliance-plugin-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-mydas' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-mydas/19.0-SNAPSHOT/transmart-mydas-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-mydas' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-mydas/19.0/transmart-mydas-19.0.zip</jar>
     </dependency>
-    <dependency group='uk.ac.ebi.mydas' name='mydas' version='1.7.0.transmart-19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/uk/ac/ebi/mydas/mydas/1.7.0.transmart-19.0-SNAPSHOT/mydas-1.7.0.transmart-19.0-SNAPSHOT.jar</jar>
+    <dependency group='uk.ac.ebi.mydas' name='mydas' version='1.7.0.transmart-19.0'>
+      <jar>/home/pmr/.m2/repository/uk/ac/ebi/mydas/mydas/1.7.0.transmart-19.0/mydas-1.7.0.transmart-19.0.jar</jar>
     </dependency>
     <dependency group='uk.ac.ebi.das' name='jdas' version='1.0.4'>
       <jar>/home/pmr/.m2/repository/uk/ac/ebi/das/jdas/1.0.4/jdas-1.0.4.jar</jar>
@@ -2610,14 +2610,14 @@
     <dependency group='xpp3' name='xpp3' version='1.1.3.4.O'>
       <jar>/home/pmr/.m2/repository/xpp3/xpp3/1.1.3.4.O/xpp3-1.1.3.4.O.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-rest-api' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-rest-api/19.0-SNAPSHOT/transmart-rest-api-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-rest-api' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-rest-api/19.0/transmart-rest-api-19.0.zip</jar>
     </dependency>
     <dependency group='org.javassist' name='javassist' version='3.16.1-GA'>
       <jar>/home/pmr/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-shared' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.0-SNAPSHOT/transmart-shared-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-shared' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.0/transmart-shared-19.0.zip</jar>
     </dependency>
     <dependency group='com.auth0' name='java-jwt' version='3.2.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/java-jwt/3.2.0/java-jwt-3.2.0.jar</jar>
@@ -2625,8 +2625,8 @@
     <dependency group='org.bouncycastle' name='bcprov-jdk15on' version='1.55'>
       <jar>/home/pmr/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.55/bcprov-jdk15on-1.55.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='spring-security-auth0' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-auth0/19.0-SNAPSHOT/spring-security-auth0-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='spring-security-auth0' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-auth0/19.0/spring-security-auth0-19.0.zip</jar>
     </dependency>
     <dependency group='com.auth0' name='mvc-auth-commons' version='1.0.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/mvc-auth-commons/1.0.0/mvc-auth-commons-1.0.0.jar</jar>
@@ -2655,8 +2655,8 @@
     <dependency group='net.java.dev.javacc' name='javacc' version='4.1'>
       <jar>/home/pmr/.m2/repository/net/java/dev/javacc/javacc/4.1/javacc-4.1.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='galaxy-export-plugin' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/galaxy-export-plugin/19.0-SNAPSHOT/galaxy-export-plugin-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='galaxy-export-plugin' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/galaxy-export-plugin/19.0/galaxy-export-plugin-19.0.zip</jar>
     </dependency>
     <dependency group='com.github.jmchilton.blend4j' name='blend4j' version='0.1.2'>
       <jar>/home/pmr/.m2/repository/com/github/jmchilton/blend4j/blend4j/0.1.2/blend4j-0.1.2.jar</jar>
@@ -2697,17 +2697,17 @@
     <dependency group='org.json' name='json' version='20090211'>
       <jar>/home/pmr/.m2/repository/org/json/json/20090211/json-20090211.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.0-SNAPSHOT/transmart-metacore-plugin-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.0/transmart-metacore-plugin-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-xnat-importer' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-xnat-importer/19.0-SNAPSHOT/transmart-xnat-importer-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-xnat-importer' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-xnat-importer/19.0/transmart-xnat-importer-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='biomart-domain' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/biomart-domain/19.0-SNAPSHOT/biomart-domain-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='biomart-domain' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/biomart-domain/19.0/biomart-domain-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-java' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-java/19.0-SNAPSHOT/transmart-java-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-java' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-java/19.0/transmart-java-19.0.zip</jar>
     </dependency>
     <dependency group='com.thoughtworks.xstream' name='xstream' version='1.3'>
       <jar>/home/pmr/.m2/repository/com/thoughtworks/xstream/xstream/1.3/xstream-1.3.jar</jar>
@@ -2718,14 +2718,14 @@
     <dependency group='jfree' name='jcommon' version='1.0.14'>
       <jar>/home/pmr/.m2/repository/jfree/jcommon/1.0.14/jcommon-1.0.14.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='xnat-viewer' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/xnat-viewer/19.0-SNAPSHOT/xnat-viewer-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='xnat-viewer' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/xnat-viewer/19.0/xnat-viewer-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-custom' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.0-SNAPSHOT/transmart-custom-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-custom' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.0/transmart-custom-19.0.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-fractalis' version='19.0-SNAPSHOT'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-fractalis/19.0-SNAPSHOT/transmart-fractalis-19.0-SNAPSHOT.zip</jar>
+    <dependency group='org.grails.plugins' name='transmart-fractalis' version='19.0'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-fractalis/19.0/transmart-fractalis-19.0.zip</jar>
     </dependency>
   </runtime>
   <provided>

@@ -33,7 +33,7 @@ In an unix-like environment you could add something like this to your .bashrc
 
 4. Link tranSMART to your SmartR directory
     - Search this line `runtime ':resources:1.2.1'` and change it to `runtime ':resources:1.2.14'`
-    - Remove this line `runtime ':smart-r:16.2-SNAPSHOT'`
+    - Remove this line `runtime ':smart-r:19.0'`
     - Add this line to the end of the file `grails.plugin.location.SmartR="../relative/path/to/SmartR"`
 
 5. Prepare your Configuration files
