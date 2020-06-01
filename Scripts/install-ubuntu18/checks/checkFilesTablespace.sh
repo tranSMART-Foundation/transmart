@@ -8,7 +8,7 @@
 
 function checkForPostgresTablespaceFolder {
 
-    TABLESPACES="/var/lib/postgresql/tablespaces"
+    TABLESPACES="/var/lib/postgresql/tablespaces/"
 
     name=$1
     checkPath="$TABLESPACES/$name"
