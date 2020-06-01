@@ -129,7 +129,7 @@ update_etl_git: transmart-etl-release-19.0.zip
 	test -d transmart-etl || mv transmart-etl-release-19.0 transmart-etl
 
 transmart-etl-release-19.0.zip:
-	curl -L -f "http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-etl-release-19.0.zip" > transmart-etl-release-19.0.zip
+	curl -L -f "http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-etl-release-19.0.zip" > transmart-etl-release-19.0.zip
 
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 

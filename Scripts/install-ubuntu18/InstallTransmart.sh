@@ -104,8 +104,7 @@ echo "+++++++++++++++++++++++++++++++++++"
 
 cd $INSTALL_BASE/
 if ! [ -e transmart-data-release-19.0.zip ] ; then
-    curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
-#    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
+    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-data-release-19.0.zip --output transmart-data-release-19.0.zip
 fi
 if ! [ -e transmart-data ] ; then
 	unzip -q transmart-data-release-19.0.zip
@@ -383,18 +382,16 @@ fi
 
 cd war-files
 if ! [ -e transmart.war ]; then
-    curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmartApp-release-19.0.war --output transmart.war
-#    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart.war --output transmart.war
+    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmartApp-release-19.0.war --output transmart.war
 fi
 if ! [ -e gwava.war ]; then
-    curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/gwava-release-19.0.war --output gwava.war
-#    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/gwava.war --output gwava.war
+    curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/gwava-release-19.0.war --output gwava.war
 fi
 sudo cp *.war /var/lib/tomcat8/webapps/
 cd ..
 
 rm -rf transmart-manual-release-19.0
-curl http://library.transmartfoundation.org/beta/beta19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual-release-19.0.zip
+curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual-release-19.0.zip
 unzip -q transmart-manual-release-19.0.zip
 sudo rm -rf /var/lib/tomcat8/webapps/transmartmanual
 sudo mv transmart-manual-release-19.0 /var/lib/tomcat8/webapps/transmartmanual
