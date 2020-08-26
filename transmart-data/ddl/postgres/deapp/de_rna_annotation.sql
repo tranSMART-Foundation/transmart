@@ -9,4 +9,3 @@ CREATE TABLE de_rna_annotation (
     organism character varying(30),
     probeset_id int
 );
-
