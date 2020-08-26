@@ -853,7 +853,9 @@ class I2b2HelperService implements InitializingBean {
 			'male' :
 			sexCode == 'f' || sexCode == 'female' ?
 			'female' :
-			'NULL'
+			sexCode == 'x' || sexCode == 'unknown' ?
+			'' :
+			sexCode
 		}
 		String ageInYears = rowGet(row, 'AGE_IN_YEARS_NUM', String)
 		if (ageInYears) {
