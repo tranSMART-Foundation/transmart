@@ -71,7 +71,7 @@ function validateHeatMapsSample(completedFunction)
     //We need to generate a JSON object that has all the subsets.
     jsonDataToPass = buildSubsetJSON();
 
-    //Exit is we found no records in the subsets.
+    //Exit if we found no records in the subsets.
     if(!jsonDataToPass)
     {
 	Ext.Msg.alert("No subsets loaded","Please add records to a subset to run a workflow!");
@@ -90,7 +90,7 @@ function validateHeatMapsSample(completedFunction)
 	if(jsonDataToPass[subset].DataType)DataTypeList.push(jsonDataToPass[subset].DataType.toString());
     }
 	
-    //Distinct our arrays.
+    //Remove duplicates from  arrays
     DataSetList = DataSetList.unique();
     DataTypeList = DataTypeList.unique();
 	
