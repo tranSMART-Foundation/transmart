@@ -19,7 +19,7 @@ CREATE SEQUENCE plugin_module_seq
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
-    CACHE 20;
+    CACHE 1;
 
 --
 -- Name: plugin_seq; Type: SEQUENCE; Schema: searchapp; Owner: -
@@ -29,5 +29,5 @@ CREATE SEQUENCE plugin_seq
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
-    CACHE 20;
+    CACHE 1;
 
