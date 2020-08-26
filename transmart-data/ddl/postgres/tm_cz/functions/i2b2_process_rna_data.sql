@@ -73,7 +73,6 @@ AS $$
 			from  i2b2metadata.i2b2
 			where c_fullname like topNode || '%'
 			and substring(c_visualattributes from 2 for 1) = 'H';
-    --and c_visualattributes like '_H_';
 
     uploadI2b2 CURSOR FOR
 			  select category_cd,display_value,display_label,display_unit from
@@ -163,8 +162,8 @@ begin
 	    having count(distinct platform) > 1) as x;
 
     if pCount > 0 then
-	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in lt_src_rna_subj_samp_map',1,stepCt,'ERROR');
-	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
+	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in lt_src_rna_subj_samp_map',pCount,stepCt,'ERROR');
+	perform tm_cz.cz_error_handler(jobId, procedureName, errorNumber, errorMessage);
 	perform tm_cz.cz_end_audit (jobId,'FAIL');
 	return 164;
     end if;
@@ -228,16 +227,16 @@ begin
     --	format of sourcesystem_cd:  trial:[site:]subject_cd
 	
     begin
-	insert into i2b2demodata.patient_dimension
-		    ( patient_num
-		    ,sex_cd
-		    ,age_in_years_num
-		    ,race_cd
-		    ,update_date
-		    ,download_date
-		    ,import_date
-		    ,sourcesystem_cd
-		    )
+	insert into i2b2demodata.patient_dimension (
+	    patient_num
+	    ,sex_cd
+	    ,age_in_years_num
+	    ,race_cd
+	    ,update_date
+	    ,download_date
+	    ,import_date
+	    ,sourcesystem_cd
+	)
 	select nextval('i2b2demodata.seq_patient_num')
 	       ,x.sex_cd
 	       ,x.age_in_years_num
@@ -307,23 +306,26 @@ begin
     execute('truncate table tm_wz.wt_rna_node_values');
 
     begin
-	insert into tm_wz.wt_rna_node_values
-		    (category_cd
-		    ,platform
-		    ,tissue_type
-		    ,attribute_1
-		    ,attribute_2
-		    ,title
-		    )
-	select distinct a.category_cd
-			,coalesce(a.platform,'GPL570')
-			,coalesce(a.tissue_type,'Unspecified Tissue Type')
-			,a.attribute_1
-			,a.attribute_2
-			,''--g.title
+	insert into tm_wz.wt_rna_node_values (
+	    category_cd
+	    ,platform
+	    ,tissue_type
+	    ,attribute_1
+	    ,attribute_2
+	    ,title
+	)
+	select
+	    distinct a.category_cd
+	    ,coalesce(a.platform,'HUMAN_GENES')
+	    ,coalesce(a.tissue_type,'Unspecified Tissue Type')
+	    ,a.attribute_1
+	    ,a.attribute_2
+	    ,g.title
 	  from tm_lz.lt_src_rna_subj_samp_map a
+	       ,deapp.de_gpl_info g
 	 where a.trial_name = TrialID
-	   and a.source_cd = sourceCD;
+	   and a.source_cd = sourceCD
+	   and coalesce(a.platform,'HUMAN_GENES') = g.platform;
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -349,18 +351,20 @@ begin
 		    ,attribute_2
 		    ,node_type
 		    )
-	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
-	    category_cd,'PLATFORM',title),
-	    'ATTR1',coalesce(attribute_1,'')),
-	    'ATTR2',coalesce(attribute_2,'')),
-	    'TISSUETYPE',coalesce(tissue_type,'')),
-	    '+','\'),'_',' ') || '\', '(\\){2,}', '\', 'g')
-			,category_cd
-			,platform as platform
-			,tissue_type
-			,attribute_1 as attribute_1
-			,attribute_2 as attribute_2
-			,'LEAF'
+	select
+	    distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+		category_cd,'PLATFORM',title),
+		'ATTR1',coalesce(attribute_1,'')),
+		'ATTR2',coalesce(attribute_2,'')),
+		'TISSUETYPE',coalesce(tissue_type,'')),
+		'+','\'),
+		'_',' ') || '\', '(\\){2,}', '\', 'g')
+	    ,category_cd
+	    ,platform as platform
+	    ,tissue_type
+	    ,attribute_1 as attribute_1
+	    ,attribute_2 as attribute_2
+	    ,'LEAF'
 	  from  tm_wz.wt_rna_node_values;
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -388,20 +392,25 @@ begin
 		    ,attribute_2
 		    ,node_type
 		    )
-	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
-	    substr(category_cd,1,tm_cz.instr(category_cd,'PLATFORM')+8),
-	    'PLATFORM',title),
-	    'ATTR1',coalesce(attribute_1,'')),
-	    'ATTR2',coalesce(attribute_2,'')),
-	    'TISSUETYPE',coalesce(tissue_type,''))
-	    ,'+', '\'), '_', ' ') || '\', '(\\){2,}', '\', 'g')
-			,substr(category_cd,1,instr(category_cd,'PLATFORM')+8)
-			,platform as platform
-			,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
-			,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR1') > 1 then attribute_1 else null end as attribute_1
-			,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR2') > 1 then attribute_2 else null end as attribute_2
-			,'PLATFORM'
-	  from  tm_wz.wt_rna_node_values;
+	select
+	    distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+		substr(category_cd,1,tm_cz.instr(category_cd,'PLATFORM')+8),
+		'PLATFORM',title),
+		'ATTR1',coalesce(attribute_1,'')),
+		'ATTR2',coalesce(attribute_2,'')),
+		'TISSUETYPE',coalesce(tissue_type,'')),
+		'+', '\'),
+		'_', ' ') || '\', '(\\){2,}', '\', 'g')
+	    ,substr(category_cd,1,instr(category_cd,'PLATFORM')+8)
+	    ,platform as platform
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR1') > 1 then attribute_1 else null end as attribute_1
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR2') > 1 then attribute_2 else null end as attribute_2
+	    ,'PLATFORM'
+	  from  tm_wz.wt_rna_node_values
+	 where category_cd like '%PLATFORM%'
+	   and (platform is not null
+	       and platform::text <> '');
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -418,31 +427,34 @@ begin
 
     --	insert for ATTR1 node so ATTR1 concept can be populated in sample_type_cd
     begin
-	insert into tm_wz.wt_rna_nodes
-		    (leaf_node
-		    ,category_cd
-		    ,platform
-		    ,tissue_type
-		    ,attribute_1
-		    ,attribute_2
-		    ,node_type
-		    )
-	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
-	    substr(category_cd,1,tm_cz.instr(category_cd,'ATTR1')+5),
-	    'PLATFORM',title),
-	    'ATTR1',coalesce(attribute_1,'')),
-	    'ATTR2',coalesce(attribute_2,'')),
-	    'TISSUETYPE',coalesce(tissue_type,'')),
-	    '+', '\'), '_', ' ') || '\', '(\\){2,}', '\', 'g')
-			,substr(category_cd,1,instr(category_cd,'ATTR1')+5)
-			,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'PLATFORM') > 1 then platform else null end as platform
-			,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
-			,attribute_1 as attribute_1
-			,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'ATTR2') > 1 then attribute_2 else null end as attribute_2
-			,'ATTR1'
+	insert into tm_wz.wt_rna_nodes (
+	    leaf_node
+	    ,category_cd
+	    ,platform
+	    ,tissue_type
+	    ,attribute_1
+	    ,attribute_2
+	    ,node_type
+	)
+	select
+	    distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+		substr(category_cd,1,tm_cz.instr(category_cd,'ATTR1')+5),
+		'PLATFORM',title),
+		'ATTR1',coalesce(attribute_1,'')),
+		'ATTR2',coalesce(attribute_2,'')),
+		'TISSUETYPE',coalesce(tissue_type,'')),
+		'+', '\'),
+		'_', ' ') || '\', '(\\){2,}', '\', 'g')
+	    ,substr(category_cd,1,instr(category_cd,'ATTR1')+5)
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'PLATFORM') > 1 then platform else null end as platform
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
+	    ,attribute_1 as attribute_1
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'ATTR2') > 1 then attribute_2 else null end as attribute_2
+	    ,'ATTR1'
 	  from  tm_wz.wt_rna_node_values
 	 where category_cd like '%ATTR1%'
-	   and (attribute_1 IS NOT NULL AND attribute_1::text <> '');
+	   and (attribute_1 is NOT NULL
+	       and attribute_1::text <> '');
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -468,22 +480,24 @@ begin
 		    ,attribute_2
 		    ,node_type
 		    )
-	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
-	    substr(category_cd,1,tm_cz.instr(category_cd,'ATTR2')+5),
-	    'PLATFORM',title),
-	    'ATTR1',coalesce(attribute_1,'')),
-	    'ATTR2',coalesce(attribute_2,'')),
-	    'TISSUETYPE',coalesce(tissue_type,'')),
-	    '+', '\'), '_', ' ') || '\', '(\\){2,}', '\', 'g')
-			,substr(category_cd,1,instr(category_cd,'ATTR2')+5)
-			,case when instr(substr(category_cd,1,instr(category_cd,'ATTR2')+5),'PLATFORM') > 1 then platform else null end as platform
-			,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
-			,case when instr(substr(category_cd,1,instr(category_cd,'ATTR2')+5),'ATTR1') > 1 then attribute_1 else null end as attribute_1
-			,attribute_2 as attribute_2
-			,'ATTR2'
+	select
+	    distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+		substr(category_cd,1,tm_cz.instr(category_cd,'ATTR2')+5),
+		'PLATFORM',title),
+		'ATTR1',coalesce(attribute_1,'')),
+		'ATTR2',coalesce(attribute_2,'')),
+		'TISSUETYPE',coalesce(tissue_type,'')),
+		'+', '\'), '_', ' ') || '\', '(\\){2,}', '\', 'g')
+	    ,substr(category_cd,1,instr(category_cd,'ATTR2')+5)
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR2')+5),'PLATFORM') > 1 then platform else null end as platform
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR2')+5),'ATTR1') > 1 then attribute_1 else null end as attribute_1
+	    ,attribute_2 as attribute_2
+	    ,'ATTR2'
 	  from  tm_wz.wt_rna_node_values
 	 where category_cd like '%ATTR2%'
-	   and (attribute_2 IS NOT NULL AND attribute_2::text <> '');
+	   and (attribute_2 is NOT NULL
+		and attribute_2::text <> '');
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -501,30 +515,34 @@ begin
 	
     --	insert for tissue_type node so tissue_type_cd can be populated 
     begin
-	insert into tm_wz.wt_rna_nodes
-		    (leaf_node
-		    ,category_cd
-		    ,platform
-		    ,tissue_type
-		    ,attribute_1
-		    ,attribute_2
-		    ,node_type
-		    )
-	select distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
+	insert into tm_wz.wt_rna_nodes (
+	    leaf_node
+	    ,category_cd
+	    ,platform
+	    ,tissue_type
+	    ,attribute_1
+	    ,attribute_2
+	    ,node_type
+	)
+	select
+	    distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
 	    substr(category_cd,1,tm_cz.instr(category_cd,'TISSUETYPE')+10),
 	    'PLATFORM',title),
 	    'ATTR1',coalesce(attribute_1,'')),
 	    'ATTR2',coalesce(attribute_2,'')),
 	    'TISSUETYPE',coalesce(tissue_type,'')),
-	    '+', '\'), '_', ' ') || '\', '(\\){2,}', '\', 'g')
-			,substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10)
-			,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then platform else null end as platform
-			,tissue_type as tissue_type
-			,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then attribute_1 else null end as attribute_1
-			,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then attribute_2 else null end as attribute_2
-			,'TISSUETYPE'
+	    '+', '\'),
+	    '_', ' ') || '\', '(\\){2,}', '\', 'g')
+	    ,substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10)
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then platform else null end as platform
+	    ,tissue_type as tissue_type
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then attribute_1 else null end as attribute_1
+	    ,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then attribute_2 else null end as attribute_2
+	    ,'TISSUETYPE'
 	  from  tm_wz.wt_rna_node_values
-	 where category_cd like '%TISSUETYPE%';
+	 where category_cd like '%TISSUETYPE%'
+	   and (tissue_type is not null
+	       and tissue_type::text <> '');
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -703,63 +721,68 @@ begin
 	       ,t.source_cd
 	       ,t.omic_source_study
 	       ,t.omic_patient_id
-	  from (select distinct b.patient_num as patient_id
-		       ,a.site_id
-		       ,a.subject_id
-		       ,null as subject_type
-		       ,ln.concept_cd as concept_code
-		       ,a.tissue_type as tissue_type
-		       ,ttp.concept_cd as tissue_type_cd
-		       ,a.trial_name
-		       ,a.attribute_2 as timepoint
-		       ,a2.concept_cd as timepoint_cd
-		       ,a.attribute_1 as sample_type
-		       ,a1.concept_cd as sample_type_cd
-		       ,'RNASEQCOG' as platform
-		       ,pn.concept_cd as platform_cd
-		       ,ln.concept_cd || '-' || b.patient_num::text as data_uid
-		       ,a.platform as gpl_id
-		       ,coalesce(sid.patient_num,b.patient_num) as sample_id
-		       ,a.sample_cd
-		       ,coalesce(a.category_cd,'Biomarker_Data+RNA_SEQ+PLATFORM+TISSUETYPE+ATTR1+ATTR2') as category_cd
-		       ,a.source_cd
-		       ,TrialId as omic_source_study
-		       ,b.patient_num as omic_patient_id
+	  from (select
+		    distinct b.patient_num as patient_id
+		    ,a.site_id
+		    ,a.subject_id
+		    ,null as subject_type
+		    ,ln.concept_cd as concept_code
+		    ,a.tissue_type as tissue_type
+		    ,ttp.concept_cd as tissue_type_cd
+		    ,a.trial_name
+		    ,a.attribute_2 as timepoint
+		    ,a2.concept_cd as timepoint_cd
+		    ,a.attribute_1 as sample_type
+		    ,a1.concept_cd as sample_type_cd
+		    ,'RNASEQCOG' as platform
+		    ,pn.concept_cd as platform_cd
+		    ,ln.concept_cd || '-' || b.patient_num::text as data_uid
+		    ,a.platform as gpl_id
+		    ,coalesce(sid.patient_num,b.patient_num) as sample_id
+		    ,a.sample_cd
+		    ,coalesce(a.category_cd,'Biomarker_Data+RNAseq+PLATFORM+ATTR1+ATTR2+TISSUETYPE') as category_cd
+		    ,a.source_cd
+		    ,TrialId as omic_source_study
+		    ,b.patient_num as omic_patient_id
 		  from tm_lz.lt_src_rna_subj_samp_map a
-				--Joining to Pat_dim to ensure the ID's match. If not I2B2 won't work.
+		    --Joining to Pat_dim to ensure the IDs match. If not I2B2 won't work.
 			   inner join i2b2demodata.patient_dimension b
 				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':', 'g') = b.sourcesystem_cd
 			   inner join tm_wz.wt_rna_nodes ln
-				   on a.platform = ln.platform
-				   and a.tissue_type = ln.tissue_type
+				   on  a.platform = ln.platform
 				   and a.category_cd = ln.category_cd
+				   and coalesce(a.tissue_type,'@') = coalesce(ln.tissue_type,'@')
 				   and coalesce(a.attribute_1,'@') = coalesce(ln.attribute_1,'@')
 				   and coalesce(a.attribute_2,'@') = coalesce(ln.attribute_2,'@')
 				   and ln.node_type = 'LEAF'
-			   inner join tm_wz.wt_rna_nodes pn
-				   on a.platform = pn.platform
-				   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(pn.tissue_type,'@')
-				   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(pn.attribute_1,'@')
-				   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(pn.attribute_2,'@')
-				   and pn.node_type = 'PLATFORM'	  
+			   left outer join tm_wz.wt_rna_nodes pn
+					      on a.platform = pn.platform
+					      and a.category_cd like pn.category_cd || '%'
+					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(pn.tissue_type,'@')
+					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(pn.attribute_1,'@')
+					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(pn.attribute_2,'@')
+					      and pn.node_type = 'PLATFORM'
 			   left outer join tm_wz.wt_rna_nodes ttp
 					      on a.tissue_type = ttp.tissue_type
+					      and a.category_cd like ttp.category_cd || '%'
 					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '@' end = coalesce(ttp.platform,'@')
 					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(ttp.attribute_1,'@')
 					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(ttp.attribute_2,'@')
-					      and ttp.node_type = 'TISSUETYPE'		  
+					      and ttp.node_type = 'TISSUETYPE'
 			   left outer join tm_wz.wt_rna_nodes a1
 					      on a.attribute_1 = a1.attribute_1
+					      and a.category_cd like a1.category_cd || '%'
 					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a1.platform,'@')
 					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a1.tissue_type,'@')
 					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(a1.attribute_2,'@')
-					      and a1.node_type = 'ATTR1'		  
+					      and a1.node_type = 'ATTR1'
 			   left outer join tm_wz.wt_rna_nodes a2
-					      on a.attribute_2 = a1.attribute_2
+					      on a.attribute_2 = a2.attribute_2
+					      and a.category_cd like a2.category_cd || '%'
 					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a2.platform,'@')
 					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a2.tissue_type,'@')
 					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(a2.attribute_1,'@')
-					      and a2.node_type = 'ATTR2'			  
+					      and a2.node_type = 'ATTR2'
 			   left outer join i2b2demodata.patient_dimension sid --mrna expression used inner join here
 					      on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':','g') = sid.sourcesystem_cd
 		 where a.trial_name = TrialID
@@ -790,34 +813,35 @@ begin
 
     --	Insert records for patients and samples into observation_fact
     begin
-	insert into i2b2demodata.observation_fact
-		    (patient_num
-		    ,concept_cd
-		    ,modifier_cd
-		    ,valtype_cd
-		    ,tval_char
-		    ,sourcesystem_cd
-		    ,start_date
-		    ,import_date
-		    ,valueflag_cd
-		    ,provider_id
-		    ,location_cd
-		    ,units_cd
-		    ,instance_num
-		    )
-	select distinct m.patient_id
-			,m.concept_code
-			,'@'
-			,'T' -- Text data type
-			,'E'  --Stands for Equals for Text Types
-			,m.trial_name
-			,'infinity'::timestamp
-			,LOCALTIMESTAMP
-			,'@'
-			,'@'
-			,'@'
-			,'' -- no units available
-			,1
+	insert into i2b2demodata.observation_fact (
+	    patient_num
+	    ,concept_cd
+	    ,modifier_cd
+	    ,valtype_cd
+	    ,tval_char
+	    ,sourcesystem_cd
+	    ,start_date
+	    ,import_date
+	    ,valueflag_cd
+	    ,provider_id
+	    ,location_cd
+	    ,units_cd
+	    ,instance_num
+	)
+	select
+	    distinct m.patient_id
+	    ,m.concept_code
+	    ,'@'
+	    ,'T' -- Text data type
+	    ,'E'  --Stands for Equals for Text Types
+	    ,m.trial_name
+	    ,'infinity'::timestamp
+	    ,LOCALTIMESTAMP
+	    ,'@'
+	    ,'@'
+	    ,'@'
+	    ,'' -- no units available
+	    ,1
 	  from  deapp.de_subject_sample_mapping m
 	 where m.trial_name = TrialID 
 	   and m.source_cd = sourceCD
@@ -838,34 +862,35 @@ begin
   
     --	Insert sample facts 
     begin
-	insert into i2b2demodata.observation_fact
-		    (patient_num
-		    ,concept_cd
-		    ,modifier_cd
-		    ,valtype_cd
-		    ,tval_char
-		    ,sourcesystem_cd
-		    ,start_date
-		    ,import_date
-		    ,valueflag_cd
-		    ,provider_id
-		    ,location_cd
-		    ,units_cd
-		    ,instance_num
-		    )
-	select distinct m.sample_id
-			,m.concept_code
-			,m.trial_name
-			,'T' -- Text data type
-			,'E'  --Stands for Equals for Text Types
-			,m.trial_name
-			,'infinity'::timestamp
-			,LOCALTIMESTAMP
-			,'@'
-			,'@'
-			,'@'
-			,'' -- no units available
-			,1
+	insert into i2b2demodata.observation_fact (
+	    patient_num
+	    ,concept_cd
+	    ,modifier_cd
+	    ,valtype_cd
+	    ,tval_char
+	    ,sourcesystem_cd
+	    ,start_date
+	    ,import_date
+	    ,valueflag_cd
+	    ,provider_id
+	    ,location_cd
+	    ,units_cd
+	    ,instance_num
+	)
+	select
+	    distinct m.sample_id
+	    ,m.concept_code
+	    ,m.trial_name
+	    ,'T' -- Text data type
+	    ,'E'  --Stands for Equals for Text Types
+	    ,m.trial_name
+	    ,'infinity'::timestamp
+	    ,LOCALTIMESTAMP
+	    ,'@'
+	    ,'@'
+	    ,'@'
+	    ,'' -- no units available
+	    ,1
 	  from  deapp.de_subject_sample_mapping m
 	 where m.trial_name = TrialID 
 	   and m.source_cd = sourceCd
@@ -886,10 +911,12 @@ begin
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
     
     --Update I2b2 for correct data type
-    begin
 
+    begin
 	update i2b2metadata.i2b2 t
-	   set c_columndatatype = 'T', c_metadataxml = null, c_visualattributes='FA'
+	   set c_columndatatype = 'T'
+	       , c_metadataxml = null
+	       , c_visualattributes='FA'
 	 where t.c_basecode in (select distinct x.concept_cd from tm_wz.wt_rna_nodes x);
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -1238,7 +1265,7 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_rna_data',0,stepCt,'Done');
 
-    IF newJobFlag = 1 then
+    if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 

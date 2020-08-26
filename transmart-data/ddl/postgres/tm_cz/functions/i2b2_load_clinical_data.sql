@@ -265,6 +265,9 @@ begin
       from i2b2metadata.table_access
      where c_name = root_node;
 
+    stepCt := stepCt + 1;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Fetch root node "' || root_node ||'" and root_level ' || root_level::text,rowCt,stepCt,'Done');
+
     -- Get study name from topNode
 
     select tm_cz.parse_nth_value(topNode, topLevel, '\') into study_name;

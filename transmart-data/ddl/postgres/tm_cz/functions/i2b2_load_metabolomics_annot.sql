@@ -310,20 +310,19 @@ begin
     -- superpathways into search_keyword,
     -- superpathways into search_keyword_term
     begin
-        INSERT INTO searchapp.search_keyword (
+        insert into searchapp.search_keyword (
             keyword,
             bio_data_id,
             unique_id,
             data_category,
             display_data_category)
-        SELECT
-            CONCAT(CONCAT(subp.sub_pathway_name, '_'), subp.gpl_id),
+        select
+            concat(concat(subp.sub_pathway_name, '_'), subp.gpl_id),
             subp.id,
-            CONCAT('METABOLITE_SUBPATHWAY:', subp.id),
+            concat('METABOLITE_SUBPATHWAY:', subp.id),
             'METABOLITE_SUBPATHWAY',
             'Metabolite subpathway'
-          FROM
-		  deapp.de_metabolite_sub_pathways subp
+          from deapp.de_metabolite_sub_pathways subp
          where subp.gpl_id = gplId;
     exception
 	when others then
@@ -337,30 +336,27 @@ begin
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subpathways into search_keyword',rowCt,stepCt,'Done');
     
     begin
-        INSERT INTO searchapp.search_keyword_term (
+        insert into searchapp.search_keyword_term (
             keyword_term,
             search_keyword_id,
             rank,
             term_length)
-        SELECT
+        select
             upper_keyword,
             search_keyword_id,
             1,
-            LENGTH(upper_keyword)
-          FROM (
-              SELECT
-                  UPPER(skw.keyword) AS upper_keyword,
-                  skw.search_keyword_id AS search_keyword_id
-		FROM
-			searchapp.search_keyword skw
-               WHERE
+            length(upper_keyword)
+          from (
+              select
+                  upper(skw.keyword) as upper_keyword,
+                  skw.search_keyword_id as search_keyword_id
+		from searchapp.search_keyword skw
+               where
                 data_category = 'METABOLITE_SUBPATHWAY'
-            AND
-                bio_data_id IN (
-                    SELECT
-			subp.id
-                      FROM
-			      deapp.de_metabolite_sub_pathways subp
+            and
+                bio_data_id in (
+                    select subp.id
+                      from deapp.de_metabolite_sub_pathways subp
                      where subp.gpl_id = gplId
                 )
           ) as s;
@@ -368,19 +364,19 @@ begin
         stepCt := stepCt + 1;
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subpathways into search_keyword_term',rowCt,stepCt,'Done');
         
-        INSERT INTO searchapp.search_keyword (
+        insert into searchapp.search_keyword (
             keyword,
             bio_data_id,
             unique_id,
             data_category,
             display_data_category)
-        SELECT
+        select
             CONCAT(CONCAT(supp.super_pathway_name, '_'), supp.gpl_id),
             supp.id,
             CONCAT('METABOLITE_SUPERPATHWAY:', supp.id),
             'METABOLITE_SUPERPATHWAY',
             'Metabolite superpathway'
-          FROM
+          from
 		  deapp.de_metabolite_super_pathways supp
          where supp.gpl_id = gplId;
     exception

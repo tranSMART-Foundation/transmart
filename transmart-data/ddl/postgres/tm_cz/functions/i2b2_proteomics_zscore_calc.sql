@@ -4,9 +4,10 @@
 CREATE OR REPLACE FUNCTION tm_cz.i2b2_proteomics_zscore_calc(trial_id character varying, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT NULL::numeric, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2.0, source_cd character varying DEFAULT NULL::character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
+
     /*************************************************************************
-     This Stored Procedure is used in ETL load PROTEOMICS data
-      Date:12/9/2013
+     * This Stored Procedure is used in ETL load PROTEOMICS data
+     *   Date:12/9/2013
      ******************************************************************/
 
     declare
@@ -21,7 +22,7 @@ AS $$
     pExists	numeric;
     nbrRecs numeric;
     logBase numeric;
-    
+
     --Audit variables
     newJobFlag numeric(1);
     databaseName VARCHAR(100);
@@ -37,7 +38,7 @@ begin
     dataType := data_type;
     logBase := log_base;
     sourceCd := source_cd;
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -51,12 +52,12 @@ begin
 	newJobFlag := 1; -- True
 	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
-    
+
     stepCt := 0;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
-    
+
     if runType != 'L' then
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
@@ -65,14 +66,14 @@ begin
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return 150;
     end if;
-    
+
     --	For Load, make sure that the TrialId passed as parameter is the same as the trial in WT_SUBJECT_PROTEOMICS_PROBESET
     --	If not, raise exception
 
     if runType = 'L' then
 	select distinct trial_name into stgTrial
 	from wt_subject_proteomics_probeset;
-	
+
 	if stgTrial != TrialId then
 	    stepCt := stepCt + 1;
 	    get diagnostics rowCt := ROW_COUNT;
@@ -82,8 +83,9 @@ begin
 	    return 161;
 	end if;
     end if;
-    
+
     --	truncate tmp tables
+
     begin
 	execute ('truncate table tm_wz.wt_subject_proteomics_logs');
 	execute ('truncate table tm_wz.wt_subject_proteomics_calcs');
@@ -94,26 +96,26 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
+
     --drop index if exists tm_wz.wt_subject_proteomics_logs_i1;		
     --drop index if exists tm_wz.wt_subject_proteomics_calcs_i1;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
-    
+
     --	if dataType = L, use intensity_value as log_intensity
     --	if dataType = R, always use intensity_value
 
-
     if dataType = 'L' then
 	begin
-	    insert into wt_subject_proteomics_logs 
-			(probeset_id
-			,intensity_value
-			,assay_id
-			,log_intensity
-			,patient_id
-			--	,sample_cd
-			,subject_id)
+	    insert into wt_subject_proteomics_logs (
+		probeset_id
+		,intensity_value
+		,assay_id
+		,log_intensity
+		,patient_id
+		--	,sample_cd
+		,subject_id)
 	    select probeset
 		   ,intensity_value ----UAT 154 changes done on 19/03/2014
 		   ,assay_id 
@@ -131,20 +133,20 @@ begin
 	end;
     else	
 	begin
-            insert into wt_subject_proteomics_logs 
-			(probeset_id
-			,intensity_value
-			,assay_id
-			,log_intensity
-			,patient_id
-		--      ,sample_cd
-			,subject_id)
+            insert into wt_subject_proteomics_logs  (
+		probeset_id
+		,intensity_value
+		,assay_id
+		,log_intensity
+		,patient_id
+		--  ,sample_cd
+		,subject_id)
 	    select probeset
 		   ,intensity_value  ----UAT 154 changes done on 19/03/2014
 		   ,assay_id 
 		   ,round(log(2.0::numeric,intensity_value::numeric  + 0.001),4)  ----UAT 154 changes done on 19/03/2014
 		   ,patient_id
-		--		  ,sample_cd
+		-- ,sample_cd
 		   ,subject_id
 	      from wt_subject_proteomics_probeset
 	     where trial_name = TrialId;
@@ -159,22 +161,20 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ.wt_subject_proteomics_logs',rowCt,stepCt,'Done');
-
-    
-    
+   
     --execute ('create index wt_subject_proteomics_logs_I1 on tm_wz.wt_subject_proteomics_logs (trial_name, probeset_id)');
-    stepCt := stepCt + 1;
+    --stepCt := stepCt + 1;
     --perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_PROTEOMICS_LOGS_I1',0,stepCt,'Done');
     
     --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
 
     begin
-	insert into wt_subject_proteomics_calcs
-		    (trial_name
-		    ,probeset_id
-		    ,mean_intensity
-		    ,median_intensity
-		    ,stddev_intensity)
+	insert into wt_subject_proteomics_calcs (
+	    trial_name
+	    ,probeset_id
+	    ,mean_intensity
+	    ,median_intensity
+	    ,stddev_intensity)
 	select d.trial_name 
 	       ,d.probeset_id
 	       ,avg(log_intensity)
@@ -189,32 +189,31 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ WT_SUBJECT_PROTEOMICS_CALCS',rowCt,stepCt,'Done');
 
-    
-
     --execute ('create index tm_wz.wt_subject_proteomics_calcs_i1 on tm_wz.WT_SUBJECT_PROTEOMICS_CALCS (trial_name, probeset_id) nologging tablespace "INDX"');
     --stepCt := stepCt + 1;
     --cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_PROTEOMICS_CALCS',0,stepCt,'Done');
-    
+
     -- calculate zscore
 
     begin
-	insert into wt_subject_proteomics_med 
-		    (probeset_id
-		    ,intensity_value
-		    ,log_intensity
-		    ,assay_id
-		    ,mean_intensity
-		    ,stddev_intensity
-		    ,median_intensity
-		    ,zscore
-		    ,patient_id
-		    --	,sample_cd
-		    ,subject_id
-		    )
+	insert into wt_subject_proteomics_med  (
+	    probeset_id
+	    ,intensity_value
+	    ,log_intensity
+	    ,assay_id
+	    ,mean_intensity
+	    ,stddev_intensity
+	    ,median_intensity
+	    ,zscore
+	    ,patient_id
+	    --	,sample_cd
+	    ,subject_id
+	)
 	select d.probeset_id
 	       ,d.intensity_value 
 	       ,d.log_intensity 
@@ -235,24 +234,24 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ WT_SUBJECT_PROTEOMICS_MED',rowCt,stepCt,'Done');
 
-    
     begin
-	insert into de_subject_protein_data
-		    (trial_name
-		    ,protein_annotation_id
-		    ,component
-		    ,gene_symbol
-		    ,gene_id
-		    ,assay_id
-		    ,subject_id
-		    ,intensity 
-		    ,zscore
-		    ,log_intensity
-		    ,patient_id)
+	insert into de_subject_protein_data (
+	    trial_name
+	    ,protein_annotation_id
+	    ,component
+	    ,gene_symbol
+	    ,gene_id
+	    ,assay_id
+	    ,subject_id
+	    ,intensity 
+	    ,zscore
+	    ,log_intensity
+	    ,patient_id)
 	select TrialId
                ,d.id
                ,m.probeset_id 
@@ -274,13 +273,14 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP DE_SUBJECT_PROTEIN_DATA',rowCt,stepCt,'Done');
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
@@ -289,5 +289,6 @@ begin
     return 1;
 
 end;
+
 $$;
 

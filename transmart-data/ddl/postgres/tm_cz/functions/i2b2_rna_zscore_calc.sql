@@ -51,6 +51,7 @@ BEGIN
 
     partitionindx := partition_indx;
     partitionName := partition_name;	
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -73,7 +74,7 @@ BEGIN
      where table_name = partitionindx;
 
     if pExists = 0 then
-	sqlText := 'create table ' || partitionName || ' ( constraint rnaseq_' || partitionId::text || '_check check ( partition_id = ' || partitionId::text ||
+	sqlText := 'create table ' || partitionName || ' ( constraint rna_' || partitionId::text || '_check check ( partition_id = ' || partitionId::text ||
 	    ')) inherits (deapp.de_subject_rna_data)';
 --	raise notice 'sqlText= %', sqlText;
 	execute sqlText;
@@ -112,15 +113,6 @@ BEGIN
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
-
-    if runType != 'L' then
-	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting'
-			       ,0,stepCt,'Done');
-	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	return -16;
-    end if;
 
     if runType = 'L' then
 	select distinct trial_name into stgTrial
@@ -257,6 +249,7 @@ BEGIN
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on tm_wz wt_subject_rna_calcs_i1',0,stepCt,'Done');
 
@@ -296,6 +289,7 @@ BEGIN
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_rna_med',rowCt,stepCt,'Done');
 
@@ -329,15 +323,6 @@ BEGIN
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted data into ' || partitionName,rowCt,stepCt,'Done');
 
-    if (coalesce(cleanTablesValue,'yes')) then
-        EXECUTE('truncate table tm_wz.wt_subject_rna_logs');
-        EXECUTE('truncate table tm_wz.wt_subject_rna_calcs');
-        EXECUTE('truncate table tm_wz.wt_subject_rna_med');
-
-	stepCt := stepCt + 1;
-    	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
-    end if;
-
     -- create indexes on partition
 
     sqlText := ' create index ' || partitionIndx || '_idx1 on ' || partitionName || ' using btree (partition_id) tablespace indx';
@@ -355,6 +340,15 @@ BEGIN
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Created indexes on '||partitionName,4,stepCt,'Done');
+
+    if (coalesce(cleanTablesValue,'yes')) then
+        EXECUTE('truncate table tm_wz.wt_subject_rna_logs');
+        EXECUTE('truncate table tm_wz.wt_subject_rna_calcs');
+        EXECUTE('truncate table tm_wz.wt_subject_rna_med');
+
+	stepCt := stepCt + 1;
+    	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
+    end if;
 
 ---Cleanup OVERALL JOB if this proc is being run standalone
     IF newJobFlag = 1

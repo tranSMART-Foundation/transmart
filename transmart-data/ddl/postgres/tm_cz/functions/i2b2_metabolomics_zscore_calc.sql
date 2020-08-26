@@ -74,12 +74,12 @@ begin
 
     if runType = 'L' then
 	select distinct trial_name into stgTrial
-	from WT_SUBJECT_MBOLOMICS_PROBESET;
+	from tm_wz.wt_subject_mbolomics_probeset;
 	
 	if stgTrial != TrialId then
 	    stepCt := stepCt + 1;
 	    get diagnostics rowCt := ROW_COUNT;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in WT_SUBJECT_MBOLOMICS_PROBESET - procedure exiting'
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'TrialId not the same as trial in wt_subject_mbolomics_probeset - procedure exiting'
 				   ,rowCt,stepCt,'Done');
 	    --Handle errors.
     	    perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
@@ -90,12 +90,12 @@ begin
     end if;
 
     /*	remove Reload processing
-	--	For Reload, make sure that the TrialId passed as parameter has data in de_subject_METABOLOMICS_data
+	--	For Reload, make sure that the TrialId passed as parameter has data in de_subject_metabolomics_data
 	--	If not, raise exception
 
 	if runType = 'R' then
 	select count(*) into idxExists
-	from DE_SUBJECT_METABOLOMICS_DATA
+	from deapp.de_subject_metabolomics_data
 	select sys_context('userenv', 'current_schema') INTO databaseName FROM dual;
 	procedureName := 'i2b2_metabolomics_zscore_calc';
 
@@ -128,7 +128,7 @@ begin
 	if idxExists = 0 then
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in DE_SUBJECT_METABOLOMICS_DATA - procedure exiting',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_metabolomics_data - procedure exiting',rowCt,stepCt,'Done');
 	--Handle errors.
     	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     	--End Proc
@@ -175,7 +175,7 @@ begin
 
     if dataType = 'L' then
 
-	insert into WT_SUBJECT_METABOLOMICS_LOGS 
+	insert into tm_wz.wt_subject_metabolomics_logs 
 	(probeset
 	,intensity_value
 	,assay_id
@@ -191,13 +191,13 @@ begin
 	,patient_id
 	--	  ,sample_cd
 	,subject_id
-	from WT_SUBJECT_MBOLOMICS_PROBESET
+	from tm_wz.wt_subject_mbolomics_probeset
 	where trial_name = TrialId;
         
 	--end if;
     else	
 
-        insert into WT_SUBJECT_METABOLOMICS_LOGS 
+        insert into tm_wz.wt_subject_metabolomics_logs 
 		    (probeset
 		    ,intensity_value
 		    ,assay_id
@@ -213,7 +213,7 @@ begin
 	       ,patient_id
 	    --		  ,sample_cd
 	       ,subject_id
-	  from WT_SUBJECT_MBOLOMICS_PROBESET
+	  from tm_wz.wt_subject_mbolomics_probeset
 	 where trial_name = TrialId;
 	--		end if;
 
@@ -221,17 +221,17 @@ begin
 
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_mirna_logs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in wt_subject_mirna_logs',rowCt,stepCt,'Done');
 
     commit;
 
-    execute('create index tm_wz.WT_SUBJECT_MBOLOMICS_LOGS_I1 on tm_wz.WT_SUBJECT_METABOLOMICS_LOGS (trial_name, probeset) nologging  tablespace "INDX"');
+    execute('create index wt_subject_mbolomics_logs_i1 on tm_wz.wt_subject_metabolomics_logs (trial_name, probeset) nologging  tablespace "INDX"');
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_MBOLOMICS_LOGS_I1',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on wt_subject_mbolomics_logs_I1',0,stepCt,'Done');
     
     --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
 
-    insert into WT_SUBJECT_METABOLOMICS_CALCS
+    insert into tm_wz.wt_subject_metabolomics_calcs
 		(trial_name
 		,probeset
 		,mean_intensity
@@ -243,23 +243,23 @@ begin
 	   ,avg(log_intensity)
 	   ,median(log_intensity)
 	   ,stddev(log_intensity)
-      from WT_SUBJECT_METABOLOMICS_LOGS d 
+      from tm_wz.wt_subject_metabolomics_logs d 
      group by d.trial_name 
 	      ,d.probeset;
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ WT_SUBJECT_METABOLOMICS_CALCS',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in wt_subject_metabolomics_calcs',rowCt,stepCt,'Done');
 
     commit;
 
-    --execute immediate('create index tm_wz.wt_subject_METABOLOMICS_calcs_i1 on tm_wz.WT_SUBJECT_METABOLOMICS_CALCS (trial_name, probeset_id) nologging tablespace "INDX"');
+    --execute immediate('create index wt_subject_METABOLOMICS_calcs_i1 on tm_wz.wt_subject_metabolomics_calcs (trial_name, probeset_id) nologging tablespace "INDX"');
     --stepCt := stepCt + 1;
-    --perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ WT_SUBJECT_METABOLOMICS_CALCS',0,stepCt,'Done');
+    --perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on subject_metabolomics_calcs',0,stepCt,'Done');
     
     -- calculate zscore
 
     
-    insert into WT_SUBJECT_METABOLOMICS_MED
+    insert into tm_wz.wt_subject_metabolomics_med
 		(probeset
 		,intensity_value
 		,log_intensity
@@ -283,24 +283,24 @@ begin
 	   ,d.patient_id
 	--	  ,d.sample_cd
 	   ,d.subject_id
-      from WT_SUBJECT_METABOLOMICS_LOGS d 
-	   ,WT_SUBJECT_METABOLOMICS_CALCS c 
+      from tm_wz.wt_subject_metabolomics_logs d 
+	   ,tm_wz.wt_subject_metabolomics_calcs c 
      where trim(d.probeset) = c.probeset;
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ WT_SUBJECT_METABOLOMICS_MED',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in wt_subject_metabolomics_med',rowCt,stepCt,'Done');
 
     commit;
 
     /*
       select count(*) into n
       select count(*) into nbrRecs
-      from WT_SUBJECT_METABOLOMICS_MED;
+      from tm_wz.wt_subject_metabolomics_med;
       
       if nbrRecs > 10000000 then
       i2b2_mrna_index_maint('DROP',,jobId);
       stepCt := stepCt + 1;
-      perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on DEAPP de_subject_METABOLOMICS_data',0,stepCt,'Done');
+      perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on de_subject_metabolomics_data',0,stepCt,'Done');
       else
       stepCt := stepCt + 1;
       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Less than 10M records, index drop bypassed',0,stepCt,'Done');
@@ -310,7 +310,7 @@ begin
 
 
     /*
-      insert into DE_SUBJECT_METABOLOMICS_DATA
+      insert into deapp.de_subject_metabolomics_data
       (
       trial_source
       ,trial_name
@@ -339,13 +339,13 @@ begin
       else m.intensity_value
       end as zscore
       ,m.patient_id
-      from WT_SUBJECT_MBOLOMICS_PROBESET  m,
-      (select distinct mp.source_cd From "TM_LZ"."LT_SRC_METABOLOMIC_MAP" mp where rownum = 1 and mp.trial_name =TrialID) mpp
-      ,DEAPP.DE_METABOLITE_ANNOTATION d
+      from tm_wz.wt_subject_mbolomics_probeset  m,
+      (select distinct mp.source_cd From "tm_lz"."lt_src_metabolomic_map" mp where rownum = 1 and mp.trial_name =TrialID) mpp
+      ,deapp.de_metabolite_annotation d
       where m.trial_name = TrialID
       and d.biochemical_name = m.probeset;
      */
-    insert into DE_SUBJECT_METABOLOMICS_DATA
+    insert into deapp.de_subject_metabolomics_data
 		(
 		    trial_source
 		    ,trial_name
@@ -374,15 +374,15 @@ begin
 	,round(m.log_intensity,4)
         ,round(CASE WHEN m.zscore < -2.5 THEN -2.5 WHEN m.zscore >  2.5 THEN  2.5 ELSE round(m.zscore,5) END,5)		  
         ,m.patient_id
-      from WT_SUBJECT_METABOLOMICS_MED m,
+      from tm_wz.wt_subject_metabolomics_med m,
            (select distinct mp.source_cd,mp.platform From "TM_LZ"."LT_SRC_METABOLOMIC_MAP" mp LIMIT 1 OFFSET 1 and mp.trial_name =TrialID) mpp                
-	   , DE_METABOLITE_ANNOTATION d
+	   , deapp.de_metabolite_annotation d
      where trim(d.biochemical_name) = trim(m.probeset)
        and d.gpl_id = mpp.platform;
     
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP DE_SUBJECT_METABOLOMICS_DATA',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in de_subject_metabolomics_data',rowCt,stepCt,'Done');
 
     commit;
 
@@ -390,7 +390,7 @@ begin
     /*
       i2b2_mrna_index_maint('ADD',,jobId);
       stepCt := stepCt + 1;
-      perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Add indexes on DEAPP de_subject_METABOLOMICS_data',0,stepCt,'Done');
+      perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Add indexes on de_subject_metabolomics_data',0,stepCt,'Done');
      */
     
     --	cleanup tmp_ files
@@ -516,12 +516,12 @@ begin
     end if;
 
     --	remove Reload processing
-    --	For Reload, make sure that the TrialId passed as parameter has data in de_subject_METABOLOMICS_data
+    --	For Reload, make sure that the TrialId passed as parameter has data in de_subject_metabolomics_data
     --	If not, raise exception
 
     if runType = 'R' then
 	select count(*) into idxExists
-	from DE_SUBJECT_METABOLOMICS_DATA		
+	from deapp.de_subject_metabolomics_data		
 	where trial_name = TrialId;
 	
 	if idxExists = 0 then
@@ -562,10 +562,10 @@ begin
 	    ,intensity_value
 	    ,patient_id
 	    ,subject_id
-	    from wt_subject_mbolomics_probeset
+	    from tm_wz.wt_subject_mbolomics_probeset
 	    where trial_name = TrialId;
 	else	
-	    insert into wt_subject_metabolomics_logs 
+	    insert into tm_wz.wt_subject_metabolomics_logs 
 			(probeset
 			,intensity_value
 			,assay_id
@@ -579,7 +579,7 @@ begin
 		   ,log(log_base,cast(intensity_value as numeric))   -- wt_subject_mbolomics_probeset should only contain strictly positive intensities, otherwise throwing an error here is correct thing to do
 		   ,patient_id
 		   ,subject_id
-	      from wt_subject_mbolomics_probeset
+	      from tm_wz.wt_subject_mbolomics_probeset
 	     where trial_name = TrialId;
 	end if;
 	get diagnostics rowCt := ROW_COUNT;
@@ -595,7 +595,7 @@ begin
     end;
 
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_mirna_logs',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in wt_subject_mirna_logs',rowCt,stepCt,'Done');
 
     execute('create index wt_subject_mbolomics_logs_i1 on tm_wz.wt_subject_metabolomics_logs (trial_name, probeset) tablespace "indx"');
     stepCt := stepCt + 1;
@@ -615,7 +615,7 @@ begin
 	       ,avg(log_intensity)
 	       ,median(log_intensity)
 	       ,coalesce(stddev(log_intensity),0)
-	  from wt_subject_metabolomics_logs d 
+	  from tm_wz.wt_subject_metabolomics_logs d 
 	 group by d.trial_name 
 		  ,d.probeset;
 	get diagnostics rowCt := ROW_COUNT;
@@ -634,7 +634,7 @@ begin
 
     -- calculate zscore
     begin
-        insert into WT_SUBJECT_METABOLOMICS_MED 
+        insert into tm_wz.wt_subject_metabolomics_med 
 		    (probeset
 		    ,intensity_value
 		    ,log_intensity
@@ -656,8 +656,8 @@ begin
 	       ,(CASE WHEN stddev_intensity=0 THEN 0 ELSE (log_intensity - median_intensity ) / stddev_intensity END)
 	       ,d.patient_id
 	       ,d.subject_id
-	  from wt_subject_metabolomics_logs d 
-	       ,wt_subject_metabolomics_calcs c
+	  from tm_wz.wt_subject_metabolomics_logs d 
+	       ,tm_wz.wt_subject_metabolomics_calcs c
 	 where trim(d.probeset) = c.probeset;
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -671,7 +671,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ WT_SUBJECT_METABOLOMICS_MED',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in wt_subject_metabolomics_med',rowCt,stepCt,'Done');
     
     begin
 	sqlText := 'insert into ' || partitionName || 
@@ -682,9 +682,9 @@ begin
             ',m.intensity_value ,m.log_intensity ' ||
             ',CASE WHEN m.zscore < -2.5 THEN -2.5 WHEN m.zscore >  2.5 THEN  2.5 ELSE m.zscore END ' ||  
             ',m.patient_id ' ||
-	    'from wt_subject_metabolomics_med m, ' ||
+	    'from tm_wz.wt_subject_metabolomics_med m, ' ||
             '(select distinct mp.source_cd,mp.platform From TM_LZ.LT_SRC_METABOLOMIC_MAP mp where mp.trial_name = ''' || TrialId || ''') as mpp ' ||
-	    ', de_metabolite_annotation d ' ||
+	    ', deapp.de_metabolite_annotation d ' ||
             'where trim(d.biochemical_name) = trim(m.probeset) ' ||
             'and d.gpl_id = mpp.platform ';
         raise notice 'sqlText= %', sqlText;
@@ -700,7 +700,7 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP DE_SUBJECT_METABOLOMICS_DATA',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in de_subject_metabolomics_data',rowCt,stepCt,'Done');
 
     sqlText := ' create index ' || partitionIndx || '_idx1 on ' || partitionName || ' using btree (partition_id) tablespace indx';
     raise notice 'sqlText= %', sqlText;
