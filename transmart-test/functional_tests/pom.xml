@@ -29,7 +29,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>24.1-jre</version>	<!-- was 22.0 now select 24.1-jre or android flavour -->
+      <version>24.1.1-jre</version>	<!-- was 22.0 now select 24.1-jre or android flavour -->
       <scope>test</scope>
     </dependency>
     <dependency>
