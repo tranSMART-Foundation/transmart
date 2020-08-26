@@ -16,6 +16,7 @@ if [ -z "$DATA_FILE_PREFIX" ] || [ -z "$MAP_FILENAME" ]; then
 	echo "Following variables need to be set:"
 	echo "    DATA_FILE_PREFIX=$DATA_FILE_PREFIX"
 	echo "    MAP_FILENAME=$MAP_FILENAME"
+	exit 1
 fi
 
 # Extract STUDY_ID from subject sample mapping file
@@ -46,6 +47,10 @@ fi
 TOP_NODE="\\${TOP_NODE_PREFIX}\\${STUDY_NAME}\\"
 
 if [ ! -d logs ] ; then mkdir logs; fi
+
+# lt_src_mrna_data is truncated by Kettle
+# $PGSQL_BIN/psql -c "truncate tm_lz.lt_src_mrna_data"
+# echo "Loading zone tables truncated"
 
 $KITCHEN -norep -version                                                     \
 	 -file=$KETTLE_JOBS/load_gene_expression_data.kjb                    \

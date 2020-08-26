@@ -57,6 +57,11 @@ LOG_BASE=${LOG_BASE:-2}
 
 if [ ! -d logs ] ; then mkdir logs; fi
 
+$PGSQL_BIN/psql -c "truncate tm_lz.lt_src_metabolomic_data"
+$PGSQL_BIN/psql -c "truncate tm_lz.lt_src_metabolomic_map"
+$PGSQL_BIN/psql -c "truncate tm_lz.lt_src_metabol_display_mapping"
+echo "Loading zone tables truncated"
+
 $KITCHEN -norep -version                                                      \
 	 -file=$KETTLE_JOBS/load_metabolomic_data.kjb                         \
 	 -level="$KETTLE_LOG_LEVEL"                                           \

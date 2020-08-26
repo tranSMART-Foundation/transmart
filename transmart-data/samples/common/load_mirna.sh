@@ -30,6 +30,10 @@ TOP_NODE="\\${TOP_NODE_PREFIX}\\${STUDY_NAME}\\"
 
 if [ ! -d logs ] ; then mkdir logs; fi
 
+# lt_src_qpcr_mirna_data is truncated by Kettle
+$PGSQL_BIN/psql -c "truncate tm_lz.lt_src_qpcr_mirna_data"
+echo "Loading zone tables truncated"
+
 $KITCHEN -norep -version                                                \
 	 -file="$KETTLE_JOBS/load_QPCR_MIRNA_data.kjb"                  \
          -level="$KETTLE_LOG_LEVEL"                                     \

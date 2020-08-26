@@ -57,6 +57,11 @@ LOG_BASE=${LOG_BASE:-2}
 
 if [ ! -d logs ] ; then mkdir logs; fi
 
+$PGSQL_BIN/psql -c "truncate tm_lz.lt_src_rbm_data"
+$PGSQL_BIN/psql -c "truncate tm_lz.lt_src_rbm_subj_samp_map"
+$PGSQL_BIN/psql -c "truncate tm_lz.lt_src_rbm_display_mapping"
+echo "Loading zone tables truncated"
+
 $KITCHEN -norep -version                                              \
 	 -file=$KETTLE_JOBS/load_rbm_data.kjb                         \
 	 -level="$KETTLE_LOG_LEVEL"                                   \
