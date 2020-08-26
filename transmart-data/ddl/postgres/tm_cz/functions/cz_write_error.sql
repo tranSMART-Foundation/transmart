@@ -1,7 +1,7 @@
 --
 -- Name: cz_write_error(numeric, character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE OR REPLACE FUNCTION tm_cz.cz_write_error(jobId numeric, errorNumber character varying, errorMessage character varying, errorStack character varying, errorBacktrace character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.cz_write_error(jobId numeric, errorNumber character varying, errorMessage character varying, errorStack text, errorBacktrace text) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -49,8 +49,14 @@ begin
 	 where job_id = jobId;
 	
         if (coalesce(debugValue,'no')) then
-            raise NOTICE 'CZ_WRITE_ERROR job:% error:% "%" stack: "%" backtrace "%"',
-	          jobId, errorNumber, errorMessage, errorStack, errorBacktrace;
+            if(coalesce(errorBacktrace,'') <> '') then
+		errorBacktrace := 'backtrace: "' || errorBacktrace || '"';
+	    end if;
+	    if(coalesce(errorStack,'') <> '') then
+		errorStack := 'stack: "' || errorStack || '"';
+	    end if;
+	    raise NOTICE 'CZ_WRITE_ERROR job:% error:% "%" % %',
+	        jobId, errorNumber, errorMessage, errorStack, errorBacktrace;
         end if;
 
     end;
@@ -59,7 +65,7 @@ begin
     
 exception 
     when others then
-	raise notice 'proc failed state=%  errm=%', SQLSTATE, SQLERRM;
+	raise notice 'cz_write_error failed state=%  errm=%', SQLSTATE, SQLERRM;
 	return -16; 
 
 end;
