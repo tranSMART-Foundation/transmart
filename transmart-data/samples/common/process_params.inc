@@ -16,10 +16,19 @@ if [ $(echo $SUPPORTED_DATA_TYPES | grep -c -w $UPLOAD_DATA_TYPE) -ne 1 ] ; then
 fi
 
 # Before changing to the data location directory determine absolute path name of params file (optional first argument)
+# If not found, also check the UPLOAD_DATA_TYPE directory which make also tested
 if [ ! -z "$1" ]; then
+    FILE_FOUND=0
     PARAMS_FILENAME=$( cd "$( dirname "$1" )" && echo "$(pwd)/$(basename "$1")" )
-    echo "Processing file $1 \$PARAMS_FILENAME $PARAMS_FILENAME"
-    if [ ! -f "$PARAMS_FILENAME" ]; then
+    if [ -f "$PARAMS_FILENAME" ]; then
+	FILE_FOUND=1
+    else
+	PARAMS_FILENAME=$( cd "$( dirname "$1")/$UPLOAD_DATA_TYPE" && echo "$(pwd)/$(basename "$1")" )
+	if [ -f "$PARAMS_FILENAME" ]; then
+	    FILE_FOUND=2
+	fi
+    fi
+    if [ ! $FILE_FOUND ]; then
         echo "Error $(basename $0): params file ($PARAMS_FILENAME) could not be found"
         exit 1
     fi
@@ -78,12 +87,6 @@ fi
 # It may contain parameter values which only apply locally (not study global).
 
 localparams="./$UPLOAD_DATA_TYPE.params"
-if [ -f "$localparams" ] ; then
-    source $localparams
-    echo "Info $(basename $0): Sourced local params file $localparams"
-fi
-
-localparams="$UPLOAD_DATA_TYPE/$UPLOAD_DATA_TYPE.params"
 if [ -f "$localparams" ] ; then
     source $localparams
     echo "Info $(basename $0): Sourced local params file $localparams"
