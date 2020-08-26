@@ -36,7 +36,7 @@ class StudiesResourceService implements StudiesResource {
         // we actually only search the i2b2 table here
         // given that studies are implemented in a specific way in transmart,
         // and that i2b2 is the only used ontology table,
-        // we have to drop the pretense that we use table_access and multiple
+        // we have to drop the pretence that we use table_access and multiple
         // ontology tables at this point.
 	List<Object[]> rows = I2b2.executeQuery('''
 				SELECT I, TN.trial
