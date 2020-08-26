@@ -86,10 +86,11 @@
 \i tm_cz/functions/i2b2_process_rna_data.sql
 \i tm_cz/functions/i2b2_process_rnaseq_data.sql
 \i tm_cz/functions/i2b2_proteomics_zscore_calc.sql
-\i tm_cz/functions/i2b2_rbm_zscore_calc_new.sql
+\i tm_cz/functions/i2b2_rbm_zscore_calc.sql
 \i tm_cz/functions/i2b2_rename_node.sql
 \i tm_cz/functions/i2b2_rna_annotation.sql
 \i tm_cz/functions/i2b2_rna_zscore_calc.sql
+\i tm_cz/functions/i2b2_rnaseq_zscore_calc.sql
 \i tm_cz/functions/i2b2_secure_study.sql
 \i tm_cz/functions/i2b2_show_node.sql
 \i tm_cz/functions/i2b2_table_bkp.sql
