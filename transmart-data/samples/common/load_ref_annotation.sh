@@ -4,4 +4,4 @@ set -e
 
 source $1
 
-echo $PLATFORM
+echo "$PLATFORM $PLATFORMS"
