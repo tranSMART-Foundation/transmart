@@ -23,6 +23,7 @@
 \i tm_lz/lt_src_mirna_display_mapping.sql
 \i tm_lz/lt_src_mirna_subj_samp_map.sql
 \i tm_lz/lt_src_mrna_data.sql
+\i tm_lz/lt_src_mrna_display_mapping.sql
 \i tm_lz/lt_src_mrna_subj_samp_map.sql
 \i tm_lz/lt_src_nextbio.sql
 \i tm_lz/lt_src_omicsoft_annot.sql
