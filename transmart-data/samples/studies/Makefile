@@ -9,18 +9,41 @@ update_datasets:
 	@rm -f datasets
 	@$(MAKE) --quiet datasets
 
-# depends on %/%_clinical.tar.xz, but make doesn't support repeated %
-%/clinical.params %/clinical:
-	$(MAKE) $*/$*_clinical.tar.xz
-	tar -C $* -xJf $*/$*_clinical.tar.xz
+# we depend on %/%_study.tar.xz, but make doesn't support repeated %
 
+vpath %/annotation.params annotation
+
+# study needs params file and load.sh script to cascade to all other scripts
+%/study.params %/load.sh:
+	$(MAKE) $*/$*_study.tar.xz
+	tar -C $* -xJf $*/$*_study.tar.xz
+
+# ref_annotation needs params that point to the annotation needed
+%/ref_annotation.params:
+	$(MAKE) $*/$*_ref_annotation.tar.xz
+	tar -C $* -xJf $*/$*_ref_annotation.tar.xz
+
+# annotation for all types needs params (defines the type) and annotation directory
 %/annotation.params %/annotation:
 	$(MAKE) $*/$*_annotation.tar.xz
 	tar -C $* -xJf $*/$*_annotation.tar.xz
 
-%/ref_annotation.params:
-	$(MAKE) $*/$*_ref_annotation.tar.xz
-	tar -C $* -xJf $*/$*_ref_annotation.tar.xz
+# clinical data and high-dimensional datatypes need .params and directory
+
+vpath %/clinical.params clinical
+
+vpath %/acgh.params acgh
+vpath %/expression.params expression
+vpath %/mirnaqpcr.params mirnaqpcr
+vpath %/mirnaseq.params mirnaseq
+vpath %/msproteomics.params msproteomics
+vpath %/metabolomics.params metabolomics
+vpath %/rbm.params rbm
+vpath %/rnaseq.params rnaseq
+
+%/clinical.params %/clinical:
+	$(MAKE) $*/$*_clinical.tar.xz
+	tar -C $* -xJf $*/$*_clinical.tar.xz
 
 %/expression.params %/expression:
 	$(MAKE) $*/$*_expression.tar.xz
@@ -30,10 +53,6 @@ update_datasets:
 	$(MAKE) $*/$*_acgh.tar.xz
 	tar -C $* -xJf $*/$*_acgh.tar.xz
 
-%/mirna.params:
-	$(MAKE) $*/$*_mirna.tar.xz
-	tar -C $* -xJf $*/$*_mirna.tar.xz
-
 %/mirnaqpcr.params %/mirnaqpcr:
 	$(MAKE) $*/$*_mirnaqpcr.tar.xz
 	tar -C $* -xJf $*/$*_mirnaqpcr.tar.xz
@@ -41,10 +60,6 @@ update_datasets:
 %/mirnaseq.params %/mirnaseq:
 	$(MAKE) $*/$*_mirnaseq.tar.xz
 	tar -C $* -xJf $*/$*_mirnaseq.tar.xz
-
-%/proteomics.params:
-	$(MAKE) $*/$*_proteomics.tar.xz
-	tar -C $* -xJf $*/$*_proteomics.tar.xz
 
 %/msproteomics.params %/msproteomics:
 	$(MAKE) $*/$*_msproteomics.tar.xz
@@ -58,10 +73,21 @@ update_datasets:
 	$(MAKE) $*/$*_rbm.tar.xz
 	tar -C $* -xJf $*/$*_rbm.tar.xz
 
-%/rnaseq.params %.rnaseq:
+%/rnaseq.params %/rnaseq:
 	$(MAKE) $*/$*_rnaseq.tar.xz
 	tar -C $* -xJf $*/$*_rnaseq.tar.xz
 
+# old mirna target needs only params file
+%/mirna.params:
+	$(MAKE) $*/$*_mirna.tar.xz
+	tar -C $* -xJf $*/$*_mirna.tar.xz
+
+# old proteomics (not msproteomics) only needs a params file
+%/proteomics.params:
+	$(MAKE) $*/$*_proteomics.tar.xz
+	tar -C $* -xJf $*/$*_proteomics.tar.xz
+
+# vcf needs a params file to direct the scripts
 %/vcf.params:
 	$(MAKE) $*/$*_vcf.tar.xz
 	tar -C $* -xJf $*/$*_vcf.tar.xz

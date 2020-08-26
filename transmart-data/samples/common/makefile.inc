@@ -28,6 +28,7 @@ DUMMY := $(shell $(MAKE) -C ../studies datasets)
 $(info Finished fetching datasets)
 endif
 
+LOAD_STUDY_TARGETS := $(shell php ../studies/enumerate.php load_targets study)
 LOAD_BROWSE_TARGETS := $(shell php ../studies/enumerate.php load_targets browse)
 LOAD_CLINICAL_TARGETS := $(shell php ../studies/enumerate.php load_targets clinical)
 LOAD_ANNOTATION_TARGETS := $(shell php ../studies/enumerate.php load_targets annotation)
@@ -42,7 +43,7 @@ LOAD_MIRNASEQ_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_target
 LOAD_METABOLOMICS_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets metabolomics)
 LOAD_RBM_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets rbm)
 LOAD_RNASEQ_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets rnaseq)
-LOAD_SAMPLE_TARGETS := $(shell php ../studies/enumerate.php load_targets sample)
+LOAD_SAMPLES_TARGETS := $(shell php ../studies/enumerate.php load_targets samples)
 LOAD_VCF_PARAMS_TARGETS := $(patsubst ../studies/%/vcf.params,load_vcf_%, $(VCF_PARAMS_FILES))
 
 KETTLE_TARGETS := $(LOAD_CLINICAL_TARGETS) $(LOAD_EXPRESSION_PARAMS_TARGETS) $(LOAD_ACGH_PARAMS_TARGETS) $(LOAD_PROTEOMICS_PARAMS_TARGETS) $(LOAD_MSPROTEOMICS_PARAMS_TARGETS) $(LOAD_MIRNA_PARAMS_TARGETS) $(LOAD_MIRNAQPCR_PARAMS_TARGETS) $(LOAD_MIRNASEQ_PARAMS_TARGETS) $(LOAD_METABOLOMICS_PARAMS_TARGETS) $(LOAD_RBM_PARAMS_TARGETS) $(LOAD_RNASEQ_PARAMS_TARGETS)
@@ -51,6 +52,8 @@ $(KETTLE_TARGETS): kettle-home/kettle.properties
 #these ones are here just for autocompletion:
 $(LOAD_ANNOTATION_TARGETS):
 $(LOAD_BROWSE_TARGETS):
+$(LOAD_SAMPLES_TARGETS):
+$(LOAD_STUDY_TARGETS):
 $(LOAD_REF_ANNOTATION_TARGETS):
 $(LOAD_SAMPLE_TARGETS):
 $(LOAD_VCF_PARAMS_TARGETS):
@@ -75,8 +78,9 @@ load_annotation_%: ../studies/%/annotation.params ../studies/%/annotation
 		./load_annotation.sh $<
 
 load_ref_annotation_%: ../studies/%/ref_annotation.params
-	KETTLE_HOME="$(realpath kettle-home)" \
-	$(MAKE) load_annotation_`./load_ref_annotation.sh $<`
+	$(foreach  refplatform, $(shell ./load_ref_annotation.sh $<), \
+	    KETTLE_HOME="$(realpath kettle-home)" $(MAKE) load_annotation_$(refplatform); $(shell echo "refplatform=$(refplatform)" ); )
+
 
 load_expression_%: ../studies/%/expression.params ../studies/%/expression
 	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/expression)" \
@@ -203,10 +207,15 @@ load_browse_%: ../studies/%/browse.params
 	DATA_LOCATION="$(realpath ../studies/$*/browse) \"
 	./load_browse.sh $<
 
-load_sample_%: ../studies/%/sample.params
+load_samples_%: ../studies/%/samples.params
 	STUDY_ID=$* PSQL='$(PSQL_COMMAND) -d $(PGDATABASE)' \
-	DATA_LOCATION="$(realpath ../studies/$*/sample) \"
-	./load_sample.sh $<
+	DATA_LOCATION="$(realpath ../studies/$*/samples) \"
+	./load_samples.sh $<
+
+load_study_%: ../studies/%/study.params ../studies/%/load.sh
+	STUDY_ID=$* PSQL='$(PSQL_COMMAND) -d $(PGDATABASE)' \
+	cd "$(realpath ../studies/$*) \"
+	./load.sh
 
 clean:
 	rm -f logs/*.log kettle-home/kettle.properties
