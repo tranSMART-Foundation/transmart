@@ -59,7 +59,32 @@ HighDimensionalData.prototype.populate_data = function () {
                 document.getElementById("highDimensionType").value = key;
                 document.getElementById("platforms1").value = GLOBAL.HighDimDataType;
                 document.getElementById("gpl1").value = _tmp_data.platforms[0].id ? _tmp_data.platforms[0].id : "";
-                document.getElementById("sample1").value = _tmp_data.sampleTypes[0].label ? _tmp_data.sampleTypes[0].label : "";
+
+                var _strTimepoints = "";
+
+                if (_tmp_data.timepoints) {
+                    for (var i = 0, max = _tmp_data.timepoints.length; i < max; i++) {
+                        if (_tmp_data.timepoints[i].label) {
+                            _strTimepoints += _tmp_data.timepoints[i].label.concat((i < max - 1) ? ", " : "");
+                        } else {
+                            _strTimepoints += "";
+                        }
+                    }
+                    document.getElementById("timepoint1").value = _strTimepoints;
+                }
+
+                var _strSampleTypes = "";
+
+                if (_tmp_data.sampleTypes) {
+                    for (var i = 0, max = _tmp_data.sampleTypes.length; i < max; i++) {
+                        if (_tmp_data.sampleTypes[i].label) {
+                            _strSampleTypes += _tmp_data.sampleTypes[i].label.concat((i < max - 1) ? ", " : "");
+                        } else {
+                            _strSampleTypes += "";
+                        }
+                    }
+                    document.getElementById("sample1").value = _strSampleTypes;
+                }
 
                 var _strTissueTypes = "";
 
@@ -204,6 +229,7 @@ HighDimensionalData.prototype.generate_view = function () {
         window[_this.divId + 'pathwayName'] = GLOBAL.CurrentPathwayName;
         window[_this.divId + 'markerType'] = GLOBAL.HighDimDataType;
 
+        window[_this.divId + 'timepoint1'] = Ext.get('timepoint1').dom.value;
         window[_this.divId + 'samples1'] = Ext.get('sample1').dom.value;
         window[_this.divId + 'platforms1'] = Ext.get('platforms1').dom.value;
         window[_this.divId + 'gpls1'] = Ext.get('gpl1').dom.value;
@@ -239,6 +265,7 @@ HighDimensionalData.prototype.generate_view = function () {
         // init summary string
         var summaryString = '<br> <b>GPL Platform:</b> ' + Ext.get('gpl1').dom.value +
             '<br> <b>Sample:</b> ' + Ext.get('sample1').dom.value +
+            '<br> <b>Timepoint:</b> ' + Ext.get('timepoint1').dom.value +
             '<br> <b>Tissue:</b> ' + Ext.get('tissue1').dom.value +
             '<br>';
 
