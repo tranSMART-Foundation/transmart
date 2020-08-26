@@ -554,7 +554,7 @@ if (samlEnabled) {
                 // ID of the Service Provider
                 id = "gustavo-transmart"
 
-                // URL of the service provider. This should be autodected, but it isn't
+                // URL of the service provider. This should be autodetected, but it isn't
                 url = "http://localhost:8080/transmart"
 
                 // Alias of the Service Provider
