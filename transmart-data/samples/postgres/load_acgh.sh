@@ -41,6 +41,10 @@ trap 'rm -rf $TEMPDIR' EXIT
 if [ ! -d logs ] ; then mkdir logs; fi
 
 # Upload the chromosomal data
+
+    $PGSQL_BIN/psql -c "truncate tm_lz.lt_src_acgh_data"
+    echo "Loading zone tables truncated"
+
   echo "Uploading the chromosomal data"
   $KITCHEN -norep -version                                               \
 	   -file=$KETTLE_JOBS/load_acgh_data.kjb                         \

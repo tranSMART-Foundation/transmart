@@ -5,7 +5,7 @@
 # General optional parameters:
 #   DATA_LOCATION, STUDY_NAME, STUDY_ID
 # Specific mandatory parameters for this upload script:
-#   RNASEQ_DATA_FILE, SUBJECT_SAMPLE_MAPPING, R_JOBS_PSQL or KETTLE_JOBS_PSQL
+#   DATA_FILE_PREFIX, SUBJECT_SAMPLE_MAPPING, R_JOBS_PSQL or KETTLE_JOBS_PSQL
 # Specific optional parameters for this upload script:
 #   TOP_NODE_PREFIX, SECURITY_REQUIRED, SOURCE_CD, DATA_TYPE
 
@@ -34,10 +34,11 @@ if [ -z "$R_JOBS_PSQL" ]; then
 fi
 
 # Check if mandatory parameter values are provided
-if [ -z "$RNASEQ_DATA_FILE" ] || [ -z "$SUBJECT_SAMPLE_MAPPING" ] ; then
+if [ -z "DATA_FILE_PREFIX" ] || [ -z "$SUBJECT_SAMPLE_MAPPING" ]|| [ -z "$SAMPLE_MAP_FILENAME" ] ; then
     echo "Following variables need to be set:"
-    echo "    RNASEQ_DATA_FILE=$RNASEQ_DATA_FILE"
+    echo "    DATA_FILE_PREFIX=$DATA_FILE_PREFIX"
     echo "    SUBJECT_SAMPLE_MAPPING=$SUBJECT_SAMPLE_MAPPING"
+    echo "    SAMPLE_MAP_FILENAME=$SAMPLE_MAP_FILENAME"
     exit 1
 fi
 
@@ -77,6 +78,10 @@ LOG_BASE=${LOG_BASE:-2}
 
 if [ "$RNASEQ_TYPE" = "RNASEQ" ]; then
     if [ ! -d logs ] ; then mkdir logs; fi
+
+    # lt_src_mrna_data is truncated by Kettle
+    # $PGSQL_BIN/psql -c "truncate tm_lz.lt_src_rna_data"
+    # echo "Loading zone tables truncated"
 
     $KITCHEN -norep -version                                                 \
 	     -file=$KETTLE_JOBS/load_rna_data.kjb                            \
