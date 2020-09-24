@@ -56,7 +56,7 @@ begin
     databaseName := 'tm_cz';
     procedureName := 'add_platform';
     
-    -- check pfmOrganism exists in bio_concept_code
+    -- check pfmOrganism exists in bio_assay_platform
     select count(*) from biomart.bio_assay_platform where platform_organism = pfmOrganism into rowCt;
     stepCt := stepCt + 1;
     if rowCt > 0 then
