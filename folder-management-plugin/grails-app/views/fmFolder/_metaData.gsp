@@ -21,7 +21,7 @@
         <tr>
             <td valign="top" align="right" class="name">${amTagItem.displayName}&nbsp;<g:if test="${amTagItem.required}"><g:requiredIndicator/></g:if>:</td>
             <td valign="top" align="left" class="value">
-                %{--FIXED--}%
+                %{--FIXED: values stored in object (bio_experiment) --}%
                 <g:if test="${amTagItem.tagItemType == 'FIXED'}">
                     <g:if test="${amTagItem.tagItemAttr && bioDataObject?.hasProperty(amTagItem.tagItemAttr)}" >
                         <g:if test="${amTagItem.tagItemSubtype == 'PICKLIST'}">
@@ -47,9 +47,23 @@
                         <g:elseif test="${amTagItem.tagItemSubtype == 'FREETEXTAREA'}">
                             <g:textArea style="width: 100%" rows="10" name="${amTagItem.tagItemAttr}" value="${bioDataObject[amTagItem.tagItemAttr] ?: ''}"/>
                         </g:elseif>
+                        <g:elseif test="${amTagItem.tagItemSubtype == 'DATE'}">
+                            <g:textField size="100" name="${amTagItem.tagItemAttr}"
+					 value="${bioDataObject[amTagItem.tagItemAttr]? formatDate(format:'yyyy-MM-dd', date:bioDataObject[amTagItem.tagItemAttr]): ''}"/>
+                        </g:elseif>
+                        <g:elseif test="${amTagItem.tagItemSubtype == 'TIME'}">
+                            <g:textField size="100" name="${amTagItem.tagItemAttr}"
+					 value="${formatDate(format:'yyyy-MM-dd\'T\'HH:mm',
+						date:bioDataObject[amTagItem.tagItemAttr] ?: new Date())}"/>
+                        </g:elseif>
+                        <g:elseif test="${amTagItem.tagItemSubtype == 'CURRENTTIME'}">
+                            <g:textField size="100" name="${amTagItem.tagItemAttr}"
+					 value="${formatDate(format:'yyyy-MM-dd\'T\'HH:mm', date:new Date())}"/>
+                        </g:elseif>
                         <g:else>ERROR -- Unrecognized tag item subtype</g:else>
                     </g:if>
                 </g:if>
+                %{--CUSTOM: String values only stored in amapp.am_tag_value --}%
                 <g:elseif test="${amTagItem.tagItemType == 'CUSTOM'}">
                     <g:if test="${!amTagItem.editable}">not editable CUSTOM</g:if>
                     <g:else>
@@ -79,6 +93,7 @@
                         </g:elseif>
                     </g:else>
                 </g:elseif>
+                %{--OTHER: values with special search processing defined e.g. PROGAM_TARGET, BIO_DISEASE, PLATFORMs --}%
                 <g:else>
                     <g:if test="${folder.uniqueId && amTagItem.id}">
                         <g:set var="tagValues" value="${annotation.AmTagDisplayValue.findAllDisplayValue(folder.uniqueId, amTagItem.id)}"/>

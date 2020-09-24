@@ -17,6 +17,10 @@ import groovy.util.logging.Slf4j
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
+import java.sql.Date
+import java.sql.Timestamp
+import java.time.LocalDate
+import java.time.LocalDateTime
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.apache.http.entity.mime.HttpMultipartMode
@@ -779,7 +783,10 @@ class FmFolderService {
 	String hql = 'from AmTagItem ati where ati.amTagTemplate.id = :templateId and ati.' + column + ' = 1 order by displayOrder'
 	List<AmTagItem> items = AmTagItem.findAll(hql, [templateId: template.id])
 
+	logger.info 'calling validateFolder'
 	validateFolder folder, object, items, params
+
+	logger.info 'calling doSaveFolder'
 	doSaveFolder folder, object, template, items, params
     }
 
@@ -797,16 +804,21 @@ class FmFolderService {
 			  and bdu.id = ?
 			  and ff.activeInd = true''',
 			[object.id])
+
+	    logger.info 'validating Experiment object id {} : {}', object.id, existingFolders
 	    if (existingFolders && existingFolders[0] != folder) {
 		folder.errors.rejectValue 'id', 'blank',
 		    ['StudyId'] as String[], '{0} must be unique.'
             }
         }
+
         // Validate folder specific fields, if there is no business object
         if (folder == object) {
 	    List<Map<String, String>> fields = [
 		[displayName: 'Name', fieldName: 'folderName'],
 		[displayName: 'Description', fieldName: 'description']]
+
+	    logger.info 'validate object=folder fields {}', fields
 	    for (Map<String, String> field in fields) {
 		def value = params[field.fieldName]
 		if (!value) {
@@ -816,14 +828,17 @@ class FmFolderService {
             }
         }
 
+	logger.info 'validate items {}', items
 	for (AmTagItem item in items) {
             if (item.required) {
                 def value = null
 		if (item.tagItemType == 'FIXED') {
 		    value = params.list(item.tagItemAttr)
+		    logger.info 'item FIXED param tagItemAttr {} value {}', item.tagItemAttr, value
                 }
                 else {
 		    value = params.list('amTagItem_' + item.id)
+		    logger.info 'item OTHER param amTagItem_{} value {}', item.id, value
                 }
 		if (!value || value[0] == null || value[0].length() == 0) {
 		    folder.errors.rejectValue 'id', 'blank',
@@ -832,7 +847,7 @@ class FmFolderService {
                 // TODO: Check for max values
             }
             else {
-		logger.info '{} not required', item.displayName
+		logger.info '{} not required type {}', item.displayName, item.tagItemType
             }
 
             //check for unique study identifer
@@ -853,7 +868,7 @@ class FmFolderService {
     /**
      * Saves folder, associated business object, and metadata fields
      * @param folder folder to be saved
-     * @param object associated business object or folder, if there is none
+     * @param object associated business object (e.g. Experiment) or folder (if there is none)
      * @param template tag template associated with folder
      * @param items items associated with template
      * @param params field values to be saved
@@ -864,16 +879,29 @@ class FmFolderService {
 
         // Save folder object
         folder.save(flush: true, failOnError: true)
+	logger.info 'folder saved, process tagItems'
 
         // Using items associated with this folder's template, set business object property values or create tags.
         for (tagItem in items) {
+	    logger.info 'tagItem {}/{} attr {}', tagItem.tagItemType, tagItem.tagItemSubtype, tagItem.tagItemAttr
+
+	    // save by tagItemType
+	    // FIXED: save in object
+	    // CUSTOM: save in amTagAssociation (known value) amTagValue (user value)
+	    // OTHER:
+	    //        BIO_DISEASE save in amTagAssociation
+
 	    def newValue
+	    LocalDate localDateValue
+	    LocalDateTime localDateTimeValue
 	    if (tagItem.tagItemType == 'FIXED') {
 		newValue = params[tagItem.tagItemAttr]
+		logger.info 'FIXED params[{}] {}', tagItem.tagItemAttr, newValue
                 if (newValue != null) {
 		    String value = ''
 		    if (tagItem.tagItemSubtype == 'MULTIPICKLIST') {
 			newValue = params.list(tagItem.tagItemAttr)
+			logger.info 'MULTIPICKLIST list {}', newValue 
 			if (newValue) {
 			    for (it in newValue) {
 				if (value) {
@@ -882,16 +910,32 @@ class FmFolderService {
                                 value += it
                             }
                         }
+			logger.info 'list as string {}', value
+			object[tagItem.tagItemAttr] = value
                     }
+		    else if (tagItem.tagItemSubtype == 'DATE') {
+			localDateValue = LocalDate.parse(newValue)
+			object[tagItem.tagItemAttr] = java.sql.Date.valueOf(localDateValue)
+		    }
+		    else if (tagItem.tagItemSubtype == 'TIME') {
+			localDateTimeValue = LocalDateTime.parse(newValue)
+			object[tagItem.tagItemAttr] = java.sql.Timestamp.valueOf(localDateTimeValue)
+		    }
+		    else if (tagItem.tagItemSubtype == 'CURRENTTIME') {
+			localDateTimeValue = LocalDateTime.parse(newValue)
+			object[tagItem.tagItemAttr] = java.sql.Timestamp.valueOf(localDateTimeValue)
+		    }
                     else {
                         value = newValue
+			object[tagItem.tagItemAttr] = value
                     }
-		    object[tagItem.tagItemAttr] = value
                 }
             }
 	    else if (tagItem.tagItemType == 'CUSTOM') {
 		newValue = params['amTagItem_' + tagItem.id]
+		logger.info 'CUSTOM params[amTagItem_{}] {}', tagItem.id, newValue
 		if (tagItem.tagItemSubtype == 'FREETEXT' || tagItem.tagItemSubtype == 'FREETEXTAREA') {
+		    logger.info '{} delete any existing AM_TAG_VALUE value', tagItem.tagItemSubtype
 		    AmTagAssociation.executeUpdate '''
 				delete from AmTagAssociation as ata
 				where ata.objectType=:objectType
@@ -900,7 +944,9 @@ class FmFolderService {
 				[objectType: 'AM_TAG_VALUE', subjectUid: folder.uniqueId, tagItemId: tagItem.id]
 		    if (newValue) {
                         AmTagValue newTagValue = new AmTagValue(value: newValue)
+			logger.debug 'save text value {}', newTagValue
                         newTagValue.save(flush: true, failOnError: true)
+			logger.info 'save AmTagAssociation subject {} object {} tagItemId {}', folder.uniqueId, newTagValue.uniqueId, tagItem.id
 			new AmTagAssociation(
 			    objectType: 'AM_TAG_VALUE',
 			    subjectUid: folder.uniqueId,
@@ -909,6 +955,7 @@ class FmFolderService {
 		    }
 		}
 		else if (tagItem.tagItemSubtype == 'PICKLIST') {
+		    logger.info '{} delete any existing BIO_CONCEPT_CODE value', tagItem.tagItemSubtype
 		    AmTagAssociation.executeUpdate '''
 				delete from AmTagAssociation as ata
 				where ata.objectType=:objectType
@@ -916,6 +963,7 @@ class FmFolderService {
 				and ata.tagItemId=:tagItemId''',
 				[objectType: 'BIO_CONCEPT_CODE', subjectUid: folder.uniqueId, tagItemId: tagItem.id]
 		    if (newValue) {
+			logger.info 'save AmTagAssociation subject {} objectvalue {} tagItemId {}', folder.uniqueId, newValue, tagItem.id
 			new AmTagAssociation(
 			    objectType: 'BIO_CONCEPT_CODE',
 			    subjectUid: folder.uniqueId,
@@ -924,6 +972,7 @@ class FmFolderService {
 		    }
 		}
 		else if (tagItem.tagItemSubtype == 'MULTIPICKLIST') {
+		    logger.info '{} delete any existing BIO_CONCEPT_CODE value', tagItem.tagItemSubtype
 		    AmTagAssociation.executeUpdate '''
 			delete from AmTagAssociation as ata
 			where ata.objectType=:objectType
@@ -932,6 +981,7 @@ class FmFolderService {
 			[objectType: 'BIO_CONCEPT_CODE', subjectUid: folder.uniqueId, tagItemId: tagItem.id]
 		    for (it in params.list('amTagItem_' + tagItem.id)) {
                         if (it) {
+			    logger.info 'save AmTagAssociation subject {} nextObject {} tagItemId {}', folder.uniqueId, it, tagItem.id
 			    new AmTagAssociation(
 				objectType: 'BIO_CONCEPT_CODE',
 				subjectUid: folder.uniqueId,
@@ -943,8 +993,10 @@ class FmFolderService {
                         }
                     }
                 }
-            }
-            else {
+	    }
+
+	    else {
+		logger.info 'Other tagItemType {} delete any existing value', tagItem.tagItemType
 		AmTagAssociation.executeUpdate('''
 			delete from AmTagAssociation as ata
 			where ata.objectType=:objectType
@@ -954,18 +1006,19 @@ class FmFolderService {
 			 subjectUid: folder.uniqueId,
 			 tagItemId: tagItem.id])
 		for (it in params.list('amTagItem_' + tagItem.id)) {
-                    if (it) {
+		    if (it) {
+			logger.info 'save AmTagAssociation subject {} nextObject {} tagItemId {}', folder.uniqueId, it, tagItem.id
 			new AmTagAssociation(
 			    objectType: tagItem.tagItemType,
 			    subjectUid: folder.uniqueId,
 			    objectUid: it,
 			    tagItemId: tagItem.id).save(flush: true, failOnError: true)
-                    }
-                    else {
+		    }
+		    else {
 			logger.error 'amTagItem_{} is null', tagItem.id
-                    }
+		    }
                 }
-            }
+	    }
         }
 
         // Create tag template association between folder and template, if it does not already exist
@@ -980,8 +1033,8 @@ class FmFolderService {
 
         // If there is business object associated with folder, then save it and create association, if it does not exist.
         if (object != folder) {
-            object.save(flush: true, failOnError: true)
-            FmFolderAssociation folderAssoc = FmFolderAssociation.findByFmFolder(folder)
+	    object.save(flush: true, failOnError: true)
+	    FmFolderAssociation folderAssoc = FmFolderAssociation.findByFmFolder(folder)
 	    if (!folderAssoc) {
 		new FmFolderAssociation(
 		    objectUid: BioData.get(object.id).uniqueId,

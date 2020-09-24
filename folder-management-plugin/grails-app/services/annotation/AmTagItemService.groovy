@@ -22,7 +22,9 @@ class AmTagItemService {
 		and ati.amTagTemplate.id = :amTagTemplateId
 		order by displayOrder''', [amTagTemplateId: key])
 
-	logger.debug 'amTagItems = {} for key = {}', amTagItems, key
+//	for (AmTagItem item in amTagItems) {
+//	    logger.debug 'display amTagItem = {}', item
+//	}
 
 	amTagItems
     }
@@ -31,7 +33,7 @@ class AmTagItemService {
 	logger.info 'getChildDisplayItems Searching child amTagItems for tag template {}', key
 
 	if (!key) {
-            logger.error 'Unable to retrieve an child amTagItems with a null key value'
+            logger.error 'Unable to retrieve any child amTagItems with a null key value'
 	    return null
         }
 
@@ -41,16 +43,18 @@ class AmTagItemService {
 		  and ati.amTagTemplate.id = :amTagTemplateId
 		order by displayOrder''', [amTagTemplateId: key])
 
-	logger.debug 'amTagItems = {} for key = {}', amTagItems, key
+	for (AmTagItem item in amTagItems) {
+	    logger.debug 'child amTagItem = {}', item
+	}
 
 	amTagItems
     }
 
     List<AmTagItem> getEditableItems(Long key) {
-	logger.info 'getEditableItems Searching amTagItems for tag template {}', key
+	logger.info 'getEditableItems Searching amTagItems for tag templateId {}', key
 
 	if (!key) {
-            logger.error 'Unable to retrieve an amTagItems with a null key value'
+            logger.error 'Unable to retrieve any amTagItems with a null key value'
 	    return []
         }
 
@@ -60,14 +64,16 @@ class AmTagItemService {
 		  and ati.editable = 1
 		order by ati.displayOrder''', [templateId: key])
 
-	logger.debug 'amTagItems = {} for key = {}', amTagItems, key
+	for (AmTagItem item in amTagItems) {
+	    logger.debug 'editable amTagItem = {}', item
+	}
 
 	amTagItems
     }
 
     List<AmTagItem> getRequiredItems(Long key) {
 
-	logger.info 'getRequiredItems Searching amTagItems for tag template {}', key
+	logger.info 'getRequiredItems Searching amTagItems for tag templateId {}', key
 
 	if (!key) {
             logger.error 'Unable to retrieve an amTagItems with a null key value'
@@ -80,7 +86,9 @@ class AmTagItemService {
 		  and ati.amTagTemplate.id = :amTagTemplateId
 		order by displayOrder''', [amTagTemplateId: key])
 
-	logger.debug 'amTagItems = {} for key = {}', amTagItems, key
+	for (AmTagItem item in amTagItems) {
+	    logger.debug 'required amTagItem = {}', item
+	}
 
 	amTagItems
     }

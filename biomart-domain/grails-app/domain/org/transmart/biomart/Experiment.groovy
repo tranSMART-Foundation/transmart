@@ -10,7 +10,8 @@
  * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
  * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS    * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,9 +28,12 @@ class Experiment implements IExcelProfile {
     String accessType
     String bioMarkerType
     Date completionDate
+    String contactField
     String country
     String description
     String design
+    Date entrydt
+    String EtlId
     String institution
     String overallDesign
     String primaryInvestigator
@@ -38,6 +42,7 @@ class Experiment implements IExcelProfile {
     String target
     String title
     String type
+    Date updated
 
     static transients = ['compoundNames', 'diseaseNames', 'expId', 'expValues',
 	                 'organismNames', 'uniqueId', 'values']
@@ -69,20 +74,25 @@ class Experiment implements IExcelProfile {
     }
 
     static constraints = {
-	accessType nullable: true
-	bioMarkerType nullable: true
+	accession nullable: true, maxSize: 100
+	accessType nullable: true, maxSize: 100
+	bioMarkerType nullable: true, maxSize: 255
 	completionDate nullable: true
-	country nullable: true
+	contactField nullable: true, maxSize: 400
+	country nullable: true, maxSize: 1000
 	description nullable: true, maxSize: 4000
-	design nullable: true, maxSize: 4000
-	institution nullable: true
-	overallDesign nullable: true, maxSize: 4000
-	primaryInvestigator nullable: true, maxSize: 800
+	design nullable: true, maxSize: 2000
+	entrydt nullable: true
+	etlId nullable:true, maxSize: 100
+	institution nullable: true, maxSize: 400
+	overallDesign nullable: true, maxSize: 2000
+	primaryInvestigator nullable: true, maxSize: 400
 	startDate nullable: true
-	status nullable: true
-	target nullable: true
+	status nullable: true, maxSize: 100
+	target nullable: true, maxSize: 255
 	title nullable: true, maxSize: 2000
-	type nullable: true, maxSize: 400
+	type nullable: true, maxSize: 200
+	updated nullable: true
     }
 
     String getCompoundNames() {

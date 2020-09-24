@@ -32,7 +32,7 @@ class FmFolder implements Buildable {
     }
 
     static constraints = {
-	description blank: false, maxSize: 2000
+	description blank: false, maxSize: 4000
 	folderFullName nullable: true, maxSize: 1000
 	folderName blank: false, maxSize: 1000
 	folderTag nullable: true, maxSize: 50

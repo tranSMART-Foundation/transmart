@@ -163,6 +163,15 @@
                                             <g:else>${term}</g:else>
                                         </g:each>
                                     </g:elseif>
+				    <g:elseif test="${amTagItem.tagItemSubtype == 'DATE'}">
+					${bioDataObject[amTagItem.tagItemAttr]? formatDate(format:'yyyy-MM-dd', date:bioDataObject[amTagItem.tagItemAttr]): ''}
+				    </g:elseif>
+				    <g:elseif test="${amTagItem.tagItemSubtype == 'TIME'}">
+					${bioDataObject[amTagItem.tagItemAttr]? formatDate(format:'yyyy-MM-dd\'T\'HH:mm', date:bioDataObject[amTagItem.tagItemAttr]): ''}
+				    </g:elseif>
+				    <g:elseif test="${amTagItem.tagItemSubtype == 'CURRENTTIME'}">
+					${bioDataObject[amTagItem.tagItemAttr]? formatDate(format:'yyyy-MM-dd\'T\'HH:mm', date:bioDataObject[amTagItem.tagItemAttr]): ''}
+				    </g:elseif>
                                     <g:else>${fValue}</g:else>
                                 </g:if>
                                 <g:else>
