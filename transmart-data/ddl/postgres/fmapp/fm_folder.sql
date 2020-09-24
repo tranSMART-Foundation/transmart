@@ -10,7 +10,7 @@ CREATE TABLE fm_folder (
     folder_tag character varying(50),
     active_ind boolean NOT NULL,
     parent_id int,
-    description character varying(2000)
+    description character varying(4000)
 );
 
 --
