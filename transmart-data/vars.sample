@@ -24,6 +24,7 @@ PGPASSWORD=
 #     mkdir -p $TABLESPACES/{indx,transmart,i2b2,i2b2_index}
 #     chown -R postgres:postgres $TABLESPACES
 #     chmod -R 700 $TABLESPACES
+#     chmod go+rx $TABLESPACES
 # end with /
 TABLESPACES=$HOME/pg/tablespaces/
 
