@@ -1,12 +1,18 @@
 <div style="text-align: center;">
     <div class="welcome"
          style="margin: 40px auto; background: #F4F4F4; border: 1px solid #DDD; padding: 20px; width: 400px; text-align: center; border-top-left-radius: 20px; border-bottom-right-radius: 20px">
+        <g:set var="transmartIntro" value="${grailsApplication.config?.com?.recomdata?.transmartIntro}"/>
+        <g:set var="transmartSummary" value="${grailsApplication.config?.com?.recomdata?.transmartSummary}"/>
         <g:set var="projectName" value="${grailsApplication.config?.com?.recomdata?.projectName}"/>
         <g:set var="projectLogo" value="${grailsApplication.config?.com?.recomdata?.projectLogo}"/>
         <g:set var="providerName" value="${grailsApplication.config?.com?.recomdata?.providerName}"/>
         <g:set var="providerLogo" value="${grailsApplication.config?.com?.recomdata?.providerLogo}"/>
         <p><b>Welcome to tranSMART <g:if test="${projectName}">for ${projectName}</g:if></b></p>
 
+	<g:if test="${transmartIntro}">
+	    <p>Intro:</p>${transmartIntro}
+	</g:if>
+	<g:else>
         <p>The <b>Browse</b> window lets you search and dive into the information contained in tranSMART,
             including Programs, Studies, Assays and the associated Analyses Results, Subject Level Data and Raw Files.
             This is also the location to export files stored in tranSMART. Note: to edit the Program, Study, or Assay
@@ -17,8 +23,13 @@
             in the Browse window, or from the global search box located in the top ribbon of your screen.
             More information about the analyses you can perform is available in the “Help" section of the "Utilities" menu.
         </p>
-        <br/><br/>
+	</g:else>
 
+	<g:if test="${transmartSummary}">
+	    <br/>${transmartSummary}
+	</g:if>
+
+        <br/><br/>
 	<div>
 	    <g:if test="${projectName}">
 		<a id="projectpowered" target="_blank" href="${grailsApplication.config?.com?.recomdata?.projectURL}"

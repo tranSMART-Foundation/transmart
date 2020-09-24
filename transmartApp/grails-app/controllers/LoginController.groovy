@@ -34,6 +34,9 @@ class LoginController {
     @Value('${ui.loginScreen.disclaimer:}')
     private String disclaimer
 
+    @Value('${com.recomdata.transmartSummary:}')
+    private String transmartSummary
+
     @Value('${com.recomdata.guestAutoLogin:false}')
     private boolean guestAutoLogin
 

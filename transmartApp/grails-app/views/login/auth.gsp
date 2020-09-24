@@ -169,6 +169,16 @@
 		    </td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
+		<g:if test="${transmartSummary}">
+		    <tr>
+			<td style="font-weight: bold;text-align:center;color:#CC0000;vertical-align:middle;margin-left:-40px; padding-top: 10px;">
+			    <div style="margin-right:auto;margin-left:auto;width:435px">
+				${transmartSummary}
+			    </div>
+			</td>
+		    </tr>
+		</g:if>
+		<tr><td>&nbsp;</td></tr>
 		<g:if test="${disclaimer}">
 		    <tr>
 			<td style="font-weight: bold;text-align:center;color:#CC0000;vertical-align:middle;margin-left:-40px; padding-top: 10px;">
