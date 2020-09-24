@@ -114,7 +114,7 @@ where ('${dataimporter.request.clean}' != 'false' or id = '${dataimporter.reques
             <field name="ASSAY_MEASUREMENT_TYPE" column="MEASUREMENT_TYPE" splitBy="\|" />
             <field name="GENE" column="GENE" splitBy="\|" />
             <field name="MIRNA" column="MIRNA" splitBy="\|" />
-            <field name="ASSAY_TYPE_OF_BM_STUDIED" column="BIOMARKER_TYPE" splitBy="\|" />
+            <field name="ASSAY_BIOMARKER_TYPE" column="BIOMARKER_TYPE" splitBy="\|" />
             <field name="ASSAY_MEASUREMENT_TYPE" column="MEASUREMENT_TYPE" splitBy="\|" />
             <field name="ASSAY_PLATFORM_NAME" column="PLATFORM_NAME" splitBy="\|" />
             <field name="ASSAY_VENDOR" column="VENDOR" splitBy="\|" />
