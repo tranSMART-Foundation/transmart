@@ -1,5 +1,9 @@
 \i tm_cz/prelude.sql
 \i tm_cz/functions/_final_median.sql
+\i tm_cz/functions/add_bio_data_uid.sql
+\i tm_cz/functions/add_concept_species.sql
+\i tm_cz/functions/add_search_keyword.sql
+\i tm_cz/functions/add_search_keyword_term.sql
 \i tm_cz/functions/bio_assay_analysis_uid.sql
 \i tm_cz/functions/bio_assay_platform_uid.sql
 \i tm_cz/functions/bio_asy_analysis_pltfm_uid.sql
