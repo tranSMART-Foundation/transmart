@@ -120,7 +120,7 @@ CREATE VIEW browse_assays_view AS
 				    JOIN amapp.am_tag_item ati
 					    ON ((ata_1.tag_item_id = ati.tag_item_id)))
 			   WHERE ((((ata_1.object_type)::text = 'BIO_CONCEPT_CODE'::text)
-				   AND ((ati.code_type_name)::text = 'ASSAY_TYPE_OF_BM_STUDIED'::text))
+				   AND ((ati.code_type_name)::text = 'ASSAY_BIOMARKER_TYPE'::text))
 				   AND ((ff.folder_type)::text = 'ASSAY'::text))
 			   GROUP BY fdu.unique_id) biomarker_types
 				 ON (((biomarker_types.id)::text = (fd.unique_id)::text)))

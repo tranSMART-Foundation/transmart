@@ -252,7 +252,7 @@ group by fd.unique_id, f.folder_name, f.description;
         and ff.folder_type = 'ASSAY'
     ) pivot (
       listagg(to_char(object_uid), '|') within group (order by object_uid)
-      for object_type in ('BIO_MARKER_GENE' as gene,'BIO_MARKER_MIRNA' as mirna,'ASSAY_TYPE_OF_BM_STUDIED' as biomarker_type,'BIOSOURCE' as biosource)
+      for object_type in ('BIO_MARKER_GENE' as gene,'BIO_MARKER_MIRNA' as mirna,'ASSAY_BIOMARKER_TYPE' as biomarker_type,'BIOSOURCE' as biosource)
 
     )
     ) x on x.id = fd.unique_id
