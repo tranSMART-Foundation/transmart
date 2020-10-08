@@ -53,8 +53,7 @@
 		</table>
 	    </g:form>
 	</div>
-
-	<script>
+	<script type="text/javascript">
 var pageInfo = {
     basePath: '${jsContextPath}'
 };
