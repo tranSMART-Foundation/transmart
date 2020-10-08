@@ -321,9 +321,9 @@ class RecomTagLib {
 
 	out << '<thead><tr><th colSpan="' << colSpan << '" class="tableToggle">'
 	out << '<a id="' << divPrefix << '_fopen" style="' << openStyle << '" '
-	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Open' src=\"${assetPath(src:'sorted_desc.gif')}\" /></a> "
+	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Open' src=\"${assetPath(src:'skin/sorted_desc.gif')}\" /></a> "
 	out << "<a id='" << divPrefix << "_fclose' style='" << closedStyle << "' "
-	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Close' src=\"${assetPath(src:'sorted_asc.gif)')}\" /></a> "
+	out << "onclick=\"javascript:toggleDetail('" << divPrefix << "');\">" << label << "&nbsp;<img alt='Close' src=\"${assetPath(src:'skin/sorted_asc.gif)')}\" /></a> "
 	out << "</th></tr></thead>"
     }
 
