@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
     <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
 	<title>Transmart Administration</title>
 
 	<asset:stylesheet href="adminTab.css"/>
 
 	<asset:javascript src="jquery-plugin.js"/>
-<%--	<asset:javascript src="extjs.min.js"/> --%>
-<%--	<asset:javascript src="session_time.js"/> --%>
+	<asset:javascript src="extjs.min.js"/>
+	<asset:javascript src="session_time.js"/>
 	<asset:javascript src="adminTab.js"/>
 
 	<script type="text/javascript">
@@ -38,7 +40,11 @@
 	        pageInfo = {
 	            basePath :"${request.contextPath}"
 	        }
+
 	    });
+
+            var $j = window.$j = jQuery.noConflict();
+
 	</script>
     </head>
 
@@ -48,7 +54,7 @@
 		<g:render template='/layouts/commonheader' model="[app: 'accesslog']"/>
 	    </div>
 
-	    <div id='navbar'><g:render template='/layouts/adminnavbar'/></div>
+	    <div id="navbar"><g:render template='/layouts/adminnavbar'/></div>
 
 	    <div id="content"><g:layoutBody/></div>
 	</div>
