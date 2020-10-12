@@ -35,7 +35,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>    <!-- latest 4.12 -->
+      <version>4.13.1</version>    <!-- latest 4.13.1 -->
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -329,7 +329,7 @@
 	  <dependency><!-- add this to try to use latest version for testCompile -->
 	    <groupId>junit</groupId>
 	    <artifactId>junit</artifactId>
-	    <version>4.12</version>    <!-- latest 4.12 -->
+	    <version>4.13.1</version>    <!-- latest 4.13.1 -->
 	  </dependency>
 	</dependencies>
       </plugin>
