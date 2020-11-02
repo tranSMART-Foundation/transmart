@@ -107,22 +107,22 @@ class RecomTagLib {
             return
         }
 
-	if (tagItem.codeTypeName == 'STUDY_LINK') {
-	    out << "<a href=\"#\" onclick=\"var w=window.open('" << tagValue.displayValue << "', '_blank'); w.focus(); return false;\">"
-            out << tagValue.displayValue << '&nbsp;'
-            out << '<img alt="external link" class="ExternalLink" src="' << resource(dir: 'images', file: 'linkext7.gif') << '"/>'
-            out << '</a>'
-        }
-        else if (tagItem.codeTypeName != null && tagItem.codeTypeName.endsWith('_PUBMED_ID')) {
+        if (tagItem.codeTypeName != null && tagItem.codeTypeName.endsWith('_PUBMED_ID') && tagValue.displayValue.isInteger()) {
 	    out << "<a href=\"#\" onclick=\"var w=window.open('http://www.ncbi.nlm.nih.gov/pubmed/" << tagValue.displayValue << "', '_blank'); w.focus(); return false;\">"
             out << tagValue.displayValue << '&nbsp;'
             out << '<img alt="external link" src="' << resource(dir: 'images', file: 'linkext7.gif') << '"/>'
             out << '</a>'
         }
-        else if (tagItem.codeTypeName != null && tagItem.codeTypeName.endsWith('_DOI')) {
+        else if (tagItem.codeTypeName != null && tagItem.codeTypeName.endsWith('_DOI') && tagValue.displayValue.isInteger()) {
 	    out << "<a href=\"#\" onclick=\"var w=window.open('http://doi.org/" << tagValue.displayValue << "', '_blank'); w.focus(); return false;\">"
             out << tagValue.displayValue << '&nbsp;'
             out << '<img alt="external link" src="' << resource(dir: 'images', file: 'linkext7.gif') << '"/>'
+            out << '</a>'
+        }
+	else if (tagItem.codeTypeName == 'STUDY_LINK' && tagValue.displayValue.startsWith('http')) {
+	    out << "<a href=\"#\" onclick=\"var w=window.open('" << tagValue.displayValue << "', '_blank'); w.focus(); return false;\">"
+            out << tagValue.displayValue << '&nbsp;'
+            out << '<img alt="external link" class="ExternalLink" src="' << resource(dir: 'images', file: 'linkext7.gif') << '"/>'
             out << '</a>'
         }
         else {
