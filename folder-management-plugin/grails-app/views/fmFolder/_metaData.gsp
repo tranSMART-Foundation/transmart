@@ -51,13 +51,25 @@
                             <g:textField size="100" name="${amTagItem.tagItemAttr}"
 					 value="${bioDataObject[amTagItem.tagItemAttr]? formatDate(format:'yyyy-MM-dd', date:bioDataObject[amTagItem.tagItemAttr]): ''}"/>
                         </g:elseif>
+                        <g:elseif test="${amTagItem.tagItemSubtype == 'HIDDENDATE'}">
+                            <g:hiddenField size="100" name="${amTagItem.tagItemAttr}"
+					 value="${formatDate(format:'yyyy-MM-dd', bioDataObject[amTagItem.tagItemAttr] ?: new Date())}"/>
+                        </g:elseif>
                         <g:elseif test="${amTagItem.tagItemSubtype == 'TIME'}">
                             <g:textField size="100" name="${amTagItem.tagItemAttr}"
+					 value="${bioDataObject[amTagItem.tagItemAttr]? formatDate(format:'yyyy-MM-dd\'T\'HH:mm', date:bioDataObject[amTagItem.tagItemAttr]): ''}"/>
+                        </g:elseif>
+                        <g:elseif test="${amTagItem.tagItemSubtype == 'HIDDENTIME'}">
+                            <g:hiddenField size="100" name="${amTagItem.tagItemAttr}"
 					 value="${formatDate(format:'yyyy-MM-dd\'T\'HH:mm',
 						date:bioDataObject[amTagItem.tagItemAttr] ?: new Date())}"/>
                         </g:elseif>
                         <g:elseif test="${amTagItem.tagItemSubtype == 'CURRENTTIME'}">
                             <g:textField size="100" name="${amTagItem.tagItemAttr}"
+					 value="${formatDate(format:'yyyy-MM-dd\'T\'HH:mm', date:new Date())}"/>
+                        </g:elseif>
+                        <g:elseif test="${amTagItem.tagItemSubtype == 'HIDDENCURRENTTIME'}">
+                            <g:hiddenField size="100" name="${amTagItem.tagItemAttr}"
 					 value="${formatDate(format:'yyyy-MM-dd\'T\'HH:mm', date:new Date())}"/>
                         </g:elseif>
                         <g:else>ERROR -- Unrecognized tag item subtype</g:else>
