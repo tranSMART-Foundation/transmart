@@ -198,7 +198,6 @@ while (<IN>) {
 	} else {
 	    $data =~ s/\'/\\\'/g; # Escape any single quotes
 	}
-	if($data ne $savedata) {print "Modified data\ndata: $data\nsave: $savedata\n"}
 	if(defined($linetypes{$type})){
 	    push @linetype, $type;
 	    push @input, $data;
