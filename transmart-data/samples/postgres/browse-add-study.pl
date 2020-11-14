@@ -192,11 +192,13 @@ while (<IN>) {
 #	print "Read line $line: $_\n";
 	$type = $1;
 	$data = $2;
+	$savedata = $data;
 	if($ispostgres) {
-	    $data =~ s/\'/\\\'/g; # Escape any single quotes
-	} else {
 	    $data =~ s/\'/\'\'/g; # Double up any single quotes
+	} else {
+	    $data =~ s/\'/\\\'/g; # Escape any single quotes
 	}
+	if($data ne $savedata) {print "Modified data\ndata: $data\nsave: $savedata\n"}
 	if(defined($linetypes{$type})){
 	    push @linetype, $type;
 	    push @input, $data;
@@ -235,7 +237,7 @@ for($i = 0; $i < $line; $i++) {
 	$description .= $data;
     }
     elsif($type eq "Overalldesign"){
-	if($overalldesign ne "") {$overalldesign .= "<br/><br/>"}
+	if($overalldesign ne "") {$overalldesign .= " "}
 	$overalldesign .= $data;
     }
     elsif($type eq "Target"){
@@ -629,6 +631,8 @@ sub testPubmed($) {
     close WEB;
 }
 
+print "Looking for program '$program'\n";
+print STDERR "Looking for program '$program'\n";
 $programid = findFolder("PROGRAM", $program, 0);
 
 if(!$programid) {print STDERR "program '$program' not found\n";exit}
@@ -637,7 +641,7 @@ else {print "program '$program' found with ID $programid\n"}
 $studyid = findFolder("STUDY", $title, 1);
 
 if(!$studyid) {print "study '$title' not found, can create\n"}
-else {print STDERR "study '$title' found with ID $studyid\n"}
+else {print STDERR "study '$title' found with ID $studyid\n";exit}
 
 #Accession .... what do we need to check?
 
@@ -772,7 +776,12 @@ print "Organism tagid $organismtag\n";
 foreach $organism (@organism){
     ($id, $code) = findConcept($organism,"SPECIES");
 
-    if(!defined($code)){print STDERR "Organism '$organism' not found\n";exit}
+    if(!defined($code)){
+	print STDERR "Organism '$organism' not found: Use 'Other'\n";
+	$organism = "Other";
+	($id, $code) = findConcept($organism,"SPECIES");
+    }
+    if(!defined($code)){print STDERR "Organism '$organism' not found: Use 'Other'\n";exit}
     else {
 	print "Organism '$organism' id '$id', code '$code'\n";
 	push @organismcode, $code;
