@@ -517,12 +517,13 @@ begin
 	    where trial_name = TrialId
 	    and platform = 'RNASEQCOG'
 	    and coalesce(omic_source_study,trial_name) = TrialId
+
 	    loop
-	    sqlTxt := 'drop table if exists deapp.de_subject_rna_data_' || v_partition_id;
-	    execute sqlTxt;
-	    stepCt := stepCt + 1;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_rna_data',rowCt,stepCt,'Done');
-	end loop;
+	        sqlTxt := 'drop table if exists deapp.de_subject_rna_data_' || v_partition_id;
+	        execute sqlTxt;
+	        stepCt := stepCt + 1;
+	        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop partition table for de_subject_rna_data',rowCt,stepCt,'Done');
+	    end loop;
 
 	begin
 	    delete from deapp.de_subject_sample_mapping
