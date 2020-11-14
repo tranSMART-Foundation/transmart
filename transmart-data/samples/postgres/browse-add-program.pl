@@ -92,7 +92,11 @@ while (<IN>) {
 #	print "Read line $line: $_\n";
 	$type = $1;
 	$data = $2;
-	$data =~ s/\'/\\\'/g; # Escape any single quotes
+	if($ispostgres) {
+	    $data =~ s/\'/\'\'/g; # Double up any single quotes
+	} else {
+	    $data =~ s/\'/\\\'/g; # Escape any single quotes
+	}
 
 	if(defined($linetypes{$type})){
 	    push @linetype, $type;
