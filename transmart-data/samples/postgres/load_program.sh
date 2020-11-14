@@ -11,17 +11,15 @@ set -e
 #   TOP_NODE_PREFIX, SECURITY_REQUIRED, USE_R_UPLOAD
 
 # locate this shell script, and source a generic shell script to process all params related settings
-UPLOAD_SCRIPTS_DIRECTORY=$(dirname $(realpath "$0"))
+UPLOAD_SCRIPTS_DIRECTORY=$(dirname "$0")
 UPLOAD_DATA_TYPE="program"
-echo "UPLOAD_SCRIPTS_DIRECTORY $UPLOAD_SCRIPTS_DIRECTORY"
-echo "Parameter '$1'"
 source "$UPLOAD_SCRIPTS_DIRECTORY/process_params.inc"
 
 # Check if mandatory variables are set
-if [ -z "$PROGRAM" ] || [ -z "$DATA_LOCATION" ]; then
+if [ -z "$STUDY_ID" ] || [ -z "$SOME_VARIABLE" ]; then
 	echo "Following variables need to be set:"
-	echo "    PROGRAM=$PROGRAM"
-	echo "    DATA_LOCATION=$DATA_LOCATION"
+	echo "    STUDY_ID=$STUDY_ID"
+	echo "    SOME_VARIABLE=$SOME_VARIABLE"
 	exit -1
 fi
 
@@ -48,6 +46,3 @@ fi
 # and new paragraphs in browse tab
 # by adding in browser and checking content of column
 
-pwd
-
-$UPLOAD_SCRIPTS_DIRECTORY/browse-add-program.pl $DATA_LOCATION/program.txt

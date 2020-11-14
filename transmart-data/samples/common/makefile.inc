@@ -29,6 +29,7 @@ $(info Finished fetching datasets)
 endif
 
 LOAD_STUDY_TARGETS := $(shell php ../studies/enumerate.php load_targets study)
+LOAD_PROGRAM_TARGETS := $(shell php ../studies/enumerate.php load_targets program)
 LOAD_BROWSE_TARGETS := $(shell php ../studies/enumerate.php load_targets browse)
 LOAD_CLINICAL_TARGETS := $(shell php ../studies/enumerate.php load_targets clinical)
 LOAD_ANNOTATION_TARGETS := $(shell php ../studies/enumerate.php load_targets annotation)
@@ -51,6 +52,7 @@ KETTLE_TARGETS := $(LOAD_CLINICAL_TARGETS) $(LOAD_EXPRESSION_PARAMS_TARGETS) $(L
 $(KETTLE_TARGETS): kettle-home/kettle.properties
 #these ones are here just for autocompletion:
 $(LOAD_ANNOTATION_TARGETS):
+$(LOAD_PROGRAM_TARGETS):
 $(LOAD_BROWSE_TARGETS):
 $(LOAD_SAMPLES_TARGETS):
 $(LOAD_STUDY_TARGETS):
@@ -84,7 +86,7 @@ load_ref_annotation_%: ../studies/%/ref_annotation.params
 # browse study - check and load program, then load study for browse tab
 
 load_browse_%: ../studies/%/browse.params
-	$(foreach  program, $(shell ./load_browse_program.sh $<), \
+	$(foreach  program, $(shell ./show_browse_program.sh $<), \
 	    KETTLE_HOME="$(realpath kettle-home)" $(MAKE) load_program_$(program); $(shell echo "program=$(program)" ); )
 	    STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/browse)" \
 			./load_browse_study.sh $<
