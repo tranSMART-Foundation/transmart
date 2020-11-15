@@ -55,6 +55,9 @@ ORACLE_TABLESPACES_DIR=/home/oracle/app/oracle/oradata
 # }}}
 
 # Only needed for ETL
+
+# End with /
+TRANSMARTDATA=/path/to/transmart-data/
 # End with /
 KETTLE_JOBS_PSQL=/path/to/transmart-etl/Kettle/postgres/Kettle-ETL/
 # End with /
@@ -125,7 +128,7 @@ TSUSER_HOME=$HOME/
 # If you need to proxy (you may need to combine with option above)
 # export _JAVA_OPTIONS="-Dhttp.proxyHost=$proxy_host -Dhttp.proxyPort=$proxy_port"
 
-export PGHOST PGPORT PGDATABASE PGUSER PGPASSWORD TABLESPACES PGSQL_BIN \
+export PGHOST PGPORT PGDATABASE PGUSER PGPASSWORD TABLESPACES PGSQL_BIN TRANSMARTDATA \
 	R_JOBS_PSQL KETTLE_JOBS KETTLE_JOBS_PSQL KETTLE_JOBS_ORA KITCHEN TSUSER_HOME ORAHOST ORAPORT \
 	ORASID ORASVC ORAUSER ORAPASSWORD ORACLE_MANAGE_TABLESPACES \
 	ORACLE_TABLESPACES_DIR ORACLE
