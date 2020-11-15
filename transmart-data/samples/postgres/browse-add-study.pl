@@ -922,7 +922,7 @@ insert into fmapp.fm_folder (folder_name,parent_id,folder_level,folder_type,acti
     }
 
     $studyid = findFolder("STUDY", $title, 1);
-    print STDERR "Created study with ID '$studyid'\n";
+    print STDERR "Created study '$title' with ID '$studyid'\n";
 }
 
 
