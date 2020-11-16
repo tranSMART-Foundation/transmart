@@ -4,7 +4,7 @@ KETTLE_ZIP=8.2.0.0-342
 TRANSMART_RELEASE_BRANCH=release-19.0
 
 UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
-				tar gfortran gcc-c++ unzip libreadline-dev \
+				tar gfortran g++ unzip libreadline-dev \
 				libxt-dev libpango1.0-dev libprotoc-dev \
 				texlive-fonts-recommended tex-gyre liblz4-tool pv zip
 
