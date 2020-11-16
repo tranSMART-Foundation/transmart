@@ -6,7 +6,7 @@ ALTER FUNCTION tm_cz.cz_start_audit(character varying, character varying) SET se
 
 ALTER FUNCTION tm_cz.cz_write_audit(numeric, character varying, character varying, character varying, numeric, numeric, character varying) SET search_path TO tm_cz, pg_temp;
 
-ALTER FUNCTION tm_cz.cz_write_error(numeric, character varying, character varying, character varying, character varying) SET search_path TO tm_cz, pg_temp;
+ALTER FUNCTION tm_cz.cz_write_error(numeric, character varying, character varying, text, text) SET search_path TO tm_cz, pg_temp;
 
 ALTER FUNCTION tm_cz.cz_write_info(numeric, numeric, numeric, character varying, character varying) SET search_path TO tm_cz, pg_temp;
 
