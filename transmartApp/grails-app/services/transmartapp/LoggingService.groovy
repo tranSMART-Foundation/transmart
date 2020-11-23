@@ -48,7 +48,7 @@ class LoggingService {
 		logger.info 'duplicateSymlinkedAppenders No entry'
 	    if(!entry.key)
 		logger.info 'duplicateSymlinkedAppenders No key for entry {}', entry
-	    if(!entry.key/file)
+	    if(!entry.key.file)
 		logger.info 'duplicateSymlinkedAppenders No file for entry.key {}', entry.key
 	    if(entry.key.file) {
 		logger.info 'create duplicate file appender for file {}', entry.key.file
