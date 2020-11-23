@@ -12,9 +12,9 @@ echo "------------------------------------------------------------"
 base="$INSTALL_BASE/transmart-data"
 baseEnv="$base/env"
 baseR="$base/R"
-baseConfig="/usr/share/tomcat8/.grails/transmartConfig"
-baseWebapps="/var/lib/tomcat8/webapps"
-baseLogs="/var/lib/tomcat8/logs"
+baseConfig="/usr/share/tomcat9/.grails/transmartConfig"
+baseWebapps="/var/lib/tomcat9/webapps"
+baseLogs="/var/lib/tomcat9/logs"
 
 returnValue=0
 

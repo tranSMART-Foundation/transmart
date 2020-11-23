@@ -9,7 +9,7 @@ echo "-------------------------------------------------------------"
 echo "|  Checking for required transmart/grails configuration files"
 echo "-------------------------------------------------------------"
 
-baseConfig="/var/lib/tomcat8/.grails/transmartConfig"
+baseConfig="/var/lib/tomcat9/.grails/transmartConfig"
 
 returnValue=0
  

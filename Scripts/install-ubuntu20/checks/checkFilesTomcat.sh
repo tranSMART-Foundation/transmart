@@ -9,8 +9,8 @@ echo "-------------------------------------------------"
 echo "|  Checking for required tomcat files and folders"
 echo "-------------------------------------------------"
 
-baseWebapps="/var/lib/tomcat8/webapps"
-baseLogs="/var/lib/tomcat8/logs"
+baseWebapps="/var/lib/tomcat9/webapps"
+baseLogs="/var/lib/tomcat9/logs"
 
 returnValue=0
 
@@ -34,7 +34,7 @@ filepath="$baseLogs/catalina.out"
 if [ ! -e "$filepath" ]; then
 	echo "The file at $filepath"
 	echo "  does not exist; it is likely the case that tomcat was never started;"
-	echo "  start it with the command: 'sudo service tomcat8 restart'"
+	echo "  start it with the command: 'sudo service tomcat9 restart'"
 	returnValue=1
 fi
 
@@ -42,7 +42,7 @@ filepath="$baseLogs/transmart.log"
 if [ ! -e "$filepath" ]; then
 	echo "The file at $filepath"
 	echo "  does not exist; one posibility is that tomcat was never started;"
-	echo "  start it with the command: 'sudo service tomcat8 restart'"
+	echo "  start it with the command: 'sudo service tomcat9 restart'"
 	echo "  another possibility is that transmart failed to start"
 	echo "  check the log file at $baseLogs/catalina.out for possible problems"
 	returnValue=1
@@ -52,7 +52,7 @@ filepath="$baseWebapps/transmart"
 if [ ! -e "$filepath" ]; then
 	echo "The file at $filepath"
 	echo "  is required and does not exist; one posibility is that tomcat is not running;"
-	echo "  start it with the command: 'sudo service tomcat8 restart'"
+	echo "  start it with the command: 'sudo service tomcat9 restart'"
 	echo "  another possibility is that transmart failed to start"
 	echo "  check the log file at $baseLogs/catalina.out for possible problems"
 	returnValue=1

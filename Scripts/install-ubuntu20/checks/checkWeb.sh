@@ -78,7 +78,7 @@ fi
 probe=$(curl -L $transmartUrl | grep "title" | grep "Transmart")
 if [ -z "$probe" ] ; then
 	echo "The tranSMART web site (at $transmartUrl) is not delivering the login home page;"
-	echo "  see tomcat log file, /var/lib/tomcat8/logs/transmart.log for possible errors "
+	echo "  see tomcat log file, /var/lib/tomcat9/logs/transmart.log for possible errors "
 	exitResults=1
 else
 	echo "The transmart home page (login) appears to be loading"

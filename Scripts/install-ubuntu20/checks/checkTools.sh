@@ -25,11 +25,11 @@ else
 fi
 
 if [ -z "$tomcatRunning" ]; then 
-	echo "The tomcat8 process does not appear to be running; start it"
-	echo "  with the command: sudo systemctl restart tomcat8"
+	echo "The tomcat9 process does not appear to be running; start it"
+	echo "  with the command: sudo systemctl restart tomcat9"
 	exitReturn=1
 else 
-	echo "The tomcat8 process is running"
+	echo "The tomcat9 process is running"
 fi
 
 if [ -z "$rserveRunning" ]; then 
