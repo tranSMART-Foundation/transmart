@@ -1,4 +1,4 @@
-#!/bin/perl -w
+#!/usr/bin/perl -w
 
 # /data/scratch/git-master/transmart/transmart-data/ddl/comparison/ora-pg-compare.pl > x.x 2> y.y
 # i2b2 sqlserver and oracle have FUNCTION and PROCEDURE definitions together - merge

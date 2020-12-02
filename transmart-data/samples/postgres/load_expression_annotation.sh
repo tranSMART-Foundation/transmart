@@ -6,9 +6,9 @@ set -e
 echo "running load_expression_annotation.sh $1"
 
 # General optional parameters:
-#   DATA_LOCATION, STUDY_NAME, STUDY_ID
+#   DATA_LOCATION
 # Mandatory parameters specific for this upload script:
-#   ANNOTATIONS_FILE
+#   ANNOTATIONS_FILE, PLATFORM_TITLE
 # Optional parameter(s) specific for this upload script:
 #   PLATFORM_ID, PLATFORM_TITLE, GENOME_RELEASE
 
@@ -16,29 +16,35 @@ echo "running load_expression_annotation.sh $1"
 UPLOAD_SCRIPTS_DIRECTORY=$(dirname "$0")
 UPLOAD_DATA_TYPE="annotation"
 
+if [ -z "$PLATFORM_ID" ] &&  [ ! -z "$PLATFORM" ]; then
+    PLATFORM_ID=$PLATFORM
+fi
+
 # Check if mandatory variables are set
-if [ -z "$ANNOTATIONS_FILE" ]; then
+if [ -z "$PLATFORM_ID" ] || [ -z "$ANNOTATIONS_FILE" ] || [ -z "$PLATFORM_TITLE" ]; then
         echo "Following variables need to be set:"
+        echo "    PLATFORM_ID=$PLATFORM_ID"
+	echo "    PLATFORM_TITLE=$PLATFORM_TITLE"
         echo "    ANNOTATIONS_FILE=$ANNOTATIONS_FILE"
         exit -1
 fi
 
 # Check if mandatory parameter values are provided
 # Read platform from first line, first column
-PLATFORM=$(awk -F'\t' 'BEGIN{getline}{print $1}' "${ANNOTATIONS_FILE}" | head -n 1)
+READ_PLATFORM=$(awk -F'\t' 'BEGIN{getline}{print $1}' "${ANNOTATIONS_FILE}" | head -n 1)
 if [ ! -z "$PLATFORM_ID" ]; then
-    if [[ "$PLATFORM" != "$PLATFORM_ID" ]]
+    if [[ "$READ_PLATFORM" != "$PLATFORM_ID" ]]
     then
-        echo "Error: PLATFORM_ID=$PLATFORM_ID defined in annotation.params differs from PLATFORM=$PLATFORM defined in $ANNOTATIONS_FILE"
+        echo "Error: PLATFORM_ID=$PLATFORM_ID defined in annotation.params differs from PLATFORM=$READ_PLATFORM defined in $ANNOTATIONS_FILE"
         exit 1
     fi
 fi
 
 # Is the platform already uploaded?
 ALREADY_LOADED=`$PGSQL_BIN/psql -c "select exists \
-                (select platform from deapp.de_gpl_info where platform = '$PLATFORM')" -tA`
+                (select platform from deapp.de_gpl_info where platform = '$READ_PLATFORM')" -tA`
 if [ $ALREADY_LOADED = 't' ]; then
-    echo -e "\e[33mWARNING\e[m: Platform $PLATFORM already loaded; skipping" >&2
+    echo -e "\e[33mWARNING\e[m: Platform $READ_PLATFORM already loaded; skipping" >&2
     exit 0
 fi
 
@@ -56,7 +62,7 @@ fi
 
 PLATFORM_TITLE=${PLATFORM_TITLE:-${PLATFORM}}
 $PGSQL_BIN/psql -c "COPY deapp.de_gpl_info(platform, title, organism, marker_type, genome_build) FROM STDIN" <<HEREDOC
-$PLATFORM	$PLATFORM_TITLE	$READ_ORGANISM	Gene Expression	$GENOME_RELEASE
+$READ_PLATFORM	$PLATFORM_TITLE	$READ_ORGANISM	Gene Expression	$GENOME_RELEASE
 HEREDOC
 
 # Upload platform definition

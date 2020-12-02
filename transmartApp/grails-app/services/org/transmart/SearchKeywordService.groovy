@@ -24,28 +24,28 @@ class SearchKeywordService {
     //Hard-coded list of items that we consider filter categories... configure in Config/database?
     private static final List<Map> filtercats = [
 
-        [codeTypeName: 'THERAPEUTIC_DOMAIN', category: 'THERAPEUTIC_DOMAIN', displayName: 'Program Therapeutic Domain'],
-        [codeTypeName: 'PROGRAM_INSTITUTION', category: 'PROGRAM_INSTITUTION', displayName: 'Program Institution'],
+        [codeTypeName: 'THERAPEUTIC_DOMAIN',      category: 'THERAPEUTIC_DOMAIN',        displayName: 'Program Therapeutic Domain'],
 
-        [codeTypeName: 'STUDY_PHASE', category: 'STUDY_PHASE', displayName: 'Study Phase'],
-        [codeTypeName: 'STUDY_OBJECTIVE', category: 'STUDY_OBJECTIVE', displayName: 'Study Objective'],
-        [codeTypeName: 'STUDY_DESIGN', category: 'STUDY_DESIGN', displayName: 'Study Design'],
-        [codeTypeName: 'STUDY_BIOMARKER_TYPE', category: 'STUDY_BIOMARKER_TYPE', displayName: 'Study Biomarker Type'],
-        [codeTypeName: 'STUDY_ACCESS_TYPE', category: 'STUDY_ACCESS_TYPE', displayName: 'Study Access Type'],
-        [codeTypeName: 'STUDY_INSTITUTION', category: 'STUDY_INSTITUTION', displayName: 'Study Institution'],
+        [codeTypeName: 'STUDY_PHASE',             category: 'STUDY_PHASE',               displayName: 'Study Phase'],
+        [codeTypeName: 'STUDY_OBJECTIVE',         category: 'STUDY_OBJECTIVE',           displayName: 'Study Objective'],
+        [codeTypeName: 'STUDY_DESIGN',            category: 'STUDY_DESIGN',              displayName: 'Study Design'],
+        [codeTypeName: 'STUDY_BIOMARKER_TYPE',    category: 'STUDY_BIOMARKER_TYPE',      displayName: 'Study Biomarker Type'],
+        [codeTypeName: 'STUDY_ACCESS_TYPE',       category: 'STUDY_ACCESS_TYPE',         displayName: 'Study Access Type'],
+        [codeTypeName: 'STUDY_INSTITUTION',       category: 'STUDY_INSTITUTION',         displayName: 'Study Institution'],
 
-        [codeTypeName: 'ASSAY_BIOMARKER_TYPE', category: 'ASSAY_BIOMARKER_TYPE', displayName: 'Assay Type of Biomarkers'],
-        [category: 'ASSAY_MEASUREMENT_TYPE', displayName: 'Assay Measurement Type', useText: true, platformProperty: 'platformType'],
-        [category: 'ASSAY_TECHNOLOGY', displayName: 'Assay Technology', prefix: true, useText: true, platformProperty: 'platformTechnology'],
-        [category: 'ASSAY_VENDOR', displayName: 'Assay Vendor', prefix: true, useText: true, platformProperty: 'vendor'],
-        [category: 'ASSAY_PLATFORM_NAME', displayName: 'Assay Platform Name', useText: true, platformProperty: 'name'],
+        [codeTypeName: 'ASSAY_BIOMARKER_TYPE',    category: 'ASSAY_BIOMARKER_TYPE',      displayName: 'Assay Type of Biomarkers'],
 
-        [category: 'ANALYSIS_MEASUREMENT_TYPE', displayName: 'Analysis Measurement Type', useText: true, platformProperty: 'platformType'],
-        [category: 'ANALYSIS_TECHNOLOGY', displayName: 'Analysis Technology', prefix: true, useText: true, platformProperty: 'platformTechnology'],
-        [category: 'ANALYSIS_VENDOR', displayName: 'Analysis Vendor', prefix: true, useText: true, platformProperty: 'vendor'],
-        [category: 'ANALYSIS_PLATFORM_NAME', displayName: 'Analysis Platform Name', useText: true, platformProperty: 'name'],
+        [platformProperty: 'platformType',        category: 'ASSAY_MEASUREMENT_TYPE',    displayName: 'Assay Measurement Type',    useText: true],
+        [platformProperty: 'platformTechnology',  category: 'ASSAY_TECHNOLOGY',          displayName: 'Assay Technology',          useText: true, prefix: true],
+        [platformProperty: 'vendor',              category: 'ASSAY_VENDOR',              displayName: 'Assay Vendor',              useText: true, prefix: true],
+        [platformProperty: 'name',                category: 'ASSAY_PLATFORM_NAME',       displayName: 'Assay Platform Name',       useText: true],
 
-        [codeTypeName: 'FILE_TYPE', category: 'FILE_TYPE', displayName: 'File type']
+        [platformProperty: 'platformType',        category: 'ANALYSIS_MEASUREMENT_TYPE', displayName: 'Analysis Measurement Type', useText: true],
+        [platformProperty: 'platformTechnology',  category: 'ANALYSIS_TECHNOLOGY',       displayName: 'Analysis Technology',       useText: true, prefix: true],
+        [platformProperty: 'vendor',              category: 'ANALYSIS_VENDOR',           displayName: 'Analysis Vendor',           useText: true, prefix: true],
+        [platformProperty: 'name',                category: 'ANALYSIS_PLATFORM_NAME',    displayName: 'Analysis Platform Name',    useText: true],
+
+        [codeTypeName: 'FILE_TYPE',               category: 'FILE_TYPE',                 displayName: 'File type']
     ].asImmutable()
 
     /** Finds all of the search categories pertaining to search keywords */

@@ -102,16 +102,21 @@ class FeedFactory {
         files.collect {
             def result = []
             it.eachLine { line ->
-                List<String> split = line.split(/\s+/, 2) as List
-                if (split.size() != 2) {
-                    throw new InvalidDataException(
+		if(line =~ '^#' || line =~ '^//') {
+		    Log.out "Skip $line"
+		}
+		else {
+		    List<String> split = line.split(/\s+/, 2) as List
+                    if (split.size() != 2) {
+			throw new InvalidDataException(
                             "Invalid line in feed list: $line")
-                }
-                if (!FEED_TYPES[split[0]]) {
-                    throw new InvalidDataException(
+                    }
+                    if (!FEED_TYPES[split[0]]) {
+			throw new InvalidDataException(
                             "Unknown feed type: ${split[0]}")
-                }
-                result << FEED_TYPES[split[0]].newInstance(split[1])
+                    }
+                    result << FEED_TYPES[split[0]].newInstance(split[1])
+		}
             }
             result
         }.flatten() as Set

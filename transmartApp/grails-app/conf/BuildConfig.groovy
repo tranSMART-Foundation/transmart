@@ -180,8 +180,8 @@ grails.project.dependency.resolution = {
 	build ':release:3.1.2'
 	build ':tomcat:8.0.50'
 
-//	runtime ':jquery-ui:1.10.4' // latest plugin version available in repo.grails.org
-//	runtime ':jquery:1.11.1'    // latest plugin version available in repo.grails.org
+	runtime ':jquery:1.11.1'    // Provides integration for the jQuery library with Grails JavascriptProvider
+	runtime ':jquery-ui:1.10.4' // Simply supplies jQuery UI resources, depends on jQuery plugin
 
 //	runtime ':prototype:1.0'    // requires  resources:1.0
 //	runtime ':resources:1.2.14'

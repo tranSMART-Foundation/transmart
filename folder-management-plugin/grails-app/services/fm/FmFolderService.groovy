@@ -913,15 +913,15 @@ class FmFolderService {
 			logger.info 'list as string {}', value
 			object[tagItem.tagItemAttr] = value
                     }
-		    else if (tagItem.tagItemSubtype == 'DATE') {
+		    else if (tagItem.tagItemSubtype == 'DATE' || tagItem.tagItemSubtype == 'HIDDENDATE') {
 			localDateValue = LocalDate.parse(newValue)
 			object[tagItem.tagItemAttr] = java.sql.Date.valueOf(localDateValue)
 		    }
-		    else if (tagItem.tagItemSubtype == 'TIME') {
+		    else if (tagItem.tagItemSubtype == 'TIME' || tagItem.tagItemSubtype == 'HIDDENTIME') {
 			localDateTimeValue = LocalDateTime.parse(newValue)
 			object[tagItem.tagItemAttr] = java.sql.Timestamp.valueOf(localDateTimeValue)
 		    }
-		    else if (tagItem.tagItemSubtype == 'CURRENTTIME') {
+		    else if (tagItem.tagItemSubtype == 'CURRENTTIME' || tagItem.tagItemSubtype == 'HIDDENCURRENTTIME') {
 			localDateTimeValue = LocalDateTime.parse(newValue)
 			object[tagItem.tagItemAttr] = java.sql.Timestamp.valueOf(localDateTimeValue)
 		    }

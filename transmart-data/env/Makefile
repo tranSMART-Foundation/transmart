@@ -8,9 +8,16 @@ UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
 				libxt-dev libpango1.0-dev libprotoc-dev \
 				texlive-fonts-recommended tex-gyre liblz4-tool pv zip
 
+CENTOS7_PACKAGES=postgresql tomcat make git rsync \
+			gcc gcc-gfortran cpp gcc-c++ \
+			readline-devel libXt-devel zlib-devel bzip2-devel \
+			xz-devel pcre2-devel libcurl-devel cairo-devel libxml2-devel \
+			openssl-devel
+
 UBUNTU14_PACKAGES=php5-cli php5-json openjdk-7-jdk
 UBUNTU16_PACKAGES=php7.0-cli php7.0-json
 UBUNTU18_PACKAGES=php7.2-cli php7.2-json libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
+UBUNTU20_PACKAGES=php7.2-cli php7.2-json libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
 
 # Latest version of groovy-binary
 GROOVY_VERSION=2.4.3
@@ -113,6 +120,10 @@ install_ubuntu_packages18:
 install_ubuntu_packages:
 	apt-get update
 	apt-get install -y $(UBUNTU_PACKAGES)
+
+install_centos_package7:
+	yum update
+	yum -y $(CENTOS7_PACKAGES)
 
 # <directory> <repos> <branch>
 update_repos = if [ ! -d $(1) ]; then \

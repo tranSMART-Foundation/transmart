@@ -25,7 +25,7 @@
     </div>
 </td>
 
-<script>
+<script type="text/javascript">
     (function () {
         'use strict';
 

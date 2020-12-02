@@ -18,6 +18,21 @@ vpath %/annotation.params annotation
 	$(MAKE) $*/$*_study.tar.xz
 	tar -C $* -xJf $*/$*_study.tar.xz
 
+# browse program needs params that define the program needed
+%/program.params:
+	$(MAKE) $*/$*_program.tar.xz
+	tar -C $* -xJf $*/$*_program.tar.xz
+
+# browse study needs params that point to the study and the program needed
+%/browse.params:
+	$(MAKE) $*/$*_browse.tar.xz
+	tar -C $* -xJf $*/$*_browse.tar.xz
+
+# samples needs params that point to the study needed
+%/samples.params:
+	$(MAKE) $*/$*_samples.tar.xz
+	tar -C $* -xJf $*/$*_samples.tar.xz
+
 # ref_annotation needs params that point to the annotation needed
 %/ref_annotation.params:
 	$(MAKE) $*/$*_ref_annotation.tar.xz

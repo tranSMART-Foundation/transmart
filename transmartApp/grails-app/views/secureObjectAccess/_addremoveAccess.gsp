@@ -32,7 +32,7 @@
     </td>
 </g:else>
 
-<script>
+<script type="text/javascript">
     (function () {
         'use strict';
 

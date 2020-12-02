@@ -4064,7 +4064,7 @@ class I2b2HelperService implements InitializingBean {
 			SELECT sourcesystem_cd, secure_obj_token
 			FROM i2b2metadata.i2b2_SECURE
 			WHERE sourcesystem_cd IN (''' + listToIN(studyIds) + ''')
-			AND c_visualattributes like \'%S\''''
+			AND c_visualattributes like \'%S\' '''
 	eachRow(sql) { row ->
 	    String code = rowGet(row, 'sourcesystem_cd', String)
 	    tokens[code] = rowGet(row, 'secure_obj_token', String)
@@ -4075,15 +4075,15 @@ class I2b2HelperService implements InitializingBean {
 
     Map<String, String> getSecureTokensWithAccessForUser() {
 	List<String[]> results = AuthUserSecureAccess.executeQuery('''
-				SELECT DISTINCT so.bioDataUniqueId, ausa.accessLevel.accessLevelName
+	    SELECT DISTINCT so.bioDataUniqueId, ausa.accessLevel.accessLevelName
             FROM AuthUserSecureAccess ausa
             JOIN ausa.accessLevel
             JOIN ausa.secureObject so
-				WHERE ausa.authUser IS NULL
-				   OR ausa.authUser.id = :userId''',
-				[userId: securityService.currentUserId()]) as List<String[]>
+		WHERE ausa.authUser IS NULL
+		   OR ausa.authUser.id = :userId''',
+	    [userId: securityService.currentUserId()]) as List<String[]>
 
-	    Map<String, String> map = results.collectEntries { String[] result ->
+	Map<String, String> map = results.collectEntries { String[] result ->
 	    String bioDataUniqueIdToken = result[0]
 	    String accessLevelName = result[1]
 	    [bioDataUniqueIdToken, accessLevelName]

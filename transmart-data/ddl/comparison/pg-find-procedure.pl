@@ -1,4 +1,4 @@
-#!/bin/perl -w
+#!/usr/bin/perl -w
 
 $dodir="../../ddl/oracle";
 opendir(ODIR,"$dodir") || die "Cannot open current directory";

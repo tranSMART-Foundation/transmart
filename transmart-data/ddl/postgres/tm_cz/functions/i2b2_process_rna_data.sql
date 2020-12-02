@@ -339,7 +339,7 @@ begin
     end;
 
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_rna_node_values',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_rna_nodes',rowCt,stepCt,'Done');
 
     begin
 	insert into tm_wz.wt_rna_nodes
@@ -379,9 +379,15 @@ begin
     end;
 	
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_rna_nodes',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP wt_rna_nodes',rowCt,stepCt,'Done');
 	
-    --	insert for platform node so platform concept can be populated
+    if rowCt < 1 then
+	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Failed to load records in wt_rna_nodes - check platform(s)',0,stepCt,'ERROR');
+	perform tm_cz.cz_end_audit (jobId,'FAIL');
+	return 161;
+    end if;
+
+--	insert for platform node so platform concept can be populated
     begin
 	insert into tm_wz.wt_rna_nodes
 		    (leaf_node
@@ -932,25 +938,6 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',rowCt,stepCt,'Done');
     
-    ---INSERT sample_dimension
-    begin
-	insert into i2b2demodata.sample_dimension(sample_cd)
-        select distinct sample_cd
-	  from deapp.de_subject_sample_mapping where sample_cd not in (select sample_cd from i2b2demodata.sample_dimension) ;
-	get diagnostics rowCt := ROW_COUNT;
-    exception
-	when others then
-	    errorNumber := SQLSTATE;
-	    errorMessage := SQLERRM;
-	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return -16;
-    end;
-    stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'insert distinct sample_cd in sample_dimension from de_subject_sample_mapping',rowCt,stepCt,'Done');
-
     ---- update c_metadataxml in i2b2
     begin
 	for ul in uploadI2b2 loop
