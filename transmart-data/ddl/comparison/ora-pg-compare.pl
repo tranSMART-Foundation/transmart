@@ -1360,78 +1360,82 @@ sub compareTypes($$$$){
 	$pt =~ s/ NULL$/\)/;
     }
 
+    if($ot =~ / NULL$/ && $ot !~ / NOT NULL$/ && $pt !~ / NULL/) {
+	$ot =~ s/ NULL$//;
+    }
+
     $ot =~ s/ WITH LOCAL TIME ZONE//g; # only allows local time display, storage unchanged
 
     if($pt =~ /^BIGINT/) {
-	if($ot =~ /^NUMBER/) {
-	    $ot =~ s/^\S+/matched/;
-	    $pt =~ s/^\S+/matched/;
-	}
-	elsif($ot =~ /^NUMBER\((\d+,0)\)/){
-	    if($1 >= 9 && $1 <= 18) {
+	if($ot =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 9 && $1 <= 18) { # FIX size of bigint
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
+	}
+	elsif($ot =~ /^NUMBER/) {
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
 	}
 	else {return 1}
     }
 
     elsif($pt =~ /^BIGSERIAL/) {	# used for unique identifiers in i2b2 postgres
-	if($ot =~ /^NUMBER/) {
-	    $ot =~ s/^\S+/matched/;
-	    $pt =~ s/^\S+/matched/;
-	}
-	elsif($ot =~ /^NUMBER\((\d+,0)\)/){
-	    if($1 >= 9 && $1 <= 18) {
+	if($ot =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 9 && $1 <= 18) { # fix: size of bigserial
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
+	}
+	elsif($ot =~ /^NUMBER/) {
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
 	}
 	else {return 1}
     }
 
     elsif($pt =~ /^INT/) {
-	if($ot =~ /^NUMBER/) {
-	    $ot =~ s/^\S+/matched/;
-	    $pt =~ s/^\S+/matched/;
-	}
 	if($ot =~ /^INTEGER/) {
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
-	elsif($ot =~ /^NUMBER\((\d+,0)\)/){
-	    if($1 >= 5 && $1 <= 18) {
+	elsif($ot =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 5 && $1 <= 18) { # fix: size of INT
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
+	}
+	elsif($ot =~ /^NUMBER/) {
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
 	}
 	else {return 1}
     }
 
     elsif($pt =~ /^SERIAL/) {	# used for unique identifiers in i2b2 postgres
-	if($ot =~ /^NUMBER/) {
-	    $ot =~ s/^\S+/matched/;
-	    $pt =~ s/^\S+/matched/;
-	}
-	elsif($ot =~ /^NUMBER\((\d+,0)\)/){
+	if($ot =~ /^NUMBER\((\d+),0\)/){ # fix: size of serial
 	    if($1 >= 5 && $1 <= 8) {
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
 	}
+	elsif($ot =~ /^NUMBER/) {
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
 	else {return 1}
     }
 
     elsif($pt =~ /^SMALLINT/) {
-	if($ot =~ /^NUMBER/) {
-	    $ot =~ s/^\S+/matched/;
-	    $pt =~ s/^\S+/matched/;
-	}
-	elsif($ot =~ /^NUMBER\((\d+,0)\)/){
-	    if($1 >= 1 && $1 <= 4) {
+	if($ot =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 1 && $1 <= 4) { # fix: size of smallint
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
+	}
+	elsif($ot =~ /^NUMBER/) {
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
 	}
 	else {return 1}
     }
@@ -1536,6 +1540,29 @@ sub compareTypes($$$$){
 	if($ot =~ /N?VARCHAR2\($size\)/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
+	}
+	if($ot =~ / DEFAULT \'([^\']*)\'$/) {
+	    $oval = $1;
+	    if($pt =~ /DEFAULT \'$oval\'::CHARACTER VARYING$/) {
+		$ot =~ s/ DEFAULT \'([^\']*)\'$//;
+		$pt =~ s/ DEFAULT \'$oval\'::CHARACTER VARYING$//;
+	    }
+	}
+    }
+
+    elsif($pt =~ /^VARCHAR2\((\d+) BYTE\)/) {
+	$size = $1;
+	if($ot =~ /N?VARCHAR2\($size BYTE\)/){
+	    $ot =~ s/^\S+ \S+/matched/;
+	    $pt =~ s/^\S+ \S+/matched/;
+	}
+	if($ot =~ /N?VARCHAR2\($size CHAR\)/){
+	    $ot =~ s/^\S+ \S+/matched/;
+	    $pt =~ s/^\S+ \S+/matched/;
+	}
+	if($ot =~ /N?VARCHAR2\($size\)/){
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+ \S+/matched/;
 	}
 	if($ot =~ / DEFAULT \'([^\']*)\'$/) {
 	    $oval = $1;
@@ -3814,7 +3841,7 @@ sub parseI2b2Sqlserver($){
 $dir = getcwd();
 $dir .= "/";
 print "$dir\n";
-$iplus = "../../../../git-i2b2/i2b2-data/edu.harvard.i2b2.data/Release_1-7/NewInstall";
+$iplus = "../../../../../git-i2b2/i2b2-data/edu.harvard.i2b2.data/Release_1-7/NewInstall";
 $oplus = "../../ddl/oracle";
 $pplus = "../../ddl/postgres";
 $ischema = "undefined";
