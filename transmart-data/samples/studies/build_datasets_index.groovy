@@ -47,7 +47,10 @@ GParsPool.withPool(NUMBER_OF_THREADS) {
     dataSets = feeds.collect { feed ->
         try {
             def result = feed.fetchDataSets()
-            Log.out "Got ${result.size()} data sets from $feed"
+	    def studies = result.groupBy {
+		[it.study]
+	    }
+            Log.out "Got ${result.size()} data sets for ${studies.size()} studies/IDs from $feed"
             result
         } catch (Exception e) {
             Log.err("Error fetching data sets for feed $feed: ${e.message}")
@@ -59,7 +62,10 @@ GParsPool.withPool(NUMBER_OF_THREADS) {
 def groupedDataSets = dataSets.groupBy {
     [it.study, it.type]
 }
-Log.out "Found ${groupedDataSets.size()} unique data sets"
+def allStudies = dataSets.groupBy {
+		[it.study]
+}
+Log.out "Found ${groupedDataSets.size()} unique data sets for ${allStudies.size()} studies/IDs"
 dataSets = groupedDataSets.collect { List<String> key, List<DataSet> list ->
     list
 }
