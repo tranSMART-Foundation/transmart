@@ -9,7 +9,7 @@ echo "-----------------------------------------"
 echo "|  Checking for required tomcat war files"
 echo "-----------------------------------------"
 
-baseWebapps="/var/lib/tomcat8/webapps"
+baseWebapps="/var/lib/tomcat9/webapps"
 
 returnValue=0
 

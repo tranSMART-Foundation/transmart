@@ -27,7 +27,6 @@ if [ $returnValue != 0 ]; then
     exit $returnvalue
 fi
 
-baserootbin="$baseR/root/bin"
 for filename in  "$baseSolr/start.jar"
 do
 	if [ ! -e "$filename" ]; then

@@ -86,6 +86,12 @@ abstract class AbstractAnalysisJob {
 
     private void setupTemporaryDirectory() {
         temporaryDirectory = new File(new File(topTemporaryDirectory, name), 'workingDirectory')
-        temporaryDirectory.mkdirs()
+	try {
+            temporaryDirectory.mkdirs()
+	}
+	catch(e) {
+	    throw new Exception('Failed to create Temporary Directory path for job, ' +
+				'maybe there is not enough space on disk. Please contact an administrator.', e)
+	}
     }
 }

@@ -247,14 +247,26 @@ if [ "$( checkInstallError "Database table folders needs by transmart not correc
 echo "Finished installing basic tools and dependencies at $(date)"
 
 echo "+++++++++++++++++++"
-echo "+  Install Tomcat 8"
+echo "+  Install Tomcat 9"
 echo "+++++++++++++++++++"
 
 sudo -v 
 cd $HOME
-sudo apt-get -q install -y tomcat8 
-sudo service tomcat8 stop
+sudo apt-get -q install -y tomcat9 
+sudo service tomcat9 stop
+
+# while tomcat9 is stopped:
+# For tomcat9 on Ubuntu20 we need to define the tomcat user directory
+# which defaults to root!
+
+sudo usermod tomcat --home /home/tomcat
+sudo mkdir -p /home/tomcat
+sudo chown -R tomcat:tomcat /home/tomcat
+
 $SCRIPTS_BASE/Scripts/install-ubuntu20/updateTomcatConfig.sh
+
+# Fix tomcat user:
+# for Ubuntu20 and tomcat9 the user has no hom edirectory
 
 echo "+  Checks on tomcat install"
 cd $SCRIPTS_BASE/Scripts/install-ubuntu20/checks
@@ -290,7 +302,7 @@ source /etc/profile.d/Rpath.sh
 sudo -v
 cd $INSTALL_BASE/transmart-data
 source ./vars
-sudo TABLESPACES=$TABLESPACES RSERVE_USER="tomcat8" make -C R install_rserve_unit
+sudo TABLESPACES=$TABLESPACES RSERVE_USER="tomcat" make -C R install_rserve_unit
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu20/checks
 ./checkFilesR.sh
@@ -348,6 +360,7 @@ sudo TABLESPACES=$TABLESPACES SOLR_USER="$USER" make -C solr install_solr_unit
 cd $SCRIPTS_BASE/Scripts/install-ubuntu20/checks
 ./checkFilesSolr.sh
 if [ "$( checkInstallError "solR install failed; redo install" )" ] ; then exit -1; fi
+
 ./checkR.sh
 if [ "$( checkInstallError "solR install failed; redo install" )" ] ; then exit -1; fi
 echo "Finished installing solr and solr service at $(date)"
@@ -360,9 +373,9 @@ cd $INSTALL_BASE/transmart-data
 sudo -v
 source ./vars
 make -C config install
-sudo mkdir -p /var/lib/tomcat8/.grails/transmartConfig/
-sudo cp $HOME/.grails/transmartConfig/*.groovy /var/lib/tomcat8/.grails/transmartConfig/
-sudo chown -R tomcat8:tomcat8 /var/lib/tomcat8/.grails
+sudo mkdir -p /home/tomcat/.grails/transmartConfig/
+sudo cp $HOME/.grails/transmartConfig/*.groovy /home/tomcat/.grails/transmartConfig/
+sudo chown -R tomcat:tomcat /home/tomcat/.grails
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu20/checks
 ./checkFilesConfig.sh
@@ -387,15 +400,15 @@ fi
 if ! [ -e gwava.war ]; then
     curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/gwava-release-19.0.war --output gwava.war
 fi
-sudo cp *.war /var/lib/tomcat8/webapps/
+sudo cp *.war /var/lib/tomcat9/webapps/
 cd ..
 
 rm -rf transmart-manual-release-19.0
 curl http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-manual-release-19.0.zip --output transmart-manual-release-19.0.zip
 unzip -q transmart-manual-release-19.0.zip
-sudo rm -rf /var/lib/tomcat8/webapps/transmartmanual
-sudo mv transmart-manual-release-19.0 /var/lib/tomcat8/webapps/transmartmanual
-sudo chown -R tomcat8.tomcat8 /var/lib/tomcat8/webapps/transmartmanual
+sudo rm -rf /var/lib/tomcat9/webapps/transmartmanual
+sudo mv transmart-manual-release-19.0 /var/lib/tomcat9/webapps/transmartmanual
+sudo chown -R tomcat.tomcat /var/lib/tomcat9/webapps/transmartmanual
 
 cd $SCRIPTS_BASE/Scripts/install-ubuntu20/checks
 sudo ./checkFilesTomcatWar.sh
@@ -427,9 +440,9 @@ echo "++++++++++++++++++++++++++++"
 
 sudo -v
 cd $SCRIPTS_BASE/Scripts/install-ubuntu20
-# rserve runs as user tomcat8
+# rserve runs as user tomcat9
 # service started using /etc/systemd/system/rserve.service
-# and writes to /var/log/tomcat8/rserve-transmart.log
+# and writes to /var/log/tomcat9/rserve-transmart.log
 sudo systemctl enable rserve
 sudo systemctl start rserve
 echo "Finished starting RServe at $(date)"
@@ -439,8 +452,8 @@ echo "+  start Tomcat"
 echo "++++++++++++++++++++++++++++"
 
 #  (TODO)  Should check to see if it is already running
-sudo systemctl restart tomcat8
-echo "Finished starting Tomcat8 at $(date)"
+sudo systemctl restart tomcat9
+echo "Finished starting Tomcat9 at $(date)"
 echo "Sleeping - waiting for tomcat/transmart to start (3 minutes)"
 sleep 3m
 
