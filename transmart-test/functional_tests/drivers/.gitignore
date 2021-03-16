@@ -1,0 +1,4 @@
+*.version
+*.exe
+*linux-64bit
+*mac-64bit
