@@ -14,7 +14,9 @@ import pages.GwasPage
 class GwasPageSpec extends GebReportingSpecTransmart {
 
     def setupSpec() {
+        println "setupSpec loginTransmart"
         loginTransmart(GwasPage)
+        println "setupSpec loginTransmart GwasPage done"
     }
     
 

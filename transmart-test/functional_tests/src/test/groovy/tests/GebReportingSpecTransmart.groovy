@@ -19,7 +19,7 @@ class GebReportingSpecTransmart extends GebReportingSpec {
 
     void loginTransmart(Class<? extends Page> page, String userLevel = "guest", boolean firstCall = true) {
         via page
-//        println "loginTransmart ${page} autologin ${Constants.AUTO_LOGIN_ENABLED}"
+        println "loginTransmart ${page} autologin ${Constants.AUTO_LOGIN_ENABLED}"
         if (printme("testing isAt(page ${page.class})") && isAt(page)) {
             println "passed isAt"
             /* Already at required page */

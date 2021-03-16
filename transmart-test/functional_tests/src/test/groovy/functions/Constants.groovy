@@ -36,7 +36,7 @@ class Constants {
     def Constants(Browser browser) {
 
         String hasBaseUrl = browser.config.rawConfig.baseUrl
-        if(hasBaseUrl == 'http://localhost/transmart/') {
+        if(hasBaseUrl == 'http://localhost:8080/transmart/') {
             HOST_SERVER = 'localhost'
 
 //            AUTO_LOGIN_ENABLED = true

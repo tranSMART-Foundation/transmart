@@ -1,14 +1,13 @@
 package pages.helpers
 
 
-import geb.navigator.AbstractNavigator
-//import geb.navigator.Navigator
+import geb.navigator.Navigator
 import geb.Module
 
 class SearchItem extends Module {
 
     @Delegate
-    AbstractNavigator navigator
+    Navigator navigator
 
     String getType() {
 //        println "in SearchItem.getType"

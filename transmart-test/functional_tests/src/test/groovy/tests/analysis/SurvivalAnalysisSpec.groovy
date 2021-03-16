@@ -1,7 +1,7 @@
 package tests.analysis
 
 import geb.Page
-import geb.junit4.GebReportingTest
+//import geb.junit4.GebReportingTest
 
 import junit.framework.AssertionFailedError
 

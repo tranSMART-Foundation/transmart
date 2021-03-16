@@ -1,7 +1,6 @@
 package pages.modules
 
 import geb.Module
-import geb.navigator.AbstractNavigator
 import geb.navigator.Navigator
 import groovy.transform.ToString
 import org.openqa.selenium.WebElement
