@@ -2,12 +2,16 @@ import geb.Page
 import org.openqa.selenium.Point
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeDriverService
+import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
+import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.firefox.ProfilesIni
+import org.openqa.selenium.os.ExecutableFinder
 import geb.report.ScreenshotReporter
 
-//import org.openqa.selenium.chrome.ChromeDriver
-//import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.os.ExecutableFinder
 
 import static org.apache.commons.lang3.SystemUtils.IS_OS_LINUX
@@ -24,11 +28,14 @@ import pages.BrowsePage
 // The tranSMART Foundation CI testing site
 //baseUrl = 'http://postgres-ci.transmartfoundation.org/transmart/'
 
+// The tranSMART Foundation PostgreSQL demo server
+//baseUrl = 'http://postgres-demo.transmartfoundation.org/transmart/'
+
 // for local testing set here or use -Pfirefoxlocal below
-baseUrl = 'http://localhost/transmart/'
+baseUrl = 'http://localhost:8080/transmart/'
 
 // directory for copies of HTML and PNG image
-// for each test
+// for each test (for any driver unless overridden)
 reportsDir = 'build/geb-reports'
 
 // write HTML and PNG reports only on failure if this is set
@@ -36,96 +43,96 @@ reportOnTestFailureOnly = true
 
 reporter = new ScreenshotReporter()
 
-def instantiateDriver(String className) {
-    def driverInstance = Class.forName(className).newInstance(profile)
-    driverInstance.manage().window().size = new Dimension(1600, 1024)
-    driverInstance
+File findDriverExecutable(String driverName){
+    def defaultExecutable = new ExecutableFinder().find(driverName)
+    if(defaultExecutable) {
+        new File(defaultExecutable)
+    } else {
+        new File("drivers").listFiles().findAll {
+            it.name.contains(driverName) &&
+            !it.name.endsWith(".version")
+        }.find {
+            if(IS_OS_LINUX) {
+                it.name.contains("linux")
+            }
+            else if (IS_OS_MAC) {
+                it.name.contains("mac")
+            } else if (IS_OS_WINDOWS) {
+                it.name.contains("windows")
+            }
+        }
+    }
 }
 
-def instantiateDriverWebDriver(String className) {
-    println "instantiateDriverWebDriver '${className}'"
-    def profile = new org.openqa.selenium.firefox.FirefoxProfile()
-    def options = new org.openqa.selenium.firefox.FirefoxOptions()
-
-//    options.setLogLevel(Level.OFF)
-    options.setProfile(profile)
-
-    profile.setPreference("intl.accept_languages", "en-us")
-    profile.setPreference("browser.download.dir", "/data/scratch/git-master/transmart-test/functional_tests/savefiles")
-    profile.setPreference("browser.download.folderList", 2)
-    profile.setPreference("browser.helperApps.neverAsk.saveToDisk", "image/jpeg, image/jpg, image/png, image/gif,"+
-                          " application/zip, application/x-compressed, application/x-zip-compressed,"+
-                          " application/pdf, application/octet-stream,"+
-                          " text/plain")
-    profile.setPreference("pdfjs.disabled", true)
-
-    //set more capabilities as per your requirements
- 
-    def driverInstance = Class.forName(className).newInstance(options)
-    driverInstance.manage().window().size = new Dimension(1280, 1024)
-
-    println "initial window size ${driverInstance.manage().window().size}"
-
-//// Note: maximize() just hangs
-////    driverInstance.manage().window().maximize()
-
-// set to top left before resize - else setSize is ignored!
-//    driverInstance.manage().window().setPosition(new Point(0,0))
-// somehow sets to a smaller size than the previous default(1366, 704)
-//    driverInstance.manage().window().setSize(new Dimension(1600, 1024))
-//    println "size updated"
-//    println "updated window size ${driverInstance.manage().window().size}"
-// reports reduced size (1221, 661)
-    println "instantiateDriverWebDriver"
-    driverInstance
-}
-
-def instantiateDriverProfile(String className) {
-    def profile = new org.openqa.selenium.firefox.FirefoxProfile()
-    profile.setPreference("intl.accept_languages", "en-us")
-    def driverInstance = Class.forName(className).newInstance(profile)
-    driverInstance.manage().window().size = new Dimension(1600, 1024)
-    driverInstance
-}
-
-/*
-def instantiateDriverChrome(String className) {
-    def profile = new org.openqa.selenium.chrome.ChromeOptions()
-//    profile.setPreference("intl.accept_languages", "en-us")
-    profile.addArguments("--start-maximized")
-    def driverInstance = Class.forName(className).newInstance(profile)
-    driverInstance.manage().window().size = new Dimension(1600, 1024)
-    driverInstance
-}
-*/
 environments {
     chrome {
-        driver = { instantiateDriverChrome 'org.openqa.selenium.chrome.ChromeDriver' }
-    }
+        driver = {
+            File chromeFile = findDriverExecutable("chromedriver")
 
+            System.setProperty("webdriver.chrome.driver", chromeFile.path)
+
+            // chromeService to keep running for all tests
+            ChromeDriverService chromeService = new ChromeDriverService.Builder()
+            .usingAnyFreePort()
+            .usingDriverExecutable(chromeFile)
+            .build()
+            chromeService.start()
+
+            // chromeOpts for any options needed to ensure consistent results
+            ChromeOptions chromeOpts = new ChromeOptions()
+            chromeOpts.addArguments("--lang=en-us")
+            chromeOpts.addArguments("--start-maximized")
+
+            // chromeDriver
+            WebDriver chromeDriver = new ChromeDriver(chromeService, chromeOpts)
+            chromeDriver.manage().window().maximize()
+
+            chromeDriver
+        }
+    }
+    
     firefox {
-        driver = { instantiateDriverWebDriver 'org.openqa.selenium.firefox.FirefoxDriver' }
-    }
+        driver = {
+            ProfilesIni iniprofile = new org.openqa.selenium.firefox.ProfilesIni()
+            FirefoxProfile firefoxProfile = iniprofile.getProfile("tmtestProfile");
 
+            firefoxProfile.setPreference("intl.accept_languages", "en-us")
+            firefoxProfile.setPreference("browser.download.dir", "/data/scratch/git-master/transmart-test/functional_tests/savefiles")
+            firefoxProfile.setPreference("browser.download.folderList", 2)
+            firefoxProfile.setPreference("browser.helperApps.neverAsk.saveToDisk", "image/jpeg, image/jpg, image/png, image/gif, \
+application/zip, application/x-compressed, application/x-zip-compressed, \
+application/pdf, application/octet-stream, text/plain")
+            firefoxProfile.setPreference("pdfjs.disabled", true)
+
+            FirefoxOptions firefoxOptions = new FirefoxOptions()
+
+            firefoxOptions.setProfile(firefoxProfile)
+
+            File geckoFile = findDriverExecutable("geckodriver")
+            System.setProperty("webdriver.gecko.driver", geckoFile.path)
+
+            WebDriver firefoxDriver = new FirefoxDriver(firefoxOptions)
+            firefoxDriver.manage().window().maximize()
+
+            firefoxDriver
+        }
+    }
+    
     firefoxlocal {
-        baseUrl = 'http://localhost/transmart/'
-        driver = { instantiateDriver 'org.openqa.selenium.firefox.FirefoxDriver' }
+        baseUrl = 'http://localhost:8080/transmart/'
+        driver = { new FirefoxDriver() }
     }
 
     firefoxoracle {
-        baseUrl = 'http://localhost/transmart/'
-        driver = { instantiateDriver 'org.openqa.selenium.firefox.FirefoxDriver' }
+        baseUrl = 'http://localhost:8080/transmart/'
+        driver = { new FirefoxDriver() }
     }
 
     firefoxpostgres {
-        baseUrl = 'http://localhost/transmart/'
-        driver = { instantiateDriver 'org.openqa.selenium.firefox.FirefoxDriver' }
+        baseUrl = 'http://localhost:8080/transmart/'
+        driver = { new FirefoxDriver() }
     }
 
-    htmlunit {
-        // See: http://code.google.com/p/selenium/wiki/HtmlUnitDriver
-        driver = { Class.forName('org.openqa.selenium.htmlunit.HtmlUnitDriver').newInstance() }
-    }
 }
 
 HOST_SERVER = "undefined"
@@ -135,7 +142,7 @@ BAD_PASSWORD = 'bad password'
 GOOD_USERNAME = 'guest'
 GOOD_PASSWORD = 'transmart2016'
 ADMIN_USERNAME = 'admin'
-String ADMIN_PASSWORD = 'admin'
+ADMIN_PASSWORD = 'admin'
 AUTO_LOGIN_ENABLED = true // locally set to true
 GALAXY_ENABLED = true
 GWAS_PLINK_ENABLED = true
@@ -148,98 +155,15 @@ LANDING_PAGE = new BrowsePage() // local configuration
 
 GSE8581_KEY = '\\\\Public Studies\\Public Studies\\GSE8581\\'
 
-if(baseUrl == 'http://localhost/transmart/') {
+if(baseUrl == 'http://localhost:8080/transmart/') {
     HOST_SERVER = 'localhost'
-
-//            AUTO_LOGIN_ENABLED = true
-//            LANDING_PAGE = new BrowsePage()
-
-//            GOOD_USERNAME = 'guest'
-//            GOOD_PASSWORD = 'transmart2016'
-//            ADMIN_USERNAME = 'admin'
-//            ADMIN_PASSWORD = 'admin'
-
-//            GALAXY_ENABLED = true
-//            GWAS_PLINK_ENABLED = true
-//            METACORE_ENABLED = true
-//            SMARTR_ENABLED = true
-//            XNAT_IMPORT_ENABLED = true
-//            XNAT_VIEW_ENABLED = true
-
 } else if(baseUrl == 'http://postgres-ci.transmartfoundation.org/transmart/') {
     HOST_SERVER = 'TranSMART Oracle test server'
-
-//            AUTO_LOGIN_ENABLED = true
-//            LANDING_PAGE = new BrowsePage()
-
-//            GOOD_USERNAME = 'guest'
-//            GOOD_PASSWORD = 'transmart2016'
-//            ADMIN_USERNAME = 'admin'
-//            ADMIN_PASSWORD = 'admin'
-
-//             AUTO_LOGIN_ENABLED = true
-//            GWAS_PLINK_ENABLED = true
-//            METACORE_ENABLED = true
-//            SMARTR_ENABLED = true
-//            XNAT_IMPORT_ENABLED = true
-//            XNAT_VIEW_ENABLED = true
-
 } else if(baseUrl == 'http://postgres-test.transmartfoundation.org/transmart/') {
     HOST_SERVER = 'TranSMART Postgres test server'
-
-//            AUTO_LOGIN_ENABLED = true
-//            LANDING_PAGE = new BrowsePage()
-
-//            GOOD_USERNAME = 'guest'
-//            GOOD_PASSWORD = 'transmart2016'
-//            ADMIN_USERNAME = 'admin'
-//            ADMIN_PASSWORD = 'admin'
-
-//            AUTO_LOGIN_ENABLED = true
-//            GWAS_PLINK_ENABLED = true
-//            METACORE_ENABLED = true
-//            SMARTR_ENABLED = true
-//            XNAT_IMPORT_ENABLED = true
-//            XNAT_VIEW_ENABLED = true
-
-} else if(baseUrl == 'http://transmartci.etriks.org/') {
-    HOST_SERVER = 'eTRIKS test server'
-
-//            AUTO_LOGIN_ENABLED = true
-//            LANDING_PAGE = new BrowsePage()
-
-//            GOOD_USERNAME = 'guest'
-//            GOOD_PASSWORD = 'transmart2016'
-//            ADMIN_USERNAME = 'admin'
-//            ADMIN_PASSWORD = 'admin'
-
-//            AUTO_LOGIN_ENABLED = true
-//            GWAS_PLINK_ENABLED = true
-//            METACORE_ENABLED = true
-//            SMARTR_ENABLED = true
-//            XNAT_IMPORT_ENABLED = true
-//            XNAT_VIEW_ENABLED = true
-
 } else {                // default values
     HOST_SERVER = 'default server'
-
-//            AUTO_LOGIN_ENABLED = true
-//            LANDING_PAGE = new BrowsePage()
-
-//            GOOD_USERNAME = 'guest'
-//            GOOD_PASSWORD = 'transmart2016'
-//            ADMIN_USERNAME = 'admin'
-//            ADMIN_PASSWORD = 'admin'
-
-//            AUTO_LOGIN_ENABLED = true
-//            GWAS_PLINK_ENABLED = true
-//            METACORE_ENABLED = true
-//            SMARTR_ENABLED = true
-//            XNAT_IMPORT_ENABLED = true
-//            XNAT_VIEW_ENABLED = true
-
 }
-
 
 // force waiting for document to load before any at(Page)
 // CommonHeader module base query was failing otherwise
@@ -248,7 +172,6 @@ atCheckWaiting = true
 
 // set timeout for root element of a page
 // as Firefox driver can timeout with default settings
-
 baseNavigatorWaiting = true
 
 // increase timeout for slow pages to 10 seconds
@@ -258,4 +181,3 @@ waiting {
     retryInterval = 0.5
     includeCauseInMessage = true // Force Maven Surefire to include cause of exception
 }
-

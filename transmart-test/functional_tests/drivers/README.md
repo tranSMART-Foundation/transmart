@@ -1,10 +1,6 @@
-Gecko Driver
-------------
+Drivers
+-------
 
-Download from https://github.com/mozilla/geckodriver/releases/download/v0.20.0/geckodriver-v0.20.0-linux64.tar.gz
+Latest versions of drivers are downloaded here.
 
-Chrome Driver
--------------
-
-Download from https://chromedriver.storage.googleapis.com/2.31/chromedriver_linux64.zip
-
+GebConfig searches for the latest driver when running tests.
