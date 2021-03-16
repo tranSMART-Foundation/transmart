@@ -79,7 +79,8 @@
       <note>/*****************************************
 This ETL is designed for Sanofi to load metabolomic data
 Date: 10/22/2013
-/*****************************************</note>
+*****************************************/
+      </note>
       <xloc>11</xloc>
       <yloc>613</yloc>
       <width>321</width>
@@ -351,7 +352,15 @@ Date: 10/22/2013
 	<leftvalue>load_type</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>F</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>F</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -1199,7 +1208,9 @@ Date: 10/22/2013
         <name>sample_ct</name>
         <value>2</value>
         <norm>step_count</norm>
-        </field>      </fields>     <cluster_schema/>
+      </field>
+    </fields>
+    <cluster_schema/>
     <remotesteps>
       <input>   </input>
       <output>   </output>

@@ -956,7 +956,15 @@
 	<leftvalue>marker_type</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>RBM</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>RBM</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>

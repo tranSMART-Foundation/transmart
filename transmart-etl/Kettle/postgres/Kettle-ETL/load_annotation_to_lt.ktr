@@ -82,7 +82,7 @@ Format:
 	GENE_SYMBOL
 	GENE_ID
 	ORGANISM
-	</note>
+      </note>
       <xloc>135</xloc>
       <yloc>31</yloc>
       <width>269</width>
@@ -117,7 +117,8 @@ Format:
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-******************************************************************/</note>
+******************************************************************/
+      </note>
       <xloc>45</xloc>
       <yloc>507</yloc>
       <width>444</width>

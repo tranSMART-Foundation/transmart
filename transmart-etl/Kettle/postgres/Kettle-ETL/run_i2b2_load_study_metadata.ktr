@@ -89,7 +89,8 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-******************************************************************/</note>
+******************************************************************/
+      </note>
       <xloc>94</xloc>
       <yloc>421</yloc>
       <width>444</width>
@@ -183,7 +184,15 @@
 	<leftvalue>rtnCd</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>##</mask></value>
+	<value>
+	  <name>constant</name>
+	  <type>Number</type>
+	  <text>0.0</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask>##</mask>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -271,7 +280,8 @@
     <logmessage>********************************
 i2b2_load_study_metadata
 did NOT complete successfully
-********************************</logmessage>
+********************************
+    </logmessage>
     <fields>
       <field>
         <name>rtnCd</name>

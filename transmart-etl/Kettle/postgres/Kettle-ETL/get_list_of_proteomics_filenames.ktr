@@ -79,7 +79,8 @@
       <note>/*****************************************
 This ETL is designed for Sanofi to load proteomics data
 Date: 10/22/2013
-/*****************************************</note>
+*****************************************/
+      </note>
       <xloc>127</xloc>
       <yloc>309</yloc>
       <width>285</width>

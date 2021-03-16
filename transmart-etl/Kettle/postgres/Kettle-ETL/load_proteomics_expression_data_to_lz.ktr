@@ -288,7 +288,15 @@
 	<leftvalue>output_rows</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value>
+	<value>
+	  <name>constant</name>
+	  <type>Integer</type>
+	  <text>0</text>
+	  <length>-1</length>
+	  <precision>0</precision>
+	  <isnull>N</isnull>
+	  <mask>#;-#</mask>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -383,7 +391,15 @@ Alert(isNum(str2));
 	<leftvalue>load_type</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>I</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>I</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -416,7 +432,15 @@ Alert(isNum(str2));
 	<leftvalue>load_type</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>L</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>L</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -471,7 +495,15 @@ Alert(isNum(str2));
 	<leftvalue>isnum_result</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>false</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>false</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -930,7 +962,15 @@ Alert(isNum(str2));
 	<leftvalue>Step name</leftvalue>
 	<function>IN LIST</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>Bulk Loader;Insert to lt_src_proteomics_data</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>Bulk Loader;Insert to lt_src_proteomics_data</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -1320,7 +1360,15 @@ else
 	<leftvalue>sample_remap_file</leftvalue>
 	<function>&lt;&gt;</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>NOSAMPLEREMAP</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>NOSAMPLEREMAP</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -1676,7 +1724,7 @@ else
     <fileNameField/>
     <create_parent_folder>N</create_parent_folder>
     <file>
-      <name>${DATA_LOCATION}/${STUDY_ID}_PROTEOMICSexpression_pivot</name>
+      <name>${DATA_LOCATION}/${STUDY_ID}_proteomics_expression_pivot</name>
       <is_command>N</is_command>
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>Y</do_not_open_new_file_init>
@@ -1804,11 +1852,12 @@ else
     </partitioning>
     <loglevel>log_level_basic</loglevel>
     <displayHeader>Y</displayHeader>
-    <logmessage>**************************************************
-*                                                *
-*     NO ROWS WRITTEN TO LT_SRC_LT_SRC_PROTEOMICS_DATA        *
-*                                                *
-**************************************************</logmessage>
+    <logmessage>*********************************************
+*                                           *
+* NO ROWS WRITTEN TO LT_SRC_PROTEOMICS_DATA *
+*                                           *
+*********************************************
+    </logmessage>
     <fields>
     </fields>
     <cluster_schema/>

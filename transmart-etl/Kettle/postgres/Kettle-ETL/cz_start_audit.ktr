@@ -77,7 +77,8 @@
   <notepads>
     <notepad>
       <note>This needs to be run from the top-level job because the scope of the 
-ETL_JOB_ID is  at the parent level</note>
+ETL_JOB_ID is  at the parent level
+      </note>
       <xloc>235</xloc>
       <yloc>281</yloc>
       <width>349</width>
@@ -112,7 +113,8 @@ ETL_JOB_ID is  at the parent level</note>
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-******************************************************************/</note>
+******************************************************************/
+      </note>
       <xloc>45</xloc>
       <yloc>424</yloc>
       <width>444</width>

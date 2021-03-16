@@ -90,7 +90,8 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-******************************************************************/</note>
+******************************************************************/
+      </note>
       <xloc>109</xloc>
       <yloc>359</yloc>
       <width>444</width>
@@ -541,7 +542,8 @@ from (select organism, count(*) from lt_src_deapp_annot
     <loglevel>log_level_basic</loglevel>
     <displayHeader>Y</displayHeader>
     <logmessage>*** Invalid ANNOTATION_DATE format ***
-*** Must be YYYY/MM/DD ***</logmessage>
+*** Must be YYYY/MM/DD ***
+    </logmessage>
     <fields>
       <field>
         <name>annotation_date</name>

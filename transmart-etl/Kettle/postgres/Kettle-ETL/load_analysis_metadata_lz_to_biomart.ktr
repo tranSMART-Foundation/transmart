@@ -221,17 +221,17 @@
     <hop> <from>Got observation</from><to>Write invalid phenotype to log</to><enabled>Y</enabled> </hop>
     <hop> <from>Got observation</from><to>Insert BIO_DATA_OBSERVATION</to><enabled>Y</enabled> </hop>
     <hop> <from>Select values for expression platform ids</from><to>Split expression platform ids</to><enabled>Y</enabled> </hop>
-    <hop> <from>Lookup GEX platform</from><to>Got gex platform</to><enabled>Y</enabled> </hop>
-    <hop> <from>Got gex platform</from><to>Insert BIO_DATA_PLATFORM for gex</to><enabled>Y</enabled> </hop>
-    <hop> <from>Got gex platform</from><to>Write invalid gex platform to log</to><enabled>Y</enabled> </hop>
+    <hop> <from>Lookup expression platform</from><to>Got expression platform</to><enabled>Y</enabled> </hop>
+    <hop> <from>Got expression platform</from><to>Insert BIO_DATA_PLATFORM for expression</to><enabled>Y</enabled> </hop>
+    <hop> <from>Got expression platform</from><to>Write invalid expression platform to log</to><enabled>Y</enabled> </hop>
     <hop> <from>Got genotype platform</from><to>Write invalid genotype platform</to><enabled>Y</enabled> </hop>
     <hop> <from>Add new seq for bio_assay_analysis_id</from><to>Set new_assay_id to number</to><enabled>Y</enabled> </hop>
     <hop> <from>Set new_assay_id to number</from><to>Set BIO_ASSAY_ANALYSIS_ID to new_assay_id</to><enabled>Y</enabled> </hop>
     <hop> <from>Add new seq for BIO_ASSAY_ANALYSIS_EXT_ID</from><to>Set new_ext_id to number</to><enabled>Y</enabled> </hop>
     <hop> <from>Set new_ext_id to number</from><to>Set BIO_ASSAY_ANALYSIS_ID to new_ext_id</to><enabled>Y</enabled> </hop>
     <hop> <from>Skip null phenotypes</from><to>No phenotype</to><enabled>Y</enabled> </hop>
-    <hop> <from>Split expression platform ids</from><to>Skip null gex platform</to><enabled>Y</enabled> </hop>
-    <hop> <from>Skip null gex platform</from><to>No gex platform</to><enabled>Y</enabled> </hop>
+    <hop> <from>Split expression platform ids</from><to>Skip null expression platform</to><enabled>Y</enabled> </hop>
+    <hop> <from>Skip null expression platform</from><to>No expression platform</to><enabled>Y</enabled> </hop>
     <hop> <from>Skip null genotype platform</from><to>No genotype platform</to><enabled>Y</enabled> </hop>
     <hop> <from>Remove new_ext_id</from><to>Insert/Update BIO_ASSAY_ANALYSIS_EXT</to><enabled>Y</enabled> </hop>
     <hop> <from>Lookup bio_assay_analysis_ext_id in biomart</from><to>No BIO_ASSAY_ANALYSIS_EXT_ID</to><enabled>Y</enabled> </hop>
@@ -262,15 +262,15 @@
     <hop> <from>Got disease</from><to>Remove BIO_DISEASE_ID</to><enabled>Y</enabled> </hop>
     <hop> <from>Remove BIO_DISEASE_ID</from><to>Lookup observation</to><enabled>Y</enabled> </hop>
     <hop> <from>MESH source</from><to>Lookup observation</to><enabled>Y</enabled> </hop>
-    <hop> <from>Write invalid gex platform to log</from><to>Add gex log fields</to><enabled>Y</enabled> </hop>
-    <hop> <from>Add gex log fields</from><to>Step_desc for gex</to><enabled>Y</enabled> </hop>
-    <hop> <from>Step_desc for gex</from><to>Select gex log values</to><enabled>Y</enabled> </hop>
+    <hop> <from>Write invalid expression platform to log</from><to>Add expression log fields</to><enabled>Y</enabled> </hop>
+    <hop> <from>Add expression log fields</from><to>Step_desc for expression</to><enabled>Y</enabled> </hop>
+    <hop> <from>Step_desc for expression</from><to>Select expression log values</to><enabled>Y</enabled> </hop>
     <hop> <from>Step_desc for genotype</from><to>Select genotype log values</to><enabled>Y</enabled> </hop>
     <hop> <from>Add genotype log fields</from><to>Step_desc for genotype</to><enabled>Y</enabled> </hop>
     <hop> <from>Write invalid genotype platform</from><to>Add genotype log fields</to><enabled>Y</enabled> </hop>
     <hop> <from>Add audit constants unmapped</from><to>Set database name as study - analysis  unmapped</to><enabled>Y</enabled> </hop>
     <hop> <from>Select genotype log values</from><to>Add audit constants unmapped</to><enabled>Y</enabled> </hop>
-    <hop> <from>Select gex log values</from><to>Add audit constants unmapped</to><enabled>Y</enabled> </hop>
+    <hop> <from>Select expression log values</from><to>Add audit constants unmapped</to><enabled>Y</enabled> </hop>
     <hop> <from>Step_desc for phenotype</from><to>Select phenotype log values</to><enabled>Y</enabled> </hop>
     <hop> <from>Write invalid phenotype to log</from><to>Add phenotype log fields</to><enabled>Y</enabled> </hop>
     <hop> <from>Add phenotype log fields</from><to>Step_desc for phenotype</to><enabled>Y</enabled> </hop>
@@ -281,15 +281,15 @@
     <hop> <from>Write to log</from><to>Set load_date</to><enabled>Y</enabled> </hop>
     <hop> <from>Select genotype platform ids</from><to>Split genotype platform ids</to><enabled>Y</enabled> </hop>
     <hop> <from>Skip null genotype platform</from><to>Get unique snp platforms</to><enabled>Y</enabled> </hop>
-    <hop> <from>Skip null gex platform</from><to>Get unique gex platform</to><enabled>Y</enabled> </hop>
+    <hop> <from>Skip null expression platform</from><to>Get unique expression platform</to><enabled>Y</enabled> </hop>
     <hop> <from>Skip null phenotypes</from><to>Get unique phenotypes</to><enabled>Y</enabled> </hop>
     <hop> <from>Lookup genotype platform</from><to>Got genotype platform</to><enabled>Y</enabled> </hop>
     <hop> <from>Get unique snp platforms</from><to>Add SNP platform_type</to><enabled>Y</enabled> </hop>
-    <hop> <from>Get unique gex platform</from><to>Add Gene Expression platform_type</to><enabled>Y</enabled> </hop>
+    <hop> <from>Get unique expression platform</from><to>Add Gene Expression platform_type</to><enabled>Y</enabled> </hop>
     <hop> <from>Add SNP platform_type</from><to>Trim snp platform</to><enabled>Y</enabled> </hop>
     <hop> <from>Trim snp platform</from><to>Lookup genotype platform</to><enabled>Y</enabled> </hop>
-    <hop> <from>Add Gene Expression platform_type</from><to>Trim gex platform</to><enabled>Y</enabled> </hop>
-    <hop> <from>Trim gex platform</from><to>Lookup GEX platform</to><enabled>Y</enabled> </hop>
+    <hop> <from>Add Gene Expression platform_type</from><to>Trim expression platform</to><enabled>Y</enabled> </hop>
+    <hop> <from>Trim expression platform</from><to>Lookup expression platform</to><enabled>Y</enabled> </hop>
     <hop> <from>Get unique phenotypes</from><to>Trim phenotype</to><enabled>Y</enabled> </hop>
     <hop> <from>Trim phenotype</from><to>Make copy of phenotype</to><enabled>Y</enabled> </hop>
     <hop> <from>Set load_date</from><to>Lookup BIO_ASSAY_ANALYSIS_ID</to><enabled>Y</enabled> </hop>
@@ -525,7 +525,7 @@
   </step>
 
   <step>
-    <name>Add gex log fields</name>
+    <name>Add expression log fields</name>
     <type>Constant</type>
     <description/>
     <distribute>Y</distribute>
@@ -547,7 +547,7 @@
         <precision>-1</precision>
       </field>
       <field>
-        <name>gex_log_msg</name>
+        <name>expression_log_msg</name>
         <type>String</type>
         <format/>
         <currency/>
@@ -740,7 +740,7 @@
         <CopyNr>0</CopyNr>
       </step>
       <step>
-        <name>Insert BIO_DATA_PLATFORM for gex</name>
+        <name>Insert BIO_DATA_PLATFORM for expression</name>
         <CopyNr>0</CopyNr>
       </step>
       <step>
@@ -771,7 +771,7 @@
       <schema_name/>
     </partitioning>
     <connection>TM_CZ</connection>
-    <procedure>czx_write_audit</procedure>
+    <procedure>cz_write_audit</procedure>
     <lookup>
       <arg>
         <name>job_id</name>
@@ -837,7 +837,7 @@
       <schema_name/>
     </partitioning>
     <connection>TM_CZ</connection>
-    <procedure>czx_write_audit</procedure>
+    <procedure>cz_write_audit</procedure>
     <lookup>
       <arg>
         <name>job_id</name>
@@ -1026,7 +1026,7 @@
         <stepRequired>N</stepRequired>
       </step>
       <step>
-        <name>Insert BIO_DATA_PLATFORM for gex</name>
+        <name>Insert BIO_DATA_PLATFORM for expression</name>
         <copyNr>0</copyNr>
         <stepRequired>N</stepRequired>
       </step>
@@ -1161,7 +1161,7 @@ where etl_id = ${ETL_ID}
   </step>
 
   <step>
-    <name>Get unique gex platform</name>
+    <name>Get unique expression platform</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1209,7 +1209,7 @@ where etl_id = ${ETL_ID}
         <case_sensitive>N</case_sensitive>
       </field>
       <field>
-        <name>gex_platform</name>
+        <name>expression_platform</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
       </field>
@@ -1455,7 +1455,7 @@ where etl_id = ${ETL_ID}
   </step>
 
   <step>
-    <name>Got gex platform</name>
+    <name>Got expression platform</name>
     <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1464,8 +1464,8 @@ where etl_id = ${ETL_ID}
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <send_true_to>Insert BIO_DATA_PLATFORM for gex</send_true_to>
-    <send_false_to>Write invalid gex platform to log</send_false_to>
+    <send_true_to>Insert BIO_DATA_PLATFORM for expression</send_true_to>
+    <send_false_to>Write invalid expression platform to log</send_false_to>
     <compare>
       <condition>
 	<negated>N</negated>
@@ -1857,7 +1857,7 @@ where etl_id = ${ETL_ID}
   </step>
 
   <step>
-    <name>Insert BIO_DATA_PLATFORM for gex</name>
+    <name>Insert BIO_DATA_PLATFORM for expression</name>
     <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
@@ -2089,7 +2089,7 @@ where etl_id = ${ETL_ID}
   </step>
 
   <step>
-    <name>Lookup GEX platform</name>
+    <name>Lookup expression platform</name>
     <type>DBLookup</type>
     <description/>
     <distribute>Y</distribute>
@@ -2109,7 +2109,7 @@ where etl_id = ${ETL_ID}
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
       <key>
-        <name>gex_platform</name>
+        <name>expression_platform</name>
         <field>PLATFORM_ACCESSION</field>
         <condition>=</condition>
         <name2/>
@@ -2386,16 +2386,24 @@ where etl_id = ${ETL_ID}
       <method>none</method>
       <schema_name/>
     </partitioning>
-<send_true_to>Lookup disease</send_true_to>
-<send_false_to>Lookup observation</send_false_to>
+    <send_true_to>Lookup disease</send_true_to>
+    <send_false_to>Lookup observation</send_false_to>
     <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>phenotype_source</leftvalue>
- <function>=</function>
- <rightvalue/>
- <value><name>constant</name><type>String</type><text>MESH</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
-    </condition>
+      <condition>
+	<negated>N</negated>
+	<leftvalue>phenotype_source</leftvalue>
+	<function>=</function>
+	<rightvalue/>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>MESH</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
+      </condition>
     </compare>
     <cluster_schema/>
     <remotesteps>
@@ -2533,7 +2541,7 @@ where etl_id = ${ETL_ID}
   </step>
 
   <step>
-    <name>No gex platform</name>
+    <name>No expression platform</name>
     <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
@@ -2884,7 +2892,7 @@ where etl_id = ${ETL_ID}
   </step>
 
   <step>
-    <name>Select gex log values</name>
+    <name>Select expression log values</name>
     <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
@@ -3548,7 +3556,7 @@ where etl_id = ${ETL_ID}
   </step>
 
   <step>
-    <name>Skip null gex platform</name>
+    <name>Skip null expression platform</name>
     <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -3557,12 +3565,12 @@ where etl_id = ${ETL_ID}
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <send_true_to>No gex platform</send_true_to>
-    <send_false_to>Get unique gex platform</send_false_to>
+    <send_true_to>No expression platform</send_true_to>
+    <send_false_to>Get unique expression platform</send_false_to>
     <compare>
       <condition>
 	<negated>N</negated>
-	<leftvalue>gex_platform</leftvalue>
+	<leftvalue>expression_platform</leftvalue>
 	<function>IS NULL</function>
 	<rightvalue/>
       </condition>
@@ -3659,7 +3667,7 @@ where etl_id = ${ETL_ID}
     </partitioning>
     <splitfield>EXPRESSION_PLATFORM_IDS</splitfield>
     <delimiter>;</delimiter>
-    <newfield>gex_platform</newfield>
+    <newfield>expression_platform</newfield>
     <rownum>N</rownum>
     <rownum_field/>
     <resetrownumber>Y</resetrownumber>
@@ -3823,7 +3831,7 @@ where etl_id = ${ETL_ID}
   </step>
 
   <step>
-    <name>Step_desc for gex</name>
+    <name>Step_desc for expression</name>
     <type>Calculator</type>
     <description/>
     <distribute>Y</distribute>
@@ -3835,8 +3843,8 @@ where etl_id = ${ETL_ID}
     <calculation>
       <field_name>step_desc</field_name>
       <calc_type>ADD</calc_type>
-      <field_a>gex_log_msg</field_a>
-      <field_b>gex_platform</field_b>
+      <field_a>expression_log_msg</field_a>
+      <field_b>expression_platform</field_b>
       <field_c/>
       <value_type>String</value_type>
       <value_length>-1</value_length>
@@ -3897,7 +3905,7 @@ where etl_id = ${ETL_ID}
   </step>
 
   <step>
-    <name>Trim gex platform</name>
+    <name>Trim expression platform</name>
     <type>StringOperations</type>
     <description/>
     <distribute>Y</distribute>
@@ -3908,7 +3916,7 @@ where etl_id = ${ETL_ID}
     </partitioning>
     <fields>
       <field>
-        <in_stream_name>gex_platform</in_stream_name>
+        <in_stream_name>expression_platform</in_stream_name>
         <out_stream_name/>
         <trim_type>both</trim_type>
         <lower_upper>none</lower_upper>
@@ -4020,7 +4028,8 @@ where etl_id = ${ETL_ID}
     <loglevel>log_level_basic</loglevel>
     <displayHeader>Y</displayHeader>
     <logmessage>***********  WARNING  ************
-Unable to map genotype platform</logmessage>
+Unable to map genotype platform
+    </logmessage>
     <fields>
       <field>
         <name>STUDY_ID</name>
@@ -4045,7 +4054,7 @@ Unable to map genotype platform</logmessage>
   </step>
 
   <step>
-    <name>Write invalid gex platform to log</name>
+    <name>Write invalid expression platform to log</name>
     <type>WriteToLog</type>
     <description/>
     <distribute>Y</distribute>
@@ -4057,7 +4066,8 @@ Unable to map genotype platform</logmessage>
     <loglevel>log_level_basic</loglevel>
     <displayHeader>Y</displayHeader>
     <logmessage>***********  WARNING  ************
-Unable to map gene expression platform</logmessage>
+Unable to map gene expression platform
+    </logmessage>
     <fields>
       <field>
         <name>STUDY_ID</name>
@@ -4066,7 +4076,7 @@ Unable to map gene expression platform</logmessage>
         <name>ANALYSIS_NAME</name>
         </field>
       <field>
-        <name>gex_platform</name>
+        <name>expression_platform</name>
         </field>
       </fields>
     <cluster_schema/>
@@ -4094,8 +4104,9 @@ Unable to map gene expression platform</logmessage>
     <loglevel>log_level_basic</loglevel>
     <displayHeader>Y</displayHeader>
     <logmessage>************WARNING  *********************
-Unable to map phenotype</logmessage>
-<fields>
+Unable to map phenotype
+    </logmessage>
+    <fields>
       <field>
         <name>STUDY_ID</name>
         </field>

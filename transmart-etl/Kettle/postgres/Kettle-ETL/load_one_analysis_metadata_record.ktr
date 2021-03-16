@@ -257,7 +257,7 @@
       <schema_name/>
     </partitioning>
     <connection>TM_CZ</connection>
-    <procedure>czx_write_audit</procedure>
+    <procedure>cz_write_audit</procedure>
     <lookup>
       <arg>
         <name>job_id</name>

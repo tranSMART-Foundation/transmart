@@ -133,7 +133,15 @@
 		    <leftvalue>DATA_TYPE</leftvalue>
 		    <function>IN LIST</function>
 		    <rightvalue/>
-		    <value><name>constant</name><type>String</type><text>GWAS;EQTL;Metabolic GWAS</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+		    <value>
+		      <name>constant</name>
+		      <type>String</type>
+		      <text>GWAS;EQTL;Metabolic GWAS</text>
+		      <length>-1</length>
+		      <precision>-1</precision>
+		      <isnull>N</isnull>
+		      <mask/>
+		    </value>
 		  </condition>
 		</conditions>
 	      </condition>

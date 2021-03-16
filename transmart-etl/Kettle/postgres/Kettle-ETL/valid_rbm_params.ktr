@@ -77,8 +77,9 @@
   <notepads>
     <notepad>
       <note>/*****************************************
-*created for RBM  analysis
-/*****************************************</note>
+*created for RBM analysis
+*****************************************/
+      </note>
       <xloc>61</xloc>
       <yloc>452</yloc>
       <width>194</width>
@@ -100,8 +101,25 @@
     </notepad>
   </notepads>
   <order>
-    <hop> <from>Check STUDY_ID is not null</from><to>Check TOP_NODE is not null</to><enabled>Y</enabled> </hop>  <hop> <from>Check STUDY_ID is not null</from><to>STUDY_ID required</to><enabled>Y</enabled> </hop>  <hop> <from>STUDY_ID required</from><to>Abort</to><enabled>Y</enabled> </hop>  <hop> <from>Check TOP_NODE is not null</from><to>Check LOAD_TYPE in I, L, F</to><enabled>Y</enabled> </hop>  <hop> <from>Check TOP_NODE is not null</from><to>TOP_NODE required</to><enabled>Y</enabled> </hop>  <hop> <from>TOP_NODE required</from><to>Abort</to><enabled>Y</enabled> </hop>  <hop> <from>Check LOAD_TYPE in I, L, F</from><to>LOAD_TYPE invalid</to><enabled>Y</enabled> </hop>  <hop> <from>LOAD_TYPE invalid</from><to>Abort</to><enabled>Y</enabled> </hop>  <hop> <from>Check LOAD_TYPE in I, L, F</from><to>Filter rows</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>DATA_TYPE invaid</to><enabled>Y</enabled> </hop>  <hop> <from>DATA_TYPE invaid</from><to>Abort</to><enabled>Y</enabled> </hop>  <hop> <from>Get variables for STUDY_ID, TOP_NODE, LOAD_TYPE, DATA_TYPE</from><to>String operations</to><enabled>Y</enabled> </hop>  <hop> <from>String operations</from><to>Check STUDY_ID is not null</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>checking INC_LOAD type parameter </to><enabled>Y</enabled> </hop>  <hop> <from>checking INC_LOAD type parameter </from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>checking INC_LOAD type parameter </from><to>Write to log</to><enabled>Y</enabled> </hop>  <hop> <from>Write to log</from><to>Abort</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check STUDY_ID is not null</from><to>Check TOP_NODE is not null</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check STUDY_ID is not null</from><to>STUDY_ID required</to><enabled>Y</enabled> </hop>
+    <hop> <from>STUDY_ID required</from><to>Abort</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check TOP_NODE is not null</from><to>Check LOAD_TYPE in I, L, F</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check TOP_NODE is not null</from><to>TOP_NODE required</to><enabled>Y</enabled> </hop>
+    <hop> <from>TOP_NODE required</from><to>Abort</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check LOAD_TYPE in I, L, F</from><to>LOAD_TYPE invalid</to><enabled>Y</enabled> </hop>
+    <hop> <from>LOAD_TYPE invalid</from><to>Abort</to><enabled>Y</enabled> </hop>
+    <hop> <from>Check LOAD_TYPE in I, L, F</from><to>Filter rows</to><enabled>Y</enabled> </hop>
+    <hop> <from>Filter rows</from><to>DATA_TYPE invaid</to><enabled>Y</enabled> </hop>
+    <hop> <from>DATA_TYPE invaid</from><to>Abort</to><enabled>Y</enabled> </hop>
+    <hop> <from>Get variables for STUDY_ID, TOP_NODE, LOAD_TYPE, DATA_TYPE</from><to>String operations</to><enabled>Y</enabled> </hop>
+    <hop> <from>String operations</from><to>Check STUDY_ID is not null</to><enabled>Y</enabled> </hop>
+    <hop> <from>Filter rows</from><to>checking INC_LOAD type parameter </to><enabled>Y</enabled> </hop>
+    <hop> <from>checking INC_LOAD type parameter </from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>
+    <hop> <from>checking INC_LOAD type parameter </from><to>Write to log</to><enabled>Y</enabled> </hop>
+    <hop> <from>Write to log</from><to>Abort</to><enabled>Y</enabled> </hop>
   </order>
+
   <step>
     <name>Abort</name>
     <type>Abort</type>
@@ -145,7 +163,15 @@
 	<leftvalue>load_type</leftvalue>
 	<function>IN LIST</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>I;L;F</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>I;L;F</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -294,7 +320,15 @@
 	<leftvalue>data_type</leftvalue>
 	<function>IN LIST</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>R;L;T</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>R;L;T</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -532,7 +566,15 @@
 	<leftvalue>inc_load</leftvalue>
 	<function>IN LIST</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>N;Y</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>N;Y</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>

@@ -78,7 +78,8 @@
     <notepad>
       <note>/*************************************************************************
 **created for High-Dimensional Data analysis
-******************************************************************/</note>
+******************************************************************/
+      </note>
       <xloc>49</xloc>
       <yloc>328</yloc>
       <width>331</width>
@@ -104,7 +105,8 @@
 	step count
 	step desc
 	database name
-	step status</note>
+	step status
+      </note>
       <xloc>96</xloc>
       <yloc>31</yloc>
       <width>115</width>

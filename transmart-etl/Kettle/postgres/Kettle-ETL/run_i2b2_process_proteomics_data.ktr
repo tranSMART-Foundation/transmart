@@ -210,7 +210,15 @@
 	<leftvalue>rtn_code</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>Number</type><text>1.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>
+	<value>
+	  <name>constant</name>
+	  <type>Number</type>
+	  <text>1.0</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask>#.#;-#.#</mask>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -243,7 +251,15 @@
 	<leftvalue>rtn_code</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>Number</type><text>1.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>
+	<value>
+	  <name>constant</name>
+	  <type>Number</type>
+	  <text>1.0</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask>#.#;-#.#</mask>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -276,7 +292,15 @@
 	<leftvalue>data_type</leftvalue>
 	<function>IN LIST</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>R;L;T</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>R;L;T</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -349,7 +373,8 @@
     <displayHeader>Y</displayHeader>
     <logmessage>**********************************************
 ***  Error running i2b2_process_proteomics_data ****
-**********************************************</logmessage>
+**********************************************
+    </logmessage>
     <fields>
       <field>
         <name>rtn_code</name>
@@ -381,7 +406,8 @@
     <displayHeader>Y</displayHeader>
     <logmessage>**********************************************
 ***  Error running i2b2_process_proteomics_data ****
-**********************************************</logmessage>
+**********************************************
+    </logmessage>
     <fields>
       <field>
         <name>rtn_code</name>
@@ -549,7 +575,15 @@
 	<leftvalue>inc_load</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>Y</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>Y</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -697,7 +731,8 @@
     <loglevel>log_level_basic</loglevel>
     <displayHeader>Y</displayHeader>
     <logmessage>**** Invalid DATA_TYPE specified ****
-**** Must be R, L, or T          ****</logmessage>
+**** Must be R, L, or T          ****
+    </logmessage>
     <fields>
       <field>
         <name>data_type</name>

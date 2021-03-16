@@ -79,8 +79,9 @@
       <note>/*****************************************
 This ETL is designed for Sanofi to load proteomics data
 Date: 10/22/2013
-/*****************************************</note>
-<xloc>17</xloc>
+*****************************************/
+      </note>
+      <xloc>17</xloc>
       <yloc>529</yloc>
       <width>285</width>
       <heigth>60</heigth>
@@ -101,8 +102,21 @@ Date: 10/22/2013
     </notepad>
   </notepads>
   <order>
-    <hop> <from>Reset step names</from><to>Set step_number based on step_name</to><enabled>Y</enabled> </hop>  <hop> <from>Split for input and output counts</from><to>Set counts for output steps</to><enabled>Y</enabled> </hop>  <hop> <from>Set step_number based on step_name</from><to>Sort audit records by step_number</to><enabled>Y</enabled> </hop>  <hop> <from>Split for input and output counts</from><to>Set counts for input steps</to><enabled>Y</enabled> </hop>  <hop> <from>Split for input and output counts</from><to>Write to log 2</to><enabled>Y</enabled> </hop>  <hop> <from>Set counts for input steps</from><to>Set step_number to numeric</to><enabled>Y</enabled> </hop>  <hop> <from>Set counts for output steps</from><to>Set step_number to numeric</to><enabled>Y</enabled> </hop>  <hop> <from>Get Variables</from><to>Add proc_prefix, step_status</to><enabled>Y</enabled> </hop>  <hop> <from>Get Audit rows</from><to>Reset step names</to><enabled>Y</enabled> </hop>  <hop> <from>Sort audit records by step_number</from><to>Split for input and output counts</to><enabled>Y</enabled> </hop>  <hop> <from>Set step_number to numeric</from><to>Get Variables</to><enabled>Y</enabled> </hop>  <hop> <from>Add proc_prefix, step_status</from><to>Select values</to><enabled>Y</enabled> </hop>  <hop> <from>Select values</from><to>Copy rows to result</to><enabled>Y</enabled> </hop>
+    <hop> <from>Reset step names</from><to>Set step_number based on step_name</to><enabled>Y</enabled> </hop>
+    <hop> <from>Split for input and output counts</from><to>Set counts for output steps</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set step_number based on step_name</from><to>Sort audit records by step_number</to><enabled>Y</enabled> </hop>
+    <hop> <from>Split for input and output counts</from><to>Set counts for input steps</to><enabled>Y</enabled> </hop>
+    <hop> <from>Split for input and output counts</from><to>Write to log 2</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set counts for input steps</from><to>Set step_number to numeric</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set counts for output steps</from><to>Set step_number to numeric</to><enabled>Y</enabled> </hop>
+    <hop> <from>Get Variables</from><to>Add proc_prefix, step_status</to><enabled>Y</enabled> </hop>
+    <hop> <from>Get Audit rows</from><to>Reset step names</to><enabled>Y</enabled> </hop>
+    <hop> <from>Sort audit records by step_number</from><to>Split for input and output counts</to><enabled>Y</enabled> </hop>
+    <hop> <from>Set step_number to numeric</from><to>Get Variables</to><enabled>Y</enabled> </hop>
+    <hop> <from>Add proc_prefix, step_status</from><to>Select values</to><enabled>Y</enabled> </hop>
+    <hop> <from>Select values</from><to>Copy rows to result</to><enabled>Y</enabled> </hop>
   </order>
+
   <step>
     <name>Add proc_prefix, step_status</name>
     <type>Constant</type>
@@ -640,13 +654,20 @@ Date: 10/22/2013
     <case_value_decimal/>
     <case_value_group/>
     <default_target_step>Write to log 2</default_target_step>
-    <cases><case><value>Loaded records</value>
-    <target_step>Set counts for output steps</target_step>
-    </case><case><value>Dropped samples</value>
-    <target_step>Set counts for output steps</target_step>
-    </case><case><value>Dropped non-numeric data</value>
-    <target_step>Set counts for output steps</target_step>
-    </case></cases>
+    <cases>
+      <case>
+	<value>Loaded records</value>
+	<target_step>Set counts for output steps</target_step>
+      </case>
+      <case>
+	<value>Dropped samples</value>
+	<target_step>Set counts for output steps</target_step>
+      </case>
+      <case>
+	<value>Dropped non-numeric data</value>
+	<target_step>Set counts for output steps</target_step>
+      </case>
+    </cases>
     <cluster_schema/>
     <remotesteps>
       <input>   </input>

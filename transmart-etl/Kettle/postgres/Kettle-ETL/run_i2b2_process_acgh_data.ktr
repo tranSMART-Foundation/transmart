@@ -90,7 +90,8 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-******************************************************************/</note>
+******************************************************************/
+      </note>
       <xloc>38</xloc>
       <yloc>481</yloc>
       <width>479</width>
@@ -186,7 +187,15 @@
 	<leftvalue>rtnCd</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>Number</type><text>1.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>
+	<value>
+	  <name>constant</name>
+	  <type>Number</type>
+	  <text>1.0</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask>#.#;-#.#</mask>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -237,7 +246,8 @@
     <displayHeader>Y</displayHeader>
     <logmessage>**********************************************
 ***  Error running i2b2_process_acgh_data ****
-**********************************************</logmessage>
+**********************************************
+    </logmessage>
     <fields>
       <field>
         <name>rtnCd</name>

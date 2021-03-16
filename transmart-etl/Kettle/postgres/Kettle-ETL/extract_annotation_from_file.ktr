@@ -90,7 +90,8 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-******************************************************************/</note>
+******************************************************************/
+      </note>
       <xloc>58</xloc>
       <yloc>1280</yloc>
       <width>444</width>
@@ -275,7 +276,15 @@
 	<leftvalue>first_char</leftvalue>
 	<function>IN LIST</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>!;#;~</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>!;#;~</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -485,7 +494,15 @@
 	<leftvalue>embedded_gene_table</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>Y</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>Y</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>

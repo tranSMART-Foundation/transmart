@@ -12,16 +12,16 @@
     <log>
       <trans-log-table>
         <connection/>
-      <schema/>
-      <table/>
-      <size_limit_lines/>
-      <interval/>
-      <timeout_days/>
+	<schema/>
+	<table/>
+	<size_limit_lines/>
+	<interval/>
+	<timeout_days/>
 	<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STATUS</id><enabled>Y</enabled><name>STATUS</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name><subject/></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name><subject/></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name><subject/></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name><subject/></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name><subject/></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name><subject/></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>STARTDATE</id><enabled>Y</enabled><name>STARTDATE</name></field><field><id>ENDDATE</id><enabled>Y</enabled><name>ENDDATE</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>DEPDATE</id><enabled>Y</enabled><name>DEPDATE</name></field><field><id>REPLAYDATE</id><enabled>Y</enabled><name>REPLAYDATE</name></field><field><id>LOG_FIELD</id><enabled>Y</enabled><name>LOG_FIELD</name></field>
       </trans-log-table>
       <perf-log-table>
         <connection/>
-      <schema/>
+	<schema/>
       <table/>
       <interval/>
       <timeout_days/>
@@ -89,9 +89,10 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-******************************************************************/</note>
-      <xloc>38</xloc>
-      <yloc>481</yloc>
+******************************************************************/
+      </note>
+      <xloc>58</xloc>
+      <yloc>435</yloc>
       <width>444</width>
       <heigth>197</heigth>
       <fontname>Microsoft Sans Serif</fontname>
@@ -212,7 +213,15 @@
 	<leftvalue>rtnCd</leftvalue>
 	<function>=</function>
 	<rightvalue/>
-	<value><name>constant</name><type>Number</type><text>1.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>
+	<value>
+	  <name>constant</name>
+	  <type>Number</type>
+	  <text>1.0</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask>#.#;-#.#</mask>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -245,7 +254,15 @@
 	<leftvalue>data_type</leftvalue>
 	<function>IN LIST</function>
 	<rightvalue/>
-	<value><name>constant</name><type>String</type><text>R;L;T</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+	<value>
+	  <name>constant</name>
+	  <type>String</type>
+	  <text>R;L;T</text>
+	  <length>-1</length>
+	  <precision>-1</precision>
+	  <isnull>N</isnull>
+	  <mask/>
+	</value>
       </condition>
     </compare>
     <cluster_schema/>
@@ -296,7 +313,8 @@
     <displayHeader>Y</displayHeader>
     <logmessage>**********************************************
 ***  Error running i2b2_process_mrna_data ****
-**********************************************</logmessage>
+**********************************************
+    </logmessage>
     <fields>
       <field>
         <name>rtnCd</name>
@@ -501,7 +519,8 @@
     <loglevel>log_level_basic</loglevel>
     <displayHeader>Y</displayHeader>
     <logmessage>**** Invalid DATA_TYPE specified ****
-**** Must be R, L, or T          ****</logmessage>
+    **** Must be R, L, or T          ****
+    </logmessage>
     <fields>
       <field>
         <name>data_type</name>

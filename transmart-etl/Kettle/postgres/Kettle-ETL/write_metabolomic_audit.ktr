@@ -79,7 +79,8 @@
       <note>/*****************************************
 This ETL is designed for Sanofi to load metabolomic data
 Date: 12/30/2013
-/*****************************************</note>
+*****************************************/
+      </note>
       <xloc>17</xloc>
       <yloc>529</yloc>
       <width>294</width>
