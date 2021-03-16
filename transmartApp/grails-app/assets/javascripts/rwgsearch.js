@@ -603,14 +603,12 @@ function toggleSidebar() {
     };
     if (sidebarIsVisible) {
         jQuery(element).fadeOut(500, func);
-        var bgimg = jQuery('#sidebartoggle').css('background-image').replace('-left', '-right');
-        jQuery('#sidebartoggle').css('background-image', bgimg);
+        jQuery('#sidebartoggle').css('background-image', toggleIcon.right);
     }
     else {
         jQuery(element).fadeIn();
         if (func) func(); //Not a callback here - resize as soon as it starts appearing.
-        var bgimg = jQuery('#sidebartoggle').css('background-image').replace('-right', '-left');
-        jQuery('#sidebartoggle').css('background-image', bgimg);
+	jQuery('#sidebartoggle').css('background-image', toggleIcon.left);
     }
 }
 

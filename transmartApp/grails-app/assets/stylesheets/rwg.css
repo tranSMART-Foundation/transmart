@@ -373,7 +373,7 @@ ul.dynatree-container li {
 ul.dynatree-container li ul li{	
     background-attachment: scroll;
     background-color: transparent;
-	background-image: url("jquery/skin/vline.gif");
+    background-image: url("jquery/skin/vline.gif");
     background-position: 0 0;
     background-repeat: repeat-y;
     padding-top:1px;

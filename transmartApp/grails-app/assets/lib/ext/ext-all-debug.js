@@ -806,7 +806,8 @@ Ext.DomQuery = function(){
                 path = path.substr(1);
             }
 
-            while(q && lq != q){
+            fn[fn.length] = 'console.log("executing eval");';
+           while(q && lq != q){
                 lq = q;
                 var tm = q.match(tagTokenRe);
                 if(type == "select"){
@@ -855,29 +856,38 @@ Ext.DomQuery = function(){
                 }
             }
             fn[fn.length] = "return nodup(n);\n}";
+	    console.log("about to eval(fn.(join)) fn: "+fn);
             eval(fn.join(""));
             return f;
         },
 
         
         select : function(path, root, type){
+	    console.log("select path " + path + ", root: " + root + ", type " + type);
             if(!root || root == document){
+		console.log("select root = document");
                 root = document;
             }
             if(typeof root == "string"){
+		console.log("select root = getElementById("+root+")");
                 root = document.getElementById(root);
             }
             var paths = path.split(",");
             var results = [];
             for(var i = 0, len = paths.length; i < len; i++){
+		console.log("select paths["+i+"] "+paths[i]);
                 var p = paths[i].replace(trimRe, "");
+		console.log("after trimRe '"+trimRe+"' p: "+p);
                 if(!cache[p]){
                     cache[p] = Ext.DomQuery.compile(p);
                     if(!cache[p]){
                         throw p + " is not a valid selector";
                     }
                 }
+		console.log("checking cache[p]");
+		console.log("root: "+root.textContent);
                 var result = cache[p](root);
+		console.log("result: "+result);
                 if(result && result != document){
                     results = results.concat(result);
                 }
@@ -6133,7 +6143,7 @@ Ext.override(Date, {
 
     
     getTimezone : function() {
-                                                                                                        return this.toString().replace(/^.* (?:\((.*)\)|([A-Z]{1,4})(?:[\-+][0-9]{4})?(?: -?\d+)?)$/, "$1$2").replace(/[^A-Z]/g, "");
+        return this.toString().replace(/^.* (?:\((.*)\)|([A-Z]{1,4})(?:[\-+][0-9]{4})?(?: -?\d+)?)$/, "$1$2").replace(/[^A-Z]/g, "");
     },
 
     
@@ -6505,7 +6515,8 @@ Ext.extend(Ext.util.MixedCollection, Ext.util.Observable, {
 
 
     each : function(fn, scope){
-        var items = [].concat(this.items);         for(var i = 0, len = items.length; i < len; i++){
+        var items = [].concat(this.items);
+        for(var i = 0, len = items.length; i < len; i++){
             if(fn.call(scope || items[i], items[i], i, len) === false){
                 break;
             }
@@ -14084,6 +14095,7 @@ Ext.Container = Ext.extend(Ext.BoxComponent, {
             }
         }
         if(!this.ownerCt){
+	    console.log("doLayout in render type: " + (typeof this.layout));
             this.doLayout();
         }
         if(this.monitorResize === true){
@@ -14210,7 +14222,10 @@ Ext.Container = Ext.extend(Ext.BoxComponent, {
 
     
     doLayout : function(shallow){
+	console.log("doLayout: " + this);
+	console.log("doLayout text: " + this.textContent);
         if(this.rendered && this.layout){
+	    console.log("doLayout rendered layout: " + this.layout);
             this.layout.layout();
         }
         if(shallow !== false && this.items){
@@ -14218,6 +14233,7 @@ Ext.Container = Ext.extend(Ext.BoxComponent, {
             for(var i = 0, len = cs.length; i < len; i++) {
                 var c  = cs[i];
                 if(c.doLayout){
+		    console.log("doLayout in doLayout");
                     c.doLayout();
                 }
             }
@@ -16393,6 +16409,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
                     this.on('expand', function(){
                         delete this.queuedExpand;
                         this.onResize(this.queuedBodySize.width, this.queuedBodySize.height);
+			console.log("doLayout in onResize-1");
                         this.doLayout();
                     }, this, {single:true});
                 }
@@ -16770,6 +16787,7 @@ Ext.Window = Ext.extend(Ext.Panel, {
         this.updateHandles();
         this.saveState();
         if(this.layout){
+	    console.log("doLayout in handleResize");
             this.doLayout();
         }
         this.fireEvent("resize", this, box.width, box.height);
@@ -16860,6 +16878,7 @@ Ext.Window = Ext.extend(Ext.Panel, {
         }
         this.doConstrain();
         if(this.layout){
+	    console.log("doLayout in afterShow");
             this.doLayout();
         }
         if(this.keyMap){
@@ -17621,14 +17640,6 @@ Ext.extend(Ext.state.CookieProvider, Ext.state.Provider, {
 });
 
 Ext.DataView = Ext.extend(Ext.BoxComponent, {
-    
-    
-    
-    
-    
-    
-    
-    
     
     selectedClass : "x-view-selected",
     
@@ -19160,6 +19171,7 @@ Ext.TabPanel = Ext.extend(Ext.Panel,  {
 
             this.layout.setActiveItem(item);
             if(this.layoutOnTabChange && item.doLayout){
+		console.log("doLayout in setActiveTab");
                 item.doLayout();
             }
             if(this.scrolling){
@@ -28314,6 +28326,7 @@ Ext.form.CheckboxGroup = Ext.extend(Ext.form.Field, {
     
         onResize : function(w, h){
         this.panel.setSize(w, h);
+	    console.log("doLayout in onResize-2");
         this.panel.doLayout();
     },
     
