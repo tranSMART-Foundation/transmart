@@ -1,7 +1,7 @@
 --
--- Type: PROCEDURE; Owner: TM_CZ; Name: I2B2_PROCESS_MIRNA_INC_DATA
+-- Type: PROCEDURE; Owner: TM_CZ; Name: I2B2_PROCESS_RNA_INC_DATA
 --
-CREATE OR REPLACE PROCEDURE TM_CZ.I2B2_PROCESS_MIRNA_INC_DATA (
+CREATE OR REPLACE PROCEDURE TM_CZ.I2B2_PROCESS_RNA_INC_DATA (
     trial_id 		VARCHAR2
     ,top_node		varchar2
     ,data_type		varchar2 := 'R'		--	R = raw data, do zscore calc, T = transformed data, load raw values as zscore,
@@ -10,15 +10,14 @@ CREATE OR REPLACE PROCEDURE TM_CZ.I2B2_PROCESS_MIRNA_INC_DATA (
     ,log_base		number := 2			--	log base value for conversion back to raw
     ,secure_study	varchar2			--	security setting if new patients added to patient_dimension
     ,currentJobID 	NUMBER := null
-    ,mirna_type varchar2
     ,rtn_code		OUT	NUMBER
 )
 
 AS
 
     /*************************************************************************
-     * This store procedure is for ETL for Sanofi to load  qpcr or seq miRNA data
-     * Date: 12/05/2013
+     * This stored procedure is for ETL to load RNA sequencing
+     * Date:10/23/2013
      ******************************************************************/
 
     --	***  NOTE ***
@@ -31,35 +30,33 @@ AS
 
     TrialID		varchar2(100);
     RootNode		VARCHAR2(2000);
-    root_level	integer;
+    root_level		integer;
     topNode		varchar2(2000);
     topLevel		integer;
-    tPath			varchar2(2000);
+    tPath		varchar2(2000);
     study_name	varchar2(100);
     sourceCd		varchar2(50);
     secureStudy	varchar2(1);
 
     dataType		varchar2(10);
     sqlText		varchar2(1000);
-    tText			varchar2(1000);
+    tText		varchar2(1000);
     gplTitle		varchar2(1000);
     pExists		number;
-    partTbl   	number;
-    partExists 	number;
+    partTbl   		number;
+    partExists 		number;
     sampleCt		number;
-    idxExists 	number;
+    idxExists 		number;
     logBase		number;
     pCount		integer;
     sCount		integer;
     tablespaceName	varchar2(200);
     v_bio_experiment_id	number(18,0);
-    mirnaType varchar2(15);
-    -- mirnaPlatform varchar2(20);
 
     --Audit variables
-    newJobFlag INTEGER(1);
-    databaseName VARCHAR(100);
-    procedureName VARCHAR(100);
+    newJobFlag integer(1);
+    databaseName varchar(100);
+    procedureName varchar(100);
     jobID number(18,0);
     stepCt number(18,0);
 
@@ -69,12 +66,11 @@ AS
     unmapped_platform exception;
     multiple_platform	exception;
     no_probeset_recs	exception;
-    -- missing_mirna_type	EXCEPTION;
 
     CURSOR addNodes is
 	select distinct t.leaf_node
 			,t.node_name
-	  from tm_wz.wt_qpcr_mirna_nodes t
+	  from tm_wz.wt_rna_nodes t
 	 where not exists
 	       (select 1 from i2b2metadata.i2b2 x
 		 where t.leaf_node = x.c_fullname);
@@ -90,14 +86,13 @@ AS
 
     cursor uploadI2b2 is
 	select category_cd,display_value,display_label,display_unit
-	  from tm_lz.lt_src_mirna_display_mapping;
+	  from tm_lz.lt_src_rna_display_mapping;
 
 BEGIN
 
     EXECUTE IMMEDIATE 'alter session set NLS_NUMERIC_CHARACTERS=".,"';
     TrialID := upper(trial_id);
     secureStudy := upper(secure_study);
-    mirnaType:=upper(mirna_type);
 
     if (secureStudy not in ('Y','N') ) then
 	secureStudy := 'Y';
@@ -116,11 +111,6 @@ BEGIN
 	end if;
     end if;
 
-    ---check for mirna_type is not null if it is null raise an exception
-    /*if mirna_type is null then
-      raise missing_mirna_type;
-      end if;
-     */
     logBase := log_base;
     sourceCd := upper(nvl(source_cd,'STD'));
 
@@ -139,36 +129,27 @@ BEGIN
     END IF;
 
     stepCt := 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_qpcr_mirna_data',0,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_rna_data',0,stepCt,'Done');
 
-    --	Get count of records in LT_SRC_MIRNA_SUBJ_SAMP_MAP
+    --	Get count of records in lt_src_rna_subj_samp_map
 
     select count(*) into sCount
-      from tm_lz.lt_src_mirna_subj_samp_map;
+      from tm_lz.lt_src_rna_subj_samp_map;
 
     --	check if all subject_sample map records have a platform, If not, abort run
 
     select count(*) into pCount
-      from tm_lz.lt_src_mirna_subj_samp_map
+      from tm_lz.lt_src_rna_subj_samp_map
      where platform is null;
 
     if pCount > 0 then
 	raise missing_platform;
     end if;
 
-    --	check if platform exists in de_qpcr_mirna_annotation .  If not, abort run.
-
-    select count(*) into pCount
-      from deapp.de_qpcr_mirna_annotation
-     where gpl_id in (select distinct m.platform from tm_lz.lt_src_mirna_subj_samp_map m);
-
-    --if PCOUNT = 0 then
-    --RAISE UNMAPPED_platform;
-    --end if;--mod
-
-    select count(*) into pCount
+    /*select count(*) into pCount
       from deapp.de_gpl_info
-     where platform in (select distinct m.platform from tm_lz.lt_src_mirna_subj_samp_map m);
+      where platform in (select distinct m.platform from tm_lz.lt_src_rna_subj_samp_map m);
+     */
 
     /*if PCOUNT = 0 then
       RAISE UNMAPPED_platform;
@@ -177,18 +158,18 @@ BEGIN
     --	check if all subject_sample map records have a tissue_type, If not, abort run
 
     select count(*) into pCount
-      from tm_lz.lt_src_mirna_subj_samp_map
+      from tm_lz.lt_src_rna_subj_samp_map
      where tissue_type is null;
 
     if pCount > 0 then
 	raise missing_tissue;
     end if;
 
-    --	check if there are multiple platforms, if yes, then platform must be supplied in LT_SRC_QPCR_MIRNA_DATA
+    --	check if there are multiple platforms, if yes, then platform must be supplied in lt_src_rna_data
 
     select count(*) into pCount
       from (select sample_cd
-	      from tm_lz.lt_src_mirna_subj_samp_map
+	      from tm_lz.lt_src_rna_subj_samp_map
 	     group by sample_cd
 	    having count(distinct platform) > 1);
 
@@ -225,13 +206,14 @@ BEGIN
 	tm_cz.i2b2_fill_in_tree(null, tPath, jobId);
     end if;
 
-    --	uppercase study_id in lt_src_mirna_subj_samp_map in case curator forgot
+    --	uppercase study_id in lt_src_rna_subj_samp_map in case curator forgot
 
-    update tm_lz.lt_src_mirna_subj_samp_map
+    update tm_lz.lt_src_rna_subj_samp_map
        set trial_name=upper(trial_name);
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_MIRNA_SUBJ_SAMP_MAP',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in lt_src_rna_subj_samp_map',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
     --	create records in patient_dimension for subject_ids if they do not exist
@@ -261,13 +243,13 @@ BEGIN
 		null as age_in_years_num,
 		null as race_cd,
 		regexp_replace(TrialID || ':' || s.site_id || ':' || s.subject_id,'(::){1,}', ':') as sourcesystem_cd
-	      from tm_lz.lt_src_mirna_subj_samp_map s
-		   ,deapp.de_gpl_info g
+	      from tm_lz.lt_src_rna_subj_samp_map s
+		-- ,de_gpl_info g
 	     where s.subject_id is not null
 	       and s.trial_name = TrialID
 	       and s.source_cd = sourceCD
-	       and s.platform = g.platform
-	       and upper(g.marker_type) = mirnaType
+	       --  and s.platform = g.platform
+	       --and upper(g.marker_type) = 'GENE EXPRESSION'
 	       and not exists
 		   (select 1 from i2b2demodata.patient_dimension x
 		     where x.sourcesystem_cd =
@@ -278,6 +260,7 @@ BEGIN
 
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',pCount,stepCt,'Done');
+
     commit;
 
     tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
@@ -285,17 +268,17 @@ BEGIN
     --	Delete existing observation_fact data, will be repopulated
 
     delete from i2b2demodata.observation_fact obf
-     where obf.concept_cd in
-	   (select distinct x.concept_code
+     where (obf.concept_cd) in
+	   (select distinct (x.concept_code)
 	      from deapp.de_subject_sample_mapping x
 	     where x.trial_name = TrialId
 	       and nvl(x.source_cd,'STD') = sourceCD
-	       and x.platform = mirna_type
-               --and (x.subject_id||x.category_cd) in (select (subject_id||category_cd) from tm_lz.lt_src_mirna_subj_samp_map));
-               and (x.subject_id||x.sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_mirna_subj_samp_map)); ---UAT 163 changes made on 25/02/2014
+	       and x.platform = 'RNASEQ'
+               and (x.subject_id||x.sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_rna_subj_samp_map));
 
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
     --	Cleanup any existing data in de_subject_sample_mapping.
@@ -303,77 +286,75 @@ BEGIN
     delete from deapp.de_subject_sample_mapping
      where trial_name = TrialID
 	   and nvl(source_cd,'STD') = sourceCd
-	   and platform = mirna_type
-	--and (subject_id||category_cd) in (select (subject_id||category_cd) from tm_lz.lt_src_mirna_subj_samp_map); --Making sure only miRNA data is deleted
-           and (subject_id||sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_mirna_subj_samp_map); --UAT 163 changes made on 25/02/2014
+	   and platform = 'RNA_SEQ'
+	   and (subject_id||sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_rna_subj_samp_map); --Making sure only RNA_sequencing data is deleted
+
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete trial from DEAPP de_subject_sample_mapping',SQL%ROWCOUNT,stepCt,'Done');
 
     commit;
 
-    delete from deapp.de_subject_mirna_data
+    delete from deapp.de_subject_rna_data
      where trial_name = TrialId
-           and assay_id not in (select assay_id from deapp.de_subject_sample_mapping where trial_name=TrialId)
-	--and patient_id in (select p.patient_num from i2b2demodata.patient_dimension p,LT_SRC_MIRNA_SUBJ_SAMP_MAP s
-        -- where p.sourcesystem_cd=regexp_replace(TrialID || ':' || s.site_id || ':' || s.subject_id,'(::){1,}', ':'))
+           and assay_id not in (select assay_id
+				  from deapp.de_subject_sample_mapping
+				 where trial_name=TrialId)
+	--and patient_id in (select p.patient_num from i2b2demodata.patient_dimension p,lt_src_rna_subj_samp_map s where
+        -- p.sourcesystem_cd=regexp_replace(TrialID || ':' || s.site_id || ':' || s.subject_id,'(::){1,}', ':'))
            ;
-
-    stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from de_subject_mirna_data for  updation',SQL%ROWCOUNT,stepCt,'Done');
-    commit;
 
     select count(*) into pExists
       from all_tables
-     where table_name = 'DE_SUBJECT_MIRNA_DATA'
+     where table_name = 'DE_SUBJECT_RNA_DATA'
        and partitioned = 'YES';
 
     if pExists = 0 then
 	--	dataset is not partitioned so must delete
 
-	--delete from deapp.de_subject_mirna_data
+	--delete from deapp.de_subject_rna_data
 	--where trial_source = TrialId || ':' || sourceCd;
+
 	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from de_subject_mirna_data',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from de_subject_rna_data',SQL%ROWCOUNT,stepCt,'Done');
 	commit;
     else
-	--	Create partition in de_subject_MIRNA_data if it doesn't exist else truncate partition
+	--	Create partition in de_subject_RNA_data if it doesn't exist else truncate partition
 
 	select count(*)
 	  into pExists
 	  from all_tab_partitions
-	 where table_name = 'DE_SUBJECT_MIRNA_DATA'
-	   and partition_name = TrialId;
-
+	 where table_name = 'DE_SUBJECT_RNA_DATA'
+	   and partition_name = TrialId || ':' || sourceCd;
+	--10/30/2013  //modified
 	if pExists = 0 then
 
-	    --	needed to add partition to de_subject_MIRNA_data
+	    --	needed to add partition to de_subject_RNA_data
 
-	    sqlText := 'alter table deapp.de_subject_mirna_data add PARTITION "' || TrialID || '"  VALUES (' || '''' || TrialID || '''' || ') ' ||
+	    sqlText := 'alter table deapp.de_subject_rna_data add PARTITION "' || TrialID || ':' || sourceCd || '"  VALUES (' || '''' || TrialID || ':' || sourceCd || '''' || ') ' ||
 		'NOLOGGING COMPRESS TABLESPACE "TRANSMART" ';
 	    execute immediate(sqlText);
 	    stepCt := stepCt + 1;
-	    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding partition to de_subject_mirna_data',0,stepCt,'Done');
+	    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding partition to de_subject_rna_data',0,stepCt,'Done');
 
-	    /*else
-	      sqlText := 'alter table deapp.de_subject_mirna_data truncate partition "' || TrialID || ':' || sourceCd || '"';
-	      execute immediate(sqlText);
-	      stepCt := stepCt + 1;
-	      tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncating partition in de_subject_mirna_data',0,stepCt,'Done');
-	     */
-        end if;
+	else
+	    sqlText := 'alter table deapp.de_subject_rna_data truncate partition "' || TrialID || ':' || sourceCd || '"';
+	    execute immediate(sqlText);
+	    stepCt := stepCt + 1;
+	    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncating partition in de_subject_rna_data',0,stepCt,'Done');
+	end if;
 
     end if;
 
     --	truncate tmp node table
 
-    execute immediate('truncate table tm_wz.wt_qpcr_mirna_nodes');
+    execute immediate('truncate table tm_wz.wt_rna_nodes');
 
     --	load temp table with leaf node path, use temp table with distinct sample_type, ATTR2, platform, and title   this was faster than doing subselect
-    --	from wt_subject_mirna_data
+    --	from wt_subject_RNA_sequencing_data
 
-    execute immediate('truncate table tm_wz.wt_qpcr_mirna_node_values');
+    execute immediate('truncate table tm_wz.wt_rna_node_values');
 
-    insert into tm_wz.wt_qpcr_mirna_node_values (
+    insert into tm_wz.wt_rna_node_values (
 	category_cd
 	,platform
 	,tissue_type
@@ -387,24 +368,25 @@ BEGIN
 	,nvl(a.tissue_type,'Unspecified Tissue Type')
 	,a.attribute_1
 	,a.attribute_2
-	,g.title
-      from tm_lz.lt_src_mirna_subj_samp_map a
-	   ,deapp.de_gpl_info g
+	,'RNA_SEQ'--g.title
+      from tm_lz.lt_src_rna_subj_samp_map a
+	--  ,de_gpl_info g
      where a.trial_name = TrialID
-       and nvl(a.platform,'GPL570') = g.platform
+	--  and nvl(a.platform,'GPL570') = g.platform
        and a.source_cd = sourceCD
-       and a.platform = g.platform
-       and upper(g.marker_type) = mirnaType
-       and g.title = (select min(x.title) from deapp.de_gpl_info x where nvl(a.platform,'GPL570') = x.platform)
+	-- and a.platform = g.platform
+	--  and upper(g.marker_type) = 'GENE EXPRESSION'
+	--  and g.title = (select min(x.title) from deapp.de_gpl_info x where nvl(a.platform,'GPL570') = x.platform)
 	-- and upper(g.organism) = 'HOMO SAPIENS'
+	--  and decode(dataType,'R',sign(a.intensity_value),1) = 1;	--	take all values when dataType T, only >0 for dataType R
 	   ;
 
-    --  and decode(dataType,'R',sign(a.intensity_value),1) = 1;	--	take all values when dataType T, only >0 for dataType R
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_qpcr_mirna_node_values',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_rna_node_values',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
-    insert into tm_wz.wt_qpcr_mirna_nodes (
+    insert into tm_wz.wt_rna_nodes (
 	leaf_node
 	,category_cd
 	,platform
@@ -422,15 +404,16 @@ BEGIN
 	,attribute_1 as attribute_1
         ,attribute_2 as attribute_2
 	,'LEAF'
-      from tm_wz.wt_qpcr_mirna_node_values;
+      from tm_wz.wt_rna_node_values;
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_mirna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes in DEAPP tmp_rna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
     --	insert for platform node so platform concept can be populated
 
-    insert into tm_wz.wt_qpcr_mirna_nodes (
+    insert into tm_wz.wt_rna_nodes (
 	leaf_node
 	,category_cd
 	,platform
@@ -449,15 +432,16 @@ BEGIN
 	,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR1') > 1 then attribute_1 else null end as attribute_1
         ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 	,'PLATFORM'
-      from tm_wz.wt_qpcr_mirna_node_values;
+      from tm_wz.wt_rna_node_values;
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in wt_qpcr_mirna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create platform nodes in wt_RNA_nodes',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
     --	insert for ATTR1 node so ATTR1 concept can be populated in tissue_type_cd
 
-    insert into tm_wz.wt_qpcr_mirna_nodes (
+    insert into tm_wz.wt_rna_nodes (
 	leaf_node
 	,category_cd
 	,platform
@@ -476,17 +460,18 @@ BEGIN
 	,attribute_1 as attribute_1
         ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 	,'ATTR1'
-      from tm_wz.wt_qpcr_mirna_node_values
+      from tm_wz.wt_rna_node_values
      where category_cd like '%ATTR1%'
        and attribute_1 is not null;
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in WT_QPCR_MIRNA_NODES',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in wt_rna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
     --	insert for ATTR2 node so ATTR2 concept can be populated in timepoint_cd
 
-    insert into tm_wz.wt_qpcr_mirna_nodes (
+    insert into tm_wz.wt_rna_nodes (
 	leaf_node
 	,category_cd
 	,platform
@@ -505,17 +490,18 @@ BEGIN
         ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR2')+5),'ATTR1') > 1 then attribute_1 else null end as attribute_1
 	,attribute_2 as attribute_2
 	,'ATTR2'
-      from tm_wz.wt_qpcr_mirna_node_values
+      from tm_wz.wt_rna_node_values
      where category_cd like '%ATTR2%'
        and attribute_2 is not null;
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in WT_QPCR_MIRNA_NODES',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in wt_rna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
     --	insert for tissue_type node so sample_type_cd can be populated
 
-    insert into tm_wz.wt_qpcr_mirna_nodes (
+    insert into tm_wz.wt_rna_nodes (
 	leaf_node
 	,category_cd
 	,platform
@@ -534,21 +520,23 @@ BEGIN
 	,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then attribute_1 else null end as attribute_1
         ,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 	,'TISSUETYPE'
-      from tm_wz.wt_qpcr_mirna_node_values
+      from tm_wz.wt_rna_node_values
      where category_cd like '%TISSUETYPE%';
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in wt_qpcr_mirna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR2 nodes in wt_rna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
-    update tm_wz.wt_qpcr_mirna_nodes
+    update tm_wz.wt_rna_nodes
        set node_name=tm_cz.parse_nth_value(leaf_node,length(leaf_node)-length(replace(leaf_node,'\',null)),'\');
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_mirna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated node_name in DEAPP tmp_rna_nodes',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
-    --	add leaf nodes for miRNA data  The cursor will only add nodes that do not already exist.
+    --	add leaf nodes for RNA_sequencing data  The cursor will only add nodes that do not already exist.
 
     FOR r_addNodes in addNodes Loop
 
@@ -558,15 +546,16 @@ BEGIN
 	stepCt := stepCt + 1;
 	tText := 'Added Leaf Node: ' || r_addNodes.leaf_node || '  Name: ' || r_addNodes.node_name;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,SQL%ROWCOUNT,stepCt,'Done');
+
 	tm_cz.i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID);
 
     END LOOP;
 
     --	update concept_cd for nodes, this is done to make the next insert easier
 
-    update tm_wz.wt_qpcr_mirna_nodes t
+    update tm_wz.wt_rna_nodes t
        set concept_cd=(select c.concept_cd from i2b2demodata.concept_dimension c
-	                where c.concept_path = t.leaf_node and rownum = 1
+	                where c.concept_path = t.leaf_node
        )
      where exists
            (select 1 from i2b2demodata.concept_dimension x
@@ -575,27 +564,28 @@ BEGIN
 	   and t.concept_cd is null;
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update WT_QPCR_MIRNA_NODES with newly created concept_cds',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update wt_rna_nodes with newly created concept_cds',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
-    --Load the DE_SUBJECT_SAMPLE_MAPPING from wt_subject_mirna_data
+    --Load the DE_SUBJECT_SAMPLE_MAPPING from wt_subject_RNA_sequencing_data
 
     --PATIENT_ID      = PATIENT_ID (SAME AS ID ON THE PATIENT_DIMENSION)
     --SITE_ID         = site_id
     --SUBJECT_ID      = subject_id
     --SUBJECT_TYPE    = NULL
-    --CONCEPT_CODE    = from LEAF records in wt_mirna_nodes
+    --CONCEPT_CODE    = from LEAF records in wt_rna_nodes
     --SAMPLE_TYPE    	= TISSUE_TYPE
-    --SAMPLE_TYPE_CD  = concept_cd from TISSUETYPE records in wt_mirna_nodes
+    --SAMPLE_TYPE_CD  = concept_cd from TISSUETYPE records in wt_rna_nodes
     --TRIAL_NAME      = TRIAL_NAME
     --TIMEPOINT		= attribute_2
-    --TIMEPOINT_CD	= concept_cd from ATTR2 records in wt_mirna_nodes
+    --TIMEPOINT_CD	= concept_cd from ATTR2 records in wt_rna_nodes
     --TISSUE_TYPE     = attribute_1
-    --TISSUE_TYPE_CD  = concept_cd from ATTR1 records in wt_mirna_nodes
-    --PLATFORM        = MIRNA_QPCR or MIRNA_SEQ - this is required by ui code
-    --PLATFORM_CD     = concept_cd from PLATFORM records in wt_qpcr_mirna_nodes
+    --TISSUE_TYPE_CD  = concept_cd from ATTR1 records in wt_rna_nodes
+    --PLATFORM        = RNA_sequencing_AFFYMETRIX - this is required by ui code
+    --PLATFORM_CD     = concept_cd from PLATFORM records in wt_rna_nodes
     --DATA_UID		= concatenation of concept_cd-patient_num
-    --GPL_ID			= platform from wt_subject_mirna_data
+    --GPL_ID			= platform from wt_subject_rna_data
     --CATEGORY_CD		= category_cd that generated ontology
     --SAMPLE_ID		= id of sample (trial:S:[site_id]:subject_id:sample_cd) from patient_dimension, may be the same as patient_num
     --SAMPLE_CD		= sample_cd
@@ -665,49 +655,49 @@ BEGIN
 		,a2.concept_cd as timepoint_cd
 		,a.attribute_1 as tissue_type
 		,a1.concept_cd as tissue_type_cd
-		,mirna_type as platform
+		,'RNA_SEQ' as platform
 		,pn.concept_cd as platform_cd
 		,ln.concept_cd || '-' || to_char(b.patient_num) as data_uid
 		,a.platform as gpl_id
 		,coalesce(sid.patient_num,b.patient_num) as sample_id
 		,a.sample_cd
-		,nvl(a.category_cd,'Biomarker_Data+QPCR_MIRNA+PLATFORM+TISSUETYPE+ATTR1+ATTR2') as category_cd
+		,nvl(a.category_cd,'Biomarker_Data+RNA_SEQ+PLATFORM+TISSUETYPE+ATTR1+ATTR2') as category_cd
 		,a.source_cd
 		,TrialId as omic_source_study
 		,b.patient_num as omic_patient_id
-	      from tm_lz.lt_src_mirna_subj_samp_map a
+	      from tm_lz.lt_src_rna_subj_samp_map a
 		--Joining to Pat_dim to ensure the ID's match. If not I2B2 won't work.
 		       inner join i2b2demodata.patient_dimension b
 			       on regexp_replace(TrialID || ':' || a.site_id || ':' || a.subject_id,'(::){1,}', ':') = b.sourcesystem_cd
-		       inner join tm_wz.wt_qpcr_mirna_nodes ln
+		       inner join tm_wz.wt_rna_nodes ln
 			       on a.platform = ln.platform
 			       and a.category_cd=ln.category_cd
 			       and a.tissue_type = ln.tissue_type
 			       and nvl(a.attribute_1,'@') = nvl(ln.attribute_1,'@')
 			       and nvl(a.attribute_2,'@') = nvl(ln.attribute_2,'@')
 			       and ln.node_type = 'LEAF'
-		       inner join tm_wz.wt_qpcr_mirna_nodes pn
+		       inner join tm_wz.wt_rna_nodes pn
 			       on a.platform = pn.platform
 			       and  pn.category_cd=substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8)
 			       and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '@' end = nvl(pn.tissue_type,'@')
 			       and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '@' end = nvl(pn.attribute_1,'@')
 			       and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '@' end = nvl(pn.attribute_2,'@')
 			       and pn.node_type = 'PLATFORM'
-		       left outer join tm_wz.wt_qpcr_mirna_nodes ttp
+		       left outer join tm_wz.wt_rna_nodes ttp
 					  on a.tissue_type = ttp.tissue_type
 					  and ttp.category_cd=substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10)
 					  and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '@' end = nvl(ttp.platform,'@')
 					  and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '@' end = nvl(ttp.attribute_1,'@')
 					  and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '@' end = nvl(ttp.attribute_2,'@')
 					  and ttp.node_type = 'TISSUETYPE'
-		       left outer join tm_wz.wt_qpcr_mirna_nodes a1
+		       left outer join tm_wz.wt_rna_nodes a1
 					  on a.attribute_1 = a1.attribute_1
 					  and a1.category_cd=substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5)
 					  and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '@' end = nvl(a1.platform,'@')
 					  and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = nvl(a1.tissue_type,'@')
 					  and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '@' end = nvl(a1.attribute_2,'@')
 					  and a1.node_type = 'ATTR1'
-		       left outer join tm_wz.wt_qpcr_mirna_nodes a2
+		       left outer join tm_wz.wt_rna_nodes a2
 					  on a.attribute_2 = a1.attribute_2
 					  and a2.category_cd=substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5)
 					  and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '@' end = nvl(a2.platform,'@')
@@ -726,7 +716,6 @@ BEGIN
 
     commit;
 
-    --	recreate de_subject_sam
     --	recreate de_subject_sample_mapping indexes
 
     -- execute immediate('create index de_subject_smpl_mpng_idx1 on de_subject_sample_mapping(timepoint, patient_id, trial_name) parallel nologging');
@@ -760,7 +749,7 @@ BEGIN
 	,'@'
 	,'T' -- Text data type
 	,'E'  --Stands for Equals for Text Types
-	,null	--	not numeric for qpcr_mirna
+	,null	--	not numeric for RNA_sequencing
 	,m.trial_name
 	,sysdate
 	,'@'
@@ -771,8 +760,8 @@ BEGIN
       from deapp.de_subject_sample_mapping m
      where m.trial_name = TrialID
        and m.source_cd = sourceCD
-       and m.platform = mirna_type
-       and (m.subject_id||m.sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_mirna_subj_samp_map);
+       and m.platform = 'RNA_SEQ'
+       and (m.subject_id||m.sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_rna_subj_samp_map);
 
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',SQL%ROWCOUNT,stepCt,'Done');
@@ -794,7 +783,7 @@ BEGIN
 	,provider_id
 	,location_cd
 	,units_cd
-        ,INSTANCE_NUM
+        ,instance_num
     )
     select
 	distinct m.sample_id
@@ -802,7 +791,7 @@ BEGIN
 	,m.trial_name
 	,'T' -- Text data type
 	,'E'  --Stands for Equals for Text Types
-	,null	--	not numeric for miRNA
+	,null	--	not numeric for RNA_sequencing
 	,m.trial_name
 	,sysdate
 	,'@'
@@ -813,9 +802,9 @@ BEGIN
       from deapp.de_subject_sample_mapping m
      where m.trial_name = TrialID
        and m.source_cd = sourceCd
-       and m.platform = mirna_type
+       and m.platform = 'RNA_SEQ'
        and m.patient_id != m.sample_id
-       and (m.subject_id||m.sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_mirna_subj_samp_map);
+       and (m.subject_id||m.sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_rna_subj_samp_map);
 
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert sample facts into I2B2DEMODATA observation_fact',SQL%ROWCOUNT,stepCt,'Done');
@@ -826,10 +815,11 @@ BEGIN
 
     update i2b2metadata.i2b2 t
        set c_columndatatype = 'T', c_metadataxml = null, c_visualattributes='FA'
-     where t.c_basecode in (select distinct x.concept_cd from tm_wz.wt_qpcr_mirna_nodes x);
+     where t.c_basecode in (select distinct x.concept_cd from tm_wz.wt_rna_nodes x);
 
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Initialize data_type and xml in i2b2',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
     ---INSERT sample_dimension
@@ -838,6 +828,7 @@ BEGIN
 
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'insert distinct sample_cd in sample_dimension from de_subject_sample_mapping',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
     ---- update c_metedataxml in i2b2
@@ -845,7 +836,7 @@ BEGIN
     for ul in uploadI2b2
         loop
 	update i2b2metadata.i2b2 n
-	   SET n.c_columndatatype = 'T',
+	   set n.c_columndatatype = 'T',
 	    --Static XML String
 	       n.c_metadataxml =  ('<?xml version="1.0"?><ValueMetadata><Version>3.02</Version><CreationDateTime>08/14/2008 01:22:59</CreationDateTime><TestID></TestID><TestName></TestName><DataType>PosFloat</DataType><CodeType></CodeType><Loinc></Loinc><Flagstouse></Flagstouse><Oktousevalues>Y</Oktousevalues><MaxStringLength></MaxStringLength><LowofLowValue>0</LowofLowValue>
 				   <HighofLowValue>0</HighofLowValue><LowofHighValue>100</LowofHighValue>100<HighofHighValue>100</HighofHighValue>
@@ -855,13 +846,14 @@ BEGIN
 				   <ExcludingUnits></ExcludingUnits><ConvertingUnits><Units></Units><MultiplyingFactor></MultiplyingFactor>
 				   </ConvertingUnits></UnitValues><Analysis><Enums /><Counts />
 				   <New /></Analysis>'||(select xmlelement(name "SeriesMeta",xmlforest(m.display_value as "Value",m.display_unit as "Unit",m.display_label as "DisplayName")) as hi
-							   from tm_lz.lt_src_mirna_display_mapping m where m.category_cd=ul.category_cd)||
-							   '</ValueMetadata>') where n.c_fullname=(select leaf_node from tm_wz.wt_qpcr_mirna_nodes where category_cd=ul.category_cd and leaf_node=n.c_fullname and leaf_node=n.c_fullname );
+							   from tm_lz.lt_src_rna_display_mapping m where m.category_cd=ul.category_cd)||
+							   '</ValueMetadata>') where n.c_fullname=(select leaf_node from tm_wz.wt_rna_nodes where category_cd=ul.category_cd and leaf_node=n.c_fullname);
 
     end loop;
 
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update c_columndatatype and c_metadataxml for numeric data types in I2B2METADATA i2b2',SQL%ROWCOUNT,stepCt,'Done');
+
     commit;
 
     /*
@@ -878,9 +870,10 @@ BEGIN
     --UPDATE VISUAL ATTRIBUTES for Leaf Active (Default is folder)
     update i2b2metadata.i2b2 a
        set c_visualattributes = 'LAH'
-     where a.c_basecode in (select distinct x.concept_code from deapp.de_subject_sample_mapping x
+     where a.c_basecode in (select distinct x.concept_code
+			      from deapp.de_subject_sample_mapping x
 			     where x.trial_name = TrialId
-			       and x.platform = mirna_type
+			       and x.platform = 'RNA_SEQ'
 			       and x.concept_code is not null);
 
     stepCt := stepCt + 1;
@@ -897,9 +890,27 @@ BEGIN
 
     commit;
 
+    insert into tm_cz.probeset_deapp (
+	probeset,
+	platform
+    )
+    select
+	distinct s.probeset
+        ,m.platform
+      from tm_lz.lt_src_rna_data s
+           ,tm_lz.lt_src_rna_subj_samp_map m
+     where s.trial_name=m.trial_name
+       and not exists
+	   (select 1 from tm_cz.probeset_deapp x
+	     where m.platform = x.platform
+	       and s.probeset = x.probeset);
+
+    stepCt := stepCt + 1;
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into probeset_deapp',SQL%ROWCOUNT,stepCt,'Done');
+
     --Build concept Counts
     --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
-    -- a unique top-level node for miRNA data
+    -- a unique top-level node for RNA_sequencing data
 
     tm_cz.i2b2_create_concept_counts(topNode ,jobID );
     stepCt := stepCt + 1;
@@ -907,16 +918,17 @@ BEGIN
 
     --	delete each node that is hidden
 
-    FOR r_delNodes in delNodes Loop
+    /* FOR r_delNodes in delNodes Loop
 
-	--	deletes hidden nodes for a trial one at a time
+       --	deletes hidden nodes for a trial one at a time
 
-	tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname);
-	stepCt := stepCt + 1;
-	tText := 'Deleted node: ' || r_delNodes.c_fullname;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,SQL%ROWCOUNT,stepCt,'Done');
+       tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname);
+       stepCt := stepCt + 1;
+       tText := 'Deleted node: ' || r_delNodes.c_fullname;
+       tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,SQL%ROWCOUNT,stepCt,'Done');
 
-    END LOOP;
+       END LOOP;
+     */
 
     --Reload Security: Inserts one record for every I2B2 record into the security table
 
@@ -926,14 +938,13 @@ BEGIN
 
     --	tag data with probeset_id from reference.probeset_deapp
 
-    execute immediate ('truncate table tm_wz.WT_SUBJECT_MIRNA_PROBESET');
+    execute immediate ('truncate table tm_wz.wt_subject_rna_probeset');
 
     --	note: assay_id represents a unique subject/site/sample
 
-    insert into tm_wz.wt_subject_mirna_probeset (
-	--mod
-	probeset_id
-	--	,expr_id
+    insert into tm_wz.wt_subject_rna_probeset (
+	probeset
+        --	,expr_id
 	,intensity_value
 	,patient_id
 	--	,sample_cd
@@ -942,62 +953,47 @@ BEGIN
 	,assay_id
     )
     select
-	p.probeset_id
-	,avg(md.intensity_value)
-        ,sd.patient_id
-	,TrialId
+	md.probeset
+	--		  ,sd.sample_cd
+	, avg(md.intensity_value) as intensity_value
+	,sd.patient_id
+	--		  ,sd.sample_cd
+	--		  ,sd.subject_id
+	,TrialId as trial_name
 	,sd.assay_id
       from deapp.de_subject_sample_mapping sd
-	   ,tm_lz.lt_src_qpcr_mirna_data md
-           ,tm_cz.mirna_probeset_deapp p
-     where sd.sample_cd (+)= md.expr_id
-       and sd.platform = mirna_type
-       and sd.trial_name =TrialId
+	   ,tm_lz.lt_src_rna_data md
+	   ,tm_cz.probeset_deapp gs
+     where sd.sample_cd = md.expr_id
+       and sd.platform = 'RNA_SEQ'
+       and sd.trial_name = TrialId
        and sd.source_cd = sourceCd
-       and md.probeset =p.probeset-- gs.mirna_id
-       and decode(dataType,'R',sign(md.intensity_value),1) <> -1  ---UAT_163-Changes introduced ,UAT 154 changes on 19/03/2014
-       and (sd.subject_id||sd.sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_mirna_subj_samp_map)
-       and sd.gpl_id = p.platform
-     group by  p.probeset_id
-	       ,sd.patient_id,sd.assay_id;
+	--  and sd.gpl_id = gs.platform
+       and md.probeset = gs.probeset
+	--and decode(dataType,'R',sign(md.intensity_value),1) = 1  --	take only >0 for dataType R
+       and (sd.subject_id||sd.sample_cd) in (select (subject_id||sample_cd) from tm_lz.lt_src_rna_subj_samp_map)
+     group by md.probeset
+	--  ,sd.sample_cd
+	      ,sd.patient_id
+	--  ,sd.sample_cd
+	--  ,sd.subject_id
+	      ,sd.assay_id;
 
     pExists := SQL%ROWCOUNT;
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_mirna_probeset',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_rna_probeset',SQL%ROWCOUNT,stepCt,'Done');
 
     commit;
 
-    if pExists = 0 then
-	raise no_probeset_recs;
-    end if;
+    /*if pExists = 0 then
+      raise no_probeset_recs;
+      end if;*/
 
-    --	insert into de_subject_mirna_data when dataType is T (transformed)
+    --	insert into de_subject_rna_data when dataType is T (transformed)
 
     if dataType = 'T' then
-
-	/*update deapp.de_subject_mirna_data d set (d.probeset_id
-	  ,d.assay_id
-	  ,d.zscore )=
-	  (select  p.probeset_id
-	  ,p.assay_id
-	  ,(case when p.intensity_value < -2.5
-	  then -2.5
-	  when p.intensity_value > 2.5
-	  then 2.5
-	  else p.intensity_value
-	  end) as zscore
-	  from tm_wz.wt_subject_mirna_probeset p
-          ,deapp.de_subject_mirna_data da
-	  where p.trial_name=TrialID
-	  and da.trial_name=p.trial_name
-	  and da.patient_id=p.patient_id
-	  and d.trial_name=da.trial_name
-	  and d.patient_id=da.patient_id) ;
-	  stepCt := stepCt + 1;
-	  tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update into DEAPP de_subject_microarray_data',SQL%ROWCOUNT,stepCt,'Done');*/
-
-	insert into deapp.de_subject_mirna_data (
+	insert into deapp.de_subject_rna_data (
 	    trial_source
 	    ,probeset_id
 	    ,assay_id
@@ -1008,37 +1004,33 @@ BEGIN
 	    ,zscore
 	)
 	select
-	(TrialId || ':' || sourceCd)
-	,probeset_id
+	TrialId || ':' || sourceCd
+	,probeset
 	,assay_id
 	,patient_id
 	--,sample_id
 	--,subject_id
 	,trial_name
-	/*,case when intensity_value < -2.5
-	  then -2.5
+	,case when intensity_value < -2.5
+	    then -2.5
 	  when intensity_value > 2.5
-	  then 2.5
+	      then 2.5
 	  else intensity_value
-	  end as zscore */
-        ,intensity_value as zscore
-	from tm_wz.wt_subject_mirna_probeset --mod
-	where trial_name = TrialID    ;
+	  end as zscore
+	from tm_wz.wt_subject_rna_probeset
+	where trial_name = TrialID;
+
 	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP de_subject_mirna_data',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert transformed into DEAPP de_subject_rna_data',SQL%ROWCOUNT,stepCt,'Done');
 
 	commit;
     else
 
-	--	Calculate ZScores and insert data into de_subject_mirna_data.  The 'L' parameter indicates that the gene expression data will be selected from
-	--	wt_subject_mirna_probeset as part of a Load.
+	--	Calculate ZScores and insert data into de_subject_rna_data.  The 'L' parameter indicates that the RNA_sequencing  data will be selected from
+	--	wt_subject_rna_probeset as part of a Load.
 
 	if dataType = 'R' or dataType = 'L' then
-	    if mirna_type='MIRNA_QPCR' then
-		tm_cz.i2b2_mirna_inc_zscore_calc(TrialID,'L',jobId,'R',logBase,sourceCD);----donot do log transform
-            else
-                tm_cz.i2b2_mirna_inc_zscore_calc(TrialID,'L',jobId,'L',logBase,sourceCD);----do log transform
-            end if;
+	    tm_cz.i2b2_rna_zscore_calc(TrialID,'L',jobId,dataType,logBase,sourceCD);
 	    stepCt := stepCt + 1;
 	    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score',0,stepCt,'Done');
 	    commit;
@@ -1049,7 +1041,7 @@ BEGIN
     ---Cleanup OVERALL JOB if this proc is being run standalone
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_QPCR_miRNA_DATA',0,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_rna_data',0,stepCt,'Done');
 
     IF newJobFlag = 1 THEN
 	tm_cz.cz_end_audit (jobID, 'SUCCESS');
@@ -1072,27 +1064,27 @@ EXCEPTION
 	tm_cz.cz_error_handler(jobid,procedurename);
 	tm_cz.cz_end_audit (jobId,'FAIL');
 	select 162 into rtn_code from dual;
-    when unmapped_platform then
-	tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_qpcr_mirna_annotation',1,stepCt,'ERROR');
-	tm_cz.cz_error_handler(jobId,procedurename);
-	tm_cz.cz_end_audit (jobId,'FAIL');
-	select 163 into rtn_code from dual;--mod
+    /*when unmapped_platform then
+      tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform not found in de_RNA_annotation',1,stepCt,'ERROR');
+      tm_cz.cz_error_handler(jobId,procedurename);
+      tm_cz.cz_end_audit (jobId,'FAIL');
+      select 163 into rtn_code from dual;*/
     when multiple_platform then
-	tm_cz.cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in LT_SRC_MIRNA_SUBJ_SAMP_MAP',1,stepCt,'ERROR');
+	tm_cz.cz_write_audit(jobId,databasename,procedurename,'Multiple platforms for sample_cd in lt_src_rna_subj_samp_map',1,stepCt,'ERROR');
 	tm_cz.cz_error_handler(jobId,procedurename);
 	tm_cz.cz_end_audit (jobId,'FAIL');
 	select 164 into rtn_code from dual;
-    when no_probeset_recs then
-	tm_cz.cz_write_audit(jobId,databasename,procedurename,'Unable to match probesets to platform in probeset_deapp',1,stepCt,'ERROR');
-	tm_cz.cz_error_handler(jobId,procedurename);
-	tm_cz.cz_end_audit (jobId,'FAIL');
-	select 165 into rtn_code from dual;
+    /*when no_probeset_recs then
+      tm_cz.cz_write_audit(jobId,databasename,procedurename,'Unable to match probesets to platform in probeset_deapp',1,stepCt,'ERROR');
+      tm_cz.cz_error_handler(jobId,procedurename);
+      tm_cz.cz_end_audit (jobId,'FAIL');
+      select 165 into rtn_code from dual;*/
     WHEN OTHERS THEN
 	--Handle errors.
 	tm_cz.cz_error_handler (jobID, procedureName);
     --End Proc
 	tm_cz.cz_end_audit (jobID, 'FAIL');
-	select 16  into rtn_code from dual;
+	select 166 into rtn_code from dual;
 
 END;
 /
