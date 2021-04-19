@@ -17,11 +17,14 @@
 -- Type: TRIGGER; Owner: TM_CZ; Name: TRG_CZ_TEST_RESULT_ID
 --
   CREATE OR REPLACE TRIGGER "TM_CZ"."TRG_CZ_TEST_RESULT_ID" 
-before insert on "CZ_TEST_RESULT"    for each row
-begin     if inserting then
-if :NEW."TEST_RESULT_ID" is null then
-select SEQ_CZ.nextval into :NEW."TEST_RESULT_ID" from dual;       end if;       end if;   end;
-
+before insert on "CZ_TEST_RESULT"
+  for each row begin
+    if inserting then
+      if :NEW."TEST_RESULT_ID" is null then
+        select SEQ_CZ.nextval into :NEW."TEST_RESULT_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "TM_CZ"."TRG_CZ_TEST_RESULT_ID" ENABLE;
  

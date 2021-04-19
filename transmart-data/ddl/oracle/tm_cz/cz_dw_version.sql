@@ -3,7 +3,7 @@
 --
  CREATE TABLE "TM_CZ"."CZ_DW_VERSION" 
   (	"DW_VERSION_ID" NUMBER(18,0) NOT NULL ENABLE, 
-"VERSION_NAME" NVARCHAR2(200), 
+"VERSION_NAME" VARCHAR2(200), 
 "RELEASE_DATE" DATE, 
 "CREATE_DATE" DATE, 
 "CREATED_BY" NUMBER(18,0), 
@@ -22,17 +22,15 @@ CREATE SEQUENCE  "TM_CZ"."SEQ_CZ_DW_VERSION_ID"  MINVALUE 1 MAXVALUE 99999999999
 --
 -- Type: TRIGGER; Owner: TM_CZ; Name: TRG_CZ_DW_VERSION_ID
 --
-  CREATE OR REPLACE TRIGGER "TM_CZ"."TRG_CZ_DW_VERSION_ID" before insert on "CZ_DW_VERSION"    for each row 
-begin     if inserting then       if :NEW."DW_VERSION_ID" is null then          select SEQ_CZ_DW_VERSION_ID.nextval into :NEW."DW_VERSION_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "TM_CZ"."TRG_CZ_DW_VERSION_ID"
+before insert on "CZ_DW_VERSION"
+  for each row begin
+    if inserting then
+      if :NEW."DW_VERSION_ID" is null then
+        select SEQ_CZ_DW_VERSION_ID.nextval into :NEW."DW_VERSION_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "TM_CZ"."TRG_CZ_DW_VERSION_ID" ENABLE;
  

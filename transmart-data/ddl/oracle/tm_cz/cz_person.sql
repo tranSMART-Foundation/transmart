@@ -3,10 +3,10 @@
 --
  CREATE TABLE "TM_CZ"."CZ_PERSON" 
   (	"PERSON_ID" NUMBER(18,0) NOT NULL ENABLE, 
-"F_NAME" NVARCHAR2(200), 
-"L_NAME" NVARCHAR2(200), 
-"M_NAME" NVARCHAR2(200), 
-"USER_NAME" NVARCHAR2(20), 
+"F_NAME" VARCHAR2(200), 
+"L_NAME" VARCHAR2(200), 
+"M_NAME" VARCHAR2(200), 
+"USER_NAME" VARCHAR2(20), 
 "ROLE_CODE" VARCHAR2(20 BYTE), 
 "EMAIL_ADDRESS" VARCHAR2(100 BYTE), 
 "MAIL_ADDRESS" VARCHAR2(200 BYTE), 
@@ -28,18 +28,13 @@ CREATE SEQUENCE  "TM_CZ"."SEQ_CZ_PERSON_ID"  MINVALUE 1 MAXVALUE 999999999999999
 --
   CREATE OR REPLACE TRIGGER "TM_CZ"."TRG_CZ_PERSONID" 
 before insert on "CZ_PERSON"
-for each row
-begin     if inserting then
-if :NEW."PERSON_ID" is null then
-select SEQ_CZ_PERSON_ID.nextval into :NEW."PERSON_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
+  for each row begin
+    if inserting then
+      if :NEW."PERSON_ID" is null then
+        select SEQ_CZ_PERSON_ID.nextval into :NEW."PERSON_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "TM_CZ"."TRG_CZ_PERSONID" ENABLE;
  

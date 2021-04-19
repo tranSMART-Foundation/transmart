@@ -8,9 +8,9 @@ CREATE SEQUENCE  "TM_CZ"."SEQ_CZ_DATA"  MINVALUE 1 MAXVALUE 99999999999999999999
 --
  CREATE TABLE "TM_CZ"."CZ_DATA" 
   (	"DATA_ID" NUMBER(18,0) NOT NULL ENABLE, 
-"DATA_NAME" NVARCHAR2(200), 
-"TECHNICAL_DESC" NVARCHAR2(1000), 
-"BUSINESS_DESC" NVARCHAR2(1000), 
+"DATA_NAME" VARCHAR2(200), 
+"TECHNICAL_DESC" VARCHAR2(1000), 
+"BUSINESS_DESC" VARCHAR2(1000), 
 "CREATE_DATE" DATE, 
 "CUSTODIAN_ID" NUMBER(18,0), 
 "OWNER_ID" NUMBER(18,0), 
@@ -24,17 +24,15 @@ CREATE SEQUENCE  "TM_CZ"."SEQ_CZ_DATA"  MINVALUE 1 MAXVALUE 99999999999999999999
 --
 -- Type: TRIGGER; Owner: TM_CZ; Name: TRG_CZ_DATA_ID
 --
-  CREATE OR REPLACE TRIGGER "TM_CZ"."TRG_CZ_DATA_ID" before insert on "CZ_DATA"    for each row 
-begin     if inserting then       if :NEW."DATA_ID" is null then          select SEQ_CZ_DATA.nextval into :NEW."DATA_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "TM_CZ"."TRG_CZ_DATA_ID"
+before insert on "CZ_DATA"
+  for each row begin
+    if inserting then
+      if :NEW."DATA_ID" is null then
+        select SEQ_CZ_DATA.nextval into :NEW."DATA_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "TM_CZ"."TRG_CZ_DATA_ID" ENABLE;
  

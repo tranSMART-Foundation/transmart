@@ -2,10 +2,10 @@
 -- Type: TABLE; Owner: TM_CZ; Name: CZ_DATA_FILE
 --
  CREATE TABLE "TM_CZ"."CZ_DATA_FILE" 
-  (	"FILE_NAME" NVARCHAR2(200), 
-"PROVIDER" NVARCHAR2(200), 
+  (	"FILE_NAME" VARCHAR2(200), 
+"PROVIDER" VARCHAR2(200), 
 "EXTRACTION_DATE" DATE, 
-"LOCATION" NVARCHAR2(500), 
+"LOCATION" VARCHAR2(500), 
 "DATA_ID" NUMBER(18,0) NOT NULL ENABLE, 
 "CONTACT_ID" NUMBER(18,0), 
 "EXP_RECORD_CNT" NUMBER(18,0), 
@@ -29,20 +29,13 @@ CREATE SEQUENCE  "TM_CZ"."SEQ_CZ_DATA_FILE"  MINVALUE 1 MAXVALUE 999999999999999
 --
   CREATE OR REPLACE TRIGGER "TM_CZ"."TRG_CZ_DATA_FILE_ID" 
 before insert on "CZ_DATA_FILE"    
-for each row 
-begin     
-if inserting then       
-if :NEW."DATA_FILE_ID" is null then          
-select SEQ_CZ_DATA_FILE.nextval into :NEW."DATA_FILE_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
-
+  for each row begin     
+    if inserting then       
+      if :NEW."DATA_FILE_ID" is null then          
+        select SEQ_CZ_DATA_FILE.nextval into :NEW."DATA_FILE_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "TM_CZ"."TRG_CZ_DATA_FILE_ID" ENABLE;
  
