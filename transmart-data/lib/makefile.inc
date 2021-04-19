@@ -1,8 +1,19 @@
 JDBC_DL_PSQL     := https://jdbc.postgresql.org/download
 JDBC_DRIVER_PSQL := postgresql-42.2.5.jar
-JDBC_DL_ORA      := http://maven.in2p3.fr/com/oracle/ojdbc7/12.1.0.1
-JDBC_DRIVER_ORA  := ojdbc7-12.1.0.1.jar
-JDBC_XDB_ORA     := xdb.jar
+#JDBC_DL_ORA      := http://maven.in2p3.fr/com/oracle/ojdbc7/12.1.0.1
+#JDBC_DRIVER_ORA  := ojdbc7-12.1.0.1.jar
+#JDBC_XDB_ORA     := xdb.jar
+##JDBC_DLO_ORA      := https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/ojdbc8/19.3.0.0/
+##JDBC_DLX_ORA      := https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/xdb/19.3.0.0
+JDBC_DRIVER_ORA  := ojdbc8-19.3.0.0.jar
+JDBC_XDB_ORA     := xdb-19.3.0.0.jar
+JDBC_DLO_ORA      := https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/ojdbc6/12.2.0.1.0/
+JDBC_DLX_ORA      := https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/xdb/12.2.0.1.0
+##JDBC_DRIVER_ORA  := ojdbc6-12.2.0.1.0.jar
+##JDBC_XDB_ORA     := xdb-12.2.0.1.0.jar
+
+# https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/xdb/19.3.0.0/xdb-19.3.0.0.jar
+# https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/ojdbc8/19.3.0.0/ojdbc8-19.3.0.0.jar
 
 # Official Oracle driver is from:
 #http://download.oracle.com/otn/utilities_drivers/jdbc/121020/ojdbc7.jar
@@ -20,10 +31,10 @@ $(JDBC_DRIVER_PSQL_PATH):
 
 # For correctness, the dependency on XDB should be split off since some uses of this rule don't need XDB, but it doesn't matter a lot.
 $(JDBC_DRIVER_ORA_PATH): $(JDBC_XDB_ORA_PATH)
-	curl -f $(JDBC_DL_ORA)/$(JDBC_DRIVER_ORA) > $@
+	curl -f $(JDBC_DLO_ORA)/$(JDBC_DRIVER_ORA) > $@
 
 $(JDBC_XDB_ORA_PATH):
-	curl -f $(JDBC_DL_ORA)/$(JDBC_XDB_ORA) > $@
+	curl -f $(JDBC_DLX_ORA)/$(JDBC_XDB_ORA) > $@
 
 NETTY_JAR        := netty-3.5.13.Final.jar
 NETTY_JAR_DL     := http://files.thehyve.net
