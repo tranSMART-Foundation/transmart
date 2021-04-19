@@ -44,7 +44,7 @@ CREATE TABLE lt_src_study_metadata (
     compound character varying(1000),
     disease character varying(1000),
     pubmed_ids character varying(4000),
-    organism character varying(200),
+    organism character varying(100),
     study_title character varying(500),
     study_date timestamp,
     study_institution character varying(500),
@@ -57,6 +57,6 @@ CREATE TABLE lt_src_study_metadata (
     study_compound character varying(500),
     study_design_factors character varying(2000),
     study_nbr_subjects character varying(20),
-    study_organism character varying(500)
+    study_organism character varying(100)
 );
 

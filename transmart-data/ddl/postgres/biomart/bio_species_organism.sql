@@ -3,7 +3,7 @@
 --
 CREATE TABLE bio_species_organism (
     id int,
-    species character varying(200),
-    organism character varying(200)
+    species character varying(100),
+    organism character varying(100)
 );
 

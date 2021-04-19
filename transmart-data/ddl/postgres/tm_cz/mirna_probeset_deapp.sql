@@ -15,6 +15,6 @@ CREATE TABLE mirna_probeset_deapp (
     probeset_id int DEFAULT nextval('seq_probeset_id'::regclass) NOT NULL,
     probeset character varying(100),
     platform character varying(100),
-    organism character varying(200)
+    organism character varying(100)
 );
 

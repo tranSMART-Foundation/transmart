@@ -11,7 +11,7 @@ CREATE TABLE i2b2 (
     c_basecode character varying(50),
     c_metadataxml text,
     c_facttablecolumn character varying(50) NOT NULL,
-    c_tablename character varying(150) NOT NULL,
+    c_tablename character varying(50) NOT NULL,
     c_columnname character varying(50) NOT NULL,
     c_columndatatype character varying(50) NOT NULL,
     c_operator character varying(10) NOT NULL,
@@ -54,16 +54,14 @@ CREATE INDEX META_SYNONYM_IDX_i2b2 ON i2b2 USING btree (c_synonym_cd);
 -- Name: i2b2_c_comment_char_length_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
 CREATE INDEX i2b2_c_comment_char_length_idx ON i2b2 USING btree (c_comment, char_length((c_fullname)::text)); --not in i2b2
-
 --
--- Name: idx_i2b2_fullname_basecode; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: idx_i2b2_basecode_fullname; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX idx_i2b2_fullname_basecode ON i2b2 USING btree (c_fullname, c_basecode); --not in i2b2
-
+CREATE INDEX idx_i2b2_basecode_fullname ON i2b2 USING btree (c_basecode, c_fullname); --not in i2b2
 --
--- Name: ix_i2b2_source_system_cd; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: idx_i2b2_visatt; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX ix_i2b2_source_system_cd ON i2b2 USING btree (sourcesystem_cd); --not in i2b2
+CREATE INDEX idx_i2b2_visatt ON i2b2 USING btree (c_visualattributes); --not in i2b2
 
 --
 -- name: i2b2_id_seq; Type: SEQUENCE; Schema: i2b2metadata; Owner: -

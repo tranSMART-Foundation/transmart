@@ -6,7 +6,7 @@ CREATE TABLE de_gene_info (
     gene_source_id int DEFAULT 1 NOT NULL,
     entrez_id int,
     gene_symbol character varying(100) NOT NULL,
-    gene_name character varying(20),
+    gene_name character varying(100),
     chrom character varying(40) NOT NULL,
     chrom_start int,
     chrom_stop int,

@@ -7,7 +7,7 @@ CREATE TABLE rwg_cohorts (
     disease character varying(500),
     sample_type character varying(100),
     treatment character varying(500),
-    organism character varying(500),
+    organism character varying(100),
     pathology character varying(500),
     cohort_title character varying(500),
     short_desc character varying(500),

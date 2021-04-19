@@ -3,7 +3,7 @@
 --
 CREATE TABLE lt_src_pathway (
     name character varying(1000),
-    gene character varying(1000),
-    organism character varying(200)
+    gene character varying(100),
+    organism character varying(100)
 );
 

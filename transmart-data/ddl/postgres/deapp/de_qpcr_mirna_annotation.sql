@@ -7,7 +7,7 @@ CREATE TABLE de_qpcr_mirna_annotation (
     mirna_symbol character varying(100),
     mirna_id character varying(100),
     probeset_id int NOT NULL,
-    organism character varying(200),
+    organism character varying(100),
     gpl_id character varying(50)
 );
 

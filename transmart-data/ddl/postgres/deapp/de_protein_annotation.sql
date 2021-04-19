@@ -17,7 +17,7 @@ CREATE TABLE de_protein_annotation (
     peptide character varying(200) NOT NULL,
     uniprot_id character varying(200),
     biomarker_id character varying(200),
-    organism character varying(200),
+    organism character varying(100),
     uniprot_name character varying(200),
     chromosome character varying(5),
     start_bp int,

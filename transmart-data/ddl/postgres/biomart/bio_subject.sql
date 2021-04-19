@@ -7,7 +7,7 @@ CREATE TABLE bio_subject (
     source character varying(200),
     source_code character varying(200),
     status character varying(200),
-    organism character varying(200),
+    organism character varying(100),
     bio_subject_type character varying(200) NOT NULL
 );
 

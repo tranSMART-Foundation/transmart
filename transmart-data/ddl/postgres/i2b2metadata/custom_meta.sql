@@ -15,7 +15,7 @@ CREATE TABLE custom_meta (
     c_columnname character varying(50) NOT NULL,
     c_columndatatype character varying(50) NOT NULL,
     c_operator character varying(10) NOT NULL,
-    c_dimcode character varying(900) NOT NULL,
+    c_dimcode character varying(700) NOT NULL,
     c_comment text,
     c_tooltip character varying(900),
     m_applied_path character varying(700) NOT NULL,

@@ -8,6 +8,8 @@ CREATE TABLE wrk_clinical_data (
     visit_name character varying(100),
     data_label character varying(500),
     data_value character varying(500),
+    dval_char character varying(500),
+    dval_num decimal(18,5),
     category_cd character varying(250),
     etl_job_id int,
     etl_date timestamp,

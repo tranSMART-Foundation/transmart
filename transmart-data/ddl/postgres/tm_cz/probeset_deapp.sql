@@ -5,7 +5,7 @@ CREATE TABLE probeset_deapp (
     probeset_id int NOT NULL,
     probeset character varying(100) NOT NULL,
     platform character varying(100) NOT NULL,
-    organism character varying(200)
+    organism character varying(100)
 );
 
 --

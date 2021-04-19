@@ -5,7 +5,7 @@ CREATE TABLE bio_marker (
     bio_marker_id int NOT NULL,
     bio_marker_name character varying(200),
     bio_marker_description character varying(1000),
-    organism character varying(200),
+    organism character varying(100),
     primary_source_code character varying(200),
     primary_external_id character varying(200),
     bio_marker_type character varying(200) NOT NULL

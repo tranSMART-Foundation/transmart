@@ -27,5 +27,5 @@ CREATE INDEX pd_idx_name_char ON provider_dimension USING btree (provider_id, na
 --
 -- Name: PD_IDX_UPLOADID; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX PD_IDX_UPLOADID ON provider_dimension USING btree (upload_id);
+CREATE INDEX pd_idx_uploadid ON provider_dimension USING btree (upload_id);
 

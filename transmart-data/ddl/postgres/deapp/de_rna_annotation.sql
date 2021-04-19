@@ -6,6 +6,6 @@ CREATE TABLE de_rna_annotation (
     transcript_id character varying(50),
     gene_symbol character varying(100),
     gene_id character varying(100),
-    organism character varying(30),
+    organism character varying(100),
     probeset_id int
 );

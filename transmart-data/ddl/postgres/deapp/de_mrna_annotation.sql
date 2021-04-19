@@ -7,7 +7,7 @@ CREATE TABLE de_mrna_annotation (
     gene_symbol character varying(100),
     probeset_id int,
     gene_id int,
-    organism character varying(200),
+    organism character varying(100),
     de_mrna_annotation_id int NOT NULL
 );
 

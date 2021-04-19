@@ -9,10 +9,10 @@ CREATE TABLE patient_dimension (
     sex_cd character varying(50),
     age_in_years_num int,
     language_cd character varying(50),
-    race_cd character varying(100),
+    race_cd character varying(50),
     marital_status_cd character varying(50),
     religion_cd character varying(50),
-    zip_cd character varying(50),
+    zip_cd character varying(10),
     statecityzip_path character varying(700),
     income_cd character varying(50),
     patient_blob text,
@@ -49,6 +49,11 @@ CREATE INDEX PD_IDX_StateCityZip ON patient_dimension USING btree (statecityzip_
 -- Name: PA_IDX_UPLOADID; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
 CREATE INDEX PA_IDX_UPLOADID ON patient_dimension USING btree (upload_id);
+
+--
+-- Name: PA_IDX_UPLOADID; Type: INDEX; Schema: i2b2demodata; Owner: -
+--
+CREATE INDEX PA_IDX_SOURCESYSTEMCD ON patient_dimension USING btree (sourcesystem_cd);
 
 --
 -- Name: tf_trg_patient_dimension(); Type: FUNCTION; Schema: i2b2demodata; Owner: -

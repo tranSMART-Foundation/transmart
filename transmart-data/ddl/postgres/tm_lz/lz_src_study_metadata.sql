@@ -16,6 +16,6 @@ CREATE TABLE lz_src_study_metadata (
     study_compound character varying(500),
     study_design_factors character varying(2000),
     study_nbr_subjects character varying(20),
-    study_organism character varying(500),
+    study_organism character varying(100),
     study_id character varying(50)
 );

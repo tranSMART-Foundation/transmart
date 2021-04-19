@@ -6,6 +6,6 @@ CREATE TABLE lt_src_mirna_deapp_annot (
     probe_id character varying(100),
     mirna_symbol character varying(100),
     mirna_id character varying(250),
-    organism character varying(200)
+    organism character varying(100)
 );
 

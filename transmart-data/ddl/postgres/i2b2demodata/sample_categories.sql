@@ -26,7 +26,7 @@ CREATE TABLE sample_categories (
     disease character varying(2000),
     tissue_state character varying(2000),
     biobank character varying(3),
-    source_organism character varying(255),
+    source_organism character varying(100),
     treatment character varying(255),
     sample_treatment character varying(2000),
     subject_treatment character varying(2000),

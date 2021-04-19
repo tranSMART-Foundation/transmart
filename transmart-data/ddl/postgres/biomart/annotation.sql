@@ -7,7 +7,7 @@ CREATE TABLE annotation (
     gene_descr character varying(4000),
     gene_symbol character varying(100),
     gene_id character varying(100),
-    organism character varying(200),
+    organism character varying(100),
     id int NOT NULL
 );
 

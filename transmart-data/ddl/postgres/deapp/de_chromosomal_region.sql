@@ -22,7 +22,7 @@ CREATE TABLE de_chromosomal_region (
     cytoband character varying(100),
     gene_symbol character varying(100),
     gene_id int,
-    organism character varying(200)
+    organism character varying(100)
 );
 
 --

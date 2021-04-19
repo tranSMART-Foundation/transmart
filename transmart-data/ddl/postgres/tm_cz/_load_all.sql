@@ -2,6 +2,7 @@
 \i tm_cz/functions/_final_median.sql
 \i tm_cz/functions/add_bio_data_uid.sql
 \i tm_cz/functions/add_concept_species.sql
+\i tm_cz/functions/add_platform.sql
 \i tm_cz/functions/add_search_keyword.sql
 \i tm_cz/functions/add_search_keyword_term.sql
 \i tm_cz/functions/bio_assay_analysis_uid.sql
@@ -200,7 +201,6 @@
 \i tm_cz/observation_fact_release.sql
 \i tm_cz/patient_dimension_release.sql
 \i tm_cz/probeset_deapp.sql
-\i tm_cz/probeset_deapp_20120206.sql
 \i tm_cz/sample_categories_release.sql
 \i tm_cz/search_secure_object_release.sql
 \i tm_cz/stg_rbm_antigen_gene.sql
