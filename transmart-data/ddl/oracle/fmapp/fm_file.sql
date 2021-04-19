@@ -3,14 +3,14 @@
 --
  CREATE TABLE "FMAPP"."FM_FILE" 
   (	"FILE_ID" NUMBER(18,0) NOT NULL ENABLE, 
-"DISPLAY_NAME" NVARCHAR2(1000) NOT NULL ENABLE, 
-"ORIGINAL_NAME" NVARCHAR2(1000) NOT NULL ENABLE, 
+"DISPLAY_NAME" VARCHAR2(1000) NOT NULL ENABLE, 
+"ORIGINAL_NAME" VARCHAR2(1000) NOT NULL ENABLE, 
 "FILE_VERSION" NUMBER(18,0), 
-"FILE_TYPE" NVARCHAR2(100), 
+"FILE_TYPE" VARCHAR2(100), 
 "FILE_SIZE" NUMBER(18,0), 
-"FILESTORE_LOCATION" NVARCHAR2(1000), 
-"FILESTORE_NAME" NVARCHAR2(1000), 
-"LINK_URL" NVARCHAR2(1000), 
+"FILESTORE_LOCATION" VARCHAR2(1000), 
+"FILESTORE_NAME" VARCHAR2(1000), 
+"LINK_URL" VARCHAR2(1000), 
 "ACTIVE_IND" CHAR(1 BYTE) NOT NULL ENABLE, 
 "CREATE_DATE" DATE NOT NULL ENABLE, 
 "UPDATE_DATE" DATE NOT NULL ENABLE, 
@@ -23,14 +23,15 @@
 --
 -- Type: TRIGGER; Owner: FMAPP; Name: TRG_FM_FILE_ID
 --
-  CREATE OR REPLACE TRIGGER "FMAPP"."TRG_FM_FILE_ID" before insert on fmapp."FM_FILE"    
-for each row begin    
-if inserting then      
-  if :NEW."FILE_ID" is null then          
-    select SEQ_FM_ID.nextval into :NEW."FILE_ID" from dual;       
-  end if;    
-end if; 
-end;
+  CREATE OR REPLACE TRIGGER "FMAPP"."TRG_FM_FILE_ID"
+before insert on fmapp."FM_FILE"    
+  for each row begin    
+    if inserting then      
+      if :NEW."FILE_ID" is null then          
+        select SEQ_FM_ID.nextval into :NEW."FILE_ID" from dual;       
+      end if;    
+    end if; 
+  end;
 /
 ALTER TRIGGER "FMAPP"."TRG_FM_FILE_ID" ENABLE;
  
