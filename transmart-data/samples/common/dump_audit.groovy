@@ -42,7 +42,9 @@ if (cols < 80) {
 
 if (rdbms == 'oracle') {
     driver = 'oracle.jdbc.driver.OracleDriver'
-    jdbcUrl = "jdbc:oracle:thin:@${e.ORAHOST}:${e.ORAPORT}:${e.ORASID}"
+    jdbcUrl = "jdbc:oracle:thin:@${e.ORAHOST}:${e.ORAPORT}"
+    if(e.ORASVC) jdbcUrl += "/${e.ORASVC}"
+    else jdbcUrl += ":${e.ORASID}"
 } else {
     driver = 'org.postgresql.Driver'
     def host = 'localhost'
