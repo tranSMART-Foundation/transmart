@@ -2,12 +2,12 @@
 -- Type: TABLE; Owner: DEAPP; Name: DE_PATHWAY
 --
  CREATE TABLE "DEAPP"."DE_PATHWAY" 
-  (	"NAME" NVARCHAR2(300), 
-"DESCRIPTION" NVARCHAR2(510), 
+  (	"NAME" VARCHAR2(300), 
+"DESCRIPTION" VARCHAR2(510), 
 "ID" NUMBER(18,0) NOT NULL ENABLE, 
-"TYPE" NVARCHAR2(100), 
-"SOURCE" NVARCHAR2(100), 
-"EXTERNALID" NVARCHAR2(100), 
+"TYPE" VARCHAR2(100), 
+"SOURCE" VARCHAR2(100), 
+"EXTERNALID" VARCHAR2(100), 
 "PATHWAY_UID" VARCHAR2(200 BYTE), 
 "USER_ID" NUMBER(18,0), 
  CONSTRAINT "DE_PATHWAY_PK" PRIMARY KEY ("ID")
@@ -19,11 +19,15 @@
 --
 -- Type: TRIGGER; Owner: DEAPP; Name: TRG_DE_PATHWAY_ID
 --
-  CREATE OR REPLACE TRIGGER "DEAPP"."TRG_DE_PATHWAY_ID" before insert on "DE_PATHWAY"    for each row
-begin     if inserting then       if :NEW."ID" is null then          select SEQ_DATA_ID.nextval into :NEW."ID" from dual;       end if;    end if; end;
-
-
-
+  CREATE OR REPLACE TRIGGER "DEAPP"."TRG_DE_PATHWAY_ID"
+before insert on "DE_PATHWAY"
+  for each row begin
+    if inserting then
+      if :NEW."ID" is null then
+        select SEQ_DATA_ID.nextval into :NEW."ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "DEAPP"."TRG_DE_PATHWAY_ID" ENABLE;
  

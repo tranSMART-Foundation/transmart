@@ -6,8 +6,8 @@
 "GPL_ID" VARCHAR2(50 BYTE) NOT NULL ENABLE, 
 "PEPTIDE" VARCHAR2(200 CHAR) NOT NULL ENABLE, 
 "UNIPROT_ID" VARCHAR2(200 BYTE), 
-"BIOMARKER_ID" NVARCHAR2(200), 
-"ORGANISM" VARCHAR2(200 CHAR), 
+"BIOMARKER_ID" VARCHAR2(200), 
+"ORGANISM" VARCHAR2(100 CHAR), 
 "UNIPROT_NAME" VARCHAR2(200 CHAR), 
 "CHROMOSOME" VARCHAR2(5 CHAR),
 "START_BP" NUMBER,
@@ -27,15 +27,14 @@ CREATE SEQUENCE  "DEAPP"."PROTEIN_ANNOTATION_ID"  MINVALUE 1 MAXVALUE 999999999 
 -- Type: TRIGGER; Owner: DEAPP; Name: PROTEOMICS_ID
 --
   CREATE OR REPLACE TRIGGER "DEAPP"."PROTEOMICS_ID" 
-   before insert on "DEAPP"."DE_PROTEIN_ANNOTATION" 
-   for each row 
-begin  
-   if inserting then 
-      if :NEW."ID" is null then 
+before insert on "DEAPP"."DE_PROTEIN_ANNOTATION" 
+  for each row begin  
+     if inserting then 
+       if :NEW."ID" is null then 
          select PROTEIN_ANNOTATION_ID.nextval into :NEW."ID" from dual; 
-      end if; 
-   end if; 
-end;
+       end if; 
+    end if; 
+  end;
 /
 ALTER TRIGGER "DEAPP"."PROTEOMICS_ID" ENABLE;
  

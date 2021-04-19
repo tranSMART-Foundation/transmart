@@ -434,7 +434,7 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
-      "name" : "DE_RNASEQ_ANNOTATION"
+      "name" : "DE_RNA_ANNOTATION"
     },
     "parents" : [ ]
   }, {
@@ -1122,6 +1122,21 @@
       "type" : "TABLE",
       "owner" : "DEAPP",
       "name" : "DE_VARIANT_SUBJECT_SUMMARY"
+    } ]
+  }, {
+    "child" : {
+      "type" : "VIEW",
+      "owner" : "DEAPP",
+      "name" : "DE_XTRIAL_NODE_VIEW"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_XTRIAL_NODE"
+    }, {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_XTRIAL_METADATA"
     } ]
   }, {
     "child" : {
@@ -2080,6 +2095,24 @@
       "owner" : "DEAPP",
       "name" : "DE_VARIANT_POPULATION_INFO"
     } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "XN_IDX_UPLOADID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_XTRIAL_NODE"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_XTRIAL_NODE"
+    },
+    "parents" : [ ]
   } ],
   "fileAssignments" : [ {
     "item" : {
@@ -2400,9 +2433,9 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
-      "name" : "DE_RNASEQ_ANNOTATION"
+      "name" : "DE_RNA_ANNOTATION"
     },
-    "file" : "deapp/de_rnaseq_annotation.sql"
+    "file" : "deapp/de_rna_annotation.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -2916,6 +2949,13 @@
     "file" : "deapp/views/de_variant_summary_detail_gene.sql"
   }, {
     "item" : {
+      "type" : "VIEW",
+      "owner" : "DEAPP",
+      "name" : "DE_XTRIAL_NODE_VIEW"
+    },
+    "file" : "deapp/views/de_xtrial_node_view.sql"
+  }, {
+    "item" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
       "name" : "DE_VAR_POPULAT_DEFAULT_IDX"
@@ -3187,6 +3227,27 @@
       "name" : "RICERCA"
     },
     "file" : "deapp/ricerca.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_XTRIAL_NODE"
+    },
+    "file" : "deapp/de_xtrial_node.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_XTRIAL_METADATA"
+    },
+    "file" : "deapp/de_xtrial_metadata.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "XN_IDX_UPLOADID"
+    },
+    "file" : "deapp/de_xtrial_node.sql"
   }, {
     "item" : {
       "type" : "SEQUENCE",

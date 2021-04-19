@@ -4,8 +4,8 @@
  CREATE TABLE "DEAPP"."DE_PATHWAY_GENE" 
   (	"ID" NUMBER(18,0) NOT NULL ENABLE, 
 "PATHWAY_ID" NUMBER(18,0), 
-"GENE_SYMBOL" NVARCHAR2(200), 
-"GENE_ID" NVARCHAR2(200), 
+"GENE_SYMBOL" VARCHAR2(100), 
+"GENE_ID" VARCHAR2(100), 
  CONSTRAINT "DE_PATHWAY_GENE_PK" PRIMARY KEY ("ID")
  USING INDEX
  TABLESPACE "INDX"  ENABLE
@@ -21,11 +21,15 @@ TABLESPACE "INDX" ;
 --
 -- Type: TRIGGER; Owner: DEAPP; Name: TRG_DE_PATHWAY_GENE_ID
 --
-  CREATE OR REPLACE TRIGGER "DEAPP"."TRG_DE_PATHWAY_GENE_ID" before insert on "DE_PATHWAY_GENE"    for each row
-begin     if inserting then       if :NEW."ID" is null then          select SEQ_DATA_ID.nextval into :NEW."ID" from dual;       end if;    end if; end;
-
-
-
+  CREATE OR REPLACE TRIGGER "DEAPP"."TRG_DE_PATHWAY_GENE_ID"
+before insert on "DE_PATHWAY_GENE"
+  for each row begin
+    if inserting then
+      if :NEW."ID" is null then
+        select SEQ_DATA_ID.nextval into :NEW."ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "DEAPP"."TRG_DE_PATHWAY_GENE_ID" ENABLE;
  
