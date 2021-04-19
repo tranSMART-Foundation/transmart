@@ -239,14 +239,14 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "TM_WZ",
-      "name" : "WT_RNA_SEQ_NODES"
+      "name" : "WT_RNA_NODES"
     },
     "parents" : [ ]
   }, {
     "child" : {
       "type" : "TABLE",
       "owner" : "TM_WZ",
-      "name" : "WT_RNA_SEQ_NODE_VALUES"
+      "name" : "WT_RNA_NODE_VALUES"
     },
     "parents" : [ ]
   }, {
@@ -826,16 +826,16 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "TM_WZ",
-      "name" : "WT_RNA_SEQ_NODES"
+      "name" : "WT_RNA_NODES"
     },
-    "file" : "tm_wz/wt_rna_seq_nodes.sql"
+    "file" : "tm_wz/wt_rna_nodes.sql"
   }, {
     "item" : {
       "type" : "TABLE",
       "owner" : "TM_WZ",
-      "name" : "WT_RNA_SEQ_NODE_VALUES"
+      "name" : "WT_RNA_NODE_VALUES"
     },
-    "file" : "tm_wz/wt_rna_seq_node_values.sql"
+    "file" : "tm_wz/wt_rna_node_values.sql"
   }, {
     "item" : {
       "type" : "TABLE",
