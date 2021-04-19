@@ -1,5 +1,5 @@
 /ojdbc*.jar
 /postgresql-*.jar
-/xdb.jar
+/xdb*.jar
 /netty-*.jar
 /schemaSpy*.jar
