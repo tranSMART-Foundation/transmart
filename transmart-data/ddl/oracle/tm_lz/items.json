@@ -63,7 +63,7 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "TM_LZ",
-      "name" : "LT_RNASEQ_ANNOTATION"
+      "name" : "LT_RNA_ANNOTATION"
     },
     "parents" : [ ]
   }, {
@@ -294,14 +294,14 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "TM_LZ",
-      "name" : "LT_SRC_RNA_SEQ_DATA"
+      "name" : "LT_SRC_RNA_DATA"
     },
     "parents" : [ ]
   }, {
     "child" : {
       "type" : "TABLE",
       "owner" : "TM_LZ",
-      "name" : "LT_SRC_RNA_SEQ_SUBJ_SAMP_MAP"
+      "name" : "LT_SRC_RNA_SUBJ_SAMP_MAP"
     },
     "parents" : [ ]
   }, {
@@ -330,13 +330,6 @@
       "type" : "TABLE",
       "owner" : "TM_LZ",
       "name" : "LT_SRC_STUDY_METADATA_AD_HOC"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "TM_LZ",
-      "name" : "LT_SRC_STUDY_METADATA_ORIG"
     },
     "parents" : [ ]
   }, {
@@ -379,13 +372,6 @@
       "type" : "TABLE",
       "owner" : "TM_LZ",
       "name" : "LZ_SRC_SAMPLE_CATEGORIES"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "TM_LZ",
-      "name" : "LZ_SRC_SAMPLE_CATEGORIES_BKUP"
     },
     "parents" : [ ]
   }, {
@@ -584,9 +570,9 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "TM_LZ",
-      "name" : "LT_RNASEQ_ANNOTATION"
+      "name" : "LT_RNA_ANNOTATION"
     },
-    "file" : "tm_lz/lt_rnaseq_annotation.sql"
+    "file" : "tm_lz/lt_rna_annotation.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -815,16 +801,16 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "TM_LZ",
-      "name" : "LT_SRC_RNA_SEQ_DATA"
+      "name" : "LT_SRC_RNA_DATA"
     },
-    "file" : "tm_lz/lt_src_rna_seq_data.sql"
+    "file" : "tm_lz/lt_src_rna_data.sql"
   }, {
     "item" : {
       "type" : "TABLE",
       "owner" : "TM_LZ",
-      "name" : "LT_SRC_RNA_SEQ_SUBJ_SAMP_MAP"
+      "name" : "LT_SRC_RNA_SUBJ_SAMP_MAP"
     },
-    "file" : "tm_lz/lt_src_rna_seq_subj_samp_map.sql"
+    "file" : "tm_lz/lt_src_rna_subj_samp_map.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -853,13 +839,6 @@
       "name" : "LT_SRC_STUDY_METADATA_AD_HOC"
     },
     "file" : "tm_lz/lt_src_study_metadata_ad_hoc.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "TM_LZ",
-      "name" : "LT_SRC_STUDY_METADATA_ORIG"
-    },
-    "file" : "tm_lz/lt_src_study_metadata_orig.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -902,13 +881,6 @@
       "name" : "LZ_SRC_SAMPLE_CATEGORIES"
     },
     "file" : "tm_lz/lz_src_sample_categories.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "TM_LZ",
-      "name" : "LZ_SRC_SAMPLE_CATEGORIES_BKUP"
-    },
-    "file" : "tm_lz/lz_src_sample_categories_bkup.sql"
   }, {
     "item" : {
       "type" : "TABLE",
