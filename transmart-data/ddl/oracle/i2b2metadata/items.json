@@ -82,7 +82,7 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "ICD9_ICD10"
+      "name" : "ICD10_ICD9"
     },
     "parents" : [ ]
   }, {
@@ -307,9 +307,9 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "ICD9_ICD10"
+      "name" : "ICD10_ICD9"
     },
-    "file" : "i2b2metadata/icd9_icd10.sql"
+    "file" : "i2b2metadata/icd10_icd9.sql"
   }, {
     "item" : {
       "type" : "VIEW",
@@ -328,6 +328,13 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_APPLIED_PATH_BIRN_IDX"
+    },
+    "file" : "i2b2metadata/birn.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_APPLIED_PATH_CUSTOM_IDX"
     },
     "file" : "i2b2metadata/custom_meta.sql"
@@ -338,6 +345,13 @@
       "name" : "META_APPLIED_PATH_I2B2_IDX"
     },
     "file" : "i2b2metadata/i2b2.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_FULLNAME_BIRN_IDX"
+    },
+    "file" : "i2b2metadata/birn.sql"
   }, {
     "item" : {
       "type" : "INDEX",
