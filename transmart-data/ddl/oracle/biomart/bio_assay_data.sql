@@ -29,20 +29,15 @@ ALTER TABLE "BIOMART"."BIO_ASSAY_DATA" ADD CONSTRAINT "BIO_ASY_DT_DS_FK" FOREIGN
 --
 -- Type: TRIGGER; Owner: BIOMART; Name: TRG_BIO_ASSAY_DATA_ID
 --
-  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_ASSAY_DATA_ID" before insert on "BIO_ASSAY_DATA"    for each row begin     if inserting then       if :NEW."BIO_ASSAY_DATA_ID" is null then          select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_ASSAY_DATA_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_ASSAY_DATA_ID"
+before insert on "BIO_ASSAY_DATA"
+  for each row begin
+    if inserting then
+      if :NEW."BIO_ASSAY_DATA_ID" is null then
+        select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_ASSAY_DATA_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "BIOMART"."TRG_BIO_ASSAY_DATA_ID" ENABLE;
  

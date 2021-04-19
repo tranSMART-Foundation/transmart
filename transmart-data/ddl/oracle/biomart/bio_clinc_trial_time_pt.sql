@@ -3,8 +3,8 @@
 --
  CREATE TABLE "BIOMART"."BIO_CLINC_TRIAL_TIME_PT" 
   (	"BIO_CLINC_TRIAL_TM_PT_ID" NUMBER(18,0) NOT NULL ENABLE, 
-"TIME_POINT" NVARCHAR2(200), 
-"TIME_POINT_CODE" NVARCHAR2(200), 
+"TIME_POINT" VARCHAR2(200), 
+"TIME_POINT_CODE" VARCHAR2(200), 
 "START_DATE" DATE, 
 "END_DATE" DATE, 
 "BIO_EXPERIMENT_ID" NUMBER(18,0) NOT NULL ENABLE, 
@@ -17,20 +17,15 @@
 --
 -- Type: TRIGGER; Owner: BIOMART; Name: TRG_BIO_CL_TRL_TIME_PT_ID
 --
-  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_CL_TRL_TIME_PT_ID" before insert on "BIO_CLINC_TRIAL_TIME_PT"    for each row begin     if inserting then       if :NEW."BIO_CLINC_TRIAL_TM_PT_ID" is null then          select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_CLINC_TRIAL_TM_PT_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_CL_TRL_TIME_PT_ID"
+before insert on "BIO_CLINC_TRIAL_TIME_PT"
+  for each row begin
+    if inserting then
+      if :NEW."BIO_CLINC_TRIAL_TM_PT_ID" is null then
+        select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_CLINC_TRIAL_TM_PT_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "BIOMART"."TRG_BIO_CL_TRL_TIME_PT_ID" ENABLE;
  

@@ -21,14 +21,15 @@ PARALLEL 3 ;
 --
 -- Type: TRIGGER; Owner: BIOMART; Name: TRG_BIO_ASSAY_F_G_ID
 --
-  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_ASSAY_F_G_ID" before insert on "BIO_ASSAY_FEATURE_GROUP"    for each row begin     if inserting then       if :NEW."BIO_ASSAY_FEATURE_GROUP_ID" is null then          select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_ASSAY_FEATURE_GROUP_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_ASSAY_F_G_ID"
+before insert on "BIO_ASSAY_FEATURE_GROUP"
+  for each row begin
+    if inserting then
+      if :NEW."BIO_ASSAY_FEATURE_GROUP_ID" is null then
+        select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_ASSAY_FEATURE_GROUP_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "BIOMART"."TRG_BIO_ASSAY_F_G_ID" ENABLE;
  

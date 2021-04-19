@@ -5,7 +5,7 @@
   (	"BIO_CURATION_DATASET_ID" NUMBER(18,0) NOT NULL ENABLE, 
 "BIO_ASY_ANALYSIS_PLTFM_ID" NUMBER(18,0), 
 "BIO_SOURCE_IMPORT_ID" NUMBER(18,0), 
-"BIO_CURATION_TYPE" NVARCHAR2(200) NOT NULL ENABLE, 
+"BIO_CURATION_TYPE" VARCHAR2(200) NOT NULL ENABLE, 
 "CREATE_DATE" DATE, 
 "CREATOR" NUMBER(18,0), 
 "BIO_CURATION_NAME" VARCHAR2(500 BYTE), 
@@ -19,19 +19,15 @@
 --
 -- Type: TRIGGER; Owner: BIOMART; Name: TRG_BIO_CURATION_DATASET_ID
 --
-  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_CURATION_DATASET_ID" before insert on "BIO_CURATION_DATASET"    for each row begin     if inserting then       if :NEW."BIO_CURATION_DATASET_ID" is null then          select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_CURATION_DATASET_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_CURATION_DATASET_ID"
+before insert on "BIO_CURATION_DATASET"
+  for each row begin
+    if inserting then
+      if :NEW."BIO_CURATION_DATASET_ID" is null then
+        select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_CURATION_DATASET_ID" from dual;
+      end if;
+    end if;
+  end;
 
 /
 ALTER TRIGGER "BIOMART"."TRG_BIO_CURATION_DATASET_ID" ENABLE;

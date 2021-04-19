@@ -4,8 +4,8 @@
  CREATE TABLE "BIOMART"."BIO_DATA_EXT_CODE" 
   (	"BIO_DATA_ID" NUMBER(18,0) NOT NULL ENABLE, 
 "CODE" VARCHAR2(500 BYTE) NOT NULL ENABLE, 
-"CODE_SOURCE" NVARCHAR2(200), 
-"CODE_TYPE" NVARCHAR2(200), 
+"CODE_SOURCE" VARCHAR2(200), 
+"CODE_TYPE" VARCHAR2(200), 
 "BIO_DATA_TYPE" VARCHAR2(100 BYTE), 
 "BIO_DATA_EXT_CODE_ID" NUMBER(18,0) NOT NULL ENABLE, 
 "ETL_ID" VARCHAR2(50 BYTE), 
@@ -39,20 +39,15 @@ PARALLEL 4 ;
 --
 -- Type: TRIGGER; Owner: BIOMART; Name: TRG_BIO_DATA_EXT_CODE_ID
 --
-  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_DATA_EXT_CODE_ID" before insert on "BIO_DATA_EXT_CODE"    for each row begin     if inserting then       if :NEW."BIO_DATA_EXT_CODE_ID" is null then          select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_DATA_EXT_CODE_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "BIOMART"."TRG_BIO_DATA_EXT_CODE_ID"
+before insert on "BIO_DATA_EXT_CODE"
+  for each row begin
+    if inserting then
+      if :NEW."BIO_DATA_EXT_CODE_ID" is null then
+        select SEQ_BIO_DATA_ID.nextval into :NEW."BIO_DATA_EXT_CODE_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "BIOMART"."TRG_BIO_DATA_EXT_CODE_ID" ENABLE;
  
