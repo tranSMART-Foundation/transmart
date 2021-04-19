@@ -33,28 +33,28 @@ AS $$
     v_sqlerrm		varchar(1000);
     errorNumber		character varying;
     errorMessage	character varying;
-    
+
 begin
 
     stepCt := 0;
     rowCt := 0;
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
     databaseName := 'tm_cz';
     procedureName := 'i2b2_load_gwas_top50';
-    
+
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(jobID IS NULL or jobID < 1) then
 	newJobFlag := 1; -- True
 	select tm_cz.czx_start_audit (procedureName, databaseName) into jobId;
     end if;
-    
+
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done');
-    
+
     begin
 	delete from biomart.bio_asy_analysis_gwas_top50
 	 where bio_assay_analysis_id = i_bio_assay_analysis_id;
@@ -71,7 +71,7 @@ begin
     end;
     stepCt := stepCt + 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete analysis from bio_asy_analysis_gwas_top50',rowCt,stepCt,'Done');
-    
+
     begin
 	insert into biomart.bio_asy_analysis_gwas_top50
 		    (bio_assay_analysis_id
@@ -96,11 +96,11 @@ begin
 		       ,gwas.log_p_value as logpvalue
 		       ,gwas.ext_data as extdata
 		       ,row_number () over (order by gwas.p_value asc, gwas.rs_id asc) as rnum
-		  from biomart.bio_assay_analysis_gwas gwas 
-			   inner join biomart.bio_assay_analysis baa 
+		  from biomart.bio_assay_analysis_gwas gwas
+			   inner join biomart.bio_assay_analysis baa
 				   on  baa.bio_assay_analysis_id = gwas.bio_assay_analysis_id
-			   inner join deapp.de_rc_snp_info info 
-				   on  gwas.rs_id = info.rs_id 
+			   inner join deapp.de_rc_snp_info info
+				   on  gwas.rs_id = info.rs_id
 				   and hg_version='19'
 		 where gwas.bio_assay_analysis_id = i_bio_assay_analysis_id) a
 	 where a.rnum <= 500;
@@ -117,12 +117,12 @@ begin
     end;
     stepCt := stepCt + 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert into bio_asy_analysis_gwas_top50',rowCt,stepCt,'Done');
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newjobflag = 1 then
 	perform tm_cz.czx_end_audit (jobID, 'SUCCESS');
     end if;
-    
+
     return 0;
 
 end;

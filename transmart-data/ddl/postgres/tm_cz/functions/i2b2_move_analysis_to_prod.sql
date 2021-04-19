@@ -31,7 +31,7 @@ Declare
 	v_sqlerrm		varchar(1000);
 	errorNumber		character varying;
 	errorMessage	character varying;
- 
+
     v_etl_id					bigint;
     v_bio_assay_analysis_id			bigint;
     v_data_type					varchar(50);
@@ -40,10 +40,10 @@ Declare
     v_GWAS_staged				integer;
     v_EQTL_staged				integer;
 	v_max_ext_flds				integer;
-    
+
 	stage_rec					record;
- 
-BEGIN    
+
+BEGIN
     jobId := i_job_id;
 
     --Set Audit Parameters
@@ -60,8 +60,8 @@ BEGIN
 		newJobFlag := 1; -- True
 		select tm_cz.czx_start_audit (procedureName, databaseName) into jobId;
 	END IF;
-        
-    stepCt := 1;    
+
+    stepCt := 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting i2b2_move_analysis_to_prod',0,stepCt,'Done');
 
 	--	delete existing data for staged analyses from bio_asy_analysis_gwas
@@ -126,7 +126,7 @@ BEGIN
 
 	v_GWAS_staged := 0;
     v_EQTL_staged := 0;
-    
+
 	for stage_rec in
 		perform baa.bio_assay_analysis_id
 			  ,lz.etl_id
@@ -142,11 +142,11 @@ BEGIN
 		  and case when i_etl_id = -1 then 1
 				   when lz.etl_id = i_etl_id then 1
 				   else 0 end = 1
-	loop   
+	loop
 
 	    select tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Loading ' || stage_rec.study_id || ' ' || stage_rec.orig_data_type || ' ' ||
                        stage_rec.analysis_name,0,stepCt,'Done');
-					   
+
 		v_bio_assay_analysis_id := stage_rec.bio_assay_analysis_id;
 		v_data_type := stage_rec.data_type;
 		v_etl_id := stage_rec.etl_id;
@@ -156,7 +156,7 @@ BEGIN
 		select max(field_idx) into v_max_ext_flds
 		from biomart.bio_asy_analysis_data_idx
 		where ext_type = stage_rec.orig_data_type;
-					   
+
         if stage_rec.data_type = 'GWAS' then
             v_GWAS_staged := 1;
 
@@ -219,19 +219,19 @@ BEGIN
             stepCt := stepCt +1;
             perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Update data_count in bio_assay_analysis',rowCt,stepCt,'Done');
 
-			v_sqlText := 'delete from biomart_stage.bio_assay_analysis_' || v_data_type || 
+			v_sqlText := 'delete from biomart_stage.bio_assay_analysis_' || v_data_type ||
 						 ' where bio_assay_analysis_id = ' || v_bio_assay_analysis_id;
 			execute v_sqlText;
 			get diagnostics rowCt := ROW_COUNT;
 			stepCt := stepCt + 1;
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete data for analysis from biomart_stage.bio_assay_analysis_' || v_data_type,rowCt,stepCt,'Done');
-           
+
 			--	load top 500 rows to bio_asy_analysis_gwas_top50
 
 			-- perform * from tm_cz.i2b2_load_gwas_top50(v_bio_assay_analysis_id,jobId);
 
         end if;
-        
+
         if stage_rec.data_type = 'EQTL' then
             v_EQTL_staged := 1;
 
@@ -279,7 +279,7 @@ BEGIN
 			end;
             stepCt := stepCt + 1;
             perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert data for analysis from biomart_stage.bio_assay_analysis_' || v_data_type,rowCt,stepCt,'Done');
-        
+
 			--	update data_count in bio_assay_analysis
 
 			begin
@@ -300,7 +300,7 @@ BEGIN
             stepCt := stepCt +1;
             perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Update data_count in bio_assay_analysis',rowCt,stepCt,'Done');
 
-			v_sqlText := 'delete from biomart_stage.bio_assay_analysis_' || v_data_type || 
+			v_sqlText := 'delete from biomart_stage.bio_assay_analysis_' || v_data_type ||
 						 ' where bio_assay_analysis_id = ' || v_bio_assay_analysis_id;
 			execute  v_sqlText;
 			get diagnostics rowCt := ROW_COUNT;
@@ -309,7 +309,7 @@ BEGIN
 
 			--	load top 500 rows to bio_asy_analysis_eqtl_top50
 
-			perform * from tm_ca.i2b2_load_eqtl_top50(v_bio_assay_analysis_id,jobId);
+			perform * from tm_cz.i2b2_load_eqtl_top50(v_bio_assay_analysis_id,jobId);
 
 		end if;
 
@@ -331,10 +331,10 @@ BEGIN
 			return -16;
 		end;
         stepCt := stepCt + 1;
-        perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Set status to PRODUCTION in tm_lz.lz_src_analysis_metadata',rowCt,stepCt,'Done');               
-        
+        perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Set status to PRODUCTION in tm_lz.lz_src_analysis_metadata',rowCt,stepCt,'Done');
+
 	end loop;
-      
+
 	--	check if no data loaded from biomart_stage, if none, terminate normally
 
 	if v_GWAS_staged = 0 and v_EQTL_staged = 0 then
@@ -342,7 +342,7 @@ BEGIN
         perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No staged data - run terminating normally',0,stepCt,'Done');
 		return 0;
 	end if;
-    
+
 	--	check if any data left in stage tables after move, usually indicates missing bio_assay_analysis record
 
 	if i_etl_id = -1 then
@@ -355,14 +355,14 @@ BEGIN
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'**WARNING ** Data remains in staging tables',0,stepCt,'Done');
 		end if;
 	end if;
-    
+
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End i2b2_move_analysis_to_prod',0,stepCt,'Done');
     stepCt := stepCt + 1;
-    
+
     perform tm_cz.czx_end_audit(jobId, 'Success');
 	return 0;
-    
-    
+
+
 END;
 $$;
 

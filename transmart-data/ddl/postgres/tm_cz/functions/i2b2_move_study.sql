@@ -72,7 +72,7 @@ begin
 
     select length(oldPath)-length(replace(oldPath,'\','')) into oldLevel;
     select length(newPath)-length(replace(newPath,'\','')) into newLevel;
-    select ltrim(substr(newPath, 1,instr(newPath, '\',-1,2))) into newParent;
+    select ltrim(substr(newPath, 1,tm_cz.instr(newPath, '\',-1,2))) into newParent;
 
     if newLevel < 3 then
 	stepCt := stepCt + 1;
@@ -101,8 +101,8 @@ begin
      where c_name = root_node;
 
     if old_path != ''  or old_path != '%' or new_path != ''  or new_path != '%'
-    then 
-	
+    then
+
 	--CONCEPT DIMENSION
 	select count(*) into rowCt from i2b2demodata.concept_dimension
 	where sourcesystem_cd = 'GSE34466';
@@ -189,10 +189,10 @@ begin
 
 
 	-- No other concept_counts update needed for the study node
-				     
+
 	--	fill in any upper levels
 
-	select i2b2_fill_in_tree(null, newPath, jobID) into rtnCd;
+	select tm_cz.i2b2_fill_in_tree(null, newPath, jobID) into rtnCd;
 	if(rtnCd <> 1) then
 	    tText := 'Failed to fill in tree '|| newPath;
 	    stepCt := stepCt + 1;

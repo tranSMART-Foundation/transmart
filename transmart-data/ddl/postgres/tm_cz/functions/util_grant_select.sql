@@ -21,7 +21,7 @@ AS $$
 
     v_user      text2(2000) := SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA');
 
-    
+
 begin
 
     raise notice '%%%%', 'Owner ' ,  v_user  ,  '   Grantee ' ,  username;

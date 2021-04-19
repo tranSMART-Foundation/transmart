@@ -7,7 +7,7 @@ AS $$
     declare
 
     l_number numeric;
-    
+
 begin
     l_number := p_string;
     return l_number;

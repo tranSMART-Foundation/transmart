@@ -9,7 +9,7 @@ AS $$
     temp integer:=0;
     drp_stmt varchar(200):=null;
 
-    
+
 BEGIN
     select count(*) into
         temp

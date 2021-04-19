@@ -35,7 +35,7 @@ begin
 
     --set start and end for first token
     start_pos := 1;
-    end_pos   := instr(string_tokens,',',1,1);
+    end_pos   := tm_cz.instr(string_tokens,',',1,1);
     counter := 1;
 
     loop
@@ -54,7 +54,7 @@ begin
 	    start_pos := end_pos + 1;
 	    --increment counter
 	    counter := counter + 1;
-	end_pos := instr(string_tokens, ',',1, counter);
+	end_pos := tm_cz.instr(string_tokens, ',',1, counter);
 
 	end if;
     end loop;

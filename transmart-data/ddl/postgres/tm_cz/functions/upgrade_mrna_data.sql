@@ -9,7 +9,7 @@ AS $$
     -- Attention: Rewrite needed for partitions underneath by name new_nn
     -- Oracle procedure
     -- Also to cater for postgres10+ partitioning
-    
+
     --Audit variables
     newJobFlag 	numeric(1);
     databaseName 	varchar(100);
@@ -17,30 +17,30 @@ AS $$
     jobID 		integer;
     stepCt 		integer;
     rowCt           integer;
-    
+
     gexStudy	varchar(200);
     gexSource	varchar(200);
     pExists		integer;
     tText		varchar(2000);
-    
+
     gexCt integer;
     gexSize integer;
     gex_study_array deapp.de_subject_sample_mapping[] = array(
 	select row (trial_name, source_cd)
 	  from (select distinct trial_name
 				,coalesce(source_cd,'STD') as source_cd
-		  from de_subject_sample_mapping
+		  from deapp.de_subject_sample_mapping
 		 where platform = 'MRNA_AFFYMETRIX'
 		 order by trial_name
 		  	  ,source_cd) AS dssm);
-    
+
     -- JEA@20120602	New
 
 
 begin
     gexSize = array_length(gex_study_array,1);
     stepCt := 0;
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -54,37 +54,37 @@ begin
 	newJobFlag := 1; -- True
 	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start upgrade_mrna_data',0,stepCt,'Done');
     commit;
-    
-    --	get trial_names for all gex data
-    
 
-    
+    --	get trial_names for all gex data
+
+
+
     stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Bulk Collect trial_names',rowCt,stepCt,'Done');
     gexCt := 0;
     for i in 0 .. (gexSize - 1) loop
 	gexStudy := gex_study_array[i].trial_name;
 	gexSource := gex_study_array[i].source_cd;
-	
+
 	--	check if new table is partitioned and if partition exists
-	
+
 	select count(*) into pExists
 	  from pg_tables
 	 where tablename = 'de_subject_microarray_data_new'
 	   and partitioned = 'YES';
-	
+
 	if pExists > 0 then
 	    select count(*) into pExists
 	    from all_tab_partitions
 	    where tablename = 'de_subject_microarray_data_new'
 	    and partition_name = gexStudy || ':' || gexSource;
-	    
+
 	    if pExists = 0 then
-		tText := 'alter table deapp.de_subject_microarray_data_new add PARTITION "' || gexStudy || ':' || gexSource || 
+		tText := 'alter table deapp.de_subject_microarray_data_new add PARTITION "' || gexStudy || ':' || gexSource ||
 		    '"  VALUES (' || '''' || gexStudy || ':' || gexSource || '''' || ') ' ||
 		    'NOLOGGING COMPRESS TABLESPACE "TRANSMART" ';
 		execute(tText);
@@ -92,7 +92,7 @@ begin
 		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Added ' || gexStudy || ':' || gexSource || ' partition to de_subject_microarray_data_new',0,stepCt,'Done');
 	    end if;
 	end if;
-	
+
 	insert into deapp.de_subject_microarray_data_new
 		    (trial_source
 		    ,trial_name
@@ -111,24 +111,24 @@ begin
 	       ,sd.raw_intensity
 	       ,sd.log_intensity
 	       ,sd.zscore
-	  from de_subject_sample_mapping sm
-	       ,de_subject_microarray_data sd
+	  from deapp.de_subject_sample_mapping sm
+	       ,deapp.de_subject_microarray_data sd
 	 where sm.trial_name = gexStudy
 	   and sm.source_cd = gexSource
 	   and sm.platform = 'MRNA_AFFYMETRIX'
 	   and sm.assay_id = sd.assay_id;
-	
+
 	stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted ' || gexStudy || ':' || gexSource || ' to new table',rowCt,stepCt,'Done');
-	
+
     end loop;
-    
+
     --	drop indexes on de_subject_microarray_data
-    
-    perform i2b2_mrna_index_maint('DROP',null,jobId);
-    
+
+    perform tm_cz.i2b2_mrna_index_maint('DROP',null,jobId);
+
     --	rename existing de_subject_microarray_data to _old
-    
+
     alter table deapp.de_subject_microarray_data rename to de_subject_microarray_data_old;
 
     stepCt := stepCt + 1;
@@ -143,7 +143,7 @@ begin
 
     --	add indexes to de_subject_microarray_data
 
-    perform i2b2_mrna_index_maint('ADD',null,jobId);
+    perform tm_cz.i2b2_mrna_index_maint('ADD',null,jobId);
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_audit',0,stepCt,'Done');
@@ -161,9 +161,9 @@ exception
 	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
     --End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	
+
 end;
 
- 
+
 $$;
 

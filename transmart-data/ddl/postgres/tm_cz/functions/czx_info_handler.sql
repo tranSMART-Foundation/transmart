@@ -27,9 +27,9 @@ AS $$
 begin
 
     select database_name into databasename
-      from tm_cz.cz_job_master 
+      from tm_cz.cz_job_master
      where job_id = jobid;
-    
+
     perform tm_cz.czx_write_audit(jobid, databaseName, messageProcedure, 'Step contains more details', 0, stepNumber, 'Information' );
 
     perform tm_cz.czx_write_info(jobid, messageID, messageLine, messageProcedure, infoMessage );

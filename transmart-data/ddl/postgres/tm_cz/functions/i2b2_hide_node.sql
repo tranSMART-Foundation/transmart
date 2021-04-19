@@ -49,8 +49,8 @@ begin
 	newJobFlag := 1; -- True
 	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
-    
-    if path = ''  or path = '%' or path_name = '' then 
+
+    if path = ''  or path = '%' or path_name = '' then
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path or Path name missing, no action taken',0,stepCt,'Done');
 	return 1;
 	end if;
@@ -68,12 +68,12 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-	    get diagnostics rowCt := ROW_COUNT;	
+	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Nodes hidden in i2b2metadata.i2b2',rowCt,stepCt,'Done');
 
-    
+
     begin
 	delete from i2b2demodata.concept_counts
 	 where concept_path like path || '%' escape '`';
@@ -86,17 +86,17 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-	    get diagnostics rowCt := ROW_COUNT;	
+	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted hidden nodes from i2b2demodata.concept_counts',rowCt,stepCt,'Done');
 
     --	reload i2b2_secure for hidden nodes
-    
+
     select tm_cz.load_security_data(jobId) into rtnCd;
-    
+
     return rtnCd;
-    
+
 end;
 
 $$;

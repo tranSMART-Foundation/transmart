@@ -21,7 +21,7 @@ AS $$
      * See the License for the specific language governing permissions and
      * limitations under the License.
      ******************************************************************/
-    
+
     --Audit variables
     newJobFlag integer;
     databaseName varchar(100);
@@ -34,7 +34,7 @@ AS $$
     rtnCd integer;
 
 begin
-    
+
     rtnCd := 1;
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -54,8 +54,8 @@ begin
     stepCt := 0;
 
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_rename_node',0,stepCt,'Done'); 
-    
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_rename_node',0,stepCt,'Done');
+
     if old_node != ''  and old_node != '%' and new_node != ''  and new_node != '%' then
 
 	--  Update concept_counts paths
@@ -80,7 +80,7 @@ begin
 		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
-		
+
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_counts with new path',rowCt,stepCt,'Done');
 
@@ -103,9 +103,9 @@ begin
 		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
-			
+
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2_tags with new path',rowCt,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2_tags with new path',rowCt,stepCt,'Done');
 
 	--Update specific name
 	--update concept_dimension
@@ -132,7 +132,7 @@ begin
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',rowCt,stepCt,'Done'); 
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_dimension with new path',rowCt,stepCt,'Done');
 
 	--Update all paths, added updates to c_dimcode and c_tooltip instead of separate pass
 	begin
@@ -155,9 +155,9 @@ begin
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',rowCt,stepCt,'Done'); 
-					
-	select i2b2_load_security_data(jobID) into rtnCd;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',rowCt,stepCt,'Done');
+
+	select tm_cz.i2b2_load_security_data(jobID) into rtnCd;
 
 	return rtnCd;
 

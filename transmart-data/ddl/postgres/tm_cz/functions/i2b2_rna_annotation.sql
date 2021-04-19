@@ -73,7 +73,7 @@ begin
 	     select distinct b.transcript_id
 	       from deapp.de_rna_annotation b
 	      where b.gpl_id = platformId);
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -110,7 +110,7 @@ begin
 	     where a.gpl_id = platformId
 		   and a.gene_id is null
 		   and a.gene_symbol is not null;
-	    get diagnostics rowCt := ROW_COUNT;	
+	    get diagnostics rowCt := ROW_COUNT;
         exception
 	    when others then
 		errorNumber := SQLSTATE;

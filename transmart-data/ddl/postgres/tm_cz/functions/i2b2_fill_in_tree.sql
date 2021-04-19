@@ -21,7 +21,7 @@ AS $$
      ******************************************************************/
 
     declare
-    
+
     --Audit variables
     newJobFlag		integer;
     databaseName 	VARCHAR(100);
@@ -31,7 +31,7 @@ AS $$
     rowCt			numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
-    
+
     TrialID varchar(100);
     auditText varchar(4000);
     root_node varchar(1000);
@@ -42,13 +42,13 @@ AS $$
     --Get the nodes
     cNodes cursor for
 		      --Trimming off the last node as it would never need to be added.
-		      select distinct substr(c_fullname, 1,instr(c_fullname,'\',-2,1)) as c_fullname
-		      from i2b2metadata.i2b2 
+		      select distinct substr(c_fullname, 1,tm_cz.instr(c_fullname,'\',-2,1)) as c_fullname
+		      from i2b2metadata.i2b2
 		      where c_fullname like path || '%' escape '`';
 
 begin
     TrialID := upper(trial_id);
-    
+
     stepCt := 0;
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -63,7 +63,7 @@ begin
 	newJobFlag := 1; -- True
 	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
-    
+
     --start node with the first slash
 
     --Iterate through each node
@@ -71,15 +71,15 @@ begin
 	root_node := '\';
 	--Determine how many nodes there are
 	--Iterate through, Start with 2 as one will be null from the parser
-	
+
 	for loop_counter in 2 .. (length(r_cNodes.c_fullname) - coalesce(length(replace(r_cNodes.c_fullname, '\','')),0)) / length('\')
 	    loop
 	    --Determine Node:
 	    node_name := tm_cz.parse_nth_value(r_cNodes.c_fullname, loop_counter, '\');
 	    root_node :=  root_node || node_name || '\';
-	    
+
             --Check if node exists. If it does not, add it.
-            select count(*) into v_count 
+            select count(*) into v_count
               from i2b2metadata.i2b2
              where c_fullname = root_node;
 
@@ -104,12 +104,12 @@ begin
 	root_node := '';
 	node_name := '';
     end loop;
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
-    
+
     return 1;
 
 exception
@@ -122,7 +122,7 @@ exception
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
 
-	
+
 end;
 
 $$;

@@ -10,7 +10,7 @@ AS $$
 
 begin
     num := 0;
-    while instr(input_str, search_str, 1, num + 1) > 0 loop
+    while tm_cz.instr(input_str, search_str, 1, num + 1) > 0 loop
 	num := num + 1;
     end loop;
 

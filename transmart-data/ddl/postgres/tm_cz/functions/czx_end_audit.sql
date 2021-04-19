@@ -1,7 +1,7 @@
 --
 -- Name: czx_end_audit(numeric, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION czx_end_audit(jobid numeric, jobstatus character varying) RETURNS numeric
+CREATE FUNCTION tm_cz.czx_end_audit(jobid numeric, jobstatus character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -25,26 +25,26 @@ AS $$
     endDate timestamp;
 
 begin
-    
+
     select clock_timestamp() into endDate;
-    
+
     begin
 	update tm_cz.cz_job_master
-	   set 
+	   set
 	       active='N',
 	       end_date = endDate,
-	       time_elapsed_secs = coalesce(((date_part('day', endDate - START_DATE) * 24 + 
+	       time_elapsed_secs = coalesce(((date_part('day', endDate - START_DATE) * 24 +
 					      date_part('hour', endDate - START_DATE)) * 60 +
 					      date_part('minute', endDate - START_DATE)) * 60 +
 					      date_part('second', endDate - START_DATE),0),
-	       job_status = jobStatus		
-	 where active='Y' 
+	       job_status = jobStatus
+	 where active='Y'
 	       and job_id=jobID;
     end;
-    
+
     return 1;
-    
-exception 
+
+exception
     when others then
     --raise notice 'proc failed state=%  errm=%', SQLSTATE, SQLERRM;
 	perform tm_cz.cz_write_error(jobId,SQLSTATE,SQLERRM,null,null);

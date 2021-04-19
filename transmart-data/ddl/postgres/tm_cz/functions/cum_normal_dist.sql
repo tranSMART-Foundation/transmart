@@ -22,7 +22,7 @@ AS $$
      ******************************************************************/
 
     -------------------------------------------------------------------------------
-    -- param foldChg: fold change ratio from from analysis_data table
+    -- param foldChg: fold change ratio from analysis_data table
     -- param mu: mean of all analsyis_data records for a given analysis
     -- param sigma: std dev of all analsyis_data records for a given analysis
     -------------------------------------------------------------------------------

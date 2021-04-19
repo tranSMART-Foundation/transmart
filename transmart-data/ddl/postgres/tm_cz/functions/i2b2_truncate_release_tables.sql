@@ -26,7 +26,7 @@ AS $$
     jobID integer;
     stepCt integer;
 
-    
+
 begin
 
     --Set Audit Parameters

@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_mrna_zscore_calc(character varying, character varying, character varying, numeric, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE OR REPLACE FUNCTION i2b2_mrna_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_mrna_zscore_calc(trial_id character varying, partition_name character varying, partition_indx character varying, partitionid numeric, run_type character varying DEFAULT 'L'::character varying, currentjobid numeric DEFAULT 0, data_type character varying DEFAULT 'R'::character varying, log_base numeric DEFAULT 2, source_cd character varying DEFAULT NULL::character varying) RETURNS numeric
     LANGUAGE plpgsql
 AS $$
     declare
@@ -62,7 +62,7 @@ begin
     sourceCd := source_cd;
 
     partitionindx := partition_indx;
-    partitionName := partition_name;	
+    partitionName := partition_name;
 
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -154,8 +154,8 @@ begin
     execute('truncate table tm_wz.wt_subject_microarray_logs');
     execute('truncate table tm_wz.wt_subject_microarray_calcs');
     execute('truncate table tm_wz.wt_subject_microarray_med');
-    
-    execute('drop index if exists tm_wz.wt_subject_mrna_logs_i1');		
+
+    execute('drop index if exists tm_wz.wt_subject_mrna_logs_i1');
     execute('drop index if exists tm_wz.wt_subject_mrna_calcs_i1');
 
     stepCt := stepCt + 1;
@@ -174,8 +174,8 @@ begin
 		,patient_id
 	    )
 	    select probeset_id
-	    ,intensity_value  
-	    ,assay_id 
+	    ,intensity_value
+	    ,assay_id
 	    ,intensity_value
 	    ,patient_id
 	from tm_wz.wt_subject_mrna_probeset
@@ -189,8 +189,8 @@ begin
 		,patient_id
 	    )
 	    select probeset_id
-		   ,intensity_value 
-		   ,assay_id 
+		   ,intensity_value
+		   ,assay_id
 		   ,round((CASE WHEN intensity_value <= 0 THEN 0
 			   ELSE ln(intensity_value)/ln(logBase::double precision) END)::numeric,5)
 		   ,patient_id
@@ -282,12 +282,12 @@ begin
 	    ,patient_id
 	)
 	select d.probeset_id
-	       ,d.intensity_value 
-	       ,d.log_intensity 
-	       ,d.assay_id  
-	       ,c.mean_intensity 
-	       ,c.stddev_intensity 
-	       ,c.median_intensity 
+	       ,d.intensity_value
+	       ,d.log_intensity
+	       ,d.assay_id
+	       ,c.mean_intensity
+	       ,c.stddev_intensity
+	       ,c.median_intensity
 	       ,CASE WHEN stddev_intensity=0 THEN 0 ELSE (log_intensity - median_intensity ) / stddev_intensity END
 	       ,d.patient_id
 	  from tm_wz.wt_subject_microarray_logs d
@@ -378,7 +378,7 @@ exception
     --End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -166;
-	
+
 end;
 
 $$;

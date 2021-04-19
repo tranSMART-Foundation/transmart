@@ -24,7 +24,7 @@ AS $$
 
     --	alias for parameters
     currentJobID alias for $1;
-    
+
     pexists			INTEGER;
     subjCt			INTEGER;
     bslash			char(1);
@@ -59,7 +59,7 @@ begin
 
     stepCt := stepCt + 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done');
-    
+
     select count(*) into pExists
       from (select t.platform, bcr.location
 	      from tm_lz.lt_src_mrna_subj_samp_map t
@@ -69,21 +69,21 @@ begin
 	       and not exists
 		   (select 1 from deapp.de_gpl_info g
 		     where t.platform = g.platform)) as samp;
-    
+
     if pExists > 0 then
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'At least one platform in lt_src_mrna_subj_samp_map does not exist in bio_content_repository',0,stepCt,'Done');
 	return 16;
     end if;
-    
+
     --	check to make sure subject map to patient_dimension
-    
+
     select count(*) into subjCt
       from tm_lz.lt_src_mrna_subj_samp_map t
      where not exists
 	   (select 1 from deapp.de_gpl_info g
 	     where t.platform = g.platform);
-    
+
     select count(*) into pExists
       from tm_lz.lt_src_mrna_subj_samp_map t
 	   ,i2b2demodata.patient_dimension pd
@@ -94,7 +94,7 @@ begin
 	     where t.platform = g.platform);
     stepCt := stepCt + 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Check patient mapping',SQL%ROWCOUNT,stepCt,'Done');
-    
+
     if pExists < subjCt then
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'One or more subject in subject_sample map file are not mapped to patients',0,stepCt,'Done');
@@ -102,7 +102,7 @@ begin
     end if;
 
     --	insert additional data into bio_content
-    
+
     insert into biomart.bio_content
 		(file_name			-- filename value in sample_cd without extension
 		,repository_id		-- bio_content_repo_id
@@ -116,7 +116,7 @@ begin
 		,cel_location		-- url for site, example http://157.206.120.144:7070/CEL/BSI201_20070102/
 		,cel_file_suffix	-- filename extension (everything to right of first .)
 		)
-    select distinct substr(t.sample_cd,1,instr(t.sample_cd,'.')-1) as file_name
+    select distinct substr(t.sample_cd,1,tm_cz.instr(t.sample_cd,'.')-1) as file_name
 		    ,bc.bio_content_repo_id
 		    ,t.trial_name as location
 		    ,null as title
@@ -126,21 +126,21 @@ begin
 		    ,t.trial_name as etl_id_c
 		    ,t.trial_name as study_name
 		    ,bc.location || '/' || t.trial_name || '/' as cel_location
-		    ,substr(t.sample_cd,instr(t.sample_cd,'.')) as cel_file_suffix
+		    ,substr(t.sample_cd,tm_cz.instr(t.sample_cd,'.')) as cel_file_suffix
       from tm_lz.lt_src_mrna_subj_samp_map t
 	   ,biomart.bio_content_repository bc
      where upper(bc.repository_type) = upper(t.platform)
 	--and t.platform not in (select distinct x.platform from de_gpl_info x)
        and not exists
 	   (select 1 from biomart.bio_content x
-	     where substr(t.sample_cd,1,instr(t.sample_cd,'.')-1) = x.file_name
+	     where substr(t.sample_cd,1,tm_cz.instr(t.sample_cd,'.')-1) = x.file_name
 	       and bc.bio_content_repo_id = x.repository_id
 	       and t.trial_name = x.location
 	       and bc.location || '/' || t.trial_name = x.cel_location
-	       and substr(t.sample_cd,instr(t.sample_cd,'.')) = x.cel_file_suffix);
+	       and substr(t.sample_cd,tm_cz.instr(t.sample_cd,'.')) = x.cel_file_suffix);
     stepCt := stepCt + 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add additional data links to bio_content',SQL%ROWCOUNT,stepCt,'Done');
-    
+
     --	insert into bio_experiment if needed
 
     insert into biomart.bio_experiment
@@ -153,17 +153,17 @@ begin
 		    ,'METADATA:' || t.trial_name
 		    ,t.trial_name
       from tm_lz.lt_src_mrna_subj_samp_map t
-     where not exists 
+     where not exists
 	   (select 1 from biomart.bio_experiment x
 	     where t.trial_name = x.accession);
     stepCt := stepCt + 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added trial to bio_experiment if needed',SQL%ROWCOUNT,stepCt,'Done');
 
     --	insert into bio_content_reference
-    
+
     insert into biomart.bio_content_reference
 		(bio_content_id
-		,bio_data_id	
+		,bio_data_id
 		,content_reference_type
 		,etl_id
 		,etl_id_c
@@ -211,7 +211,7 @@ begin
 		    ,null as gpl_id
 		    ,null as rbm_panel
 		    ,null as sample_id
-		    ,substr(t.sample_cd,1,instr(t.sample_cd,'.')-1) as sample_cd
+		    ,substr(t.sample_cd,1,tm_cz.instr(t.sample_cd,'.')-1) as sample_cd
 		    ,null as category_cd
 		    ,'ADDL' as source_cd
 		    ,t.trial_name as omic_source_study
@@ -229,14 +229,14 @@ begin
 
     stepCt := stepCt + 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done');
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 THEN
 	perform tm_cz.czx_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 0;
-    
+
 exception
     when others then
 	v_sqlerrm := substr(SQLERRM,1,1000);

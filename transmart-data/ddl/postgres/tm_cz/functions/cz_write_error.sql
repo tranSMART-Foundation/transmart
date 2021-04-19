@@ -44,10 +44,10 @@ begin
 	    ,errorMessage
 	    ,errorStack
 	    ,errorBackTrace
-	    ,max(seq_id) 
-	  from tm_cz.cz_job_audit 
+	    ,max(seq_id)
+	  from tm_cz.cz_job_audit
 	 where job_id = jobId;
-	
+
         if (coalesce(debugValue,'no')) then
             if(coalesce(errorBacktrace,'') <> '') then
 		errorBacktrace := 'backtrace: "' || errorBacktrace || '"';
@@ -55,18 +55,18 @@ begin
 	    if(coalesce(errorStack,'') <> '') then
 		errorStack := 'stack: "' || errorStack || '"';
 	    end if;
-	    raise NOTICE 'CZ_WRITE_ERROR job:% error:% "%" % %',
+	    raise notice 'CZ_WRITE_ERROR job:% error:% "%" % %',
 	        jobId, errorNumber, errorMessage, errorStack, errorBacktrace;
         end if;
 
     end;
-    
+
     return 1;
-    
-exception 
+
+exception
     when others then
 	raise notice 'cz_write_error failed state=%  errm=%', SQLSTATE, SQLERRM;
-	return -16; 
+	return -16;
 
 end;
 $$;

@@ -22,7 +22,7 @@ AS $$
      ******************************************************************/
 
     declare
- 
+
     pExists		integer;
     sqlTxt		character varying;
     msgTxt		character varying;
@@ -45,14 +45,14 @@ AS $$
 begin
 
     stepCt := 0;
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobId := currentjobId;
 
     databaseName := 'tm_cz';
     procedureName := 'i2b2_backout_trial';
-    
+
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
     if(jobId IS NULL or jobId < 1) then
@@ -83,7 +83,7 @@ begin
     rowCt := 0;
     stepCt := stepCt + 1;
     if (path_string is not null AND length(path_string) > 0) then
-	auditMessage := 'The use of the path_string argument for this stored procedure (i2b2_backout_trial) is deprecated';
+	auditMessage := 'The use of the path_string argument for this stored procedure (tm_cz.i2b2_backout_trial) is deprecated';
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
     end if;
 
@@ -199,7 +199,7 @@ begin
 
     -- delete patient data
     -- ===================
-    
+
     begin
 	delete from i2b2demodata.patient_dimension
 	 where sourcesystem_cd like trialid || ':%';
@@ -282,7 +282,7 @@ begin
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete expression data for trial from DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
 
     end if;
-    
+
     --	delete acgh data
     --  ================
 
@@ -640,7 +640,7 @@ begin
     end if;
 
     return 1;
-    
+
 exception
     when others then
 	errorNumber := SQLSTATE;

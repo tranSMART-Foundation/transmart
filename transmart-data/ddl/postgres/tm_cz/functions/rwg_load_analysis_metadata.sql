@@ -78,13 +78,13 @@ BEGIN
 	 * TM_LZ.Rwg_Analysis at time of creation. A check is done, and if the IDs
 	 * match, then this step is bypassed
 	 */
-  
-  
+
+
 	-- get the count of the incoming analysis data
 	BEGIN
 	SELECT count(*)
-	INTO analysisCount 
-	FROM TM_LZ.Rwg_Analysis
+	INTO analysisCount
+	FROM tm_lz.rwg_analysis
 	WHERE study_id =  Upper(trialID);
 
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
@@ -106,8 +106,8 @@ BEGIN
 		COUNT ( * )
 		INTO resultCount
 	FROM
-		TM_LZ.Rwg_Analysis analysis,
-		Biomart.Bio_Assay_Analysis Baa
+		tm_lz.rwg_analysis analysis,
+		biomart.bio_assay_analysis baa
 	WHERE
 		analysis.bio_assay_analysis_id = baa.bio_assay_analysis_id --bio_assay_analysis_id in 'TM_LZ.Rwg_Analysis analysis' should already exist
 		AND UPPER ( analysis.study_id ) = UPPER ( trialID );
@@ -125,7 +125,7 @@ BEGIN
 		RETURN;
 	END;
 
-	IF analysisCount != resultCount THEN  
+	IF analysisCount != resultCount THEN
 	  RAISE 'Analysis count mismatch' USING ERRCODE = 'AA001';
 	END IF;
 
@@ -229,10 +229,10 @@ BEGIN
 		Long_Desc,
 		now()
 	FROM
-		TM_LZ.Rwg_Cohorts
+		tm_lz.rwg_cohorts
 	WHERE
 		UPPER ( Study_Id ) = UPPER ( trialID );
-	
+
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'Insert into Biomart.Bio_Assay_Cohort', rowCt, stepCt, 'Done');
@@ -249,7 +249,7 @@ BEGIN
 
 	SELECT coalesce(Max(Length(Regexp_Replace(analysis.Cohorts,'[^;]','g'))),0)+1
 	INTO dcount
-	FROM TM_LZ.Rwg_Analysis analysis;
+	FROM tm_lz.rwg_analysis analysis;
 
 	FOR lcount IN 1 .. dcount
 		LOOP
@@ -265,13 +265,13 @@ BEGIN
 		SELECT
 			upper(analysis.Study_Id),
 			analysis.Cohorts,
-			trim(Parse_Nth_Value(analysis.Cohorts,lcount,';')) AS cohort,
+			trim(tm_cz.parse_nth_value(analysis.Cohorts,lcount,';')) AS cohort,
 			baa.bio_assay_analysis_id
-		FROM TM_LZ.Rwg_Analysis analysis, Biomart.Bio_Assay_Analysis Baa
+		FROM tm_lz.rwg_analysis analysis, biomart.bio_assay_analysis baa
 		WHERE analysis.bio_assay_analysis_id= Baa.bio_assay_analysis_id
 			AND Upper(Baa.Etl_Id) LIKE '%' || Upper(Trialid) || '%'
 			AND Upper(analysis.Study_Id) LIKE '%' || Upper(Trialid) || '%'
-			AND Trim(Parse_Nth_Value(analysis.Cohorts,lcount,';')) IS NOT NULL;
+			AND Trim(tm_cz.parse_nth_value(analysis.Cohorts,lcount,';')) IS NOT NULL;
 
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
@@ -339,12 +339,12 @@ BEGIN
 		upper(Cohort.Study_Id),
 		upper('sample_type'),
 		cohort.sample_type
-	FROM TM_LZ.Rwg_Cohorts Cohort
+	FROM tm_lz.rwg_cohorts cohort
 	WHERE upper(Cohort.Study_Id)=upper(trialID)
-		AND NOT EXISTS 
+		AND NOT EXISTS
 			(SELECT Upper(Tax.Term_Name) FROM Searchapp.Search_Taxonomy Tax
 			 WHERE Upper(Cohort.sample_type) = Upper(Tax.Term_Name));
-	
+
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'sample_type: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
@@ -369,15 +369,15 @@ BEGIN
 	SELECT DISTINCT
 		upper(Cohort.Study_Id),
 		Xref.Bio_Assay_Analysis_Id,
-		Tax.Term_Id, Upper('sample_type:' || Cohort.sample_type) 
+		Tax.Term_Id, Upper('sample_type:' || Cohort.sample_type)
 	FROM
-		TM_LZ.Rwg_Cohorts Cohort,
-		Biomart.Bio_Analysis_Cohort_Xref Xref,
-		Searchapp.Search_Taxonomy Tax
+		tm_lz.rwg_cohorts cohort,
+		biomart.bio_analysis_cohort_xref xref,
+		searchapp.search_taxonomy tax
 	WHERE upper(Cohort.Cohort_Id) = upper(Xref.Cohort_Id)
 		AND upper(Xref.Study_Id) = upper(Cohort.Study_Id)
 		AND Upper(Cohort.Sample_Type) = Upper(Tax.Term_Name)
-		AND Cohort.Study_Id =upper(trialID); 
+		AND Cohort.Study_Id =upper(trialID);
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
@@ -404,7 +404,7 @@ BEGIN
 		'disease',
 		cohort.disease
 	FROM
-		TM_LZ.Rwg_Cohorts Cohort
+		tm_lz.rwg_cohorts cohort
 	WHERE
 		UPPER ( Cohort.Study_Id )
 		= UPPER ( trialID )
@@ -443,14 +443,14 @@ BEGIN
 		Tax.Term_Id,
 		UPPER ( 'disease:' || Cohort.disease )
 	FROM
-		TM_LZ.Rwg_Cohorts Cohort,
-		Biomart.Bio_Analysis_Cohort_Xref Xref,
-		Searchapp.Search_Taxonomy Tax
+		tm_lz.rwg_cohorts cohort,
+		biomart.bio_analysis_cohort_xref xref,
+		searchapp.search_taxonomy tax
 	WHERE
 		UPPER ( Cohort.Cohort_Id ) = UPPER ( Xref.Cohort_Id )
 		AND UPPER ( Xref.Study_Id ) = UPPER ( Cohort.Study_Id )
 		AND UPPER ( Cohort.Disease ) = UPPER ( Tax.Term_Name )
-		AND UPPER ( cohort.study_id ) = UPPER ( trialID ); 
+		AND UPPER ( cohort.study_id ) = UPPER ( trialID );
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
@@ -477,8 +477,8 @@ BEGIN
 		'pathology',
 		cohort.pathology
 	FROM
-		TM_LZ.Rwg_Cohorts Cohort
-	WHERE
+		tm_lz.rwg_cohorts cohort
+	where
 		UPPER ( Cohort.Study_Id ) = UPPER ( trialID )
 		AND NOT EXISTS (
 			SELECT
@@ -515,9 +515,9 @@ BEGIN
 		Tax.Term_Id,
 		UPPER ( 'pathology:' || Cohort.pathology )
 	FROM
-		TM_LZ.Rwg_Cohorts Cohort,
-		Biomart.Bio_Analysis_Cohort_Xref Xref,
-		Searchapp.Search_Taxonomy Tax
+		tm_lz.rwg_cohorts cohort,
+		biomart.bio_analysis_cohort_xref xref,
+		searchapp.search_taxonomy tax
 	WHERE
 		UPPER ( Cohort.Cohort_Id ) = UPPER ( Xref.Cohort_Id )
 		AND UPPER ( Xref.Study_Id ) = UPPER ( Cohort.Study_Id )
@@ -541,10 +541,10 @@ BEGIN
 	-- LOOP FOR TREATMENT
 	SELECT coalesce(Max(Length(Regexp_Replace(Cohort.Treatment,'[^;]', 'g'))),0)+1
 	INTO Dcount
-	FROM TM_LZ.Rwg_Cohorts Cohort
+	FROM tm_lz.rwg_cohorts cohort
 	WHERE upper(Cohort.Study_Id)=upper(trialID);
 	FOR lcount IN 1 .. dcount
-		LOOP	
+		LOOP
 		stepCt := stepCt + 1;
 		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting COHORT TREATMENT LOOP, pass: ',lcount,stepCt,'Done');
 
@@ -557,9 +557,9 @@ BEGIN
 		SELECT
 			DISTINCT UPPER ( Cohort.Study_Id ) ,
 			'treatment',
-			TRIM ( Parse_Nth_Value ( cohort.treatment, lcount, ';' ) )
+			TRIM ( tm_cz.parse_nth_value ( cohort.treatment, lcount, ';' ) )
 		FROM
-			TM_LZ.Rwg_Cohorts Cohort
+			tm_lz.rwg_cohorts cohort
 		WHERE
 			UPPER ( Cohort.Study_Id ) = UPPER ( trialID )
 			AND NOT EXISTS (
@@ -568,9 +568,9 @@ BEGIN
 				FROM
 					Searchapp.Search_Taxonomy Tax
 				WHERE
-					UPPER ( TRIM ( Parse_Nth_Value ( cohort.treatment, lcount, ';' ) ) )
+					UPPER ( TRIM ( tm_cz.parse_nth_value ( cohort.treatment, lcount, ';' ) ) )
 					= UPPER ( Tax.Term_Name ) )
-			AND TRIM ( Parse_Nth_Value ( cohort.treatment, lcount, ';' ) ) IS NOT NULL;
+			AND TRIM ( tm_cz.parse_nth_value ( cohort.treatment, lcount, ';' ) ) IS NOT NULL;
 
 		-- treatment: insert terms into attribute table
 		INSERT INTO biomart.bio_analysis_attribute (
@@ -582,7 +582,7 @@ BEGIN
 			UPPER ( cohort.study_id ) ,
 			xref.bio_assay_analysis_id,
 			tax.term_id,
-			UPPER ( 'treatment:' || TRIM ( parse_nth_value ( cohort.treatment,
+			UPPER ( 'treatment:' || TRIM ( tm_cz.parse_nth_value ( cohort.treatment,
 						lcount,
 						';' ) ) )
 		FROM
@@ -592,7 +592,7 @@ BEGIN
 		WHERE
 			UPPER ( cohort.cohort_id ) = UPPER ( xref.cohort_id )
 			AND UPPER ( xref.study_id ) = UPPER ( cohort.study_id )
-			AND UPPER ( TRIM ( parse_nth_value ( cohort.treatment, lcount, ';' ) ) )
+			AND UPPER ( TRIM ( tm_cz.parse_nth_value ( cohort.treatment, lcount, ';' ) ) )
 				= UPPER ( tax.term_name )
 			AND UPPER ( cohort.study_id ) = UPPER ( trialid );
 
@@ -628,7 +628,7 @@ BEGIN
 		'organism',
 		Cohort.organism
 	FROM
-		TM_LZ.Rwg_Cohorts Cohort
+		tm_lz.rwg_cohorts cohort
 	WHERE
 		UPPER ( Cohort.Study_Id ) = UPPER ( trialID )
 		AND NOT EXISTS (
@@ -666,9 +666,9 @@ BEGIN
 		Tax.Term_Id,
 		UPPER ( 'organism:' || Cohort.Organism )
 	FROM
-		TM_LZ.Rwg_Cohorts Cohort,
-		Biomart.Bio_Analysis_Cohort_Xref Xref,
-		Searchapp.Search_Taxonomy Tax
+		TM_lz.rwg_cohorts cohort,
+		biomart.bio_analysis_cohort_xref xref,
+		searchapp.search_taxonomy tax
 	WHERE
 		UPPER ( Cohort.Cohort_Id ) = UPPER ( Xref.Cohort_Id )
 		AND UPPER ( Xref.Study_Id ) = UPPER ( Cohort.Study_Id )
@@ -700,7 +700,7 @@ BEGIN
 		'data_type',
 		analysis.data_type
 	FROM
-		TM_LZ.Rwg_Analysis analysis
+		tm_lz.rwg_analysis analysis
 	WHERE
 		UPPER ( analysis.Study_Id ) = UPPER ( trialID )
 		AND NOT EXISTS (
@@ -738,9 +738,9 @@ BEGIN
 		Tax.Term_Id,
 		UPPER ( 'data_type:' || analysis.Data_Type )
 	FROM
-		TM_LZ.Rwg_Analysis analysis,
-		Searchapp.Search_Taxonomy Tax,
-		Biomart.Bio_Assay_Analysis Baa
+		tm_lz.rwg_analysis analysis,
+		searchapp.search_taxonomy tax,
+		biomart.bio_assay_analysis baa
 	WHERE
 		UPPER ( analysis.Data_Type ) = UPPER ( Tax.Term_Name )
 		AND analysis.bio_assay_analysis_id = Baa.bio_assay_analysis_id
@@ -773,7 +773,7 @@ BEGIN
 		'platform',
 		analysis.platform
 	FROM
-		TM_LZ.Rwg_Analysis analysis
+		tm_lz.rwg_analysis analysis
 	WHERE
 		UPPER ( analysis.Study_Id ) = UPPER ( trialID )
 		AND NOT EXISTS (
@@ -811,9 +811,9 @@ BEGIN
 		Tax.Term_Id,
 		UPPER ( 'platform:' || analysis.Platform )
 	FROM
-		TM_LZ.Rwg_Analysis analysis,
-		Searchapp.Search_Taxonomy Tax,
-		Biomart.Bio_Assay_Analysis Baa
+		tm_lz.rwg_analysis analysis,
+		searchapp.search_taxonomy tax,
+		biomart.bio_assay_analysis baa
 	WHERE
 		UPPER ( analysis.Platform ) = UPPER ( Tax.Term_Name )
 		AND analysis.bio_assay_analysis_id = Baa.bio_assay_analysis_id
@@ -838,11 +838,11 @@ BEGIN
 	-- LOOP FOR ANALYSIS TYPE
 	SELECT coalesce(Max(Length(Regexp_Replace(analysis.Analysis_Type,'[^;]', 'g'))),0)+1
 	INTO Dcount
-	FROM TM_LZ.Rwg_Analysis analysis
+	FROM tm_lz.rwg_analysis analysis
 	WHERE upper(analysis.Study_Id)=upper(trialID);
 
 	FOR Lcount IN 1 .. Dcount
-		LOOP	 
+		LOOP
 		stepCt := stepCt + 1;
 		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting ANALYSIS_TYPE LOOP, pass: ',lcount,stepCt,'Done');
 
@@ -855,9 +855,9 @@ BEGIN
 		SELECT DISTINCT
 			UPPER ( analysis.Study_Id ),
 			'Analysis_Type',
-			TRIM ( Parse_Nth_Value ( analysis.Analysis_Type, lcount, ';' ) )
+			TRIM ( tm_cz.parse_nth_value ( analysis.Analysis_Type, lcount, ';' ) )
 		FROM
-			TM_LZ.Rwg_Analysis analysis
+			tm_lz.rwg_analysis analysis
 		WHERE
 			UPPER ( analysis.Study_Id ) = UPPER ( trialID )
 			AND NOT EXISTS (
@@ -866,9 +866,9 @@ BEGIN
 				FROM
 					Searchapp.Search_Taxonomy Tax
 				WHERE
-					UPPER ( TRIM ( Parse_Nth_Value ( analysis.Analysis_Type, Lcount, ';' ) ) )
+					UPPER ( TRIM ( tm_cz.parse_nth_value ( analysis.Analysis_Type, Lcount, ';' ) ) )
 						= UPPER ( Tax.Term_Name ) )
-			AND TRIM ( Parse_Nth_Value ( analysis.Analysis_Type, Lcount, ';' ) ) IS NOT NULL;
+			AND TRIM ( tm_cz.parse_nth_value ( analysis.Analysis_Type, Lcount, ';' ) ) IS NOT NULL;
 
 		-- Analysis_Type: insert terms into attribute table
 		INSERT INTO Biomart.Bio_Analysis_Attribute (
@@ -880,15 +880,15 @@ BEGIN
 			UPPER ( analysis.study_id ),
 			baa.bio_assay_analysis_id,
 			tax.term_id,
-			UPPER ( 'ANALYSIS_TYPE:' || TRIM ( Parse_Nth_Value ( analysis.Analysis_Type,
+			UPPER ( 'ANALYSIS_TYPE:' || TRIM ( tm_cz.parse_nth_value ( analysis.Analysis_Type,
 						lcount,
 						';' ) ) )
 		FROM
-			TM_LZ.Rwg_Analysis analysis,
-			Searchapp.Search_Taxonomy Tax,
-			Biomart.Bio_Assay_Analysis Baa
+			tm_lz.rwg_analysis analysis,
+			searchapp.search_taxonomy tax,
+			biomart.bio_assay_analysis baa
 		WHERE
-			UPPER ( TRIM ( Parse_Nth_Value ( analysis.Analysis_Type,
+			UPPER ( TRIM ( tm_cz.parse_nth_value ( analysis.Analysis_Type,
 						Lcount,
 						';' ) ) )
 				= UPPER ( Tax.Term_Name )
@@ -896,7 +896,7 @@ BEGIN
 			AND UPPER ( Baa.Etl_Id )
 				LIKE '%' || UPPER ( analysis.Study_Id ) || '%'
 			AND UPPER ( analysis.Study_Id ) = UPPER ( Trialid )
-			AND TRIM ( Parse_Nth_Value ( analysis.Analysis_Type, Lcount, ';' ) ) IS NOT NULL;
+			AND TRIM ( tm_cz.parse_nth_value ( analysis.Analysis_Type, Lcount, ';' ) ) IS NOT NULL;
 
 		GET DIAGNOSTICS rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
@@ -929,7 +929,7 @@ BEGIN
 		'search_area',
 		ext.search_area
 	FROM
-		TM_LZ.clinical_trial_metadata_ext Ext
+		tm_lz.clinical_trial_metadata_ext ext
 	WHERE
 		UPPER ( ext.Study_Id ) = UPPER ( trialID )
 		AND NOT EXISTS (
@@ -967,9 +967,9 @@ BEGIN
 		Tax.Term_Id,
 		UPPER ( 'search_area:' || Ext.search_area )
 	FROM
-		TM_LZ.Clinical_Trial_Metadata_Ext Ext,
-		Biomart.Bio_Analysis_Cohort_Xref Xref,
-		Searchapp.Search_Taxonomy Tax
+		tm_lz.clinical_trial_metadata_ext ext,
+		biomart.bio_analysis_cohort_xref xref,
+		searchapp.search_taxonomy tax
 	WHERE
 		UPPER ( Xref.Study_Id ) = UPPER ( ext.Study_Id )
 		AND UPPER ( Ext.Search_Area ) = UPPER ( Tax.Term_Name )
@@ -1000,7 +1000,7 @@ BEGIN
 		'DATA_SOURCE',
 		ext.data_source
 	FROM
-		TM_LZ.Clinical_Trial_Metadata_Ext Ext
+		tm_lz.clinical_trial_metadata_ext ext
 	WHERE
 		UPPER ( ext.Study_Id ) = UPPER ( trialID )
 		AND NOT EXISTS (
@@ -1010,7 +1010,7 @@ BEGIN
 				Searchapp.Search_Taxonomy Tax
 			WHERE
 				UPPER ( ext.data_source ) = UPPER ( Tax.Term_Name ) );
-	
+
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'data source: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
@@ -1024,7 +1024,7 @@ BEGIN
 		rtn_code := -16;
 		RETURN;
 	END;
-	
+
 	-- data source: insert terms into attribute table
 	BEGIN
 	INSERT INTO Biomart.Bio_Analysis_Attribute (
@@ -1038,9 +1038,9 @@ BEGIN
 		Tax.Term_Id,
 		UPPER ( 'DATA_SOURCE:' || Ext.data_source )
 	FROM
-		TM_LZ.Clinical_Trial_Metadata_Ext Ext,
-		Biomart.Bio_Analysis_Cohort_Xref Xref,
-		Searchapp.Search_Taxonomy Tax
+		tm_lz.clinical_trial_metadata_ext ext,
+		biomart.bio_analysis_cohort_xref xref,
+		searchapp.search_taxonomy tax
 	WHERE
 		UPPER ( Xref.Study_Id ) = UPPER ( ext.Study_Id )
 		AND UPPER ( Ext.data_source ) = UPPER ( Tax.Term_Name )
@@ -1071,7 +1071,7 @@ BEGIN
 		'study_design',
 		ext.study_design
 	FROM
-		TM_LZ.Clinical_Trial_Metadata_Ext Ext
+		tm_lz.clinical_trial_metadata_ext ext
 	WHERE
 		UPPER ( ext.Study_Id ) = UPPER ( trialID )
 		AND NOT EXISTS (
@@ -1081,7 +1081,7 @@ BEGIN
 				Searchapp.Search_Taxonomy Tax
 			WHERE
 				UPPER ( ext.experimental_design ) = UPPER ( Tax.Term_Name ) );
-	
+
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
 		'study design: register invalid terms (with no match in the taxonomy)', rowCt, stepCt, 'Done');
@@ -1109,9 +1109,9 @@ BEGIN
 		Tax.Term_Id,
 		UPPER ( 'study_design:' || Ext.experimental_design )
 	FROM
-		TM_LZ.Clinical_Trial_Metadata_Ext Ext,
-		Biomart.Bio_Analysis_Cohort_Xref Xref,
-		Searchapp.Search_Taxonomy Tax
+		tm_lz.clinical_trial_metadata_ext ext,
+		biomart.bio_analysis_cohort_xref xref,
+		searchapp.search_taxonomy tax
 	WHERE
 		UPPER ( Xref.Study_Id ) = UPPER ( ext.Study_Id )
 		AND UPPER ( ( CASE
@@ -1190,7 +1190,7 @@ BEGIN
 	END;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End FUNCTION',0,stepCt,'Done');
 
-	---Cleanup OVERALL JOB if this proc is being run standalone    
+	---Cleanup OVERALL JOB if this proc is being run standalone
 	IF newJobFlag = 1
 		THEN
 		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
@@ -1204,7 +1204,7 @@ EXCEPTION
 		perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
 		--End Proc
 		perform tm_cz.cz_end_audit (jobID, 'FAIL');
-		rtn_code := 16;		
+		rtn_code := 16;
 	WHEN OTHERS THEN
 	errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;

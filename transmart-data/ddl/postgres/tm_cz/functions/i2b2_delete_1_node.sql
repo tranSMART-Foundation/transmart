@@ -21,7 +21,7 @@ AS $$
      ******************************************************************/
 
     declare
-    
+
     --Audit variables
     newJobFlag		integer;
     databaseName 	VARCHAR(100);
@@ -41,19 +41,19 @@ begin
 	newJobFlag := 1; -- True
 	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
-    
+
     stepCt := 0;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_delete_1_node: ' || path,0,stepCt,'Done');
-    
-    if coalesce(path,'') = ''  or path = '%'  then 
+
+    if coalesce(path,'') = ''  or path = '%'  then
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path missing, no action taken',0,stepCt,'Done');
 	return 1;
     end if;
-    
+
     --i2b2
     begin
-	delete from i2b2demodata.observation_fact 
+	delete from i2b2demodata.observation_fact
 	 where concept_cd in (select c_basecode from i2b2metadata.i2b2 where c_fullname = path);
     exception
 	when others then
@@ -64,7 +64,7 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-	    get diagnostics rowCt := ROW_COUNT;	
+	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
@@ -82,11 +82,11 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-	    get diagnostics rowCt := ROW_COUNT;	
+	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from concept_dimension',rowCt,stepCt,'Done');
-    
+
     --i2b2
     begin
 	delete from i2b2metadata.i2b2
@@ -100,11 +100,11 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-	    get diagnostics rowCt := ROW_COUNT;	
+	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from i2b2',rowCt,stepCt,'Done');
-    
+
     --i2b2_secure
     begin
 	delete from i2b2metadata.i2b2_secure
@@ -118,7 +118,7 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-	    get diagnostics rowCt := ROW_COUNT;	
+	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from i2b2_secure',rowCt,stepCt,'Done');
@@ -136,14 +136,14 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-	    get diagnostics rowCt := ROW_COUNT;	
+	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from concept_counts',rowCt,stepCt,'Done');
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_delete_1_node',rowCt,stepCt,'Done');
-    
+
     return 1;
 
 end;

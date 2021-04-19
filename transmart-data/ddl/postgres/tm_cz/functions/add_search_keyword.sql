@@ -39,7 +39,7 @@ AS $$
 begin
 
     stepCt := 0;
-    
+
     --Set Audit Parameters
 
     databaseName := 'tm_cz';
@@ -67,7 +67,7 @@ begin
 	    ,keyCat
 	    ,keySrc
 	    ,keyDisplay
-	);	
+	);
 	select search_keyword_id from searchapp.search_keyword where keyword = keyWrd and unique_id = keyUid and data_category = 'SPECIES' into keyId;
 	stepCt := stepCt + 1;
 	msgTxt := 'Keyword added to search_keyword: ' || keyId;

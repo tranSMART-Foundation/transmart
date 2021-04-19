@@ -21,7 +21,7 @@ AS $$
      ******************************************************************/
 
     declare
-    
+
     --Audit variables
     newJobFlag		integer;
     databaseName 	VARCHAR(100);
@@ -37,7 +37,7 @@ begin
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
-    
+
     databaseName := 'tm_cz';
     procedureName := 'i2b2_delete_all_nodes';
 
@@ -47,12 +47,12 @@ begin
 	newJobFlag := 1; -- True
 	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
-    
-    if path != ''  and path != '%' then 
+
+    if path != ''  and path != '%' then
 	-- observation_fact
 	begin
-	    delete from i2b2demodata.observation_fact 
-	     where 
+	    delete from i2b2demodata.observation_fact
+	     where
 		 concept_cd in (select c_basecode from i2b2metadata.i2b2 where c_fullname like path || '%' escape '`');
 	    get diagnostics rowCt := ROW_COUNT;
 	exception
@@ -103,7 +103,7 @@ begin
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2METADATA i2b2',rowCt,stepCt,'Done');
-				
+
 	--i2b2_secure
 	begin
 	    delete from i2b2metadata.i2b2_secure
@@ -140,7 +140,7 @@ begin
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA concept_counts',rowCt,stepCt,'Done');
-	
+
     end if;
 
     return 1;

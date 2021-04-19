@@ -21,7 +21,7 @@ AS $$
     errorNumber		character varying;
     errorMessage	character varying;
     rowCt			numeric(18,0);
-    
+
 begin
 
     stepCt := 0;
@@ -29,7 +29,7 @@ begin
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
-    
+
     databaseName := 'tm_cz';
     procedureName := 'i2b2_load_rbm_annotation';
 
@@ -52,7 +52,7 @@ begin
     begin
 	delete from tm_cz.antigen_deapp
 	 where platform = gplId;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -62,7 +62,7 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-    end;	
+    end;
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from REFERENCE antigen_deapp',rowCt,stepCt,'Done');
@@ -72,7 +72,7 @@ begin
     begin
 	delete from tm_cz.annotation_deapp
 	 where gpl_id = gplId;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -82,7 +82,7 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-    end;	
+    end;
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from annotation_deapp',rowCt,stepCt,'Done');
@@ -92,7 +92,7 @@ begin
     begin
 	delete from deapp.de_rbm_annotation
 	 where gpl_id = gplId;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -120,7 +120,7 @@ begin
 	       (select 1 from tm_cz.antigen_deapp x
 		 where t.gpl_id = x.platform
 		   and t.antigen_name = x.antigen_name);
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -157,7 +157,7 @@ begin
 	 where d.antigen_name = p.antigen_name
 	   and d.gpl_id = p.platform
 	   and ((d.gene_id IS NOT NULL AND d.gene_id::text <> '') or (d.gene_symbol IS NOT NULL AND d.gene_symbol::text <> '')) ;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -224,7 +224,7 @@ begin
 		 where t.gene_symbol = x.bio_marker_name
 	       --and upper(x.organism) = upper(t.organism)
 		   and upper(x.bio_marker_type) = 'RBM');
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -241,7 +241,7 @@ begin
 
     --	update gene_symbol if null
     begin
-	update deapp.de_rbm_annotation t 
+	update deapp.de_rbm_annotation t
 	   set gene_symbol=(select min(b.bio_marker_name) as gene_symbol
 			      from biomart.bio_marker b
 			     where t.gene_id::varchar = b.primary_external_id
@@ -256,7 +256,7 @@ begin
 		 where t.gene_id::varchar = x.primary_external_id
 	       --and upper(x.organism) = upper(t.organism)
 		   and upper(x.bio_marker_type) = 'RBM');
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -284,7 +284,7 @@ begin
 		 where t.uniprotid = x.feature_group_name)
 	   and (t.uniprotid is NOT NULL
 		and t.uniprotid::text <> '');
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -319,12 +319,12 @@ begin
 		 or (t.gene_id is NOT NULL
 		     and t.gene_id::text <> ''))
 	   and coalesce(bgs.bio_marker_id,bgi.bio_marker_id,-1) > 0
-	   and not exists 
+	   and not exists
 	       (select 1
 		  from biomart.bio_assay_data_annotation x
 		 where fg.bio_assay_feature_group_id = x.bio_assay_feature_group_id
 		   and coalesce(bgs.bio_marker_id,bgi.bio_marker_id,-1) = x.bio_marker_id);
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;

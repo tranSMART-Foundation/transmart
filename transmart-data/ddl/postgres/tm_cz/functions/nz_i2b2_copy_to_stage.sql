@@ -23,7 +23,7 @@ AS $$
     declare
 
     --	Alias for parameters
-    
+
     trial_id  alias for $1;
     data_type alias for $2;
     currentJobID alias for $3;
@@ -46,18 +46,18 @@ AS $$
     procedureName VARCHAR(100);
     jobID numeric(18,0);
     stepCt numeric(18,0);
-    
+
     r_stage_table	record;
 
-    
+
 begin
 
     TrialID := upper(trial_id);
     dataType := upper(data_type);
-    
+
     stepCt := 0;
     tCount := 0;
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -71,10 +71,10 @@ begin
 	newJobFlag := 1; -- True
 	jobId := tm_cz.czx_start_audit (procedureName, databaseName);
     end if;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done');
-    
+
     stepCt := stepCt + 1;
     msgText := 'Extracting trial: ' || TrialId;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName, msgText,0,stepCt,'Done');
@@ -84,7 +84,7 @@ begin
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'TrialID missing',0,stepCt,'Done');
 	return 16;
     end if;
-    
+
     for r_stage_table in
 	select upper(table_owner) as table_owner
 	       ,upper(table_name) as table_name
@@ -92,7 +92,7 @@ begin
 	       ,where_clause
 	       ,upper(stage_table_name) as stage_table_name
 	  from tm_cz.migrate_tables
-	 where instr(dataType,data_type) > 0
+	 where tm_cz.instr(dataType,data_type) > 0
 	       loop
 
 	    source_table := r_stage_table.table_owner || '.' || r_stage_table.table_name;
@@ -100,15 +100,15 @@ begin
 	    stepCt := stepCt + 1;
 	    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Processing ' || source_table,0,stepCt,'Done');
 	    tCount := tCount + 1;
-	
+
 	    if r_stage_table.study_specific = 'Y' then
 		tText := 'delete from ' || release_table || ' where release_study = ' || '''' || TrialId || '''';
 		execute immediate tText;
 		rowCt := ROW_COUNT;
 		stepCt := stepCt + 1;
 		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Deleted study from ' || release_table,rowCt,stepCt,'Done');
-	    
-		tText := 'insert into ' || release_table || ' select st.*,' || '''' || TrialId || '''' || ' from ' || source_table || ' st ' || 
+
+		tText := 'insert into ' || release_table || ' select st.*,' || '''' || TrialId || '''' || ' from ' || source_table || ' st ' ||
 		    replace(r_stage_table.where_clause,'TrialId','''' || TrialId || '''');
 		execute immediate tText ;
 		rowCt := ROW_COUNT;
@@ -116,7 +116,7 @@ begin
 		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Inserted study into ' || release_table,rowCt,stepCt,'Done';
 	    else
 		tText := 'truncate table ' || release_table;
-		stepCt := stepCt + 1;		
+		stepCt := stepCt + 1;
 		execute immediate tText;
 		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Truncated '|| release_table,0,stepCt,'Done');
 		tText := 'insert into ' || release_table || ' select st.* from ' || source_table || ' st ';
@@ -125,9 +125,9 @@ begin
 		stepCt := stepCt + 1;
 		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Inserted all data into ' || release_table,rowCt,stepCt,'Done');
 	    end if;
-	
+
     end loop;
-    
+
     if tCount = 0 then
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'data_type invalid: '|| data_type,0,stepCt,'Done');
@@ -140,7 +140,7 @@ begin
     if newJobFlag = 1 then
 	perform tm_cz.czx_end_audit (jobID, 'SUCCESS');
     end if;
-    
+
     return 0;
 
 exception

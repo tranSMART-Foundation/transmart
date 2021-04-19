@@ -48,7 +48,7 @@ AS $$
 
 BEGIN
 
-    --util_make_object_list(v_whattype, v_things);
+    -- tm_cz.util_make_object_list(v_whattype, v_things);
 
     -- drop procedure(s) or function(s)
     if upper(v_whattype) like 'FUNCTION' or upper(v_whattype) like 'FUNCTION' then

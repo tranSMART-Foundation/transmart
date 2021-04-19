@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_mirna_annot_deapp(currentjobid numeri
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
-     *This stored procedure is for ETL to load QPCR MIRNA ANNOTATION 
+     *This stored procedure is for ETL to load QPCR MIRNA ANNOTATION
      * Date:10/29/2013
      ******************************************************************/
 
@@ -15,14 +15,14 @@ AS $$
     newJobFlag numeric(1);
     databaseName VARCHAR(100);
     procedureName VARCHAR(100);
-    jobID numeric(18,0); 
-    stepCt numeric(18,0); 
+    jobID numeric(18,0);
+    stepCt numeric(18,0);
     idREF	varchar(100);
     rowCt integer;
 
 begin
 
-    stepCt := 0; 
+    stepCt := 0;
 
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -90,7 +90,7 @@ begin
 	  from tm_lz.lt_qpcr_mirna_annotation t
 	 where not exists
 	       (select 1 from tm_cz.mirna_probeset_deapp x
-		 where 
+		 where
                      t.id_ref = x.probeset
                  and t.gpl_id = x.platform
 		     --and coalesce(t.organism,'Homo sapiens') = coalesce(x.organism,'Homo sapiens')
@@ -102,15 +102,15 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    
-    
-    --where id_ref is not null 
+
+
+    --where id_ref is not null
     --   or mirna_symbol is not null;
-    
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert new probesets into mirna_probeset_deapp',rowCt,stepCt,'Done');
-    
+
     --	update organism for existing probesets in mirna_probeset_deapp
 
     begin
@@ -130,13 +130,13 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update organism in mirna_probeset_deapp',rowCt,stepCt,'Done');
-    
-    
-    
+
+
+
     --	insert data into mirna_annotation_deapp
     begin
 	insert into tm_cz.mirna_annotation_deapp
@@ -167,15 +167,15 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into REFERENCE mirna_annotation_deapp',rowCt,stepCt,'Done');
-    
+
     --	insert data into deapp.de_qpcr_mirna_annotation
 
     begin
-	insert into 
+	insert into
             deapp.de_qpcr_mirna_annotation
 	    (id_ref
 	    ,probe_id
@@ -195,18 +195,18 @@ begin
 	       ,tm_cz.mirna_probeset_deapp p
 	 where d.id_ref = p.probeset
 	   and p.platform = d.gpl_id
-	   and coalesce(d.organism,'Homo sapiens') = coalesce(p.organism,'Homo sapiens');	  
+	   and coalesce(d.organism,'Homo sapiens') = coalesce(p.organism,'Homo sapiens');
     exception
 	when others then
 	    perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_qpcr_mirna_annotation',rowCt,stepCt,'Done');
-    
+
     insert into biomart.mirna_bio_assay_feature_group
 		(feature_group_name
 		,feature_group_type)
@@ -215,11 +215,11 @@ begin
      where not exists
 	   (select 1 from biomart.mirna_bio_assay_feature_group x
 	     where t.id_ref = x.feature_group_name);
-    
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert probesets into biomart.mirna_bio_assay_feature_group',rowCt,stepCt,'Done');
-    
+
     --	insert probesets into biomart.mirna_bio_assay_data_annotation
     begin
 	insert into biomart.mirna_bio_assay_data_annot
@@ -244,21 +244,21 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    
+
     stepCt := stepCt + 1;
-    get diagnostics rowCt := ROW_COUNT; 
+    get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.mirna_bio_assay_data_annotation',rowCt,stepCt,'Done');
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_MIRNA_annot_deapp',0,stepCt,'Done');
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	perform tm_cz.cz_end_audit (jobID, 'SUCCESS'); 
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 1;
-exception 
+exception
     when others then
     --Handle errors.
 	perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);

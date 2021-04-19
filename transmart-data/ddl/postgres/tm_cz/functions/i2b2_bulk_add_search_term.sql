@@ -43,13 +43,13 @@ AS $$
     Parent_Id 		integer;
     new_Term_Id 	integer;
     keyword_id 		integer;
-    Lcount 			integer; 
+    Lcount 			integer;
     Ncount 			integer;
 
     --v_category_display	character varying(200);
 
     keyArray tm_lz.lt_src_search_keyword[] = array(
-	select row(keyword, display_category, data_category, UID_prefix, unique_id, source_cd, parent_term, bio_data_id) 
+	select row(keyword, display_category, data_category, UID_prefix, unique_id, source_cd, parent_term, bio_data_id)
 	  from tm_lz.lt_src_search_keyword
     	 where (keyword IS NOT NULL AND keyword::text <> ''));
 
@@ -70,12 +70,12 @@ begin
 	newJobFlag := 1; -- True
 	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
-    	
+
     --stepCt := 0;
     --rowCt := 0;
-  
+
     --perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start Procedure',0,stepCt,'Done');
-    --stepCt := stepCt + 1;	
+    --stepCt := stepCt + 1;
 
     keySize = array_length(keyArray, 1);
     for i in 0 .. (keySize - 1)
@@ -88,7 +88,7 @@ begin
     	v_source_cd := keyArray[i].source_cd;
     	v_parent_term := keyArray[i].parent_term;
     	v_bio_data_id := keyArray[i].bio_data_id;
-    
+
 	--dbms_output.put_line('keyword: ' || v_keyword_term);
 
 	if (coalesce(v_display_category::text, '') = '') then
@@ -103,7 +103,7 @@ begin
 
 	-- Insert taxonomy term into searchapp.search_keyword
 	-- (searches search_keyword with the parent term to find the category to use)
-	insert into searchapp.search_keyword 
+	insert into searchapp.search_keyword
 		    (data_category
 		    ,keyword
 		    ,unique_id
@@ -122,23 +122,23 @@ begin
 		 where upper(x.data_category) = upper(v_data_category)
 		   and upper(x.keyword) = upper(v_keyword_term)
          	   and upper(x.bio_data_id) = upper(v_bio_data_id));
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,v_keyword_term || ' added to searchapp.search_keyword',rowCt,stepCt,'Done');
-	stepCt := stepCt + 1;	
+	stepCt := stepCt + 1;
 	commit;
 
 	-- Get the ID of the new term in search_keyword
-	select search_keyword_id  into keyword_id 
-	  from  searchapp.search_keyword 
+	select search_keyword_id  into keyword_id
+	  from  searchapp.search_keyword
 	 where upper(keyword) = upper(v_keyword_term)
 	   and upper(data_category) = upper(v_data_category)
     	   and upper(bio_data_id) = upper(v_bio_data_id);
 	get diagnostics rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'New search keyword ID stored in keyword_id',rowCt,stepCt,'Done');
-	stepCt := stepCt + 1;	
+	stepCt := stepCt + 1;
 
-	-- Insert the new term into searchapp.search_keyword_term 
-	insert into searchapp.search_keyword_term 
+	-- Insert the new term into searchapp.search_keyword_term
+	insert into searchapp.search_keyword_term
 		    (keyword_term
 		    ,search_keyword_id
 		    ,rank
@@ -146,22 +146,22 @@ begin
 	select upper(v_keyword_term)
 	       ,keyword_id
 	       ,1
-	       ,length(v_keyword_term) 
+	       ,length(v_keyword_term)
 	 where not exists
 	       (select 1 from searchapp.search_keyword_term x
 		 where upper(x.keyword_term) = upper(v_keyword_term)
 		   and x.search_keyword_id = keyword_id);
 	get diagnostics rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'Term added to searchapp.search_keyword_term',rowCt,stepCt,'Done');
-	stepCt := stepCt + 1;	
+	stepCt := stepCt + 1;
 	commit;
 
     end loop;
 
     perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'End '|| procedureName,0,stepCt,'Done');
-    stepCt := stepCt + 1;  
+    stepCt := stepCt + 1;
 
-    ---Cleanup OVERALL JOB if this proc is being run standalone    
+    ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
@@ -175,6 +175,6 @@ exception
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
     return -16;
 end;
- 
+
 $$;
 

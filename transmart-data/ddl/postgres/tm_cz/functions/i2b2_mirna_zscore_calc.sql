@@ -95,9 +95,9 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    --drop index if exists tm_wz.wt_subject_mirna_logs_i1;		
+    --drop index if exists tm_wz.wt_subject_mirna_logs_i1;
     --drop index if exists tm_wz.wt_subject_mirna_calcs_i1;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
 
@@ -115,7 +115,7 @@ begin
 	    select
 		probeset_id
 		,intensity_value
-		,assay_id 
+		,assay_id
 		,round((case when intensity_value <=0 then 0
                         else ln(intensity_value)/ln(logBase::double precision) end)::numeric,5)
 		,patient_id
@@ -127,7 +127,7 @@ begin
 		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
-    else	
+    else
 	begin
             insert into tm_wz.wt_subject_mirna_logs (
 		probeset_id
@@ -138,7 +138,7 @@ begin
 	    select
 		probeset_id
 		,intensity_value
-		,assay_id 
+		,assay_id
 		,intensity_value
 		,patient_id
 	      from tm_wz.wt_subject_mirna_probeset
@@ -169,13 +169,13 @@ begin
 	    ,median_intensity
 	    ,stddev_intensity
 	)
-	select d.trial_name 
+	select d.trial_name
 	       ,d.probeset_id
 	       ,avg(log_intensity)
 	       ,median(log_intensity)
 	       ,stddev(log_intensity)
 	  from tm_wz.wt_subject_mirna_logs d
-	 group by d.trial_name 
+	 group by d.trial_name
 		  ,d.probeset_id;
     exception
 	when others then
@@ -188,9 +188,9 @@ begin
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_mirna_calcs',rowCt,stepCt,'Done');
 
-    --execute ('create index tm_wz.wt_subject_mirna_calcs_i1 on tm_wz.wt_subject_mirna_calcs (trial_name, probeset_id) nologging tablespace "INDX"');
-    --stepCt := stepCt + 1;
-    --cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_mirna_calcs',0,stepCt,'Done');
+    -- execute ('create index tm_wz.wt_subject_mirna_calcs_i1 on tm_wz.wt_subject_mirna_calcs (trial_name, probeset_id) nologging tablespace "INDX"');
+    -- stepCt := stepCt + 1;
+    -- tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_mirna_calcs',0,stepCt,'Done');
 
     -- calculate zscore
 
@@ -207,12 +207,12 @@ begin
 	    ,patient_id
 	)
 	select d.probeset_id
-	       ,d.intensity_value 
-	       ,d.log_intensity 
-	       ,d.assay_id  
-	       ,c.mean_intensity 
-	       ,c.stddev_intensity 
-	       ,c.median_intensity 
+	       ,d.intensity_value
+	       ,d.log_intensity
+	       ,d.assay_id
+	       ,c.mean_intensity
+	       ,c.stddev_intensity
+	       ,c.median_intensity
 	       ,(CASE WHEN stddev_intensity=0 THEN 0 ELSE (d.log_intensity - c.median_intensity ) / c.stddev_intensity END)
 	       ,d.patient_id
 	  from tm_wz.wt_subject_mirna_logs d
@@ -235,7 +235,7 @@ begin
 	    ,trial_name
 	    ,assay_id
 	    ,probeset_id
-	    ,raw_intensity 
+	    ,raw_intensity
 	    ,log_intensity
 	    ,zscore
 	    ,patient_id
@@ -243,14 +243,14 @@ begin
 	select (TrialId || ':' || sourceCD)
 	       ,TrialId
 	       ,m.assay_id
-	       ,m.probeset_id 
+	       ,m.probeset_id
 	       ,case when dataType = 'R' then m.intensity_value
-		when dataType = 'L' 
+		when dataType = 'L'
 		    then m.intensity_value
 		else null
 		end as raw_intensity
 	       ,case when dataType = 'R' then m.intensity_value
-		when dataType = 'L' 
+		when dataType = 'L'
 		    then m.log_intensity
 		else null
 		end

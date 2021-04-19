@@ -22,7 +22,7 @@ AS $$
      **************************************************************************/
 
     declare
- 
+
     msgTxt		character varying;
 
     --Audit variables
@@ -40,7 +40,7 @@ AS $$
 begin
 
     stepCt := 0;
-    
+
     --Set Audit Parameters
 
     select tm_cz.cz_start_audit (procedureName, databaseName) into jobId;

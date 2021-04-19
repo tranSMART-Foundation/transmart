@@ -38,7 +38,7 @@ AS $$
 begin
 
     TrialId := trial_id;
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -52,18 +52,18 @@ begin
 	newJobFlag := 1; -- True
 	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
     end if;
-    
+
     stepCt := 0;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done');
-    
+
     --	create security records in observation_fact
-    
-    perform i2b2_create_security_for_trial(TrialId, 'Y', jobID);
-    
+
+    perform tm_cz.i2b2_create_security_for_trial(TrialId, 'Y', jobID);
+
     --	load i2b2_secure
-    
-    select i2b2_load_security_data(jobID) into rtnCd;
+
+    select tm_cz.i2b2_load_security_data(jobID) into rtnCd;
     if(rtnCd <> 1) then
         stepCt := stepCt + 1;
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
@@ -72,11 +72,11 @@ begin
     end if;
 
     --	check if entry exists for study in bio_experiment
-    
+
     select count(*) into pExists
       from biomart.bio_experiment
      where accession = TrialId;
-    
+
     if pExists = 0 then
 	insert into biomart.bio_experiment (
 	    title
@@ -90,23 +90,23 @@ begin
 	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert trial/study into biomart.bio_experiment',rowCt,stepCt,'Done');
 	--commit;
     end if;
-    
+
     select bio_experiment_id into v_bio_experiment_id
       from biomart.bio_experiment
      where accession = TrialId;
-    
+
     insert into searchapp.search_secure_object
 		(bio_data_id
 		,display_name
 		,data_type
 		,bio_data_unique_id)
     select v_bio_experiment_id
-	   ,parse_nth_value(md.c_fullname,2,'\') || ' - ' || md.c_name as display_name
+	   ,tm_cz.parse_nth_value(md.c_fullname,2,'\') || ' - ' || md.c_name as display_name
 	   ,'BIO_CLINICAL_TRIAL' as data_type
 	   ,'EXP:' || TrialId as bio_data_unique_id
       from i2b2metadata.i2b2 md
      where md.sourcesystem_cd = TrialId
-       and md.c_hlevel = 
+       and md.c_hlevel =
 	   (select min(x.c_hlevel) from i2b2metadata.i2b2 x
 	     where x.sourcesystem_cd = TrialId)
        and not exists
@@ -116,11 +116,11 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Inserted trial/study into SEARCHAPP search_secure_object',rowCt,stepCt,'Done');
     --commit;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'End ' || procedureName,rowCt,stepCt,'Done');
     --commit;
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
@@ -131,7 +131,7 @@ exception
 	raise notice 'Error % %', SQLSTATE, SQLERRM;
     --Handle errors.
 	perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
-	
+
     --End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 

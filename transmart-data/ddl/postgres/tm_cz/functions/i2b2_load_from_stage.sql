@@ -23,7 +23,7 @@ AS $$
     declare
 
     --	Alias for parameters
-    
+
     trial_id  alias for $1;
     data_type alias for $2;
     currentJobID alias for $3;
@@ -53,7 +53,7 @@ AS $$
     jobID numeric(18,0);
     stepCt numeric(18,0);
     v_sqlerrm		varchar(1000);
-    
+
     r_stage_table	record;
     r_stage_columns record;
     rtnCd	    integer;
@@ -62,11 +62,11 @@ begin
 
     TrialID := upper(trial_id);
     dataType := upper(data_type);
-    
+
     stepCt := 0;
     pCount := 0;
     bslash := '\\';
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -80,10 +80,10 @@ begin
 	newJobFlag := 1; -- True
 	jobId := tm_cz.czx_start_audit (procedureName, databaseName);
     end if;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done');
-    
+
     stepCt := stepCt + 1;
     msgText := 'Extracting trial: ' || TrialId;
     select tm_cz.czx_write_audit(jobId,databaseName,procedureName, msgText,0,stepCt,'Done');
@@ -93,7 +93,7 @@ begin
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'TrialID missing',0,stepCt,'Done');
 	return 16;
     end if;
-    
+
     for r_stage_table in
 	select upper(table_owner) as table_owner
 	       ,upper(table_name) as table_name
@@ -101,12 +101,12 @@ begin
 	       ,where_clause
 	       ,upper(stage_table_name) as stage_table_name
 	  from tm_cz.migrate_tables
-	 where instr(dataType,data_type) > 0
-	loop	
+	 where tm_cz.instr(dataType,data_type) > 0
+	loop
 
 	    pCount := pCount + 1;
 	    --	setup variables
-	
+
 	    source_table := r_stage_table.table_owner || '.' || r_stage_table.table_name;
 	    release_table := 'tm_stage.' || r_stage_table.stage_table_name;
 	    tableName := r_stage_table.table_name;
@@ -114,18 +114,18 @@ begin
 	    stepCt := stepCt + 1;
 	    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Processing ' || source_table,0,stepCt,'Done');
 
-	    if r_stage_table.study_specific = 'N' then	
+	    if r_stage_table.study_specific = 'N' then
 		--	truncate target table
 	    tText := 'truncate table ' || source_table;
 		execute immediate tText;
-		stepCt := stepCt + 1;		
+		stepCt := stepCt + 1;
 		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Truncated '|| source_table,0,stepCt,'Done');
 		--	insert from staged source into target
 		tText := 'insert into ' || source_table || ' select st.* from ' || release_table || ' st ';
 		execute immediate tText;
 		rowCt := ROW_COUNT;
 		stepCt := stepCt + 1;
-		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Inserted all data into ' || source_table,rowCt,stepCt,'Done');		
+		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Inserted all data into ' || source_table,rowCt,stepCt,'Done');
 	    else
 		tText := 'delete from ' || source_table || ' st ' || replace(r_stage_table.where_clause,'TrialId','''' || TrialId || '''');
 		execute immediate tText;
@@ -133,75 +133,75 @@ begin
 		stepCt := stepCt + 1;
 		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Deleted study from ' || source_table,ROW_COUNT,stepCt,'Done');
 		tText := 'insert into ' || source_table || ' select ';
-	    
+
 		--	get list of columns in order
-	    
+
 		for r_stage_columns in
 		    select attname as column_name
-		    from _v_relation_column 
+		    from _v_relation_column
 		    where name=upper(tablename)
 		    order by attnum asc
 		    loop
-		    --	insert by column for study_specific 
+		    --	insert by column for study_specific
 		    tText := tText || ' st.' || r_stage_columns.column_name || ',';
 		end loop;
-	    
+
 		tText := trim(trailing ',' from tText) || ' from ' || release_table || ' st ' || ' where st.release_study = ' || '''' || TrialId || '''';
 		execute immediate tText;
 		rowCt := ROW_COUNT;
 		stepCt := stepCt + 1;
 		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Inserted study into ' || source_table,rowCt,stepCt,'Done');
-	    end if;		
-	
+	    end if;
+
     end loop;
-    
+
     if pCount = 0 then
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'No staged data for study',0,stepCt,'Done');
 	return 16;
-    end if;	
+    end if;
 
     --	if CLINICAL data, add root node if needed and fill in tree for any top nodes
-    
-    if instr(dataType,'CLINICAL') > 0 then
-	
+
+    if tm_cz.instr(dataType,'CLINICAL') > 0 then
+
 	--	get topNode for study
-	
+
 	select min(c_fullname) into topNode
 	from i2b2metadata.i2b2
 	where sourcesystem_cd = TrialId;
-	
+
 	if topNode is null then
 	    stepCt := stepCt + 1;
 	    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Unable to get topNode for study',0,stepCt,'Done');
 	    return 16;
 	end if;
-	
+
 	-- Get rootNode from topNode
-	
-	rootNode := replace(substr(topNode,1,instr(topNode,bslash,2)),bslash,'');
-	
+
+	rootNode := replace(substr(topNode,1,tm_cz.instr(topNode,bslash,2)),bslash,'');
+
 	select count(*) into pExists
 	  from i2b2metadata.table_access
 	 where c_name = rootNode;
-	
+
 	select count(*) into pCount
 	  from i2b2metadata.i2b2
 	 where c_name = rootNode;
-	
+
 	if pExists = 0 or pCount = 0 then
 	    perform tm_cz.i2b2_add_root_node(rootNode, jobId);
 	end if;
-	
+
 	--	Add any upper level nodes as needed, trim off study name because it's already in i2b2
-	
-	tPath := substr(topNode, 1,instr(topNode,bslash,-2,1));
+
+	tPath := substr(topNode, 1,tm_cz.instr(topNode,bslash,-2,1));
 	pCount := length(tPath) - length(replace(tPath,bslash,''));
 
 	if pCount > 2 then
 	    stepCt := stepCt + 1;
 	    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Adding upper-level nodes',0,stepCt,'Done');
-	    select i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
+	    select tm_cz.i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
 	    if(rtnCd <> 1) then
                 tText := 'Failed to fill in tree '|| tPath;
                 perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
@@ -226,7 +226,7 @@ begin
     if newJobFlag = 1 then
 	perform tm_cz.czx_end_audit (jobID, 'SUCCESS');
     end if;
-    
+
     return 0;
 
 exception

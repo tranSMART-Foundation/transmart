@@ -31,7 +31,7 @@ AS $$
     pCount		integer;
     sCount		integer;
     tablespaceName	varchar(200);
-    
+
     --Audit variables
     newJobFlag numeric(1);
     databaseName varchar(100);
@@ -42,9 +42,9 @@ AS $$
 
 begin
     TrialID := upper(trial_id);
-    --	topNode := REGEXP_REPLACE('\' || top_node || '\','(\\){2,}', '\');	
+    --	topNode := REGEXP_REPLACE('\' || top_node || '\','(\\){2,}', '\');
     --	select length(topNode)-length(replace(topNode,'\','')) into topLevel from dual;
-    
+
     if coalesce(data_type::text, '') = '' then
 	dataType := 'R';
     else
@@ -54,7 +54,7 @@ begin
 	    dataType := 'R';
 	end if;
     end if;
-    
+
     logBase := log_base;
     sourceCd := upper(coalesce(source_cd,'STD'));
 
@@ -71,43 +71,43 @@ begin
 	newJobFlag := 1; -- True
 	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
-    
+
     stepCt := 0;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_mrna_data',0,stepCt,'Done');
-    
+
     --	truncate tmp tables
 
     execute('truncate table tm_wz.wt_subject_microarray_logs');
     execute('truncate table tm_wz.wt_subject_microarray_calcs');
     execute('truncate table tm_wz.wt_subject_microarray_med');
-    
-    select count(*) 
+
+    select count(*)
       into idxExists
       from pg_indexes
      where tablename = 'WT_SUBJECT_MICROARRAY_LOGS'
        and indexname = 'WT_SUBJECT_MRNA_LOGS_I1'
        and owner = 'TM_WZ';
-    
+
     if idxExists = 1 then
-	execute('drop index tm_wz.wt_subject_mrna_logs_i1');		
+	execute('drop index tm_wz.wt_subject_mrna_logs_i1');
     end if;
-    
-    select count(*) 
+
+    select count(*)
       into idxExists
       from pg_indexes
      where tablename = 'WT_SUBJECT_MICROARRAY_CALCS'
        and indexname = 'WT_SUBJECT_MRNA_CALCS_I1'
        and owner = 'TM_WZ';
-    
+
     if idxExists = 1 then
 	execute('drop index tm_wz.wt_subject_mrna_calcs_i1');
     end if;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
-    
-    insert into wt_subject_microarray_logs 
+
+    insert into tm_wz.wt_subject_microarray_logs
 		(probeset_id
 		,intensity_value
 		,assay_id
@@ -123,9 +123,9 @@ begin
 		    ,sd.patient_id
 		    ,sd.sample_id
 		    ,sd.subject_id
-      from de_subject_sample_mapping sd
-	   ,lz_src_mrna_data md   
-	   ,de_mrna_annotation gs
+      from deapp.de_subject_sample_mapping sd
+	   ,tm_lz.lz_src_mrna_data md
+	   ,deapp.de_mrna_annotation gs
      where sd.sample_cd = md.expr_id
        and sd.platform = 'MRNA_AFFYMETRIX'
        and sd.trial_name = TrialId
@@ -137,32 +137,32 @@ begin
 	      ,sd.patient_id
 	      ,sd.sample_id
 	      ,sd.subject_id;
-    
+
     stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Loaded data for trial in TM_WZ wt_subject_microarray_logs',rowCt,stepCt,'Done');
 
     commit;
-    
+
     execute('create index tm_wz.wt_subject_mrna_logs_i1 on tm_wz.wt_subject_microarray_logs (trial_name, probeset_id) nologging  tablespace "INDX"');
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_microarray_logs',0,stepCt,'Done');
-    
+
     --	calculate mean_intensity, median_intensity, and stddev_intensity per experiment, probe
 
-    insert into wt_subject_microarray_calcs
+    insert into tm_wz.wt_subject_microarray_calcs
 		(trial_name
 		,probeset_id
 		,mean_intensity
 		,median_intensity
 		,stddev_intensity
 		)
-    select d.trial_name 
+    select d.trial_name
 	   ,d.probeset_id
 	   ,avg(log_intensity)
 	   ,median(log_intensity)
 	   ,stddev(log_intensity)
-      from wt_subject_microarray_logs d 
-     group by d.trial_name 
+      from tm_wz.wt_subject_microarray_logs d
+     group by d.trial_name
 	      ,d.probeset_id;
     stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate intensities for trial in TM_WZ wt_subject_microarray_calcs',rowCt,stepCt,'Done');
@@ -172,10 +172,10 @@ begin
     execute('create index tm_wz.wt_subject_mrna_calcs_i1 on tm_wz.wt_subject_microarray_calcs (trial_name, probeset_id) nologging tablespace "INDX"');
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create index on TM_WZ wt_subject_microarray_calcs',0,stepCt,'Done');
-    
+
     -- calculate zscore
 
-    insert into wt_subject_microarray_med
+    insert into tm_wz.wt_subject_microarray_med
 		(probeset_id
 		,intensity_value
 		,log_intensity
@@ -188,45 +188,45 @@ begin
 		,sample_id
 		,subject_id)
     select d.probeset_id
-	   ,d.intensity_value 
-	   ,d.log_intensity 
-	   ,d.assay_id  
-	   ,c.mean_intensity 
-	   ,c.stddev_intensity 
-	   ,c.median_intensity 
+	   ,d.intensity_value
+	   ,d.log_intensity
+	   ,d.assay_id
+	   ,c.mean_intensity
+	   ,c.stddev_intensity
+	   ,c.median_intensity
 	   ,CASE WHEN stddev_intensity=0 THEN 0 ELSE (log_intensity - median_intensity ) / stddev_intensity END
 	   ,d.patient_id
 	   ,d.sample_id
 	   ,d.subject_id
-      from wt_subject_microarray_logs d 
-	   ,wt_subject_microarray_calcs c 
+      from tm_wz.wt_subject_microarray_logs d
+	   ,tm_wz.wt_subject_microarray_calcs c
      where d.probeset_id = c.probeset_id;
     stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_microarray_med',rowCt,stepCt,'Done');
 
     commit;
 
-    select count(*) 
+    select count(*)
       into idxExists
       from pg_indexes
      where tablename = 'de_subject_microarray_data'
        and indexname = 'mrna_indx1'
        and owner = 'deapp';
-    
+
     if idxExists = 0 then
 	execute('create index deapp.mrna_idx1 on deapp.de_subject_microarray_data (trial_name) nologging tablespace "INDX"');
     end if;
-    
-    delete from de_subject_microarray_data
+
+    delete from deapp.de_subject_microarray_data
      where trial_name = TrialId;
-    
+
     execute('drop index deapp.mrna_idx1');
 
-    insert into de_subject_microarray_data
+    insert into deapp.de_subject_microarray_data
 		(trial_name
 		,assay_id
 		,probeset_id
-		,raw_intensity 
+		,raw_intensity
 		,log_intensity
 		,zscore
 		,patient_id
@@ -235,7 +235,7 @@ begin
 		)
     select TrialId
 	   ,m.assay_id
-	   ,m.probeset_id 
+	   ,m.probeset_id
 	   ,case when dataType = 'R' then m.intensity_value
 	    when dataType = 'L' then case when logBase = -1 then null else power(logBase, m.log_intensity) end
 	    else null end
@@ -244,12 +244,12 @@ begin
 	   ,m.patient_id
 	   ,m.sample_id
 	   ,m.subject_id
-      from wt_subject_microarray_med m;
+      from tm_wz.wt_subject_microarray_med m;
     stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data for trial in DEAPP de_subject_microarray_data',rowCt,stepCt,'Done');
 
     commit;
-    
+
     --	cleanup tmp_ files
 
     execute('truncate table tm_wz.wt_subject_microarray_logs');
@@ -258,16 +258,16 @@ begin
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncate work tables in TM_WZ',0,stepCt,'Done');
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_mrna_data',0,stepCt,'Done');
 
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
-    
+
     --select 0 into rtn_code from dual;
 
 exception

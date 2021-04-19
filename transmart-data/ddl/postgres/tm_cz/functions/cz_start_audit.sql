@@ -27,23 +27,23 @@ AS $$
 begin
     begin
 	insert into tm_cz.cz_job_master
-		    (start_date 
+		    (start_date
 		    ,active
 		    ,database_name
 		    ,job_name
-		    ,job_status) 
+		    ,job_status)
 	values(
 	    current_timestamp
-	    ,'Y' 
+	    ,'Y'
 	    ,databaseName
 	    ,jobName
 	    ,'Running')
 	    returning job_id INTO jobId;
     end;
-    
+
     return jobId;
-    
-exception 
+
+exception
     when others then
 	perform tm_cz.cz_write_error(jobId,SQLERRML,SQLSTATE,SQLERRM,null,null);
 	return -16;
@@ -79,11 +79,11 @@ AS $$
 begin
     begin
 	insert into tm_cz.cz_job_master
-		    (start_date 
+		    (start_date
 		    ,active
 		    ,database_name
 		    ,job_name
-		    ,job_status) 
+		    ,job_status)
 	values(
 	    current_timestamp
 	    ,'Y'
@@ -92,10 +92,10 @@ begin
 	    ,'Running')
 	    returning job_id into jobid;
     end;
-    
+
     return jobid;
-    
-exception 
+
+exception
     when others then
 	perform tm_cz.cz_write_error(jobId,SQLERRML,SQLSTATE,SQLERRM,null,null);
 	return -16;

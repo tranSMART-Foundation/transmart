@@ -3,7 +3,7 @@
 --
 CREATE FUNCTION czx_array_sort(anyarray) RETURNS anyarray
     LANGUAGE sql SECURITY DEFINER
-AS $$   
+AS $$
     /*************************************************************************
      * Copyright 2008-2012 Janssen Research & Development, LLC.
      *
@@ -19,10 +19,10 @@ AS $$
      * See the License for the specific language governing permissions and
      * limitations under the License.
      ******************************************************************/
-    select array(   
-	select $1[s.i] as "foo"   
-	  from generate_series(array_lower($1,1), array_upper($1,1)) AS s(i)   
-	 order by foo   
-    );   
+    select array(
+	select $1[s.i] as "foo"
+	  from generate_series(array_lower($1,1), array_upper($1,1)) AS s(i)
+	 order by foo
+    );
 $$;
 

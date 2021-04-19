@@ -15,10 +15,10 @@ AS $$
     --------------------------------------------------------------------------------------
     --The name of the table, proc, function or view.
     V_OBJNAME varchar(50);
-    
+
     --Dynamic SQL line
     V_CMDLINE varchar(200);
-    
+
     --Table list
     L_TABLE cursor for
 		       select table_name

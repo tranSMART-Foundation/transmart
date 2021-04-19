@@ -37,19 +37,19 @@ AS $$
     rowCount	numeric(18,0);
 
     --	Define the abstract result set record
-    
+
     r_stage_table		record;
     r_stage_column		record;
-    
+
     --	Variables
 
     tText 			varchar(2000);
     pExists			int4;
     release_table	varchar(50);
     v_sqlerrm		varchar(1000);
-    
-begin	
-    
+
+begin
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := -1;
@@ -63,10 +63,10 @@ begin
 	newJobFlag := 1; -- True
 	jobId := tm_cz.czx_start_audit (procedureName, databaseName);
     end if;
-    
-    stepCt := 0;	
+
+    stepCt := 0;
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done');
-    
+
     for r_stage_table in
 	select upper(table_owner) as table_owner
 	,upper(table_name) as table_name
@@ -80,24 +80,24 @@ begin
 	    select count(*) into pExists
 	      from _v_table
 	     where schema = 'TM_STAGE'
-	       and tablename = release_table;	
+	       and tablename = release_table;
 	    if pExists > 0 then
 	        tText := 'drop table tm_stage.' || release_table;
 	        execute immediate tText;
 	    end if;
 
 	    tText := 'create table tm_stage.' || release_table || ' (';
-	
+
 	    for r_stage_column in
 		select attname as column_name
 		,format_type
-		from _v_relation_column 
+		from _v_relation_column
 		where name=upper(r_stage_table.table_name)
 		order by attnum asc
 		loop
-		    tText := tText || r_stage_column.column_name || ' ' || r_stage_column.format_type || ',';	
+		    tText := tText || r_stage_column.column_name || ' ' || r_stage_column.format_type || ',';
 	   end loop;
-	
+
 	    if r_stage_table.study_specific = 'Y' then
 		tText := tText || 'release_study varchar(200))';
 	    else
@@ -108,10 +108,10 @@ begin
 	    perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Created '|| release_table,0,stepCt,'Done');
 
     end loop;
-    
+
     perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'End i2b2_create_release_tables',0,stepCt,'Done');
     stepCt := stepCt + 1;
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
 	perform tm_cz.czx_end_audit (jobID, 'SUCCESS');

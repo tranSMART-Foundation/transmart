@@ -21,7 +21,7 @@ AS $$
      ******************************************************************/
 
     declare
-    
+
     --Audit variables
     newJobFlag		integer;
     databaseName 	VARCHAR(100);
@@ -234,7 +234,7 @@ begin
     --	update gene_id if null
 
     begin
-	with upd as (select b.bio_marker_name as gene_symbol, b.organism, min(b.primary_external_id::numeric) as gene_id 
+	with upd as (select b.bio_marker_name as gene_symbol, b.organism, min(b.primary_external_id::numeric) as gene_id
 		       from biomart.bio_marker b
 		      where upper(b.bio_marker_type) = 'GENE'
 		      group by b.bio_marker_name, b.organism)

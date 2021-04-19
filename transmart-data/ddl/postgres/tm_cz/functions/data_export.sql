@@ -12,8 +12,8 @@ AS $$
 
     cPatients cursor for
 			 select distinct a.patient_num
-			 from observation_fact a
-			 join i2b2 b
+			 from i2b2demodata.observation_fact a
+			 join i2b2metadataq.i2b2 b
 			 on a.concept_cd = b.c_basecode
 			 where c_fullname like '%BRC Depression Study%'
 			 and c_visualattributes not like '%H%'
@@ -34,8 +34,8 @@ begin
 
     end loop;
 
-    dynamicSQL := dynamicSQL || ' from observation_fact a join i2b2 b on a.concept_cd = b.c_basecode where c_fullname like ''%BRC Depression Study%'' and c_columndatatype = ''T'' and c_visualattributes not like ''%H%'' group by c_name, c_fullname';
-    dynamicSQL2 := dynamicSQL2 || ' from observation_fact a join i2b2 b on a.concept_cd = b.c_basecode where c_fullname like ''%BRC Depression Study%'' and c_columndatatype = ''N'' and c_visualattributes not like ''%H%'' group by c_name, c_fullname order by c_fullname';
+    dynamicSQL := dynamicSQL || ' from i2b2demodata.observation_fact a join i2b2metadata.i2b2 b on a.concept_cd = b.c_basecode where c_fullname like ''%BRC Depression Study%'' and c_columndatatype = ''T'' and c_visualattributes not like ''%H%'' group by c_name, c_fullname';
+    dynamicSQL2 := dynamicSQL2 || ' from i2b2demodata.observation_fact a join i2b2metadata.i2b2 b on a.concept_cd = b.c_basecode where c_fullname like ''%BRC Depression Study%'' and c_columndatatype = ''N'' and c_visualattributes not like ''%H%'' group by c_name, c_fullname order by c_fullname';
 
     execute(dynamicSQL || ' UNION ALL ' || dynamicsql2);
 

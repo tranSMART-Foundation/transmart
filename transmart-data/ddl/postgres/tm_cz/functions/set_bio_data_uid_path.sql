@@ -25,17 +25,17 @@ begin
 
     delete from biomart.bio_data_uid where unique_id in
 					   (select biomarker_pathway_uid(primary_source_code, primary_external_id)
-					      from bio_marker);
+					      from biomart.bio_marker);
     delete from biomart.bio_data_uid where unique_id in
 					   (select biomarker_gene_uid(primary_external_id)
-					      from bio_marker);
+					      from biomart.bio_marker);
     insert into biomart.bio_data_uid(
         bio_data_id, unique_id, bio_data_type)
     select
         bio_marker_id
         ,biomarker_pathway_uid(primary_source_code, primary_external_id)
         ,'BIO_MARKER.PATHWAY'
-      from bio_marker
+      from biomart.bio_marker
      where bio_marker_type='PATHWAY'
        and not exists
            (select 1 from biomart.bio_data_uid
@@ -47,7 +47,7 @@ begin
         bio_marker_id
         ,biomarker_gene_uid(primary_external_id)
         ,'BIO_MARKER.GENE'
-      from bio_marker
+      from biomart.bio_marker
      where bio_marker_type='GENE'
        and not exists
            (select 1 from biomart.bio_data_uid

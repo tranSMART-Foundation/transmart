@@ -24,7 +24,7 @@ AS $$
      **************************************************************************/
 
     declare
- 
+
     pExists		integer;
     bapId		character varying;
     msgTxt		character varying;
@@ -48,14 +48,14 @@ AS $$
 begin
 
     stepCt := 0;
-    
+
     --Set Audit Parameters
     newJobFlag := 1;
     select tm_cz.cz_start_audit (procedureName, databaseName) into jobId;
 
     databaseName := 'tm_cz';
     procedureName := 'add_platform';
-    
+
     -- check pfmOrganism exists in bio_assay_platform
     select count(*) from biomart.bio_assay_platform where platform_organism = pfmOrganism into rowCt;
     stepCt := stepCt + 1;
@@ -152,7 +152,7 @@ begin
     end if;
 
     return 1;
-    
+
 exception
     when others then
 	errorNumber := SQLSTATE;

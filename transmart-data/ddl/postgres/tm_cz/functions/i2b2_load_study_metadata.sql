@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_study_metadata(currentjobid numeric D
 * limitations under the License.
 ******************************************************************/
 declare
-  
+
 	--Audit variables
 	newJobFlag		integer;
 	databaseName 	VARCHAR(100);
@@ -30,7 +30,7 @@ declare
 	rowCt			numeric(18,0);
 	errorNumber		character varying;
 	errorMessage	character varying;
-	
+
 	dcount 				int;
 	lcount 				int;
 	upload_date			timestamp;
@@ -40,7 +40,7 @@ declare
 	tmp_pubmed			varchar(2000);
 	pubmed_id			varchar(200);
 	pubmed_title		varchar(2000);
-	
+
 	study_compound_rec	record;
 	study_disease_rec	record;
 	study_taxonomy_rec  record;
@@ -68,9 +68,9 @@ BEGIN
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Starting ' || procedureName,0,stepCt,'Done');
 
 	select clock_timestamp() into upload_date;
- 
+
 	--	Update existing bio_experiment data
-	
+
 	begin
 	with upd as (select m.study_id
 				,m.title
@@ -95,7 +95,7 @@ BEGIN
 		,primary_investigator=upd.primary_investigator
 		,overall_design=upd.overall_design
 		,institution=upd.institution
-		,country=upd.country 
+		,country=upd.country
 	from upd
 	where b.accession = upd.study_id
 	  and b.etl_id = 'METADATA:' || upd.study_id;
@@ -108,12 +108,12 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Updated trial data in BIOMART bio_experiment',rowCt,stepCt,'Done');
 
-/*	
+/*
 	--	Update existing bio_clinical_trial data only for true Clinical Trials or JnJ Experimental Medicine Studies
 
 	update biomart.bio_clinical_trial b
@@ -148,22 +148,22 @@ BEGIN
 			   ,m.study_phase
 			   ,m.blinding_procedure
 			   ,m.studytype
-			   ,decode(is_number(m.duration_of_study_weeks),1,null,to_number(m.duration_of_study_weeks))
-			   ,decode(is_number(m.number_of_patients),1,null,to_number(m.number_of_patients))
-			   ,decode(is_number(m.number_of_sites),1,null,to_number(m.number_of_sites))
+			   ,decode(tm_cz.is_number(m.duration_of_study_weeks),1,null,to_number(m.duration_of_study_weeks))
+			   ,decode(tm_cz.is_number(m.number_of_patients),1,null,to_number(m.number_of_patients))
+			   ,decode(tm_cz.is_number(m.number_of_sites),1,null,to_number(m.number_of_sites))
 			   ,m.route_of_administration
 			   ,m.dosing_regimen
 			   ,m.group_assignment
 			   ,m.type_of_control
-			   ,decode(is_date(m.completion_date,'YYYYMMDD'),1,null,to_date(m.completion_date,'YYYYMMDD'))
+			   ,decode(tm_czis_date(m.completion_date,'YYYYMMDD'),1,null,to_date(m.completion_date,'YYYYMMDD'))
 			   ,m.primary_end_points
 			   ,m.secondary_end_points
 			   ,m.inclusion_criteria
 			   ,m.exclusion_criteria
 			   ,m.subjects
 			   ,m.gender_restriction_mfb
-			   ,decode(is_number(m.min_age),1,null,to_number(m.min_age))
-			   ,decode(is_number(m.max_age),1,null,to_number(m.max_age))
+			   ,decode(tm_cz.is_number(m.min_age),1,null,to_number(m.min_age))
+			   ,decode(tm_cz.is_number(m.max_age),1,null,to_number(m.max_age))
 			   ,m.secondary_ids
 			   ,m.development_partner
 			   ,m.main_findings
@@ -184,9 +184,9 @@ BEGIN
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated study data in BIOMART bio_clinical_trial',SQL%ROWCOUNT,stepCt,'Done');
 	commit;
 */
-	
+
 	--	Add new trial data to bio_experiment
-	
+
 	begin
 	insert into biomart.bio_experiment
 	(bio_experiment_type
@@ -239,9 +239,9 @@ BEGIN
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study to BIOMART bio_experiment',rowCt,stepCt,'Done');
 
-/*		
+/*
 	--	Add new trial data to bio_clinical_trial
-	
+
 	insert into biomart.bio_clinical_trial
 	(trial_number
 	,study_owner
@@ -277,22 +277,22 @@ BEGIN
           ,m.study_phase
           ,m.blinding_procedure
           ,m.studytype
-		  ,decode(is_number(m.duration_of_study_weeks),1,null,to_number(m.duration_of_study_weeks))
-		  ,decode(is_number(m.number_of_patients),1,null,to_number(m.number_of_patients))
-		  ,decode(is_number(m.number_of_sites),1,null,to_number(m.number_of_sites))
+		  ,decode(tm_cz.is_number(m.duration_of_study_weeks),1,null,to_number(m.duration_of_study_weeks))
+		  ,decode(tm_cz.is_number(m.number_of_patients),1,null,to_number(m.number_of_patients))
+		  ,decode(tm_cz.is_number(m.number_of_sites),1,null,to_number(m.number_of_sites))
           ,m.route_of_administration
           ,m.dosing_regimen
           ,m.group_assignment
           ,m.type_of_control
-          ,decode(is_date(m.completion_date,'YYYYMMDD'),1,null,to_date(m.completion_date,'YYYYMMDD'))
+          ,decode(tm_cz.is_date(m.completion_date,'YYYYMMDD'),1,null,to_date(m.completion_date,'YYYYMMDD'))
           ,m.primary_end_points
           ,m.secondary_end_points
           ,m.inclusion_criteria
           ,m.exclusion_criteria
           ,m.subjects
           ,m.gender_restriction_mfb
-		  ,decode(is_number(m.min_age),1,null,to_number(m.min_age))
-		  ,decode(is_number(m.max_age),1,null,to_number(m.max_age))
+		  ,decode(tm_cz.is_number(m.min_age),1,null,to_number(m.min_age))
+		  ,decode(tm_cz.is_number(m.max_age),1,null,to_number(m.max_age))
           ,m.secondary_ids
           ,b.bio_experiment_id
 		  ,m.development_partner
@@ -311,9 +311,9 @@ BEGIN
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted trial data in BIOMART bio_clinical_trial',SQL%ROWCOUNT,stepCt,'Done');
 	commit;
 */
-	
+
 	--	Insert new trial into bio_data_uid
-	
+
 	begin
 	insert into biomart.bio_data_uid
 	(bio_data_id
@@ -339,16 +339,16 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added study to bio_data_uid',rowCt,stepCt,'Done');
 
 	--	delete existing compound data for study, compound list may change
-	
+
 	begin
 	delete from biomart.bio_data_compound dc
-	where dc.bio_data_id in 
+	where dc.bio_data_id in
 		 (select x.bio_experiment_id
 		  from biomart.bio_experiment x
 			  ,tm_lz.lt_src_study_metadata y
@@ -363,13 +363,13 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study data from bio_compound',rowCt,stepCt,'Done');
 
 	--	add study compound data
-	
+
 	for study_compound_rec in
 		select distinct study_id
 			  ,compound
@@ -378,9 +378,9 @@ BEGIN
 	loop
 		select length(study_compound_rec.compound)-length(replace(study_compound_rec.compound,';',''))+1 into dcount;
 		while dcount > 0
-		Loop	
+		Loop
 			select tm_cz.parse_nth_value(study_compound_rec.compound,dcount,';') into tmp_compound;
-			   
+
 			--	add new compound
 			begin
 			insert into biomart.bio_compound
@@ -399,11 +399,11 @@ BEGIN
 				--End Proc
 				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
-			get diagnostics rowCt := ROW_COUNT;	
+			get diagnostics rowCt := ROW_COUNT;
 			end;
 			stepCt := stepCt + 1;
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study compound to bio_compound',rowCt,stepCt,'Done');
-					
+
 			--	Insert new trial data into bio_data_compound
 			begin
 			insert into biomart.bio_data_compound
@@ -416,7 +416,7 @@ BEGIN
 				  ,'METADATA:' || study_compound_rec.study_id
 			from biomart.bio_experiment b
 				,biomart.bio_compound c
-			where upper(tmp_compound) = upper(c.generic_name) 
+			where upper(tmp_compound) = upper(c.generic_name)
 			  and tmp_compound is not null
 			  and b.accession = study_compound_rec.study_id
 			  and not exists
@@ -432,19 +432,19 @@ BEGIN
 				--End Proc
 				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
-			get diagnostics rowCt := ROW_COUNT;	
+			get diagnostics rowCt := ROW_COUNT;
 			end;
 			stepCt := stepCt + 1;
-			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study compound to bio_data_compound',rowCt,stepCt,'Done');			
+			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study compound to bio_data_compound',rowCt,stepCt,'Done');
 			dcount := dcount - 1;
 		end loop;
 	end loop;
 
 	--	delete existing disease data for studies
-	
+
 	begin
 	delete from biomart.bio_data_disease dc
-	where dc.bio_data_id in 
+	where dc.bio_data_id in
 		 (select x.bio_experiment_id
 		  from biomart.bio_experiment x
 			  ,tm_lz.lt_src_study_metadata y
@@ -459,13 +459,13 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study data from bio_data_disease',rowCt,stepCt,'Done');
 
 	--	add study disease data
-	
+
 	for study_disease_rec in
 		select distinct study_id, disease
 		from tm_lz.lt_src_study_metadata
@@ -473,9 +473,9 @@ BEGIN
 	loop
 		select length(study_disease_rec.disease)-length(replace(study_disease_rec.disease,';',''))+1 into dcount;
 		while dcount > 0
-		Loop	
+		Loop
 			select tm_cz.parse_nth_value(study_disease_rec.disease,dcount,';') into tmp_disease;
-			   
+
 			--	add new disease
 			begin
 			insert into biomart.bio_disease
@@ -496,11 +496,11 @@ BEGIN
 				--End Proc
 				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
-			get diagnostics rowCt := ROW_COUNT;	
+			get diagnostics rowCt := ROW_COUNT;
 			end;
 			stepCt := stepCt + 1;
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study disease to bio_disease',rowCt,stepCt,'Done');
-			
+
 			--	Insert new trial data into bio_data_disease
 			begin
 			insert into biomart.bio_data_disease
@@ -513,7 +513,7 @@ BEGIN
 				  ,'METADATA:' || study_disease_rec.study_id
 			from biomart.bio_experiment b
 				,biomart.bio_disease c
-			where upper(tmp_disease) = upper(c.disease) 
+			where upper(tmp_disease) = upper(c.disease)
 			  and tmp_disease is not null
 			  and b.accession = study_disease_rec.study_id
 			  and not exists
@@ -529,7 +529,7 @@ BEGIN
 				--End Proc
 				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
-			get diagnostics rowCt := ROW_COUNT;	
+			get diagnostics rowCt := ROW_COUNT;
 			end;
 			stepCt := stepCt + 1;
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study disease to bio_data_disease',rowCt,stepCt,'Done');
@@ -538,10 +538,10 @@ BEGIN
 	end loop;
 
 	--	delete existing taxonomy data for studies
-	
+
 	begin
 	delete from biomart.bio_data_taxonomy dc
-	where dc.bio_data_id in 
+	where dc.bio_data_id in
 		 (select x.bio_experiment_id
 		  from biomart.bio_experiment x
 			  ,tm_lz.lt_src_study_metadata y
@@ -556,13 +556,13 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study data from bio_data_taxonomy',rowCt,stepCt,'Done');
 
 	--	add study organism to taxonomy
-	
+
 	for study_taxonomy_rec in
 		select distinct study_id, organism
 		from tm_lz.lt_src_study_metadata
@@ -570,9 +570,9 @@ BEGIN
 	loop
 		select length(study_taxonomy_rec.organism)-length(replace(study_taxonomy_rec.organism,';',''))+1 into dcount;
 		while dcount > 0
-		Loop	
+		Loop
 			select tm_cz.parse_nth_value(study_taxonomy_rec.organism,dcount,';') into tmp_organism;
-			   
+
 			--	add new organism
 			begin
 			insert into biomart.bio_taxonomy
@@ -593,11 +593,11 @@ BEGIN
 				--End Proc
 				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
-			get diagnostics rowCt := ROW_COUNT;	
+			get diagnostics rowCt := ROW_COUNT;
 			end;
 			stepCt := stepCt + 1;
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study organism to bio_taxonomy',rowCt,stepCt,'Done');
-							
+
 			--	Insert new trial data into bio_data_taxonomy
 			begin
 			insert into biomart.bio_data_taxonomy
@@ -610,7 +610,7 @@ BEGIN
 				  ,'METADATA:' || study_disease_rec.study_id
 			from biomart.bio_experiment b
 				,biomart.bio_taxonomy c
-			where upper(tmp_organism) = upper(c.taxon_name) 
+			where upper(tmp_organism) = upper(c.taxon_name)
 			  and tmp_organism is not null
 			  and b.accession = study_disease_rec.study_id
 			  and not exists
@@ -626,7 +626,7 @@ BEGIN
 				--End Proc
 				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
-			get diagnostics rowCt := ROW_COUNT;	
+			get diagnostics rowCt := ROW_COUNT;
 			end;
 			stepCt := stepCt + 1;
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study organism to bio_data_taxonomy',rowCt,stepCt,'Done');
@@ -634,23 +634,23 @@ BEGIN
 			dcount := dcount - 1;
 		end loop;
 	end loop;
-	
+
 	--	add ncbi/GEO linking
-	
+
 	--	check if ncbi exists in bio_content_repository, if not, add
-	
+
 	select count(*) into dcount
 	from biomart.bio_content_repository
 	where repository_type = 'NCBI'
 	  and location_type = 'URL';
-	
+
 	if dcount = 0 then
 		begin
 		insert into biomart.bio_content_repository
 		(location
 		,active_y_n
 		,repository_type
-		,location_type) 
+		,location_type)
 		values ('http://www.ncbi.nlm.nih.gov/','Y','NCBI','URL');
 		exception
 		when others then
@@ -661,14 +661,14 @@ BEGIN
 			--End Proc
 			perform tm_cz.czx_end_audit (jobID, 'FAIL');
 			return -16;
-		get diagnostics rowCt := ROW_COUNT;	
+		get diagnostics rowCt := ROW_COUNT;
 		end;
 		stepCt := stepCt + 1;
 		perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Insert link to NCBI into bio_content_repository',rowCt,stepCt,'Done');
 	end if;
 
 	--	insert GSE studies into bio_content
-	
+
 	begin
 	insert into biomart.bio_content
 	(repository_id
@@ -699,13 +699,13 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add GEO study to bio_content',rowCt,stepCt,'Done');
-	
+
 	--	insert GSE studies into bio_content_reference
-	
+
 	begin
 	insert into biomart.bio_content_reference
 	(bio_content_id
@@ -738,18 +738,18 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Added GEO study to bio_content_reference',rowCt,stepCt,'Done');
 
 	--	add PUBMED linking
-	
+
 	--	delete existing pubmed data for studies
-	
+
 	begin
 	delete from biomart.bio_content_reference dc
-	where dc.bio_content_id in 
+	where dc.bio_content_id in
 		 (select x.bio_file_content_id
 		  from biomart.bio_content x
 			  ,tm_lz.lt_src_study_metadata y
@@ -764,14 +764,14 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study pubmed from bio_content_reference',rowCt,stepCt,'Done');
-		
+
 	begin
 	delete from biomart.bio_content dc
-	where dc.bio_file_content_id in 
+	where dc.bio_file_content_id in
 		 (select x.bio_file_content_id
 		  from biomart.bio_content x
 			  ,tm_lz.lt_src_study_metadata y
@@ -786,24 +786,24 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete existing study pubmed from bio_content',rowCt,stepCt,'Done');
 
 	--	add study pubmed ids'
-	
+
 	select count(*) into dcount
 	from biomart.bio_content_repository
-	where repository_type = 'PubMed';	
-	
+	where repository_type = 'PubMed';
+
 	if dcount = 0 then
 		begin
 		insert into biomart.bio_content_repository
 		(location
 		,active_y_n
 		,repository_type
-		,location_type) 
+		,location_type)
 		values ('http://www.ncbi.nlm.nih.gov/pubmed/','Y','PubMed','URL');
 		exception
 		when others then
@@ -814,12 +814,12 @@ BEGIN
 			--End Proc
 			perform tm_cz.czx_end_audit (jobID, 'FAIL');
 			return -16;
-		get diagnostics rowCt := ROW_COUNT;	
+		get diagnostics rowCt := ROW_COUNT;
 		end;
 			stepCt := stepCt + 1;
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add pubmed url to bio_content_repository',rowCt,stepCt,'Done');
 	end if;
-	
+
 	for study_pubmed_rec in
 		select distinct study_id, pubmed_ids
 		from tm_lz.lt_src_study_metadata
@@ -827,20 +827,20 @@ BEGIN
 	loop
 		select length(study_pubmed_rec.pubmed_ids)-length(replace(study_pubmed_rec.pubmed_ids,'|',''))+1 into dcount;
 		while dcount > 0
-		Loop	
+		Loop
 			-- multiple pubmed id can be separated by |, pubmed id and title are separated by @
-			
-			select tm_cz.parse_nth_value(study_pubmed_rec.pubmed_ids,dcount,'|') into tmp_pubmed;			
+
+			select tm_cz.parse_nth_value(study_pubmed_rec.pubmed_ids,dcount,'|') into tmp_pubmed;
 			select tm_cz.instr(tmp_pubmed,'@') into lcount;
-			
+
 			if lcount = 0 then
 				pubmed_id := tmp_pubmed;
 				pubmed_title := null;
 			else
-				pubmed_id := substr(tmp_pubmed,1,instr(tmp_pubmed,'@')-1);	
-				pubmed_title := substr(tmp_pubmed,instr(tmp_pubmed,'@')+1);
+				pubmed_id := substr(tmp_pubmed,1,tm_cz.instr(tmp_pubmed,'@')-1);
+				pubmed_title := substr(tmp_pubmed,tm_cz.instr(tmp_pubmed,'@')+1);
 			end if;
-			
+
 			begin
 			insert into biomart.bio_content
 			(repository_id
@@ -870,11 +870,11 @@ BEGIN
 				--End Proc
 				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
-			get diagnostics rowCt := ROW_COUNT;	
+			get diagnostics rowCt := ROW_COUNT;
 			end;
 			stepCt := stepCt + 1;
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study pubmed to bio_content',rowCt,stepCt,'Done');
-		
+
 			begin
 			insert into biomart.bio_content_reference
 			(bio_content_id
@@ -895,7 +895,7 @@ BEGIN
 			  and not exists
 				 (select 1 from biomart.bio_content_reference x
 				  where bc.bio_file_content_id = x.bio_content_id
-					and be.bio_experiment_id = x.bio_data_id);	
+					and be.bio_experiment_id = x.bio_data_id);
 			exception
 			when others then
 				errorNumber := SQLSTATE;
@@ -905,14 +905,14 @@ BEGIN
 				--End Proc
 				perform tm_cz.czx_end_audit (jobID, 'FAIL');
 				return -16;
-			get diagnostics rowCt := ROW_COUNT;	
+			get diagnostics rowCt := ROW_COUNT;
 			end;
 			stepCt := stepCt + 1;
 			perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study pubmed to bio_content_reference',rowCt,stepCt,'Done');
 			dcount := dcount - 1;
 		end loop;
 	end loop;
-	
+
 		--	Create i2b2_tags
 
 	begin
@@ -927,7 +927,7 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete study from i2b2_tags',rowCt,stepCt,'Done');
@@ -953,21 +953,21 @@ BEGIN
 		--End Proc
 		perform tm_cz.czx_end_audit (jobID, 'FAIL');
 		return -16;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
 	end;
 	stepCt := stepCt + 1;
 	perform tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Add study to i2b2_tags',rowCt,stepCt,'Done');
 
-/*					 
+/*
 	--	Insert trial data tags - COMPOUND
-	
+
 	delete from i2b2metadata.i2b2_tags t
 	where upper(t.tag_type) = 'COMPOUND';
 
 	stepCt := stepCt + 1;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing Compound tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
-	commit;	
-	
+	commit;
+
 	insert into i2b2metadata.i2b2_tags
 	(path, tag, tag_type, tags_idx)
 	select distinct min(o.c_fullname) as path
@@ -987,17 +987,17 @@ BEGIN
 
 	stepCt := stepCt + 1;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert Compound tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
-	commit;	
-					 
+	commit;
+
 	--	Insert trial data tags - DISEASE
-	
+
 	delete from i2b2metadata.i2b2_tags t
 	where upper(t.tag_type) = 'DISEASE';
 
 	stepCt := stepCt + 1;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing DISEASE tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
-	commit;	
-		
+	commit;
+
 	insert into i2b2metadata.i2b2_tags
 	(path, tag, tag_type, tags_idx)
 	select distinct min(o.c_fullname) as path
@@ -1017,9 +1017,9 @@ BEGIN
 
 	stepCt := stepCt + 1;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert Disease tags in I2B2METADATA i2b2_tags',SQL%ROWCOUNT,stepCt,'Done');
-	commit;	
+	commit;
 */
-	
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
 
 	stepCt := stepCt + 1;
@@ -1032,7 +1032,7 @@ BEGIN
 	END IF;
 
 	return 0;
-	
+
 END;
 
 $$;

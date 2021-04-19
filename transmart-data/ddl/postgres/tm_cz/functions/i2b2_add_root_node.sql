@@ -20,7 +20,7 @@ AS $$
      * limitations under the License.
      ******************************************************************/
 
-    declare	
+    declare
 
     --Audit variables
     newJobFlag		integer;
@@ -34,20 +34,20 @@ AS $$
     rootPath		varchar(200);
     errorNumber		character varying;
     errorMessage	character varying;
-    
+
 begin
     rootNode := root_node;
     rootPath := '\' || rootNode || '\';
 
     stepCt := 0;
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
 
     databaseName := 'tm_cz';
     procedureName := 'i2b2_add_root_node';
-    
+
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -55,12 +55,12 @@ begin
 	newJobFlag := 1; -- True
 	select tm_cz.cz_start_audit (procedureName, databaseName) into jobId;
     end if;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start ' || procedureName,0,stepCt,'Done');
-    
+
     begin
-	
+
 	insert into i2b2metadata.table_access
 		    (c_table_cd
 		    ,c_table_name
@@ -113,12 +113,12 @@ begin
 	       (select 1 from i2b2metadata.table_access x
 		 where x.c_table_cd = rootNode);
 	get diagnostics rowCt := ROW_COUNT;
-	
+
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert to table_access',rowCt,stepCt,'Done');	
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert to table_access',rowCt,stepCt,'Done');
 
 	--	insert root_node into i2b2
-	
+
 	insert into i2b2metadata.i2b2
 		    (c_hlevel
 		    ,c_fullname
@@ -179,22 +179,22 @@ begin
 	       (select 1 from i2b2metadata.i2b2 x
 		 where x.c_name = rootNode);
 	get diagnostics rowCt := ROW_COUNT;
-	
+
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert root_node ' || rootNode || ' to i2b2',rowCt,stepCt,'Done');
-	
+
     end;
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End ' || procedureName,0,stepCt,'Done');
-    
+
     --Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 1;
-    
+
 exception
     when others then
 	errorNumber := SQLSTATE;
@@ -204,7 +204,7 @@ exception
     --End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
-	
+
 end;
 
 $$;

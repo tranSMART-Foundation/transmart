@@ -70,7 +70,7 @@ AS $$
      where not exists
 	   (select 1 from i2b2metadata.i2b2 x
 	     where t.leaf_node = x.c_fullname);
-    
+
     --	cursor to define the path for delete_one_node  this will delete any nodes that are hidden after i2b2_create_concept_counts
 
     delNodes CURSOR is
@@ -365,7 +365,7 @@ BEGIN
 
     --	get next partitionId
     select nextval('deapp.seq_mrna_partition_id') into partitionId;
-	
+
     partitionName := 'deapp.de_subject_microarray_data_' || partitionId::text; -- revert to using partitions
     partitionIndx := 'de_subject_microarray_data_' || partitionId::text; -- revert to using partitions
 
@@ -764,30 +764,30 @@ BEGIN
 				left outer join tm_wz.wt_mrna_nodes pn
 						   on  a.platform = pn.platform
 						   and a.category_cd like pn.category_cd || '%'
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(pn.tissue_type,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(pn.attribute_1,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(pn.attribute_2,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(pn.tissue_type,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(pn.attribute_1,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(pn.attribute_2,'')
 						   and pn.node_type = 'PLATFORM'
 				left outer join tm_wz.wt_mrna_nodes ttp
 						   on  a.tissue_type = ttp.tissue_type
 						   and a.category_cd like ttp.category_cd || '%'
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '' end = coalesce(ttp.platform,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(ttp.attribute_1,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(ttp.attribute_2,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '' end = coalesce(ttp.platform,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(ttp.attribute_1,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(ttp.attribute_2,'')
 						   and ttp.node_type = 'TISSUETYPE'
 				left outer join tm_wz.wt_mrna_nodes a1
 						   on  a.attribute_1 = a1.attribute_1
 						   and a.category_cd like a1.category_cd || '%'
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '' end = coalesce(a1.platform,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(a1.tissue_type,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(a1.attribute_2,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '' end = coalesce(a1.platform,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(a1.tissue_type,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(a1.attribute_2,'')
 						   and a1.node_type = 'ATTR1'
 				left outer join tm_wz.wt_mrna_nodes a2
 						   on  a.attribute_2 = a2.attribute_2
 						   and a.category_cd like a2.category_cd || '%'
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '' end = coalesce(a2.platform,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(a2.tissue_type,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(a2.attribute_1,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '' end = coalesce(a2.platform,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(a2.tissue_type,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(a2.attribute_1,'')
 						   and a2.node_type = 'ATTR2')
 		update deapp.de_subject_sample_mapping pd
 		set concept_code=upd.concept_code
@@ -963,9 +963,9 @@ BEGIN
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into de_subject_sample_mapping',rowCt,stepCt,'Done');
     pCount := pCount + rowCt;
-	
+
     --	check if all records from lt_src_mrna_subj_samp_map were added/updated
-	
+
     if sCount <> pCount then
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Not all records in lt_src_mrna_subj_samp_map inserted/updated in de_subject_sample_mapping',0,stepCt,'Done');
@@ -1029,7 +1029,7 @@ BEGIN
 		update i2b2metadata.i2b2 t
 		set c_columndatatype = 'T'
 		,c_metadataxml = null
-		,c_visualattributes=case when upd.node_type = 0 then 'LAH' else 'FA' end  
+		,c_visualattributes=case when upd.node_type = 0 then 'LAH' else 'FA' end
 		from upd
 		where t.c_basecode = upd.concept_cd;
         get diagnostics rowCt := ROW_COUNT;
@@ -1049,8 +1049,8 @@ BEGIN
 
     update i2b2metadata.i2b2 a
        set c_visualattributes='FAS'
-     where a.c_fullname = substr(topNode,1,instr(topNode,'\',1,3));
-        
+     where a.c_fullname = substr(topNode,1,tm_cz.instr(topNode,'\',1,3));
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',RowCt,stepCt,'Done');
 
@@ -1108,7 +1108,7 @@ BEGIN
 		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
         end;
-        stepCt := stepCt + 1; 
+        stepCt := stepCt + 1;
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove unusable negative intensity_value from lt_src_mrna_data for dataType R',rowCt,stepCt,'Done');
     end if;
 
@@ -1218,7 +1218,7 @@ BEGIN
     end if;
 
     return 1;
-    
+
 END;
 
 $$;

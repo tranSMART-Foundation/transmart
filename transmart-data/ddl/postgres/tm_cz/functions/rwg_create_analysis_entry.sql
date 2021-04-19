@@ -24,7 +24,7 @@ DECLARE
 	errorNumber   varchar;
 	errorMessage  varchar;
 
-	Cdelete CURSOR FOR 
+	Cdelete CURSOR FOR
 		SELECT
 			DISTINCT ( baa.bio_assay_analysis_id )
 		FROM
@@ -54,7 +54,7 @@ BEGIN
 	-- If this flag is set to 'D', all study data from biomart.bio_assay_analysis and biomart.bio_assay_analysis_data
 	IF upper(delete_flag) = 'D' THEN
 		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start Delete bio_assay_analysis_data Loop',0,stepCt,'Done');
-		stepCt := stepCt + 1;	
+		stepCt := stepCt + 1;
 
 		FOR Cdeleterow IN Cdelete LOOP
 			BEGIN

@@ -22,7 +22,7 @@ AS $$
      **************************************************************************/
 
     declare
- 
+
     msgTxt		character varying;
 
     --Audit variables
@@ -34,11 +34,11 @@ AS $$
     errorNumber		character varying;
     errorMessage	character varying;
     rtnCd		integer;
- 
+
 begin
 
     stepCt := 0;
-    
+
     --Set Audit Parameters
 
     databaseName := 'tm_cz';

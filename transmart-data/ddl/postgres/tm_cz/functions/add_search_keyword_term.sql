@@ -39,7 +39,7 @@ AS $$
 begin
 
     stepCt := 0;
-    
+
     --Set Audit Parameters
 
     databaseName := 'tm_cz';

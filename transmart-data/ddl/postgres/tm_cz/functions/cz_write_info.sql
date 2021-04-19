@@ -33,9 +33,9 @@ begin
 	  from tm_cz.cz_job_audit
 	 where job_id = jobID;
     end;
-    
+
     if (coalesce(debugValue,'no')) then
-        raise NOTICE 'CZ_WRITE_INFO job:% id:% line:% procedure:% info:%',
+        raise notice 'CZ_WRITE_INFO job:% id:% line:% procedure:% info:%',
 	      jobId, messageID, messageLine, messageProcedure, infoMessage;
     commit;
     return 1;

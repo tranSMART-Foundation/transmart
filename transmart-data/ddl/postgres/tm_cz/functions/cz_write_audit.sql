@@ -38,12 +38,12 @@ begin
       into lastTime
       from tm_cz.cz_job_audit
      where job_id = jobID;
-    
+
     --        clock_timestamp() is the current system time
-    
+
     select clock_timestamp() into currTime;
 
-    elapsedSecs := coalesce(((DATE_PART('day', currTime - lastTime) * 24 + 
+    elapsedSecs := coalesce(((DATE_PART('day', currTime - lastTime) * 24 +
                               DATE_PART('hour', currTime - lastTime)) * 60 +
                               DATE_PART('minute', currTime - lastTime)) * 60 +
                               DATE_PART('second', currTime - lastTime),0);
@@ -70,17 +70,17 @@ begin
             ,stepStatus
             ,currTime
             ,elapsedSecs);
-    exception 
+    exception
         when others then
             perform tm_cz.cz_write_error(jobId,SQLSTATE,SQLERRM,null,null);
             return -16;
     end;
 
     if (coalesce(debugValue,'no')) then
-        raise NOTICE 'CZ_WRITE_AUDIT job:% function:%.% step: % records:%  status:%  date:%  elapsed:%        %',
+        raise notice 'CZ_WRITE_AUDIT job:% function:%.% step: % records:%  status:%  date:%  elapsed:%        %',
 	      jobId, databaseName,procedureName, stepNumber, recordsManipulated, stepStatus, currTime, elapsedSecs, stepDesc;
     end if;
-	      
+
     return 1;
 end;
 $$;

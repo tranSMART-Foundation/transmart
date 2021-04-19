@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_proteomics_annot(currentjobid numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
-     *This stored procedure is for ETL to load proteomics ANNOTATION 
+     *This stored procedure is for ETL to load proteomics ANNOTATION
      * Date:10/29/2013
      ******************************************************************/
 
@@ -15,8 +15,8 @@ AS $$
     newJobFlag NUMERIC(1);
     databaseName character varying(100);
     procedureName character varying(100);
-    jobID numeric(18,0); 
-    stepCt numeric(18,0); 
+    jobID numeric(18,0);
+    stepCt numeric(18,0);
     gplId	character varying(100);
     errorNumber character varying;
     errorMessage character varying;
@@ -24,7 +24,7 @@ AS $$
 
 begin
 
-    stepCt := 0; 
+    stepCt := 0;
 
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -44,7 +44,7 @@ begin
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting I2B2_LOAD_PROTEOMICS_ANNOTATION',0,stepCt,'Done');
 
     --	get  id_ref  from external table
-    
+
     select distinct gpl_id into gplId from tm_lz.lt_protein_annotation ;
 
     stepCt := stepCt + 1;
@@ -75,7 +75,7 @@ begin
     begin
 	insert into  deapp.de_protein_annotation
 		     (gpl_id
-		     ,peptide 
+		     ,peptide
 		     ,uniprot_id
 		     ,biomarker_id
 		     ,organism)
@@ -87,7 +87,7 @@ begin
 	  from tm_lz.lt_protein_annotation d
 	       ,biomart.bio_marker p
 	 where d.gpl_id = gplId
-           and p.primary_external_id = d.uniprot_id 
+           and p.primary_external_id = d.uniprot_id
 	    --  and coalesce(d.organism,'Homo sapiens') = coalesce(p.organism,'Homo sapiens')
 	    -- and (d.gpl_id is not null or d.gene_symbol is not null)
 	       ;
@@ -97,7 +97,7 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing uniprot_id in de_protein_annotation',rowCt,stepCt,'Done');
@@ -112,23 +112,23 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, SQLSTATE, SQLERRM);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-    end;  
-    
+    end;
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update uniprot_name in DEAPP de_protein_annotation',rowCt,stepCt,'Done');
-    
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_proteomics_annotation',0,stepCt,'Done');
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
-    end if; 
+    end if;
 
     return 1;
 
-exception 
+exception
     when others then
 	errorNumber := SQLSTATE;
 	errorMessage := SQLERRM;

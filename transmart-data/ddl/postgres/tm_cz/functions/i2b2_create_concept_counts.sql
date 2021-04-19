@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_create_concept_counts(character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_concept_counts(path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_concept_counts(trialid character varying, path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -21,7 +21,7 @@ AS $$
      ******************************************************************/
 
     declare
-    
+
     --Audit variables
     newJobFlag		integer;
     databaseName 	VARCHAR(100);
@@ -31,9 +31,10 @@ AS $$
     rowCt			numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
+    tExplain 		text;
 
 begin
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -49,7 +50,13 @@ begin
     end if;
 
     stepCt := 0;
-    
+
+    raise NOTICE 'i2b2_create_concept_counts(%,%,0)', trialid, path;
+    select count(*) from i2b2demodata.concept_counts
+	 where concept_path like path || '%' escape '`' into rowCt;
+
+    raise NOTICE 'Before delete: concept_counts % records below concept_path %', rowCt, path;
+
     begin
 	delete from i2b2demodata.concept_counts
 	 where concept_path like path || '%' escape '`';
@@ -67,27 +74,38 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete counts for trial from I2B2DEMODATA concept_counts',rowCt,stepCt,'Done');
 
+    select count(*) from i2b2demodata.concept_counts
+	 where concept_path = path into rowCt;
+
+    raise NOTICE 'After detele: concept_counts % records for concept_path %', rowCt, path;
+
     --	Join each node (folder or leaf) in the path to its leaf in the work table to count patient numbers
 
     begin
-	insert into i2b2demodata.concept_counts
-		    (concept_path
-		    ,parent_concept_path
-		    ,patient_count)
+    for tExplain in
+	EXPLAIN (ANALYZE, VERBOSE, BUFFERS)
+	insert into i2b2demodata.concept_counts (
+	    concept_path
+	    ,parent_concept_path
+	    ,patient_count)
 	select fa.c_fullname
-	       ,ltrim(SUBSTR(fa.c_fullname, 1,instr(fa.c_fullname, '\',-1,2)))
-	       ,count(distinct tpm.patient_num)
+	       ,ltrim(SUBSTR(fa.c_fullname, 1,tm_cz.instr(fa.c_fullname, '\',-1,2)))
+	       ,count(distinct ob.patient_num)
 	  from i2b2metadata.i2b2 fa
 	       ,i2b2metadata.i2b2 la
-	       ,i2b2demodata.observation_fact tpm
+	left join i2b2demodata.observation_fact ob
+	on la.c_basecode = ob.concept_cd
 	 where fa.c_fullname like path || '%' escape '`'
 	   and substr(fa.c_visualattributes,2,1) != 'H'
 	   and la.c_fullname like fa.c_fullname || '%' escape '`'
 	   and la.c_visualattributes like 'L%'
-	   and la.c_basecode = tpm.concept_cd   -- outer join in oracle ???
-	 group by fa.c_fullname
-		  ,ltrim(SUBSTR(fa.c_fullname, 1,instr(fa.c_fullname, '\',-1,2)));
-	get diagnostics rowCt := ROW_COUNT;		
+	group by fa.c_fullname
+	,ltrim(SUBSTR(fa.c_fullname, 1,tm_cz.instr(fa.c_fullname, '\',-1,2)))
+	LOOP
+	    raise notice 'explain: %', tExplain;
+	END LOOP
+           ;
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -100,10 +118,12 @@ begin
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert counts for trial into I2B2DEMODATA concept_counts',rowCt,stepCt,'Done');
-    
+
     --SET ANY NODE WITH MISSING OR ZERO COUNTS TO HIDDEN
 
     begin
+    for tExplain in
+    EXPLAIN (ANALYZE, VERBOSE, BUFFERS)
 	update i2b2metadata.i2b2
 	   set c_visualattributes = substr(c_visualattributes,1,1) || 'H' || substr(c_visualattributes,3,1)
 	 where c_fullname like path || '%' escape '`'
@@ -116,8 +136,12 @@ begin
 			where c_fullname = zc.concept_path
 			  and zc.patient_count = 0)
 	       )
-	       and c_name != 'SECURITY';
-	get diagnostics rowCt := ROW_COUNT;	
+	       and c_name != 'SECURITY'
+	LOOP
+	    raise notice 'explain: %', tExplain;
+	END LOOP
+	;
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -130,7 +154,7 @@ begin
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Nodes hidden with missing/zero counts for trial into I2B2DEMODATA concept_counts',rowCt,stepCt,'Done');
-    
+
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
 	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');

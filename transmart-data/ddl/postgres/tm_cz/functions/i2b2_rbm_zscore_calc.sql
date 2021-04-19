@@ -134,7 +134,7 @@ begin
     --	For Reload, make sure that the TrialId passed as parameter has data in de_subject_rbm_data
     --	If not, raise exception
 
-    if runType = 'R' then 
+    if runType = 'R' then
 	select count(*) into idxExists
 	from deapp.de_subject_rbm_data
 	where trial_name = TrialId;
@@ -155,7 +155,7 @@ begin
     execute('truncate table tm_wz.wt_subject_rbm_calcs');
     execute('truncate table tm_wz.wt_subject_rbm_med');
 
-    execute('drop index if exists tm_wz.wt_subject_rbm_logs_i1');		
+    execute('drop index if exists tm_wz.wt_subject_rbm_logs_i1');
 
     execute('drop index if exists tm_wz.wt_subject_rbm_calcs_i1');
 
@@ -175,8 +175,8 @@ begin
 		,patient_id
 	    )
 	    select probeset
-	           ,intensity_value  
-	           ,assay_id 
+	           ,intensity_value
+	           ,assay_id
 	           ,intensity_value
 	           ,patient_id
 	      from tm_wz.wt_subject_rbm_probeset
@@ -190,8 +190,8 @@ begin
 		,patient_id
 	    )
 	    select probeset
-		   ,intensity_value 
-		   ,assay_id 
+		   ,intensity_value
+		   ,assay_id
 		   ,ln(intensity_value)/ln(logBase::double precision)
 		   ,patient_id
 	      from tm_wz.wt_subject_rbm_probeset
@@ -224,13 +224,13 @@ begin
 		    ,median_intensity
 		    ,stddev_intensity
 		    )
-	select d.trial_name 
+	select d.trial_name
 	       ,d.probeset_id
 	       ,avg(log_intensity)
 	       ,median(log_intensity)
 	       ,stddev(log_intensity)
-	  from tm_wz.wt_subject_rbm_logs d 
-	 group by d.trial_name 
+	  from tm_wz.wt_subject_rbm_logs d
+	 group by d.trial_name
 		  ,d.probeset_id;
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -265,16 +265,16 @@ begin
 	    ,patient_id
 	)
 	select d.probeset_id
-	       ,d.intensity_value 
-	       ,d.log_intensity 
-	       ,d.assay_id  
-	       ,c.mean_intensity 
-	       ,c.stddev_intensity 
-	       ,c.median_intensity 
+	       ,d.intensity_value
+	       ,d.log_intensity
+	       ,d.assay_id
+	       ,c.mean_intensity
+	       ,c.stddev_intensity
+	       ,c.median_intensity
 	       ,(CASE WHEN stddev_intensity=0 THEN 0 ELSE (log_intensity - median_intensity ) / stddev_intensity END)
 	       ,d.patient_id
-	  from tm_wz.wt_subject_rbm_logs d 
-	       ,tm_wz.wt_subject_rbm_calcs c 
+	  from tm_wz.wt_subject_rbm_logs d
+	       ,tm_wz.wt_subject_rbm_calcs c
 	 where d.probeset_id = c.probeset_id;
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -292,11 +292,11 @@ begin
 
     -- insert into de_subject_rbm_data when dataType is T (transformed)
 
-    sqlText := 'insert into ' || partitionName || 
+    sqlText := 'insert into ' || partitionName ||
 	'(partition_id, trial_name, antigen_name, patient_id, gene_symbol, gene_id, assay_id ' ||
 	',concept_cd, value, normalized_value, unit, zscore, id) ' ||
 	'select ' || partitioniD::text || ', ''' || TrialId || '''' ||
-	',trim(substr(m.probeset_id,1,instr(m.probeset_id,''('')-1)) ' ||
+	',trim(substr(m.probeset_id,1,tm_cz.instr(m.probeset_id,''('')-1)) ' ||
 	',m.patient_id ' ||
 	',a.gene_symbol  ' ||
 	',a.gene_id::integer  ' ||
@@ -308,7 +308,7 @@ begin
 	'then case when ''' || logBase || ''' = -1 then null else power( ''' || logBase || ''' , m.log_intensity)::numeric end ' ||
 	'else null ' ||
 	'end,4) as normalized_value ' ||
-	',trim(substr(m.probeset_id ,instr(m.probeset_id ,''('',-1,1),length(m.probeset_id ))) ' ||
+	',trim(substr(m.probeset_id ,tm_cz.instr(m.probeset_id ,''('',-1,1),length(m.probeset_id ))) ' ||
 	',(CASE WHEN m.zscore < -2.5 THEN -2.5 WHEN m.zscore >  2.5 THEN  2.5 ELSE m.zscore END) ' ||
 	',nextval(''deapp.RBM_ANNOTATION_ID'') '||
 	'from tm_wz.wt_subject_rbm_med m ' ||
@@ -316,7 +316,7 @@ begin
 	',deapp.DE_RBM_ANNOTATION a ' ||
 	',deapp.de_subject_sample_mapping d ' ||
 	'where  ' ||
-	'trim(substr(p.probeset,1,instr(p.probeset,''('')-1)) =trim(a.antigen_name)  ' ||
+	'trim(substr(p.probeset,1,tm_cz.instr(p.probeset,''('')-1)) =trim(a.antigen_name)  ' ||
 	'and   d.subject_id=p.subject_id ' ||
 	'and p.platform=a.gpl_id ' ||
 	'and m.assay_id=p.assay_id ' ||
@@ -354,8 +354,8 @@ begin
     end if;
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
-    if newJobFlag = 1 then 
-	perform tm_cz.cz_end_audit (jobID, 'SUCCESS'); 
+    if newJobFlag = 1 then
+	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
     end if;
 
     return 1;

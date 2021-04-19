@@ -65,7 +65,7 @@ begin
     begin
 	delete from deapp.de_chromosomal_region
 	 where gpl_id = gplId;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -83,7 +83,7 @@ begin
     begin
 	delete from deapp.de_gpl_info
 	 where platform = gplId;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -116,7 +116,7 @@ begin
 
     select distinct organism INTO organismId FROM tm_lz.lt_chromosomal_region;
     begin
-	insert into deapp.de_gpl_info 
+	insert into deapp.de_gpl_info
 		    (platform
 		    ,title
 		    ,organism
@@ -131,7 +131,7 @@ begin
 		,marker_type
 		,genome_release
 		,gene_annotation_id);
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -149,7 +149,7 @@ begin
 
     -- Next insert the new definitions
     begin
-	insert into deapp.de_chromosomal_region 
+	insert into deapp.de_chromosomal_region
   		    (gpl_id
 		    ,region_name
 		    ,chromosome
@@ -171,7 +171,7 @@ begin
 	       ,lz.gene_id
 	       ,lz.organism
 	  from tm_lz.lt_chromosomal_region lz;
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -188,11 +188,11 @@ begin
 
 
     --	update gene_id if null
-    
+
     begin
 	with upd as (select b.bio_marker_name as gene_symbol
 			    ,b.organism
-			    ,min(b.primary_external_id::numeric) as gene_id 
+			    ,min(b.primary_external_id::numeric) as gene_id
 		       from biomart.bio_marker b
 		      where upper(b.bio_marker_type) = 'GENE'
 		      group by b.bio_marker_name, b.organism)
@@ -209,7 +209,7 @@ begin
 		  where a.gene_symbol = x.bio_marker_name
 		    and upper(x.organism) = upper(a.organism)
 		    and upper(x.bio_marker_type) = 'GENE');
-	get diagnostics rowCt := ROW_COUNT;	
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -219,13 +219,13 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-    end;		
+    end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_chromosomal_region',rowCt,stepCt,'Done');
 
 
     --	update gene_symbol if null
-    
+
     begin
 	with upd as (select b.primary_external_id::numeric as gene_id
 			    ,b.organism
@@ -255,8 +255,8 @@ begin
 	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return -16;	
-    end;		
+	    return -16;
+    end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_symbol in de_chromosomal_region',rowCt,stepCt,'Done');
 

@@ -1,7 +1,7 @@
 --
 -- Name: czf_num_occurances(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION czf_num_occurances(input_str character varying, search_str character varying) RETURNS integer
+CREATE FUNCTION tm_cz.czf_num_occurances(input_str character varying, search_str character varying) RETURNS integer
     LANGUAGE plpgsql
 AS $$
     declare
@@ -10,7 +10,7 @@ AS $$
 
 begin
     num := 0;
-    while instr(input_str, search_str, 1, num + 1) > 0 loop
+    while tm_cz.instr(input_str, search_str, 1, num + 1) > 0 loop
 	num := num + 1;
     end loop;
 

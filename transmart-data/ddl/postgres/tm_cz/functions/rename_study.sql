@@ -17,33 +17,33 @@ begin
     newTopNode := '\' || programName || '\' || newTitle|| '\';
     regex1 := '\\' || replace(replace(programname, '(', '\('), ')', '\)') || '\\' || replace(replace(oldtitle, '(', '\('), ')', '\)')|| '\\' || '(.*)';
     regex2 := '\\' || programname || '\\' || newtitle|| '\\' || '\1';
-    
+
     update i2b2metadata.i2b2
        set c_fullname=regexp_replace(c_fullname, regex1, regex2),
            c_dimcode=regexp_replace(c_dimcode, regex1, regex2),
            c_tooltip=regexp_replace(c_tooltip, regex1, regex2);
     update i2b2metadata.i2b2
        set c_name=newTitle where c_fullname=newTopNode;
-    
+
     update i2b2metadata.i2b2_secure
        set c_fullname=regexp_replace(c_fullname, regex1, regex2),
            c_dimcode=regexp_replace(c_dimcode, regex1, regex2),
            c_tooltip=regexp_replace(c_tooltip, regex1, regex2);
     update i2b2metadata.i2b2_secure
        set c_name=newTitle where c_fullname=newTopNode;
-    
+
     update i2b2demodata.concept_counts
        set concept_path=regexp_replace(concept_path, regex1, regex2);
     update i2b2demodata.concept_counts
        set parent_concept_path=regexp_replace(parent_concept_path, regex1, regex2);
-    
+
     update i2b2demodata.concept_dimension
        set concept_path=regexp_replace(concept_path, regex1, regex2);
     update i2b2demodata.concept_dimension
        set name_char=newTitle where concept_path=newTopNode;
-    
+
     commit;
-    
+
 END;
 
 $$;

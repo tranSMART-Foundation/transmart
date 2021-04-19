@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_rbm_data(trial_id character varying, 
     LANGUAGE plpgsql
     AS $$
     declare
-    
+
     /******************************************************************
      * This stored procedure is for ETL  to load  RBM data for Sanofi
      * Date: 12/05/2013
@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_rbm_data(trial_id character varying, 
     --
     --		tissue_type	=>	tissue_type
     --		attribute_1	=>	sample_type
-    --		attribute_2	=>	timepoint	
+    --		attribute_2	=>	timepoint
 
     TrialID		varchar(100);
     RootNode		varchar(2000);
@@ -67,7 +67,7 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_rbm_data(trial_id character varying, 
     --	cursor to define the path for delete_one_node  this will delete any nodes that are hidden after i2b2_create_concept_counts
 
     delNodes CURSOR FOR
-    SELECT distinct c_fullname 
+    SELECT distinct c_fullname
       from  i2b2metadata.i2b2
      where c_fullname like topNode || '%'
        and substring(c_visualattributes from 2 for 1) = 'H';
@@ -172,7 +172,7 @@ begin
 	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Tissue Type data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
 	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	perform tm_cz.cz_END_AUDIT (JOBID,'FAIL');
-	return 162;  
+	return 162;
     end if;
 
     --	check if there are multiple platforms, if yes, then platform must be supplied in lt_src_rbm_data
@@ -280,7 +280,7 @@ begin
 		   and upper(g.marker_type) = 'RBM'
 		   and not exists
 		       (select 1 from i2b2demodata.patient_dimension x
-			 where x.sourcesystem_cd = 
+			 where x.sourcesystem_cd =
 			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g'))
 	  ) as x;
 	get diagnostics rowCt := ROW_COUNT;
@@ -332,11 +332,11 @@ begin
     partitionName := 'deapp.de_subject_rbm_data_' || partitionId::text;
     partitionIndx := 'de_subject_rbm_data_' || partitionId::text;
 
-    --	Cleanup any existing data in de_subject_sample_mapping.  
+    --	Cleanup any existing data in de_subject_sample_mapping.
 
     begin
-	delete from deapp.DE_SUBJECT_SAMPLE_MAPPING 
-	 where trial_name = TrialID 
+	delete from deapp.DE_SUBJECT_SAMPLE_MAPPING
+	 where trial_name = TrialID
 	       and coalesce(source_cd,'STD') = sourceCd
 	       and platform = 'RBM'; --Making sure only rbm data is deleted
 	get diagnostics rowCt := ROW_COUNT;
@@ -380,7 +380,7 @@ begin
 	    ,a.attribute_2
 	    ,g.title
 	  from Tm_lz.lt_src_rbm_subj_samp_map a
-	       ,deapp.de_gpl_info g 
+	       ,deapp.de_gpl_info g
 	 where a.trial_name = TrialID
 	   and coalesce(a.platform,'GPL570') = g.platform
 	   and a.source_cd = sourceCD
@@ -677,7 +677,7 @@ begin
 
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
-    end loop;  
+    end loop;
 
     --	update concept_cd for nodes, this is done to make the next insert easier
 
@@ -803,7 +803,7 @@ begin
 		    ,a.source_cd
 		    ,TrialId as omic_source_study
 		    ,b.patient_num as omic_patient_id
-		  from tm_lz.lt_src_rbm_subj_samp_map a		
+		  from tm_lz.lt_src_rbm_subj_samp_map a
 		    --Joining to Pat_dim to ensure the ID's match. If not I2B2 won't work.
 			   inner join i2b2demodata.patient_dimension b
 				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':', 'g') = b.sourcesystem_cd
@@ -818,25 +818,25 @@ begin
 				   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(pn.tissue_type,'@')
 				   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(pn.attribute_1,'@')
 				   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(pn.attribute_2,'@')
-				   and pn.node_type = 'PLATFORM'	  
+				   and pn.node_type = 'PLATFORM'
 			   left outer join tm_wz.wt_rbm_nodes ttp
 					      on a.tissue_type = ttp.tissue_type
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '@' end = coalesce(ttp.platform,'@')
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(ttp.attribute_1,'@')
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(ttp.attribute_2,'@')
-					      and ttp.node_type = 'TISSUETYPE'		  
+					      and ttp.node_type = 'TISSUETYPE'
 			   left outer join tm_wz.wt_rbm_nodes a1
 					      on a.attribute_1 = a1.attribute_1
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a1.platform,'@')
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a1.tissue_type,'@')
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(a1.attribute_2,'@')
-					      and a1.node_type = 'ATTR1'		  
+					      and a1.node_type = 'ATTR1'
 			   left outer join tm_wz.wt_rbm_nodes a2
 					      on a.attribute_2 = a1.attribute_2
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a2.platform,'@')
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a2.tissue_type,'@')
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(a2.attribute_1,'@')
-					      and a2.node_type = 'ATTR2'			  
+					      and a2.node_type = 'ATTR2'
 			   left outer join i2b2demodata.patient_dimension sid
 					      on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':','g') = sid.sourcesystem_cd
 		 where a.trial_name = TrialID
@@ -889,7 +889,7 @@ begin
 			,'' -- no units available
 			,1
 	  from  deapp.de_subject_sample_mapping m
-	 where m.trial_name = TrialID 
+	 where m.trial_name = TrialID
 	   and m.source_cd = sourceCD
 	   and m.platform = 'RBM';
 	get diagnostics rowCt := ROW_COUNT;
@@ -907,7 +907,7 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
-    --	Insert sample facts 
+    --	Insert sample facts
 
     begin
 	insert into i2b2demodata.observation_fact (
@@ -938,7 +938,7 @@ begin
 	    ,'@'
 	    ,'' -- no units available
 	  from  deapp.de_subject_sample_mapping m
-	 where m.trial_name = TrialID 
+	 where m.trial_name = TrialID
 	   and m.source_cd = sourceCd
 	   and m.platform = 'RBM'
 	   and m.patient_id != m.sample_id;
@@ -1003,7 +1003,7 @@ begin
 
     ---- update c_metadataxml in i2b2
 
-    begin	
+    begin
 	for ul in uploadI2b2
 	    loop
 	    update i2b2metadata.i2b2 n
@@ -1057,7 +1057,7 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-    end;  
+    end;
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for leaf nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
@@ -1065,19 +1065,19 @@ begin
     begin
 	update i2b2metadata.i2b2 a
 	   set c_visualattributes='FAS'
-         where a.c_fullname = substr(topNode,1,instr(topNode,'\',1,3));
+         where a.c_fullname = substr(topNode,1,tm_cz.instr(topNode,'\',1,3));
     exception
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
 
     stepCt := stepCt + 1; get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update visual attributes for study nodes in I2B2METADATA i2b2',rowCt,stepCt,'Done');
- 
+
     --Build concept Counts
     --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
     -- a unique top-level node for rbm data
@@ -1118,7 +1118,7 @@ begin
 
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
-    end loop;  	
+    end loop;
 
     --Reload Security: Inserts one record for every I2B2 record into the security table
 
@@ -1169,7 +1169,7 @@ begin
             ,timepoint
             ,sample_type
             ,platform
-            ,tissue_type    
+            ,tissue_type
 	)
 	select md.analyte
                ,avg(md.avalue)
@@ -1189,7 +1189,7 @@ begin
 	   and sd.trial_name =TrialId
 	   and sd.source_cd = sourceCd
 	    -- and sd.gpl_id = gs.id_ref   --check
-	    --and trim(substr(md.analyte,1,instr(md.analyte,'(')-1)) =trim(gs.antigen_name)
+	    --and trim(substr(md.analyte,1,tm_cz.instr(md.analyte,'(')-1)) =trim(gs.antigen_name)
 	    --    and (CASE WHEN dataType = 'R' THEN sign(md.avalue) ELSE 1 END) <> -1  --UAT 154 changes done on 19/03/2014
 	   and sd.subject_id in (select subject_id from tm_lz.LT_SRC_RBM_SUBJ_SAMP_MAP)
 	 group by md.analyte
@@ -1214,9 +1214,9 @@ begin
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_rbm_probeset',rowCt,stepCt,'Done');
-	
+
     --	Calculate ZScores and insert data into de_subject_rbm_data.  The 'L' parameter indicates that the gene expression data will be selected from
-    --	wt_subject_rbm_probeset as part of a Load.  
+    --	wt_subject_rbm_probeset as part of a Load.
 
     if dataType = 'R' or dataType = 'L' then
 	select tm_cz.i2b2_rbm_zscore_calc(TrialID, partitionName, partitionindx,partitioniD,'L',jobId,dataType,logBase,sourceCD) into rtnCd;
@@ -1239,6 +1239,6 @@ begin
     return 1;
 
 end;
- 
+
 $$;
 

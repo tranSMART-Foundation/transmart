@@ -50,7 +50,7 @@ begin
     sourceCd := source_cd;
 
     partitionindx := partition_indx;
-    partitionName := partition_name;	
+    partitionName := partition_name;
 
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -99,9 +99,9 @@ begin
 		  else case when logBase = -1 then 0 else power(logBase,normalized_readcount) end
 		  end
 		 ,case when dataType = 'L' then normalized_readcount else log(logBase,normalized_readcount::numeric) end
-		 ,patient_id 
+		 ,patient_id
 		 ,trial_name
-	  from tm_wz.wt_subject_rnaseq_region;		
+	  from tm_wz.wt_subject_rnaseq_region;
         get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -197,6 +197,6 @@ begin
 
     return 1;
 end;
- 
+
 $$;
 

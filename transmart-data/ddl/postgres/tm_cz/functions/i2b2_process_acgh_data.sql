@@ -351,9 +351,9 @@ begin
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
-    
+
     --	check if trial/source_cd already loaded, if yes, get existing partition_id else get new one
-	
+
     select count(*) into partExists
       from deapp.de_subject_sample_mapping sm
      where sm.trial_name = TrialId
@@ -782,27 +782,27 @@ begin
 					and ln.node_type = 'LEAF'
 				left outer join tm_wz.wt_mrna_nodes pn
 						   on  a.platform = pn.platform
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(pn.tissue_type,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(pn.attribute_1,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(pn.attribute_2,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(pn.tissue_type,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(pn.attribute_1,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(pn.attribute_2,'')
 						   and pn.node_type = 'PLATFORM'
 				left outer join tm_wz.wt_mrna_nodes ttp
 						   on  a.tissue_type = ttp.tissue_type
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '' end = coalesce(ttp.platform,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(ttp.attribute_1,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(ttp.attribute_2,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '' end = coalesce(ttp.platform,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(ttp.attribute_1,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(ttp.attribute_2,'')
 						   and ttp.node_type = 'TISSUETYPE'
 				left outer join tm_wz.wt_mrna_nodes a1
 						   on  a.attribute_1 = a2.attribute_1
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '' end = coalesce(a1.platform,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(a1.tissue_type,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(a1.attribute_2,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '' end = coalesce(a1.platform,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(a1.tissue_type,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '' end = coalesce(a1.attribute_2,'')
 						   and a1.node_type = 'ATTR1'
 				left outer join tm_wz.wt_mrna_nodes a2
 						   on  a.attribute_2 = a2.attribute_2
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '' end = coalesce(a2.platform,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(a2.tissue_type,'')
-						   and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(a2.attribute_1,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '' end = coalesce(a2.platform,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(a2.tissue_type,'')
+						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(a2.attribute_1,'')
 						   and a2.node_type = 'ATTR2')
 		update deapp.de_subject_sample_mapping pd
 		set concept_code=upd.concept_code
@@ -834,7 +834,7 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-		
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update existing data in de_subject_sample_mapping',rowCt,stepCt,'Done');
     pcount := rowCt;	--	set counter to check that all subject_sample mapping records were added/updated
@@ -973,16 +973,16 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into DEAPP de_subject_sample_mapping',rowCt,stepCt,'Done');
     pCount := pCount + rowCt;
-	
+
     --	check if all records from lt_src_mrna_subj_samp_map were added/updated
-	
+
     if scount <> pCount then
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Not all records in lt_src_mrna_subj_samp_map inserted/updated in de_subject_sample_mapping',0,stepCt,'Done');
 	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
-    end if;	
+    end if;
 
     --	Insert records for subjects into observation_fact
 
@@ -1049,7 +1049,7 @@ begin
 	    update i2b2metadata.i2b2 t
 	       set c_columndatatype = 'T'
 		   ,c_metadataxml = null
-		   ,c_visualattributes=case when upd.node_type = 0 then 'LAH' else 'FA' end  
+		   ,c_visualattributes=case when upd.node_type = 0 then 'LAH' else 'FA' end
 		   from upd
 	     where t.c_basecode = upd.concept_cd;
 	get diagnostics rowCt := ROW_COUNT;
@@ -1169,13 +1169,13 @@ begin
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
     end if;
-	
+
     --	add partition if it doesn't exist, drop indexes and truncate if it does (reload)
 
     select count(*) into pExists
       from information_schema.tables
      where table_name = partitionindx;
-	
+
     if pExists = 0 then
 	sqlText := 'create table ' || partitionName || ' ( constraint mrna_' || partitionId::text || '_check check ( partition_id = ' || partitionId::text ||
 	    ')) inherits (deapp.de_subject_acgh_data)';

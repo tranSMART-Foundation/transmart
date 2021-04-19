@@ -55,30 +55,31 @@ BEGIN
 		'Start FUNCTION', 0, stepCt, 'Done');
 	stepCt := 1;
 
-	delete from TM_LZ.Rwg_Analysis where upper(study_id) =upper(trialID);
+	delete from tm_lz.rwg_analysis where upper(study_id) =upper(trialID);
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing records from TM_LZ.Rwg_Analysis',rowCt,stepCt,'Done');
 	stepCt := stepCt + 1;
 
-	delete from TM_LZ.Rwg_Cohorts where upper(study_id) =upper(trialID);
+	delete from tm_lz.rwg_cohorts where upper(study_id) =upper(trialID);
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 
-	perform tm_cz.cz_Write_Audit(Jobid,Databasename,Procedurename,'Delete existing records from TM_LZ.Rwg_Cohorts',rowCt,Stepct,'Done');
+	perform tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'Delete existing records from TM_LZ.Rwg_Cohorts',rowCt,Stepct,'Done');
 	stepCt := stepCt + 1;
 
-	delete from TM_LZ.Rwg_Samples where upper(study_id) =upper(trialID);
+	delete from tm_lz.rwg_samples where upper(study_id) =upper(trialID);
 	perform tm_cz.cz_Write_Audit(Jobid,Databasename,Procedurename,'Delete existing records from TM_LZ.Rwg_Samples',rowCt,Stepct,'Done');
 	stepCt := stepCt + 1;
 
 	-- not used??
-	-- delete from TM_LZ.RWG_BAAD_ID where upper(study_id) =upper(trialID);
-	--Cz_Write_Audit(Jobid,Databasename,Procedurename,'Delete existing records from TM_LZ.RWG_BAAD_ID',rowCt,Stepct,'Done');
-	--stepCt := stepCt + 1;
+	-- delete from tm_lz.rwg_baad_id where upper(study_id) =upper(trialID);
+	-- tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'Delete existing records from TM_LZ.RWG_BAAD_ID',rowCt,Stepct,'Done');
+	-- stepCt := stepCt + 1;
 	--Insert Analysis
-	BEGIN
-	INSERT INTO TM_LZ.Rwg_Analysis
-	(
+
+    BEGIN
+
+	INSERT INTO tm_lz.rwg_analysis (
 		Study_Id,
 		Cohorts,
 		ANALYSIS_ID,
@@ -105,7 +106,7 @@ BEGIN
 		Replace(  Long_Desc,'"',''),
 		Replace(   short_desc,'"',''),
 		now()
-    FROM  TM_LZ.Rwg_Analysis_Ext
+    FROM  tm_lz.rwg_analysis_ext
     WHERE upper(study_id) = upper(trialID);
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId, databaseName, procedureName,
@@ -159,7 +160,7 @@ BEGIN
     --Insert Cohorts
 	BEGIN
 	INSERT
-	INTO TM_LZ.Rwg_Cohorts
+	INTO tm_lz.rwg_cohorts
 	(
 		Study_Id,
 		Cohort_Id,
@@ -178,7 +179,7 @@ BEGIN
 	Replace(Short_Desc, '"',''),
 	Replace(Treatment,'"',''),
 	now()
-	From  TM_LZ.Rwg_Cohorts_Ext
+	From  tm_lz.rwg_cohorts_ext
 	where upper(study_id) = upper(trialID);
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;
@@ -197,7 +198,7 @@ BEGIN
 	--Insert samples
 	BEGIN
 	INSERT
-	INTO TM_LZ.Rwg_Samples(
+	INTO tm_lz.rwg_samples(
 		study_id, COHORTS, EXPR_ID, IMPORT_DATE
 	)
 	SELECT
@@ -205,7 +206,7 @@ BEGIN
 		trim(upper(Replace(  Cohorts,'"',''))),
 		Replace(  Expr_Id, '"',''),
 		now()
-	FROM  TM_LZ.Rwg_Samples_Ext
+	FROM  tm_lz.rwg_samples_ext
 	WHERE upper(study_id) = upper(trialID);
 
 	GET DIAGNOSTICS rowCt := ROW_COUNT;

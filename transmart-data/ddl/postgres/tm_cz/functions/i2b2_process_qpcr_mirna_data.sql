@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_qpcr_mirna_data(trial_id character
     --
     --		tissue_type	=>	tissue_type
     --		attribute_1	=>	sample_type
-    --		attribute_2	=>	timepoint	
+    --		attribute_2	=>	timepoint
 
     Declare
     TrialID		varchar(100);
@@ -44,7 +44,7 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_qpcr_mirna_data(trial_id character
     v_bio_experiment_id	numeric(18,0);
     mirnaType varchar(15);
     -- mirnaPlatform varchar(20);
-  
+
     --Audit variables
     newJobFlag numeric(1);
     databaseName varchar(100);
@@ -67,12 +67,12 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_qpcr_mirna_data(trial_id character
     --	cursor to define the path for delete_one_node  this will delete any nodes that are hidden after i2b2_create_concept_counts
 
     delNodes CURSOR for
-    select distinct c_fullname 
+    select distinct c_fullname
       from  i2b2metadata.i2b2
      where c_fullname like topNode || '%'
        and substr(c_visualattributes,2,1) = 'H';
 
-    uploadI2b2 cursor for 
+    uploadI2b2 cursor for
     select category_cd,display_value,display_label,display_unit
       from tm_lz.lt_src_mirna_display_mapping;
 
@@ -80,14 +80,14 @@ begin
     TrialID := upper(trial_id);
     secureStudy := upper(secure_study);
     mirnaType:=upper(mirna_type);
-	
+
     if (secureStudy not in ('Y','N') ) then
 	secureStudy := 'Y';
     end if;
-	
-    topNode := REGEXP_REPLACE('\' || top_node || '\','(\\){2,}', '\', 'g');	
+
+    topNode := REGEXP_REPLACE('\' || top_node || '\','(\\){2,}', '\', 'g');
     select length(topNode)-length(replace(topNode,'\','')) into topLevel ;
-	
+
     if data_type is null then
 	dataType := 'R';
     else
@@ -117,18 +117,18 @@ begin
     stepCt := 0;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_qpcr_mirna_data',0,stepCt,'Done');
-	
+
     --	Get count of records in LT_SRC_MIRNA_SUBJ_SAMP_MAP
-	
+
     select count(*) into sCount
       from tm_lz.lt_src_mirna_subj_samp_map;
-	
+
     --	check if all subject_sample map records have a platform, If not, abort run
-	
+
     select count(*) into pCount
       from tm_lz.lt_src_mirna_subj_samp_map
      where platform is null;
-	
+
     if pCount > 0 then
 	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Platform data missing from one or more subject_sample mapping records',1,stepCt,'ERROR');
 	perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
@@ -137,44 +137,44 @@ begin
     end if;
 
     --	check if platform exists in de_qpcr_mirna_annotation .  If not, abort run.
-	
+
     select count(*) into pCount
       from deapp.de_qpcr_mirna_annotation
      where gpl_id in (select distinct m.platform from tm_lz.lt_src_mirna_subj_samp_map m);
-	
+
     if PCOUNT = 0 then
 	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Unmapped platform',1,stepCt,'ERROR');
 	perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobId,'FAIL');
 	return 162;
     end if;--mod
-	
+
     select count(*) into pCount
       from deapp.de_gpl_info
      where platform in (select distinct m.platform from tm_lz.lt_src_mirna_subj_samp_map m);
-	
+
     if PCOUNT = 0 then
 	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'No platform in de_gpl_info',1,stepCt,'ERROR');
 	perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobId,'FAIL');
 	return 163;
     end if;
-		
+
     --	check if all subject_sample map records have a tissue_type, If not, abort run
-	
+
     select count(*) into pCount
       from tm_lz.lt_src_mirna_subj_samp_map
      where tissue_type is null;
-	
+
     if pCount > 0 then
 	perform tm_cz.cz_write_audit(jobId,databasename,procedurename,'Missing tissue',1,stepCt,'ERROR');
 	perform tm_cz.cz_error_handler(jobid,procedurename, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobId,'FAIL');
 	return 164;
     end if;
-	
+
     --	check if there are multiple platforms, if yes, then platform must be supplied in lt_src_qpcr_mirna_data
-	
+
     select count(*) into pCount
       from (select sample_cd
 	      from tm_lz.lt_src_mirna_subj_samp_map
@@ -187,33 +187,33 @@ begin
 	perform tm_cz.cz_end_audit (jobId,'FAIL');
 	return 165;
     end if;
-		
+
     -- Get root_node from topNode
 
-    select parse_nth_value(topNode, 2, '\') into RootNode ;
-	
+    select tm_cz.parse_nth_value(topNode, 2, '\') into RootNode ;
+
     select count(*) into pExists
       from i2b2metadata.table_access
      where c_name = rootNode;
-	
+
     if pExists = 0 then
 	perform tm_cz.i2b2_add_root_node(rootNode, jobId);
     end if;
-	
+
     select c_hlevel into root_level
       from i2b2metadata.i2b2
      where c_name = RootNode;
-	
+
     -- Get study name from topNode
 
-    select parse_nth_value(topNode, topLevel, '\') into study_name ;
-	
+    select tm_cz.parse_nth_value(topNode, topLevel, '\') into study_name ;
+
     --	Add any upper level nodes as needed
-	
+
     tPath := REGEXP_REPLACE(replace(top_node,study_name,''),'(\\){2,}', '\', 'g');
     select length(tPath) - length(replace(tPath,'\','')) into pCount ;
     if pCount > 2 then
-	select i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
+	select tm_cz.i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
 	if(rtnCd <> 1) then
 	    tText := 'Failed to fill in tree '|| tPath;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
@@ -223,14 +223,14 @@ begin
     end if;
 
     --	uppercase study_id in lt_src_mirna_subj_samp_map in case curator forgot
-	
+
     update tm_lz.lt_src_mirna_subj_samp_map
        set trial_name=upper(trial_name);
-	
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_MIRNA_SUBJ_SAMP_MAP',rowCt,stepCt,'Done');	
-	
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_MIRNA_SUBJ_SAMP_MAP',rowCt,stepCt,'Done');
+
     --	create records in patient_dimension for subject_ids if they do not exist
     --	format of sourcesystem_cd:  trial:[site:]subject_cd
 
@@ -266,32 +266,32 @@ begin
 		   and upper(g.marker_type) = mirnaType
 		   and not exists
 		       (select 1 from i2b2demodata.patient_dimension x
-			 where x.sourcesystem_cd = 
+			 where x.sourcesystem_cd =
 			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g'))
 	  ) x;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
 
     get diagnostics rowCt := ROW_COUNT;
     pCount := rowCt;
-	
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension.',pCount,stepCt,'Done');
-	
+
     begin
-	perform i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
+	perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
     exception
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -310,7 +310,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -318,14 +318,14 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from observation_fact',rowCt,stepCt,'Done');
-	
+
     begin
 	execute('truncate table tm_wz.wt_qpcr_mirna_nodes');
     exception
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -336,7 +336,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -370,7 +370,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -378,7 +378,7 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert node values into DEAPP wt_qpcr_mirna_node_values',rowCt,stepCt,'Done');
-	
+
     begin
 	insert into tm_wz.wt_qpcr_mirna_nodes (
 	    leaf_node
@@ -396,7 +396,7 @@ begin
 		'ATTR2',coalesce(attribute_2, '')),
 		'TISSUETYPE',coalesce(tissue_type, '')),
 		'+', '\'),
-		'_', ' ') || '\', '(\\){2,}', '\', 'g') 
+		'_', ' ') || '\', '(\\){2,}', '\', 'g')
 	    ,category_cd
 	    ,platform as platform
 	    ,tissue_type
@@ -408,7 +408,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -432,18 +432,18 @@ begin
 	)
 	select
 	    distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
-		substr(category_cd,1,instr(category_cd,'PLATFORM')+8),
+		substr(category_cd,1,tm_cz.instr(category_cd,'PLATFORM')+8),
 		'PLATFORM',title),
 		'ATTR1',coalesce(attribute_1, '')),
 		'ATTR2',coalesce(attribute_2, '')),
 		'TISSUETYPE',coalesce(tissue_type, '')),
 		'+', '\'),
 		'_', ' ') || '\', '(\\){2,}', '\', 'g')
-	    ,substr(category_cd,1,instr(category_cd,'PLATFORM')+8)
+	    ,substr(category_cd,1,tm_cz.instr(category_cd,'PLATFORM')+8)
 	    ,platform as platform
-	    ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
-	    ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR1') > 1 then attribute_1 else null end as attribute_1
-            ,case when instr(substr(category_cd,1,instr(category_cd,'PLATFORM')+8),'ATTR2') > 1 then attribute_2 else null end as attribute_2
+	    ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
+	    ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'PLATFORM')+8),'ATTR1') > 1 then attribute_1 else null end as attribute_1
+            ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'PLATFORM')+8),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 	    ,'PLATFORM'
 	  from tm_wz.wt_qpcr_mirna_node_values
 	 where category_cd like '%PLATFORM%'
@@ -457,7 +457,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -475,18 +475,18 @@ begin
 	)
 	select
 	    distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
-		substr(category_cd,1,instr(category_cd,'ATTR1')+5),
+		substr(category_cd,1,tm_cz.instr(category_cd,'ATTR1')+5),
 		'PLATFORM',title),
 		'ATTR1',coalesce(attribute_1, '')),
 		'ATTR2',coalesce(attribute_2, '')),
 		'TISSUETYPE',coalesce(tissue_type, '')),
 		'+', '\'),
 		'_', ' ') || '\', '(\\){2,}', '\', 'g')
-	    ,substr(category_cd,1,instr(category_cd,'ATTR1')+5)
-	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'PLATFORM') > 1 then platform else null end as platform
-	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
+	    ,substr(category_cd,1,tm_cz.instr(category_cd,'ATTR1')+5)
+	    ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'ATTR1')+5),'PLATFORM') > 1 then platform else null end as platform
+	    ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
 	    ,attribute_1 as attribute_1
-	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'ATTR2') > 1 then attribute_2 else null end as attribute_2
+	    ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'ATTR1')+5),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 	    ,'ATTR1'
 	  from  tm_wz.wt_qpcr_mirna_node_values
 	 where category_cd like '%ATTR1%'
@@ -496,11 +496,11 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-		   
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create ATTR1 nodes in wt_qpcr_mirna_nodes',rowCt,stepCt,'Done');
@@ -519,17 +519,17 @@ begin
 	)
 	select
 	    distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
-		substr(category_cd,1,instr(category_cd,'ATTR2')+5),
+		substr(category_cd,1,tm_cz.instr(category_cd,'ATTR2')+5),
 		'PLATFORM',title),
 		'ATTR1',coalesce(attribute_1, '')),
 		'ATTR2',coalesce(attribute_2, '')),
 		'TISSUETYPE',coalesce(tissue_type, '')),
 		'+', '\'),
 		'_', ' ') || '\', '(\\){2,}', '\', 'g')
-	    ,substr(category_cd,1,instr(category_cd,'ATTR2')+5)
-	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR2')+5),'PLATFORM') > 1 then platform else null end as platform
-	    ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
-            ,case when instr(substr(category_cd,1,instr(category_cd,'ATTR2')+5),'ATTR1') > 1 then attribute_1 else null end as attribute_1
+	    ,substr(category_cd,1,tm_cz.instr(category_cd,'ATTR2')+5)
+	    ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'ATTR2')+5),'PLATFORM') > 1 then platform else null end as platform
+	    ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then tissue_type else null end as tissue_type
+            ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'ATTR2')+5),'ATTR1') > 1 then attribute_1 else null end as attribute_1
 	    ,attribute_2 as attribute_2
 	    ,'ATTR2'
 	  from  tm_wz.wt_qpcr_mirna_node_values
@@ -540,7 +540,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -563,18 +563,18 @@ begin
 	)
 	select
 	    distinct topNode || regexp_replace(replace(replace(replace(replace(replace(replace(
-		substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),
+		substr(category_cd,1,tm_cz.instr(category_cd,'TISSUETYPE')+10),
 		'PLATFORM',title),
 		'ATTR1',coalesce(attribute_1, '')),
 		'ATTR2',coalesce(attribute_2, '')),
 		'TISSUETYPE',coalesce(tissue_type, '')),
 		'+', '\'),
 		'_', ' ') || '\', '(\\){2,}', '\', 'g')
-	    ,substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10)
-	    ,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then platform else null end as platform
+	    ,substr(category_cd,1,tm_cz.instr(category_cd,'TISSUETYPE')+10)
+	    ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then platform else null end as platform
 	    ,tissue_type as tissue_type
-	    ,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then attribute_1 else null end as attribute_1
-            ,case when instr(substr(category_cd,1,instr(category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then attribute_2 else null end as attribute_2
+	    ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then attribute_1 else null end as attribute_1
+            ,case when tm_cz.instr(substr(category_cd,1,tm_cz.instr(category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then attribute_2 else null end as attribute_2
 	    ,'TISSUETYPE'
 	  from  tm_wz.wt_qpcr_mirna_node_values
 	 where category_cd like '%TISSUETYPE%'
@@ -584,7 +584,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -592,15 +592,15 @@ begin
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create TISSUETYPE nodes in wt_qpcr_mirna_nodes',rowCt,stepCt,'Done');
-	
-    begin			
+
+    begin
 	update tm_wz.wt_qpcr_mirna_nodes
-	   set node_name=parse_nth_value(leaf_node,length(leaf_node)-length(replace(leaf_node,'\','')),'\');
+	   set node_name=tm_cz.parse_nth_value(leaf_node,length(leaf_node)-length(replace(leaf_node,'\','')),'\');
     exception
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -616,7 +616,7 @@ begin
 	--Add nodes for all types (ALSO DELETES EXISTING NODE)
 
 	begin
-	    select i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId) into rtnCd;
+	    select tm_cz.i2b2_add_node(TrialID, r_addNodes.leaf_node, r_addNodes.node_name, jobId) into rtnCd;
 	    stepCt := stepCt + 1;
 	    get diagnostics rowCt := ROW_COUNT;
 	    if(rtnCd <> 1) then
@@ -629,7 +629,7 @@ begin
 
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
-	    select i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID) into rtnCd;
+	    select tm_cz.i2b2_fill_in_tree(TrialId, r_addNodes.leaf_node, jobID) into rtnCd;
 	    if(rtnCd <> 1) then
 		tText := 'Failed to fill in tree '|| r_addNodes.leaf_node;
 		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
@@ -640,12 +640,12 @@ begin
 	    when others then
 		errorNumber := SQLSTATE;
 		errorMessage := SQLERRM;
-		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
 	end;
 
-    end loop;  
+    end loop;
 
     begin
 	update tm_wz.wt_qpcr_mirna_nodes t
@@ -660,7 +660,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -780,35 +780,35 @@ begin
 			   left outer join tm_wz.wt_qpcr_mirna_nodes pn
 					      on a.platform = pn.platform
 					      and a.category_cd like pn.category_cd || '%'
-					      and  pn.category_cd=substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8)
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(pn.tissue_type,'@')
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(pn.attribute_1,'@')
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(pn.attribute_2,'@')
-					      and pn.node_type = 'PLATFORM'	  
+					      and  pn.category_cd=substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8)
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(pn.tissue_type,'@')
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(pn.attribute_1,'@')
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'PLATFORM')+8),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(pn.attribute_2,'@')
+					      and pn.node_type = 'PLATFORM'
 			   left outer join tm_wz.wt_qpcr_mirna_nodes ttp
 					      on a.tissue_type = ttp.tissue_type
 					      and a.category_cd like ttp.category_cd || '%'
-					      and ttp.category_cd=substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10)
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '@' end = coalesce(ttp.platform,'@')
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(ttp.attribute_1,'@')
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(ttp.attribute_2,'@')
-					      and ttp.node_type = 'TISSUETYPE'		  
+					      and ttp.category_cd=substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10)
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'PLATFORM') > 1 then a.platform else '@' end = coalesce(ttp.platform,'@')
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(ttp.attribute_1,'@')
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'TISSUETYPE')+10),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(ttp.attribute_2,'@')
+					      and ttp.node_type = 'TISSUETYPE'
 			   left outer join tm_wz.wt_qpcr_mirna_nodes a1
 					      on a.attribute_1 = a1.attribute_1
 					      and a.category_cd like a1.category_cd || '%'
-					      and a1.category_cd=substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5)
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a1.platform,'@')
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a1.tissue_type,'@')
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(a1.attribute_2,'@')
-					      and a1.node_type = 'ATTR1'		  
+					      and a1.category_cd=substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5)
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a1.platform,'@')
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a1.tissue_type,'@')
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR1')+5),'ATTR2') > 1 then a.attribute_2 else '@' end = coalesce(a1.attribute_2,'@')
+					      and a1.node_type = 'ATTR1'
 			   left outer join tm_wz.wt_qpcr_mirna_nodes a2
 					      on a.attribute_2 = a2.attribute_2
 					      and a.category_cd like a2.category_cd || '%'
-					      and a2.category_cd=substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5)
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a2.platform,'@')
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a2.tissue_type,'@')
-					      and case when instr(substr(a.category_cd,1,instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(a2.attribute_1,'@')
-					      and a2.node_type = 'ATTR2'			  
+					      and a2.category_cd=substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5)
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'PLATFORM') > 1 then a.platform else '@' end = coalesce(a2.platform,'@')
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '@' end = coalesce(a2.tissue_type,'@')
+					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(a2.attribute_1,'@')
+					      and a2.node_type = 'ATTR2'
 			   left outer join i2b2demodata.patient_dimension sid
 					      on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':','g') = sid.sourcesystem_cd
 		 where a.trial_name = TrialID
@@ -818,7 +818,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -862,14 +862,14 @@ begin
 	    ,'' -- no units available
             ,1
           from  deapp.de_subject_sample_mapping m
-         where m.trial_name = TrialID 
+         where m.trial_name = TrialID
            and m.source_cd = sourceCD
            and m.platform = mirna_type;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -878,7 +878,7 @@ begin
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert patient facts into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
-    --	Insert sample facts 
+    --	Insert sample facts
     begin
 	insert into i2b2demodata.observation_fact (
 	    patient_num
@@ -912,7 +912,7 @@ begin
 	    ,'' -- no units available
             ,1
 	  from  deapp.de_subject_sample_mapping m
-	 where m.trial_name = TrialID 
+	 where m.trial_name = TrialID
 	   and m.source_cd = sourceCd
 	   and m.platform = mirna_type
 	   and m.patient_id != m.sample_id;
@@ -920,7 +920,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -938,7 +938,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -958,7 +958,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -969,7 +969,7 @@ begin
 
     ---- update c_metedataxml in i2b2
 
-    begin   
+    begin
 	for ul in uploadI2b2 loop
 	    update i2b2metadata.i2b2 n
 	       SET c_columndatatype = 'T',
@@ -981,7 +981,7 @@ begin
 				     <UnitValues><NormalUnits>ratio</NormalUnits><EqualUnits></EqualUnits>
 				     <ExcludingUnits></ExcludingUnits><ConvertingUnits><Units></Units><MultiplyingFactor></MultiplyingFactor>
 				     </ConvertingUnits></UnitValues><Analysis><Enums /><Counts />
-				     <New /></Analysis>'||(select xmlelement(name "SeriesMeta",xmlforest(m.display_value as "Value",m.display_unit as "Unit",m.display_label as "DisplayName")) as hi 
+				     <New /></Analysis>'||(select xmlelement(name "SeriesMeta",xmlforest(m.display_value as "Value",m.display_unit as "Unit",m.display_label as "DisplayName")) as hi
 							     from tm_lz.lt_src_mirna_display_mapping m where m.category_cd=ul.category_cd)||
 							     '</ValueMetadata>') where n.c_fullname=(select leaf_node from tm_wz.wt_qpcr_mirna_nodes where category_cd=ul.category_cd and leaf_node=n.c_fullname);
 	end loop;
@@ -989,7 +989,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -1011,7 +1011,7 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -1023,12 +1023,12 @@ begin
     begin
 	update i2b2metadata.i2b2 a
 	   set c_visualattributes='FAS'
-         where a.c_fullname = substr(topNode,1,instr(topNode,'\',1,3));
+         where a.c_fullname = substr(topNode,1,tm_cz.instr(topNode,'\',1,3));
     exception
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
@@ -1041,11 +1041,11 @@ begin
     --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
     -- a unique top-level node for miRNA data
 
-    perform i2b2_create_concept_counts(topNode ,jobID );
+    perform tm_cz.i2b2_create_concept_counts(topNode ,jobID );
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
-	
+
     --	delete each node that is hidden
 
     begin
@@ -1053,7 +1053,7 @@ begin
 
 	    --	deletes hidden nodes for a trial one at a time
 
-	    select i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+	    select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
 	    stepCt := stepCt + 1;
 	    get diagnostics rowCt := ROW_COUNT;
 	    if(rtnCd <> 1) then
@@ -1071,15 +1071,15 @@ begin
 	when others then
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-    end;  	
+    end;
 
     --Reload Security: Inserts one record for every I2B2 record into the security table
 
     begin
-	select i2b2_load_security_data(jobId) into rtnCd;
+	select tm_cz.i2b2_load_security_data(jobId) into rtnCd;
 	if(rtnCd <> 1) then
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
@@ -1133,7 +1133,7 @@ begin
 	    ,assay_id
 	)
 	select
-	    p.probeset_id 
+	    p.probeset_id
 	    ,avg(md.intensity_value::numeric)
             ,sd.patient_id
 	    ,TrialId
@@ -1149,7 +1149,7 @@ begin
 	   and md.probeset = p.probeset-- gs.mirna_id
 	   and sd.subject_id in (select subject_id from tm_lz.lt_src_mirna_subj_samp_map)
            and sd.gpl_id = p.platform
-	 group by  p.probeset_id 
+	 group by  p.probeset_id
                    ,sd.patient_id
 		   ,sd.assay_id;
 	get diagnostics rowCt := ROW_COUNT;
@@ -1163,7 +1163,7 @@ begin
     end;
 
     pExists := rowCt;
-	
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into wt_subject_mirna_probeset',rowCt,stepCt,'Done');
@@ -1176,7 +1176,7 @@ begin
     end if;
 
     --	insert into de_subject_mirna_data when dataType is T (transformed)
- 
+
     if dataType = 'T' then
 	begin
 	    insert into deapp.de_subject_mirna_data (
@@ -1215,11 +1215,11 @@ begin
 		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		return -16;
-	end;	
+	end;
     else
-		
+
 	--	Calculate ZScores and insert data into de_subject_mirna_data.  The 'L' parameter indicates that the mirna expression data will be selected from
-	--	wt_subject_mirna_probeset as part of a Load.  
+	--	wt_subject_mirna_probeset as part of a Load.
 
 	if dataType = 'R' or dataType = 'L' then
 	    begin
@@ -1240,7 +1240,7 @@ begin
 		when others then
 		    errorNumber := SQLSTATE;
 		    errorMessage := SQLERRM;
-		    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);	
+		    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
 		    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 		    return -16;
 	    end;
@@ -1249,7 +1249,7 @@ begin
     end if;
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
-	
+
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_QPCR_miRNA_DATA',0,stepCt,'Done');
 
@@ -1258,7 +1258,7 @@ begin
     end if;
 
     return 1;
-	
+
 exception
 	when others then
     --Handle errors.

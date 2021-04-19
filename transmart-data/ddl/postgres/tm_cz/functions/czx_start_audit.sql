@@ -1,7 +1,7 @@
 --
 -- Name: czx_start_audit(character varying, character varying); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE FUNCTION czx_start_audit(jobname character varying, databasename character varying) RETURNS numeric
+CREATE FUNCTION tm_cz.czx_start_audit(jobname character varying, databasename character varying) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -27,11 +27,11 @@ AS $$
 begin
     begin
 	insert into tm_cz.cz_job_master
-		    (start_date 
+		    (start_date
 		    ,active
 		    ,database_name
 		    ,job_name
-		    ,job_status) 
+		    ,job_status)
 	values(
 	    clock_timestamp()
 	    ,'Y'
@@ -40,10 +40,10 @@ begin
 	    ,'Running')
 	    returning job_id into jobId;
     end;
-    
+
     return jobID;
-    
-exception 
+
+exception
     when others then
 	perform tm_cz.czx_write_error(jobId,'0',SQLERRML,SQLSTATE,SQLERRM);
 	return -16;

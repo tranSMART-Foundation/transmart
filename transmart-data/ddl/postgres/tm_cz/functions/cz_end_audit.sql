@@ -9,26 +9,26 @@ AS $$
     endDate timestamp;
 
 begin
-    
+
     select current_timestamp into endDate;
-    
+
     begin
 	update tm_cz.cz_job_master
-	   set 
+	   set
 	       active='N',
 	       end_date = endDate,
-	       time_elapsed_secs = coalesce(((DATE_PART('day', endDate - START_DATE) * 24 + 
+	       time_elapsed_secs = coalesce(((DATE_PART('day', endDate - START_DATE) * 24 +
 					      DATE_PART('hour', endDate - START_DATE)) * 60 +
 					      DATE_PART('minute', endDate - START_DATE)) * 60 +
 					      DATE_PART('second', endDate - START_DATE),0),
-	       job_status = jobStatus		
-	 where active='Y' 
+	       job_status = jobStatus
+	 where active='Y'
 	       and job_id=jobID;
     end;
-    
+
     return 1;
-    
-exception 
+
+exception
     when others then
     --raise notice 'proc failed state=%  errm=%', SQLSTATE, SQLERRM;
 	perform tm_cz.cz_write_error(jobId,SQLSTATE,SQLERRM,null,null);

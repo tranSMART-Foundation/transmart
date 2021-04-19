@@ -17,7 +17,7 @@ AS $$
 
     --	create array to hold strings that will not be initcapped
 
-    excludedText tm_cz.category_path_excluded_words[] = array(select row(excluded_text) from tm_cz.category_path_excluded_words);	
+    excludedText tm_cz.category_path_excluded_words[] = array(select row(excluded_text) from tm_cz.category_path_excluded_words);
 
     exclCt integer;
     exclSize integer;

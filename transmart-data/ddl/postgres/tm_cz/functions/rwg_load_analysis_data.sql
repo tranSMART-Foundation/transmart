@@ -142,9 +142,9 @@ BEGIN
 	END;
 
 	-- not used ???
-	--delete from tm_lz.RWG_BAAD_ID where upper(study_id) =upper(trialID);
-	--Cz_Write_Audit(Jobid,Databasename,Procedurename,'Delete existing records from tm_lz.RWG_BAAD_ID',rowCt,Stepct,'Done');
-	--stepCt := stepCt + 1;
+	-- delete from tm_lz.RWG_BAAD_ID where upper(study_id) =upper(trialID);
+	-- tm_cz.cz_write_audit(Jobid,Databasename,Procedurename,'Delete existing records from tm_lz.RWG_BAAD_ID',rowCt,Stepct,'Done');
+	-- stepCt := stepCt + 1;
 	IF (coalesce(inPlatformID::text, '') = '')
 		THEN
 
@@ -393,7 +393,7 @@ BEGIN
 	BEGIN
 	UPDATE tm_wz.BIO_ASSAY_ANALYSIS_DATA_NEW AS d
 	SET
-		tea_normalized_pvalue = TEA_NPV_PRECOMPUTE(d.fold_change_ratio, m.fc_mean, m.fc_stddev )
+		tea_normalized_pvalue = tm_cz.tea_npv_precompute(d.fold_change_ratio, m.fc_mean, m.fc_stddev )
 	FROM
 		tm_wz.tmp_assay_analysis_metrics m
 	WHERE d.bio_assay_analysis_id = m.bio_assay_analysis_id

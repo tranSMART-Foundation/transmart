@@ -25,48 +25,48 @@ begin
      * See the License for the specific language governing permissions and
      * limitations under the License.
      ******************************************************************/
-    
+
     select count(*) into tExists
       from information_schema.tables
      where table_schema = 'i2b2metadata'
        and table_name = 'i2b2_bkp';
-    
+
     if tExists > 0 then
 	EXECUTE('drop table i2b2metadata.i2b2_bkp');
     end if;
-    
+
     select count(*) into tExists
       from information_schema.tables
      where table_schema = 'i2b2demodata'
        and table_name = 'concept_counts_bkp';
-    
-    if tExists > 0 then	
+
+    if tExists > 0 then
 	execute('drop table i2b2demodata.concept_counts_bkp');
     end if;
-    
+
     select count(*) into tExists
       from information_schema.tables
      where table_schema = 'i2b2demodata'
        and table_name = 'concept_dimension_bkp';
-    
+
     if tExists > 0 then
 	execute('drop table i2b2demodata.concept_dimension_bkp');
     end if;
-    
+
     select count(*) into tExists
       from information_schema.tables
      where table_schema = 'i2b2demodata'
        and table_name = 'observation_fact_bkp';
-    
+
     if tExists > 0 then
 	execute('drop table i2b2demodata.observation_fact_bkp');
     end if;
-    
+
     select count(*) into tExists
       from information_schema.tables
      where table_schema = 'i2b2demodata'
        and table_name = 'patient_dimension_bkp';
-    
+
     if tExists > 0 then
 	execute('drop table i2b2demodata.patient_dimension_bkp');
     end if;

@@ -32,7 +32,7 @@ begin
 	select current_user into userName;
     end if;
 
-    
+
     return userName;
 
 end;

@@ -31,7 +31,7 @@ begin
 	v_posA := 1; -- Start at the beginning
     else
 	select tm_cz.instr(pValue,delimiter, 1, iLoc-1) into v_posA;
-	--     v_posA := tm_cz.instr(pValue,delimiter, 1, location - 1); 
+	--     v_posA := tm_cz.instr(pValue,delimiter, 1, location - 1);
 	if v_posA = 0 then
             return null; --No values left.
 	end if;
@@ -43,7 +43,7 @@ begin
     if v_posB = 0 then -- Use the end of the file
 	return substr (pValue, v_posA);
     end if;
-    
+
     return substr (pValue, v_posA, v_posB - v_posA);
 
 end;

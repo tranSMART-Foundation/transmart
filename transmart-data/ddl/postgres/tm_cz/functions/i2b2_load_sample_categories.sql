@@ -22,7 +22,7 @@ AS $$
     --
 
 begin
-    
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -36,24 +36,24 @@ begin
 	newJobFlag := 1; -- True
 	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
     end if;
-    
+
     stepCt := 0;
-    
+
     --	delete any data for study in sample_categories_extrnl from lz_src_sample_categories
-    
+
     delete from tm_lz.lz_src_sample_categories
      where trial_cd in (select distinct trial_cd from tm_lz.lt_src_sample_categories);
-    
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted existing study data in lz_src_sample_categories',rowCt,stepCt,'Done');
-    commit;	
+    commit;
 
-    /*	
+    /*
 	--	create records in patient_dimension for samples if they do not exist
 	--	format of sourcesystem_cd:  trial:S:[site:]subject_cd:sample_cd
 	--	if no sample_cd specified, then the patient_num of the trial:[site]:subject_cd should have already been created
-	
+
 	insert into i2b2demodata.patient_dimension
 	( patient_num,
 	sex_cd,
@@ -77,15 +77,15 @@ begin
 	,site_cd
 	,subject_cd
 	,sample_cd
-	from sample_categories_extrnl s
+	from tm_cz.sample_categories_extrnl s
 	where s.sample_cd is not null
 	and not exists
-	(select 1 from patient_dimension x
-	where x.sourcesystem_cd = 
+	(select 1 from i2b2demodata.patient_dimension x
+	where x.sourcesystem_cd =
 	regexp_replace(s.trial_cd || ':S:' || s.site_cd || ':' || s.subject_cd || ':' || s.sample_cd,
 	'(::){1,}', ':'))
 	) s;
-	
+
 	stepCt := stepCt + 1;
 	get diagnostics rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Added new sample_cds for study in I2B2DEMODATA patient_dimension',rowCt,stepCt,'Done');
@@ -93,7 +93,7 @@ begin
      */
 
     --	Load data into lz_src_sample_categories table, joins to make sure study/trial exists and there's an entry in the patient_dimension
-    
+
     insert into tm_lz.lz_src_sample_categories
 		(trial_cd
 		,site_cd
@@ -113,7 +113,7 @@ begin
        and replace(s.category_value,'"',null) is not null
        and s.trial_cd in (select distinct x.sourcesystem_cd from i2b2metadata.i2b2 x)
 	   ;
-    
+
     stepCt := stepCt + 1;
     get diagnostics rowCt := ROW_COUNT;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted sample data in lz_src_sample_categories',rowCt,stepCt,'Done');
@@ -128,7 +128,7 @@ exception
     when others then
     --Handle errors.
 	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-	
+
     --End Proc
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 

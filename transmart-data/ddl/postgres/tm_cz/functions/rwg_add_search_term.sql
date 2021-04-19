@@ -77,7 +77,7 @@ BEGIN
 	 */
 	/*
 	-- check if the new term exists
-	Select Count(*) 
+	Select Count(*)
 	into Ncount
 	From Searchapp.Search_Keyword
 	where upper(Keyword) like upper(New_Term)
@@ -129,7 +129,7 @@ BEGIN
 
 	-- Get the ID of the new term in Search_Keyword
 	BEGIN
-	SELECT Search_Keyword_Id INTO Keyword_Id 
+	SELECT Search_Keyword_Id INTO Keyword_Id
 	FROM Searchapp.Search_Keyword
 	WHERE Upper(Keyword) = Upper(New_Term)
 		AND upper(data_category) = upper(category_name);
@@ -147,7 +147,7 @@ BEGIN
 		RETURN -16;
 	END;
 
-	-- Insert the new term into Searchapp.Search_Keyword_Term 
+	-- Insert the new term into Searchapp.Search_Keyword_Term
 	BEGIN
 	INSERT INTO Searchapp.Search_Keyword_Term(
 		Keyword_Term,
@@ -182,7 +182,7 @@ BEGIN
 		RETURN -16;
 	END;
 
-     ---Cleanup OVERALL JOB if this proc is being run standalone    
+     ---Cleanup OVERALL JOB if this proc is being run standalone
 	IF newJobFlag = 1
 		THEN
 		perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
