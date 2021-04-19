@@ -161,11 +161,11 @@ fi
 
 # Set KETTLE_LOG_LEVEL parameter
 if [ -z "$KETTLE_LOG_LEVEL" ] ; then
-    KETTLE_LOG_LEVEL="BASIC"
+   KETTLE_LOG_LEVEL="Basic"
 fi
-
+echo "Using KETTLE_LOG_LEVEL '$KETTLE_LOG_LEVEL'"
 # Check KETTLE_LOG_LEVEL parameter
-KETTLE_LOG_TEST="BASIC DETAILED DEBUG ROWLEVEL ERROR NOTHING"
+KETTLE_LOG_TEST="Basic Detailed Debug Rowlevel Error Nothing"
 
 if [ $(echo "$KETTLE_LOG_TEST" | grep -c -w $KETTLE_LOG_LEVEL) -ne 1 ] ; then
     echo "Error process_params.inc: KETTLE_LOG_LEVEL '$KETTLE_LOG_LEVEL' is not supported ($KETTLE_LOG_TEST)"

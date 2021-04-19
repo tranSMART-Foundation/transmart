@@ -35,7 +35,7 @@ $PGSQL_BIN/psql -c "truncate tm_lz.lt_src_qpcr_mirna_data"
 echo "Loading zone tables truncated"
 
 $KITCHEN -norep -version                                                \
-	 -file="$KETTLE_JOBS/load_QPCR_MIRNA_data.kjb"                  \
+	 -file="$KETTLE_JOBS/load_qpcr_mirna_data.kjb"                  \
          -level="$KETTLE_LOG_LEVEL"                                     \
 	 -logfile="$PWD"/logs/load_mirna_data_$(date +"%Y%m%d%H%M").log \
 	 -param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"                    \

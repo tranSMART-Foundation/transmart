@@ -36,7 +36,7 @@ fi
 
 # Start the upload
 $KITCHEN -norep -version                                                      \
-	 -file="$KETTLE_JOBS/load_QPCR_MIRNA_annotation.kjb"                  \
+	 -file="$KETTLE_JOBS/load_qpcr_mirna_annotation.kjb"                  \
          -level="$KETTLE_LOG_LEVEL"                                           \
 	 -logfile="$PWD"/logs/load_mirna_annotation_$(date +"%Y%m%d%H%M").log \
 	 -param:ANNOTATION_TITLE="$ANNOTATION_TITLE"                          \

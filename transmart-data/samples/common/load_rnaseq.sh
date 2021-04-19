@@ -69,8 +69,8 @@ LOG_BASE=${LOG_BASE:-2}
 if [ "$RNASEQ_TYPE" = "RNASEQ" ]; then
     if [ ! -d logs ] ; then mkdir logs; fi
 
-    $KITCHEN -norep=Y                                        \
-	     -file=$KETTLE_JOBS/load_RNA_sequencing_data.kjb          \
+    $KITCHEN -norep=Y                                                 \
+	     -file=$KETTLE_JOBS/load_rna_data.kjb                     \
 	     -log=logs/load_rnaseq_data_$(date +"%Y%m%d%H%M").log     \
 	     /param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"              \
 	     /param:DATA_LOCATION="$DATA_LOCATION"                    \

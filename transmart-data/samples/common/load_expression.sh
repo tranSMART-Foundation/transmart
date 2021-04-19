@@ -52,9 +52,11 @@ if [ ! -d logs ] ; then mkdir logs; fi
 # $PGSQL_BIN/psql -c "truncate tm_lz.lt_src_mrna_data"
 # echo "Loading zone tables truncated"
 
+echo "launch kitchen with level=$KETTLE_LOG_LEVEL"
+
 $KITCHEN -norep -version                                                     \
 	 -file=$KETTLE_JOBS/load_gene_expression_data.kjb                    \
-	 -level="$KETTLE_LOG_LEVEL"                                          \
+	 -level=$KETTLE_LOG_LEVEL                                            \
 	 -logfile="$PWD"/logs/load_expression_data_$(date +"%Y%m%d%H%M").log \
 	 -param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"                         \
 	 -param:DATA_LOCATION="$DATA_LOCATION"                               \

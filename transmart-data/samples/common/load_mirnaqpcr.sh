@@ -41,7 +41,7 @@ LOG_BASE=${LOG_BASE:-2}
 if [ ! -d logs ] ; then mkdir logs; fi
 
 $KITCHEN -norep -version                                                    \
-	 -file="$KETTLE_JOBS/load_QPCR_MIRNA_data.kjb"                      \
+	 -file="$KETTLE_JOBS/load_qpcr_mirna_data.kjb"                      \
          -level="$KETTLE_LOG_LEVEL"                                         \
 	 -logfile="$PWD"/logs/load_mirnaqpcr_data_$(date +"%Y%m%d%H%M").log \
 	 -param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"                        \
