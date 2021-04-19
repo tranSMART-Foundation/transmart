@@ -27,17 +27,15 @@ ALTER TABLE "SEARCHAPP"."SEARCH_AUTH_USER_SEC_ACCESS" ADD CONSTRAINT "SEARCH_SEC
 --
 -- Type: TRIGGER; Owner: SEARCHAPP; Name: TRG_SEARCH_A_U_SEC_ACCESS_ID
 --
-  CREATE OR REPLACE TRIGGER "SEARCHAPP"."TRG_SEARCH_A_U_SEC_ACCESS_ID" before insert on "SEARCH_AUTH_USER_SEC_ACCESS"    for each row begin     if inserting then       if :NEW."SEARCH_AUTH_USER_SEC_ACCESS_ID" is null then          select SEQ_SEARCH_DATA_ID.nextval into :NEW."SEARCH_AUTH_USER_SEC_ACCESS_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "SEARCHAPP"."TRG_SEARCH_A_U_SEC_ACCESS_ID"
+before insert on "SEARCH_AUTH_USER_SEC_ACCESS"
+  for each row begin
+    if inserting then
+      if :NEW."SEARCH_AUTH_USER_SEC_ACCESS_ID" is null then
+        select SEQ_SEARCH_DATA_ID.nextval into :NEW."SEARCH_AUTH_USER_SEC_ACCESS_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "SEARCHAPP"."TRG_SEARCH_A_U_SEC_ACCESS_ID" ENABLE;
  

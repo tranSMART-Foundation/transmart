@@ -33,13 +33,15 @@ ALTER TABLE "SEARCHAPP"."SEARCH_AUTH_SEC_OBJECT_ACCESS" ADD CONSTRAINT "SCH_SEC_
 --
 -- Type: TRIGGER; Owner: SEARCHAPP; Name: TRG_SEARCH_AU_OBJ_ACCESS_ID
 --
-  CREATE OR REPLACE TRIGGER "SEARCHAPP"."TRG_SEARCH_AU_OBJ_ACCESS_ID" before insert on SEARCH_AUTH_SEC_OBJECT_ACCESS    for each row begin     if inserting then       if :NEW.AUTH_SEC_OBJ_ACCESS_ID is null then          select SEQ_SEARCH_DATA_ID.nextval into :NEW.AUTH_SEC_OBJ_ACCESS_ID from dual;       end if;    end if; end;
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "SEARCHAPP"."TRG_SEARCH_AU_OBJ_ACCESS_ID"
+before insert on SEARCH_AUTH_SEC_OBJECT_ACCESS
+  for each row begin
+    if inserting then
+      if :NEW.AUTH_SEC_OBJ_ACCESS_ID is null then
+        select SEQ_SEARCH_DATA_ID.nextval into :NEW.AUTH_SEC_OBJ_ACCESS_ID from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "SEARCHAPP"."TRG_SEARCH_AU_OBJ_ACCESS_ID" ENABLE;
  

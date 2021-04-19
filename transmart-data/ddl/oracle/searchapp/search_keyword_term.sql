@@ -23,15 +23,15 @@ TABLESPACE "INDX" ;
 --
 -- Type: TRIGGER; Owner: SEARCHAPP; Name: TRG_SEARCH_KEYWORD_TERM_ID
 --
-  CREATE OR REPLACE TRIGGER "SEARCHAPP"."TRG_SEARCH_KEYWORD_TERM_ID" before insert on "SEARCH_KEYWORD_TERM"    for each row begin     if inserting then       if :NEW."SEARCH_KEYWORD_TERM_ID" is null then          select SEQ_SEARCH_DATA_ID.nextval into :NEW."SEARCH_KEYWORD_TERM_ID" from dual;       end if;    end if; end;
-
-
-
-
-
-
-
-
+  CREATE OR REPLACE TRIGGER "SEARCHAPP"."TRG_SEARCH_KEYWORD_TERM_ID"
+before insert on "SEARCH_KEYWORD_TERM"
+  for each row begin
+    if inserting then
+      if :NEW."SEARCH_KEYWORD_TERM_ID" is null then
+        select SEQ_SEARCH_DATA_ID.nextval into :NEW."SEARCH_KEYWORD_TERM_ID" from dual;
+      end if;
+    end if;
+  end;
 /
 ALTER TRIGGER "SEARCHAPP"."TRG_SEARCH_KEYWORD_TERM_ID" ENABLE;
  

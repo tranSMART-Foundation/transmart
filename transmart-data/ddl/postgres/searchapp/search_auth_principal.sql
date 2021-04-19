@@ -4,9 +4,9 @@
 CREATE TABLE search_auth_principal (
     id int NOT NULL,
     principal_type character varying(255),
-    date_created timestamp,
+    date_created timestamp NOT NULL,
     description character varying(4000),
-    last_updated timestamp,
+    last_updated timestamp NOT NULL,
     name character varying(255),
     unique_id character varying(255),
     enabled boolean
