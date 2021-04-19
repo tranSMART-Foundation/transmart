@@ -32,6 +32,21 @@
 #
 ##################################################
 
+##################################################
+#
+# postgres serial column: add sequence and trigger
+#
+# compare 3 index types - Prikey UniKey Forkey
+# sorted lists for tables
+#
+# review checks vs totals for any other oddities
+#
+# Note lists to be added - functions etc.
+#
+# Map triggers with added trg_ prefix and flag as OK
+#
+##################################################
+
 use Cwd;
 
 $showSame = 1;
@@ -166,12 +181,54 @@ foreach $arg (@ARGV) {
 %isTableColumn = ();
 %oTableColumn = ();
 %pTableColumn = ();
-%ioTableKey = ();
-%ipTableKey = ();
-%isTableKey = ();
-%oTableKey = ();
-%pTableKey = ();
+%ioTableForkey = ();
+%ipTableForkey = ();
+%isTableForkey = ();
+%oTableForkey = ();
+%pTableForkey = ();
 
+
+sub compareForkey($$) {
+    my ($keya,$keyb) = @_;
+    if($keya eq $keyb) {return 1}
+    my @keya = split(/;/,$keya);
+    my @keyb = split(/;/,$keyb);
+    my %keya = ();
+    my %keyb = ();
+    my $k;
+    my $id;
+    my $rest;
+
+    # global text message to flag reason for rejection
+    
+    $compareForkey = "";
+
+    foreach $k (@keya) {
+	($id,$rest) = ($k =~ /^(.*)([\(].*[\)] .*[\(].*[\)])/g);
+	$keya{$id} = $rest;
+    }
+    foreach $k (@keyb) {
+	($id,$rest) = ($k =~ /^(.*)([\(].*[\)] .*[\(].*[\)])/g);
+	$keyb{$id} = $rest;
+    }
+    foreach $k(sort(keys(%keya))) {
+	if(!defined($keyb{$k})){
+	    $compareForkey = "$k defined for first set only: $keya{$k}";
+	    return 0;
+	}
+	if($keya{$k} ne $keyb{$k}){
+	    $compareForkey = "$k differs; $keya{$k} $keyb{$k}";
+	    return 0;
+	}
+    }
+    foreach $k(sort(keys(%keyb))) {
+	if(!defined($keyb{$k})){
+	    $compareForkey = "$k defined for second set only: $keyb{$k}";
+	    return 0;
+	}
+    }
+    return 1;
+}
 
 sub parseI2b2Properties($$){
     my ($d,$f) = @_;
@@ -521,7 +578,11 @@ sub parseOracle($){
 	    if($f =~ /^_.*[.]sql$/){
 		if($f eq "_cross.sql"){
 		}
+		elsif($f eq "_grants.sql"){
+		}
 		elsif($f eq "_misc.sql"){
+		}
+		elsif($f eq "_synonyms.sql"){
 		}
 		elsif($f eq "util_grant_all.sql"){
 		}
@@ -574,7 +635,7 @@ sub parseOracle($){
 		    }
 		    $forkey = 0;
 		}
-		if(/(\S+)\s+(TABLE|table)\s+([^.]+)[.](\S+)/) {
+		if(/(\S+)\s+GLOBAL\s+TEMPORARY\s+(TABLE|table)\s+([^.]+)[.](\S+)/) {
 		    $tuse = $1;
 		    $schema = $3;
 		    $table = $4;
@@ -588,7 +649,34 @@ sub parseOracle($){
 			$ctable = 1;
 		    }
 		    elsif($tuse eq "ALTER") {
-			if(/CONSTRAINT (\S+ )FOREIGN KEY (\([^\)]+\))/){
+			if(/CONSTRAINT\s+(\S+)\s+FOREIGN KEY (\([^\)]+\))/){
+			    $pc = $1;
+			    $pk = $2;
+			    $pc =~ s/\"//g;
+			    if(length($pc) > 31){print STDERR "Oracle constraint length ".length($pc)." '$pc'\n"}
+			    $pfk = uc($pc).uc($pk);
+			    $pfk =~ s/\"//g;
+			    $oTableForkey{"$schema.$table"} .= $pfk;
+			    $forkey=1;
+			}
+		    }
+
+		}
+		elsif(/(\S+)\s+(TABLE|table)\s+([^.]+)[.](\S+)/) {
+		    $tuse = $1;
+		    $schema = $3;
+		    $table = $4;
+		    $tuse = uc($tuse);
+		    $schema = uc($schema);
+		    $table = uc($table);
+		    $schema =~ s/\"//g;
+		    $table =~ s/\"//g;
+		    if($tuse eq "CREATE") {
+			$oTableFile{"$schema.$table"} = "$d/$f";
+			$ctable = 1;
+		    }
+		    elsif($tuse eq "ALTER") {
+			if(/CONSTRAINT\s+(\S+)\s+FOREIGN KEY (\([^\)]+\))/){
 			    $pc = $1;
 			    $pk = $2;
 			    $pc =~ s/\"//g;
@@ -621,9 +709,15 @@ sub parseOracle($){
 			    $pkc = uc($pkc);
 			    $pkc =~ s/\s//g;
 			    $pkc =~ s/\"//g;
-			    $oTableKeycon{"$schema.$table"} = $pkc;
+			    $oTablePrikeyName{"$schema.$table"} = $pkc;
+			    $oTablePrikey{"$schema.$table"} = $pk;
 			}
-			$oTableKey{"$schema.$table"} = $pk;
+			elsif(defined($pk)){
+			    print STDERR "++ Oracle primary key unnamed for $schema.$table\n";
+#			    $oTablePrikeyName{"$schema.$table"} = $table."_PK"; # make up a name
+			    $oTablePrikeyName{"$schema.$table"} = "unnamed"; # There is no name
+			    $oTablePrikey{"$schema.$table"} = $pk;
+			}
 		    }
 		    if(/^\s*(CONSTRAINT (\S+)\s+)?UNIQUE \(([^\)]+)\)/){
 			$pkc = $2;
@@ -725,7 +819,9 @@ sub parseOracle($){
 	elsif($f eq "items.json"){
 #	    print "Oracle parse json $d/$f\n";
 	    open(IN,"$dir$d/$f") || die "Failed to read $d/$f";
+	    $itemText = "";
 	    while(<IN>) {
+		$itemText .= $_;
 		if(/^\s+\"file\" : \"(\S+)\"/){
 		    $ofile = $1;
 		    if($ofile !~ /\/_cross[.]sql$/){
@@ -734,6 +830,78 @@ sub parseOracle($){
 		}
 	    }
 	    close IN;
+	    ($itemsDepend, $itemsFiles) = ($itemText =~ /\"dependencies\" : [\[]( [\{].*[\}]) [\]],\s+\"fileAssignments\" : [\[]( [\{].*[\}]) [\]]\s+[\}]$/gosm);
+	    if(!defined($itemsFiles)) {print STDERR "Failed to parse $dir$d/$f\n"}
+	    else {
+	    print STDERR "Oracle parse json $d/$f itemsDepend ".length($itemsDepend)." itemsFiles ".length($itemsFiles)."\n";
+		while($itemsFiles =~ /[\{]\s+\"item\" : [\{]\s+\"type\" : \"([^\"]+)\",\s+\"owner\" : \"([^\"]+)\",\s+\"name\" : \"([^\"]+)\"\s+[\}],\s+\"file\" : \"([^\"]+)\"\s+[\}]/gosm) {
+		    $ijType = $1;
+		    $ijOwner = $2;
+		    $ijName = $3;
+		    $ijFile = $4;
+		    print STDERR "$dir$d/$f\titem\t$ijType\t$ijOwner.$ijName\t\t$ijFile\n";
+		    $ifn = "$ijOwner.$ijName";
+		    if(defined($itemsFile{$ifn})){print STDERR "$ifn in items.json twice: $itemsFile{$ifn} $ijFile\n"}
+		    $itemsFile{$ifn} = $ijFile;
+		    if($ijType eq "FUNCTION") {
+			$itemsFunction{$ifn} = $ijFile;
+		    } elsif($ijType eq "INDEX") {
+			$itemsIndex{$ifn} = $ijFile;
+		    } elsif($ijType eq "MATERIALIZED_VIEW") {
+			$itemsMaterializedView{$ifn} = $ijFile;
+		    } elsif($ijType eq "PROCEDURE") {
+			$itemsProcedure{$ifn} = $ijFile;
+		    } elsif($ijType eq "REF_CONSTRAINT") {
+			$itemsRefConstraint{$ifn} = $ijFile;
+		    } elsif($ijType eq "SEQUENCE") {
+			$itemsSequence{$ifn} = $ijFile;
+		    } elsif($ijType eq "TABLE") {
+			$itemsTable{$ifn} = $ijFile;
+		    } elsif($ijType eq "TRIGGER") {
+			$itemsTrigger{$ifn} = $ijFile;
+		    } elsif($ijType eq "TYPE") {
+			$itemsType{$ifn} = $ijFile;
+		    } elsif($ijType eq "VIEW") {
+			$itemsView{$ifn} = $ijFile;
+		    } else {print STDERR "Unknown items.json item type: $ijType\n"}
+		}
+		while($itemsDepend =~ /[\{]\s+\"child\" : [\{]\s+\"type\" : \"([^\"]+)\",\s+\"owner\" : \"([^\"]+)\",\s+\"name\" : \"([^\"]+)\"\s+[\}],\s+\"parents\" : [\[]([^\]]+)[\]]\s+[\}]/gosm) {
+		    $ijType = $1;
+		    $ijOwner = $2;
+		    $ijName = $3;
+		    $ijParents = $4;
+		    $ijPlist = "";
+		    while($ijParents =~ /[\{]\s+\"type\" : \"([^\"]+)\",\s+\"owner\" : \"([^\"]+)\",\s+\"name\" : \"([^\"]+)\"\s+[\}]/gosm){
+			$ijPlist .= " $1 $2.$3;";
+		    }
+		    if($ijPlist ne "") {$dependParent{"$ijType:$ijOwner.$ijName"} = $ijPlist}
+		    
+		    print STDERR "$dir$d/$f\tchild\t$ijType\t$ijOwner.$ijName\t$ijPlist\n";
+		    if($ijType eq "FUNCTION") {
+			$dependFunction{$ifn} = $ijFile;
+		    } elsif($ijType eq "INDEX") {
+			$dependIndex{$ifn} = $ijFile;
+		    } elsif($ijType eq "MATERIALIZED_VIEW") {
+			$dependMaterializedView{$ifn} = $ijFile;
+		    } elsif($ijType eq "PROCEDURE") {
+			$dependProcedure{$ifn} = $ijFile;
+		    } elsif($ijType eq "REF_CONSTRAINT") {
+			$dependRefConstraint{$ifn} = $ijFile;
+		    } elsif($ijType eq "SEQUENCE") {
+			$dependSequence{$ifn} = $ijFile;
+		    } elsif($ijType eq "SYNONYM") {
+			$dependSynonym{$ifn} = $ijFile;
+		    } elsif($ijType eq "TABLE") {
+			$dependTable{$ifn} = $ijFile;
+		    } elsif($ijType eq "TRIGGER") {
+			$dependTrigger{$ifn} = $ijFile;
+		    } elsif($ijType eq "TYPE") {
+			$dependType{$ifn} = $ijFile;
+		    } elsif($ijType eq "VIEW") {
+			$dependView{$ifn} = $ijFile;
+		    } else {print STDERR "Unknown items.json child type: $ijType\n"}
+		}
+	    }
 	}
 	else {
 	    print "Oracle file $d/$f\n";
@@ -795,22 +963,23 @@ sub parsePostgresFunctions($){
 	    while(<IN>) {
 		s/\s*--.*//g;
 		s/\(-1\)/-1/g;
-		if(/^\s*CREATE\s+FUNCTION\s+(\S+)\s*\(([^\)]*)\)\s*RETURNS (.*)/) {
-		    $func = $1;
-		    $ret = $2;
+		if(/^\s*CREATE\s+(OR\s+REPLACE\s+)?FUNCTION\s+(\S+)\s*\(([^\)]*)\)\s*RETURNS (.*)/) {
+		    $func = $2;
+		    $ret = $3;
 		    $func =~ s/\(\)$//g;
 		    ($schema) = ($d =~ /\/([^\/]+)\/functions$/);
 		    $func = uc($func);
 		    $schema = uc($schema);
+		    $func =~ s/^[^.]+[.]//;
 		    if($ret ne "trigger"){
 			$pFunctionFile{"$schema.$func"} = "$d/$f";
 			$pFunctionReturn{"$schema.$func"} = "$ret";
 			$cfunc = 1;
 		    }
 		}
-		elsif(/^\s*CREATE\s+FUNCTION\s+(\S+)\s+RETURNS (.*)/) {
-		    $func = $1;
-		    $ret = $2;
+		elsif(/^\s*CREATE\s+(OR\s+REPLACE\s+)?FUNCTION\s+(\S+)\s+RETURNS (.*)/) {
+		    $func = $2;
+		    $ret = $3;
 		    $func =~ s/\(\)$//g;
 		    ($schema) = ($d =~ /\/([^\/]+)\/functions$/);
 		    $func = uc($func);
@@ -882,6 +1051,7 @@ sub parsePostgresViews($){
 		    $view = uc($view);
 		    $schema =~ s/\"//g;
 		    $view =~ s/\"//g;
+		    $view =~ s/^$schema[.]//;
 		    if($vuse =~ /^CREATE/) {
 			$pViewFile{"$schema.$view"} = "$d/$f";
 			$cview = 1;
@@ -1123,15 +1293,15 @@ sub parsePostgres($){
 		s/\s*--.*//g;
 
 		if($alterctable) {
-		    if(/^\s*ADD CONSTRAINT (\S+) PRIMARY KEY \(([^\)]+)\)/) {
+		    if(/^\s*ADD\s+CONSTRAINT\s+(\S+)\s+PRIMARY\s+KEY\s+\(([^\)]+)\)/) {
 			$pkc = uc($1);
 			$pk = uc($2);
 			$pk =~ s/\s//g;
 			$pk =~ s/\"//g;
-			$pTableKey{$altertable} = $pk;
-			if(defined($pkc)){$pTableKeycon{"$schema.$table"} = $pkc}
+			$pTablePrikey{$altertable} = $pk;
+			if(defined($pkc)){$pTablePrikeyName{"$schema.$table"} = $pkc}
 		    }
-		    if(/^\s*ADD CONSTRAINT (\S+) UNIQUE \(([^\)]+)\)/) {
+		    if(/^\s*ADD\s+CONSTRAINT\s+(\S+)\s+UNIQUE\s+\(([^\)]+)\)/) {
 			$pkc = uc($1);
 			$pk = uc($2);
 			$pk =~ s/\s//g;
@@ -1139,15 +1309,40 @@ sub parsePostgres($){
 			if(defined($pkc)){$pTableUnikey{$altertable} .= "$pkc $pk;"}
 			else {$pTableUnikey{$altertable} .= ". $pk;"}
 		    }
-		    if(/^\s*ADD CONSTRAINT (\S+ )FOREIGN KEY (\(\S+\) )REFERENCES ([^\(]+\([^\)]+\))/){
+		    if(/^\s*ADD\s+CONSTRAINT\s+(\S+)\s+FOREIGN\s+KEY\s+(\(\S+\)\s+)REFERENCES\s+([^\(]+\([^\)]+\))/){
 			$pk = uc($1).uc($2);
 			$pk .= uc($schema);
-			$pk .= ".";
-			$pk .= uc($3);
+			$pk .= ".";	
+		$pk .= uc($3);
 			$pk .= ";";
 			$pTableForkey{"$schema.$table"} .= $pk;
 		    }
 		    if(/;/) {$alterctable = 0}
+		}
+		if(/(\S+)\s+TEMPORARY\s+(TABLE|table)\s+(ONLY\s+)?(\S+)/) {
+		    $tuse = $1;
+		    $table = $4;
+		    if($table =~ /(^[.]+)[.](.*)/) {
+			$schema = $1;
+			$table = $2;
+		    }
+		    else {
+			($schema) = ($d =~ /\/([^\/]+)$/);
+		    }
+		    $tuse = uc($tuse);
+		    $schema = uc($schema);
+		    $table = uc($table);
+		    $schema =~ s/\"//g;
+		    $table =~ s/\"//g;
+		    print STDERR "Postgres temptable tuse: $tuse table: $table schema: $schema\n";
+		    if($tuse eq "CREATE") {
+			$pTableFile{"$schema.$table"} = "$d/$f";
+			$ctable = 1;
+		    }
+		    if($tuse eq "ALTER") {
+			$altertable = "$schema.$table";
+			$alterctable = 1;
+		    }
 		}
 		if(/(\S+)\s+(TABLE|table)\s+(ONLY\s+)?(\S+)/) {
 		    $tuse = $1;
@@ -1184,27 +1379,27 @@ sub parsePostgres($){
 			$col = uc($col);
 			$cdef =~ s/,\s+$//g;
 			$pTableColumn{"$schema.$table"} .= "$col $cdef;";
-			if($cdef =~ / DEFAULT nextval\(\'([^\']+)\'::regclass\) NOT NULL$/){
+			if($cdef =~ /\s+DEFAULT\s+nextval\(\'([^\']+)\'::regclass\) NOT NULL$/){
 			    $cid = $1;
 			    $cid = uc($1);
 			    $pNextval{"$schema.$table"} = "$col.$cid";
 			}
-			elsif($cdef =~ /DEFAULT nextval/){print STDERR "$d/$f DEFAULT nextval not recognized: '$cdef'\n"}
+			elsif($cdef =~ /DEFAULT\s+nextval/){print STDERR "$d/$f DEFAULT nextval not recognized: '$cdef'\n"}
 		    }
-		    if(/^\s*(CONSTRAINT (\S+)\s+)?PRIMARY KEY \(([^\)]+)\)/){
+		    if(/^\s*(CONSTRAINT\s+(\S+)\s+)?PRIMARY\s+KEY\s+\(([^\)]+)\)/){
 			$pkc = $2;
 			$pk = uc($3);
 			$pk =~ s/\s//g;
 			$pk =~ s/\"//g;
-			$pTableKey{"$schema.$table"} = $pk;
+			$pTablePrikey{"$schema.$table"} = $pk;
 			if(defined($pkc)){
 			    $pkc = uc($pkc);
 			    $pkc =~ s/\s//g;
 			    $pkc =~ s/\"//g;
-			    $pTableKeycon{"$schema.$table"} = $pkc;
+			    $pTablePrikeyName{"$schema.$table"} = $pkc;
 			}
 		    }
-		    if(/^\s*(CONSTRAINT (\S+)\s+)?UNIQUE \(([^\)]+)\)/){
+		    if(/^\s*(CONSTRAINT (\S+)\s+)?UNIQUE\s+\(([^\)]+)\)/){
 			$pkc = $2;
 			$pk = uc($3);
 			$pk =~ s/\s//g;
@@ -1246,7 +1441,7 @@ sub parsePostgres($){
 		    $tseq = "";
 		}
 
-		if(/^\s*CREATE\s+FUNCTION\s+(\S+)\s+RETURNS trigger/) {
+		if(/^\s*CREATE\s+FUNCTION\s+(\S+)\s+RETURNS\s+trigger/) {
 		    $trig = $1;
 		    $trig =~ s/\(\)$//g;
 		    ($schema) = ($d =~ /\/([^\/]+)$/);
@@ -1273,7 +1468,7 @@ sub parsePostgres($){
 			$cfunc = 1;
 		    }
 		}
-		if(/^\s*CREATE\s+FUNCTION\s+(\S+)\s*\(([^\)]*)\)\s*RETURNS (.*)/) {
+		if(/^\s*CREATE\s+FUNCTION\s+(\S+)\s*\(([^\)]*)\)\s*RETURNS\s+(.*)/) {
 		    $func = $1;
 		    $ret = $2;
 		    $func =~ s/\(\)$//g;
@@ -1328,6 +1523,9 @@ sub compareTypes($$$$){
     my ($st,$c,$ot,$pt) = @_;
     my $s;
     my $t;
+
+    $otrigger = "";
+
     if($ot eq $pt) {return 0}
 
 #    if($pt =~ /DEFAULT NEXTVAL\S+/ && $ot =~ /\/\* POSTGRES NEXTVAL NEEDS TRIGGER \*\//){
@@ -1335,11 +1533,24 @@ sub compareTypes($$$$){
 #	$ot =~ s/\/\*[^*]+\*\/ //g;
 #    }
 
-    $ot =~ s/  +/ /g;
-    $pt =~ s/  +/ /g;
+    $ot =~ s/\s+/ /g;
+    $pt =~ s/\s+/ /g;
+
+    $ot =~ s/NUMBER \(/NUMBER(/;
+    $ot =~ s/VARCHAR2 \(/VARCHAR2(/;
+    $ot =~ s/VARCHAR \(/VARCHAR(/;
+
+    if($pt =~ /TIMESTAMP\)$/) {
+	$pt =~ s/\)$//;
+    }
 
 # clean up matching NULL and NOT NULL with optional ENABLE
-   
+
+    if($ot =~ / NOT NULL$/ && $pt =~ / NOT NULL ENABLE$/) {
+	$ot =~ s/ NOT NULL$//;
+	$pt =~ s/ NOT NULL ENABLE$//;
+    }
+
     if($ot =~ / NOT NULL ENABLE$/ && $pt =~ / NOT NULL$/) {
 	$ot =~ s/ NOT NULL ENABLE$//;
 	$pt =~ s/ NOT NULL$//;
@@ -1355,25 +1566,59 @@ sub compareTypes($$$$){
 	$pt =~ s/\) NULL$/\)/;
     }
 
-    if($ot =~ /DATE NULL$/ && $pt =~ /TIMESTAMP NULL$/) {
-	$ot =~ s/ NULL$/\)/;
-	$pt =~ s/ NULL$/\)/;
+    if($ot =~ /(\S\S\S) NULL$/) {
+	if($1 ne "NOT" && $pt =~ /(\S\S\S) NULL$/) {
+	    if($1 ne "NOT") {
+		$ot =~ s/ NULL$//;
+		$pt =~ s/ NULL$//;
+	    }
+	}
     }
 
-    if($ot =~ / NULL$/ && $ot !~ / NOT NULL$/ && $pt !~ / NULL/) {
-	$ot =~ s/ NULL$//;
+    if($pt !~ / NULL$/) {
+	if($ot =~ /(\S\S\S) NULL$/) {
+	    if($1 ne "NOT") {
+		$ot =~ s/ NULL$//;
+	    }
+	}
+    }
+
+    if($ot !~ / NULL$/) {
+	if($pt =~ /(\S\S\S) NULL$/) {
+	    if($1 ne "NOT") {
+		$pt =~ s/ NULL$//;
+	    }
+	}
     }
 
     $ot =~ s/ WITH LOCAL TIME ZONE//g; # only allows local time display, storage unchanged
 
+    if($ot =~ / DEFAULT '1'$/ && $pt =~ / DEFAULT \(1\)$/) {
+	$ot =~ s/ \S+ \S+$//;
+	$pt =~ s/ \S+ \S+$//;
+    }
+    
+    if($pt =~ / DEFAULT NOW\(\)$/ && $ot =~ / DEFAULT SYSDATE$/) {
+	$pt =~ s/ \S+ \S+$//;
+	$ot =~ s/ \S+ \S+$//;
+    }
+    if($pt =~ / DEFAULT CURRENT_TIMESTAMP$/ && $ot =~ / DEFAULT SYSDATE$/) {
+	$pt =~ s/ \S+ \S+$//;
+	$ot =~ s/ \S+ \S+$//;
+    }
+
     if($pt =~ /^BIGINT/) {
-	if($ot =~ /^NUMBER\((\d+),0\)/){
-	    if($1 >= 9 && $1 <= 18) { # FIX size of bigint
+	if($ot =~ /^NUMBER\s/ || $ot eq "NUMBER") {
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
+	elsif($ot =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 1 && $1 <= 22) {
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
 	}
-	elsif($ot =~ /^NUMBER/) {
+	elsif($ot =~ /^NUMBER\([*],0\)/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
@@ -1382,12 +1627,16 @@ sub compareTypes($$$$){
 
     elsif($pt =~ /^BIGSERIAL/) {	# used for unique identifiers in i2b2 postgres
 	if($ot =~ /^NUMBER\((\d+),0\)/){
-	    if($1 >= 9 && $1 <= 18) { # fix: size of bigserial
+	    if($1 >= 1 && $1 <= 22) {
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
 	}
-	elsif($ot =~ /^NUMBER/) {
+	elsif($ot =~ /^NUMBER\([*],0\)/){
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
+	elsif($ot =~ /^NUMBER\s/ || $ot eq "NUMBER") {
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
@@ -1400,12 +1649,31 @@ sub compareTypes($$$$){
 	    $pt =~ s/^\S+/matched/;
 	}
 	elsif($ot =~ /^NUMBER\((\d+),0\)/){
-	    if($1 >= 5 && $1 <= 18) { # fix: size of INT
+	    $isize = 22;
+	    
+	    # Allowed exceptions where i2b2 uses a latger Oracle datatype
+	    if($c eq "AGE_IN_YEARS_NUM") {$isize = 38}
+	    if($c eq "CRC_UPLOAD_ID") {$isize = 38}
+	    if($c eq "ENCOUNTER_NUM") {$isize = 38}
+	    if($c eq "I2B2_ID") {$isize = 38}
+	    if($c eq "LENGTH_OF_STAY") {$isize = 38}
+	    if($c eq "PATIENT_COUNT") {$isize = 38}
+	    if($c eq "PATIENT_ID") {$isize = 38}
+	    if($c eq "PATIENT_NUM") {$isize = 38}
+	    if($c eq "SEARCH_KEYWORD_ID") {$isize = 38}
+	    if($c eq "SET_TYPE_ID") {$isize = 38}
+	    if($c eq "UPLOAD_ID") {$isize = 38}
+	    if($st eq "I2B2DEMODATA.DATAMART_REPORT") {$isize = 38}
+	    if($1 >= 1 && $1 <=$isize) {
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
 	}
-	elsif($ot =~ /^NUMBER/) {
+	elsif($ot =~ /^NUMBER\([*],0\)/){
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
+	elsif($ot =~ /^NUMBER\s/ || $ot eq "NUMBER") {
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
@@ -1413,13 +1681,20 @@ sub compareTypes($$$$){
     }
 
     elsif($pt =~ /^SERIAL/) {	# used for unique identifiers in i2b2 postgres
-	if($ot =~ /^NUMBER\((\d+),0\)/){ # fix: size of serial
-	    if($1 >= 5 && $1 <= 8) {
+	if($ot =~ /^NUMBER\s/ || $ot eq "NUMBER") {
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
+	elsif($ot =~ /^NUMBER\((\d+),0\)/){
+	    $isize = 22;
+	    if($c eq "I2B2_ID") {$isize = 38}
+	    if($c eq "UPLOAD_ID") {$isize = 38}
+	    if($1 >= 5 && $1 <= $isize) {
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
 	}
-	elsif($ot =~ /^NUMBER/) {
+	elsif($ot =~ /^NUMBER\([*],0\)/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
@@ -1427,13 +1702,17 @@ sub compareTypes($$$$){
     }
 
     elsif($pt =~ /^SMALLINT/) {
-	if($ot =~ /^NUMBER\((\d+),0\)/){
-	    if($1 >= 1 && $1 <= 4) { # fix: size of smallint
+	if($ot =~ /^NUMBER\s/ || $ot eq "NUMBER") {
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
+	elsif($ot =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 1 && $1 <= 4) {
 		$ot =~ s/^\S+/matched/;
 		$pt =~ s/^\S+/matched/;
 	    }
 	}
-	elsif($ot =~ /^NUMBER/) {
+	elsif($ot =~ /^NUMBER\([*],0\)/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
@@ -1464,6 +1743,14 @@ sub compareTypes($$$$){
 	else {return 1}
     }
 
+    elsif($pt =~ /^REAL/) {
+	if($ot =~ /^NUMBER\((\d+),(\d+)\)/){
+	    if($1 >= 2 && $1 <= 22 && $2 > 0) {
+		$ot =~ s/^\S+/matched/;
+		$pt =~ s/^\S+/matched/;
+	    }
+	}
+    }
     elsif($pt =~ /^DOUBLE PRECISION/) {
 	if($ot =~ /^NUMBER\((\d+),(\d+)\)/){
 	    if($1 >= 9 && $1 <= 38 && $2 > 0) {
@@ -1471,7 +1758,7 @@ sub compareTypes($$$$){
 		$pt =~ s/^\S+ \S+/matched/;
 	    }
 	}
-	elsif($ot =~ /^NUMBER/){
+	elsif($ot =~ /^NUMBER\s/ || $ot eq "NUMBER"){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
@@ -1527,17 +1814,29 @@ sub compareTypes($$$$){
 	else {return 1}
     }
 
-    elsif($pt =~ /^VARCHAR\((\d+)\)/) {
+    elsif($pt =~ /^VARCHAR2?\((\d+)\)/) {
 	$size = $1;
-	if($ot =~ /N?VARCHAR2\($size BYTE\)/){
+	if($ot =~ /^VARCHAR2?\($size BYTE\)/){
 	    $ot =~ s/^\S+ \S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
-	if($ot =~ /N?VARCHAR2\($size CHAR\)/){
+	if($ot =~ /^VARCHAR2?\($size CHAR\)/){
 	    $ot =~ s/^\S+ \S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
-	if($ot =~ /N?VARCHAR2\($size\)/){
+	if($ot =~ /^VARCHAR2?\($size\)/){
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
+	if($ot =~ /^NVARCHAR2\($size BYTE\)/){
+	    $ot =~ s/^\S+ \S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
+	if($ot =~ /^NVARCHAR2\($size CHAR\)/){
+	    $ot =~ s/^\S+ \S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
+	if($ot =~ /^NVARCHAR2\($size\)/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
@@ -1550,40 +1849,29 @@ sub compareTypes($$$$){
 	}
     }
 
-    elsif($pt =~ /^VARCHAR2\((\d+) BYTE\)/) {
+    elsif($pt =~ /^VARCHAR2?\((\d+) BYTE\)/) {
 	$size = $1;
-	if($ot =~ /N?VARCHAR2\($size BYTE\)/){
+	if($ot =~ /^VARCHAR2?\($size BYTE\)/){
 	    $ot =~ s/^\S+ \S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
-	if($ot =~ /N?VARCHAR2\($size CHAR\)/){
+	if($ot =~ /^VARCHAR2?\($size CHAR\)/){
 	    $ot =~ s/^\S+ \S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
-	if($ot =~ /N?VARCHAR2\($size\)/){
+	if($ot =~ /^VARCHAR2?\($size\)/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
-	if($ot =~ / DEFAULT \'([^\']*)\'$/) {
-	    $oval = $1;
-	    if($pt =~ /DEFAULT \'$oval\'::CHARACTER VARYING$/) {
-		$ot =~ s/ DEFAULT \'([^\']*)\'$//;
-		$pt =~ s/ DEFAULT \'$oval\'::CHARACTER VARYING$//;
-	    }
-	}
-    }
-
-    elsif($pt =~ /^VARCHAR \((\d+)\)/) {
-	$size = $1;
-	if($ot =~ /N?VARCHAR2\($size BYTE\)/){
+	if($ot =~ /^NVARCHAR2\($size BYTE\)/){
 	    $ot =~ s/^\S+ \S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
-	if($ot =~ /N?VARCHAR2\($size CHAR\)/){
+	if($ot =~ /^NVARCHAR2\($size CHAR\)/){
 	    $ot =~ s/^\S+ \S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
-	if($ot =~ /N?VARCHAR2\($size\)/){
+	if($ot =~ /^NVARCHAR2\($size\)/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
@@ -1598,19 +1886,31 @@ sub compareTypes($$$$){
 
     elsif($pt =~ /^CHARACTER VARYING\((\d+)\)/) {
 	$size = $1;
-	if($ot =~ /N?VARCHAR2?\($size BYTE\)/){
+	if($ot =~ /^VARCHAR2?\($size BYTE\)/){
 	    $ot =~ s/^\S+ \S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
-	if($ot =~ /N?VARCHAR2\($size CHAR\)/){
+	if($ot =~ /^VARCHAR2?\($size CHAR\)/){
 	    $ot =~ s/^\S+ \S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
-	if($ot =~ /N?VARCHAR2\($size\)/){
+	if($ot =~ /^VARCHAR2?\($size\)/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
-	if($ot =~ /CLOB/ && $size >= 2000){
+	if($ot =~ /^NVARCHAR2\($size BYTE\)/){
+	    $ot =~ s/^\S+ \S+/matched/;
+	    $pt =~ s/^\S+ \S+/matched/;
+	}
+	if($ot =~ /^NVARCHAR2\($size CHAR\)/){
+	    $ot =~ s/^\S+ \S+/matched/;
+	    $pt =~ s/^\S+ \S+/matched/;
+	}
+	if($ot =~ /^NVARCHAR2\($size\)/){
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+ \S+/matched/;
+	}
+	if($ot =~ /^CLOB/ && $size >= 2000){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+ \S+/matched/;
 	}
@@ -1635,12 +1935,32 @@ sub compareTypes($$$$){
 	}
     }
 
+    elsif($ot =~ /^CHAR\((\d+)\)/) {
+	$size = $1;
+	if($pt =~ /CHAR\($size BYTE\)/){
+	    $pt =~ s/^\S+ \S+/matched/;
+	    $ot =~ s/^\S+/matched/;
+	}
+	if($pt =~ /CHAR\($size CHAR\)/){
+	    $pt =~ s/^\S+ \S+/matched/;
+	    $ot =~ s/^\S+/matched/;
+	}
+    }
+
     elsif($pt =~ /^OID/) {
 	$size = $1;
 	if($ot =~ /^BLOB/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
+	if($ot =~ /^CLOB/){
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
+    }
+
+    elsif($pt =~ /^BYTEA/) {
+	$size = $1;
 	if($ot =~ /^CLOB/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
@@ -1670,15 +1990,15 @@ sub compareTypes($$$$){
 	    $pt =~ s/ \S+ \S+$//;
 	    $ot =~ s/ \S+ \S+$//;
 	}
-	if($pt =~ / DEFAULT CURRENT TIMESTAMP$/ && $ot =~ / DEFAULT SYSDATE$/) {
-	    $pt =~ s/ \S+ \S+ \S+$//;
+	if($pt =~ / DEFAULT CURRENT_TIMESTAMP$/ && $ot =~ / DEFAULT SYSDATE$/) {
+	    $pt =~ s/ \S+ \S+$//;
 	    $ot =~ s/ \S+ \S+$//;
 	}
     }
     elsif($pt =~ /^TIMESTAMP (\(6\))/){
 	if($ot =~ /^DATE$/) {
-	    $pt =~ s/\S+ \S+$//;
-	    $ot =~ s/\S+$//;
+	    $pt =~ s/^\S+ \S+/matched/;
+	    $ot =~ s/^\S+/matched/;
 	}
     }
     elsif($pt =~ /^TIMESTAMP(\(\d\))/){
@@ -1688,20 +2008,16 @@ sub compareTypes($$$$){
     }
     elsif($pt =~ /^TIMESTAMP$/){
 	if($ot =~ /^DATE$/) {
-	    $pt =~ s/\S+$//;
-	    $ot =~ s/\S+$//;
+	    $pt =~ s/^\S+/matched/;
+	    $ot =~ s/^\S+/matched/;
 	}
 	if($ot =~ /^TIMESTAMP \(6\)$/) {
-	    $pt =~ s/\S+$//;
-	    $ot =~ s/\S+ \S+$//;
+	    $pt =~ s/^\S+/matched/;
+	    $ot =~ s/^\S+ \S+/matched/;
 	}
 	if($ot =~ /^TIMESTAMP \(9\)$/) {
-	    $pt =~ s/\S+$//;
-	    $ot =~ s/\S+ \S+$//;
-	}
-	if($pt =~ / DEFAULT NOW\(\)$/ && $ot =~ / DEFAULT SYSDATE$/) {
-	    $pt =~ s/ \S+ \S+$//;
-	    $ot =~ s/ \S+ \S+$//;
+	    $pt =~ s/^\S+/matched/;
+	    $ot =~ s/^\S+ \S+/matched/;
 	}
     }
     elsif($pt =~ /^DATE\b/){
@@ -1724,8 +2040,6 @@ sub compareTypes($$$$){
     if($pt =~ /DEFAULT '\S'::BPCHAR/) {
 	$pt =~ s/(DEFAULT '\S')::BPCHAR/$1/;
     }
-
-    $otrigger = "";
 
     if($pt =~ /^matched DEFAULT NEXTVAL\(\'([^\']+)\'::REGCLASS\)/) {
 	$sq = $1;
@@ -1770,6 +2084,562 @@ ALTER TRIGGER \"$s\".\"$trig\" ENABLE;
 	}
     }
     if($ot eq $pt) {return 0} 
+
+#    print "comparetypes $st.$c '$ot' '$pt'\n";
+    return 1;
+}
+
+#####################################################
+#
+# Compare two Oracle databases : i2b2 and tranSMART
+#
+#####################################################
+
+sub compareOracleTypes($$$$){
+    my ($st,$c,$ibt,$tmt) = @_;
+    my $s;
+    my $t;
+
+    $ibtrigger = "";
+
+    if($ibt eq $tmt) {return 0}
+
+#    if($tmt =~ /DEFAULT NEXTVAL\S+/ && $ot =~ /\/\* POSTGRES NEXTVAL NEEDS TRIGGER \*\//){
+#	$tmt =~ s/DEFAULT NEXTVAL\S+ //g;
+#	$ibt =~ s/\/\*[^*]+\*\/ //g;
+#    }
+
+    $ibt =~ s/\s+/ /g;
+    $tmt =~ s/\s+/ /g;
+
+    $ibt =~ s/NUMBER \(/NUMBER(/;
+    $ibt =~ s/VARCHAR2 \(/VARCHAR2(/;
+    $ibt =~ s/VARCHAR \(/VARCHAR(/;
+
+    # clean up quotes around column name
+
+    $ibt =~ s/\"([A-Za-z0-9_]+)\"/$1/;
+    $tmt =~ s/\"([A-Za-z0-9_]+)\"/$1/;
+
+# clean up matching NULL and NOT NULL with optional ENABLE
+   
+    if($ibt =~ / NOT NULL ENABLE$/ && $tmt =~ / NOT NULL ENABLE$/) {
+	$ibt =~ s/ NOT NULL ENABLE$//;
+	$tmt =~ s/ NOT NULL ENABLE$//;
+    }
+
+    if($ibt =~ / NOT NULL$/ && $tmt =~ / NOT NULL ENABLE$/) {
+	$ibt =~ s/ NOT NULL//;
+	$tmt =~ s/ NOT NULL ENABLE$//;
+    }
+
+    if($ibt =~ / NOT NULL$/ && $tmt =~ / NOT NULL$/) {
+	$ibt =~ s/ NOT NULL$//;
+	$tmt =~ s/ NOT NULL$//;
+    }
+
+    if($ibt =~ /DATE NULL$/ && $tmt =~ /DATE$/) {
+	$ibt =~ s/ NULL$//;
+	$tmt =~ s/ NULL$//;
+    }
+
+    if($ibt =~ /(\S\S\S) NULL$/) {
+	if($1 ne "NOT" && $tmt =~ /(\S\S\S) NULL$/) {
+	    if($1 ne "NOT") {
+		$ibt =~ s/ NULL$//;
+		$tmt =~ s/ NULL$//;
+	    }
+	}
+    }
+
+    if($tmt !~ / NULL$/) {
+	if($ibt =~ /(\S\S\S) NULL$/) {
+	    if($1 ne "NOT") {
+		$ibt =~ s/ NULL$//;
+	    }
+	}
+    }
+
+    if($ibt !~ / NULL$/) {
+	if($tmt =~ /(\S\S\S) NULL$/) {
+	    if($1 ne "NOT") {
+		$tmt =~ s/ NULL$//;
+	    }
+	}
+    }
+
+    if($ibt =~ /DATE NULL$/ && $tmt =~ /TIMESTAMP NULL$/) {
+	$ibt =~ s/ NULL$//;
+	$tmt =~ s/ NULL$//;
+    }
+
+    $ibt =~ s/ WITH LOCAL TIME ZONE//g; # only allows local time display, storage unchanged
+
+    if($tmt =~ /^BIGINT/) {
+	if($ibt =~ /^NUMBER\s/ || $ibt eq "NUMBER") {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	elsif($ot =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 1 && $1 <= 22) {
+		$ibt =~ s/^\S+/matched/;
+		$tmt =~ s/^\S+/matched/;
+	    }
+	}
+	elsif($ibt =~ /^NUMBER\([*],0\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^BIGSERIAL/) {	# used for unique identifiers in i2b2 postgres
+	if($ibt =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 1 && $1 <= 22) {
+		$ibt =~ s/^\S+/matched/;
+		$tmt =~ s/^\S+/matched/;
+	    }
+	}
+	elsif($ibt =~ /^NUMBER\([*],0\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	elsif($ibt =~ /^NUMBER\s/ || $ibt eq "NUMBER") {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($ibt =~ /^INT/) {
+	if($tmt =~ /^NUMBER\([*],0\)/) {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+    }
+
+    elsif($tmt =~ /^INT/) {
+	if($ibt =~ /^INTEGER/) {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	elsif($ibt =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 1 && $1 <= 22) {
+		$ibt =~ s/^\S+/matched/;
+		$tmt =~ s/^\S+/matched/;
+	    }
+	}
+	elsif($ibt =~ /^NUMBER\([*],0\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	elsif($ibt =~ /^NUMBER\s/ || $ibt eq "NUMBER") {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^SERIAL/) {	# used for unique identifiers in i2b2 postgres
+	if($ibt =~ /^NUMBER\s/ || $ibt eq "NUMBER") {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	elsif($ibt =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 5 && $1 <= 22) {
+		$ibt =~ s/^\S+/matched/;
+		$tmt =~ s/^\S+/matched/;
+	    }
+	}
+	elsif($ibt =~ /^NUMBER\([*],0\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^SMALLINT/) {
+	if($ibt =~ /^NUMBER\s/ || $ibt eq "NUMBER") {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	elsif($ibt =~ /^NUMBER\((\d+),0\)/){
+	    if($1 >= 1 && $1 <= 4) {
+		$ibt =~ s/^\S+/matched/;
+		$tmt =~ s/^\S+/matched/;
+	    }
+	}
+	elsif($ibt =~ /^NUMBER\([*],0\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^BOOLEAN DEFAULT FALSE/) { # treat boolean as never NULL
+	if($ibt =~ /^NUMBER\(1,0\) DEFAULT 0 NOT NULL ENABLE/){
+	    $ibt =~ s/^\S+ DEFAULT 0 NOT NULL ENABLE/matched/;
+	    $tmt =~ s/^\S+ DEFAULT FALSE/matched/;
+	}
+	elsif($ibt =~ /^CHAR\(1 BYTE\) DEFAULT 0/){
+	    $ibt =~ s/^\S+ \S+ DEFAULT 0/matched/;
+	    $tmt =~ s/^\S+ DEFAULT FALSE/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^BOOLEAN/) {
+	if($ibt =~ /^NUMBER\(1,0\)/) {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	elsif($ibt =~ /^CHAR\(1 BYTE\)/) {
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^DOUBLE PRECISION/) {
+	if($ibt =~ /^NUMBER\((\d+),(\d+)\)/){
+	    if($1 >= 9 && $1 <= 38 && $2 > 0) {
+		$ibt =~ s/^\S+/matched/;
+		$tmt =~ s/^\S+ \S+/matched/;
+	    }
+	}
+	elsif($ibt =~ /^NUMBER\s/ || $ot eq "NUMBER"){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	elsif($ibt =~ /^FLOAT\((\d+)\)/){ # (n) is the precision
+	    if($1 > 0) {
+		$ibt =~ s/^\S+/matched/;
+		$tmt =~ s/^\S+ \S+/matched/;
+	    }
+	}
+	elsif($ibt =~ /^BINARY_DOUBLE/){ # (n) is the precision
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^DECIMAL\((\d+),(\d+)\)/) {
+	$size=$1;
+	$prec=$2;
+	if($ibt =~ /NUMBER\($size,$prec\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^NUMERIC\((\d+),(\d+)\)/) {
+	$size=$1;
+	$prec=$2;
+	if($ibt =~ /NUMBER\($size,$prec\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^NUMERIC/) {
+	$size=$1;
+	$prec=$2;
+	if($ibt =~ /NUMBER\(([*]|\d+),(\d+)\)/){
+	    if($2 == 0) {
+		$ibt =~ s/^\S+/matched/;
+		$tmt =~ s/^\S+/matched/;
+	    }
+	}
+	elsif($ibt =~ /NUMBER\(/){
+	    return 1;
+	}
+	elsif($ibt =~ /NUMBER/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	else {return 1}
+    }
+
+    elsif($tmt =~ /^VARCHAR2?\((\d+)\)/) {
+	$size = $1;
+	if($ibt =~ /^VARCHAR2?\($size BYTE\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	if($ibt =~ /^VARCHAR2?\($size CHAR\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	if($ibt =~ /^VARCHAR2?\($size\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	if($ibt =~ /^NVARCHAR2\($size BYTE\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	if($ibt =~ /^NVARCHAR2\($size CHAR\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	if($ibt =~ /^NVARCHAR2\($size\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	if($ibt =~ / DEFAULT \'([^\']*)\'$/) {
+	    if($tmt =~ /DEFAULT \'$oval\'::CHARACTER VARYING$/) {
+		$ibt =~ s/ DEFAULT \'([^\']*)\'$//;
+		$tmt =~ s/ DEFAULT \'$oval\'::CHARACTER VARYING$//;
+	    }
+	}
+    }
+
+    elsif($tmt =~ /^VARCHAR2?\((\d+) BYTE\)/) {
+	$size = $1;
+	if($ibt =~ /^VARCHAR2?\($size BYTE\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^VARCHAR2?\($size CHAR\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^VARCHAR2?\($size\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^NVARCHAR2\($size BYTE\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^NVARCHAR2\($size CHAR\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^NVARCHAR2\($size\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ / DEFAULT \'([^\']*)\'$/) {
+	    $oval = $1;
+	    if($tmt =~ /DEFAULT \'$oval\'::CHARACTER VARYING$/) {
+		$ibt =~ s/ DEFAULT \'([^\']*)\'$//;
+		$tmt =~ s/ DEFAULT \'$oval\'::CHARACTER VARYING$//;
+	    }
+	}
+    }
+
+    elsif($tmt =~ /^CHARACTER VARYING\((\d+)\)/) {
+	$size = $1;
+	if($ibt =~ /^VARCHAR2?\($size BYTE\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^VARCHAR2?\($size CHAR\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^VARCHAR2?\($size\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^NVARCHAR2\($size BYTE\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^NVARCHAR2\($size CHAR\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^NVARCHAR2\($size\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ /^CLOB/ && $size >= 2000){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($ibt =~ / DEFAULT \'([^\']*)\'$/) {
+	    $oval = $1;
+	    if($tmt =~ /DEFAULT \'$oval\'::CHARACTER VARYING$/) {
+		$ibt =~ s/ DEFAULT \'([^\']*)\'$//;
+		$tmt =~ s/ DEFAULT \'$oval\'::CHARACTER VARYING$//;
+	    }
+	}
+    }
+
+    elsif($tmt =~ /^CHARACTER\((\d+)\)/) {
+	$size = $1;
+	if($ibt =~ /^CHAR\($size BYTE\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	if($ibt =~ /^CHAR\($size CHAR\)/){
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+    }
+
+    elsif($ibt =~ /^CHAR\((\d+)\)/) {
+	$size = $1;
+	if($tmt =~ /^CHAR\($size BYTE\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+	if($tmt =~ /^CHAR\($size CHAR\)/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+/matched/;
+	}
+    }
+
+    elsif($tmt =~ /^OID/) {
+	$size = $1;
+	if($ibt =~ /^BLOB/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+	if($ibt =~ /^CLOB/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+    }
+
+    elsif($tmt =~ /^BYTEA/) {
+	$size = $1;
+	if($ibt =~ /^CLOB/){
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+    }
+
+    elsif($tmt =~ /^TIMESTAMP(\((\d)\))? WITHOUT TIME ZONE/){
+	if(!defined($1)) {$it = 6}
+	else {$it = $2}
+	if($ibt =~ /^DATE/) {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+ \S+ \S+/matched/;
+	}
+	elsif($ibt =~ /^TIMESTAMP \(9\)/ && $it == 6) {
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+ \S+ \S+/matched/;
+	}
+	elsif($ibt =~ /^TIMESTAMP$/ && $it == 6) {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+ \S+ \S+ \S+/matched/;
+	}
+	elsif($ibt =~ /^TIMESTAMP \($it\)/) {
+	    $ibt =~ s/^\S+ \S+/matched/;
+	    $tmt =~ s/^\S+ \S+ \S+ \S+/matched/;
+	}
+	if($tmt =~ / DEFAULT NOW\(\)$/ && $ibt =~ / DEFAULT SYSDATE$/) {
+	    $ibt =~ s/ \S+ \S+$//;
+	    $tmt =~ s/ \S+ \S+$//;
+	}
+	if($tmt =~ / DEFAULT CURRENT TIMESTAMP$/ && $ibt =~ / DEFAULT SYSDATE$/) {
+	    $ibt =~ s/ \S+ \S+$//;
+	    $tmt =~ s/ \S+ \S+ \S+$//;
+	}
+    }
+    elsif($tmt =~ /^TIMESTAMP (\(6\))/){
+	if($ibt =~ /^DATE$/) {
+	    $ibt =~ s/\S+$//;
+	    $tmt =~ s/\S+ \S+$//;
+	}
+	if($ibt =~ /^TIMESTAMP$/) {
+	    $ibt =~ s/\S+$//;
+	    $tmt =~ s/\S+ \S+$//;
+	}
+    }
+    elsif($tmt =~ /^TIMESTAMP(\(\d\))/){
+	if($ibt =~ /^TIMESTAMP \(\d\)/) {
+	    $ibt =~ s/^(\S+) (\S+)/$1$2/;
+	}
+    }
+    elsif($tmt =~ /^TIMESTAMP$/){
+	if($ibt =~ /^DATE$/) {
+	    $ibt =~ s/\S+$//;
+	    $tmt =~ s/\S+$//;
+	}
+	if($ibt =~ /^TIMESTAMP \(6\)$/) {
+	    $ibt =~ s/\S+ \S+$//;
+	    $tmt =~ s/\S+$//;
+	}
+	if($ibt =~ /^TIMESTAMP \(9\)$/) {
+	    $ibt =~ s/\S+ \S+$//;
+	    $tmt =~ s/\S+$//;
+	}
+	if($tmt =~ / DEFAULT NOW\(\)$/ && $ibt =~ / DEFAULT SYSDATE$/) {
+	    $ibt =~ s/ \S+ \S+$//;
+	    $tmt =~ s/ \S+ \S+$//;
+	}
+    }
+    elsif($tmt =~ /^DATE\b/){
+	if($ibt =~ /^DATE\b/) {
+	    $ibt =~ s/^(\S+)/matched/;
+	    $tmt =~ s/^(\S+)/matched/;
+	}
+	if($tmt =~ / DEFAULT NOW\(\)$/ && $ibt =~ / DEFAULT SYSDATE$/) {
+	    $ibt =~ s/ \S+ \S+$//;
+	    $tmt =~ s/ \S+ \S+$//;
+	}
+    }
+    elsif($tmt =~ /^TEXT/){
+	if($ibt =~ /^N?[CB]LOB/) {
+	    $ibt =~ s/^\S+/matched/;
+	    $tmt =~ s/^\S+/matched/;
+	}
+    }
+
+    if($tmt =~ /DEFAULT '\S'::BPCHAR/) {
+	$tmt =~ s/(DEFAULT '\S')::BPCHAR/$1/;
+    }
+
+    if($tmt =~ /^matched DEFAULT NEXTVAL\(\'([^\']+)\'::REGCLASS\)/) {
+	$sq = $1;
+	($s,$t) = ($st =~ /([^.]+)[.](.*)/);
+	my $ibnv = "";
+	my $tmnv = "";
+	if(defined($ioNextval{"$s.$t"})) {$ibnv = $ioNextval{"$s.$t"}}
+	if(defined($oNextval{"$s.$t"})) {$tmnv = $oNextval{"$s.$t"}}
+	if($ibt eq "matched" && $ibnv eq $tmnv) {
+	    $ibt =~ s/ \S+$//;
+	    $tmt =~ s/ \S+ \S+$//;
+	}
+	else {
+	    print STDERR "Create trigger ibnv: '$ibnv' tmnv: '$tmnv'\n";
+	    my $trig = "TRG_$t\_$c";
+	    $trig =~ s/PATIENT/PAT/g;
+	    $trig =~ s/COLLECTION/COL/g;
+	    $trig =~ s/QUERY_MASTER/QM/g;
+	    $trig =~ s/QUERY_RESULT_INSTANCE/QRI/g;
+	    $trig =~ s/QUERY_INSTANCE/QI/g;
+	    $trig =~ s/QUERY_RESULT/QR/g;
+	    $trig =~ s/RESULT_INSTANCE/RI/g;
+	    $trig =~ s/QUERY/Q/g;
+	    $trig =~ s/RESULT/RES/g;
+	    $ibtrigger = "--
+-- Type: TRIGGER; Owner: $s; Name: $trig
+--
+  CREATE OR REPLACE TRIGGER \"$s\".\"$trig\" 
+   before insert on \"$s\".\"$t\" 
+   for each row 
+begin  
+   if inserting then 
+      if :NEW.\"$c\" is null then 
+         select $sq.nextval into :NEW.\"$c\" from dual; 
+      end if; 
+   end if; 
+end;
+/
+ALTER TRIGGER \"$s\".\"$trig\" ENABLE;
+";
+
+	}
+    }
+    if($ibt eq $tmt) {return 0} 
 
     return 1;
 }
@@ -1826,29 +2696,31 @@ sub compareColumns($$){
 	}
     }
 
+    # Compare primary key constraints
+
     my $okey = "undefined";
     my $pkey = "undefined";
     my @okey = ();
     my @pkey = ();
 
-    if(defined($oTableKey{$t})){$okey = $oTableKey{$t}}
-    if(defined($pTableKey{$t})){$pkey = $pTableKey{$t}}
+    if(defined($oTablePrikey{$t})){$okey = $oTablePrikey{$t}}
+    if(defined($pTablePrikey{$t})){$pkey = $pTablePrikey{$t}}
     if($okey ne $pkey) {
 	$compstr .= "PRIMARY KEY     $okey    $pkey\n";
 	if($okey eq "undefined") {
-	    if(!defined($pTableKeycon{$t})) {
-		$compstr .= "PRIMARY KEY (\"$pTableKey{$t}\")\n";
+	    if(!defined($pTablePrikeyName{$t})) {
+		$compstr .= "PRIMARY KEY (\"$pTablePrikey{$t}\")\n";
 	    }else{
-		$compstr .= "CONSTRAINT \"$pTableKeycon{$t}\" PRIMARY KEY (\"$pTableKey{$t}\")\n";
+		$compstr .= "CONSTRAINT \"$pTablePrikeyName{$t}\" PRIMARY KEY (\"$pTablePrikey{$t}\")\n";
 	    }
 	}
 	if($pkey eq "undefined") {
-	    $lk = lc($oTableKey{$t});
-	    if(!defined($oTableKeycon{$t})) {
+	    $lk = lc($oTablePrikey{$t});
+	    if(!defined($oTablePrikeyName{$t})) {
 		$compstr .= "PRIMARY KEY (lk)\n";
 	    }else{
 		($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
-		$lc = lc($oTableKeycon{$t});
+		$lc = lc($oTablePrikeyName{$t});
 		$compstr .= "--
 -- Name: $lc; Type: CONSTRAINT; Schema: $ts; Owner: -
 --
@@ -1857,6 +2729,8 @@ ALTER TABLE ONLY $tt\n";
 	    }
 	}
     }
+
+    # Compare unique key constraints
 
     $okey=0;
     $pkey=0;
@@ -1872,7 +2746,7 @@ ALTER TABLE ONLY $tt\n";
 	    }
 	}
 	else {
-	    $compstr = "UNIQUE      count $okey    $pkey\n";
+	    $compstr .= "UNIQUE      count $okey    $pkey\n";
 	    for ($i = 0; $i < $okey; $i++) {
 		$compstr .= "            oracle: $okey[$i]\n";
 	    }
@@ -1882,7 +2756,7 @@ ALTER TABLE ONLY $tt\n";
 	}
     }
     elsif($#okey >= 0) {
-	$compstr = "UNIQUE oracle only $okey\n";
+	$compstr .= "UNIQUE oracle only $okey\n";
 	for ($i = 0; $i < $okey; $i++) {
 	    $pk = lc($okey[$i]);
 	    $compstr .= "            oracle: $pk\n";
@@ -1900,7 +2774,7 @@ ALTER TABLE ONLY $tt
 	}
     }
     elsif($#pkey >= 0) {
-	$compstr = "UNIQUE postgres only $pkey\n";
+	$compstr .= "UNIQUE postgres only $pkey\n";
 	for ($i = 0; $i < $pkey; $i++) {
 	    $compstr .= "          postgres: $pkey[$i]\n";
 	}
@@ -1944,6 +2818,8 @@ ALTER TABLE \"$ts\".\"$tt\"
 #	}
 #   }
 
+    # compare foreign key constraints
+
     @okey = ();
     @pkey = ();
     $okey=0;
@@ -1961,7 +2837,7 @@ ALTER TABLE \"$ts\".\"$tt\"
 	    }
 	}
 	else {
-	    $compstr = "FOREIGN KEY count $okey    $pkey\n";
+	    $compstr .= "FOREIGN KEY count $okey    $pkey\n";
 	    for ($i = 0; $i < $okey; $i++) {
 		$compstr .= "            oracle: $okey[$i]\n";
 	    }
@@ -1971,14 +2847,14 @@ ALTER TABLE \"$ts\".\"$tt\"
 	}
     }
     elsif($#okey >= 0) {
-	$compstr = "FOREIGN KEY oracle only $okey\n";
+	$compstr .= "FOREIGN KEY oracle only $okey\n";
 	    for ($i = 0; $i < $okey; $i++) {
 		$pk = lc($okey[$i]);
 		$compstr .= "            oracle: $pk\n";
 	    }
     }
     elsif($#pkey >= 0) {
-	$compstr = "FOREIGN KEY postgres only $pkey\n";
+	$compstr .= "FOREIGN KEY postgres only $pkey\n";
 	for ($i = 0; $i < $pkey; $i++) {
 	    $compstr .= "          postgres: $pkey[$i]\n";
 	}
@@ -2032,7 +2908,7 @@ sub compareI2b2Columns($$){
 	    $compstr .= sprintf "$head"."column not in PostgresI2b2:  %-32s %s\n", $c, $ocol{$c};
 	    $head = "";
 	}
-	elsif(compareTypes($t,$c,$ocol{$c},$pcol{$c})) {
+	elsif(compareTypes($t,$c,$ocol{$c},$pcol{$c})) { 		# compares postgres to i2b2 for transmart or i2b2
 	    $compstr .= sprintf "$head"."column %-32s %-45s <=> %-45s\n",
 	                        $c, "'$ocol{$c}'", "'$pcol{$c}'";
             if($otrigger ne "") {$compstr .= $otrigger}
@@ -2055,24 +2931,24 @@ sub compareI2b2Columns($$){
     my @okey = ();
     my @pkey = ();
 
-    if(defined($ioTableKey{$t})){$okey = $ioTableKey{$t}}
-    if(defined($ipTableKey{$t})){$pkey = $ipTableKey{$t}}
+    if(defined($ioTablePrikey{$t})){$okey = $ioTablePrikey{$t}}
+    if(defined($ipTablePrikey{$t})){$pkey = $ipTablePrikey{$t}}
     if($okey ne $pkey) {
 	$compstr .= "PRIMARY KEY     $okey    $pkey\n";
 	if($okey eq "undefined") {
-	    if(!defined($ipTableKeycon{$t})) {
-		$compstr .= "PRIMARY KEY (\"$pTableKey{$t}\")\n";
+	    if(!defined($ipTablePrikeyName{$t})) {
+		$compstr .= "PRIMARY KEY (\"$pTablePrikey{$t}\")\n";
 	    }else{
-		$compstr .= "CONSTRAINT \"$pTableKeycon{$t}\" PRIMARY KEY (\"$pTableKey{$t}\")\n";
+		$compstr .= "CONSTRAINT \"$pTablePrikeyName{$t}\" PRIMARY KEY (\"$pTablePrikey{$t}\")\n";
 	    }
 	}
 	if($pkey eq "undefined") {
-	    $lk = lc($ioTableKey{$t});
-	    if(!defined($ioTableKeycon{$t})) {
+	    $lk = lc($ioTablePrikey{$t});
+	    if(!defined($ioTablePrikeyName{$t})) {
 		$compstr .= "PRIMARY KEY (lk)\n";
 	    }else{
 		($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
-		$lc = lc($ioTableKeycon{$t});
+		$lc = lc($ioTablePrikeyName{$t});
 		$compstr .= "--
 -- Name: $lc; Type: CONSTRAINT; Schema: $ts; Owner: -
 --
@@ -2096,7 +2972,7 @@ ALTER TABLE ONLY $tt\n";
 	    }
 	}
 	else {
-	    $compstr = "UNIQUE      count $okey    $pkey\n";
+	    $compstr .= "UNIQUE      count $okey    $pkey\n";
 	    for ($i = 0; $i < $okey; $i++) {
 		$compstr .= "            oracle: $okey[$i]\n";
 	    }
@@ -2106,7 +2982,7 @@ ALTER TABLE ONLY $tt\n";
 	}
     }
     elsif($#okey >= 0) {
-	$compstr = "UNIQUE oracle i2b2 only $okey\n";
+	$compstr .= "UNIQUE oracle i2b2 only $okey\n";
 	for ($i = 0; $i < $okey; $i++) {
 	    $pk = lc($okey[$i]);
 	    $compstr .= "            oracle: $pk\n";
@@ -2124,7 +3000,7 @@ ALTER TABLE ONLY $tt
 	}
     }
     elsif($#pkey >= 0) {
-	$compstr = "UNIQUE postgres i2b2 only $pkey\n";
+	$compstr .= "UNIQUE postgres i2b2 only $pkey\n";
 	for ($i = 0; $i < $pkey; $i++) {
 	    $compstr .= "          postgres: $pkey[$i]\n";
 	}
@@ -2185,7 +3061,7 @@ ALTER TABLE \"$ts\".\"$tt\"
 	    }
 	}
 	else {
-	    $compstr = "FOREIGN KEY count $okey    $pkey\n";
+	    $compstr .= "FOREIGN KEY count $okey    $pkey\n";
 	    for ($i = 0; $i < $okey; $i++) {
 		$compstr .= "            oracle: $okey[$i]\n";
 	    }
@@ -2195,20 +3071,252 @@ ALTER TABLE \"$ts\".\"$tt\"
 	}
     }
     elsif($#okey >= 0) {
-	$compstr = "FOREIGN KEY oracle i2b2 only $okey\n";
+	$compstr .= "FOREIGN KEY oracle i2b2 only $okey\n";
 	    for ($i = 0; $i < $okey; $i++) {
 		$pk = lc($okey[$i]);
 		$compstr .= "            oracle: $pk\n";
 	    }
     }
     elsif($#pkey >= 0) {
-	$compstr = "FOREIGN KEY postgres i2b2 only $pkey\n";
+	$compstr .= "FOREIGN KEY postgres i2b2 only $pkey\n";
 	for ($i = 0; $i < $pkey; $i++) {
 	    $compstr .= "          postgres: $pkey[$i]\n";
 	}
 	($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
 	for ($i = 0; $i < $pkey; $i++) {
 	    ($kn,$ki,$ks,$kt,$kr) = ($pkey[$i] =~ /(\S+) \(([^\)]+)\) ([^.]+)[.]([^\(]+)\(([^\)]+)\)/);
+	    $compstr .= "--
+-- Type: REF_CONSTRAINT; Owner: $ts; Name: $kn
+--
+ALTER TABLE \"$ts\".\"$tt\" ADD CONSTRAINT \"$kn\" FOREIGN KEY (\"$ki\")
+ REFERENCES \"$ks\".\"$kt\" (\"$kr\") ENABLE;
+";
+	}
+    }
+
+    if($head eq "") {$compstr .= "\n"}
+    return $compstr;
+}
+
+########################################
+# Compare Oracle I2B2 v Oracle TranSMART
+########################################
+
+sub compareOracleColumns($$){
+    my ($ibtc,$tmtc) = @_;
+    $ibtc =~ s/\"//g;
+    my @ibcols = split(/;/,$ibtc);
+    my @tmcols = split(/;/,$tmtc);
+    my $c;
+    my %ibcol = ();
+    my %tmcol = ();
+    my $col;
+    my $def;
+    my $compstr = "";
+
+    $head = "Compare table $t\n";
+    foreach $c (@ibcols) {
+	($col, $def) = ($c =~ /^(\S+)\s+(.*)/);
+	$col = uc($col);
+	$def = uc($def);
+	$ibcol{$col} = $def;
+    }
+
+    foreach $c (@tmcols) {
+	($col, $def) = ($c =~ /^(\S+)\s+(.*)/);
+	$col = uc($col);
+	$def = uc($def);
+	$tmcol{$col} = $def;
+    }
+
+    $iibnewcol = 0;
+    $itmnewcol = 0;
+    foreach $c (sort(keys(%ibcol))) {
+	if(!defined($tmcol{$c})) {
+	    $iibnewcol++;
+	    $compstr .= sprintf "$head"."column not in OracleTranSMART:  %-32s %s\n", $c, $ibcol{$c};
+	    $head = "";
+	}
+	elsif(compareOracleTypes($t,$c,$ibcol{$c},$tmcol{$c})) {
+	    $compstr .= sprintf "$head"."column %-32s %-45s <=> %-45s\n",
+	                        $c, "'$ibcol{$c}'", "'$tmcol{$c}'";
+            if($ibtrigger ne "") {$compstr .= $ibtrigger}
+	    $head="";
+	}
+	else {
+#	    printf "column %-32s matched\n", $c
+	}
+    }
+    foreach $c (sort(keys(%tmcol))) {
+	if(!defined($ibcol{$c})) {
+	    $itmnewcol++;
+	    $compstr .= sprintf "$head"."column not in OracleI2b2:  %-32s %s\n", $c, $tmcol{$c};
+	    $head="";
+	}
+    }
+
+    my $ibkey = "undefined";
+    my $tmkey = "undefined";
+    my @ibkey = ();
+    my @tmkey = ();
+
+# Compare PRIMARY keys
+# --------------------
+    
+    if(defined($ioTablePrikey{$t})){$ibkey = $ioTablePrikey{$t}}
+    if(defined($ipTablePrikey{$t})){$tmkey = $ipTablePrikey{$t}}
+    if($ibkey ne $tmkey) {
+	$compstr .= "PRIMARY KEY     $ibkey    $tmkey\n";
+	if($ibkey eq "undefined") {
+	    if(!defined($ipTablePrikeyName{$t})) {
+		$compstr .= "PRIMARY KEY (\"$pTablePrikey{$t}\")\n";
+	    }else{
+		$compstr .= "CONSTRAINT \"$pTablePrikeyName{$t}\" PRIMARY KEY (\"$pTablePrikey{$t}\")\n";
+	    }
+	}
+	if($tmkey eq "undefined") {
+	    $lk = lc($ioTablePrikey{$t});
+	    if(!defined($ioTablePrikeyName{$t})) {
+		$compstr .= "PRIMARY KEY (lk)\n";
+	    }else{
+		($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
+		$lc = lc($ioTablePrikeyName{$t});
+		$compstr .= "--
+-- Name: $lc; Type: CONSTRAINT; Schema: $ts; Owner: -
+--
+ALTER TABLE ONLY $tt\n";
+ 		$compstr .= "    ADD CONSTRAINT $lc PRIMARY KEY ($lk);\n";
+	    }
+	}
+    }
+
+    $ibkey=0;
+    $tmkey=0;
+    if(defined($ioTableUnikey{$t})){@ibkey = sort(split(/;/,$ioTableUnikey{$t}));$ibkey=$#ibkey+1}
+    if(defined($ipTableUnikey{$t})){@tmkey = sort(split(/;/,$ipTableUnikey{$t}));$tmkey=$#tmkey+1}
+    if($ibkey && $tmkey) {
+	if($ibkey == $tmkey) {
+	    for ($i = 0; $i < $ibkey; $i++) {
+		if($ibkey[$i] ne $tmkey[$i]) {
+		    $compstr .= "UNIQUE      oracle: $ibkey[$i]\n";
+		    $compstr .= "          postgres: $tmkey[$i]\n";
+		}
+	    }
+	}
+	else {
+	    $compstr .= "UNIQUE      count $ibkey    $tmkey\n";
+	    for ($i = 0; $i < $ibkey; $i++) {
+		$compstr .= "            oracle: $ibkey[$i]\n";
+	    }
+	    for ($i = 0; $i < $tmkey; $i++) {
+		$compstr .= "          postgres: $tmkey[$i]\n";
+	    }
+	}
+    }
+    elsif($#ibkey >= 0) {
+	$compstr .= "UNIQUE oracle i2b2 only $ibkey\n";
+	for ($i = 0; $i < $ibkey; $i++) {
+	    $ibk[$i] = lc($ibkey[$i]);
+	    $compstr .= "            oracle: $ibk[$i]\n";
+	}
+	for ($i = 0; $i < $ibkey; $i++) {
+	    ($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
+	    $ts = lc($ts);
+	    $tt = lc($tt);
+	    ($kn,$ki) = ($ibk[$i] =~ /(\S+) (\S+)/);
+	    $compstr .= "--
+-- Name: $kn; Type: CONSTRAINT; Schema: $ts; Owner: -
+--
+ALTER TABLE ONLY $tt
+    ADD CONSTRAINT $kn UNIQUE ($ki);\n"
+	}
+    }
+    elsif($#tmkey >= 0) {
+	$compstr .= "UNIQUE oracle transmart only $tmkey\n";
+	for ($i = 0; $i < $tmkey; $i++) {
+	    $compstr .= "          postgres: $tmkey[$i]\n";
+	}
+	($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
+	for ($i = 0; $i < $tmkey; $i++) {
+	    ($kn,$ki) = ($tmkey[$i] =~ /(\S+) (\S+)/);
+	    $ki =~ s/,/\",\"/g;
+	    $compstr .= "--
+-- Type: REF_CONSTRAINT; Owner: $ts; Name: $kn
+--
+ALTER TABLE \"$ts\".\"$tt\"
+    ADD CONSTRAINT \"$kn\" UNIQUE (\"$ki\");
+";
+	}
+    }
+
+#    if($ibkey ne $tmkey) {
+#	$compstr .= "UNIQUE     $ibkey    $tmkey\n";
+#	if($ibkey eq "undefined") {
+#	    $uk = $oTableUnikey{$t};
+#	    $uk =~ s/,/\",\"/g;
+#	    if(!defined($oTableUnikeycon{$t})) {
+#		$compstr .= "UNIQUE (\"$uk\")\n";
+#	    }else{
+#		$compstr .= "CONSTRAINT \"$oTableUnikeycon{$t}\" UNIQUE (\"$uk\")\n";
+#	    }
+#	}
+#	if($tmkey eq "undefined") {
+#	    $lk = lc($ioTableUnikey{$t});
+#	    if(!defined($ioTableUnikeycon{$t})) {
+#		$compstr .= "UNIQUE ($lk)\n";
+#	    }else{
+#		($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
+#		$lc = lc($ioTableUnikeycon{$t});
+#		$compstr .= "--
+#-- Name: $lc; Type: CONSTRAINT; Schema: $ts; Owner: -
+#--
+#ALTER TABLE ONLY $tt
+#    ADD CONSTRAINT $lc UNIQUE ($lk);\n"
+#	    }
+#	}
+#   }
+
+    @ibkey = ();
+    @tmkey = ();
+    $ibkey=0;
+    $tmkey=0;
+    if(defined($ioTableForkey{$t})){@ibkey = sort(split(/;/,$ioTableForkey{$t}));$ibkey=$#ibkey+1}
+    if(defined($oTableForkey{$t})){@tmkey = sort(split(/;/,$oTableForkey{$t}));$tmkey=$#tmkey+1}
+    
+    if($ibkey && $tmkey) {
+	if($ibkey == $tmkey) {
+	    for ($i = 0; $i < $ibkey; $i++) {
+		if($ibkey[$i] ne $tmkey[$i]) {
+		    $compstr .= "FOREIGN KEY oracle i2b2: $ibkey[$i]\n";
+		    $compstr .= "       oracle transmart: $tmkey[$i]\n";
+		}
+	    }
+	}
+	else {
+	    $compstr .= "FOREIGN KEY count $ibkey    $tmkey\n";
+	    for ($i = 0; $i < $ibkey; $i++) {
+		$compstr .= "       oracle i2b2: $ibkey[$i]\n";
+	    }
+	    for ($i = 0; $i < $tmkey; $i++) {
+		$compstr .= "  oracle transmart: $tmkey[$i]\n";
+	    }
+	}
+    }
+    elsif($#ibkey >= 0) {
+	$compstr .= "FOREIGN KEY oracle i2b2 only $ibkey\n";
+	    for ($i = 0; $i < $ibkey; $i++) {
+		$ibk = lc($ibkey[$i]);
+		$compstr .= "       oracle i2b2: $ibk\n";
+	    }
+    }
+    elsif($#tmkey >= 0) {
+	$compstr .= "FOREIGN KEY oracle transmart only $tmkey\n";
+	for ($i = 0; $i < $tmkey; $i++) {
+	    $compstr .= "      oracle transmart: $tmkey[$i]\n";
+	}
+	($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
+	for ($i = 0; $i < $tmkey; $i++) {
+	    ($kn,$ki,$ks,$kt,$kr) = ($tmkey[$i] =~ /(\S+) \(([^\)]+)\) ([^.]+)[.]([^\(]+)\(([^\)]+)\)/);
 	    $compstr .= "--
 -- Type: REF_CONSTRAINT; Owner: $ts; Name: $kn
 --
@@ -2234,8 +3342,8 @@ sub compareSequence($$){
 
     if($compstr ne "") {return $compstr}
 
-    $otxt =~ s/\s\s+/ /g;
-    $ptxt =~ s/\s\s+/ /g;
+    $otxt =~ s/\s+/ /g;
+    $ptxt =~ s/\s+/ /g;
 
     $otxt =~ s/^\s+//g;
     $ptxt =~ s/^\s+//g;
@@ -2343,7 +3451,7 @@ sub parseI2b2OracleFunctions($){
 	if($f =~ /_gsk[.]sql$/) {next}
 
 	if(-d "$dir$d/$f") {
-	    if($f eq "oracle") {
+	    if($f eq "scripts" || $f eq "procedures" || $f eq "oracle") {
 		parseI2b2OracleFunctions("$d/$f");
 		next;
 	    } elsif ($f eq "postgresql" || $f eq "sqlserver") {
@@ -2411,7 +3519,7 @@ sub parseI2b2OracleProcedures($){
 	if($f =~ /_gsk[.]sql$/) {next}
 
 	if(-d "$dir$d/$f") {
-	    if($f eq "oracle") {
+	    if($f eq "scripts" || $f eq "procedures" || $f eq "oracle") {
 		parseI2b2OracleProcedures("$d/$f");
 		next;
 	    } elsif ($f eq "postgresql" || $f eq "sqlserver") {
@@ -2429,7 +3537,7 @@ sub parseI2b2OracleProcedures($){
 	    open(IN,"$dir$d/$f") || die "Failed to read $d/$f";
 	    while(<IN>) {
 		s/\s*--.*//g;
-		if(/^\s*(.*\S)\s+(PROCEDURE|procedure)\s+(\S+)/) {
+		if(/^\s*(.*\S)\s+(PROCEDURE|procedure)\s+(\S[^\(]+)/) {
 		    $puse = $1;
 		    $schema = $ischema;
 		    $proc = $3;
@@ -2437,6 +3545,7 @@ sub parseI2b2OracleProcedures($){
 		    $schema = uc($schema);
 		    $proc = uc($proc);
 		    $schema =~ s/\"//g;
+		    $proc =~ s/\s+$//g;
 		    $proc =~ s/\"//g;
 		    if($puse =~ /^CREATE/) {
 			$ioProcFile{"$schema.$proc"} = "$d/$f";
@@ -2647,7 +3756,7 @@ sub parseI2b2Oracle($){
 		    }
 		    $forkey = 0;
 		}
-		if(/(\S+)\s+(TABLE|table)\s+(\S+)/) {
+		if(/(\S+)\s+GLOBAL\s+TEMPORARY\s+(TABLE|table)\s+(\S+)/) {
 		    $tuse = $1;
 		    $schema = $ischema;
 		    $table = $3;
@@ -2661,7 +3770,34 @@ sub parseI2b2Oracle($){
 			$ctable = 1;
 		    }
 		    elsif($tuse eq "ALTER") {
-			if(/CONSTRAINT (\S+ )FOREIGN KEY (\([^\)]+\))/){
+			if(/CONSTRAINT (\S+ )FOREIGN KEY *(\([^\)]+\))/){
+			    $pc = $1;
+			    $pk = $2;
+			    $pc =~ s/\"//g;
+			    if(length($pc) > 31){print STDERR "I2b2Oracle constraint length ".length($pc)." '$pc'\n"}
+			    $pfk = uc($pc).uc($pk);
+			    $pfk =~ s/\"//g;
+			    $ioTableForkey{"$schema.$table"} .= $pfk;
+			    $forkey=1;
+			}
+		    }
+
+		}
+		elsif(/(\S+)\s+(TABLE|table)\s+(\S+)/) {
+		    $tuse = $1;
+		    $schema = $ischema;
+		    $table = $3;
+		    $tuse = uc($tuse);
+		    $schema = uc($schema);
+		    $table = uc($table);
+		    $schema =~ s/\"//g;
+		    $table =~ s/\"//g;
+		    if($tuse eq "CREATE") {
+			$ioTableFile{"$schema.$table"} = "$d/$f";
+			$ctable = 1;
+		    }
+		    elsif($tuse eq "ALTER") {
+			if(/CONSTRAINT (\S+ )FOREIGN KEY *(\([^\)]+\))/){
 			    $pc = $1;
 			    $pk = $2;
 			    $pc =~ s/\"//g;
@@ -2678,17 +3814,10 @@ sub parseI2b2Oracle($){
 		    if(/;/){$ctable=0; next}
 		    if(/^\s*\(/){s/^\s*\(\s*//}
 		    if(/^\s*\)/){$ctable=2; s/^\s*\)\s*//}
-		    if(/^\s*(\S+)\s+(.*?),?$/) {
-			$col = $1;
-			$cdef = $2;
-			$cdef =~ s/,\s+$//g;
-			if($cdef =~ / PRIMARY KEY/g) {
-			    $cdef =~ s/ PRIMARY KEY//g;
-			    $ioTableKeycon{"$schema.$table"} = $col;
-			}
-			$ioTableColumn{"$schema.$table"} .= "$col $cdef;";
-		    }
-		    if(/^\s*(CONSTRAINT (\S+)\s+)?PRIMARY KEY \(([^\)]+)\)/){
+		    s/\s+/ /g;
+		    s/ $//g;
+		    s/ ,$/,/g;
+		    if(/^\s*(CONSTRAINT (\S+)\s+)?PRIMARY KEY *\(([^\)]+)\)/){
 			$pkc = $2;
 			$pk = uc($3);
 			$pk =~ s/\s//g;
@@ -2697,11 +3826,11 @@ sub parseI2b2Oracle($){
 			    $pkc = uc($pkc);
 			    $pkc =~ s/\s//g;
 			    $pkc =~ s/\"//g;
-			    $ioTableKeycon{"$schema.$table"} = $pkc;
+			    $ioTablePrikeyName{"$schema.$table"} = $pkc;
 			}
-			$ioTableKey{"$schema.$table"} = $pk;
+			$ioTablePrikey{"$schema.$table"} = $pk;
 		    }
-		    if(/^\s*(CONSTRAINT (\S+)\s+)?UNIQUE \(([^\)]+)\)/){
+		    elsif(/^\s*(CONSTRAINT (\S+)\s+)?UNIQUE *\(([^\)]+)\)/){
 			$pkc = $2;
 			$pk = uc($3);
 			$pk =~ s/\s//g;
@@ -2714,11 +3843,26 @@ sub parseI2b2Oracle($){
 			}
 			else {$ioTableUnikey{"$schema.$table"} .= ". $pk;"}
 		    }
-		    if(/^\s*(CONSTRAINT (\S+\s+))?FOREIGN KEY (\([^\)]+\))/){
+		    elsif(/^\s*(CONSTRAINT (\S+\s+))?FOREIGN KEY *(\([^\)]+\))/){
 			if(defined($1)) {$pk = uc($2).uc($3)}
 			else{$pk = "unnamed ".uc($3)}
 			$pk =~ s/\"//g;
 			$ioTableForkey{"$schema.$table"} .= $pk;
+		    }
+		    elsif(/^\s*REFERENCES (\S+\s+) *(\([^\)]+\))/){
+			# skip rest of foreign key definition
+		    }
+		    elsif(/^\s*(\S+)\s+(.*?),?$/) {
+			$col = $1;
+			$cdef = $2;
+			$col =~ s/\"//g;
+			$cdef =~ s/,\s*$//g;
+			if($cdef =~ / PRIMARY KEY/g) {
+			    $cdef =~ s/ PRIMARY KEY//g;
+			    $ioTablePrikeyName{"$schema.$table"} = $col;
+			    $ioTablePrikey{"$schema.$table"} = $col;
+			}
+			$ioTableColumn{"$schema.$table"} .= "$col $cdef;";
 		    }
 		}
 
@@ -2868,7 +4012,7 @@ sub parseI2b2PostgresFunctions($){
 	if($f =~ /^[.]/) {next}
 	if($f =~ /[~]$/) {next}
 	if(-d "$dir$d/$f") {
-	    if($f eq "postgresql") {
+	    if($f eq "scripts" || $f eq "procedures" || $f eq "postgresql") {
 		parseI2b2PostgresFunctions("$d/$f");
 		next;
 	    } elsif ($f eq "oracle" || $f eq "sqlserver") {
@@ -3096,7 +4240,7 @@ sub parseI2b2Postgres($){
 	}
 
 	if($f eq "data_build.xml"){
-	parseI2b2PostgresDataBuild("$d");
+	    parseI2b2PostgresDataBuild("$d");
 	    next;
 	}
 
@@ -3121,17 +4265,16 @@ sub parseI2b2Postgres($){
 	    open(IN,"$dir$d/$f") || die "Failed to read $d/$f";
 	    while(<IN>) {
 		s/\s*--.*//g;
-
 		if($alterctable) {
-		    if(/^\s*ADD CONSTRAINT (\S+) PRIMARY KEY \(([^\)]+)\)/) {
+		    if(/^\s*ADD CONSTRAINT (\S+) PRIMARY KEY *\(([^\)]+)\)/) {
 			$pkc = uc($1);
 			$pk = uc($2);
 			$pk =~ s/\s//g;
 			$pk =~ s/\"//g;
-			$ipTableKey{$altertable} = $pk;
-			if(defined($pkc)){$ipTableKeycon{"$schema.$table"} = $pkc}
+			$ipTablePrikey{$altertable} = $pk;
+			if(defined($pkc)){$ipTablePrikeyName{"$schema.$table"} = $pkc}
 		    }
-		    if(/^\s*ADD CONSTRAINT (\S+) UNIQUE \(([^\)]+)\)/) {
+		    if(/^\s*ADD CONSTRAINT (\S+) UNIQUE *\(([^\)]+)\)/) {
 			$pkc = uc($1);
 			$pk = uc($2);
 			$pk =~ s/\s//g;
@@ -3139,7 +4282,7 @@ sub parseI2b2Postgres($){
 			if(defined($pkc)){$ipTableUnikey{$altertable} .= "$pkc $pk;"}
 			else {$ipTableUnikey{$altertable} .= ". $pk;"}
 		    }
-		    if(/^\s*ADD CONSTRAINT (\S+ )FOREIGN KEY (\(\S+\) )REFERENCES ([^\(]+\([^\)]+\))/){
+		    if(/^\s*ADD CONSTRAINT (\S+ )FOREIGN KEY *(\(\S+\) )REFERENCES *([^\(]+\([^\)]+\))/){
 			$pk = uc($1).uc($2);
 			$pk .= uc($schema);
 			$pk .= ".";
@@ -3149,7 +4292,7 @@ sub parseI2b2Postgres($){
 		    }
 		    if(/;/) {$alterctable = 0}
 		}
-		if(/(\S+)\s+(TABLE|table)\s+(ONLY\s+)?(\S+)/) {
+		if(/(\S+)\s+TEMPORARY\s+(TABLE|table)\s+(ONLY\s+)?(\S+)/) {
 		    $tuse = $1;
 		    $table = $4;
 		    if ($ischema ne "unknown") {
@@ -3163,6 +4306,31 @@ sub parseI2b2Postgres($){
 		    $table = uc($table);
 		    $schema =~ s/\"//g;
 		    $table =~ s/\"//g;
+		    $table =~ s/\($//g;
+		    if($tuse eq "CREATE") {
+			$ipTableFile{"$schema.$table"} = "$d/$f";
+			$ctable = 1;
+		    }
+		    if($tuse eq "ALTER") {
+			$altertable = "$schema.$table";
+			$alterctable = 1;
+		    }
+		}
+		elsif(/(\S+)\s+(TABLE|table)\s+(ONLY\s+)?(\S+)/) {
+		    $tuse = $1;
+		    $table = $4;
+		    if ($ischema ne "unknown") {
+			($schema) = $ischema;
+		    }
+		    else {
+			($schema) = ($d =~ /\/([^\/]+)$/);
+		    }
+		    $tuse = uc($tuse);
+		    $schema = uc($schema);
+		    $table = uc($table);
+		    $schema =~ s/\"//g;
+		    $table =~ s/\"//g;
+		    $table =~ s/\($//g;
 		    if($tuse eq "CREATE") {
 			$ipTableFile{"$schema.$table"} = "$d/$f";
 			$ctable = 1;
@@ -3177,37 +4345,23 @@ sub parseI2b2Postgres($){
 		    if(/^\s*\(/){s/^\s*\(\s*//}
 		    if(/^\s*\"position\"\s+/){s/\"position\"/position/} # used in de_variant_subject_idx
 		    if(/^\s*\)/){$ctable=2; s/^\s*\)\s*//}
-		    if(/^\s*([A-Z]\S+)\s+(.*?),?$/) {
-			$col = $1;
-			$cdef = $2;
-			$col = uc($col);
-			$cdef =~ s/,\s+$//g;
-			if($cdef =~ / PRIMARY KEY/g) {
-			    $cdef =~ s/ PRIMARY KEY//g;
-			    $ipTableKeycon{"$schema.$table"} = $col;
-			}
-			$ipTableColumn{"$schema.$table"} .= "$col $cdef;";
-			if($cdef =~ / DEFAULT nextval\(\'([^\']+)\'::regclass\) NOT NULL$/){
-			    $cid = $1;
-			    $cid = uc($1);
-			    $ipNextval{"$schema.$table"} = "$col.$cid";
-			}
-			elsif($cdef =~ /DEFAULT nextval/){print STDERR "$d/$f DEFAULT nextval not recognized: '$cdef'\n"}
-		    }
-		    if(/^\s*(CONSTRAINT (\S+)\s+)?PRIMARY KEY \(([^\)]+)\)/){
+		    s/\s+/ /g;
+		    s/ $//g;
+		    s/ ,$/,/g;
+		    if(/^\s*(CONSTRAINT (\S+)\s+)?PRIMARY KEY *\(([^\)]+)\)/){
 			$pkc = $2;
 			$pk = uc($3);
 			$pk =~ s/\s//g;
 			$pk =~ s/\"//g;
-			$ipTableKey{"$schema.$table"} = $pk;
+			$ipTablePrikey{"$schema.$table"} = $pk;
 			if(defined($pkc)){
 			    $pkc = uc($pkc);
 			    $pkc =~ s/\s//g;
 			    $pkc =~ s/\"//g;
-			    $ipTableKeycon{"$schema.$table"} = $pkc;
+			    $ipTablePrikeyName{"$schema.$table"} = $pkc;
 			}
 		    }
-		    if(/^\s*(CONSTRAINT (\S+)\s+)?UNIQUE \(([^\)]+)\)/){
+		    elsif(/^\s*(CONSTRAINT (\S+)\s+)?UNIQUE *\(([^\)]+)\)/){
 			$pkc = $2;
 			$pk = uc($3);
 			$pk =~ s/\s//g;
@@ -3219,6 +4373,35 @@ sub parseI2b2Postgres($){
 			    $ipTableUnikey{"$schema.$table"} .= "$pkc $pk;";
 			}
 			else {$ipTableUnikey{"$schema.$table"} .= ". $pk;"}
+		    }
+		    elsif(/^\s*(CONSTRAINT (\S+\s+))?FOREIGN KEY *(\([^\)]+\))/){
+			if(defined($1)) {$pk = uc($2).uc($3)}
+			else{$pk = "unnamed ".uc($3)}
+			$pk =~ s/\"//g;
+			$pk =~ s/ \)/\)/g;
+			$ipTableForkey{"$schema.$table"} .= $pk;
+		    }
+		    elsif(/^\s*REFERENCES (\S+\s+) *(\([^\)]+\))/){
+			# skip rest of foreign key definition
+		    }
+		    elsif(/^\s*([A-Za-z]\S+)\s+(.*?),?$/) {
+			$col = $1;
+			$cdef = $2;
+			$col = uc($col);
+			$cdef = uc($cdef);
+			$cdef =~ s/,\s+$//g;
+			if($cdef =~ / PRIMARY KEY/g) {
+			    $cdef =~ s/ PRIMARY KEY//g;
+			    $ipTablePrikeyName{"$schema.$table"} = $col;
+			    $ipTablePrikey{"$schema.$table"} = $col;
+			}
+			$ipTableColumn{"$schema.$table"} .= "$col $cdef;";
+			if($cdef =~ / DEFAULT nextval\(\'([^\']+)\'::regclass\) NOT NULL$/){
+			    $cid = $1;
+			    $cid = uc($1);
+			    $ipNextval{"$schema.$table"} = "$col.$cid";
+			}
+			elsif($cdef =~ /DEFAULT nextval/){print STDERR "$d/$f DEFAULT nextval not recognized: '$cdef'\n"}
 		    }
 		}
 
@@ -3623,8 +4806,8 @@ sub parseI2b2Sqlserver($){
 			$pk = uc($2);
 			$pk =~ s/\s//g;
 			$pk =~ s/\"//g;
-			$isTableKey{$altertable} = $pk;
-			if(defined($pkc)){$isTableKeycon{"$schema.$table"} = $pkc}
+			$isTablePrikey{$altertable} = $pk;
+			if(defined($pkc)){$isTablePrikeyName{"$schema.$table"} = $pkc}
 		    }
 		    if(/^\s*ADD CONSTRAINT (\S+) UNIQUE \(([^\)]+)\)/) {
 			$pkc = uc($1);
@@ -3691,12 +4874,12 @@ sub parseI2b2Sqlserver($){
 			$pk = uc($3);
 			$pk =~ s/\s//g;
 			$pk =~ s/\"//g;
-			$isTableKey{"$schema.$table"} = $pk;
+			$isTablePrikey{"$schema.$table"} = $pk;
 			if(defined($pkc)){
 			    $pkc = uc($pkc);
 			    $pkc =~ s/\s//g;
 			    $pkc =~ s/\"//g;
-			    $isTableKeycon{"$schema.$table"} = $pkc;
+			    $isTablePrikeyName{"$schema.$table"} = $pkc;
 			}
 		    }
 		    if(/^\s*(CONSTRAINT (\S+)\s+)?UNIQUE \(([^\)]+)\)/){
@@ -3923,6 +5106,7 @@ opendir(PDIR, "$pplus") || die "Failed to open postres DDLs $pplus";
 $plus = $oplus;
 while($d = readdir(ODIR)){
     if($d =~ /^[.]/) {next}
+    if($d =~ /[~]$/) {next}
     if(-d "$dir$plus/$d") {
 	if(defined($dodir{$d})){
 	    $odir{$d} = "$plus/$d";
@@ -3940,6 +5124,7 @@ while($d = readdir(ODIR)){
 $plus = $pplus;
 while($d = readdir(PDIR)){
     if($d =~ /^[.]/) {next}
+    if($d =~ /[~]$/) {next}
     if(-d "$dir$plus/$d") {
 	if(defined($dodir{$d})){
 	    $pdir{$d} = "$plus/$d";
@@ -3960,6 +5145,7 @@ while($d = readdir(PDIR)){
 $plus = $iplus;
 while($d = readdir(IODIR)){
     if($d =~ /^[.]/) {next}
+    if($d =~ /[~]$/) {next}
     if(-d "$dir$plus/$d") {
 	if(defined($doiodir{$d})){
 	    $iodir{$d} = "$plus/$d";
@@ -3978,6 +5164,7 @@ while($d = readdir(IODIR)){
 $plus = $iplus;
 while($d = readdir(IPDIR)){
     if($d =~ /^[.]/) {next}
+    if($d =~ /[~]$/) {next}
     if(-d "$dir$plus/$d") {
 	if(defined($doipdir{$d})){
 	    $ipdir{$d} = "$plus/$d";
@@ -3996,6 +5183,7 @@ while($d = readdir(IPDIR)){
 $plus = $iplus;
 while($d = readdir(ISDIR)){
     if($d =~ /^[.]/) {next}
+    if($d =~ /[~]$/) {next}
     if(-d "$dir$plus/$d") {
 	if(defined($doisdir{$d})){
 	    $isdir{$d} = "$plus/$d";
@@ -4098,6 +5286,54 @@ foreach $u (sort(keys(%punparsed))){
     }
 }
 
+# Check the Transmart Oracle items.json files define everything that we parsed from the files
+# The items.json files were originally created by a dump and them manually maintained
+# so errors and omissions can be expected
+# ===========================================================================================
+
+foreach $it (sort(keys(%itemsFunction))){
+    if(!defined($oFunctionFile{$it})){print STDERR "Oracle itemsFunction not found $it\n"}
+}
+
+foreach $it (sort(keys(%itemsIndex))){
+    if(!defined($oIndexFile{$it})){print STDERR "Oracle itemsIndex not found $it\n"}
+}
+
+foreach $it (sort(keys(%itemsMaterializedView))){
+    if(!defined($oMaterializedViewFile{$it})){print STDERR "Oracle itemsMaterializedView not found $it\n"}
+}
+
+foreach $it (sort(keys(%itemsProcedure))){
+    if(!defined($oProcedureFile{$it})){print STDERR "Oracle itemsProcedure not found $it\n"}
+}
+
+foreach $it (sort(keys(%itemsRefConstraint))){
+    if(!defined($oRefConstraint{$it})){print STDERR "Oracle itemsRefConstraint not found $it\n"}
+}
+
+foreach $it (sort(keys(%itemsSequence))){
+    if(!defined($oSequenceFile{$it})){print STDERR "Oracle itemsSequence not found $it\n"}
+}
+
+foreach $it (sort(keys(%itemsTable))){
+    if(!defined($oTableFile{$it})){print STDERR "Oracle itemsTable not found $it\n"}
+}
+
+foreach $it (sort(keys(%itemsTrigger))){
+    if(!defined($oTriggerFile{$it})){print STDERR "Oracle itemsTrigger not found $it\n"}
+}
+
+foreach $it (sort(keys(%itemsType))){
+    if(!defined($oTypeFile{$it})){print STDERR "Oracle itemsType not found $it\n"}
+}
+
+foreach $it (sort(keys(%itemsView))){
+    if(!defined($oViewFile{$it})){print STDERR "Oracle itemsView not found $it\n"}
+}
+
+
+
+
 # Compare tables Oracle + Postgres
 
 $notable = 0;
@@ -4110,6 +5346,7 @@ foreach $t (sort(keys(%oTableFile))) {
     if(!defined($pTableFile{$t})){
 	printf "Oracle table %3d %-50s %s\n", $nocol, $t, $oTableFile{$t};
 	++$onlyotable;
+	push @onlyotable, $t;
     }
     else {
 	$compstr = compareColumns($oTableColumn{$t},$pTableColumn{$t});
@@ -4120,7 +5357,7 @@ foreach $t (sort(keys(%oTableFile))) {
 	else {$diff = "   "}
 	$pfile = $pTableFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $oTableFile{$t}) {$pfile = ""}
+	if($pfile eq $oTableFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $pTableFile{$t}"}
 	if($showSame || $compstr ne "") {
 	    printf "Both %3s %3d %3d %-50s %s%s\n",
@@ -4138,6 +5375,7 @@ foreach $t (sort(keys(%pTableFile))) {
     if(!defined($oTableFile{$t})){
 	printf "Postgres table %-50s %s\n", $t, $pTableFile{$t};
 	++$onlyptable;
+	push @onlyptable, $t;
     }
 }
 
@@ -4150,12 +5388,13 @@ foreach $t (sort(keys(%oSequenceFile))) {
     if(!defined($pSequenceFile{$t})){
 	printf "Oracle sequence %-50s %s\n", $t, $oSequenceFile{$t};
 	++$onlyoseq;
+	push @onlyoseq, $t;
     }
     else {
 	$compstr = compareSequence($oSequenceText{$t},$pSequenceText{$t});
 	$pfile = $pSequenceFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $oSequenceFile{$t}) {$pfile = ""}
+	if($pfile eq $oSequenceFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $pSequenceFile{$t}"}
 	if($compstr eq "") {$diff = "   "}
 	else {$diff = "CMP"}
@@ -4173,6 +5412,7 @@ foreach $t (sort(keys(%pSequenceFile))) {
     if(!defined($oSequenceFile{$t})){
 	printf "Postgres sequence %-50s %s\n", $t, $pSequenceFile{$t};
 	++$onlypseq;
+	push @onlypseq, $t;
     }
 }
 
@@ -4207,12 +5447,13 @@ foreach $t (sort(keys(%oTriggerFile))) {
 	if(!$pnext){
 	    printf "Oracle trigger %-50s %s\n", $t, $oTriggerFile{$t};
 	    ++$onlyotrig;
+	    push @onlyotrig, $t;
 	}
     }
     else {
 	$pfile = $pTriggerFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $oTriggerFile{$t}) {$pfile = ""}
+	if($pfile eq $oTriggerFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $pTriggerFile{$t}"}
 	$tfname = $t;
 	$tfname =~ s/[.]/.TF_/g;
@@ -4232,6 +5473,7 @@ foreach $t (sort(keys(%pTriggerFile))) {
     if(!defined($oTriggerFile{$t})){
 	printf "Postgres trigger %-50s %s\n", $t, $pTriggerFile{$t};
 	++$onlyptrig;
+	push @onlyptrig, $t;
 	$tfname = $t;
 	$tfname =~ s/[.]/.TF_/g;
 	if(!defined($pFunctionFile{"$tfname"})){
@@ -4249,11 +5491,12 @@ foreach $t (sort(keys(%oFunctionFile))) {
     if(!defined($pFunctionFile{$t})){
 	printf "Oracle function %-50s %s\n", $t, $oFunctionFile{$t};
 	++$onlyofunc;
+	push @onlyofunc, $t;
     }
     else {
 	$pfile = $pFunctionFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $oFunctionFile{$t}) {$pfile = ""}
+	if($pfile eq $oFunctionFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $pFunctionFile{$t}"}
 	if($showSame) {
 	    printf "Both   function %-50s %s%s\n", $t, $oFunctionFile{$t}, $pfile;
@@ -4274,6 +5517,7 @@ if(defined($pTriggerFile{$tt})) {next}
        !defined($oProcFile{$t})){
 	printf "Postgres function %-50s %s\n", $t, $pFunctionFile{$t};
 	++$onlypfunc;
+	push @onlypfunc, $t;
     }
 }
 
@@ -4284,11 +5528,12 @@ foreach $t (sort(keys(%oProcFile))) {
     if(!defined($pFunctionFile{$t})){
 	printf "Oracle procedure %-50s %s\n", $t, $oProcFile{$t};
 	++$onlyoproc;
+	push @onlyoproc, $t;
     }
     else {
 	$pfile = $pFunctionFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $oProcFile{$t}) {$pfile = ""}
+	if($pfile eq $oProcFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $pFunctionFile{$t}"}
 	if($showSame) {
 	    printf "Both   procedure %-50s %s%s\n", $t, $oProcFile{$t}, $pfile;
@@ -4305,11 +5550,12 @@ foreach $t (sort(keys(%oViewFile))) {
     if(!defined($pViewFile{$t})){
 	printf "Oracle view %-50s %s\n", $t, $oViewFile{$t};
 	++$onlyoview;
+	push @onlyoview, $t;
     }
     else {
 	$pfile = $pViewFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $oViewFile{$t}) {$pfile = ""}
+	if($pfile eq $oViewFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $pViewFile{$t}"}
 	if($showSame){
 	    printf "Both   view %-50s %s%s\n", $t, $oViewFile{$t}, $pfile;
@@ -4324,8 +5570,121 @@ foreach $t (sort(keys(%pViewFile))) {
     if(!defined($oViewFile{$t})){
 	printf "Postgres view %-50s %s\n", $t, $pViewFile{$t};
 	++$onlypview;
+	push @onlypview, $t;
     }
 }
+
+
+# Compare Primary keys
+
+$noindexprim = 0;
+$onlyoindexprim = 0;
+$diffindexprim = 0;
+foreach $t (sort(keys(%oTablePrikey))) {
+    ++$noindexprim;
+    if(!defined($pTablePrikey{$t})){
+	printf "Oracle primary index %-50s (%s) %s\n", $t, $oTablePrikeyName{$t}, $oTablePrikey{$t};
+	++$onlyoindexprim;
+	push @onlyoindexprim, $t;
+    }
+    else {
+	if($oTablePrikey{$t} eq $pTablePrikey{$t}) {$pindex = "   (same)"}
+	else {
+	    $pindex .= " $pTablePrikey{$t})";
+	    ++$diffindexprim;
+	    push @diffindexprim, "$t ($oTablePrikeyName{$t}) $oTablePrikey{$t} <=> $pindex";
+	}
+	if($showSame){
+	    printf "Both   primary index %-50s %s%s\n", $t, $oTablePrikey{$t}, $pindex;
+	}
+    }
+}
+
+$npindexprim = 0;
+$onlypindexprim = 0;
+foreach $t (sort(keys(%pTablePrikey))) {
+    ++$npindexprim;
+    if(!defined($oTablePrikey{$t})){
+	printf "Postgres primary index %-50s %s\n", $t, $pTablePrikey{$t};
+	++$onlypindexprim;
+	push @onlypindexprim, $t;
+    }
+}
+
+
+# Compare Unique keys
+
+$noindexuni = 0;
+$onlyoindexuni = 0;
+$diffindexuni = 0;
+foreach $t (sort(keys(%oTableUnikey))) {
+    ++$noindexuni;
+    if(!defined($pTableUnikey{$t})){
+	printf "Oracle unique index %-50s (%s) %s\n", $t, $oTableUnikey{$t};
+	++$onlyoindexuni;
+	push @onlyoindexuni, $t;
+    }
+    else {
+	if($oTableUnikey{$t} eq $pTableUnikey{$t}) {$pindex = "   (same)"}
+	else {
+	    $pindex = "($pTableUnikey{$t})";
+	    ++$diffindexuni;
+	    push @diffindexuni, "$t ($oTableUnikey{$t}) <=> $pindex";
+	}
+	if($showSame){
+	    printf "Both   unique index %-50s %s%s\n", $t, $oTableUnikey{$t}, $pindex;
+	}
+    }
+}
+
+$npindexuni = 0;
+$onlypindexuni = 0;
+foreach $t (sort(keys(%pTableUnikey))) {
+    ++$npindexuni;
+    if(!defined($oTableUnikey{$t})){
+	printf "Postgres unique index %-50s %s\n", $t, $pTableUnikey{$t};
+	++$onlypindexuni;
+	push @onlypindexuni, $t;
+    }
+}
+
+# Compare Foreign keys
+
+$noindexfor = 0;
+$onlyoindexfor = 0;
+$diffindexfor = 0;
+foreach $t (sort(keys(%oTableForkey))) {
+    ++$npindexfor;
+    if(!defined($pTableForkey{$t})){
+	printf "Oracle foreign index %-50s (%s) %s\n", $t, $oTableForkey{$t};
+	++$onlyoindexfor;
+	push @onlyoindexfor, $t;
+    }
+    else {
+	if(compareForkey($oTableForkey{$t},$pTableForkey{$t})) {$pindex = "   (same)"}
+	else{
+	    print STDERR "Transmart foreign keys differ: $compareForkey\n";
+	    $pindex = "($pTableForkey{$t})";
+	    ++$diffindexfor;
+	    push @diffindexfor, "$t ($oTableForkey{$t}) <=> $pindex";
+	}
+	if($showSame){
+	    printf "Both   foreign index %-50s %s%s\n", $t, $oTableForkey{$t}, $pindex;
+	}
+    }
+}
+
+$npindexfor = 0;
+$onlypindexfor = 0;
+foreach $t (sort(keys(%pTableForkey))) {
+    ++$noindexfor;
+    if(!defined($oTableForkey{$t})){
+	printf "Postgres foreign index %-50s %s\n", $t, $pTableForkey{$t};
+	++$onlypindexfor;
+	push @onlypindexfor, $t;
+    }
+}
+
 
 
 # Check I2b2 Oracle + Postgres + Sqlserver
@@ -4335,6 +5694,8 @@ foreach $t (sort(keys(%pViewFile))) {
 
 # Print results
 
+print "\n";
+print "----------- transmart oracle <=> postgres ------------------------------\n";
 print "\n";
 print "  Oracle files: ".(scalar keys %orsql)."\n";
 print "Postgres files: ".(scalar keys %pgsql)."\n";
@@ -4377,6 +5738,8 @@ print "  Oracle views: $noview\n";
 print "Postgres views: $npview\n";
 print "  Oracle new views: $onlyoview\n";
 print "Postgres new views: $onlypview\n";
+print "\n";
+print "-----------------------------------------------------------\n";
 print "\n";
 
 foreach $os (sort(keys(%orsql))){
@@ -4535,6 +5898,7 @@ foreach $t (sort(keys(%ioTableFile))) {
     if(!defined($ipTableFile{$t})){
 	printf "I2b2Oracle table %3d %-50s %s\n", $nocol, $t, $ioTableFile{$t};
 	++$ionlyotable;
+	push @ionlyotable, $t;
     }
     else {
 	$compstr = compareI2b2Columns($ioTableColumn{$t},$ipTableColumn{$t});
@@ -4545,7 +5909,7 @@ foreach $t (sort(keys(%ioTableFile))) {
 	else {$diff = "   "}
 	$pfile = $ipTableFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $ioTableFile{$t}) {$pfile = ""}
+	if($pfile eq $ioTableFile{$t}) {$pfile = "  (same)"}
 	else{$pfile = "   $ipTableFile{$t}"}
 	printf "I2b2Both %3s %3d %3d %-50s %s%s\n",
 		  $diff, $npcol, $nocol, $t, $ioTableFile{$t}, $pfile;
@@ -4561,6 +5925,7 @@ foreach $t (sort(keys(%ipTableFile))) {
     if(!defined($ioTableFile{$t})){
 	printf "I2b2Postgres table %-50s %s\n", $t, $ipTableFile{$t};
 	++$ionlyptable;
+	push @ionlyptable, $t;
     }
 }
 
@@ -4574,12 +5939,13 @@ foreach $t (sort(keys(%ioSequenceFile))) {
     if(!defined($ipSequenceFile{$t})){
 	printf "I2b2Oracle sequence %-50s %s\n", $t, $ioSequenceFile{$t};
 	++$ionlyoseq;
+	push @ionlyoseq, $t;
     }
     else {
 	$compstr = compareSequence($ioSequenceText{$t},$ipSequenceText{$t});
 	$pfile = $ipSequenceFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $ioSequenceFile{$t}) {$pfile = ""}
+	if($pfile eq $ioSequenceFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $ipSequenceFile{$t}"}
 	if($compstr eq "") {$diff = "   "}
 	else {$diff = "CMP"}
@@ -4591,10 +5957,11 @@ foreach $t (sort(keys(%ioSequenceFile))) {
 $inpseq = 0;
 $ionlypseq = 0;
 foreach $t (sort(keys(%ipSequenceFile))) {
-    ++$npseq;
+    ++$inpseq;
     if(!defined($ioSequenceFile{$t})){
 	printf "I2b2Postgres sequence %-50s %s\n", $t, $ipSequenceFile{$t};
 	++$ionlypseq;
+	push @ionlypseq, $t;
     }
 }
 
@@ -4630,12 +5997,13 @@ foreach $t (sort(keys(%ioTriggerFile))) {
 	if(!$pnext){
 	    printf "I2b2Oracle trigger %-50s %s\n", $t, $ioTriggerFile{$t};
 	    ++$ionlyotrig;
+	    push @ionlyotrig, $t;
 	}
     }
     else {
 	$pfile = $ipTriggerFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $ioTriggerFile{$t}) {$pfile = ""}
+	if($pfile eq $ioTriggerFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $ipTriggerFile{$t}"}
 	printf "I2b2Both   trigger %-50s %s%s\n", $t, $ioTriggerFile{$t}, $pfile;
 	$tfname = $t;
@@ -4649,10 +6017,11 @@ foreach $t (sort(keys(%ioTriggerFile))) {
 $inptrig = 0;
 $ionlyptrig = 0;
 foreach $t (sort(keys(%ipTriggerFile))) {
-    ++$nptrig;
+    ++$inptrig;
     if(!defined($ioTriggerFile{$t})){
 	printf "I2b2Postgres trigger %-50s %s\n", $t, $ipTriggerFile{$t};
 	++$ionlyptrig;
+	push @ionlyptrig, $t;
 	$tfname = $t;
 	$tfname =~ s/[.]/.TF_/g;
 	if(!defined($ipFunctionFile{"$tfname"})){
@@ -4671,11 +6040,12 @@ foreach $t (sort(keys(%ioFunctionFile))) {
     if(!defined($ipFunctionFile{$t})){
 	printf "I2b2Oracle function %-50s %s\n", $t, $ioFunctionFile{$t};
 	++$ionlyofunc;
+	push @ionlyofunc, $t;
     }
     else {
 	$pfile = $ipFunctionFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $ioFunctionFile{$t}) {$pfile = ""}
+	if($pfile eq $ioFunctionFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $ipFunctionFile{$t}"}
 	printf "I2b2Both   function %-50s %s%s\n", $t, $ioFunctionFile{$t}, $pfile;
     }
@@ -4694,9 +6064,9 @@ foreach $t (sort(keys(%ipFunctionFile))) {
        !defined($ioProcFile{$t})){
 	printf "I2b2Postgres function %-50s %s\n", $t, $ipFunctionFile{$t};
 	++$ionlypfunc;
+	push @ionlypfunc, $t;
     }
 }
-
 
 $inoproc = 0;
 $ionlyoproc = 0;
@@ -4705,11 +6075,12 @@ foreach $t (sort(keys(%ioProcFile))) {
     if(!defined($ipFunctionFile{$t})){
 	printf "I2b2Oracle procedure %-50s %s\n", $t, $ioProcFile{$t};
 	++$ionlyoproc;
+	push @ionlyoproc, $t;
     }
     else {
 	$pfile = $ipFunctionFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $ioProcFile{$t}) {$pfile = ""}
+	if($pfile eq $ioProcFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   i$pFunctionFile{$t}"}
 	printf "I2b2Both   procedure %-50s %s%s\n", $t, $ioProcFile{$t}, $pfile;
     }
@@ -4725,11 +6096,12 @@ foreach $t (sort(keys(%ioViewFile))) {
     if(!defined($ipViewFile{$t})){
 	printf "I2b2Oracle view %-50s %s\n", $t, $ioViewFile{$t};
 	++$ionlyoview;
+	push @ionlyoview, $t;
     }
     else {
 	$pfile = $ipViewFile{$t};
 	$pfile =~ s/\/postgres\//\/oracle\//g;
-	if($pfile eq $ioViewFile{$t}) {$pfile = ""}
+	if($pfile eq $ioViewFile{$t}) {$pfile = "   (same)"}
 	else{$pfile = "   $ipViewFile{$t}"}
 	printf "I2b2Both   view %-50s %s%s\n", $t, $ioViewFile{$t}, $pfile;
     }
@@ -4742,6 +6114,120 @@ foreach $t (sort(keys(%ipViewFile))) {
     if(!defined($ioViewFile{$t})){
 	printf "I2b2Postgres view %-50s %s\n", $t, $ipViewFile{$t};
 	++$ionlypview;
+	push @ionlypview, $t;
+    }
+}
+
+
+
+
+# Compare Primary keys
+
+$noindexprim = 0;
+$onlyoindexprim = 0;
+$diffindexprim = 0;
+foreach $t (sort(keys(%oTablePrikey))) {
+    ++$noindexprim;
+    if(!defined($pTablePrikey{$t})){
+	printf "I2b2Oracle primary index %-50s (%s) %s\n", $t, $oTablePrikeyName{$t}, $oTablePrikey{$t};
+	++$onlyoindexprim;
+	push @onlyoindexprim, $t;
+    }
+    else {
+	if($oTablePrikey{$t} eq $pTablePrikey{$t}) {$pindex = "   (same)"}
+	else {
+	    $pindex .= " $pTablePrikey{$t})";
+	    ++$diffindexprim;
+	    push @diffindexprim, "$t ($oTablePrikeyName{$t}) $oTablePrikey{$t} <=> $pindex";
+	}
+	if($showSame){
+	    printf "I2b2Both   primary index %-50s %s%s\n", $t, $oTablePrikey{$t}, $pindex;
+	}
+    }
+}
+
+$npindexprim = 0;
+$onlypindexprim = 0;
+foreach $t (sort(keys(%pTablePrikey))) {
+    ++$npindexprim;
+    if(!defined($oTablePrikey{$t})){
+	printf "I2b2Postgres primary index %-50s %s\n", $t, $pTablePrikey{$t};
+	++$onlypindexprim;
+	push @onlypindexprim, $t;
+    }
+}
+
+
+# Compare Unique keys
+
+$noindexuni = 0;
+$onlyoindexuni = 0;
+$diffindexuni = 0;
+foreach $t (sort(keys(%oTableUnikey))) {
+    ++$noindexuni;
+    if(!defined($pTableUnikey{$t})){
+	printf "I2b2Oracle unique index %-50s (%s) %s\n", $t, $oTableUnikey{$t};
+	++$onlyoindexuni;
+	push @onlyoindexuni, $t;
+    }
+    else {
+	if($oTableUnikey{$t} eq $pTableUnikey{$t}) {$pindex = "   (same)"}
+	else {
+	    $pindex = "($pTableUnikey{$t})";
+	    ++$diffindexuni;
+	    push @diffindexuni, "$t ($oTableUnikey{$t}) <=> $pindex";
+	}
+	if($showSame){
+	    printf "I2b2Both   unique index %-50s %s%s\n", $t, $oTableUnikey{$t}, $pindex;
+	}
+    }
+}
+
+$inpindexuni = 0;
+$ionlypindexuni = 0;
+foreach $t (sort(keys(%ipTableUnikey))) {
+    ++$inpindexuni;
+    if(!defined($ioTableUnikey{$t})){
+	printf "I2b2Postgres unique index %-50s %s\n", $t, $ipTableUnikey{$t};
+	++$ionlypindexuni;
+	push @ionlypindexuni, $t;
+    }
+}
+
+# Compare Foreign keys
+
+$inoindexfor = 0;
+$ionlyoindexfor = 0;
+$idiffindexfor = 0;
+foreach $t (sort(keys(%ioTableForkey))) {
+    ++$inpindexfor;
+    if(!defined($ipTableForkey{$t})){
+	printf "I2b2Oracle foreign index %-50s (%s) %s\n", $t, $ioTableForkey{$t};
+	++$ionlyoindexfor;
+	push @ionlyoindexfor, $t;
+    }
+    else {
+	if(compareForkey($ioTableForkey{$t},$ipTableForkey{$t})) {$pindex = "   (same)"}
+	else{
+	    print STDERR "I2b2 foreign keys differ: $compareForkey\n";
+	    $pindex = "($ipTableForkey{$t})";
+	    ++$idiffindexfor;
+	    push @idiffindexfor, "$t ($ioTableForkey{$t}) <=> $pindex";
+	}
+	if($showSame){
+	    printf "I2b2Both   foreign index %-50s %s%s\n", $t, $ioTableForkey{$t}, $pindex;
+	}
+    }
+}
+
+$inpindexfor = 0;
+$ionlypindexfor = 0;
+foreach $t (sort(keys(%ipTableForkey))) {
+    ++$inoindexfor;
+    if(!defined($ioTableForkey{$t})){
+	printf "I2b2Postgres foreign index %-50s %s\n", $t, $ipTableForkey{$t};
+	++$ionlypindexfor;
+	push @ionlypindexfor, $t;
     }
 }
 
@@ -4753,6 +6239,8 @@ foreach $t (sort(keys(%ipViewFile))) {
 
 # Print results
 
+print "\n";
+print "------------------------- i2b2 postgres <=> i2b2 oracle -----------------------------\n";
 print "\n";
 print "  Oracle I2b2 tables: $inotable\n";
 print "Postgres I2b2 tables: $inptable\n";
@@ -4789,29 +6277,31 @@ print "Postgres I2b2 views: $inpview\n";
 print "  Oracle I2b2 new views: $ionlyoview\n";
 print "Postgres I2b2 new views: $ionlypview\n";
 print "\n";
+print "--------------------------------------------------------------\n";
+print "\n";
 
 
+# =========================================
+# Compare Oracle i2b2 with Oracle transmart
+# =========================================
 
-# =====================================
-# Compare Oracle i2b2 with transmart
-# =====================================
+# Compare tables Oracle I2b2 + Transmart
+# ======================================
 
-# I2b2 Compare tables I2b2 + Oracle
-# =====================================
-
-$initable = 0;
-$ionlyitable = 0;
+$nibtable = 0;
+$onlyibtable = 0;
 foreach $t (sort(keys(%ioTableFile))) {
     if(defined($iskip{$ioTableFile{$t}})){next}
-    ++$initable;
+    ++$nibtable;
     @icols = split(/;/,$ioTableColumn{$t});
     $nicol = 1 + $#icols;
     if(!defined($oTableFile{$t})){
 	printf "I-O I2b2 table %3d %-50s %s\n", $nicol, $t, $ioTableFile{$t};
-	++$ionlyitable;
+	++$onlyibtable;
+	push @onlyibtable, $t;
     }
     else {
-	$compstr = compareI2b2Columns($ioTableColumn{$t},$oTableColumn{$t});
+	$compstr = compareOracleColumns($ioTableColumn{$t},$oTableColumn{$t});
 	@ocols = split(/;/,$oTableColumn{$t});
 	$nocol = 1 + $#ocols;
 	if($nicol != $nocol) {$diff = "MOD"}
@@ -4826,28 +6316,30 @@ foreach $t (sort(keys(%ioTableFile))) {
     }
 }
 
-$inotable = 0;
-$ionlyotable = 0;
+$ntmtable = 0;
+$onlytmtable = 0;
 foreach $t (sort(keys(%oTableFile))) {
     if(defined($iskip{$oTableFile{$t}})){next}
-    if($t !~ /^I2B2[.]/) {next}
-    ++$inotable;
+    if($t !~ /^I2B2/) {next}
+    ++$ntmtable;
     if(!defined($ioTableFile{$t})){
-	printf "I-O Oracle table %-50s %s\n", $t, $oTableFile{$t};
-	++$ionlyotable;
+	printf "I-O Transmart table %-50s %s\n", $t, $oTableFile{$t};
+	++$onlytmtable;
+	push @onlytmtable, $t;
     }
 }
 
-# I2b2 Compare sequences I2B2 + Oracle
-# ========================================
+# Compare sequences Oracle I2B2 + Transmart
+# =========================================
 
-$iniseq = 0;
-$ionlyiseq = 0;
+$nibseq = 0;
+$onlyibseq = 0;
 foreach $t (sort(keys(%ioSequenceFile))) {
-    ++$iniseq;
+    ++$nibseq;
     if(!defined($oSequenceFile{$t})){
 	printf "I-O I2b2 sequence %-50s %s\n", $t, $ioSequenceFile{$t};
-	++$ionlyiseq;
+	++$onlyibseq;
+	push @onlyibseq, $t;
     }
     else {
 	$compstr = compareSequence($ioSequenceText{$t},$oSequenceText{$t});
@@ -4861,25 +6353,26 @@ foreach $t (sort(keys(%ioSequenceFile))) {
     }
 }
 
-$inoseq = 0;
-$ionlyo = 0;
+$ntmseq = 0;
+$onlytmseq = 0;
 foreach $t (sort(keys(%oSequenceFile))) {
-    if($t !~ /^I2B2[.]/) {next}
-    ++$noseq;
+    if($t !~ /^I2B2/) {next}
+    ++$ntmseq;
     if(!defined($ioSequenceFile{$t})){
-	printf "I-O Oracle sequence %-50s %s\n", $t, $oSequenceFile{$t};
-	++$ionlyoseq;
+	printf "I-O Transmart sequence %-50s %s\n", $t, $oSequenceFile{$t};
+	++$onlytmseq;
+	push @onlytmseq, $t;
     }
 }
 
-# I2b2 Compare triggers Oracle + Postgres
-# =======================================
+# Compare triggers Oracle I2b2 + Transmart
+# ========================================
 
-$initrig = 0;
-$ionlyitrig = 0;
+$nibtrig = 0;
+$onlyibtrig = 0;
 foreach $t (sort(keys(%ioTriggerFile))) {
     if(defined($ioSkipTrigger{$t})){next}
-    ++$initrig;
+    ++$nibtrig;
     if(!defined($oTriggerFile{$t})){
 # check for Postgres nextval default
 # implemented as a trigger in Oracle
@@ -4902,15 +6395,16 @@ foreach $t (sort(keys(%ioTriggerFile))) {
 	    }
 	}
 	if(!$pnext){
-	    printf "I2b2Oracle trigger %-50s %s\n", $t, $ioTriggerFile{$t};
-	    ++$ionlyotrig;
+	    printf "I2b2 trigger %-50s %s\n", $t, $ioTriggerFile{$t};
+	    ++$onlyibtrig;
+	    push @onlyibtrig, $t;
 	}
     }
     else {
 	$ofile = $oTriggerFile{$t};
 	if($ofile eq $ioTriggerFile{$t}) {$ofile = ""}
 	else{$ofile = "   $oTriggerFile{$t}"}
-	printf "I-O Both   trigger %-50s %s%s\n", $t, $ioTriggerFile{$t}, $pfile;
+	printf "I-T Both   trigger %-50s %s%s\n", $t, $ioTriggerFile{$t}, $pfile;
 #	$tfname = $t;
 #	$tfname =~ s/[.]/.TF_/g;
 #	if(!defined($oFunctionFile{"$tfname"})){
@@ -4919,111 +6413,235 @@ foreach $t (sort(keys(%ioTriggerFile))) {
     }
 }
 
-$inotrig = 0;
-$ionlyotrig = 0;
+$ntmtrig = 0;
+$onlytmtrig = 0;
 foreach $t (sort(keys(%oTriggerFile))) {
-    if($t !~ /^I2B2[.]/){next}
-    ++$inotrig;
+    if($t !~ /^I2B2/){next}
+    ++$ntmtrig;
     if(!defined($ioTriggerFile{$t})){
-	printf "I-O Oracle trigger %-50s %s\n", $t, $oTriggerFile{$t};
-	++$ionlyotrig;
+	printf "I-T Transmart trigger %-50s %s\n", $t, $oTriggerFile{$t};
+	++$onlytmtrig;
+	push @onlytmtrig, $t;
 #	$tfname = $t;
 #	$tfname =~ s/[.]/.TF_/g;
 #	if(!defined($oFunctionFile{"$tfname"})){
-#	    print STDERR "I-O I2b2Trigger $t has no function $tfname in $oTriggerFile{$t}\n";
+#	    print STDERR "I-T I2b2Trigger $t has no function $tfname in $oTriggerFile{$t}\n";
 #	}
     }
 }
 
-# Compare I2b2 functions + procedures Oracle + Postgres
-# =====================================================
+# Compare functions Oracle I2b2 + Transmart
+# =========================================
 
-$inifunc = 0;
-$ionlyifunc = 0;
+$nibfunc = 0;
+$onlyibfunc = 0;
 foreach $t (sort(keys(%ioFunctionFile))) {
-    ++$inifunc;
+    ++$nibfunc;
     if(!defined($oFunctionFile{$t})){
-	printf "I-O I2b2 function %-50s %s\n", $t, $ioFunctionFile{$t};
-	++$ionlyifunc;
+	printf "I-T I2b2 function %-50s %s\n", $t, $ioFunctionFile{$t};
+	++$onlyibfunc;
+	push @onlyibfunc, $t;
     }
     else {
 	$ofile = $oFunctionFile{$t};
 	if($ofile eq $ioFunctionFile{$t}) {$ofile = ""}
 	else{$ofile = "   $oFunctionFile{$t}"}
-	printf "I-O Both   function %-50s %s%s\n", $t, $ioFunctionFile{$t}, $ofile;
+	printf "I-T Both   function %-50s %s%s\n", $t, $ioFunctionFile{$t}, $ofile;
     }
 }
 
-$inofunc = 0;
-$ionlyofunc = 0;
+$ntmfunc = 0;
+$onlytmfunc = 0;
 foreach $t (sort(keys(%oFunctionFile))) {
-    if($t !~ /^I2B2[.]/) {next}
-    ++$inofunc;
+    if($t !~ /^I2B2/) {next}
+    ++$ntmfunc;
     if(!defined($ioFunctionFile{$t})){
-	printf "I-O Oracle function %-50s %s\n", $t, $oFunctionFile{$t};
-	++$ionlyofunc;
+	printf "I-T Transmart function %-50s %s\n", $t, $oFunctionFile{$t};
+	++$onlytmfunc;
+	push @onlytmfunc, $t;
     }
 }
 
+# Compare procedures Oracle I2b2 + Transmart
+# ==========================================
 
-$iniproc = 0;
-$ionlyiproc = 0;
+$nibproc = 0;
+$onlyibproc = 0;
 foreach $t (sort(keys(%ioProcFile))) {
-    ++$iniproc;
-    if(!defined($oFunctionFile{$t})){
-	printf "I2b2Oracle procedure %-50s %s\n", $t, $ioProcFile{$t};
-	++$ionlyoproc;
+    ++$nibproc;
+    if(!defined($oProcFile{$t})){
+	printf "I-T I2b2 procedure %-50s %s\n", $t, $ioProcFile{$t};
+	++$onlyibproc;
+	push @onlyibproc, $t;
     }
     else {
-	$ofile = $oFunctionFile{$t};
+	$ofile = $oProcFile{$t};
 	if($ofile eq $ioProcFile{$t}) {$ofile = ""}
-	else{$ofile = "   $oFunctionFile{$t}"}
-	printf "I2b2Both   procedure %-50s %s%s\n", $t, $ioProcFile{$t}, $ofile;
+	else{$ofile = "   $oProcFile{$t}"}
+	printf "I-T Both   procedure %-50s %s%s\n", $t, $ioProcFile{$t}, $ofile;
     }
 }
 
-$inoproc = 0;
-$ionlyoproc = 0;
+$ntmproc = 0;
+$onlytmproc = 0;
 foreach $t (sort(keys(%oProcFile))) {
-    if($t !~ /^I2B2[.]/) {next}
-    ++$inoproc;
+    if($t !~ /^I2B2/) {next}
+    ++$ntmproc;
     if(!defined($ioProcFile{$t})){
-	printf "I-O Oracle procedure %-50s %s\n", $t, $oProcFile{$t};
-	++$ionlyoproc;
+	printf "I-T Transmart procedure %-50s %s\n", $t, $oProcFile{$t};
+	++$onlytmproc;
+	push @onlytmproc, $t;
     }
 }
 
 
-# Compare I2b2 views Oracle + Postgres
+# Compare views Oracle I2b2 + Postgres
 # ====================================
 
-$iniview = 0;
-$ionlyiview = 0;
+$nibview = 0;
+$onlyibview = 0;
 foreach $t (sort(keys(%ioViewFile))) {
-    ++$iniview;
+    ++$nibview;
     if(!defined($oViewFile{$t})){
-	printf "I-O I2b2 view %-50s %s\n", $t, $ioViewFile{$t};
-	++$ionlyiview;
+	printf "I-T I2b2 view %-50s %s\n", $t, $ioViewFile{$t};
+	++$onlyibview;
+	push @onlyibview, $t;
     }
     else {
 	$ofile = $oViewFile{$t};
 	if($ofile eq $ioViewFile{$t}) {$ofile = ""}
 	else{$ofile = "   $oViewFile{$t}"}
-	printf "I-O Both   view %-50s %s%s\n", $t, $ioViewFile{$t}, $ofile;
+	printf "I-T Both   view %-50s %s%s\n", $t, $ioViewFile{$t}, $ofile;
     }
 }
 
-$inoview = 0;
-$ionlyoview = 0;
+$ntmview = 0;
+$onlytmview = 0;
 foreach $t (sort(keys(%oViewFile))) {
-    if($t !~ /^I2B2[.]/) {next}
-    ++$inoview;
+    if($t !~ /^I2B2/) {next}
+    ++$ntmview;
     if(!defined($ioViewFile{$t})){
-	printf "I-O Oracle view %-50s %s\n", $t, $oViewFile{$t};
-	++$ionlyoview;
+	printf "I-T Transmart view %-50s %s\n", $t, $oViewFile{$t};
+	++$onlytmview;
+	push @onlytmview, $t;
     }
 }
 
+
+
+
+# Compare Primary keys
+
+$nibindexprim = 0;
+$onlyibindexprim = 0;
+$tmdiffindexprim = 0;
+foreach $t (sort(keys(%ioTablePrikey))) {
+    ++$nibindexprim;
+    if(!defined($oTablePrikey{$t})){
+	printf "OracleI2b2 primary index %-50s %s\n", $t, $ioTablePrikey{$t};
+	++$onlyibindexprim;
+	push @onlyibindexprim, $t;
+    }
+    else {
+	if($ioTablePrikey{$t} eq $oTablePrikey{$t}) {$pindex = "   (same)"}
+	else {
+	    $pindex .= " $oTablePrikey{$t})";
+	    ++$tmdiffindexprim;
+	    push @tmdiffindexprim, "$t $oTablePrikey{$t} <=> $pindex";
+	}
+	if($showSame){
+	    printf "OracleBoth   primary index %-50s %s%s\n", $t, $oTablePrikey{$t}, $pindex;
+	}
+    }
+}
+
+$ntmindexprim = 0;
+$onlytmindexprim = 0;
+foreach $t (sort(keys(%oTablePrikey))) {
+    if($t !~ /^I2B2/) {next}
+    ++$ntmindexprim;
+    if(!defined($ioTablePrikey{$t})){
+	printf "OracleTransmart primary index %-50s %s\n", $t, $oTablePrikey{$t};
+	++$onlytmindexprim;
+	push @onlytmindexprim, $t;
+    }
+}
+
+
+# Compare Unique keys
+
+$nibindexuni = 0;
+$onlyibindexuni = 0;
+$tmdiffindexuni = 0;
+foreach $t (sort(keys(%ioTableUnikey))) {
+    ++$nibindexuni;
+    if(!defined($oTableUnikey{$t})){
+	printf "OracleI2b2 unique index %-50s (%s) %s\n", $t, $ioTableUnikey{$t};
+	++$onlyibindexuni;
+	push @onlyibindexuni, $t;
+    }
+    else {
+	if($ioTableUnikey{$t} eq $oTableUnikey{$t}) {$pindex = "   (same)"}
+	else {
+	    $pindex = "($oTableUnikey{$t})";
+	    ++$tmdiffindexuni;
+	    push @tmdiffindexuni, "$t ($ioTableUnikey{$t}) <=> $pindex";
+	}
+	if($showSame){
+	    printf "OracleBoth   unique index %-50s %s%s\n", $t, $ioTableUnikey{$t}, $pindex;
+	}
+    }
+}
+
+$ntmindexuni = 0;
+$onlytmindexuni = 0;
+foreach $t (sort(keys(%oTableUnikey))) {
+    if($t !~ /^I2B2/) {next}
+    ++$ntmindexuni;
+    if(!defined($ioTableUnikey{$t})){
+	printf "OracleTransmart unique index %-50s %s\n", $t, $oTableUnikey{$t};
+	++$onlytmindexuni;
+	push @onlytmindexuni, $t;
+    }
+}
+
+# Compare Foreign keys
+
+$nibindexfor = 0;
+$onlyibindexfor = 0;
+$tmdiffindexfor = 0;
+foreach $t (sort(keys(%ioTableForkey))) {
+    ++$nibindexfor;
+    if(!defined($oTableForkey{$t})){
+	printf "OracleI2b2 foreign index %-50s (%s) %s\n", $t, $ioTableForkey{$t};
+	++$onlyibindexfor;
+	push @onlyibindexfor, $t;
+    }
+    else {
+	if(compareForkey($ioTableForkey{$t},$oTableForkey{$t})) {$pindex = "   (same)"}
+	else{
+	    print STDERR "Oracle foreign keys differ: $compareForkey\n";
+	    $pindex = "($oTableForkey{$t})";
+	    ++$tmdiffindexfor;
+	    push @tmdiffindexfor, "$t ($oTableForkey{$t}) <=> $pindex";
+	}
+	if($showSame){
+	    printf "OracleBoth   foreign index %-50s %s%s\n", $t, $ioTableForkey{$t}, $pindex;
+	}
+    }
+}
+
+$ntmindexfor = 0;
+$onlytmindexfor = 0;
+foreach $t (sort(keys(%oTableForkey))) {
+    if($t !~ /^I2B2/) {next}
+    ++$ntmindexfor;
+    if(!defined($ioTableForkey{$t})){
+	printf "OracleTransmart foreign index %-50s %s\n", $t, $oTableForkey{$t};
+	++$onlytmindexfor;
+	push @onlytmindexfor, $t;
+    }
+}
 
 # Check I2b2 Oracle + Postgres + Sqlserver
 # Also check against Oracle + Postgres
@@ -5033,43 +6651,546 @@ foreach $t (sort(keys(%oViewFile))) {
 # Print results
 
 print "\n";
-print "    I2b2 tables: $initable\n";
-print "  Oracle tables: $inotable\n";
-print "    I2b2 new tables: $ionlyitable\n";
-print "  Oracle new tables: $ionlyotable\n";
-print "    I2b2-only columns:  $ionewcol\n"; # from compareI2b2
-print "  Oracle-only columns:  $ipnewcol\n"; # from compareI2b2
+print "------------------------- transmart oracle <=> i2b2 oracle -----------------------------\n";
+print "\n";
+print "      I2B2 tables: $inotable\n";
+print " tranSMART tables: $notable\n";
+print "      I2B2 new tables: $onlyibtable\n";
+print " tranSMART new tables: $onlytmtable\n";
+print "      I2B2-only columns:  $iibnewcol\n"; # from compareOracle
+print " tranSMART-only columns:  $itmnewcol\n"; # from compareOracle
 print "\n";
 
-print "    I2b2 sequences: $iniseq\n";
-print "  Oracle sequences: $inoseq\n";
-print "    I2b2 new sequences: $ionlyiseq\n";
-print "  Oracle new sequences: $ionlyoseq\n";
+print "       I2b2 sequences: $inoseq\n";
+print "  tranSMART sequences: $noseq\n";
+print "       I2b2 new sequences: $onlyibseq\n";
+print "  tranSMART new sequences: $onlytmseq\n";
 print "\n";
 
-print "  I2b2 triggers: $initrig\n";
-print "Oracle triggers: $inotrig\n";
-print "  I2b2 new triggers: $ionlyitrig\n";
-print "Oracle new triggers: $ionlyotrig\n";
+print "     I2b2 triggers: $inotrig\n";
+print "tranSMART triggers: $notrig\n";
+print "     I2b2 new triggers: $onlyibtrig\n";
+print "tranSMART new triggers: $onlytmtrig\n";
 print "\n";
 
-print "  I2b2 functions: $inifunc\n";
-print "Oracle functions: $inofunc\n";
-print "  I2b2 new functions: $ionlyifunc\n";
-print "Oracle new functions: $ionlyofunc\n";
+print "     I2b2 functions: $inofunc\n";
+print "tranSMART functions: $nofunc\n";
+print "     I2b2 new functions: $onlyibfunc\n";
+print "tranSMART new functions: $onlytmfunc\n";
 print "\n";
 
-print "  I2b2 procedures: $iniproc\n";
-print "  Oracle procedures: $inoproc\n";
-print "  I2b2 new procedures: $ionlyiproc\n";
-print "  Oracle new procedures: $ionlyoproc\n";
+print "     I2b2 procedures: $inoproc\n";
+print "tranSMART procedures: $noproc\n";
+print "     I2b2 new procedures: $onlyibproc\n";
+print "tranSMART new procedures: $onlytmproc\n";
 print "\n";
 
-print "  I2b2 views: $iniview\n";
-print "Oracle views: $inoview\n";
-print "  I2b2 new views: $ionlyiview\n";
-print "Oracle new views: $ionlyoview\n";
+print "     I2b2 views: $inoview\n";
+print "tranSMART views: $noview\n";
+print "     I2b2 new views: $onlyibview\n";
+print "tranSMART new views: $onlytmview\n";
+print "\n";
+print "--------------------------------------------------------------\n";
+print "\n";
+print "SUMMARY OF DIFFERENCES\n";
+print "----------------------\n";
 print "\n";
 
+# Summaries of differences
+# ========================
 
+# Postgres v Oracle (how consistent is transmart)
+# ===============================================
 
+if($onlyptable) {
+    print "\nTransmart Postgres $onlyptable new tables\n";
+    $i = 0;
+    foreach $t (@onlyptable) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyotable) {
+    print "\nTransmart Oracle $onlyotable new tables\n";
+    $i = 0;
+    foreach $t (@onlyotable) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlypseq) {
+    print "\nTransmart Postgres $onlypseq new sequences\n";
+    $i = 0;
+    foreach $t (@onlypseq) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyoseq) {
+    print "\nTransmart Oracle $onlyoseq new sequences\n";
+    $i = 0;
+    foreach $t (@onlyoseq) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyptrig) {
+    print "\nTransmart Postgres $onlyptrig new triggers\n";
+    $i = 0;
+    foreach $t (@onlyptrig) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyotrig) {
+    print "\nTransmart Oracle $onlyotrig new triggers\n";
+    $i = 0;
+    foreach $t (@onlyotrig) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlypview) {
+    print "\nTransmart Postgres $onlypview new views\n";
+    $i = 0;
+    foreach $t (@onlypview) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyoview) {
+    print "\nTransmart Oracle $onlyoview new views\n";
+    $i = 0;
+    foreach $t (@onlyoview) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlypfunc) {
+    print "\nTransmart Postgres $onlypfunc new functions\n";
+    $i = 0;
+    foreach $t (@onlypfunc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyofunc) {
+    print "\nTransmart Oracle $onlyofunc new functions\n";
+    $i = 0;
+    foreach $t (@onlyofunc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyoproc) {
+    print "\nTransmart Oracle $onlyoproc new procedures\n";
+    $i = 0;
+    foreach $t (@onlyoproc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlypindexprim) {
+    print "\nTransmart Postgres $onlypindexprim new primary index\n";
+    $i = 0;
+    foreach $t (@onlypindexprim) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyoindexprim) {
+    print "\nTransmart Oracle $onlyoindexprim new primary index\n";
+    $i = 0;
+    foreach $t (@onlyoindexprim) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($diffindexprim) {
+    print "\nTransmart Oracle $diffindexprim changed primary index\n";
+    $i = 0;
+    foreach $t (@diffindexprim) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlypindexuni) {
+    print "\nTransmart Postgres $onlypindexuni new unique index\n";
+    $i = 0;
+    foreach $t (@onlypindexuni) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyoindexuni) {
+    print "\nTransmart Oracle $onlyoindexuni new unique index\n";
+    $i = 0;
+    foreach $t (@onlyoindexuni) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($diffindexuni) {
+    print "\nTransmart Oracle $diffindexuni changed unique index\n";
+    $i = 0;
+    foreach $t (@diffindexuni) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlypindexfor) {
+    print "\nTransmart Postgres $onlypindexfor new foreign index\n";
+    $i = 0;
+    foreach $t (@onlypindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyoindexfor) {
+    print "\nTransmart Oracle $onlyoindexfor new foreign index\n";
+    $i = 0;
+    foreach $t (@onlyoindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($diffindexfor) {
+    print "\nTransmart Oracle $diffindexfor changed foreign index\n";
+    $i = 0;
+    foreach $t (@diffindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+# Postgres <=> Oracle I2b2 (i2b2 comparison)
+# ============================================
+
+if($ionlyptable) {
+    print "\nI2b2 Postgres <=> Oracle $ionlyptable new tables\n";
+    $i = 0;
+    foreach $t (@ionlyptable) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyotable) {
+    print "\nI2b2 Oracle <=> Postgres $ionlyotable new tables\n";
+    $i = 0;
+    foreach $t (@ionlyotable) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlypseq) {
+    print "\nI2b2 Postgres <=> Oracle $ionlypseq new sequences\n";
+    $i = 0;
+    foreach $t (@ionlypseq) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyoseq) {
+    print "\nI2b2 Oracle <=> Postgres $ionlyoseq new sequences\n";
+    $i = 0;
+    foreach $t (@ionlyoseq) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyptrig) {
+    print "\nI2b2 Postgres <=> Oracle $ionlyptrig new triggers\n";
+    $i = 0;
+    foreach $t (@ionlyptrig) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyotrig) {
+    print "\nI2b2 Oracle <=> Postgres $ionlyotrig new triggers\n";
+    $i = 0;
+    foreach $t (@ionlyotrig) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlypview) {
+    print "\nI2b2 Postgres <=> Oracle $ionlypview new views\n";
+    $i = 0;
+    foreach $t (@ionlypview) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyoview) {
+    print "\nI2b2 Oracle <=> Postgres $ionlyoview new views\n";
+    $i = 0;
+    foreach $t (@ionlyoview) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlypfunc) {
+    print "\nI2b2 Postgres <=> Oracle $ionlypfunc new functions\n";
+    $i = 0;
+    foreach $t (@ionlypfunc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyofunc) {
+    print "\nI2b2 Oracle <=> Postgres $ionlyofunc new functions\n";
+    $i = 0;
+    foreach $t (@ionlyofunc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyoproc) {
+    print "\nI2b2 Oracle <=> Postgres $ionlyoproc new procedures\n";
+    $i = 0;
+    foreach $t (@ionlyoproc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyoindexprim) {
+    print "\nI2b2 Postgres $ionlypindexprim new primary index\n";
+    $i = 0;
+    foreach $t (@ionlypindexprim) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyoindexprim) {
+    print "\nI2b2 Oracle $ionlyoindexprim new primary index\n";
+    $i = 0;
+    foreach $t (@ionlyoindexprim) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($idiffindexprim) {
+    print "\nI2b2 Oracle $idiffindexprim changed primary index\n";
+    $i = 0;
+    foreach $t (@idiffindexprim) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlypindexuni) {
+    print "\nI2b2 Postgres $ionlypindexuni new unique index\n";
+    $i = 0;
+    foreach $t (@ionlypindexuni) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyoindexuni) {
+    print "\nI2b2 Oracle $ionlyoindexuni new unique index\n";
+    $i = 0;
+    foreach $t (@ionlyoindexuni) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($idiffindexuni) {
+    print "\nI2b2 Oracle $idiffindexuni changed unique index\n";
+    $i = 0;
+    foreach $t (@idiffindexuni) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlypindexfor) {
+    print "\nI2b2 Postgres $ionlypindexfor new foreign index\n";
+    $i = 0;
+    foreach $t (@ionlypindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyoindexfor) {
+    print "\nI2b2 Oracle $ionlyoindexfor new foreign index\n";
+    $i = 0;
+    foreach $t (@ionlyoindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($idiffindexfor) {
+    print "\nI2b2 Oracle $idiffindexfor changed foreign index\n";
+    $i = 0;
+    foreach $t (@idiffindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+# Oracle I2b2 <=> Oracle tranSMART (compare platforms)
+# =====================================================
+
+if($onlytmtable) {
+    print "\nOracle Transmart <=> I2b2 $onlytmtable new tables\n";
+    $i = 0;
+    foreach $t (@onlytmtable) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyibtable) {
+    print "\nOracle I2b2 <=> Transmart $onlyibtable new tables\n";
+    $i = 0;
+    foreach $t (@onlyibtable) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlytmseq) {
+    print "\nOracle Transmart <=> I2b2 $onlytmseq new sequences\n";
+    $i = 0;
+    foreach $t (@onlytmseq) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyibseq) {
+    print "\nOracle I2b2 <=> Transmart $onlyibseq new sequences\n";
+    $i = 0;
+    foreach $t (@onlyibseq) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlytmtrig) {
+    print "\nOracle Transmart <=> I2b2 $onlytmtrig new triggers\n";
+    $i = 0;
+    foreach $t (@onlytmtrig) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyibtrig) {
+    print "\nOracle I2b2 <=> Transmart $onlyibtrig new triggers\n";
+    $i = 0;
+    foreach $t (@onlyibtrig) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlytmview) {
+    print "\nOracle Transmart  <=> I2b2 $onlytmview new views\n";
+    $i = 0;
+    foreach $t (@onlytmview) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyibview) {
+    print "\nOracle I2b2 <=> Transmart $onlyibview new views\n";
+    $i = 0;
+    foreach $t (@onlyibview) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlytmfunc) {
+    print "\nOracle Transmart <=> I2b2 $onlytmfunc new functions\n";
+    $i = 0;
+    foreach $t (@onlytmfunc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyibfunc) {
+    print "\nOracle I2b2 <=> Transmart $onlyibfunc new functions\n";
+    $i = 0;
+    foreach $t (@onlyibfunc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlytmproc) {
+    print "\nOracle Transmart <=> I2b2 $onlytmproc new procedures\n";
+    $i = 0;
+    foreach $t (@onlytmproc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyibproc) {
+    print "\nOracle I2b2 <=> TranSMART $onlyibproc new procedures\n";
+    $i = 0;
+    foreach $t (@onlyibproc) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+if($onlyibindexprim) {
+    print "\nOracle I2b2 $onlyibindexprim new primary index\n";
+    $i = 0;
+    foreach $t (@onlyibindexprim) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlytmindexprim) {
+    print "\nOracle Transmart $onlytmindexprim new primary index\n";
+    $i = 0;
+    foreach $t (@onlytmindexprim) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($tmdiffindexprim) {
+    print "\nOracle I2b2 $tmdiffindexprim changed primary index\n";
+    $i = 0;
+    foreach $t (@tmdiffindexprim) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyibindexuni) {
+    print "\nOracle I2b2 $onlyibindexuni new unique index\n";
+    $i = 0;
+    foreach $t (@onlyibindexuni) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlytmindexuni) {
+    print "\nOracle Transmart $onlytmindexuni new unique index\n";
+    $i = 0;
+    foreach $t (@onlytmindexuni) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($tmdiffindexuni) {
+    print "\nOracle I2b2 $tmdiffindexuni changed unique index\n";
+    $i = 0;
+    foreach $t (@tmdiffindexuni) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyibindexfor) {
+    print "\nOracle I2b2 $onlyibindexfor new foreign index\n";
+    $i = 0;
+    foreach $t (@onlyibindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlytmindexfor) {
+    print "\nOracle Transmart $onlytmindexfor new foreign index\n";
+    $i = 0;
+    foreach $t (@onlytmindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($tmdiffindexfor) {
+    print "\nOracle I2b2 $tmdiffindexfor changed foreign index\n";
+    $i = 0;
+    foreach $t (@tmdiffindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
