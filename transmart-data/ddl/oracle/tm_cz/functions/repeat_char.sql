@@ -1,30 +1,35 @@
 --
 -- Type: FUNCTION; Owner: TM_CZ; Name: REPEAT_CHAR
 --
-  CREATE OR REPLACE FUNCTION "TM_CZ"."REPEAT_CHAR" (i_value varchar2, i_count integer, i_char VARCHAR2)
-   return varchar2
+CREATE OR REPLACE FUNCTION TM_CZ.REPEAT_CHAR (
+    i_value varchar2,
+    i_count integer,
+    i_char VARCHAR2
+)
+    return varchar2
+
 is
 
---	use this function if version of Oracle does not support REPEAT string function
-	v_loop_ct	integer;
-	v_value		varchar2(4000 BYTE);
+    --	use this function if version of Oracle does not support REPEAT string function
+    v_loop_ct	integer;
+    v_value		varchar2(4000 BYTE);
 
 begin
 
-	if i_count < 1 then
-		return i_value;
-	end if;
+    if i_count < 1 then
+	return i_value;
+    end if;
 
-	v_loop_ct := 1;
-	v_value := i_value;
+    v_loop_ct := 1;
+    v_value := i_value;
 
-	while v_loop_ct <= i_count
+    while v_loop_ct <= i_count
 	loop
-		v_value := v_value || i_char;
-		v_loop_ct := v_loop_ct + 1;
-	end loop;
+	v_value := v_value || i_char;
+	v_loop_ct := v_loop_ct + 1;
+    end loop;
 
-	return v_value;
+    return v_value;
 
 end repeat_char;
 /
