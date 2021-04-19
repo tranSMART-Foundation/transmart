@@ -1,5 +1,7 @@
-KETTLE_VERSION=8.2
-KETTLE_ZIP=8.2.0.0-342
+KETTLE_VERSION=9.1
+KETTLE_ZIP=9.1.0.0-324
+##KETTLE_VERSION=8.2
+##KETTLE_ZIP=8.2.0.0-342
 
 TRANSMART_RELEASE_BRANCH=release-19.0
 
@@ -150,11 +152,13 @@ KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip
 $(KETTLE_ARCHIVE):
 	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
-KETTLE_ORACLE_DRIVER=data-integration/libext/JDBC/$(JDBC_DRIVER_ORA)
+## Updated for 9.1: Pentaho no longer has libext directory
+##KETTLE_ORACLE_DRIVER=data-integration/libext/JDBC/$(JDBC_DRIVER_ORA)
+KETTLE_ORACLE_DRIVER=data-integration/lib/$(JDBC_DRIVER_ORA)
 $(KETTLE_ORACLE_DRIVER): $(JDBC_DRIVER_ORA_PATH) data-integration/.keep
 	cp --reflink=auto "$<" "$@"
 
-data-integration-oracle: data-integration-oracle/.keep $(KETTLE_ORACLE_DRIVER)
+data-integration-oracle: data-integration/.keep $(KETTLE_ORACLE_DRIVER)
 .PHONY: data-integration-oracle
 data-integration-oracle/.keep: $(KETTLE_ARCHIVE)
 	unzip -q $<
@@ -182,7 +186,7 @@ ubuntu_deps_root16: install_ubuntu_packages install_ubuntu_packages16 /var/lib/p
 
 ubuntu_deps_root18: install_ubuntu_packages install_ubuntu_packages18 /var/lib/postgresql/tablespaces
 
-# Note: in the release case - we are making a strong assumption that transmart-etlx
+# Note: in the release case - we are making a strong assumption that transmart-etl
 #   already exists, is NOT a git archive, and can not be updated
 # ubuntu_deps_regular: update_etl data-integration ../vars groovy
 ubuntu_deps_regular: data-integration ../vars groovy
