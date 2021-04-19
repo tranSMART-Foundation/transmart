@@ -55,6 +55,9 @@ class SqlSplitter {
                     if (trimmedLine.startsWith('--')) {
                         continue /* other types of comments not supported */
                     }
+                    if (trimmedLine.contains('--')) {
+			trimmedLine = trimmedLine.substring(0, trimmedLine.indexOf('--'))
+		    }
                     if (!trimmedLine) {
                         continue
                     }
