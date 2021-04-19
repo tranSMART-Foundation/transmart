@@ -2204,17 +2204,6 @@
     "child" : {
       "type" : "SYNONYM",
       "owner" : "BIOMART_USER",
-      "name" : "DE_MRNA_ANNOTATION_BKP"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_MRNA_ANNOTATION_BKP"
-    } ]
-  }, {
-    "child" : {
-      "type" : "SYNONYM",
-      "owner" : "BIOMART_USER",
       "name" : "DE_MRNA_ANNOTATION_RELEASE"
     },
     "parents" : [ {
@@ -3179,6 +3168,20 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "BIOMART_USER",
+      "name" : "CMS_FILE"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "BIOMART_USER",
+      "name" : "CMS_SECTION"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "BIOMART_USER",
       "name" : "GENE_ONTOLOGY"
     },
     "parents" : [ ]
@@ -4009,17 +4012,6 @@
       "type" : "TABLE",
       "owner" : "TM_CZ",
       "name" : "PROBESET_DEAPP"
-    } ]
-  }, {
-    "child" : {
-      "type" : "SYNONYM",
-      "owner" : "BIOMART_USER",
-      "name" : "PROBESET_DEAPP_20120206"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
-      "name" : "PROBESET_DEAPP_20120206"
     } ]
   }, {
     "child" : {
@@ -5202,17 +5194,6 @@
     "child" : {
       "type" : "SYNONYM",
       "owner" : "BIOMART_USER",
-      "name" : "TJEA_JUNK"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "TM_CZ",
-      "name" : "TJEA_JUNK"
-    } ]
-  }, {
-    "child" : {
-      "type" : "SYNONYM",
-      "owner" : "BIOMART_USER",
       "name" : "TMP_BIO_MARKER"
     },
     "parents" : [ {
@@ -5385,6 +5366,36 @@
       "owner" : "BIOMART",
       "name" : "VW_FACETED_SEARCH"
     } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "BIOMART_USER",
+      "name" : "TRG_CMS_FILE_ID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "BIOMART_USER",
+      "name" : "CMS_FILE"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "BIOMART_USER",
+      "name" : "CMS_FILE_ID_SEQ"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "BIOMART_USER",
+      "name" : "TRG_CMS_SECTION_ID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "BIOMART_USER",
+      "name" : "CMS_SECTION"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "BIOMART_USER",
+      "name" : "CMS_SECTION_ID_SEQ"
+    } ]
   } ],
   "fileAssignments" : [ {
     "item" : {
@@ -5437,11 +5448,39 @@
     "file" : "biomart_user/_misc.sql"
   }, {
     "item" : {
+      "type" : "SEQUENCE",
+      "owner" : "BIOMART_USER",
+      "name" : "CMS_FILE_ID_SEQ"
+    },
+    "file" : "biomart_user/_misc.sql"
+  }, {
+    "item" : {
+      "type" : "SEQUENCE",
+      "owner" : "BIOMART_USER",
+      "name" : "CMS_SECTION_ID_SEQ"
+    },
+    "file" : "biomart_user/_misc.sql"
+  }, {
+    "item" : {
       "type" : "TABLE",
       "owner" : "BIOMART_USER",
       "name" : "APPLICATION_SETTINGS"
     },
     "file" : "biomart_user/application_settings.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "BIOMART_USER",
+      "name" : "CMS_FILE"
+    },
+    "file" : "biomart_user/cms_file.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "BIOMART_USER",
+      "name" : "CMS_SECTION"
+    },
+    "file" : "biomart_user/cms_section.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -5484,5 +5523,19 @@
       "name" : "PATIENTS_TAB"
     },
     "file" : "biomart_user/_misc.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "BIOMART_USER",
+      "name" : "TRG_CMS_FILE_ID"
+    },
+    "file" : "biomart_user/cms_file.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "BIOMART_USER",
+      "name" : "TRG_CMS_SECTION_ID"
+    },
+    "file" : "biomart_user/cms_section.sql"
   } ]
 }
