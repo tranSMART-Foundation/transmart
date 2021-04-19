@@ -1,20 +1,35 @@
 {
   "dependencies" : [ {
     "child" : {
+      "type" : "TRIGGER",
+      "owner" : "GWAS_PLINK",
+      "name" : "TRG_PLINK_DATA_ID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "GWAS_PLINK",
+      "name" : "PLINK_DATA"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "GWAS_PLINK",
+      "name" : "SEQ_PLINK_DATA_ID"
+    } ]
+  }, {
+    "child" : {
       "type" : "TABLE",
       "owner" : "GWAS_PLINK",
       "name" : "PLINK_DATA"
     },
     "parents" : [ ]
-  }, {
-    "child" : {
+  } ],
+  "fileAssignments" : [ {
+    "item" : {
       "type" : "SEQUENCE",
       "owner" : "GWAS_PLINK",
       "name" : "SEQ_PLINK_DATA_ID"
     },
-    "parents" : [ ]
-  } ],
-  "fileAssignments" : [ {
+    "file" : "gwas_plink/_misc.sql"
+  }, {
     "item" : {
       "type" : "TABLE",
       "owner" : "GWAS_PLINK",
@@ -28,12 +43,5 @@
       "name" : "TRG_PLINK_DATA_ID"
     },
     "file" : "gwas_plink/plink_data.sql"
-  }, {
-    "item" : {
-      "type" : "SEQUENCE",
-      "owner" : "GWAS_PLINK",
-      "name" : "SEQ_PLINK_DATA_ID"
-    },
-    "file" : "gwas_plink/_misc.sql"
   } ]
 }
