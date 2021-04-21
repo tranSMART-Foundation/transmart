@@ -1,0 +1,187 @@
+{
+  "dependencies" : [ {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_INSTANCE"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_CONTEXT"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_PARAMS"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_INSTANCE"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION_CONTEXT"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "TS_BATCH",
+      "name" : "JOB_EXEC_CTX_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_CONTEXT"
+    } ]
+  }, {
+    "child" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "TS_BATCH",
+      "name" : "JOB_EXEC_STEP_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "TS_BATCH",
+      "name" : "JOB_EXEC_CTX_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_CONTEXT"
+    } ]
+  }, {
+    "child" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "TS_BATCH",
+      "name" : "JOB_STEP_EXEC_CTX_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION_CONTEXT"
+    } ]
+  } ],
+  "fileAssignments" : [ {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION"
+    },
+    "file" : "ts_batch/batch_job_execution.sql"
+  }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "TS_BATCH",
+      "name" : "JOB_INST_EXEC_FK"
+    },
+    "file" : "ts_batch/batch_job_execution.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_CONTEXT"
+    },
+    "file" : "ts_batch/batch_job_execution_context.sql"
+  }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "TS_BATCH",
+      "name" : "JOB_EXEC_CTX_FK"
+    },
+    "file" : "ts_batch/batch_job_execution_context.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_PARAMS"
+    },
+    "file" : "ts_batch/batch_job_execution_params.sql"
+  }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "TS_BATCH",
+      "name" : "JOB_EXEC_PARAMS_FK"
+    },
+    "file" : "ts_batch/batch_job_execution_params.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_INSTANCE"
+    },
+    "file" : "ts_batch/batch_job_instance.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION"
+    },
+    "file" : "ts_batch/batch_step_execution.sql"
+  }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "TS_BATCH",
+      "name" : "JOB_EXEC_STEP_FK"
+    },
+    "file" : "ts_batch/batch_step_execution.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION_CONTEXT"
+    },
+    "file" : "ts_batch/batch_step_execution_context.sql"
+  }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "TS_BATCH",
+      "name" : "JOB_STEP_EXEC_CTX_FK"
+    },
+    "file" : "ts_batch/batch_step_execution_context.sql"
+  } ]
+}
