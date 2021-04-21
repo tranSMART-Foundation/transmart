@@ -11,7 +11,7 @@ CREATE TABLE batch_job_execution_context (
 -- Name: batch_job_execution_context_pkey; Type: CONSTRAINT; Schema: ts_batch; Owner: -
 --
 ALTER TABLE ONLY batch_job_execution_context
-    ADD CONSTRAINT batch_job_execution_context_pkey PRIMARY KEY (job_execution_id);
+    ADD CONSTRAINT batch_job_execution_ctxt_pkey PRIMARY KEY (job_execution_id);
 
 --
 -- Name: job_exec_ctx_fk; Type: FK CONSTRAINT; Schema: ts_batch; Owner: -
