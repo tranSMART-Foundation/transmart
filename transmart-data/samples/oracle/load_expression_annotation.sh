@@ -18,11 +18,15 @@ UPLOAD_DATA_TYPE="annotation"
 source $1
 cd $2
 
-PLATFORM_TITLE=${PLATFORM_TITLE:-${TITLE:-${PLATFORM}}}
+if [ -z "$PLATFORM_ID" ] &&  [ ! -z "$PLATFORM" ]; then
+    PLATFORM_ID=$PLATFORM
+fi
+
+PLATFORM_TITLE=${PLATFORM_TITLE:-${TITLE:-${PLATFORM_ID}}}
 make "$JDBC_DRIVER"
 
 groovy -cp "$LIB_CLASSPATH" InsertGplInfo.groovy \
-	-p "$PLATFORM" \
+	-p "$PLATFORM_ID" \
 	-t "$PLATFORM_TITLE" \
 	-m "Gene Expression" \
 	-o "$ORGANISM" || { test $? -eq 3 && exit 0; }
