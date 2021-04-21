@@ -10,7 +10,7 @@ AS
 BEGIN
 
     /*************************************************************************
-     * Copyright 2008-2012 Janssen Research & Development, LLC.
+     * Copyright 2008-2012 Janssen Research and Development, LLC.
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.

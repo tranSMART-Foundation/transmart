@@ -7,7 +7,7 @@ CREATE OR REPLACE PROCEDURE TM_CZ.I2B2_CREATE_CONCEPT_COUNTS (
 )
 AS
     /*************************************************************************
-     * Copyright 2008-2012 Janssen Research & Development, LLC.
+     * Copyright 2008-2012 Janssen Research and Development, LLC.
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ BEGIN
 	execute immediate('truncate table tmp_concept_counts');
 
 	--	insert data for leaf nodes, do Biomarker mRNA nodes first so that the correct patients are joined to de_subject_sample_mapping
-	--	this is done because mRNA nodes can share concept_cds with Samples & Timepoints nodes
+	--	this is done because mRNA nodes can share concept_cds with Samples and Timepoints nodes
 
 	insert into tm_cz.tmp_concept_counts
 	(leaf_path
