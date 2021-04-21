@@ -182,6 +182,13 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "TM_LZ",
+      "name" : "LT_SRC_MRNA_DISPLAY_MAPPING"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "TM_LZ",
       "name" : "LT_SRC_MRNA_SUBJ_SAMP_MAP"
     },
     "parents" : [ ]
@@ -689,6 +696,13 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "TM_LZ",
+      "name" : "LT_SRC_MRNA_DISPLAY_MAPPING"
+    },
+    "file" : "tm_lz/lt_src_mrna_display_mapping.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "TM_LZ",
       "name" : "LT_SRC_MRNA_SUBJ_SAMP_MAP"
     },
     "file" : "tm_lz/lt_src_mrna_subj_samp_map.sql"
@@ -1001,4 +1015,5 @@
     },
     "file" : "tm_lz/wt_snp_node_values.sql"
   } ]
+
 }
