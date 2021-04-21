@@ -5,18 +5,19 @@ SCHEMAS = \
     i2b2imdata \
     i2b2pm \
     i2b2workdata \
+    biomart_stage \
+    biomart_user \
     biomart \
     deapp \
     tm_lz \
+    tm_cz \
     tm_wz \
     searchapp \
     amapp \
     fmapp \
     galaxy \
     gwas_plink \
-    biomart_stage \
-    biomart_user \
-    tm_cz
+    ts_batch
 
 DUMP_SCHEMA_TARGETS = $(foreach s,$(SCHEMAS),dump_$(s))
 LOAD_SCHEMA_TARGETS = $(foreach s,$(SCHEMAS),load_$(s))
