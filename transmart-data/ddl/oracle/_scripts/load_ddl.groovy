@@ -112,7 +112,8 @@ Integer loadFileParallel(ForkJoinPool pool, BlockingQueue<Sql> sqls, File file) 
             }
         }
     }
-    System.out.println " Loaded $file ($i)"
+    Log.out " Done."
+    Log.out " Loaded $file ($i)"
 
     i.toInteger()
 }
@@ -270,6 +271,7 @@ withPool nConn, { pool ->
 
     /* 1. all elements without cross-schema dependencies; no procedures */
     if (!options."no-regular") {
+	Log.out "Stage 1: LOADING FILES: all elements without cross-schema dependencies; no procedures"
         List<File> failed = getFailedFiles(
                 loadMultiSchemaObjects(sqls,
                         joinedFileDependencies,
@@ -295,6 +297,7 @@ withPool nConn, { pool ->
 
     /* 2. load synonyms */
     if (!options."no-synonyms") {
+	Log.out "Stage 2: LOAD SYNONYMS"
         def failedFiles = loadPerUserFile sqls, users, '_synonyms.sql'
         if (failedFiles) {
             Log.err "Failed loading one or more synonyms files: $failedFiles"
@@ -304,6 +307,7 @@ withPool nConn, { pool ->
 
     /* 3. load cross grants */
     if (!options."no-grants") {
+	Log.out "Stage 3: LOAD GRANTS: generate and load cross_grants.sql"
         def file = new File('cross_grants.sql')
         try {
             generateCrossGrantsFile(joinedRepository, file)
@@ -315,8 +319,11 @@ withPool nConn, { pool ->
         }
     }
 
-    /* 4. load procedures and cross */
+    /* 4. load procedures and cross 
+     *    some will fail with 'insufficient privileges'
+     *     until grants run later once objects are created */
     if (!(options."no-procedures" && options."no-cross")) {
+	Log.out "Stage 4: LOAD PROCEDURES AND CROSS: Load procedures/*.sql and _cross.sql"
         Map<File, DataflowVariable> filePromiseMap =
             loadMultiSchemaObjects(sqls,
                     joinedFileDependencies,
@@ -331,11 +338,34 @@ withPool nConn, { pool ->
             Log.err "Failed loading one or more procedure or _cross.sql files: $failedFiles"
             System.exit 1
         }
+
     }
+
+    /* 4a. Check for warnings and errors
+    if (!(options."no-procedures" && options."no-cross")) {
+	Log.out "Stage 6a: CHECK INVALID OBJECTS SO FAR: Read and report from DBA_ERRORS by schema"
+        Log.print 'Compiling schemas'
+        // eachParallel causes errors sometimes:
+        // ORA-20000: Unable to set values for index UTL_RECOMP_SORT_IDX1: does not exist or insufficient privileges
+        users.each { String user ->
+            takeSql(sqls) { Sql sql ->
+		def statement = """SELECT ATTRIBUTE, TYPE, OWNER, NAME, LINE, POSITION, MESSAGE_NUMBER, TEXT FROM DBA_ERRORS WHERE OWNER = '${user}'"""
+                sql.eachRow(statement) { ResultSet rs ->
+                    Log.out "${rs.getString(1)}: ${rs.getString(2)} " +
+                        "${rs.getString(3)}.${rs.getString(4)}" +
+			" line ${rs.getString(5)} at position ${rs.getString(6)}" +
+			" message ${rs.getString(7)}: ${rs.getString(8)}"
+		}
+	    }
+        }
+        Log.out ' Done.'
+    }
+     */
 
     /* 5. load explicit grants */
     if (!options."no-grants") {
-        def failedFiles = loadPerUserFile sqls, users, '_grants.sql'
+	Log.out "Stage 5: LOAD GRANTS: Load _grants.sql files"
+	def failedFiles = loadPerUserFile sqls, users, '_grants.sql'
         if (failedFiles) {
             Log.err "Failed loading one or more grant files: $failedFiles"
             System.exit 1
@@ -344,6 +374,7 @@ withPool nConn, { pool ->
 
     /* 6. recompile schemas */
     if (!options."no-compile") {
+	Log.out "Stage 6: RECOMPILE SCHEMAS: Call dbms_utility.compile_schema for each schema"
         Log.print 'Compiling schemas'
         // eachParallel causes errors sometimes:
         // ORA-20000: Unable to set values for index UTL_RECOMP_SORT_IDX1: does not exist or insufficient privileges
@@ -363,6 +394,7 @@ withPool nConn, { pool ->
 
     /* 7. refresh views */
     if (!options."no-refresh-views") {
+	Log.out "Stage 7: REFRESH VIEWS: Call DBMS_MVIEW.REFRESH on each view"
         def statement = """
             BEGIN
                 FOR the_view IN
@@ -384,20 +416,38 @@ withPool nConn, { pool ->
 
     /* 8. Report objects with errors */
     if (!options."no-final-error-check") {
-        def statement = """
-            SELECT DISTINCT type, owner, name
+	Log.out "Stage 8: REPORT ERRORS: Report from DBA_ERRORS for all schemas"
+        def errStatement = """
+            SELECT DISTINCT type, owner, name, line, position, message_number, text
             FROM DBA_ERRORS
             WHERE owner IN (${users.collect { "'$it'" }.join(', ')})
             AND attribute = 'ERROR'""".toString()
 
         Log.out 'Checking for errors...'
         takeSql(sqls) { Sql sql ->
-            sql.eachRow(statement) { ResultSet rs ->
-                Log.warn "${rs.getString(1)} " +
-                        "${rs.getString(2)}.${rs.getString(3)} has errors"
+            sql.eachRow(errStatement) { ResultSet rs ->
+                Log.warn "ERROR ${rs.getString(1)} " +
+                        "${rs.getString(2)}.${rs.getString(3)} " +
+			" line ${rs.getString(4)} at position ${rs.getString(5)}" +
+			" message ${rs.getString(6)}: ${rs.getString(7)}"
+            }
+        }
+        def warnStatement = """
+            SELECT DISTINCT type, owner, name, line, position, message_number, text
+            FROM DBA_ERRORS
+            WHERE owner IN (${users.collect { "'$it'" }.join(', ')})
+            AND attribute = 'WARNING'""".toString()
+
+        Log.out 'Checking for warnings...'
+        takeSql(sqls) { Sql sql ->
+            sql.eachRow(warnStatement) { ResultSet rs ->
+                Log.warn "WARNING ${rs.getString(1)} " +
+                        "${rs.getString(2)}.${rs.getString(3)} " +
+			" line ${rs.getString(4)} at position ${rs.getString(5)}" +
+			" message ${rs.getString(6)}: ${rs.getString(7)}"
             }
         }
     }
 }
 
-Log.out 'All done.'
+Log.out 'ALL DONE.'
