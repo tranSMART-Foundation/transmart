@@ -22,7 +22,7 @@ if [ ! -d logs ] ; then mkdir logs; fi
 
 # Start the upload
 $KITCHEN -norep=Y						\
--file="$KETTLE_JOBS/load_rnaseq_annotation.kjb"		\
+-file="$KETTLE_JOBS/load_rna_annotation.kjb"		\
 -log="logs/load_rnaseq_annotation_$(date +"%Y%m%d%H%M").log"	\
 -param:DATA_LOCATION="$DATA_LOCATION"				\
 -param:DATA_FILE="$ANNOTATIONS_FILE"
