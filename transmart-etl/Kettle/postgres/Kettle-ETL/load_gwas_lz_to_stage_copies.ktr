@@ -346,7 +346,7 @@ than one field with the same field_idx.
       <field>
         <name>minus_1</name>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

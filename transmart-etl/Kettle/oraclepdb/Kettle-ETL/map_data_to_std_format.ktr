@@ -3168,7 +3168,7 @@ Alert("Hello World!");
       <field>
         <name>col_num</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -3591,7 +3591,7 @@ Alert("Hello World!");
       <field>
         <name>exclusion_col_num</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -3810,7 +3810,7 @@ Alert("Hello World!");
       <field>
         <name>word_map_col_num</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -8879,7 +8879,7 @@ else if (fromLen &gt; 0 &amp;&amp; toLen &gt; 0 )
       <field>
         <name>rec_num</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -8891,7 +8891,7 @@ else if (fromLen &gt; 0 &amp;&amp; toLen &gt; 0 )
       <field>
         <name>col_num</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

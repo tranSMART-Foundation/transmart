@@ -534,7 +534,7 @@ order by study_id, analysis_cd, cohort_id
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

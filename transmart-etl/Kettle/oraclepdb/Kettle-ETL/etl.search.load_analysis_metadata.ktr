@@ -313,7 +313,7 @@
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

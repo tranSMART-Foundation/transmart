@@ -333,7 +333,7 @@
       <field>
         <name>minus_1</name>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -915,7 +915,7 @@
         <name>d_baa_id</name>
         <variable>${BIO_ASSAY_ANALYSIS_ID}</variable>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

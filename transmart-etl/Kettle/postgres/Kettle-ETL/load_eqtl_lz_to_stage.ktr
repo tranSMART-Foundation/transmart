@@ -344,7 +344,7 @@ than one field with the same field_idx.
       <field>
         <name>minus_1</name>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -954,7 +954,7 @@ than one field with the same field_idx.
         <name>BIO_ASSAY_ANALYSIS_ID</name>
         <variable>${BIO_ASSAY_ANALYSIS_ID}</variable>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -966,7 +966,7 @@ than one field with the same field_idx.
         <name>load_type</name>
         <variable>${LOAD_TYPE}</variable>
         <type>String</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -1002,7 +1002,7 @@ than one field with the same field_idx.
         <name>d_baa_id</name>
         <variable>${BIO_ASSAY_ANALYSIS_ID}</variable>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

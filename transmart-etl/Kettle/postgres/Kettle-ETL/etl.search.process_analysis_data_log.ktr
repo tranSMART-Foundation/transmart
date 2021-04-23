@@ -626,8 +626,8 @@ where study_id = '${STUDY_ID}'
       </field>
       <field>
         <name>TIME_ELAPSED_SECS</name>
-        <type>BigNumber</type>
-        <format/>
+        <type>Number</type>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

@@ -323,7 +323,7 @@
       <field>
         <name>step_number</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -334,7 +334,7 @@
       <field>
         <name>minus_1</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -880,7 +880,7 @@
         <name>etl_id</name>
         <variable>${ETL_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -916,7 +916,7 @@
         <name>d_baa_id</name>
         <variable>${BIO_ASSAY_ANALYSIS_ID}</variable>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -952,7 +952,7 @@
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

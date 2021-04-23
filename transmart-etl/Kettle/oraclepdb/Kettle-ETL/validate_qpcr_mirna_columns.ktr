@@ -735,7 +735,7 @@ Date: 10/22/2013
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -1497,7 +1497,7 @@ Date: 10/22/2013
       <field>
         <name>a_one</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

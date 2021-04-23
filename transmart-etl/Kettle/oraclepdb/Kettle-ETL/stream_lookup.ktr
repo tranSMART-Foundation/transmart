@@ -352,7 +352,7 @@
       <field>
         <name>intensity_start_value</name>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -367,7 +367,7 @@
       <field>
         <name>intensity_end_value</name>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

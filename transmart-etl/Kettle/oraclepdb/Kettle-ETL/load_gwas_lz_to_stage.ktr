@@ -333,7 +333,7 @@ than one field with the same field_idx.
       <field>
         <name>step_number</name>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -344,7 +344,7 @@ than one field with the same field_idx.
       <field>
         <name>minus_1</name>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -1209,7 +1209,7 @@ where etl_id = ${ETL_ID}
         <name>job_id</name>
         <variable>${ETL_JOB_ID}</variable>
         <type>Integer</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>

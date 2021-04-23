@@ -252,7 +252,7 @@
       <field>
         <name>step_number</name>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -559,7 +559,7 @@
         <name>etl_id</name>
         <variable>${ETL_ID}</variable>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -607,7 +607,7 @@
         <name>d_etl_id</name>
         <variable>${ETL_ID}</variable>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
@@ -679,7 +679,7 @@
         <name>etl_id</name>
         <variable>${ETL_ID}</variable>
         <type>Number</type>
-        <format/>
+        <format>#</format>
         <currency/>
         <decimal/>
         <group/>
