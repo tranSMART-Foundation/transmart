@@ -56,6 +56,6 @@ class DeQpcrMirnaAnnotation implements Serializable {
         // unused or irrelevant:
         //idRef       nullable: true, maxSize: 100
         //probeId     nullable: true, maxSize: 100
-        //organism    nullable: true, maxSize: 2000
+        //organism    nullable: true, maxSize: 100
     }
 }

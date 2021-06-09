@@ -169,7 +169,7 @@ class GwasPlinkAnalysisJob extends AbstractAnalysisJob implements InitializingBe
             try {
                 patients = sql.rows("""
                     select pd.sourcesystem_cd, max(ps.result_instance_id) as result_instance_id, ps.patient_num
-                    from i2b2demodata.qt_patient_set_collection ps, i2b2demodata.patient_dimension pd
+                    from i2b2demodata.qtm_patient_set_collection ps, i2b2demodata.patient_dimension pd
                     where ps.patient_num = pd.patient_num and ps.result_instance_id IN (${
                     (['?'] * resultInstanceIds.size()).join(',')
                 })

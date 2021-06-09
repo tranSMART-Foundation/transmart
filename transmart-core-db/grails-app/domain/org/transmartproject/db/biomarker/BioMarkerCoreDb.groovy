@@ -44,7 +44,7 @@ class BioMarkerCoreDb {
         description       nullable: true, maxSize: 2000
         externalId        nullable: true, maxSize: 400
         name              nullable: true, maxSize: 400
-        organism          nullable: true, maxSize: 400
+        organism          nullable: true, maxSize: 100
         sourceCode        nullable: true, maxSize: 400
         type              maxSize:  400
     }

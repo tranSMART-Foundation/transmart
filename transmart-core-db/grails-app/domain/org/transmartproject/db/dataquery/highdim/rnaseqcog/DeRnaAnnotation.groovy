@@ -55,9 +55,8 @@ class DeRnaAnnotation implements Serializable {
         transcriptId maxSize: 50
         platform     nullable: true
         gplId        nullable: true, maxSize: 50
-        organism     nullable: true, maxSize: 200
+        organism     nullable: true, maxSize: 100
         probesetId   nullable: true
-        //organism nullable: true, maxSize: 30
     }
 
     void setId(String id) {

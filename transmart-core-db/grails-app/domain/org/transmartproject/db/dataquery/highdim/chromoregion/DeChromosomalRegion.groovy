@@ -67,7 +67,7 @@ class DeChromosomalRegion implements Region {
         geneSymbol     nullable: true, maxSize: 100
         name           nullable: true, maxSize: 100
         numberOfProbes nullable: true
-        organism       nullable: true, maxSize: 200
+        organism       nullable: true, maxSize: 100
         platform       nullable: true
         start          nullable: true
     }

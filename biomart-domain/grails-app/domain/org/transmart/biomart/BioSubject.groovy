@@ -35,7 +35,7 @@ class BioSubject {
     }
 
     static constraints = {
-	organism nullable: true, maxSize: 400
+	organism nullable: true, maxSize: 100
 	siteSubjectId nullable: true
 	source nullable: true, maxSize: 400
 	sourceCode nullable: true, maxSize: 400

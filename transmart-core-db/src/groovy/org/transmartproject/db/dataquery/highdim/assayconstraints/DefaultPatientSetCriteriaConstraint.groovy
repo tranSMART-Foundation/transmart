@@ -22,7 +22,7 @@ package org.transmartproject.db.dataquery.highdim.assayconstraints
 import groovy.transform.Canonical
 import org.grails.datastore.mapping.query.api.Criteria
 import org.transmartproject.core.querytool.QueryResult
-import org.transmartproject.db.querytool.QtPatientSetCollection
+import org.transmartproject.db.querytool.QtmPatientSetCollection
 
 @Canonical
 class DefaultPatientSetCriteriaConstraint implements AssayCriteriaConstraint {
@@ -30,7 +30,7 @@ class DefaultPatientSetCriteriaConstraint implements AssayCriteriaConstraint {
     QueryResult queryResult
 
     void addToCriteria(Criteria criteria) {
-        criteria.in 'patient.id', QtPatientSetCollection.where {
+        criteria.in 'patient.id', QtmPatientSetCollection.where {
             projections {
                 property 'patient.id'
             }

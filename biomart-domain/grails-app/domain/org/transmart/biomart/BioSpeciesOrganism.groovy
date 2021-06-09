@@ -28,7 +28,7 @@ class BioSpeciesOrganism {
     }
 
     static constraints = {
-	organism nullable: true, maxSize: 200
-	species nullable: true, maxSize: 200
+	organism nullable: true, maxSize: 100
+	species nullable: true, maxSize: 100
     }
 }

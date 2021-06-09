@@ -52,7 +52,7 @@ class DeMrnaAnnotationCoreDb {
         geneId     nullable: true
         geneSymbol nullable: true, maxSize: 100
         gplId      nullable: true, maxSize: 50
-        organism   nullable: true, maxSize: 200
+        organism   nullable: true, maxSize: 100
         platform   nullable: true
         probeId    nullable: true, maxSize: 100
     }

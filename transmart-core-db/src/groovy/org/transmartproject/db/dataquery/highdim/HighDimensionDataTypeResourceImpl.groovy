@@ -158,7 +158,7 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
         I2b2.executeQuery '''
             from I2b2 where code in
                 (select distinct ssm.conceptCode
-                from QtPatientSetCollection ps, DeSubjectSampleMapping ssm
+                from QtmPatientSetCollection ps, DeSubjectSampleMapping ssm
                 inner join ssm.platform as p
                 where p.markerType in (:markerTypes)
                     and ssm.patient = ps.patient

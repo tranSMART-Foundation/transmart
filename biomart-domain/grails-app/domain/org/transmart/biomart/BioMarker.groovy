@@ -56,7 +56,7 @@ class BioMarker implements IExcelProfile {
 	bioMarkerType maxSize: 400
 	description nullable: true, maxSize: 2000
 	name nullable: true, maxSize: 400
-	organism nullable: true, maxSize: 400
+	organism nullable: true, maxSize: 200
 	primaryExternalId nullable: true, maxSize: 400
 	primarySourceCode nullable: true, maxSize: 400
     }

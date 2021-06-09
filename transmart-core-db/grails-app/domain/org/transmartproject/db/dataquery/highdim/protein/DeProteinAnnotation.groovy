@@ -53,12 +53,12 @@ class DeProteinAnnotation {
     static constraints = {
         chromosome  nullable: true
         endBp       nullable: true
-        peptide     maxSize:  800
+        peptide     maxSize:  200
         startBp     nullable: true
         uniprotId   nullable: true, maxSize: 200
         uniprotName nullable: true, maxSize: 200
 
-        //biomarkerId nullable: true, maxSize: 400
-        //organism    nullable: true, maxSize: 800
+        //biomarkerId nullable: true, maxSize: 200
+        //organism    nullable: true, maxSize: 100
     }
 }
