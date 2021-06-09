@@ -26,14 +26,14 @@ import org.transmartproject.db.dataquery.clinical.PatientQuery
 import org.transmartproject.db.dataquery.clinical.patientconstraints.PatientSetsConstraint
 import org.transmartproject.db.i2b2data.PatientDimension
 
-class QtQueryResultInstance implements QueryResult {
+class QtmQueryResultInstance implements QueryResult {
 
     String deleteFlag = 'N'
     String description
     Date endDate
     String errorMessage
     String obfuscMethod
-    QtQueryInstance queryInstance
+    QtmQueryInstance queryInstance
     Long realSetSize
     Short resultTypeId = 1
     Long setSize
@@ -42,20 +42,20 @@ class QtQueryResultInstance implements QueryResult {
 
     static transients = ['username']
 
-    static hasMany = [patientSet: QtPatientSetCollection,
+    static hasMany = [patientSet: QtmPatientSetCollection,
                       patientsA:  PatientDimension]
 
-    static belongsTo = QtQueryInstance
+    static belongsTo = QtmQueryInstance
 
     static mapping = {
         table          schema: 'I2B2DEMODATA'
         /* use sequence instead of identity because our Oracle schema doesn't
          * have a trigger that fills the column in this case */
-        id             column: 'result_instance_id', generator: 'sequence', params: [sequence: 'i2b2demodata.qt_sq_qri_qriid']
+        id             column: 'result_instance_id', generator: 'sequence', params: [sequence: 'i2b2demodata.qtm_sq_qri_qriid']
 	version false
 
         errorMessage   column: 'message'
-        patientsA      joinTable: [name:   'qt_patient_set_collection',
+        patientsA      joinTable: [name:   'qtm_patient_set_collection',
                                    key:    'result_instance_id',
                                    column: 'patient_num']
         queryInstance  column: 'query_instance_id', fetch: 'join'

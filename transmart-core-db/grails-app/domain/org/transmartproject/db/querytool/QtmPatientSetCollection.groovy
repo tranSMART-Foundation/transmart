@@ -21,12 +21,12 @@ package org.transmartproject.db.querytool
 
 import org.transmartproject.db.i2b2data.PatientDimension
 
-class QtPatientSetCollection {
+class QtmPatientSetCollection {
 
     Long            setIndex
 
     static belongsTo = [patient: PatientDimension,
-			resultInstance: QtQueryResultInstance]
+			resultInstance: QtmQueryResultInstance]
 
     static mapping = {
         table          schema:   'I2B2DEMODATA'

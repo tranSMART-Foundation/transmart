@@ -19,28 +19,28 @@
 
 package org.transmartproject.db.querytool
 
-class QtQueryInstance {
+class QtmQueryInstance {
 
     String          batchMode
     String          deleteFlag = 'N'
     Date            endDate
     String          groupId
     String          message
-    QtQueryMaster   queryMaster
+    QtmQueryMaster  queryMaster
     Date            startDate
     Integer         statusTypeId
     String          userId
 
-    static hasMany = [queryResults: QtQueryResultInstance]
+    static hasMany = [queryResults: QtmQueryResultInstance]
 
-    static belongsTo = QtQueryMaster
+    static belongsTo = QtmQueryMaster
 
     static mapping = {
         table       schema: 'I2B2DEMODATA'
         /* use sequence instead of identity because our Oracle schema doesn't
          * have a trigger that fills the column in this case */
 	id          column: 'query_instance_id', generator: 'sequence',
-            params: [sequence: 'qt_sq_qi_qiid', schema: 'i2b2demodata']
+            params: [sequence: 'qtm_sq_qi_qiid', schema: 'i2b2demodata']
 	version false
 
         queryMaster column: 'query_master_id'

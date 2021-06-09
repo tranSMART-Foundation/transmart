@@ -51,8 +51,8 @@ class BootStrap {
                         .invoke(null, [patient])
             }
 
-            // hibernate is not saving QtQueryMaster before QtQueryInstance if
-            // the id of QtQueryMaster is explicitly assigned, hence we add
+            // hibernate is not saving QtmQueryMaster before QtmQueryInstance if
+            // the id of QtmQueryMaster is explicitly assigned, hence we add
             // an endpoint to retrieve these result instance ids
             // (see SmartRTestController)
 

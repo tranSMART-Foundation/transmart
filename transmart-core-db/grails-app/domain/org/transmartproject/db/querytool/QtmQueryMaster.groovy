@@ -19,7 +19,7 @@
 
 package org.transmartproject.db.querytool
 
-class QtQueryMaster {
+class QtmQueryMaster {
 
     Date createDate
     Date deleteDate
@@ -33,13 +33,13 @@ class QtQueryMaster {
     String requestXml
     String userId
 
-    static hasMany = [queryInstances: QtQueryInstance]
+    static hasMany = [queryInstances: QtmQueryInstance]
 
     static mapping = {
         table          schema: 'I2B2DEMODATA'
         /* use sequence instead of identity because our Oracle schema doesn't
          * have a trigger that fills the column in this case */
-        id             column: 'query_master_id', generator: 'sequence', params: [sequence: 'i2b2demodata.qt_sq_qm_qmid']
+        id             column: 'query_master_id', generator: 'sequence', params: [sequence: 'i2b2demodata.qtm_sq_qm_qmid']
         version false
 
         generatedSql   type:   'text'
