@@ -9,7 +9,7 @@
     <button class="ltarrowbutton"
             onclick="${remoteFunction(action: 'addPrincipalToAccessList',
                      update: [success: 'groups', failure: ''],
-                     params: 'addremovePrincipal_add_data(this)')};
+                     params: 'addremovePrincipal_add_data(this)')}
 		     return false;">&LT;&LT;Add</button><br>
 	<button class="ltarrowbutton"
 		onclick="${remoteFunction(action: 'removePrincipalFromAccessList',
