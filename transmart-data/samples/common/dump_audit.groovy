@@ -61,7 +61,14 @@ if (!row) {
     err "Could not find latest job id"
     System.exit 1
 }
-def jobId = row['JOB_ID']
+def maxId = row['JOB_ID']
+
+def jobArg = (args as List)[2]
+def jobId = e.JOBID ?
+        Integer.parseInt(e.JOBID) :
+        (jobArg ?
+                Integer.parseInt(jobArg) :
+                maxId)
 
 def separator = new String(new char[cols]).replace('\0', '-');
 

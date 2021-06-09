@@ -49,8 +49,6 @@ TOP_NODE="\\${TOP_NODE_PREFIX}\\${STUDY_NAME}\\"
 if [ ! -d logs ] ; then mkdir logs; fi
 
 # lt_src_mrna_data is truncated by Kettle
-# $PGSQL_BIN/psql -c "truncate tm_lz.lt_src_mrna_data"
-# echo "Loading zone tables truncated"
 
 echo "launch kitchen with level=$KETTLE_LOG_LEVEL"
 

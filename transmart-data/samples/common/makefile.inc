@@ -11,6 +11,9 @@ include ../../makefile.inc
 showdblog: $(JDBC_DRIVER)
 	groovy -cp '$(LIB_CLASSPATH)' ../common/dump_audit.groovy $(RDBMS) `tput cols`
 
+showdblog_%: $(JDBC_DRIVER)
+	groovy -cp '$(LIB_CLASSPATH)' ../common/dump_audit.groovy $(RDBMS) `tput cols` $*
+
 .PHONY: showdblog
 
 export KETTLE_JOBS
@@ -83,7 +86,7 @@ load_ref_annotation_%: ../studies/%/ref_annotation.params
 	$(foreach  refplatform, $(shell ./load_ref_annotation.sh $<), \
 	    KETTLE_HOME="$(realpath kettle-home)" $(MAKE) load_annotation_$(refplatform); $(shell echo "refplatform=$(refplatform)" ); )
 
-# browse study - check and load program, then load study for browse tab
+# Browse tab study - check and load program, then load study
 
 load_browse_%: ../studies/%/browse.params
 	$(foreach  program, $(shell ./show_browse_program.sh $<), \
@@ -91,7 +94,7 @@ load_browse_%: ../studies/%/browse.params
 	    STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/browse)" \
 			./load_browse_study.sh $<
 
-# Browse program - pick up from browse.params and load if not found
+# Browse tab program - picked up from browse.params and loaded if not found
 
 load_program_%: ../studies/%/program.params
 	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/program)" \

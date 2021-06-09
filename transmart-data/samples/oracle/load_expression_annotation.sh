@@ -3,6 +3,8 @@
 #set -x
 set -e
 
+STARTTIME=$(date +%s)
+
 # General optional parameters:
 #   DATA_LOCATION, STUDY_NAME, STUDY_ID
 # Mandatory parameters specific for this upload script:
@@ -13,7 +15,7 @@ set -e
 UPLOAD_SCRIPTS_DIRECTORY=$(dirname "$0")
 UPLOAD_DATA_TYPE="annotation"
 
-# load definitions in annotations.params
+# load definitions in annotation.params
 
 source $1
 cd $2
@@ -33,7 +35,6 @@ groovy -cp "$LIB_CLASSPATH" InsertGplInfo.groovy \
 # the exit code is 3 if we are to skip the rest
 # due to annotation being already loaded
 
-
 groovy -cp "$LIB_CLASSPATH" LoadTsvFile.groovy \
 	-t tm_lz.lt_src_deapp_annot \
 	-c gpl_id,probe_id,gene_symbol,gene_id,organism \
@@ -41,3 +42,9 @@ groovy -cp "$LIB_CLASSPATH" LoadTsvFile.groovy \
 	--truncate
 
 groovy -cp "$LIB_CLASSPATH" RunStoredProcedure.groovy
+
+ENDTIME=$(date +%s)
+
+SECONDS=$(($ENDTIME - $STARTTIME))
+
+echo "Completed in $(($SECONDS / 60)) minutes $(($SECONDS % 60)) seconds";

@@ -20,6 +20,19 @@ fi
 
 if [ ! -d logs ] ; then mkdir logs; fi
 
+cd $2
+
+# Is the platform already uploaded?
+groovy -cp "$LIB_CLASSPATH" InsertGplInfo.groovy \
+	-p "$GPL_ID" \
+	-t "$ANNOTATION_TITLE" \
+	-m "RNASEQ_RCNT" \
+	-o "$ORGANISM" || { test $? -eq 3 && exit 0; }
+# the exit code is 3 if we are to skip the rest
+# due to annotation being already loaded
+
+cd $DATA_LOCATION
+
 # Start the upload
 $KITCHEN -norep=Y						\
 -file="$KETTLE_JOBS/load_rna_annotation.kjb"		\

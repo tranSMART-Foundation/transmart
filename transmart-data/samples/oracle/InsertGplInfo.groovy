@@ -62,14 +62,13 @@ def insertGplInfo(options) {
 
 options = parseOptions()
 if (!options) {
-	System.exit 1
+    System.exit 1
 }
 
 if (!alreadyLoaded(options.platform)) {
   insertGplInfo(options)
+  println "Platform ${options.platform} added to DE_GPL_INFO"
 } else {
   println "Platform ${options.platform} already loaded; skipping"
   System.exit 3
 }
-
-// vim: et sts=0 sw=2 ts=2 cindent cinoptions=(0,u0,U0

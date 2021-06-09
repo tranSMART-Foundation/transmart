@@ -5,7 +5,7 @@
 # General optional parameters:
 #   DATA_LOCATION, STUDY_NAME, STUDY_ID
 # Specific mandatory parameters for this upload script:
-#   DATA_FILE_PREFIX, SUBJECT_SAMPLE_MAPPING, R_JOBS_PSQL or KETTLE_JOBS_PSQL
+#   RNASEQ_DATA_FILE, SUBJECT_SAMPLE_MAPPING, R_JOBS_ORA or KETTLE_JOBS_ORA
 # Specific optional parameters for this upload script:
 #   TOP_NODE_PREFIX, SECURITY_REQUIRED, SOURCE_CD, DATA_TYPE
 
@@ -24,21 +24,11 @@ else
     fi
 fi
 
-if [ -z "$R_JOBS_PSQL" ]; then
-    if [ -z "$KETTLE_JOBS_PSQL" ]; then
-        echo "Error: Neither R_JOBS_PSQL nor KETTLE_JOBS_PSQL parameter has been set"
-        exit 1
-    else
-        R_JOBS_PSQL="${KETTLE_JOBS_PSQL}/../../R"
-    fi
-fi
-
 # Check if mandatory parameter values are provided
-if [ -z "DATA_FILE_PREFIX" ] || [ -z "$SUBJECT_SAMPLE_MAPPING" ]|| [ -z "$SAMPLE_MAP_FILENAME" ] ; then
+if [ -z "$RNASEQ_DATA_FILE" ] || [ -z "$SUBJECT_SAMPLE_MAPPING" ] ; then
     echo "Following variables need to be set:"
-    echo "    DATA_FILE_PREFIX=$DATA_FILE_PREFIX"
+    echo "    RNASEQ_DATA_FILE=$RNASEQ_DATA_FILE"
     echo "    SUBJECT_SAMPLE_MAPPING=$SUBJECT_SAMPLE_MAPPING"
-    echo "    SAMPLE_MAP_FILENAME=$SAMPLE_MAP_FILENAME"
     exit 1
 fi
 
@@ -79,32 +69,36 @@ LOG_BASE=${LOG_BASE:-2}
 if [ "$RNASEQ_TYPE" = "RNASEQ" ]; then
     if [ ! -d logs ] ; then mkdir logs; fi
 
-    # lt_src_mrna_data is truncated by Kettle
-    # $PGSQL_BIN/psql -c "truncate tm_lz.lt_src_rna_data"
-    # echo "Loading zone tables truncated"
-
-    $KITCHEN -norep -version                                                 \
-	     -file=$KETTLE_JOBS/load_rna_data.kjb                            \
-	     -level="$KETTLE_LOG_LEVEL"                                      \
-	     -logfile="$PWD"/logs/load_rna_data_$(date +"%Y%m%d%H%M").log    \
-	     -param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"                     \
-	     -param:DATA_LOCATION="$DATA_LOCATION"                           \
-	     -param:DATA_TYPE="$DATA_TYPE"                                   \
-	     -param:FilePivot_LOCATION="${KETTLE_JOBS}/.."                   \
-	     -param:INC_LOAD="$INC_LOAD"                                     \
-	     -param:LOAD_TYPE=I                                              \
-	     -param:LOG_BASE="$LOG_BASE"                                     \
-	     -param:MAP_FILENAME="$SUBJECT_SAMPLE_MAPPING"                   \
-	     -param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"               \
-	     -param:SAMPLE_SUFFIX=                                           \
-	     -param:SECURITY_REQUIRED="$SECURITY_REQUIRED"                   \
-	     -param:SORT_DIR=/tmp                                            \
-	     -param:SOURCE_CD="${SOURCE_CD}"                                 \
-	     -param:STUDY_ID="$STUDY_ID"                                     \
-	     -param:TOP_NODE="$TOP_NODE"
+    $KITCHEN -norep=Y                                                 \
+	     -file=$KETTLE_JOBS/load_rna_data.kjb                     \
+	     -log=logs/load_rnaseq_data_$(date +"%Y%m%d%H%M").log     \
+	     /param:DATA_FILE_PREFIX="$DATA_FILE_PREFIX"              \
+	     /param:DATA_LOCATION="$DATA_LOCATION"                    \
+	     /param:DATA_TYPE="$DATA_TYPE"                            \
+	     /param:FilePivot_LOCATION="${KETTLE_JOBS}/.."            \
+	     /param:INC_LOAD="$INC_LOAD"                              \
+	     /param:LOAD_TYPE=I                                       \
+	     /param:LOG_BASE="$LOG_BASE"                              \
+	     /param:MAP_FILENAME="$SUBJECT_SAMPLE_MAPPING"            \
+	     /param:SAMPLE_MAP_FILENAME="$SAMPLE_MAP_FILENAME"        \
+	     /param:SAMPLE_SUFFIX=                                    \
+	     /param:SECURITY_REQUIRED="$SECURITY_REQUIRED"            \
+	     /param:SORT_DIR=/tmp                                     \
+	     /param:SOURCE_CD="${SOURCE_CD}"                          \
+	     /param:STUDY_ID="$STUDY_ID"                              \
+	     /param:TOP_NODE="$TOP_NODE"
 
     echo "All done."
     exit 0
+fi
+
+if [ -z "$R_JOBS_ORA" ]; then
+    if [ -z "$KETTLE_JOBS_ORA" ]; then
+        echo "Error: Neither R_JOBS_ORA nor KETTLE_JOBS_ORA parameter has been set"
+        exit 1
+    else
+        R_JOBS_ORA="${KETTLE_JOBS_ORA}/../../R"
+    fi
 fi
 
 RSCRIPT="Rscript"
@@ -116,12 +110,13 @@ if ! type "$RSCRIPT" 2>&1 > /dev/null; then
     fi
 fi
 
+
 # The unpivoted-file which will be loaded into the database
 RNASEQ_DATA_FILE_UPLOAD="${RNASEQ_DATA_FILE}".upload
 
 # Create the unpivoted file to be loaded into the database.
 echo "Start re-arranging input..."
-${RSCRIPT} ${R_JOBS_PSQL}/RNASeq/unpivot_RNASeq_data.R studyID=${STUDY_ID} \
+${RSCRIPT} ${R_JOBS_ORA}/RNASeq/unpivot_RNASeq_data.R studyID=${STUDY_ID} \
                                                        RNASeqFile="${RNASEQ_DATA_FILE}" \
                                                        dataOUT="${RNASEQ_DATA_FILE_UPLOAD}"
 
