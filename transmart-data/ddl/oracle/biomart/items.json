@@ -182,17 +182,6 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "BIOMART",
-      "name" : "BACX_IDX1"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "BIOMART",
-      "name" : "BIO_ANALYSIS_COHORT_XREF"
-    } ]
-  }, {
-    "child" : {
-      "type" : "INDEX",
-      "owner" : "BIOMART",
       "name" : "BAD_IDX13"
     },
     "parents" : [ {
@@ -427,17 +416,6 @@
       "name" : "BIO_ASSAY_ANALYSIS_EQTL"
     },
     "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "INDEX",
-      "owner" : "BIOMART",
-      "name" : "BIO_ASSAY_ANALYSIS_EQTL_IDX1"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "BIOMART",
-      "name" : "BIO_ASSAY_ANALYSIS_EQTL"
-    } ]
   }, {
     "child" : {
       "type" : "TABLE",
@@ -2737,21 +2715,6 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "BIOMART",
-      "name" : "TMP_TRG_BIO_CONCEPT_CODE_ID"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "BIOMART",
-      "name" : "BIO_CONCEPT_CODE"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "BIOMART",
-      "name" : "SEQ_BIO_DATA_ID"
-    } ]
-  }, {
-    "child" : {
-      "type" : "TRIGGER",
-      "owner" : "BIOMART",
       "name" : "TRG_BIO_AD_HOC_PROP_ID"
     },
     "parents" : [ {
@@ -3604,7 +3567,7 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "BIOMART",
-      "name" : "TRIG_CLINICAL_TRIAL_DESIGN_ID "
+      "name" : "TRIG_CLINICAL_TRIAL_DESIGN_ID"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -3819,13 +3782,6 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "BIOMART",
-      "name" : "BACX_IDX1"
-    },
-    "file" : "biomart/bio_analysis_cohort_xref.sql"
-  }, {
-    "item" : {
-      "type" : "INDEX",
-      "owner" : "BIOMART",
       "name" : "BAD_IDX13"
     },
     "file" : "biomart/bio_assay_analysis_data.sql"
@@ -3974,13 +3930,6 @@
       "type" : "TABLE",
       "owner" : "BIOMART",
       "name" : "BIO_ASSAY_ANALYSIS_EQTL"
-    },
-    "file" : "biomart/bio_assay_analysis_eqtl.sql"
-  }, {
-    "item" : {
-      "type" : "INDEX",
-      "owner" : "BIOMART",
-      "name" : "BIO_ASSAY_ANALYSIS_EQTL_IDX1"
     },
     "file" : "biomart/bio_assay_analysis_eqtl.sql"
   }, {
@@ -5618,13 +5567,6 @@
     "item" : {
       "type" : "TRIGGER",
       "owner" : "BIOMART",
-      "name" : "TMP_TRG_BIO_CONCEPT_CODE_ID"
-    },
-    "file" : "biomart/bio_concept_code.sql"
-  }, {
-    "item" : {
-      "type" : "TRIGGER",
-      "owner" : "BIOMART",
       "name" : "TRG_BIO_AD_HOC_PROP_ID"
     },
     "file" : "biomart/bio_ad_hoc_property.sql"
@@ -6017,7 +5959,7 @@
     "item" : {
       "type" : "TRIGGER",
       "owner" : "BIOMART",
-      "name" : "TRIG_CLINICAL_TRIAL_DESIGN_ID "
+      "name" : "TRIG_CLINICAL_TRIAL_DESIGN_ID"
     },
     "file" : "biomart/ctd_full.sql"
   }, {

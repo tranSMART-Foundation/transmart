@@ -98,13 +98,34 @@
     "child" : {
       "type" : "REF_CONSTRAINT",
       "owner" : "TS_BATCH",
-      "name" : "JOB_STEP_EXEC_CTX_FK"
+      "name" : "STEP_EXEC_CTX_FK"
     },
     "parents" : [ {
       "type" : "TABLE",
       "owner" : "TS_BATCH",
       "name" : "BATCH_STEP_EXECUTION_CONTEXT"
     } ]
+  }, {
+    "child" : {
+      "type" : "SEQUENCE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_SEQ"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "SEQUENCE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_SEQ"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "SEQUENCE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION_SEQ"
+    },
+    "parents" : [ ]
   } ],
   "fileAssignments" : [ {
     "item" : {
@@ -180,8 +201,29 @@
     "item" : {
       "type" : "REF_CONSTRAINT",
       "owner" : "TS_BATCH",
-      "name" : "JOB_STEP_EXEC_CTX_FK"
+      "name" : "STEP_EXEC_CTX_FK"
     },
     "file" : "ts_batch/batch_step_execution_context.sql"
+  }, {
+    "item" : {
+      "type" : "SEQUENCE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_EXECUTION_SEQ"
+    },
+    "file" : "ts_batch/_misc.sql"
+  }, {
+    "item" : {
+      "type" : "SEQUENCE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_JOB_SEQ"
+    },
+    "file" : "ts_batch/_misc.sql"
+  }, {
+    "item" : {
+      "type" : "SEQUENCE",
+      "owner" : "TS_BATCH",
+      "name" : "BATCH_STEP_EXECUTION_SEQ"
+    },
+    "file" : "ts_batch/_misc.sql"
   } ]
 }

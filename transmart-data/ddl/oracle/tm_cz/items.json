@@ -607,6 +607,13 @@
     "parents" : [ ]
   }, {
     "child" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_RWG_INVALID_TERMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "CZ_START_AUDIT"
@@ -5743,17 +5750,6 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "TM_CZ",
-      "name" : "IDX_I2B2_SECURE_FULLNAME"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_SECURE"
-    } ]
-  }, {
-    "child" : {
-      "type" : "INDEX",
-      "owner" : "TM_CZ",
       "name" : "IDX_TMP_SUBJ_USUBJID"
     },
     "parents" : [ {
@@ -7128,6 +7124,13 @@
     "file" : "tm_cz/cz_person.sql"
   }, {
     "item" : {
+      "type" : "TABLE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_RWG_INVALID_TERMS"
+    },
+    "file" : "tm_cz/cz_rwg_invalid_terms.sql"
+  }, {
+    "item" : {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "CZ_START_AUDIT"
@@ -7889,13 +7892,6 @@
       "name" : "I2B2_UI_LABEL_CHANGE"
     },
     "file" : "tm_cz/procedures/i2b2_ui_label_change.sql"
-  }, {
-    "item" : {
-      "type" : "INDEX",
-      "owner" : "TM_CZ",
-      "name" : "IDX_I2B2_SECURE_FULLNAME"
-    },
-    "file" : "tm_cz/_cross.sql"
   }, {
     "item" : {
       "type" : "INDEX",

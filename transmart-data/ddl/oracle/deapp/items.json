@@ -8,6 +8,17 @@
     "parents" : [ ]
   }, {
     "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "TR_EVENT_GENE_GENE_ID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_EVENT_GENE"
+    } ]
+  }, {
+    "child" : {
       "type" : "REF_CONSTRAINT",
       "owner" : "DEAPP",
       "name" : "DEXCM_PARENT_CD_FK"
@@ -853,16 +864,31 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "DEAPP",
-      "name" : "TRG_TWO_REGION_EVENT_GENE_ID"
+      "name" : "TRG_TWO_REGION_EVENT_ID"
     },
     "parents" : [ {
       "type" : "SEQUENCE",
       "owner" : "DEAPP",
-      "name" : "DE_TWO_REGION_EVENT_GENE_SEQ"
+      "name" : "DE_TWO_REGION_EVENT_SEQ"
     }, {
       "type" : "TABLE",
       "owner" : "DEAPP",
-      "name" : "DE_TWO_REGION_EVENT_GENE"
+      "name" : "DE_TWO_REGION_EVENT"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "DEAPP",
+      "name" : "TRG_TWO_RGN_JUNCTION_EVENT_ID"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_RGN_JUNCTION_EVENT_SEQ"
+    }, {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_JUNCTION_EVENT"
     } ]
   }, {
     "child" : {
@@ -906,6 +932,39 @@
     } ]
   }, {
     "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "TR_JUNCTION_ASSAY"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_JUNCTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "TR_JUNCTION_UP_CHR"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_JUNCTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "TR_JUNCTION_DOWN_CHR"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_JUNCTION"
+    } ]
+  }, {
+    "child" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
       "name" : "DE_TWO_REGION_JUNCTION_EVENT"
@@ -927,21 +986,6 @@
     },
     "parents" : [ ]
   }, {
-    "child" : {
-      "type" : "TRIGGER",
-      "owner" : "DEAPP",
-      "name" : "TRG_DE_TWO_RGN_JUNCTION_EVENT_ID"
-    },
-    "parents" : [ {
-      "type" : "SEQUENCE",
-      "owner" : "DEAPP",
-      "name" : "DE_TWO_RGN_JUNCTION_EVENT_SEQ"
-    }, {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_TWO_REGION_JUNCTION_EVENT"
-    } ]
- }, {
     "child" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
@@ -1082,6 +1126,17 @@
       "name" : "DE_VARIANT_SUBJECT_SUMMARY_SEQ"
     },
     "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "GEN_VARIANT_SUBJ_DET_CHR_POS"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_SUBJECT_DETAIL"
+    } ]
   }, {
     "child" : {
       "type" : "INDEX",
@@ -1630,7 +1685,7 @@
     "child" : {
       "type" : "REF_CONSTRAINT",
       "owner" : "DEAPP",
-      "name" : "SYS_C0029766"
+      "name" : "GENE_INFO_SOURCE_FK"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -1817,21 +1872,6 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "DEAPP",
-      "name" : "TRG_DE_SUBJECT_SORTED_DEF_ID"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SNP_SUBJECT_SORTED_DEF"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "DEAPP",
-      "name" : "SEQ_DATA_ID"
-    } ]
-  }, {
-    "child" : {
-      "type" : "TRIGGER",
-      "owner" : "DEAPP",
       "name" : "TRG_DE_SUBJ_RBM_DATA_ID"
     },
     "parents" : [ {
@@ -1982,7 +2022,7 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "DEAPP",
-      "name" : "TRG_SNP_SUBJECT_SORTED_DEF_ID"
+      "name" : "TRG_SNP_SUBJ_SORTED_DEF_ID"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -2067,6 +2107,17 @@
       "type" : "REF_CONSTRAINT",
       "owner" : "DEAPP",
       "name" : "VARIANT_SUBJECT_SUMMARY_FK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_SUBJECT_SUMMARY"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "GEN_VARIANT_SUBJ_SUMM_CHR_POS"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -2753,6 +2804,27 @@
     "file" : "deapp/de_two_region_event_gene.sql"
   }, {
     "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "TR_EVENT_GENE_GENE_ID"
+    },
+    "file" : "deapp/de_two_region_event_gene.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_TWO_REGION_EVENT_GENE"
+    },
+    "file" : "deapp/de_two_region_event_gene.sql"
+  }, {
+    "item" : {
+      "type" : "REF_CONSTRAINT",
+      "owner" : "DEAPP",
+      "name" : "TWO_REGION_EVENT_GENE_FK"
+    },
+    "file" : "deapp/de_two_region_event_gene.sql"
+  }, {
+    "item" : {
       "type" : "SEQUENCE",
       "owner" : "DEAPP",
       "name" : "DE_TWO_REGION_EVENT_GENE_SEQ"
@@ -2765,6 +2837,27 @@
       "name" : "TRG_TWO_REGION_EVENT_GENE_ID"
     },
     "file" : "deapp/de_two_region_event_gene.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "TR_JUNCTION_ASSAY"
+    },
+    "file" : "deapp/de_two_region_junction.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "TR_JUNCTION_DOWN_CHR"
+    },
+    "file" : "deapp/de_two_region_junction.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "TR_JUNCTION_UP_CHR"
+    },
+    "file" : "deapp/de_two_region_junction.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -2818,7 +2911,7 @@
     "item" : {
       "type" : "TRIGGER",
       "owner" : "DEAPP",
-      "name" : "TRG_DE_TWO_RGN_JUNCTION_EVENT_ID"
+      "name" : "TRG_TWO_RGN_JUNCTION_EVENT_ID"
     },
     "file" : "deapp/de_two_region_junction_event.sql"
   }, {
@@ -2914,6 +3007,13 @@
     "file" : "deapp/de_variant_subject_idx.sql"
   }, {
     "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "GEN_VARIANT_SUBJ_SUMM_CHR_POS"
+    },
+    "file" : "deapp/de_variant_subject_summary.sql"
+  }, {
+    "item" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
       "name" : "DE_VARIANT_SUBJECT_SUMMARY"
@@ -2926,6 +3026,13 @@
       "name" : "DE_VARIANT_SUBJECT_SUMMARY_SEQ"
     },
     "file" : "deapp/de_variant_subject_summary.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "GEN_VARIANT_SUBJ_DET_CHR_POS"
+    },
+    "file" : "deapp/de_variant_subject_detail.sql"
   }, {
     "item" : {
       "type" : "INDEX",
@@ -3287,7 +3394,7 @@
     "item" : {
       "type" : "REF_CONSTRAINT",
       "owner" : "DEAPP",
-      "name" : "SYS_C0029766"
+      "name" : "GENE_INFO_SOURCE_FK"
     },
     "file" : "deapp/de_gene_info.sql"
   }, {
@@ -3378,13 +3485,6 @@
     "item" : {
       "type" : "TRIGGER",
       "owner" : "DEAPP",
-      "name" : "TRG_DE_SUBJECT_SORTED_DEF_ID"
-    },
-    "file" : "deapp/de_snp_subject_sorted_def.sql"
-  }, {
-    "item" : {
-      "type" : "TRIGGER",
-      "owner" : "DEAPP",
       "name" : "TRG_DE_SUBJ_RBM_DATA_ID"
     },
     "file" : "deapp/de_subject_rbm_data.sql"
@@ -3455,7 +3555,7 @@
     "item" : {
       "type" : "TRIGGER",
       "owner" : "DEAPP",
-      "name" : "TRG_SNP_SUBJECT_SORTED_DEF_ID"
+      "name" : "TRG_SNP_SUBJ_SORTED_DEF_ID"
     },
     "file" : "deapp/de_snp_subject_sorted_def.sql"
   }, {

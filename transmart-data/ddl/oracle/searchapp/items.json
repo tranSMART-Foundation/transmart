@@ -1133,7 +1133,7 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "SEARCHAPP",
-      "name" : "TRG_SRCH_REQ_UPLOAD_FIELD_ID"
+      "name" : "TRG_SRCH_REQ_UP_FIELD_ID"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -1378,7 +1378,7 @@
     "item" : {
       "type" : "REF_CONSTRAINT",
       "owner" : "SEARCHAPP",
-      "name" : "IMPORT_XNAT_VARIABLE_FK"
+      "name" : "IMPORT_XNAT_VAR_FK"
     },
     "file" : "searchapp/import_xnat_variable.sql"
   }, {
@@ -1903,7 +1903,7 @@
     "item" : {
       "type" : "TRIGGER",
       "owner" : "SEARCHAPP",
-      "name" : "TRG_SRCH_REQ_UPLOAD_FIELD_ID"
+      "name" : "TRG_SRCH_REQ_UP_FIELD_ID"
     },
     "file" : "searchapp/search_required_upload_field.sql"
   }, {
