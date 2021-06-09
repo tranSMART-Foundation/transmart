@@ -62,16 +62,16 @@ class QueriesResourceService implements QueriesResource {
 
     @Transactional
     QueryResult runQuery(QueryDefinition definition, String username) throws InvalidRequestException {
-        // 1. Populate qt_query_master
-        QtQueryMaster queryMaster = new QtQueryMaster(
+        // 1. Populate qtm_query_master
+        QtmQueryMaster queryMaster = new QtmQueryMaster(
             name           : definition.name,
 	    userId         : username,
             groupId        : i2b2GroupId,
             createDate     : new Date(),
             requestXml     : queryDefinitionXmlService.toXml(definition))
 
-        // 2. Populate qt_query_instance
-        QtQueryInstance queryInstance = new QtQueryInstance(
+        // 2. Populate qtm_query_instance
+        QtmQueryInstance queryInstance = new QtmQueryInstance(
                 userId       : username,
                 groupId      : i2b2GroupId,
                 startDate    : new Date(),
@@ -79,8 +79,8 @@ class QueriesResourceService implements QueriesResource {
                 queryMaster  : queryMaster)
         addToQueryInstances queryMaster, queryInstance
 
-        // 3. Populate qt_query_result_instance
-        QtQueryResultInstance resultInstance = new QtQueryResultInstance(
+        // 3. Populate qtm_query_result_instance
+        QtmQueryResultInstance resultInstance = new QtmQueryResultInstance(
                 statusTypeId  : QueryStatus.PROCESSING.id,
                 startDate     : new Date(),
                 queryInstance : queryInstance)
@@ -88,10 +88,10 @@ class QueriesResourceService implements QueriesResource {
 
         // 4. Save the three objects
         if (!queryMaster.validate()) {
-            throw new InvalidRequestException('Could not create a valid QtQueryMaster: ' + queryMaster.errors)
+            throw new InvalidRequestException('Could not create a valid QtmQueryMaster: ' + queryMaster.errors)
         }
         if (!queryMaster.save()) {
-            throw new RuntimeException('Failure saving QtQueryMaster')
+            throw new RuntimeException('Failure saving QtmQueryMaster')
         }
 
         // 5. Flush session so objects are inserted & raw SQL can access them
@@ -111,7 +111,7 @@ class QueriesResourceService implements QueriesResource {
 
 	    setSize = sql.executeUpdate(sqlString)
 
-	    logger.debug 'Inserted {} rows into qt_patient_set_collection', setSize
+	    logger.debug 'Inserted {} rows into qtm_patient_set_collection', setSize
         }
         catch (InvalidRequestException e) {
             logger.error 'Invalid request; rolling back transaction', e
@@ -162,9 +162,9 @@ class QueriesResourceService implements QueriesResource {
     }
 
     QueryResult getQueryResultFromId(Long id) throws NoSuchResourceException {
-	QtQueryResultInstance qtQueryResultInstance = QtQueryResultInstance.get(id)
-	if (qtQueryResultInstance) {
-	    qtQueryResultInstance
+	QtmQueryResultInstance qtmQueryResultInstance = QtmQueryResultInstance.get(id)
+	if (qtmQueryResultInstance) {
+	    qtmQueryResultInstance
 	}
 	else {
 	    throw new NoSuchResourceException('Could not find query result instance with id ' + id)
@@ -172,9 +172,9 @@ class QueriesResourceService implements QueriesResource {
     }
 
     QueryDefinition getQueryDefinitionForResult(QueryResult result) throws NoSuchResourceException {
-	List<String> requestXmls = QtQueryResultInstance.executeQuery('''
+	List<String> requestXmls = QtmQueryResultInstance.executeQuery('''
 				SELECT R.queryInstance.queryMaster.requestXml
-				FROM QtQueryResultInstance R WHERE R = ?''', [result]) as List<String>
+				FROM QtmQueryResultInstance R WHERE R = ?''', [result]) as List<String>
 	    if (!requestXmls) {
 	    throw new NoSuchResourceException(
 		'Could not find definition for query result with id=' + result.id)
@@ -206,12 +206,12 @@ class QueriesResourceService implements QueriesResource {
     }
 
     @CompileDynamic
-    private void addToQueryInstances(QtQueryMaster queryMaster, QtQueryInstance queryInstance) {
+    private void addToQueryInstances(QtmQueryMaster queryMaster, QtmQueryInstance queryInstance) {
 	queryMaster.addToQueryInstances queryInstance
     }
 
     @CompileDynamic
-    private void addToQueryResults(QtQueryInstance queryInstance, QtQueryResultInstance resultInstance) {
+    private void addToQueryResults(QtmQueryInstance queryInstance, QtmQueryResultInstance resultInstance) {
 	queryInstance.addToQueryResults resultInstance
     }
 }

@@ -210,7 +210,7 @@ class VcfDataService {
 		SELECT DISTINCT a.dataset_id
 		from DEAPP.DE_VARIANT_SUBJECT_IDX a
 		INNER JOIN DEAPP.de_subject_sample_mapping b on a.SUBJECT_ID = b.SUBJECT_ID 
-		INNER JOIN I2B2DEMODATA.qt_patient_set_collection sc ON sc.result_instance_id in (?) AND b.patient_id = sc.patient_num
+		INNER JOIN I2B2DEMODATA.qtm_patient_set_collection sc ON sc.result_instance_id in (?) AND b.patient_id = sc.patient_num
 '''
 
 	List params = []
@@ -236,7 +236,7 @@ class VcfDataService {
 			SELECT distinct a.DATASET_ID, a.SUBJECT_ID, a.POSITION
 			from DEAPP.DE_VARIANT_SUBJECT_IDX a
 			INNER JOIN DEAPP.de_subject_sample_mapping b on a.SUBJECT_ID = b.SUBJECT_ID
-			INNER JOIN I2B2DEMODATA.qt_patient_set_collection sc ON sc.result_instance_id in (?) AND b.patient_id = sc.patient_num
+			INNER JOIN I2B2DEMODATA.qtm_patient_set_collection sc ON sc.result_instance_id in (?) AND b.patient_id = sc.patient_num
 			ORDER BY a.POSITION
 		'''
 

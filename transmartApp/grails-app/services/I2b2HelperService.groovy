@@ -45,7 +45,7 @@ import org.transmartproject.db.i2b2data.ConceptDimension
 import org.transmartproject.db.i2b2data.ObservationFact
 import org.transmartproject.db.ontology.AcrossTrialsOntologyTerm
 import org.transmartproject.db.ontology.I2b2
-import org.transmartproject.db.querytool.QtPatientSetCollection
+import org.transmartproject.db.querytool.QtmPatientSetCollection
 import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
@@ -153,7 +153,7 @@ class I2b2HelperService implements InitializingBean {
 		pt.trial IN (''' + authStudiesString + ''') AND
 		f.patient_num IN (
 		    select distinct patient_num
-		    from I2B2DEMODATA.qt_patient_set_collection
+		    from I2B2DEMODATA.qtm_patient_set_collection
 		    where result_instance_id = ?)'''
 	eachRow(sql, [resultInstanceId]) { row ->
 	    String id = rowGet(row, 2, String)
@@ -453,7 +453,7 @@ class I2b2HelperService implements InitializingBean {
 			WHERE CONCEPT_CD = ?
 			AND PATIENT_NUM IN (
 				select distinct patient_num
-				from I2B2DEMODATA.qt_patient_set_collection
+				from I2B2DEMODATA.qtm_patient_set_collection
 				where result_instance_id = ?)'''
 	    values = []
             try {
@@ -487,7 +487,7 @@ class I2b2HelperService implements InitializingBean {
 		WHERE CONCEPT_CD = ?
 		AND PATIENT_NUM IN (
 			select distinct patient_num
-			from I2B2DEMODATA.qt_patient_set_collection
+			from I2B2DEMODATA.qtm_patient_set_collection
 	where result_instance_id = ?)'''
 	eachRow(sql, [conceptCode, resultInstanceId]) { row ->
 	    Double nval = rowGet(row, 'NVAL_NUM', Double)
@@ -513,7 +513,7 @@ class I2b2HelperService implements InitializingBean {
 		select count(*) as patcount
             FROM (
                 SELECT DISTINCT pd.sourcesystem_cd AS subject_id
-			FROM I2B2DEMODATA.qt_patient_set_collection ps
+			FROM I2B2DEMODATA.qtm_patient_set_collection ps
 			JOIN I2B2DEMODATA.patient_dimension pd ON ps.patient_num=pd.patient_num
                     JOIN patient_trial pt ON pt.patient_num = ps.patient_num
                 WHERE ps.result_instance_id = CAST(? AS numeric)
@@ -540,12 +540,12 @@ class I2b2HelperService implements InitializingBean {
 		select count(*) as patcount
         FROM (
                 SELECT DISTINCT pd.sourcesystem_cd AS subject_id
-			from I2B2DEMODATA.qt_patient_set_collection a
-			inner join I2B2DEMODATA.qt_patient_set_collection b
+			from I2B2DEMODATA.qtm_patient_set_collection a
+			inner join I2B2DEMODATA.qtm_patient_set_collection b
                 on a.patient_num=b.patient_num and a.result_instance_id = CAST(? AS numeric)
 			join I2B2DEMODATA.patient_dimension pd
                 on b.patient_num=pd.patient_num and b.result_instance_id = CAST(? AS numeric)
-        ) qt_patient_set'''
+        ) qtm_patient_set'''
 
 	int i = 0
 	eachRow(sql, [resultInstanceId1, resultInstanceId2]) { row ->
@@ -701,7 +701,7 @@ class I2b2HelperService implements InitializingBean {
                     AND concept_cd != 'SECURITY'
 			AND f.patient_num IN (
 				select distinct patient_num
-				from I2B2DEMODATA.qt_patient_set_collection
+				from I2B2DEMODATA.qtm_patient_set_collection
                         where result_instance_id = ?)
 		) subjectList'''
 
@@ -776,7 +776,7 @@ class I2b2HelperService implements InitializingBean {
 					)
                     AND PATIENT_NUM IN (
                         select distinct patient_num
-				from I2B2DEMODATA.qt_patient_set_collection
+				from I2B2DEMODATA.qtm_patient_set_collection
 				where result_instance_id = ?
 			)
 		) subjectList'''
@@ -820,7 +820,7 @@ class I2b2HelperService implements InitializingBean {
 			INNER JOIN I2B2DEMODATA.patient_trial t ON p.patient_num = t.patient_num
 			WHERE p.PATIENT_NUM IN (
 				SELECT DISTINCT ps.patient_num
-				FROM I2B2DEMODATA.qt_patient_set_collection ps
+				FROM I2B2DEMODATA.qtm_patient_set_collection ps
                         JOIN patient_trial pt ON pt.patient_num = ps.patient_num
 				WHERE
                             pt.trial IN (''' + authStudiesString + ''') AND
@@ -879,7 +879,7 @@ class I2b2HelperService implements InitializingBean {
 		FROM DEAPP.de_subject_sample_mapping f
 		WHERE f.PATIENT_ID IN (
 			SELECT DISTINCT patient_num
-			FROM I2B2DEMODATA.qt_patient_set_collection
+			FROM I2B2DEMODATA.qtm_patient_set_collection
 			WHERE result_instance_id = ?)
             ORDER BY PATIENT_ID, SAMPLE_CD'''
 	for (row in new Sql(dataSource).rows(sql, resultInstanceId)) {
@@ -1077,9 +1077,9 @@ class I2b2HelperService implements InitializingBean {
         }
 
         // Determine the patients to query
-	List<Long> patientIds = QtPatientSetCollection.executeQuery('''
+	List<Long> patientIds = QtmPatientSetCollection.executeQuery('''
 		SELECT q.patient.id
-		FROM QtPatientSetCollection q
+		FROM QtmPatientSetCollection q
 		WHERE q.resultInstance.id = ?''',
 		[resultInstanceId.toLong()]) as List<Long>
 
@@ -1165,7 +1165,7 @@ class I2b2HelperService implements InitializingBean {
 			WHERE CONCEPT_CD = ?
 			AND PATIENT_NUM IN (
 				select distinct patient_num
-				from I2B2DEMODATA.qt_patient_set_collection
+				from I2B2DEMODATA.qtm_patient_set_collection
 				where result_instance_id = ?)'''
 	eachRow(sql, [conceptCode, resultInstanceId]) { row ->
 	    def value
@@ -1228,7 +1228,7 @@ class I2b2HelperService implements InitializingBean {
                     AND concept_cd != 'SECURITY'
 			AND PATIENT_NUM IN (
 				select distinct ps.patient_num
-				from I2B2DEMODATA.qt_patient_set_collection ps
+				from I2B2DEMODATA.qtm_patient_set_collection ps
                         	JOIN patient_trial pt ON pt.patient_num = ps.patient_num
 				where pt.trial IN (''' + authStudiesString + ''') AND 
 				result_instance_id = ?
@@ -1278,7 +1278,7 @@ class I2b2HelperService implements InitializingBean {
 		SELECT cat, COUNT(subject_id) as demcount
         FROM (
                 SELECT DISTINCT UPPER(''' + col + ''') as cat, pd.sourcesystem_cd AS subject_id
-			FROM I2B2DEMODATA.qt_patient_set_collection ps
+			FROM I2B2DEMODATA.qtm_patient_set_collection ps
 			JOIN I2B2DEMODATA.patient_dimension pd
                 ON ps.patient_num=pd.patient_num AND result_instance_id = ?
                 JOIN patient_trial pt ON pt.patient_num = ps.patient_num
@@ -1306,9 +1306,9 @@ class I2b2HelperService implements InitializingBean {
 	List<String> concepts = []
 	String sql = '''
 		SELECT REQUEST_XML
-		FROM I2B2DEMODATA.QT_QUERY_MASTER c
-		INNER JOIN I2B2DEMODATA.QT_QUERY_INSTANCE a ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID
-		INNER JOIN I2B2DEMODATA.QT_QUERY_RESULT_INSTANCE b ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID
+		FROM I2B2DEMODATA.QTM_QUERY_MASTER c
+		INNER JOIN I2B2DEMODATA.QTM_QUERY_INSTANCE a ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID
+		INNER JOIN I2B2DEMODATA.QTM_QUERY_RESULT_INSTANCE b ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID
 		WHERE RESULT_INSTANCE_ID = ?'''
 
         String xmlrequest = ''
@@ -1395,7 +1395,7 @@ class I2b2HelperService implements InitializingBean {
 		WHERE and x.parent_cd=?
 		and x.study_id IN (
 				select distinct p.trial
-			from I2B2DEMODATA.qt_patient_set_collection q
+			from I2B2DEMODATA.qtm_patient_set_collection q
 			inner join I2B2DEMODATA.patient_trial p on q.patient_num=p.patient_num
 			where q.result_instance_id=?'''
 	List args = [parentConcept]
@@ -1463,7 +1463,7 @@ class I2b2HelperService implements InitializingBean {
     String getQueryDefinitionXMLFromQID(String qid) {
 
         String xmlrequest = ''
-	String sqlt = '''select REQUEST_XML from I2B2DEMODATA.QT_QUERY_MASTER WHERE QUERY_MASTER_ID = ?'''
+	String sqlt = '''select REQUEST_XML from I2B2DEMODATA.QTM_QUERY_MASTER WHERE QUERY_MASTER_ID = ?'''
 	eachRow(sqlt, [qid]) { row ->
 	    def clob = rowGet(row, 'REQUEST_XML', Object)
 	    xmlrequest = clobToString(clob)
@@ -1480,9 +1480,9 @@ class I2b2HelperService implements InitializingBean {
 
 	String sql = '''
 		select REQUEST_XML
-		from I2B2DEMODATA.QT_QUERY_MASTER c
-		INNER JOIN I2B2DEMODATA.QT_QUERY_INSTANCE a ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID
-		INNER JOIN I2B2DEMODATA.QT_QUERY_RESULT_INSTANCE b ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID
+		from I2B2DEMODATA.QTM_QUERY_MASTER c
+		INNER JOIN I2B2DEMODATA.QTM_QUERY_INSTANCE a ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID
+		INNER JOIN I2B2DEMODATA.QTM_QUERY_RESULT_INSTANCE b ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID
 		WHERE RESULT_INSTANCE_ID = ?'''
 	eachRow(sql, [resultInstanceId]) { row ->
 	    def clob = rowGet(row, 'REQUEST_XML', Object)
@@ -1502,7 +1502,7 @@ class I2b2HelperService implements InitializingBean {
 
 	String sql = '''
 		select distinct patient_num
-		from I2B2DEMODATA.qt_patient_set_collection
+		from I2B2DEMODATA.qtm_patient_set_collection
 		where result_instance_id = ?
 		  AND patient_num IN (
 		     select patient_num
@@ -1527,7 +1527,7 @@ class I2b2HelperService implements InitializingBean {
 	List<String> subjectIds = []
 	String sql = '''
 		select distinct patient_num
-		from I2B2DEMODATA.qt_patient_set_collection
+		from I2B2DEMODATA.qtm_patient_set_collection
 		where result_instance_id = ?'''
 	eachRow(sql, [resultInstanceId]) { row ->
 	    subjectIds << rowGet(row, 'PATIENT_NUM', String)
@@ -3906,7 +3906,7 @@ class I2b2HelperService implements InitializingBean {
 	String sql = '''
                 select distinct gene
                 from DEAPP.haploview_data a
-                inner join I2B2DEMODATA.qt_patient_set_collection b on a.I2B2_ID=b.patient_num
+                inner join I2B2DEMODATA.qtm_patient_set_collection b on a.I2B2_ID=b.patient_num
                 where result_instance_id = ?
                 order by gene asc'''
 	eachRow(sql, [resultInstanceId as Long]) { row ->
@@ -4643,7 +4643,7 @@ class I2b2HelperService implements InitializingBean {
 		FROM I2B2DEMODATA.PATIENT_TRIAL t
 		WHERE t.PATIENT_NUM IN (
 			select distinct patient_num
-			from I2B2DEMODATA.qt_patient_set_collection
+			from I2B2DEMODATA.qtm_patient_set_collection
 			where result_instance_id'''
 
 	if (rid1 || rid2) {
@@ -4676,7 +4676,7 @@ class I2b2HelperService implements InitializingBean {
 	String sql = '''
 		SELECT distinct trial, SECURE_OBJ_TOKEN
 		FROM I2B2DEMODATA.patient_trial pt
-		JOIN I2B2DEMODATA.qt_patient_set_collection psc
+		JOIN I2B2DEMODATA.qtm_patient_set_collection psc
                     ON pt.patient_num=psc.patient_num
             WHERE psc.result_instance_id = ?
 				ORDER BY trial'''

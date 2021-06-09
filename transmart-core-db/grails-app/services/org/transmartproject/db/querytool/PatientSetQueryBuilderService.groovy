@@ -129,11 +129,11 @@ class PatientSetQueryBuilderService {
         }
     }
 
-    String buildPatientSetQuery(QtQueryResultInstance resultInstance, QueryDefinition definition,
+    String buildPatientSetQuery(QtmQueryResultInstance resultInstance, QueryDefinition definition,
                                 User user = null) throws InvalidRequestException {
 
         if (!resultInstance.id) {
-            throw new RuntimeException('QtQueryResultInstance has not been persisted')
+            throw new RuntimeException('QtmQueryResultInstance has not been persisted')
         }
 
         String patientSubQuery = buildPatientIdListQuery(definition, user)
@@ -145,7 +145,7 @@ class PatientSetQueryBuilderService {
             windowFunctionOrderBy = 'ORDER BY patient_num'
         }
 
-        String sql = 'INSERT INTO I2B2DEMODATA.qt_patient_set_collection (result_instance_id, patient_num, set_index) ' +
+        String sql = 'INSERT INTO I2B2DEMODATA.qtm_patient_set_collection (result_instance_id, patient_num, set_index) ' +
                 "SELECT ${resultInstance.id}, P.patient_num, " +
                 " row_number() OVER ($windowFunctionOrderBy) " +
                 "FROM ($patientSubQuery ORDER BY 1) P"

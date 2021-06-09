@@ -94,7 +94,7 @@ class GeneExpressionDataService {
 				SELECT DISTINCT ssm.assay_id, ssm.sample_type, ssm.timepoint, ssm.tissue_type,
 				                ssm.sample_cd, ssm.trial_name, ssm.GPL_ID
 				FROM DEAPP.de_subject_sample_mapping ssm
-				INNER JOIN I2B2DEMODATA.qt_patient_set_collection sc
+				INNER JOIN I2B2DEMODATA.qtm_patient_set_collection sc
 				ON sc.result_instance_id = ? AND ssm.patient_id = sc.patient_num
 				WHERE ssm.trial_name = ?'''
 
@@ -141,7 +141,7 @@ class GeneExpressionDataService {
 		   FROM DEAPP.de_subject_microarray_data a
 		   INNER JOIN DEAPP.de_subject_sample_mapping ssm ON ssm.assay_id = A.assay_id
 		   INNER JOIN DEAPP.de_mrna_annotation b ON a.probeset_id = b.probeset_id and ssm.gpl_id = b.gpl_id
-		   INNER JOIN I2B2DEMODATA.qt_patient_set_collection sc ON sc.result_instance_id = ? AND ssm.PATIENT_ID = sc.patient_num
+		   INNER JOIN I2B2DEMODATA.qtm_patient_set_collection sc ON sc.result_instance_id = ? AND ssm.PATIENT_ID = sc.patient_num
          INNER JOIN I2B2DEMODATA.PATIENT_DIMENSION pd on ssm.patient_id = pd.patient_num
 	   '''
 
@@ -241,9 +241,9 @@ class GeneExpressionDataService {
 
 	assayS << '''
 			SELECT DISTINCT s.assay_id
-			FROM DEAPP.de_subject_sample_mapping s, I2B2DEMODATA.qt_patient_set_collection qt
-			WHERE qt.patient_num = s.patient_id
-			  AND qt.result_instance_id = ? '''
+			FROM DEAPP.de_subject_sample_mapping s, I2B2DEMODATA.qtm_patient_set_collection qtm
+			WHERE qtm.patient_num = s.patient_id
+			  AND qtm.result_instance_id = ? '''
 
 	if (sampleTypes) {
 	    assayS << ' AND s.sample_type_cd IN ' << convertStringToken(sampleTypes)
@@ -658,11 +658,11 @@ class GeneExpressionDataService {
 					SELECT DISTINCT ssm.patient_id
 					FROM DEAPP.de_subject_sample_mapping ssm
 							INNER JOIN (SELECT DISTINCT patient_num 
-					            FROM I2B2DEMODATA.qt_patient_set_collection
+					            FROM I2B2DEMODATA.qtm_patient_set_collection
 							            WHERE result_instance_id = ?
 							            INTERSECT
 							            SELECT DISTINCT patient_num 
-					            FROM I2B2DEMODATA.qt_patient_set_collection
+					            FROM I2B2DEMODATA.qtm_patient_set_collection
 					            WHERE result_instance_id = ?
 					            ) sc ON ssm.patient_id = sc.patient_num
 							'''
@@ -749,7 +749,7 @@ class GeneExpressionDataService {
 		SELECT DISTINCT ssm.patient_id, ssm.sample_type, ssm.timepoint, ssm.tissue_type, sc.result_instance_id
 		FROM DEAPP.de_subject_sample_mapping ssm
 		   INNER JOIN (SELECT DISTINCT patient_num, result_instance_id 
-		            FROM I2B2DEMODATA.qt_patient_set_collection
+		            FROM I2B2DEMODATA.qtm_patient_set_collection
 		            WHERE result_instance_id IN (''' + resultInstanceIds + ')' + '''
 		           ) sc ON ssm.patient_id = sc.patient_num
 		WHERE ssm.trial_name IN (''' + convertList(studyList, true, 100) + ')' + '''
@@ -770,7 +770,7 @@ class GeneExpressionDataService {
 		INNER JOIN DEAPP.de_subject_sample_mapping ssm ON (ssm.trial_name = A.trial_name AND ssm.assay_id = A.assay_id)
 		INNER JOIN I2B2DEMODATA.patient_dimension pd ON a.patient_id = pd.patient_num
 	   		INNER JOIN (SELECT DISTINCT patient_num 
-					                  FROM qt_patient_set_collection 
+					                  FROM qtm_patient_set_collection 
 		            WHERE result_instance_id IN (''' + resultInstanceIds + ')' + '''
 		           ) sc ON ssm.patient_id = sc.patient_num
 		WHERE ssm.trial_name IN (''' + toListString(studyList) + ')' + '''
@@ -785,7 +785,7 @@ class GeneExpressionDataService {
 	   	SELECT DISTINCT ssm.assay_id, ssm.sample_type, ssm.timepoint, ssm.tissue_type, ssm.sample_cd, ssm.trial_name, ssm.GPL_ID
       FROM DEAPP.de_subject_sample_mapping ssm
       INNER JOIN (SELECT DISTINCT patient_num
-					                  FROM qt_patient_set_collection 
+					                  FROM qtm_patient_set_collection 
                   WHERE result_instance_id IN (''' + resultInstanceIds + ')' + '''
 		           ) sc ON ssm.patient_id = sc.patient_num
 		WHERE ssm.trial_name IN (''' + toListString(studyList) + ')' + '''

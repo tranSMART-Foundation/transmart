@@ -24,7 +24,7 @@ class I2b2ExportHelperService {
 
 	String sql = '''
 			select DISTINCT b.TRIAL
-			FROM i2b2demodata.QT_PATIENT_SET_COLLECTION a
+			FROM i2b2demodata.QTM_PATIENT_SET_COLLECTION a
 			INNER JOIN i2b2demodata.PATIENT_TRIAL b ON a.PATIENT_NUM=b.PATIENT_NUM
 			WHERE RESULT_INSTANCE_ID IN(''' + rids.join(", ") + ')'
 	List<String> trials = []

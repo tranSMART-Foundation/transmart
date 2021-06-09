@@ -30,7 +30,7 @@ class DataCountService {
 				FROM DEAPP.de_subject_snp_dataset snp
 				WHERE snp.patient_num IN (
 					SELECT DISTINCT patient_num
-					FROM I2B2DEMODATA.qt_patient_set_collection
+					FROM I2B2DEMODATA.qtm_patient_set_collection
 					WHERE result_instance_id = ?
 					  AND patient_num IN (
 						select patient_num

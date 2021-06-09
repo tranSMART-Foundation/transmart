@@ -146,7 +146,7 @@ class MetadataService {
 					   from DEAPP.de_subject_sample_mapping s
 				  where s.trial_name = ? and patient_id in (
 					      SELECT DISTINCT sc.patient_num
-					      FROM I2B2DEMODATA.qt_patient_set_collection sc, I2B2DEMODATA.patient_dimension pd
+					      FROM I2B2DEMODATA.qtm_patient_set_collection sc, I2B2DEMODATA.patient_dimension pd
 					      WHERE sc.result_instance_id = ?
 					        AND sc.patient_num = pd.patient_num
 				)

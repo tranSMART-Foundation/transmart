@@ -67,7 +67,7 @@ class SnpDataService {
 				WHERE platform = 'SNP'
 				  and patient_id in (
 					SELECT DISTINCT patient_num 
-						FROM I2B2DEMODATA.qt_patient_set_collection
+						FROM I2B2DEMODATA.qtm_patient_set_collection
 						WHERE result_instance_id = ?
 				  )
 			'''
@@ -105,7 +105,7 @@ class SnpDataService {
 		inner join deapp.DE_SAMPLE_SNP_DATA dssd on dssm.sample_cd = dssd.sample_id
                 where dssm.patient_id in (
                     select distinct patient_num
-                    from i2b2demodata.qt_patient_set_collection
+                    from i2b2demodata.qtm_patient_set_collection
                     where result_instance_id = ?
                 )'''
 	def first = new Sql(dataSource).firstRow(query, Integer.valueOf(resultInstanceId))
@@ -175,7 +175,7 @@ class SnpDataService {
 				INNER JOIN DEAPP.de_subject_sample_mapping dssm on ssd.patient_num=dssm.omic_patient_id
 				WHERE dssm.patient_id IN (
 					SELECT DISTINCT patient_num
-					FROM I2B2DEMODATA.qt_patient_set_collection
+					FROM I2B2DEMODATA.qtm_patient_set_collection
 					WHERE result_instance_id = ?
 				)'''
 
@@ -346,7 +346,7 @@ class SnpDataService {
 	sTables << '''
 				FROM DEAPP.DE_SUBJECT_SAMPLE_MAPPING DSM
 				INNER JOIN I2B2DEMODATA.patient_dimension PD ON DSM.patient_id = PD.patient_num
-				INNER JOIN I2B2DEMODATA.qt_patient_set_collection qt ON qt.result_instance_id = ? AND qt.PATIENT_NUM = DSM.PATIENT_ID
+				INNER JOIN I2B2DEMODATA.qtm_patient_set_collection qtm ON qtm.result_instance_id = ? AND qtm.PATIENT_NUM = DSM.PATIENT_ID
 				INNER JOIN DEAPP.DE_SAMPLE_SNP_DATA SNP ON DSM.SAMPLE_CD = SNP.SAMPLE_ID
 				INNER JOIN DEAPP.DE_SNP_GENE_MAP D2 ON D2.SNP_NAME = SNP.SNP_NAME
 				INNER JOIN BIOMART.bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = ''' + databasePortabilityService.toChar('D2.ENTREZ_GENE_ID')

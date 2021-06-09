@@ -32,7 +32,7 @@ import org.transmartproject.core.querytool.QueryDefinitionXmlConverter
 /**
  * Handles conversions of {@link org.transmartproject.core.querytool
  * .QueryDefinition}s to and from XML strings, as they are stored in
- * qt_query_master.
+ * qtm_query_master.
  */
 class QueryDefinitionXmlService implements QueryDefinitionXmlConverter {
 

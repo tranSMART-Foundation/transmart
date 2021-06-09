@@ -40,7 +40,7 @@ class PlinkService {
 			from DEAPP.DE_SUBJECT_SNP_DATASET a
 			INNER JOIN DEAPP.de_subject_sample_mapping c on c.omic_patient_id=a.patient_num
 			INNER JOIN (SELECT DISTINCT patient_num
-		            FROM I2B2DEMODATA.qt_patient_set_collection
+		            FROM I2B2DEMODATA.qtm_patient_set_collection
 		            WHERE result_instance_id = ?
 		              AND patient_num IN
 		                 (SELECT patient_num

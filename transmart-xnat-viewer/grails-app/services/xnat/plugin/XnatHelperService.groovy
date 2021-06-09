@@ -34,7 +34,7 @@ class XnatHelperService implements InitializingBean {
 		INNER JOIN I2B2DEMODATA.patient_trial t ON p.patient_num = t.patient_num
 		WHERE p.PATIENT_NUM IN (
 			SELECT DISTINCT patient_num
-			FROM I2B2DEMODATA.qt_patient_set_collection
+			FROM I2B2DEMODATA.qtm_patient_set_collection
 			WHERE result_instance_id=?
 		)
 	) I

@@ -21,13 +21,13 @@ class SampleService implements InitializingBean {
 
     private Map<String, String> sampleBreakdownMap
 
-    //Populate the QT_PATIENT_SAMPLE_COLLECTION table based on a result_instance_id.
+    //Populate the QTM_PATIENT_SAMPLE_COLLECTION table based on a result_instance_id.
     void generateSampleCollection(String resultInstanceId) {
 	new Sql(dataSource).execute('''
-			INSERT INTO I2B2DEMODATA.QT_PATIENT_SAMPLE_COLLECTION (SAMPLE_ID, PATIENT_ID, RESULT_INSTANCE_ID)
+			INSERT INTO I2B2DEMODATA.QTM_PATIENT_SAMPLE_COLLECTION (SAMPLE_ID, PATIENT_ID, RESULT_INSTANCE_ID)
 			SELECT DISTINCT DSSM.SAMPLE_ID, DSSM.patient_id, ?
-			FROM I2B2DEMODATA.QT_PATIENT_SET_COLLECTION QT
-			INNER JOIN DEAPP.DE_SUBJECT_SAMPLE_MAPPING DSSM ON DSSM.PATIENT_ID = QT.PATIENT_NUM
+			FROM I2B2DEMODATA.QTM_PATIENT_SET_COLLECTION QTM
+			INNER JOIN DEAPP.DE_SUBJECT_SAMPLE_MAPPING DSSM ON DSSM.PATIENT_ID = QTM.PATIENT_NUM
 			WHERE RESULT_INSTANCE_ID = ?''',
 			resultInstanceId.toInteger(), resultInstanceId.toInteger())
     }
