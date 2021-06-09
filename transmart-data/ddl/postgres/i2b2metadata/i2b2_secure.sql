@@ -32,12 +32,33 @@ CREATE TABLE i2b2_secure (
 );
 
 --
--- Name: idx_i2b2_secure_fullname; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: i2b2_sec_srcsys; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX idx_i2b2_secure_fullname ON i2b2_secure USING btree (c_fullname);
+CREATE INDEX sec_srcsys ON i2b2_secure USING btree (sourcesystem_cd);
 
 --
--- Name: idx_i2b2_secure_fullname; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: i2b2_sec_name_cd_lvl; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX i2b2_secure_srcsystem_cd_idx ON i2b2_secure USING btree (sourcesystem_cd);
+CREATE INDEX i2b2_sec_name_cd_lvl ON i2b2_secure USING btree (c_fullname, c_synonym_cd, c_hlevel);
+
+--
+-- Name: i2b2_sec_name_cd_vid; Type: INDEX; Schema: i2b2metadata; Owner: -
+--
+CREATE INDEX i2b2_sec_name_cd_vd ON i2b2_secure USING btree (c_fullname, c_basecode, c_visualattributes);
+
+--
+-- Name: i2b2_sec_upname; Type: INDEX; Schema: i2b2metadata; Owner: -
+--
+CREATE INDEX i2b2_sec_upname ON i2b2_secure USING btree (upper(c_name));
+
+--
+-- Name: i2b2_sec_name_plus; Type: INDEX; Schema: i2b2metadata; Owner: -
+--
+CREATE INDEX i2b2_sec_name_plus ON i2b2_secure USING btree (c_fullname, c_hlevel, c_synonym_cd, c_visualattributes);
+
+--
+-- Name: i2b2_sec_name; Type: INDEX; Schema: i2b2metadata; Owner: -
+--
+CREATE INDEX i2b2_sec_name ON i2b2_secure USING btree (c_fullname);
+
 

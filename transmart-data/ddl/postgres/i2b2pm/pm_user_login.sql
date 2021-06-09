@@ -9,7 +9,6 @@ CREATE TABLE pm_user_login (
     status_cd character varying(50)
 );
 --
--- Name: pm_user_login_pk; Type: CONSTRAINT; Schema: i2b2pm; Owner: -
+-- Name: pm_user_login_idx; Type: INDEX; Schema: i2b2pm; Owner: -
 --
-ALTER TABLE ONLY pm_user_login
-    ADD CONSTRAINT pm_user_login_pk PRIMARY KEY (entry_date,user_id);
+CREATE INDEX pm_user_login_idx ON pm_user_login USING btree (user_id,entry_date);

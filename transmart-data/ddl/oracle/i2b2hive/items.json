@@ -35,6 +35,13 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "I2B2HIVE",
+      "name" : "HIVE_CELL_PARAMS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
       "name" : "ONT_DB_LOOKUP"
     },
     "parents" : [ ]
@@ -74,6 +81,13 @@
       "name" : "IM_DB_LOOKUP"
     },
     "file" : "i2b2hive/im_db_lookup.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2HIVE",
+      "name" : "HIVE_CELL_PARAMS"
+    },
+    "file" : "i2b2hive/hive_cell_params.sql"
   }, {
     "item" : {
       "type" : "TABLE",

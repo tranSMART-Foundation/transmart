@@ -60,6 +60,12 @@
 \i i2b2demodata/qt_pdo_query_master.sql
 \i i2b2demodata/qt_privilege.sql
 \i i2b2demodata/qt_xml_result.sql
+\i i2b2demodata/qtm_query_master.sql
+\i i2b2demodata/qtm_query_instance.sql
+\i i2b2demodata/qtm_query_result_instance.sql
+\i i2b2demodata/qtm_patient_enc_collection.sql
+\i i2b2demodata/qtm_patient_sample_collection.sql
+\i i2b2demodata/qtm_patient_set_collection.sql
 \i i2b2demodata/ricerca.sql
 \i i2b2demodata/sample_categories.sql
 \i i2b2demodata/sample_dimension.sql

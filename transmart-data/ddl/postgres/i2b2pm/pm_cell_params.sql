@@ -15,9 +15,9 @@ CREATE TABLE pm_cell_params (
     status_cd character varying(50)
 );
 --
--- Name: tf_trg_pm_cell_params_inc(); Type: FUNCTION; Schema: i2b2pm; Owner: -
+-- Name: tf_pm_cell_params_inc(); Type: FUNCTION; Schema: i2b2pm; Owner: -
 --
-CREATE FUNCTION tf_trg_pm_cell_params_inc() RETURNS trigger
+CREATE FUNCTION tf_pm_cell_params_inc() RETURNS trigger
     LANGUAGE plpgsql
 AS $$
 begin
@@ -29,9 +29,9 @@ end;
 $$;
 
 --
--- Name: trg_pm_cell_params_inc; Type: TRIGGER; Schema: i2b2pm; Owner: -
+-- Name: pm_cell_params_inc; Type: TRIGGER; Schema: i2b2pm; Owner: -
 --
-CREATE TRIGGER trg_pm_cell_params_inc BEFORE INSERT ON pm_cell_params FOR EACH ROW EXECUTE PROCEDURE tf_trg_pm_cell_params_inc();
+CREATE TRIGGER pm_cell_params_inc BEFORE INSERT ON pm_cell_params FOR EACH ROW EXECUTE PROCEDURE tf_pm_cell_params_inc();
 --
 -- Name: pm_cell_params_pk; Type: CONSTRAINT; Schema: i2b2pm; Owner: -
 --

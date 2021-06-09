@@ -203,6 +203,17 @@
     "parents" : [ ]
   }, {
     "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_LOGIN_IDX"
+    },
+      "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_LOGIN"
+      } ]
+  }, {
+    "child" : {
       "type" : "TABLE",
       "owner" : "I2B2PM",
       "name" : "PM_USER_PARAMS"
@@ -378,6 +389,13 @@
       "name" : "PM_USER_DATA"
     },
     "file" : "i2b2pm/pm_user_data.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2PM",
+      "name" : "PM_USER_LOGIN_IDX"
+    },
+    "file" : "i2b2pm/pm_user_login.sql"
   }, {
     "item" : {
       "type" : "TABLE",
