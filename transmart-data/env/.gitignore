@@ -4,6 +4,7 @@
 /data-integration
 /groovy
 /groovy-*
+/apache-groovy-*
 /transmart-loader.tar.xz
 /transmart-loader
 /transmart-loader-from-file-server
