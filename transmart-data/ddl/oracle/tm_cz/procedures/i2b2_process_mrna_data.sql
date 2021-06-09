@@ -865,10 +865,10 @@ BEGIN
     commit;
 
     --Build concept Counts
-    --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
-    -- a unique top-level node for mRNA data
+    --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platforms
+    -- and there is no longer a unique top-level node for mRNA data
 
-    tm_cz.i2b2_create_concept_counts(topNode ,jobID );
+    tm_cz.i2b2_create_concept_counts(topNode ,jobID);
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
 
@@ -878,7 +878,7 @@ BEGIN
 
 	--	deletes hidden nodes for a trial one at a time
 
-	tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname);
+	tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname, jobID);
 	stepCt := stepCt + 1;
 	tText := 'Deleted node: ' || r_delNodes.c_fullname;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,SQL%ROWCOUNT,stepCt,'Done');

@@ -77,6 +77,7 @@ BEGIN
 	,update_date
 	,download_date
 	,import_date
+	,start_date
 	,sourcesystem_cd
 	,instance_num
     )
@@ -89,6 +90,7 @@ BEGIN
 	,decode(securedStudy,'N','EXP:PUBLIC','EXP:' || trialID)
 	,'@'
 	,'@'
+	,sysdate
 	,sysdate
 	,sysdate
 	,sysdate

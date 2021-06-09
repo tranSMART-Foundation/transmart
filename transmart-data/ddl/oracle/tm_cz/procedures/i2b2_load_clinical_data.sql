@@ -1017,7 +1017,7 @@ BEGIN
 	'@',
 	'@',
         row_number() over (partition by i.c_basecode, c.patient_num order by a.visit_date) as instance_num
-        ,to_date(a.visit_date,'YYYY/MM/DD HH24:mi')
+        ,coalesce(a.visit_date,sysdate)
       from tm_wz.wrk_clinical_data a
 	   ,i2b2demodata.patient_dimension c
 	   ,tm_wz.wt_trial_nodes t

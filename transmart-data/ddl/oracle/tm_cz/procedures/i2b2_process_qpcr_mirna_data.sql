@@ -736,6 +736,7 @@ BEGIN
 	,nval_num
 	,sourcesystem_cd
 	,import_date
+	,start_date
 	,valueflag_cd
 	,provider_id
 	,location_cd
@@ -750,6 +751,7 @@ BEGIN
 	,'E'  --Stands for Equals for Text Types
 	,null	--	not numeric for qpcr_mirna
 	,m.trial_name
+	,sysdate
 	,sysdate
 	,'@'
 	,'@'
