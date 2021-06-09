@@ -31,3 +31,30 @@ CREATE VIEW biomart.bio_metab_superpathway_view AS
 		       ON ((((b.bio_marker_type)::text = 'METABOLITE'::text)
 			    AND ((b.primary_external_id)::text = (m.hmdb_id)::text))));
 
+--
+-- Name: tf_trg_bio_analysis_att_baal(); Type: FUNCTION; Schema: biomart; Owner: -
+--
+CREATE FUNCTION tf_trg_bio_analysis_att_baal() RETURNS trigger
+    LANGUAGE plpgsql
+AS $$
+begin
+    case TG_OP
+    when ' INSERT' then
+	-- create a new record in the lineage table for each ancestor of this term (including self)
+	insert into bio_analysis_attribute_lineage
+	(bio_analysis_attribute_id, ancestor_term_id, ancestor_search_keyword_id)
+	select :NEW.bio_analysis_attribute_id, skl.ancestor_id, skl.search_keyword_id
+	from searchapp.solr_keywords_lineage skl
+	where skl.term_id = :NEW.term_id;
+    else
+	RAISE EXCEPTION 'This trigger function expects only INSERT';  
+    end case;
+
+    end if;
+end;
+$$;
+
+--
+-- Name: trg_bio_analysis_att_baal; Type: TRIGGER; Schema: biomart; Owner: -
+--
+CREATE TRIGGER trg_bio_analysis_att_baal AFTER INSERT ON bio_analysis_attribute FOR EACH ROW EXECUTE PROCEDURE tf_trg_bio_analysis_att_baal();

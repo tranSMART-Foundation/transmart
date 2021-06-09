@@ -26,7 +26,7 @@
 \i searchapp/search_auth_user_sec_access.sql
 \i searchapp/views/search_auth_user_sec_access_v.sql
 \i searchapp/search_bio_mkr_correl_fast_mv.sql
-\i searchapp/views/search_bio_mkr_correl_fast_view.sql
+\i searchapp/views/search_bio_mkr_correl_fst_view.sql
 \i searchapp/search_taxonomy.sql
 \i searchapp/search_taxonomy_rels.sql
 \i searchapp/views/search_categories.sql

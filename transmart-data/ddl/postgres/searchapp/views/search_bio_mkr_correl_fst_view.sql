@@ -1,7 +1,7 @@
 --
--- Name: search_bio_mkr_correl_fast_view; Type: VIEW; Schema: searchapp; Owner: -
+-- Name: search_bio_mkr_correl_fst_view; Type: VIEW; Schema: searchapp; Owner: -
 --
-CREATE VIEW searchapp.search_bio_mkr_correl_fast_view AS
+CREATE VIEW searchapp.search_bio_mkr_correl_fst_view AS
     SELECT i.search_gene_signature_id AS domain_object_id
 	   , i.bio_marker_id AS asso_bio_marker_id
 	   , 'GENE_SIGNATURE_ITEM'::character varying(40) AS correl_type

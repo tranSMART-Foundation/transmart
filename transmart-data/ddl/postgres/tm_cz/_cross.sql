@@ -36,7 +36,7 @@ ALTER FUNCTION tm_cz.i2b2_add_root_node(character varying, numeric) SET search_p
 
 ALTER FUNCTION tm_cz.i2b2_backout_trial(character varying, character varying, numeric) SET search_path TO tm_cz, i2b2metadata, i2b2demodata, pg_temp;
 
-ALTER FUNCTION tm_cz.i2b2_create_concept_counts(character varying, numeric) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, pg_temp;
+ALTER FUNCTION tm_cz.i2b2_create_concept_counts(character varying, character varying, numeric) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, pg_temp;
 
 ALTER FUNCTION tm_cz.i2b2_create_security_for_trial(character varying, character varying, numeric) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, searchapp, biomart, pg_temp;
 

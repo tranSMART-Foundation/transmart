@@ -14,7 +14,7 @@ BEGIN
     insert into searchapp.search_bio_mkr_correl_fast_mv
     (domain_object_id, asso_bio_marker_id, correl_type, value_metric,  mv_id)    
     select domain_object_id, asso_bio_marker_id, correl_type, value_metric,  mv_id
-       from searchapp.search_bio_mkr_correl_fast_view;  
+       from searchapp.search_bio_mkr_correl_fst_view;  
 
     return true;
 END;

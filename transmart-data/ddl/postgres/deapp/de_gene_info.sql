@@ -2,7 +2,7 @@
 -- Name: de_gene_info; Type: TABLE; Schema: deapp; Owner: -
 --
 CREATE TABLE de_gene_info (
-    gene_info_id serial NOT NULL,
+    gene_info_id int NOT NULL,
     gene_source_id int DEFAULT 1 NOT NULL,
     entrez_id int,
     gene_symbol character varying(100) NOT NULL,
@@ -38,4 +38,21 @@ CREATE INDEX de_gene_info_entrez_id_gene_source_id_idx ON de_gene_info USING btr
 -- Name: de_gene_info_gene_symbol_idx; Type: INDEX; Schema: deapp; Owner: -
 --
 CREATE INDEX de_gene_info_gene_symbol_idx ON de_gene_info USING btree (gene_symbol);
+--
+-- Name: tf_trg_de_gene_info_id(); Type: FUNCTION; Schema: deapp; Owner: -
+--
+CREATE FUNCTION tf_trg_de_gene_info_id() RETURNS trigger
+    LANGUAGE plpgsql
+AS $$
+begin
+    if new.gene_info_id is null then
+        select nextval('deapp.seq_data_id') into new.gene_info_id ;
+    end if;
+    return new;
+end;
+$$;
 
+--
+-- Name: trg_de_gene_info_id; Type: TRIGGER; Schema: deapp; Owner: -
+--
+CREATE TRIGGER trg_de_gene_info_id BEFORE INSERT ON de_gene_info FOR EACH ROW EXECUTE PROCEDURE tf_trg_de_gene_info_id();

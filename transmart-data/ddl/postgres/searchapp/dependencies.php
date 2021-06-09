@@ -13,7 +13,7 @@ $dependencies = array (
     2 => 'search_auth_sec_object_access',
     3 => 'search_auth_user',
   ),
-  'views/search_bio_mkr_correl_fast_view' => 
+  'views/search_bio_mkr_correl_fst_view' => 
   array (
     0 => 'search_gene_signature',
     1 => 'search_gene_signature_item',

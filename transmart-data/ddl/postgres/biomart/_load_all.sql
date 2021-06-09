@@ -32,6 +32,7 @@
 \i biomart/bio_assay.sql
 \i biomart/bio_asy_analysis_pltfm.sql
 \i biomart/bio_assay_analysis.sql
+\i biomart/views/gwas_anlysis.sql
 \i biomart/bio_assay_feature_group.sql
 \i biomart/bio_assay_analysis_data.sql
 \i biomart/bio_assay_analysis_data_tea.sql

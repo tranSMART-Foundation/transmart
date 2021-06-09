@@ -16,9 +16,9 @@ ALTER TABLE ONLY de_snp_subject_sorted_def
     ADD CONSTRAINT sys_c0020607 PRIMARY KEY (snp_subject_sorted_def_id);
 
 --
--- Name: tf_trg_de_snp_subj_sorted_def_id(); Type: FUNCTION; Schema: deapp; Owner: -
+-- Name: tf_trg_snp_subj_sorted_def_id(); Type: FUNCTION; Schema: deapp; Owner: -
 --
-CREATE FUNCTION tf_trg_de_snp_subj_sorted_def_id() RETURNS trigger
+CREATE FUNCTION tf_trg_snp_subj_sorted_def_id() RETURNS trigger
     LANGUAGE plpgsql
 AS $$
 begin
@@ -30,6 +30,6 @@ end;
 $$;
 
 --
--- Name: trg_de_snp_subj_sorted_def_id; Type: TRIGGER; Schema: deapp; Owner: -
+-- Name: trg_snp_subj_sorted_def_id; Type: TRIGGER; Schema: deapp; Owner: -
 --
-CREATE TRIGGER trg_de_snp_subj_sorted_def_id BEFORE INSERT ON de_snp_subject_sorted_def FOR EACH ROW EXECUTE PROCEDURE tf_trg_de_snp_subj_sorted_def_id();
+CREATE TRIGGER trg_snp_subj_sorted_def_id BEFORE INSERT ON de_snp_subject_sorted_def FOR EACH ROW EXECUTE PROCEDURE tf_trg_snp_subj_sorted_def_id();
