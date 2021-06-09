@@ -1,7 +1,6 @@
+# Kettle (Pentaho data integration community edition) 07-sep-20
 KETTLE_VERSION=9.1
 KETTLE_ZIP=9.1.0.0-324
-##KETTLE_VERSION=8.2
-##KETTLE_ZIP=8.2.0.0-342
 
 TRANSMART_RELEASE_BRANCH=release-19.0
 
@@ -16,20 +15,21 @@ CENTOS7_PACKAGES=postgresql tomcat make git rsync \
 			xz-devel pcre2-devel libcurl-devel cairo-devel libxml2-devel \
 			openssl-devel
 
-UBUNTU14_PACKAGES=php5-cli php5-json openjdk-7-jdk
+UBUNTU14_PACKAGES=php5-cli php5-json openjdk-8-jdk
 UBUNTU16_PACKAGES=php7.0-cli php7.0-json
 UBUNTU18_PACKAGES=php7.2-cli php7.2-json openjdk-8-jdk openjdk-8-jre \
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
 UBUNTU20_PACKAGES=php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
 
-# Latest version of groovy-binary
-GROOVY_VERSION=2.4.3
+# Latest version of groovy-binary for Java 8+ 
+
+GROOVY_VERSION=3.0.8
 
 ONDREJ_KEY=E5267A6C
 
-GROOVY_ZIP=groovy-binary-$(GROOVY_VERSION).zip
-GROOVY_URL=http://dl.bintray.com/groovy/maven/$(GROOVY_ZIP)
+GROOVY_ZIP=apache-groovy-binary-$(GROOVY_VERSION).zip
+GROOVY_URL=https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/$(GROOVY_ZIP)
 GROOVY_BIN=groovy-$(GROOVY_VERSION)/bin/groovy
 
 PHP_VERSION=5.5.13
@@ -87,7 +87,7 @@ $(GROOVY_BIN): $(GROOVY_ZIP)
 	touch $@
 
 groovy: $(GROOVY_BIN)
-	ln -s $< $@
+	ln -sf $< $@
 
 $(PHP_TARBALL):
 	curl -f '$(PHP_URL)' > $@
@@ -121,6 +121,10 @@ install_ubuntu_packages18:
 	apt-get update
 	apt-get install -y $(UBUNTU18_PACKAGES)
 
+install_ubuntu_packages20:
+	apt-get update
+	apt-get install -y $(UBUNTU20_PACKAGES)
+
 install_ubuntu_packages:
 	apt-get update
 	apt-get install -y $(UBUNTU_PACKAGES)
@@ -153,7 +157,6 @@ $(KETTLE_ARCHIVE):
 	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
 ## Updated for 9.1: Pentaho no longer has libext directory
-##KETTLE_ORACLE_DRIVER=data-integration/libext/JDBC/$(JDBC_DRIVER_ORA)
 KETTLE_ORACLE_DRIVER=data-integration/lib/$(JDBC_DRIVER_ORA)
 $(KETTLE_ORACLE_DRIVER): $(JDBC_DRIVER_ORA_PATH) data-integration/.keep
 	cp --reflink=auto "$<" "$@"
@@ -186,9 +189,8 @@ ubuntu_deps_root16: install_ubuntu_packages install_ubuntu_packages16 /var/lib/p
 
 ubuntu_deps_root18: install_ubuntu_packages install_ubuntu_packages18 /var/lib/postgresql/tablespaces
 
-# Note: in the release case - we are making a strong assumption that transmart-etl
-#   already exists, is NOT a git archive, and can not be updated
-# ubuntu_deps_regular: update_etl data-integration ../vars groovy
+# Additional dependencies: KETTLE, groovy, create initial transmart-data/vars file
+
 ubuntu_deps_regular: data-integration ../vars groovy
 
 ubuntu_deps_regular14: data-integration ../vars groovy
@@ -196,6 +198,8 @@ ubuntu_deps_regular14: data-integration ../vars groovy
 ubuntu_deps_regular16: data-integration ../vars groovy
 
 ubuntu_deps_regular18: data-integration ../vars groovy
+
+ubuntu_deps_regular20: data-integration ../vars groovy
 
 .DELETE_ON_ERROR:
 
