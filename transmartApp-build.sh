@@ -1473,7 +1473,6 @@ if [ $buildwar == 1 ] || [ $buildgwava == 1 ] ; then
 	cp GWAVA/dist/gwava.war $TOMCAT/webapps/gwava.war
 	echo "Copied gwava.war"
     fi
-xs
 fi
 
 echo "All done"
