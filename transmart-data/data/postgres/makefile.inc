@@ -1,6 +1,8 @@
 # to be included from <schema>/Makefile
 
-include ../../../makefile.inc
+BASE_FOLDER = ../../..
+include $(BASE_FOLDER)/makefile.inc
+include $(BASE_FOLDER)/lib/makefile.inc
 OUTDIR := ../../common/$(THIS_SCHEMA)
 
 export PSQL_COMMAND
