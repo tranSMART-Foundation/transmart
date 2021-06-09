@@ -46,7 +46,7 @@ import static org.transmartproject.db.support.DatabasePortabilityService.Databas
 @TestFor(PatientSetQueryBuilderService)
 class PatientSetQueryBuilderServiceTests {
 
-    QtQueryResultInstance resultInstance
+    QtmQueryResultInstance resultInstance
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -78,7 +78,7 @@ class PatientSetQueryBuilderServiceTests {
         ] as ConceptsResource
         service.conceptsResourceService = conceptsResourceServiceStub
 
-        resultInstance = new QtQueryResultInstance()
+        resultInstance = new QtmQueryResultInstance()
         resultInstance.id = 42
     }
 
@@ -98,7 +98,7 @@ class PatientSetQueryBuilderServiceTests {
         def sql = service.buildPatientSetQuery(resultInstance, definition)
 
         assertThat sql, allOf(
-                startsWith('INSERT INTO I2B2DEMODATA.qt_patient_set_collection'),
+                startsWith('INSERT INTO I2B2DEMODATA.qtm_patient_set_collection'),
                 containsString('SELECT patient_num FROM ' +
                         'I2B2DEMODATA.observation_fact'),
                 containsString('concept_cd IN (SELECT concept_cd FROM ' +
@@ -132,7 +132,7 @@ class PatientSetQueryBuilderServiceTests {
         def sql = service.buildPatientSetQuery(resultInstance, definition)
 
         assertThat sql, allOf(
-                startsWith('INSERT INTO I2B2DEMODATA.qt_patient_set_collection'),
+                startsWith('INSERT INTO I2B2DEMODATA.qtm_patient_set_collection'),
                 containsString('OR (concept_cd IN (SELECT concept_cd FROM ' +
                         'concept_dimension WHERE concept_path LIKE ' +
                         '\'\\\\full\\\\name2\\\\%\')'),

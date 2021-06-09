@@ -34,13 +34,13 @@ import org.transmartproject.core.querytool.QueriesResource
 import org.transmartproject.core.querytool.QueryResult
 import org.transmartproject.db.dataquery.highdim.assayconstraints.*
 import org.transmartproject.db.ontology.I2b2
-import org.transmartproject.db.querytool.QtQueryResultInstance
+import org.transmartproject.db.querytool.QtmQueryResultInstance
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
 
 @TestMixin(GrailsUnitTestMixin)
-@Mock([ I2b2, QtQueryResultInstance ])
+@Mock([ I2b2, QtmQueryResultInstance ])
 @WithGMock
 class StandardAssayConstraintFactoryTests {
 
@@ -107,7 +107,7 @@ class StandardAssayConstraintFactoryTests {
     @Test
     void testCreatePatientSetConstraint() {
         Long queryResultId = -11L
-        QueryResult queryResult = new QtQueryResultInstance()
+        QueryResult queryResult = new QtmQueryResultInstance()
 
         testee.queriesResource.
                 getQueryResultFromId(-11L).returns(queryResult)
@@ -127,7 +127,7 @@ class StandardAssayConstraintFactoryTests {
     @Test
     void testCreatePatientSetConstraintStringVariant() {
         String queryResultId = '-000011'
-        QueryResult queryResult = new QtQueryResultInstance()
+        QueryResult queryResult = new QtmQueryResultInstance()
 
         testee.queriesResource.
                 getQueryResultFromId(-11L).returns(queryResult)

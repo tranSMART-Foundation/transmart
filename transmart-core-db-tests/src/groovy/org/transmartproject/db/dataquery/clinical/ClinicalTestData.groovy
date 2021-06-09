@@ -26,7 +26,7 @@ import org.transmartproject.db.i2b2data.ConceptDimension
 import org.transmartproject.db.i2b2data.ObservationFact
 import org.transmartproject.db.i2b2data.PatientDimension
 import org.transmartproject.db.ontology.I2b2
-import org.transmartproject.db.querytool.QtQueryMaster
+import org.transmartproject.db.querytool.QtmQueryMaster
 
 import static org.transmartproject.core.ontology.OntologyTerm.VisualAttributes.LEAF
 import static org.transmartproject.db.querytool.QueryResultData.createQueryResult
@@ -41,7 +41,7 @@ class ClinicalTestData extends AbstractTestData {
 	List<ObservationFact> facts
 
 	@Lazy
-	QtQueryMaster patientsQueryMaster = createQueryResult(patients)
+	QtmQueryMaster patientsQueryMaster = createQueryResult(patients)
 
 	QueryResult getQueryResult() {
 		getQueryResultFromMaster patientsQueryMaster

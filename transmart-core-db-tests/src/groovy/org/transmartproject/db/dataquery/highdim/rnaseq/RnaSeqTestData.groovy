@@ -28,7 +28,7 @@ import org.transmartproject.db.dataquery.highdim.SampleBioMarkerTestData
 import org.transmartproject.db.dataquery.highdim.chromoregion.DeChromosomalRegion
 import org.transmartproject.db.i2b2data.PatientDimension
 import org.transmartproject.db.ontology.ConceptTestData
-import org.transmartproject.db.querytool.QtQueryMaster
+import org.transmartproject.db.querytool.QtmQueryMaster
 import org.transmartproject.db.search.SearchKeywordCoreDb
 
 import static org.transmartproject.db.dataquery.highdim.HighDimTestData.createTestAssays
@@ -50,7 +50,7 @@ class RnaSeqTestData extends AbstractTestData {
 	DeGplInfo bogusTypePlatform
 	List<DeChromosomalRegion> regions
 	List<PatientDimension> patients
-	QtQueryMaster allPatientsQueryResult
+	QtmQueryMaster allPatientsQueryResult
 	List<DeSubjectSampleMapping> assays
 	List<DeSubjectRnaseqData> rnaseqData
 

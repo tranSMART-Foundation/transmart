@@ -26,15 +26,15 @@ import org.transmartproject.db.i2b2data.PatientDimension
 
 class QueryResultData {
 
-	static QtQueryMaster createQueryResult(List<PatientDimension> patients) {
-		QtQueryMaster queryMaster = new QtQueryMaster(
+	static QtmQueryMaster createQueryResult(List<PatientDimension> patients) {
+		QtmQueryMaster queryMaster = new QtmQueryMaster(
 				name: 'test-fake-query-1',
 				userId: 'fake-user',
 				groupId: 'fake group',
 				createDate: new Date(),
 				requestXml: '')
 
-		QtQueryInstance queryInstance = new QtQueryInstance(
+		QtmQueryInstance queryInstance = new QtmQueryInstance(
 				userId: 'fake-user',
 				groupId: 'fake group',
 				startDate: new Date(),
@@ -42,7 +42,7 @@ class QueryResultData {
 				queryMaster: queryMaster)
 		queryMaster.addToQueryInstances queryInstance
 
-		QtQueryResultInstance resultInstance = new QtQueryResultInstance(
+		QtmQueryResultInstance resultInstance = new QtmQueryResultInstance(
 				statusTypeId: QueryStatus.FINISHED.id,
 				startDate: new Date(),
 				queryInstance: queryInstance,
@@ -52,13 +52,13 @@ class QueryResultData {
 
 		int i = 0
 		for (PatientDimension patient in patients) {
-			resultInstance.addToPatientSet new QtPatientSetCollection(setIndex: i++, patient: patient)
+			resultInstance.addToPatientSet new QtmPatientSetCollection(setIndex: i++, patient: patient)
 		}
 
 		queryMaster
 	}
 
-	static QueryResult getQueryResultFromMaster(QtQueryMaster master) {
+	static QueryResult getQueryResultFromMaster(QtmQueryMaster master) {
 		def f = { Iterables.getFirst it, null }
 		f(f(master.queryInstances).queryResults)
 	}

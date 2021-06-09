@@ -155,7 +155,7 @@ class QueriesResourceServiceTests {
         assertThat result, hasProperty("setSize", equalTo(
                 Long.valueOf(patientNums.size())))
 
-        def patientSet = QtPatientSetCollection.where {
+        def patientSet = QtmPatientSetCollection.where {
             eq('resultInstance.id', result.id)
         }.list()
         def memberMatchers = patientNums.collect {
@@ -331,7 +331,7 @@ class QueriesResourceServiceTests {
         def orig = queriesResourceService.patientSetQueryBuilderService
         queriesResourceService.patientSetQueryBuilderService = [
                 buildPatientSetQuery: {
-                    QtQueryResultInstance resultInstance,
+                    QtmQueryResultInstance resultInstance,
                     QueryDefinition definition,
                     User user = null ->
                     'fake query'
@@ -354,7 +354,7 @@ class QueriesResourceServiceTests {
         def orig = queriesResourceService.patientSetQueryBuilderService
         queriesResourceService.patientSetQueryBuilderService = [
                 buildPatientSetQuery: {
-                    QtQueryResultInstance resultInstance,
+                    QtmQueryResultInstance resultInstance,
                     QueryDefinition definition,
                     User user = null ->
                         throw new RuntimeException('foo bar')

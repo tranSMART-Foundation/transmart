@@ -37,7 +37,7 @@ import org.transmartproject.db.i2b2data.I2b2Data
 import org.transmartproject.db.i2b2data.ObservationFact
 import org.transmartproject.db.ontology.ConceptTestData
 import org.transmartproject.db.ontology.I2b2
-import org.transmartproject.db.querytool.QtQueryMaster
+import org.transmartproject.db.querytool.QtmQueryMaster
 import org.transmartproject.db.test.RuleBasedIntegrationTestMixin
 
 import static groovy.test.GroovyAssert.shouldFail
@@ -157,7 +157,7 @@ class ClinicalDataRetrievalTests {
     void testMultipleQueryResultsVariant() {
         results = clinicalDataResourceService.retrieveData(
                 testData.i2b2Data.patients[0..1].collect {
-                    QtQueryMaster result = createQueryResult([it])
+                    QtmQueryMaster result = createQueryResult([it])
                     result.save()
                     getQueryResultFromMaster(result)
                 },

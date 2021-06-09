@@ -25,7 +25,7 @@ import org.transmartproject.core.dataquery.assay.Assay
 import org.transmartproject.core.querytool.QueryResult
 import org.transmartproject.db.dataquery.highdim.AssayQuery
 import org.transmartproject.db.dataquery.highdim.AssayTestData
-import org.transmartproject.db.querytool.QtQueryMaster
+import org.transmartproject.db.querytool.QtmQueryMaster
 import org.transmartproject.db.querytool.QueryResultData
 
 import static org.hamcrest.MatcherAssert.assertThat
@@ -42,13 +42,13 @@ class DefaultPatientSetConstraintTests {
     void setup() {
         testData.saveAll()
 
-        QtQueryMaster master = QueryResultData.createQueryResult([
+        QtmQueryMaster master = QueryResultData.createQueryResult([
                 testData.patients[0]
         ])
 
         master.save()
         firstPatientResult = master.
-                queryInstances.iterator().next(). // QtQueryInstance
+                queryInstances.iterator().next(). // QtmQueryInstance
                 queryResults.iterator().next()
     }
 

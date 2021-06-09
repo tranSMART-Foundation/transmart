@@ -29,7 +29,7 @@ import org.transmartproject.core.dataquery.highdim.assayconstraints.AssayConstra
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.querytool.QueryResult
 import org.transmartproject.db.i2b2data.PatientDimension
-import org.transmartproject.db.querytool.QtQueryMaster
+import org.transmartproject.db.querytool.QtmQueryMaster
 
 import static groovy.util.GroovyAssert.shouldFail
 import static org.hamcrest.MatcherAssert.assertThat
@@ -227,7 +227,7 @@ class HighDimensionResourceServiceTestData {
             HighDimTestData.createTestAssays(patientsBoth, -5000, platformFoobar, TRIAL_NAME) +
                     HighDimTestData.createTestAssays(patientsFoobar, -6000, platformFoobar, TRIAL_NAME)
 
-    @Lazy QtQueryMaster allPatientsQueryMaster = createQueryResult(
+    @Lazy QtmQueryMaster allPatientsQueryMaster = createQueryResult(
             patientsBoth + patientsFoobar)
 
     QueryResult getAllPatientsQueryResult() {
