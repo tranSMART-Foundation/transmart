@@ -95,9 +95,6 @@ begin
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new dimcode and tooltip',SQL%ROWCOUNT,stepCt,'Done');
 	commit;
 
-	--if topNode != '' then
-	--	i2b2_create_concept_counts(topNode,jobId);
-	--end if;
 	end if;
 
     if newJobFlag = 1 then

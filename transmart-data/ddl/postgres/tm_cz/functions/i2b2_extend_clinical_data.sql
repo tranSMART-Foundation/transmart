@@ -1115,7 +1115,7 @@ begin
     --	set sourcesystem_cd, c_comment to null if any added upper-level nodes
 
 
-    perform tm_cz.i2b2_create_concept_counts(topNode, jobID);
+    perform tm_cz.i2b2_create_concept_counts(TrialID, topNode, jobID);
 
     --	delete each node that is hidden after create concept counts
 

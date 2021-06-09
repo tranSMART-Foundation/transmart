@@ -1275,7 +1275,7 @@ begin
 	return -16;
     end if;
 
-    perform tm_cz.i2b2_create_concept_counts(topNode, jobID);
+    perform tm_cz.i2b2_create_concept_counts(TrialID, topNode, jobID);
 
     --	delete each node that is hidden after create concept counts
 

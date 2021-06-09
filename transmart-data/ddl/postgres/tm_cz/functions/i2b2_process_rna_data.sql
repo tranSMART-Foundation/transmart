@@ -1061,7 +1061,7 @@ begin
     --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
     -- a unique top-level node for RNA_sequencing data
     begin
-	perform tm_cz.i2b2_create_concept_counts(topNode ,jobID );
+	perform tm_cz.i2b2_create_concept_counts(TrialID, topNode ,jobID );
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then

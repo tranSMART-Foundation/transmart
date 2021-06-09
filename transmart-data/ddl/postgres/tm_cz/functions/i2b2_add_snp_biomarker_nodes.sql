@@ -276,7 +276,7 @@ begin
     --Build concept Counts
     --Also marks any i2B2 records with no underlying data as Hidden, need to do at Biomarker level because there may be multiple platforms and patient count can vary
 
-    perform tm_cz.i2b2_create_concept_counts(regexp_replace(nodeName || '\','(\\){2,}', '\'),jobID );
+    perform tm_cz.i2b2_create_concept_counts(TrialID, regexp_replace(nodeName || '\','(\\){2,}', '\'),jobID );
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
 
