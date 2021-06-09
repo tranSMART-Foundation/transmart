@@ -166,3 +166,5 @@ transmart-batch/batgit add chdb-*.properties
 **/node_modules
 
 **/logback.groovy
+
+build-*.out
