@@ -14,3 +14,18 @@
   ) SEGMENT CREATION DEFERRED
 NOCOMPRESS NOLOGGING
  TABLESPACE "TRANSMART" ;
+--
+-- Type: TRIGGER; Owner: BIOMART_USER; Name: TRG_APPLICATION_SETTINGS_ID
+--
+  CREATE OR REPLACE TRIGGER "BIOMART_USER"."TRG_APPLICATION_SETTINGS_ID"
+before insert on "APPLICATION_SETTINGS"
+  for each row begin
+    if inserting then
+      if :NEW."ID" is null then
+        select APPLICATION_SETTINGS_ID_SEQ.nextval into :NEW."ID" from dual;
+      end if;
+    end if;
+  end;
+/
+
+ALTER TRIGGER "BIOMART_USER"."TRG_APPLICATION_SETTINGS_ID" ENABLE;

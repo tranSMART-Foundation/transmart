@@ -335,6 +335,13 @@
     "item" : {
       "type" : "SEQUENCE",
       "owner" : "BIOMART_USER",
+      "name" : "APPLICATION_SETTINGS_ID_SEQ"
+    },
+    "file" : "biomart_user/_misc.sql"
+  }, {
+    "item" : {
+      "type" : "SEQUENCE",
+      "owner" : "BIOMART_USER",
       "name" : "CMS_FILE_ID_SEQ"
     },
     "file" : "biomart_user/_misc.sql"
