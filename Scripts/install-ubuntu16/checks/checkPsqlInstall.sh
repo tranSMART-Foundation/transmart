@@ -25,7 +25,7 @@ fi
 echo "PostgreSQL appears to be installed"
 
 echo "checking to see if PostgreSQL is running"
-postgresRunning=$(ps aux | grep postgres | grep -v "grep" | grep "stats collector process")
+postgresRunning=$(ps aux | grep postgres | grep -v "grep" | grep "stats collector")
 if [ -z "$postgresRunning" ]; then 
 	echo "PostgreSQL does not appear to be running; start it"
 	echo  "  with the command: sudo /etc/init.d/postgresql restart"  
