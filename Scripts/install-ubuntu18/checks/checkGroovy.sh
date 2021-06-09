@@ -13,7 +13,7 @@ echo "|  Checking for basic command-line tools; if any of the following does not
 echo "|  then recheck the instructions for installing the missing items"
 echo "---------------------------------------------------------------------------------"
 
-# Depends on the path set up by sourceing transmart-data/vars
+# Depends on the path set up by sourcing transmart-data/vars
 
 probe=0
 for command in groovy
