@@ -143,29 +143,29 @@
     <body>
 
 	<div id="header-div" class="header-div">
-	    <g:render template='/layouts/commonheader' model="[app: 'datasetExplorer']"/>
+	    <g:render template='/layouts/commonheader' model="[app: 'datasetExplorer', utilitiesMenu: 'true']"/>
+	</div>
+
+	<div id="sidebar" style="width:320px; border-right:5px solid;border-color:#EDEEF6">
+	    <tmpl:/RWG/boxSearch hide="true"/>
+
+	    <div id="modifierValueDiv" title="Modifier Value Selection" style="display:none;">
+		<g:render template="/layouts/modifierValueForm" />
+	    </div>
+
+	    <div id="noAnalyzeResults" style="display: none;">No subject-level results found.<br/>
+		<g:if test="${!hideBrowse}">
+		    <g:link controller='RWG'>Switch to Browse view</g:link>
+		</g:if>
+	    </div>
+
+	    <div id="filter-div" style="display: none;"></div>
+
 	</div>
 
 	<div id="main"></div>
 
 	<h3 id="test">Loading ...</h3>
-
-	<tmpl:/RWG/boxSearch hide="true"/>
-	<tmpl:/RWG/filterBrowser/>
-
-	<div id="modifierValueDiv" title="Modifier Value Selection" style="display:none;">
-	    <g:render template="/layouts/modifierValueForm" />
-	</div>
-
-	<div id="sidebartoggle">&nbsp;</div>
-
-	<div id="noAnalyzeResults" style="display: none;">No subject-level results found.<br/>
-	    <g:if test="${!hideBrowse}">
-		<g:link controller='RWG'>Switch to Browse view</g:link>
-	    </g:if>
-	</div>
-
-	<div id="filter-div" style="display: none;"></div>
 
 	<g:form name="exportdsform" controller="export" action="exportDataset"/>
 	<g:form name="exportgridform" controller="chart" action="exportGrid"/>
@@ -192,6 +192,16 @@
 
 	<span id="visualizerSpan0"></span>
 	<span id="visualizerSpan1"></span>
+
+	<%-- Elements that are in fixed positions on the page --%>
+	<div id="sidebartoggle">&nbsp;</div>
+	<script type="text/javascript">
+	    var toggleIcon = {
+	        left: 'url("${assetPath(src: 'lefttab-left.png', absolute: true)}")',
+	        right: 'url("${assetPath(src: 'lefttab-right.png', absolute: true)}")'
+	    }
+	</script>
+	<tmpl:/RWG/filterBrowser/>
 
     </body>
 </html>

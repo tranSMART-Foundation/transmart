@@ -12,9 +12,6 @@
 	<asset:stylesheet href="browseTab.css" />
 	<%-- <asset:stylesheet href="jquery-cupertino.css" /> --%>
 
-    </head>
-
-    <body>
 	<asset:javascript src="jquery-plugin.js" />
 	<asset:javascript src="extjs.min.js" />
 	<asset:javascript src="session_time.js" />
@@ -419,6 +416,10 @@
 	</script>
 
 
+    </head>
+
+    <body>
+
 	<div id="header-div" class="header-div">
 	    <g:render template='/layouts/commonheader' model="[app: 'rwg', utilitiesMenu: 'true']"/>
 	</div>
@@ -529,6 +530,12 @@
 
 	<%-- Elements that are in fixed positions on the page --%>
 	<div id="sidebartoggle">&nbsp;</div>
+	<script type="text/javascript">
+	    var toggleIcon = {
+	        left: 'url("${assetPath(src: 'lefttab-left.png', absolute: true)}")',
+	        right: 'url("${assetPath(src: 'lefttab-right.png', absolute: true)}")'
+	    }
+	</script>
 	<tmpl:/RWG/filterBrowser/>
 
 	<!--  Used to measure the width of a text element (in svg plots) -->
