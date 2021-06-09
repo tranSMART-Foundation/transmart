@@ -1,30 +1,28 @@
-JDBC_DL_PSQL     := https://jdbc.postgresql.org/download
-JDBC_DRIVER_PSQL := postgresql-42.2.5.jar
-#JDBC_DL_ORA      := http://maven.in2p3.fr/com/oracle/ojdbc7/12.1.0.1
-#JDBC_DRIVER_ORA  := ojdbc7-12.1.0.1.jar
-#JDBC_XDB_ORA     := xdb.jar
-##JDBC_DLO_ORA      := https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/ojdbc8/19.3.0.0/
-##JDBC_DLX_ORA      := https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/xdb/19.3.0.0
-JDBC_DRIVER_ORA  := ojdbc8-19.3.0.0.jar
-JDBC_XDB_ORA     := xdb-19.3.0.0.jar
-JDBC_DLO_ORA      := https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/ojdbc6/12.2.0.1.0/
-JDBC_DLX_ORA      := https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/xdb/12.2.0.1.0
-##JDBC_DRIVER_ORA  := ojdbc6-12.2.0.1.0.jar
-##JDBC_XDB_ORA     := xdb-12.2.0.1.0.jar
-
-# https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/xdb/19.3.0.0/xdb-19.3.0.0.jar
-# https://maven.ceon.pl/artifactory/repo/com/oracle/ojdbc/ojdbc8/19.3.0.0/ojdbc8-19.3.0.0.jar
-
-# Official Oracle driver is from:
-#http://download.oracle.com/otn/utilities_drivers/jdbc/121020/ojdbc7.jar
-
 LIB_DIR          := $(dir $(lastword $(MAKEFILE_LIST)))
-CP_ORA           := $(LIB_DIR)$(JDBC_DRIVER_ORA):$(LIB_DIR)$(JDBC_XDB_ORA):$(LIB_DIR)
-CP_PSQL          := $(LIB_DIR)$(JDBC_DRIVER_PSQL):$(LIB_DIR)
+
+# PostgreSQL driver 19-apr-21
+# https://jdbc.postgresql.org/
+# ----------------------------
+
+JDBC_DL_PSQL     := https://jdbc.postgresql.org/download
+JDBC_DRIVER_PSQL := postgresql-42.2.20.jar
 
 JDBC_DRIVER_PSQL_PATH := $(LIB_DIR)$(JDBC_DRIVER_PSQL)
+
+# Oracle driver 16-jan-21
+# https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc8
+# -------------------------------------------------------------------
+
+JDBC_DLO_ORA      := https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/21.1.0.0
+JDBC_DLX_ORA      := https://repo1.maven.org/maven2/com/oracle/database/xml/xdb/21.1.0.0
+JDBC_DRIVER_ORA  := ojdbc8-21.1.0.0.jar
+JDBC_XDB_ORA     := xdb-21.1.0.0.jar
+
 JDBC_DRIVER_ORA_PATH  := $(LIB_DIR)$(JDBC_DRIVER_ORA)
 JDBC_XDB_ORA_PATH     := $(LIB_DIR)$(JDBC_XDB_ORA)
+
+CP_ORA           := $(LIB_DIR)$(JDBC_DRIVER_ORA):$(LIB_DIR)$(JDBC_XDB_ORA):$(LIB_DIR)
+CP_PSQL          := $(LIB_DIR)$(JDBC_DRIVER_PSQL):$(LIB_DIR)
 
 $(JDBC_DRIVER_PSQL_PATH):
 	curl -f $(JDBC_DL_PSQL)/$(JDBC_DRIVER_PSQL) > $@
