@@ -10,6 +10,7 @@ class CmsFile {
     String instanceType
     Date lastUpdated
     String name
+    int version
 
     static mapping = {
 	table name: 'CMS_FILE', schema: 'BIOMART_USER'
