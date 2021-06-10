@@ -99,7 +99,6 @@ grails.project.dependency.resolution = {
 
     dependencies {
 	compile 'axis:axis:1.4' // for GeneGo web services
-//	compile 'com.google.guava:guava:19.0'
 	compile 'com.google.guava:guava:30.1.1-jre'
 	compile 'commons-net:commons-net:3.3' // used for ftp transfers
 	compile 'net.sf.ehcache:ehcache:2.9.0'
@@ -117,7 +116,6 @@ grails.project.dependency.resolution = {
 	compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.2', {
 	    excludes 'groovy', 'nekohtml', 'httpclient', 'httpcore'
 	}
-//	compile 'org.rosuda:Rserve:1.7.3'
         compile 'org.rosuda.REngine:Rserve:1.8.1'
 	compile('org.springframework.security.extensions:spring-security-saml2-core:1.0.0.RELEASE') {
 	    //excludes of spring security necessary because they are for an older version (3.1 branch)

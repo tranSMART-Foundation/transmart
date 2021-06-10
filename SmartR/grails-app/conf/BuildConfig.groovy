@@ -57,12 +57,10 @@ grails.project.dependency.resolution = {
         compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
         // compile 'org.apache.ant:ant:1.9.6'
         compile 'net.sf.opencsv:opencsv:2.3'
-//       compile 'org.rosuda:Rserve:1.7.3'
         compile 'org.rosuda.REngine:Rserve:1.8.1'
         compile 'org.mapdb:mapdb:0.9.10'
         compile 'org.apache.commons:commons-lang3:3.4'
 
-//      compile 'com.google.guava:guava:19.0'
         compile 'com.google.guava:guava:30.1.1-jre'
         compile 'org.transmartproject:transmart-core-api:' + tmVersion
         //test 'com.jayway.restassured:rest-assured:2.4.1'
