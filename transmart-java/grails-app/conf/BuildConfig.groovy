@@ -48,6 +48,8 @@ grails.project.dependency.resolution = {
         }
 
 	compile 'org.apache.poi:poi:5.0.0'
+	compile 'javax.xml:jaxrpc-api:1.1'
+	compile 'org.json:json:20210307'
     }
 
     plugins {
