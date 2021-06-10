@@ -99,8 +99,8 @@ grails.project.dependency.resolution = {
 
     dependencies {
 	compile 'axis:axis:1.4' // for GeneGo web services
-	compile 'com.google.guava:guava:19.0'
-//	compile 'com.google.guava:guava:16.0-dev-20140115-68c8348'
+//	compile 'com.google.guava:guava:19.0'
+	compile 'com.google.guava:guava:30.1.1-jre'
 	compile 'commons-net:commons-net:3.3' // used for ftp transfers
 	compile 'net.sf.ehcache:ehcache:2.9.0'
 	compile 'net.sf.opencsv:opencsv:2.3'
@@ -117,7 +117,8 @@ grails.project.dependency.resolution = {
 	compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.2', {
 	    excludes 'groovy', 'nekohtml', 'httpclient', 'httpcore'
 	}
-	compile 'org.rosuda:Rserve:1.7.3'
+//	compile 'org.rosuda:Rserve:1.7.3'
+        compile 'org.rosuda.REngine:Rserve:1.8.1'
 	compile('org.springframework.security.extensions:spring-security-saml2-core:1.0.0.RELEASE') {
 	    //excludes of spring security necessary because they are for an older version (3.1 branch)
 	    //also remove xercesImpl because it breaks tomcat and is not otherwise needed
@@ -131,9 +132,11 @@ grails.project.dependency.resolution = {
 	runtime 'gov.nist.math:jama:1.0.1'
 	runtime 'oauth.signpost:signpost-commonshttp4:1.2.1.1'
 	runtime 'oauth.signpost:signpost-core:1.2.1.1'
-	runtime 'org.apache.poi:poi-contrib:3.1-FINAL'
-	runtime 'org.apache.poi:poi-scratchpad:3.1-FINAL'
-	runtime 'org.apache.poi:poi:3.1-FINAL'
+	// no version beyond 3.7-beta3; apparently not used
+	// runtime 'org.apache.poi:poi-contrib:3.6'
+	runtime 'org.apache.poi:poi-scratchpad:5.0.0'
+	runtime 'org.apache.poi:poi-ooxml:5.0.0'
+	runtime 'org.apache.poi:poi:5.0.0'
 	runtime 'xerces:xercesImpl:2.9.1'
 
 	// you can remove whichever you are not using

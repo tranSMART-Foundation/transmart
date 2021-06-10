@@ -16,20 +16,23 @@ grails.project.dependency.resolution = {
     legacyResolve false
     // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
     repositories {
-        grailsCentral()
         mavenLocal()
         mavenCentral()
+        grailsCentral()
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         // runtime 'mysql:mysql-connector-java:5.1.21'
+	runtime 'org.apache.poi:poi:5.0.0'
     }
 
     plugins {
 	compile ':asset-pipeline:2.14.1.1'
+
 	build ':release:3.1.2', ':rest-client-builder:2.1.1', {
             export = false
         }
+
     }
 }

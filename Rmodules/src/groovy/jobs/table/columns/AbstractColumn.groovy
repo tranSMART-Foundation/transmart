@@ -1,6 +1,6 @@
 package jobs.table.columns
 
-import com.google.common.base.Objects
+import com.google.common.base.MoreObjects
 import groovy.transform.CompileStatic
 import jobs.table.BackingMap
 import jobs.table.Column
@@ -30,7 +30,7 @@ abstract class AbstractColumn implements Column {
     Closure getValueTransformer() {}
 
     String toString() {
-        Objects.toStringHelper(this).add('header', header).toString()
+        MoreObjects.toStringHelper(this).add('header', header).toString()
     }
 
     protected Number validateNumber(ClinicalVariableColumn col, value) {

@@ -37,10 +37,12 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
- 	compile 'com.google.guava:guava:19.0'
+// 	compile 'com.google.guava:guava:19.0'
+ 	compile 'com.google.guava:guava:30.1.1-jre'
         compile 'net.sf.opencsv:opencsv:2.3'
         compile 'org.mapdb:mapdb:0.9.10'
-        compile 'org.rosuda:Rserve:1.7.3'
+//       compile 'org.rosuda:Rserve:1.7.3'
+        compile 'org.rosuda.REngine:Rserve:1.8.1'
 	compile 'org.transmartproject:transmart-core-api:' + tmVersion
 //	compile 'com.lowagie:itext:2.0.8' //latest 4.2.2
 //	compile 'org.xhtmlrenderer:core-renderer:R8'

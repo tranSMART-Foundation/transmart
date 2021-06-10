@@ -47,10 +47,12 @@ grails.project.dependency.resolution = {
             export = false
         }
 
+	compile 'org.apache.poi:poi:5.0.0'
     }
 
     plugins {
 	compile ':asset-pipeline:2.14.1.1'
+
         build ':release:3.1.2',
                 ':rest-client-builder:2.1.1', {
             export = false
