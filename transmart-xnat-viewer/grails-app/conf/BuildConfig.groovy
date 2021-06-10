@@ -1,4 +1,4 @@
-tmVersion = '19.0'
+tmVersion = '19.1'
 
 grails.project.class.dir = 'target/classes'
 grails.project.test.class.dir = 'target/test-classes'

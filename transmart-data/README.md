@@ -20,13 +20,13 @@ This repository is a set of make files and scripts for:
 * generating configuration files for tranSMART.
 
 The current schema is the one necessary to support the [`master`
-branch][master] of transmart and i2b2/tranSMART (release 19.0) for
+branch][master] of transmart and i2b2/tranSMART (release 19.1) for
 Oracle and Postgres
 
 Database update scripts are included to migrate the schema from
 version 1.2.4 (16.1) to 16.2 to 16.2 to 16.3 for postgres and oracle.
 
-For release 19.0 we recommend a clean installation.
+For release 19.1 we recommend a clean installation.
 
 A script is available that can compare dumps from two databases,
 intended for an installed copy to be compared to the latest

@@ -1,5 +1,5 @@
 class TransmartSharedGrailsPlugin {
-    String version = '19.0'
+    String version = '19.1'
     String grailsVersion = '2.5.4 > *'
     String title = 'Transmart Shared'
     String author = 'Burt Beckwith'

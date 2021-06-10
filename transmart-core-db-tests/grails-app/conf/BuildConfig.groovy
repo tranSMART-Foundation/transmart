@@ -1,4 +1,4 @@
-String tmVersion = '19.0'
+String tmVersion = '19.1'
 
 def defaultVMSettings = [
         maxMemory: 768,

@@ -621,7 +621,7 @@ if [ $buildapi == 1 ] ; then
 
     ./gradlew clean build publishToMavenLocal  >  $OUT/$PREFIX-$DIR.out 2>&1
 
-    egrep -i 'error[^-]|warning|fail' $OUT/$PREFIX-$DIR.out
+    egrep -i 'error[^-]|warning|fail!' $OUT/$PREFIX-$DIR.out
 
     cd ..
 
@@ -679,6 +679,7 @@ if [ $buildlegacy == 1 ] ; then
     fi
 	
     ./grailsw package-plugin >  $OUT/$PREFIX-$DIR.out 2>&1
+    
     ./grailsw maven-install  >> $OUT/$PREFIX-$DIR.out 2>&1
 
     egrep -i 'error[^-]|warning|fail' $OUT/$PREFIX-$DIR.out
@@ -803,6 +804,8 @@ if [ $buildcore == 1 ] ; then
 	./grailsw clean-all
     fi
 
+    # First pass may give errors but resolves dependencies
+    # Output file overwritten on second pass
     ./grailsw package-plugin >  $OUT/$PREFIX-$DIR.out 2>&1
     ./grailsw package-plugin >  $OUT/$PREFIX-$DIR.out 2>&1
     ./grailsw maven-install  >> $OUT/$PREFIX-$DIR.out 2>&1
@@ -835,9 +838,11 @@ if [ $buildcoretests == 1 ] ; then
 
     rm -rf target/stacktrace.log
 
+    # This step gives errors but prepares a rerun
+    # The output file will be overwritten
     ./grailsw test-app --xml >  $OUT/$PREFIX-$DIR.out 2>&1
 
-    ./grailsw  maven-install  >> $OUT/$PREFIX-$DIR.out 2>&1
+    ./grailsw maven-install  >> $OUT/$PREFIX-$DIR.out 2>&1
 
     egrep -i 'error[^-]|warning|fail' $OUT/$PREFIX-$DIR.out
 

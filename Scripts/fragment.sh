@@ -13,7 +13,7 @@ function verifyWithGpg {
 	return $?
 }
 
-TRANSMART_DATA_NAME="transmart-data-release-19.0"
+TRANSMART_DATA_NAME="transmart-data-release-19.1"
 TRANSMART_DATA_TAR="$TRANSMART_DATA_NAME.tar.gz"
 
 if [ $(verifyWithGpg "$TRANSMART_DATA_TAR") ] ; then 

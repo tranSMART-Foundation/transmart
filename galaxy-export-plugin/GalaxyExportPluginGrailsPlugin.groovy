@@ -2,7 +2,7 @@ class GalaxyExportPluginGrailsPlugin {
 
     public static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
-    def version = '19.0'
+    def version = '19.1'
     def grailsVersion = '2.5.4 > *'
     def title = 'Galaxy Export Plugin'
     def author = 'Transmart Foundation'

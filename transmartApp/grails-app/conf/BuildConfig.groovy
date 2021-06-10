@@ -1,6 +1,6 @@
 import grails.util.Environment
 
-String tmVersion = '19.0'
+String tmVersion = '19.1'
 
 def forkSettingsRun   = [minMemory: 1536, maxMemory: 4096, maxPerm: 384, debug: false]
 def forkSettingsWar   = [minMemory: 2048, maxMemory: 8192, maxPerm: 2560, debug: false, forkReserve: false]

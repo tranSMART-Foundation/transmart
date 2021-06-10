@@ -28,7 +28,7 @@ grails.project.dependency.resolution = {
 	compile ':spring-security-core:2.0.0'
 	compile ':cache:1.1.8'
 
-	String tmVersion = '19.0'
+	String tmVersion = '19.1'
 	compile ':search-domain:'    + tmVersion
 	compile ':transmart-core:'   + tmVersion
 	compile ':transmart-custom:' + tmVersion

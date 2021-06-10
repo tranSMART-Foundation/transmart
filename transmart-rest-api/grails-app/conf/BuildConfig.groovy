@@ -23,7 +23,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-String tmVersion = '19.0'
+String tmVersion = '19.1'
 
 def defaultVMSettings = [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
 

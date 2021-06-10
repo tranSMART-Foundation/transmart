@@ -29,7 +29,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | Auto | Auto increment         |
 
 ### i2b2demodata.observation_fact
-| Column           |           | 19.0   | i2b2 1.7 | 17.2       | Comments                                                                                                                                                                                                                      | 
+| Column           |           | 19     | i2b2 1.7 | 17.2       | Comments                                                                                                                                                                                                                      | 
 |------------------|-----------|--------|----------|------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| 
 | encounter_num    | numeric   |        | PK, NO   | PK, NO     | Refers to encounter_num in visit_dimension.                                                                                                                                                                                   | 
 | patient_num      | numeric   | PK, NO | PK, NO   | PK, NO     | Refers to patient_num in patient_dimension.                                                                                                                                                                                   | 
@@ -56,7 +56,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | sample_cd        | varchar   |        | NA       | Deprecated | Deprecated. Refers to the sample_dimension table.                                                                                                                                                                             | 
 
 ### i2b2demodata.patient_dimension
-| Column            |           | 19.0   | i2b2 1.7 | 17.2   | Comments                        | 
+| Column            |           | 19     | i2b2 1.7 | 17.2   | Comments                        | 
 |-------------------|-----------|--------|----------|--------|---------------------------------| 
 | patient_num       | numeric   | PK, NO | PK, NO   | PK, NO | Id of the patient.              | 
 | vital_status_cd   | varchar   |        |          |        |                                 | 
@@ -79,7 +79,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | upload_id         | numeric   |        |          |        |                                 | 
 
 ### i2b2demodata.concept_dimension
-| Column          |           | 19.0   | i2b2 1.7 | 17.2   | Comments                                                             | 
+| Column          |           | 19     | i2b2 1.7 | 17.2   | Comments                                                             | 
 |-----------------|-----------|--------|----------|--------|----------------------------------------------------------------------| 
 | concept_cd      | varchar   | NO     |          | NO     | The code that is used to refer to the concept from observation_fact. | 
 | concept_path    | varchar   | PK, NO | PK, NO   | PK, NO | The path that uniquely identifies a concept.                         | 
@@ -93,7 +93,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | table_name      | varchar   |        | NA       |        |                                                                      | 
 
 ### i2b2demodata.modifier_dimension
-| Column             |           | 19.0   | i2b2 1.7 | 17.2   | Comments                                                                                      | 
+| Column             |           | 19     | i2b2 1.7 | 17.2   | Comments                                                                                      | 
 |--------------------|-----------|--------|----------|--------|-----------------------------------------------------------------------------------------------| 
 | modifier_path      | varchar   | PK, NO | PK, NO   | PK, NO | The path that uniquely identifies a modifier.                                                 | 
 | modifier_cd        | varchar   |        |          |        | The code that is used to refer to the modifier from obervation_fact. However, it is nullable. | 
@@ -108,7 +108,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | modifier_node_type | varchar   |  NA    | NA       |        |                                                                                               | 
 
 ### i2b2demodata.provider_dimension
-| Column          |           | 19.0   | i2b2 1.7 | 17.2   | Comments                           | 
+| Column          |           | 19     | i2b2 1.7 | 17.2   | Comments                           | 
 |-----------------|-----------|--------|----------|--------|------------------------------------| 
 | provider_id     | varchar   | PK, NO | PK, NO   | PK, NO |                                    | 
 | provider_path   | varchar   | PK, NO | PK, NO   | PK, NO | A path that identifies a provider. | 
@@ -121,7 +121,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | upload_id       | numeric   |        |          |        |                                    | 
 
 ### i2b2demodata.visit_dimension
-| Column           |           | 19.0   | i2b2 1.7 | 17.2   | Comments                                                                      | 
+| Column           |           | 19     | i2b2 1.7 | 17.2   | Comments                                                                      | 
 |------------------|-----------|--------|----------|--------|-------------------------------------------------------------------------------| 
 | encounter_num    | numeric   | PK, NO | PK, NO   | PK, NO | Id of the visit. Referred to by the encounter_num column of observation_fact. | 
 | patient_num      | numeric   | PK, NO | PK, NO   | FK, NO | Id linking to patient_num in the patient_dimension.                           | 
@@ -140,7 +140,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | upload_id        | numeric   |        |          |        |                                                                               | 
 
 ### i2b2demodata.study
-| Column            |         | 19.0 | i2b2 1.7 | 17.2 | Comments                                                               | 
+| Column            |         | 19   | i2b2 1.7 | 17.2 | Comments                                                               | 
 |-------------------|---------|------|----------|------|------------------------------------------------------------------------| 
 | study_num         | numeric | NA   | NA       | Auto |                                                                        | 
 | bio_experiment_id | int8    | NA   | NA       | FK   | Foreign key: bio_experiment_id in bio_experiment.                      | 
@@ -148,7 +148,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | secure_obj_token  | varchar | NA   | NA       | NO   | Token needed for access to the study. E.g., ‘PUBLIC’ or ‘EXP:GSE8581’. | 
 
 ### i2b2demodata.trial_visit_dimension
-| Column           |         | 19.0 | i2b2 1.7 | 17.2 | Comments                                                             | 
+| Column           |         | 19   | i2b2 1.7 | 17.2 | Comments                                                             | 
 |------------------|---------|------|----------|------|----------------------------------------------------------------------| 
 | trial_visit_num  | numeric | NA   | NA       | Auto |                                                                      | 
 | study_num        | numeric | NA   | NA       | FK   | Foreign key to study_num in study.                                   | 
@@ -157,7 +157,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | rel_time_label   | varchar | NA   | NA       |      | Descriptive name. E.g., Baseline, Week 1.                            | 
 
 ### i2b2demodata.storage_system
-| Column                  |         | 19.0 | i2b2 1.7 | 17.2   |
+| Column                  |         | 19   | i2b2 1.7 | 17.2   |
 |-------------------------|---------|------|----------|--------|
 | id                      | int4    | NA   | NA       | PK, NO |
 | name                    | varchar | NA   | NA       |        |
@@ -167,7 +167,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | single_file_collections | bool    | NA   | NA       |        |
 
 ### i2b2demodata.linked_file_collection
-| Column           |         | 19.0 | i2b2 1.7 | 17.2   |
+| Column           |         | 19   | i2b2 1.7 | 17.2   |
 |------------------|---------|------|----------|--------|
 | id               | int4    | NA   | NA       | PK, NO |
 | name             | varchar | NA   | NA       |        |
@@ -176,7 +176,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | uuid             | varchar | NA   | NA       |        |
 
 ### i2b2demodata.supported_workflow
-| Column               |         | 19.0 | i2b2 1.7 | 17.2   |
+| Column               |         | 19   | i2b2 1.7 | 17.2   |
 |----------------------|---------|------|----------|--------|
 | id                   | int4    | NA   | NA       | PK, NO |
 | name                 | varchar | NA   | NA       |        |
@@ -187,7 +187,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | default_params       | text    | NA   | NA       |        |
 
 ### i2b2metadata.i2b2
-| Column             |           | 19.0 | i2b2 1.7 | 17.2 |
+| Column             |           | 19   | i2b2 1.7 | 17.2 |
 |--------------------|-----------|------|----------|------|
 | c_hlevel           | int4      | NO   | NO       | NO   |
 | c_fullname         | varchar   | NO   | NO       | NO   |
@@ -218,7 +218,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 
 
 ### i2b2metadata.i2b2_secure
-| Column             |           | 19.0 | i2b2 1.7 | 17.2 |
+| Column             |           | 19   | i2b2 1.7 | 17.2 |
 |--------------------|-----------|------|----------|------|
 | c_hlevel           | numeric   |      | NA       |      |
 | c_fullname         | varchar   | NO   | NA       | NO   |
@@ -249,7 +249,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | secure_obj_token   | varchar   |      | NA       |      |
 
 ### i2b2metadata.dimension_description
-| Column        |         | 19.0 | i2b2 1.7 | 17.2 |
+| Column        |         | 19   | i2b2 1.7 | 17.2 |
 |---------------|---------|------|----------|------|
 | id            | serial  | NA   | NA       | Auto |
 | density       | varchar | NA   | NA       |      |
@@ -260,13 +260,13 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | size_cd       | varchar | NA   | NA       |      |
 
 ### i2b2metadata.study_dimension_descriptions
-| Column                   |      | 19.0 | i2b2 1.7 | 17.2   |
+| Column                   |      | 19   | i2b2 1.7 | 17.2   |
 |--------------------------|------|------|----------|--------|
 | dimension_description_id | int8 | NA   | NA       | PK, NO |
 | study_id                 | int8 | NA   | NA       | PK, NO |
 
 ### deapp.de_subject_microarray_data
-| Column        |         | 19.0 | 17.2   |
+| Column        |         | 19   | 17.2   |
 |---------------|---------|------|--------|
 | trial_name    | varchar |      |        |
 | probeset_id   | int8    |      | PK, NO |
@@ -284,7 +284,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | partition_id  | numeric |      |        |
 
 ### deapp.de_subject_sample_mapping
-| Column            |         | 19.0 | 17.2 |
+| Column            |         | 19   | 17.2 |
 |-------------------|---------|------|------|
 | patient_id        | int8    |      |      |
 | site_id           | varchar |      |      |
@@ -316,7 +316,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | partition_id      | numeric |      |      |
 
 ### deapp.de_gpl_info
-| Column             |           | 19.0   | 17.2   |
+| Column             |           | 19     | 17.2   |
 |--------------------|-----------|--------|--------|
 | platform           | varchar   | PK, NO | PK, NO |
 | title              | varchar   |        |        |
@@ -328,7 +328,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | gene_annotation_id | varchar   |        |        |
 
 ### deapp.de_rnaseq_transcript_data
-| Column                   |        | 19.0 | 17.2   |
+| Column                   |        | 19   | 17.2   |
 |--------------------------|--------|------|--------|
 | transcript_id            | int8   | NA   | PK, NO |
 | assay_id                 | int8   | NA   | PK, NO |
@@ -338,7 +338,7 @@ The TranSMART 17.2 project added new columns and tables, described below, to pro
 | zscore                   | float8 | NA   |        |
 
 ### deapp.de_rnaseq_transcript_annot
-| Column     |         | 19.0 | 17.2   |
+| Column     |         | 19   | 17.2   |
 |------------|---------|------|--------|
 | id         | int8    | NA   | PK, NO | 
 | gpl_id     | varchar | NA   | NO     |

@@ -1,5 +1,5 @@
 class BiomartDomainGrailsPlugin {
-    def version = '19.0'
+    def version = '19.1'
     def grailsVersion = '2.5,4 > *'
     def author = 'David Newton'
     def authorEmail = 'davinewton@deloitte.com'

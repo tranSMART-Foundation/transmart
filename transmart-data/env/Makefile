@@ -2,7 +2,7 @@
 KETTLE_VERSION=9.1
 KETTLE_ZIP=9.1.0.0-324
 
-TRANSMART_RELEASE_BRANCH=release-19.0
+TRANSMART_RELEASE_BRANCH=release-19.1
 
 UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
 				tar gfortran g++ unzip libreadline-dev \
@@ -143,12 +143,13 @@ update_repos = if [ ! -d $(1) ]; then \
 update_etl:
 	echo "for release build transmart-etl is not automatically updated from git, because it is assumed to be already loaded from a zip file"
 
-update_etl_git: transmart-etl-release-19.0.zip
-	test -d transmart-etl || unzip -qu transmart-etl-release-19.0.zip
-	test -d transmart-etl || mv transmart-etl-release-19.0 transmart-etl
+update_etl_git: transmart-etl-release-19.1.zip
+	test -d transmart-etl || unzip -qu transmart-etl-release-19.1.zip
+	test -d transmart-etl || mv transmart-etl-release-19.1 transmart-etl
 
-transmart-etl-release-19.0.zip:
-	curl -L -f "http://library.transmartfoundation.org/release/release19_0_0_artifacts/transmart-etl-release-19.0.zip" > transmart-etl-release-19.0.zip
+transmart-etl-release-19.1.zip:
+	curl -L -f "http://library.transmartfoundation.org/beta/beta19_1_0_artifacts/transmart-etl-release-19.1.zip" > transmart-etl-release-19.1.zip
+#	curl -L -f "http://library.transmartfoundation.org/release/release19_1_0_artifacts/transmart-etl-release-19.1.zip" > transmart-etl-release-19.1.zip
 
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 

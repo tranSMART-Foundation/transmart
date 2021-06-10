@@ -26,7 +26,7 @@ import org.transmartproject.db.ontology.DefaultConceptsResource
 import org.transmartproject.db.support.DatabasePortabilityService
 
 class TransmartCoreGrailsPlugin {
-    def version = '19.0'
+    def version = '19.1'
     def grailsVersion = '2.5.4 > *'
 
     def title = 'Transmart Core DB Plugin'

@@ -15,7 +15,7 @@
  */
 
 class XnatViewerGrailsPlugin {
-    def version = '19.0'
+    def version = '19.1'
     def grailsVersion = '2.5.4 > *'
     def title = 'XNAT Viewer'
     def author = 'Sijin He'

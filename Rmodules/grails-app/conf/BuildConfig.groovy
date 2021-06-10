@@ -14,7 +14,7 @@
 * limitations under the License.
 ******************************************************************/
 
-String tmVersion = '19.0'
+String tmVersion = '19.1'
 
 def forkSettingsOther = [minMemory:  256, maxMemory: 1024, maxPerm: 384, debug: false]
 

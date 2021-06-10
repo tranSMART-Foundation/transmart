@@ -13,7 +13,7 @@ class smartRGrailsPlugin {
     public static final String DEFAULT_REMOTE_RSCRIPTS_DIRECTORY = '/tmp/smart_r_scripts'
     public static final String TRANSMART_EXTENSIONS_REGISTRY_BEAN_NAME = 'transmartExtensionsRegistry'
 
-    def version = '19.0'
+    def version = '19.1'
     def grailsVersion = '2.5.4 > *'
 
     def title = 'SmartR Plugin'

@@ -6,12 +6,12 @@ This repository contains Dalliance plugin for tranSMART based on Dalliance ver 0
 
 ### How to Use:
 
-Dalliance plugin can be embedded in your transmart application by include it in transmartApp's BuildConfig.groovy to have dalliance-plugin for transmart and add The Hyve repository
+The dalliance plugin can be embedded in your transmart application by including it in transmartApp's BuildConfig.groovy to have dalliance-plugin for transmart and add The Hyve repository
 
 ```
      plugins {
             ..
-            runtime ':dalliance-plugin:19.0'
+            runtime ':dalliance-plugin:19.1'
             ..
     }
     
@@ -27,7 +27,7 @@ Dalliance plugin can be embedded in your transmart application by include it in 
 After restarting transmartApp, dalliance-plugin will be downloaded and installed.
 
 
-### Embedding dalliance-plugin as inplace-plugin (for Development)
+### Embedding the dalliance-plugin as inplace-plugin (for Development)
 
 - Clone this project
 - Add following line in transmartApp's BuildConfig.groovy  

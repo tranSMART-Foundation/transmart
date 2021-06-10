@@ -1,6 +1,6 @@
 This repository is part of the tranSMART Foundation's release of
 transmartApp and the accompanying projects.
 
-VERSION: 19.0
+VERSION: 19.1
 
 [the version is also annotated in ./functional_tests/pom.xml]

@@ -2,7 +2,7 @@ import grails.util.Holders
 import org.springframework.stereotype.Component
 
 class TransmartGwasPlinkGrailsPlugin {
-    def version = '19.0'
+    def version = '19.1'
     def grailsVersion = '2.5.4 > *'
     def title = 'Transmart Gwas Plink Plugin'
     def author = 'Alexander Bondarev'
