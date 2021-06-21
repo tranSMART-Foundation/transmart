@@ -108,3 +108,9 @@ CREATE SEQUENCE seq_encounter_num
     NO MAXVALUE
     CACHE 1;
 
+--
+-- Make postgres-only serial-implied sequence start
+-- after possible i2b2 demodata load of 90753 rows
+--
+ALTER SEQUENCE observation_fact_text_search_index_seq
+    START WITH 100000;
