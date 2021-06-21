@@ -37,19 +37,11 @@
     "parents" : [ ]
   }, {
     "child" : {
-      "type" : "TRIGGER",
-      "owner" : "I2B2METADATA",
-      "name" : "TRG_I2B2_ID"
-    },
-      "parents" : [ {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_ID_SEQ"
-      }, {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "I2B2"
-      } ]
+      "name" : "PHI"
+    },
+    "parents" : [ ]
   }, {
     "child" : {
       "type" : "TRIGGER",
@@ -106,6 +98,17 @@
       "name" : "I2B2"
     } ]
   }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_FULLNAME_PHI_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI"
+    } ]
+  }, {
    "child" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
@@ -131,12 +134,34 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_SYNONYM_PHI_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_HLEVEL_I2B2_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
       "name" : "I2B2"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_HLEVEL_PHI_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI"
     } ]
   }, {
     "child" : {
@@ -153,12 +178,34 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_EXCLUSION_PHI_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_BASECODE_I2B2_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
       "name" : "I2B2"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_BASECODE_PHI_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI"
     } ]
   }, {
     "child" : {
@@ -273,6 +320,17 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_NAME_CODE_PHI_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_FULLNAME_BIRN_IDX"
     },
     "parents" : [ {
@@ -312,6 +370,17 @@
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
       "name" : "I2B2"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_APPLIED_PATH_PHI_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI"
     } ]
   }, {
     "child" : {
@@ -364,13 +433,6 @@
       "type" : "SEQUENCE",
       "owner" : "I2B2METADATA",
       "name" : "SEQ_I2B2_DATA_ID"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "SQ_I2B2_ID"
     },
     "parents" : [ ]
   }, {
@@ -486,14 +548,14 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "I2B2"
+      "name" : "PHI"
     },
-    "file" : "i2b2metadata/i2b2.sql"
+    "file" : "i2b2metadata/phi.sql"
   }, {
     "item" : {
-      "type" : "SEQUENCE",
+      "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "I2B2_ID_SEQ"
+      "name" : "I2B2"
     },
     "file" : "i2b2metadata/i2b2.sql"
   }, {
@@ -507,9 +569,23 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_EXCLUSION_PHI_IDX"
+    },
+    "file" : "i2b2metadata/phi.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_HLEVEL_I2B2_IDX"
     },
     "file" : "i2b2metadata/i2b2.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_HLEVEL_PHI_IDX"
+    },
+    "file" : "i2b2metadata/phi.sql"
   }, {
     "item" : {
       "type" : "INDEX",
@@ -528,6 +604,13 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_FULLNAME_PHI_IDX"
+    },
+    "file" : "i2b2metadata/phi.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_SYNONYM_I2B2_IDX"
     },
     "file" : "i2b2metadata/i2b2.sql"
@@ -535,9 +618,23 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_SYNONYM_PHI_IDX"
+    },
+    "file" : "i2b2metadata/phi.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_BASECODE_I2B2_IDX"
     },
     "file" : "i2b2metadata/i2b2.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_BASECODE_PHI_IDX"
+    },
+    "file" : "i2b2metadata/phi.sql"
   }, {
     "item" : {
       "type" : "INDEX",
@@ -619,6 +716,13 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_NAME_CODE_PHI_IDX"
+    },
+    "file" : "i2b2metadata/phi.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_APPLIED_PATH_BIRN_IDX"
     },
     "file" : "i2b2metadata/birn.sql"
@@ -638,11 +742,11 @@
     "file" : "i2b2metadata/i2b2.sql"
   }, {
     "item" : {
-      "type" : "TRIGGER",
+      "type" : "INDEX",
       "owner" : "I2B2METADATA",
-      "name" : "TRG_I2B2_ID"
+      "name" : "META_APPLIED_PATH_PHI_IDX"
     },
-    "file" : "i2b2metadata/i2b2.sql"
+    "file" : "i2b2metadata/phi.sql"
   }, {
     "item" : {
       "type" : "TRIGGER",
@@ -704,13 +808,6 @@
       "type" : "SEQUENCE",
       "owner" : "I2B2METADATA",
       "name" : "SEQ_I2B2_DATA_ID"
-    },
-    "file" : "i2b2metadata/_misc.sql"
-  }, {
-    "item" : {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "SQ_I2B2_ID"
     },
     "file" : "i2b2metadata/_misc.sql"
   }, {

@@ -8,6 +8,7 @@
 \i i2b2metadata/icd9_icd10.sql
 \i i2b2metadata/views/i2b2_trial_nodes.sql
 \i i2b2metadata/ont_process_status.sql
+\i i2b2metadata/phi.sql
 \i i2b2metadata/schemes.sql
 \i i2b2metadata/table_access.sql
 \i i2b2metadata/tmp_secure_token.sql
