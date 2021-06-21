@@ -118,7 +118,6 @@ BEGIN
 	,import_date
 	,sourcesystem_cd
 	,valuetype_cd
-	,i2b2_id
     )
     select 0 as c_hlevel
 	   ,rootPath as c_fullname
@@ -141,7 +140,6 @@ BEGIN
 	   ,sysdate as import_date
 	   ,null as sourcesystem_cd
 	   ,null as valuetype_cd
-	   ,I2B2_ID_SEQ.nextval as i2b2_id
       from dual
      where not exists
 	   (select 1 from i2b2metadata.i2b2 x

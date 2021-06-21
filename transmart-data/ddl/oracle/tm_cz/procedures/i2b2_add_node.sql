@@ -126,7 +126,6 @@ BEGIN
 	    , C_OPERATOR
 	    , c_columndatatype
 	    , c_comment
-	    ,i2b2_id
 	    , m_applied_path)
 	SELECT (
 	    length(concept_path) - nvl(length(replace(concept_path, '\')),0)) / length('\') - 2 + root_level,
@@ -147,7 +146,6 @@ BEGIN
 	       'LIKE',
 	       'T',
 	       decode(TrialID,null,null,'trial:' || TrialID),
-	       i2b2_id_seq.nextval,
 	       '@'
 	  from i2b2demodata.concept_dimension
 	 where CONCEPT_PATH = path;

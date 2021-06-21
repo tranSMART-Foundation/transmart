@@ -18,16 +18,15 @@ CREATE TABLE i2b2 (
     c_dimcode character varying(700) NOT NULL,
     c_comment text,
     c_tooltip character varying(900),
-    m_applied_path character varying(700) DEFAULT '@'::character varying NOT NULL,
     update_date timestamp NOT NULL,
     download_date timestamp,
     import_date timestamp,
     sourcesystem_cd character varying(50),
     valuetype_cd character varying(50),
+    m_applied_path character varying(700) DEFAULT '@'::character varying NOT NULL,
     m_exclusion_cd character varying(25),
     c_path character varying(700),
-    c_symbol character varying(50),
-    i2b2_id int		-- not in i2b2
+    c_symbol character varying(50)
 );
 
 --
@@ -62,34 +61,3 @@ CREATE INDEX idx_i2b2_basecode_fullname ON i2b2 USING btree (c_basecode, c_fulln
 -- Name: idx_i2b2_visatt; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
 CREATE INDEX idx_i2b2_visatt ON i2b2 USING btree (c_visualattributes); --not in i2b2
-
-
---
--- Name: tf_trg_i2b2_id(); Type: FUNCTION; Schema: i2b2metadata; Owner: -
---
-CREATE FUNCTION tf_trg_i2b2_id() RETURNS trigger
-    LANGUAGE plpgsql
-AS $$
-begin
-    if new.i2b2_id is null then
-        select nextval('i2b2metadata.i2b2_id_seq') into new.i2b2_id ;
-    end if;
-    return new;
-end;
-$$;
-
---
--- Name: trg_i2b2_id; Type: TRIGGER; Schema: i2b2metadata; Owner: -
---
-CREATE TRIGGER trg_i2b2_id BEFORE INSERT ON i2b2 FOR EACH ROW EXECUTE PROCEDURE tf_trg_i2b2_id();
-
---
--- name: i2b2_id_seq; Type: SEQUENCE; Schema: i2b2metadata; Owner: -
---
-CREATE SEQUENCE i2b2_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-

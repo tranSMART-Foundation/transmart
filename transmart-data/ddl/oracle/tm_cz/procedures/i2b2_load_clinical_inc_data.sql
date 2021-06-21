@@ -888,7 +888,6 @@ BEGIN
 	,c_operator
 	,c_columndatatype
 	,c_comment
-	,i2b2_id
 	,c_metadataxml
     )
     select /*+ parallel(concept_dimension, 8) */ (
@@ -910,7 +909,6 @@ BEGIN
 	,'LIKE'
 	,'T'		-- if i2b2 gets fixed to respect c_columndatatype then change to t.data_type
 	,'trial:' || TrialID
-	,i2b2_id_seq.nextval
 	,case when t.data_type = 'T' then null
 	 else '<?xml version="1.0"?><ValueMetadata><Version>3.02</Version><CreationDateTime>08/14/2008 01:22:59</CreationDateTime><TestID></TestID><TestName></TestName><DataType>PosFloat</DataType><CodeType></CodeType><Loinc></Loinc><Flagstouse></Flagstouse><Oktousevalues>Y</Oktousevalues><MaxStringLength></MaxStringLength><LowofLowValue>0</LowofLowValue><HighofLowValue>0</HighofLowValue><LowofHighValue>100</LowofHighValue>100<HighofHighValue>100</HighofHighValue><LowofToxicValue></LowofToxicValue><HighofToxicValue></HighofToxicValue><EnumValues></EnumValues><CommentsDeterminingExclusion><Com></Com></CommentsDeterminingExclusion><UnitValues><NormalUnits>ratio</NormalUnits><EqualUnits></EqualUnits><ExcludingUnits></ExcludingUnits><ConvertingUnits><Units></Units><MultiplyingFactor></MultiplyingFactor></ConvertingUnits></UnitValues><Analysis><Enums /><Counts /><New /></Analysis></ValueMetadata>'
 	 end

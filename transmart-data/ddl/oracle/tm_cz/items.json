@@ -912,10 +912,6 @@
       "owner" : "I2B2METADATA",
       "name" : "I2B2"
     }, {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_ID_SEQ"
-    }, {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
       "name" : "OBSERVATION_FACT"
@@ -954,10 +950,6 @@
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
       "name" : "I2B2"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_ID_SEQ"
     }, {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
@@ -1637,10 +1629,6 @@
       "owner" : "TM_CZ",
       "name" : "I2B2_FILL_IN_TREE"
     }, {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_ID_SEQ"
-    }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_LOAD_SECURITY_DATA"
@@ -1783,10 +1771,6 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_FILL_IN_TREE"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_ID_SEQ"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -2627,10 +2611,6 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "CZX_WRITE_AUDIT"
-    }, {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_ID_SEQ"
     }, {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
