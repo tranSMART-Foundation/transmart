@@ -21,5 +21,3 @@ load_%:
 		$(PSQL_COMMAND) -c "COPY $(THIS_SCHEMA).$* FROM STDIN \
 			CSV DELIMITER E'\t'" < $(OUTDIR)/$*.tsv; \
 	fi
-
-# vim: set ft=make:

@@ -1,0 +1,2 @@
+"PHI"	"PHI"	"Y"	"0"	"\PHI\"	"Protected Health Information"	"N"	"CA "				"concept_cd"	"concept_dimension"	"concept_path"	"T"	"LIKE"	"\PHI\"		"PHI"					"DATA_PROT"
+"I2B2"	"I2B2"	"Y"	"0"	"\i2b2\"	"I2b2 CRC Demo Data"	"N"	"CA "				"concept_cd"	"concept_dimension"	"concept_path"	"T"	"LIKE"	"\i2b2\"		"I2B2"					"DATA_PROT"

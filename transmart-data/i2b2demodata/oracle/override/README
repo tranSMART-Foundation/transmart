@@ -1,0 +1,9 @@
+The schemas should be synchronized between PostgreSQL and Oracle.
+
+That should be the case in 1.6.1 onwards.
+
+However, if at any time they are not, adding *.skip files below here
+creates data dumps specific for the Oracle version from a 'make dump'
+in the data/oracle directory.
+
+

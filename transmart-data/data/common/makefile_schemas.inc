@@ -12,5 +12,5 @@ endif
 ifdef THIS_SCHEMA
 SCHEMA_COMP := '$(THIS_SCHEMA)'
 else
-SCHEMA_COMP := IN ('i2b2demodata', 'i2b2metadata', 'deapp', 'biomart', 'biomart_user', 'searchapp', 'amapp')
+SCHEMA_COMP := IN ('amapp', 'biomart', 'biomart_user', 'deapp', 'searchapp', 'i2b2demodata', 'i2b2hive', 'i2b2metadata')
 endif
