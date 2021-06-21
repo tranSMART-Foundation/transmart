@@ -5,7 +5,6 @@ CREATE TABLE table_access (
     c_table_cd character varying(50) NOT NULL,
     c_table_name character varying(50) NOT NULL,
     c_protected_access character(1),
-    c_ontology_protection text,
     c_hlevel int NOT NULL,
     c_fullname character varying(700) NOT NULL,
     c_name character varying(2000) NOT NULL,
@@ -25,7 +24,8 @@ CREATE TABLE table_access (
     c_entry_date timestamp,
     c_change_date timestamp,
     c_status_cd character(1),
-    valuetype_cd character varying(50)
+    valuetype_cd character varying(50),
+    c_ontology_protection text
 );
 
 --
