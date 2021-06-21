@@ -310,7 +310,7 @@ begin
 	'end,4) as normalized_value ' ||
 	',trim(substr(m.probeset_id ,tm_cz.instr(m.probeset_id ,''('',-1,1),length(m.probeset_id ))) ' ||
 	',(CASE WHEN m.zscore < -2.5 THEN -2.5 WHEN m.zscore >  2.5 THEN  2.5 ELSE m.zscore END) ' ||
-	',nextval(''deapp.RBM_ANNOTATION_ID'') '||
+	',nextval(''deapp.rbm_annotation_id'') '||
 	'from tm_wz.wt_subject_rbm_med m ' ||
 	',tm_wz.wt_subject_rbm_probeset p ' ||
 	',deapp.DE_RBM_ANNOTATION a ' ||

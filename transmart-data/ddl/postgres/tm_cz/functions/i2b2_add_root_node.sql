@@ -172,9 +172,6 @@ begin
 	       ,null as m_exclusion_cd
 	       ,null as c_path
 	       ,null as c_symbol
-	    --	add trigger on i2b2 insert
-	    --,nextval('i2b2metadata.i2b2_id_seq')
-	    --,I2B2_ID_SEQ.nextval as i2b2_id
 	 where not exists
 	       (select 1 from i2b2metadata.i2b2 x
 		 where x.c_name = rootNode);

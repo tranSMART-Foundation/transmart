@@ -245,7 +245,7 @@ begin
 	    import_date,
 	    sourcesystem_cd
 	)
-	select nextval('seq_patient_num')
+	select nextval('i2b2demodata.seq_patient_num')
 	       ,x.sex_cd
 	       ,x.age_in_years_num
 	       ,x.race_cd

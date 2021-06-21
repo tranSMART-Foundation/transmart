@@ -64,7 +64,7 @@ begin
 	import_date,
 	sourcesystem_cd
 	)
-	select seq_patient_num.nextval,
+	select i2b2demodata.seq_patient_num.nextval,
 	'Unknown' as sex_cd,
 	null::integer as age_in_years_num,
 	null as race_cd,
