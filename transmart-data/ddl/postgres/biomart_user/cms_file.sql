@@ -7,7 +7,7 @@ CREATE TABLE cms_file (
     content_type character varying(255) NOT NULL,
     instance_type character varying(255) NOT NULL,
     last_updated timestamp,
-    version int,
+    version int NOT NULL,
     bytes bytea
 );
 
