@@ -57,7 +57,7 @@ BEGIN
       
       is_leaf := 'LA';
       
-      select prefix||nextval('seq_i2b2_data_id')
+      select prefix||nextval('i2b2metadata.seq_i2b2_data_id')
       into concept_code ;
       
       --is_number :='&is_number';
