@@ -1,11 +1,10 @@
 \i i2b2metadata/prelude.sql
-\i i2b2metadata/functions/add_ontology_node.sql
 \i i2b2metadata/birn.sql
 \i i2b2metadata/custom_meta.sql
 \i i2b2metadata/i2b2.sql
 \i i2b2metadata/i2b2_secure.sql
 \i i2b2metadata/i2b2_tags.sql
-\i i2b2metadata/icd9_icd10.sql
+\i i2b2metadata/icd10_icd9.sql
 \i i2b2metadata/views/i2b2_trial_nodes.sql
 \i i2b2metadata/ont_process_status.sql
 \i i2b2metadata/phi.sql
@@ -15,3 +14,9 @@
 \i i2b2metadata/totalnum.sql
 \i i2b2metadata/totalnum_report.sql
 \i i2b2metadata/_misc.sql
+\i i2b2metadata/functions/add_ontology_node.sql
+\i i2b2metadata/functions/random_normal.sql
+\i i2b2metadata/functions/buildtotalnumreport.sql
+\i i2b2metadata/functions/pat_count_dimensions.sql
+\i i2b2metadata/functions/pat_count_visits.sql
+\i i2b2metadata/functions/runtotalnum.sql
