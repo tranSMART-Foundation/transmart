@@ -10,6 +10,28 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
+      "name" : "DE_GI_EID_GS_ID_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_GENE_INFO"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_GI_GS_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_GENE_INFO"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
       "name" : "TR_EVENT_GENE_GENE_ID"
     },
     "parents" : [ {
@@ -233,6 +255,17 @@
     } ]
   }, {
     "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_MICROARRAY_DATA_IDX6"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_SUBJECT_MICROARRAY_DATA"
+    } ]
+  }, {
+    "child" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
       "name" : "DE_MRNA_ANNOTATION"
@@ -264,7 +297,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
-      "name" : "DE_MRNA_ANNOTATION_INDEX1"
+      "name" : "DE_MRNA_ANNOTATION_IDX3"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -426,6 +459,39 @@
       "type" : "TABLE",
       "owner" : "DEAPP",
       "name" : "DE_RBM_DATA_ANNOTATION_JOIN"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_RC_SNP_INFO_CHROM_POS_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_RC_SNP_INFO"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_RC_SNP_INFO_ENTREZ_ID_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_RC_SNP_INFO"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_RC_SNP_INFO_RS_ID_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_RC_SNP_INFO"
     } ]
   }, {
     "child" : {
@@ -1394,7 +1460,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
-      "name" : "IDX_PATHWAY_GENE_PATHWAY"
+      "name" : "DE_PATHWAY_GENE_PATHWAY"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -2117,7 +2183,18 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
-      "name" : "GEN_VARIANT_SUBJ_SUMM_CHR_POS"
+      "name" : "VARIANT_SUBJ_SUMM_CHR_POS"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "DEAPP",
+      "name" : "DE_VARIANT_SUBJECT_SUMMARY"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "VARIANT_SUBJ_SUMM_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -2222,6 +2299,20 @@
     },
     "file" : "deapp/de_encounter_type.sql"
   }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_GI_EID_GS_ID_IDX"
+    },
+    "file" : "deapp/de_gene_info.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_GI_GS_IDX"
+    },
+    "file" : "deapp/de_gene_info.sql"
+   }, {
     "item" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
@@ -2328,6 +2419,13 @@
     "file" : "deapp/de_subject_microarray_data.sql"
   }, {
     "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_MICROARRAY_DATA_IDX6"
+    },
+    "file" : "deapp/de_subject_microarray_data.sql"
+  }, {
+    "item" : {
       "type" : "TABLE",
       "owner" : "DEAPP",
       "name" : "DE_MRNA_ANNOTATION"
@@ -2351,7 +2449,7 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
-      "name" : "DE_MRNA_ANNOTATION_INDEX1"
+      "name" : "DE_MRNA_ANNOTATION_IDX3"
     },
     "file" : "deapp/de_mrna_annotation.sql"
   }, {
@@ -2466,6 +2564,27 @@
       "name" : "DE_RBM_DATA_ANN_JN_DATA_ID_FK"
     },
     "file" : "deapp/de_rbm_data_annotation_join.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_RC_SNP_INFO_CHROM_POS_IDX"
+    },
+    "file" : "deapp/de_rc_snp_info.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_RC_SNP_INFO_ENTREZ_ID_IDX"
+    },
+    "file" : "deapp/de_rc_snp_info.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "DE_RC_SNP_INFO_RS_ID_IDX"
+    },
+    "file" : "deapp/de_rc_snp_info.sql"
   }, {
     "item" : {
       "type" : "TABLE",
@@ -2811,13 +2930,6 @@
     "file" : "deapp/de_two_region_event_gene.sql"
   }, {
     "item" : {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_TWO_REGION_EVENT_GENE"
-    },
-    "file" : "deapp/de_two_region_event_gene.sql"
-  }, {
-    "item" : {
       "type" : "REF_CONSTRAINT",
       "owner" : "DEAPP",
       "name" : "TWO_REGION_EVENT_GENE_FK"
@@ -3009,7 +3121,14 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
-      "name" : "GEN_VARIANT_SUBJ_SUMM_CHR_POS"
+      "name" : "VARIANT_SUBJ_SUMM_CHR_POS"
+    },
+    "file" : "deapp/de_variant_subject_summary.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "DEAPP",
+      "name" : "VARIANT_SUBJ_SUMM_IDX"
     },
     "file" : "deapp/de_variant_subject_summary.sql"
   }, {
@@ -3198,7 +3317,7 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "DEAPP",
-      "name" : "IDX_PATHWAY_GENE_PATHWAY"
+      "name" : "DE_PATHWAY_GENE_PATHWAY"
     },
     "file" : "deapp/de_pathway_gene.sql"
   }, {

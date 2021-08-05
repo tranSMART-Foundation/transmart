@@ -59,13 +59,6 @@
       } ]
   }, {
     "child" : {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2_ID_SEQ"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
       "name" : "TOTALNUM_IDX"
@@ -117,7 +110,51 @@
     "parents" : [ {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
-      "name" : "I2B2"
+      "name" : "ICD10_ICD9"
+    } ]
+  }, {
+   "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_APPL_PATH_ICD10_ICD9_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "ICD10_ICD9"
+    } ]
+  }, {
+   "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_EXCLUSION_ICD10_ICD9_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "ICD10_ICD9"
+    } ]
+  }, {
+   "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_HLEVEL_ICD10_ICD9_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "ICD10_ICD9"
+    } ]
+  }, {
+   "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_SYNONYM_ICD10_ICD9_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "ICD10_ICD9"
     } ]
   }, {
     "child" : {
@@ -178,7 +215,29 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_VISATT_I2B2_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "I2B2"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_EXCLUSION_PHI_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI_VISATT_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -562,6 +621,13 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
+      "name" : "META_VISATT_I2B2_IDX"
+    },
+    "file" : "i2b2metadata/i2b2.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
       "name" : "META_EXCLUSION_I2B2_IDX"
     },
     "file" : "i2b2metadata/i2b2.sql"
@@ -570,6 +636,13 @@
       "type" : "INDEX",
       "owner" : "I2B2METADATA",
       "name" : "META_EXCLUSION_PHI_IDX"
+    },
+    "file" : "i2b2metadata/phi.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "PHI_VISATT_IDX"
     },
     "file" : "i2b2metadata/phi.sql"
   }, {
@@ -592,7 +665,35 @@
       "owner" : "I2B2METADATA",
       "name" : "META_FULLNAME_ICD10_ICD9_IDX"
     },
-    "file" : "i2b2metadata/i2b2.sql"
+    "file" : "i2b2metadata/icd10_icd9.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_APPL_PATH_ICD10_ICD9_IDX"
+    },
+    "file" : "i2b2metadata/icd10_icd9.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_EXCLUSION_ICD10_ICD9_IDX"
+    },
+    "file" : "i2b2metadata/icd10_icd9.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_HLEVEL_ICD10_ICD9_IDX"
+    },
+    "file" : "i2b2metadata/icd10_icd9.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "META_SYNONYM_ICD10_ICD9_IDX"
+    },
+    "file" : "i2b2metadata/icd10_icd9.sql"
   }, {
     "item" : {
       "type" : "INDEX",

@@ -10,7 +10,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "TM_LZ",
-      "name" : "IDX_SCD_STUDY"
+      "name" : "SCD_STUDY_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -185,6 +185,17 @@
       "name" : "LT_SRC_MRNA_DISPLAY_MAPPING"
     },
     "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "TM_LZ",
+      "name" : "LZ_SRC_MRNA_SUBJ_SAMP_IDX1"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "TM_LZ",
+      "name" : "LT_SRC_MRNA_SUBJ_SAMP_MAP"
+    } ]
   }, {
     "child" : {
       "type" : "TABLE",
@@ -528,7 +539,7 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "TM_LZ",
-      "name" : "IDX_SCD_STUDY"
+      "name" : "SCD_STUDY_IDX"
     },
     "file" : "tm_lz/lt_src_clinical_data.sql"
   }, {
@@ -699,6 +710,13 @@
       "name" : "LT_SRC_MRNA_DISPLAY_MAPPING"
     },
     "file" : "tm_lz/lt_src_mrna_display_mapping.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "TM_LZ",
+      "name" : "LZ_SRC_MRNA_SUBJ_SAMP_IDX1"
+    },
+    "file" : "tm_lz/lt_src_mrna_subj_samp_map.sql"
   }, {
     "item" : {
       "type" : "TABLE",

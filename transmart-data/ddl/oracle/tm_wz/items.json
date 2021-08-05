@@ -31,7 +31,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "TM_WZ",
-      "name" : "IDX_WRK_CD"
+      "name" : "WRK_CD_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -42,7 +42,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "TM_WZ",
-      "name" : "IDX_WTN_LOAD_CLINICAL"
+      "name" : "WTN_LOAD_CLINICAL_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -53,7 +53,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "TM_WZ",
-      "name" : "IDX_WT_TRIALNODES"
+      "name" : "WT_TRIALNODES_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -630,21 +630,21 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "TM_WZ",
-      "name" : "IDX_WRK_CD"
+      "name" : "WRK_CD_IDX"
     },
     "file" : "tm_wz/wrk_clinical_data.sql"
   }, {
     "item" : {
       "type" : "INDEX",
       "owner" : "TM_WZ",
-      "name" : "IDX_WTN_LOAD_CLINICAL"
+      "name" : "WTN_LOAD_CLINICAL_IDX"
     },
     "file" : "tm_wz/wt_trial_nodes.sql"
   }, {
     "item" : {
       "type" : "INDEX",
       "owner" : "TM_WZ",
-      "name" : "IDX_WT_TRIALNODES"
+      "name" : "WT_TRIALNODES_IDX"
     },
     "file" : "tm_wz/wt_trial_nodes.sql"
   }, {

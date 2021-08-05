@@ -234,17 +234,6 @@
       "name" : "GENE_ONTOLOGY_DATA"
     } ]
   }, {
-    "child" : {
-      "type" : "INDEX",
-      "owner" : "BIOMART_USER",
-      "name" : "OBSERVATION_FACT_PD"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "OBSERVATION_FACT"
-    } ]
-  }, {
    "child" : {
       "type" : "TYPE",
       "owner" : "BIOMART_USER",
@@ -401,13 +390,6 @@
       "name" : "IDX_GOD_SYMBOL"
     },
     "file" : "biomart_user/gene_ontology_data.sql"
-  }, {
-    "item" : {
-      "type" : "INDEX",
-      "owner" : "BIOMART_USER",
-      "name" : "OBSERVATION_FACT_PD"
-    },
-    "file" : "biomart_user/_cross.sql"
   }, {
     "item" : {
       "type" : "TYPE",

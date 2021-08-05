@@ -5730,7 +5730,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "TM_CZ",
-      "name" : "IDX_TMP_SUBJ_USUBJID"
+      "name" : "TMP_SUBJ_USUBJID_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -5758,28 +5758,6 @@
       "name" : "IS_NUMBER_V2"
     },
     "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "INDEX",
-      "owner" : "TM_CZ",
-      "name" : "IX_DE_SUBJECT_SMPL_MPNG_MRNA"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "DEAPP",
-      "name" : "DE_SUBJECT_SAMPLE_MAPPING"
-    } ]
-  }, {
-    "child" : {
-      "type" : "INDEX",
-      "owner" : "TM_CZ",
-      "name" : "IX_I2B2_SOURCE_SYSTEM_CD"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "I2B2METADATA",
-      "name" : "I2B2"
-    } ]
   }, {
     "child" : {
       "type" : "FUNCTION",
@@ -7876,7 +7854,7 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "TM_CZ",
-      "name" : "IDX_TMP_SUBJ_USUBJID"
+      "name" : "TMP_SUBJ_USUBJID_IDX"
     },
     "file" : "tm_cz/tmp_subject_info.sql"
   }, {
@@ -7900,20 +7878,6 @@
       "name" : "IS_NUMBER_V2"
     },
     "file" : "tm_cz/functions/is_number_v2.sql"
-  }, {
-    "item" : {
-      "type" : "INDEX",
-      "owner" : "TM_CZ",
-      "name" : "IX_DE_SUBJECT_SMPL_MPNG_MRNA"
-    },
-    "file" : "tm_cz/_cross.sql"
-  }, {
-    "item" : {
-      "type" : "INDEX",
-      "owner" : "TM_CZ",
-      "name" : "IX_I2B2_SOURCE_SYSTEM_CD"
-    },
-    "file" : "tm_cz/_cross.sql"
   }, {
     "item" : {
       "type" : "FUNCTION",

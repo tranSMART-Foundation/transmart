@@ -127,6 +127,28 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "BIOMART",
+      "name" : "BAAD_IDX_TEA_FG_EXPERIMENT"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "BIOMART",
+      "name" : "BIO_ASSAY_ANALYSIS_DATA_TEA"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "BIOMART",
+      "name" : "BAAD_IDX_TEA_RANK"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "BIOMART",
+      "name" : "BIO_ASSAY_ANALYSIS_DATA_TEA"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "BIOMART",
       "name" : "BAAD_IDX_TEA_EXP_ANALYSIS"
     },
     "parents" : [ {
@@ -827,6 +849,17 @@
       "type" : "TABLE",
       "owner" : "BIOMART",
       "name" : "BIO_ASSAY_DATA_STATS"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "BIOMART",
+      "name" : "BIO_A_O_AN_IDX2"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "BIOMART",
+      "name" : "BIO_ASSAY_DATA_ANNOTATION"
     } ]
   }, {
     "child" : {
@@ -3747,6 +3780,20 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "BIOMART",
+      "name" : "BAAD_IDX_TEA_FG_EXPERIMENT"
+    },
+    "file" : "biomart/bio_assay_analysis_data_tea.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "BIOMART",
+      "name" : "BAAD_IDX_TEA_RANK"
+    },
+    "file" : "biomart/bio_assay_analysis_data_tea.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "BIOMART",
       "name" : "BAAD_IDX_TEA_EXP_ANALYSIS"
     },
     "file" : "biomart/bio_assay_analysis_data_tea.sql"
@@ -4212,6 +4259,13 @@
       "name" : "BIO_A_D_S_F_G_S_IDX"
     },
     "file" : "biomart/bio_assay_data_stats.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "BIOMART",
+      "name" : "BIO_A_O_AN_IDX2"
+    },
+    "file" : "biomart/bio_assay_data_annotation.sql"
   }, {
     "item" : {
       "type" : "INDEX",

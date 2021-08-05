@@ -67,7 +67,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS_INDEX1"
+      "name" : "CONCEPT_COUNTS_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -176,52 +176,6 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$I"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$K"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$N"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$R"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$U"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "INDEX",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$X"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$I"
-    } ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
       "name" : "DX"
     },
     "parents" : [ ]
@@ -301,7 +255,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
-      "name" : "IDX_CONCEPT_CD"
+      "name" : "CD_CONCEPTCD_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -312,12 +266,34 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
-      "name" : "IDX_CONCEPT_PATH_CD"
+      "name" : "CD_UPLOADID_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
       "name" : "CONCEPT_DIMENSION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2DEMODATA",
+      "name" : "CD_PATH_CD_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "CONCEPT_DIMENSION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2DEMODATA",
+      "name" : "OF_CTX_BLOB"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "OBSERVATION_FACT"
     } ]
   }, {
     "child" : {
@@ -618,6 +594,17 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
+      "name" : "PATD_SOURCE_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "PATIENT_DIMENSION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2DEMODATA",
       "name" : "PATD_UPLOADID_IDX"
     },
     "parents" : [ {
@@ -640,7 +627,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
-      "name" : "PDX_IDX_DATES"
+      "name" : "PD_IDX_DATES"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -1621,7 +1608,7 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS_INDEX1"
+      "name" : "CONCEPT_COUNTS_IDX"
     },
     "file" : "i2b2demodata/concept_counts.sql"
   }, {
@@ -1733,48 +1720,6 @@
     "item" : {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$I"
-    },
-    "file" : "i2b2demodata/dr$of_ctx_blob$i.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$K"
-    },
-    "file" : "i2b2demodata/dr$of_ctx_blob$k.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$N"
-    },
-    "file" : "i2b2demodata/dr$of_ctx_blob$n.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$R"
-    },
-    "file" : "i2b2demodata/dr$of_ctx_blob$r.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$U"
-    },
-    "file" : "i2b2demodata/dr$of_ctx_blob$u.sql"
-  }, {
-    "item" : {
-      "type" : "INDEX",
-      "owner" : "I2B2DEMODATA",
-      "name" : "DR$OF_CTX_BLOB$X"
-    },
-    "file" : "i2b2demodata/dr$of_ctx_blob$i.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
       "name" : "DX"
     },
     "file" : "i2b2demodata/dx.sql"
@@ -1838,14 +1783,21 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
-      "name" : "IDX_CONCEPT_CD"
+      "name" : "CD_CONCEPTCD_IDX"
     },
     "file" : "i2b2demodata/concept_dimension.sql"
   }, {
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
-      "name" : "IDX_CONCEPT_PATH_CD"
+      "name" : "CD_PATH_CD_IDX"
+    },
+    "file" : "i2b2demodata/concept_dimension.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2DEMODATA",
+      "name" : "CD_UPLOADID_IDX"
     },
     "file" : "i2b2demodata/concept_dimension.sql"
   }, {
@@ -1853,6 +1805,13 @@
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
       "name" : "FACT_CNPT_IDX"
+    },
+    "file" : "i2b2demodata/observation_fact.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2DEMODATA",
+      "name" : "OF_CTX_BLOB"
     },
     "file" : "i2b2demodata/observation_fact.sql"
   }, {
@@ -2055,6 +2014,13 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
+      "name" : "PATD_SOURCE_IDX"
+    },
+    "file" : "i2b2demodata/patient_dimension.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2DEMODATA",
       "name" : "PATD_UPLOADID_IDX"
     },
     "file" : "i2b2demodata/patient_dimension.sql"
@@ -2062,7 +2028,7 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "I2B2DEMODATA",
-      "name" : "PDX_IDX_DATES"
+      "name" : "PD_IDX_DATES"
     },
     "file" : "i2b2demodata/patient_dimension.sql"
   }, {
@@ -2597,13 +2563,6 @@
       "name" : "TRG_ENCOUNTER_NUM"
     },
     "file" : "i2b2demodata/observation_fact.sql"
-  }, {
-    "item" : {
-      "type" : "SEQUENCE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "SEQ_PATIENT_NUM"
-    },
-    "file" : "i2b2demodata/patient_dimension.sql"
   }, {
     "item" : {
       "type" : "SEQUENCE",

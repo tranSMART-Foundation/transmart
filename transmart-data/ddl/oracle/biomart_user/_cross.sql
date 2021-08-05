@@ -25,8 +25,11 @@ group by  fd.unique_id, baa.analysis_name, baa.long_description;
 --
 -- Type: INDEX; Owner: BIOMART_USER; Name: OBSERVATION_FACT_PD
 --
-CREATE INDEX "BIOMART_USER"."OBSERVATION_FACT_PD" ON "I2B2DEMODATA"."OBSERVATION_FACT" ("PATIENT_NUM")
-TABLESPACE "INDX" ;
+-- Other indexes exist for observation_fact that allow a patient-num query
+-- No such index on postgres
+--CREATE INDEX "BIOMART_USER"."OBSERVATION_FACT_PD" ON "I2B2DEMODATA"."OBSERVATION_FACT" ("PATIENT_NUM")
+--TABLESPACE "INDX" ;
+
 --
 -- Type: VIEW; Owner: BIOMART_USER; Name: BROWSE_STUDIES_VIEW
 --

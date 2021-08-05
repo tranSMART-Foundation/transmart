@@ -123,7 +123,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "IDX_SK_DISPLAY_CATEGORY1"
+      "name" : "SK_DATA_DISPLAY_CAT_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -330,7 +330,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "SCH_KWD_DT_CAT_IDX"
+      "name" : "SK_DATA_CAT_IDX"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -622,7 +622,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "SEARCH_KEYWORD_INDEX1"
+      "name" : "SEARCH_KEYWORD_IDX1"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -633,7 +633,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "SEARCH_KEYWORD_INDEX2"
+      "name" : "SEARCH_KEYWORD_IDX2"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -644,7 +644,7 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "SEARCH_KEYWORD_INDEX3"
+      "name" : "SEARCH_KEYWORD_IDX3"
     },
     "parents" : [ {
       "type" : "TABLE",
@@ -1399,7 +1399,7 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "IDX_SK_DISPLAY_CATEGORY1"
+      "name" : "SK_DATA_DISPLAY_CAT_IDX"
     },
     "file" : "searchapp/search_keyword.sql"
   }, {
@@ -1497,7 +1497,7 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "SCH_KWD_DT_CAT_IDX"
+      "name" : "SK_DATA_CAT_IDX"
     },
     "file" : "searchapp/search_keyword.sql"
   }, {
@@ -1665,21 +1665,21 @@
     "item" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "SEARCH_KEYWORD_INDEX1"
+      "name" : "SEARCH_KEYWORD_IDX1"
     },
     "file" : "searchapp/search_keyword.sql"
   }, {
     "item" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "SEARCH_KEYWORD_INDEX2"
+      "name" : "SEARCH_KEYWORD_IDX2"
     },
     "file" : "searchapp/search_keyword.sql"
   }, {
     "item" : {
       "type" : "INDEX",
       "owner" : "SEARCHAPP",
-      "name" : "SEARCH_KEYWORD_INDEX3"
+      "name" : "SEARCH_KEYWORD_IDX3"
     },
     "file" : "searchapp/search_keyword.sql"
   }, {
@@ -1871,20 +1871,6 @@
       "name" : "SEQ_REQ_UPLOAD_FIELD_ID"
     },
     "file" : "searchapp/search_required_upload_field.sql"
-  }, {
-    "item" : {
-      "type" : "TRIGGER",
-      "owner" : "SEARCHAPP",
-      "name" : "TRG_IMPORT_XNAT_CONFIG_ID"
-    },
-    "file" : "searchapp/import_xnat_configuration.sql"
-  }, {
-    "item" : {
-      "type" : "REF_CONSTRAINT",
-      "owner" : "SEARCHAPP",
-      "name" : "IMPORT_XNAT_VAR_FK"
-    },
-    "file" : "searchapp/import_xnat_variable.sql"
   }, {
     "item" : {
       "type" : "TRIGGER",

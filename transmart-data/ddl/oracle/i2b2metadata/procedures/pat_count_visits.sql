@@ -31,7 +31,7 @@ execute immediate 'create table ontPatVisitDims as select c_fullname
         , c_operator
           , c_dimcode
           , c_totalnum as numpats
-	from '  || metadataTable  || ' where  m_applied_path = ''@''
+	from i2b2metadata.'  || metadataTable  || ' where  m_applied_path = ''@''
           and lower(c_tablename) in (''patient_dimension'', ''visit_dimension'') ';
 
 execute immediate 'create index ontPatVisitDims_idx on ontPatVisitDims(c_fullname)';
