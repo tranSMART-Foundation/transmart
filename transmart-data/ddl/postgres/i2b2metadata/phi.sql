@@ -30,34 +30,34 @@ CREATE TABLE phi (
 );
 
 --
--- Name: META_FULLNAME_IDX_phi; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: META_FULLNAME_phi_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX META_FULLNAME_IDX_phi ON phi USING btree (c_fullname);
+CREATE INDEX META_FULLNAME_phi_idx ON phi USING btree (c_fullname);
 --
--- Name: META_APPLIED_PATH_IDX_phi; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: META_APPLIED_PATH_phi_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX META_APPLIED_PATH_IDX_phi ON phi USING btree (m_applied_path);
+CREATE INDEX META_APPLIED_PATH_phi_idx ON phi USING btree (m_applied_path);
 --
--- Name: META_EXCLUSION_IDX_phi; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: META_EXCLUSION_phi_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX META_EXCLUSION_IDX_phi ON phi USING btree (m_exclusion_cd);
+CREATE INDEX META_EXCLUSION_phi_idx ON phi USING btree (m_exclusion_cd);
 --
--- Name: META_HLEVEL_IDX_phi; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: META_HLEVEL_phi_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX META_HLEVEL_IDX_phi ON phi USING btree (c_hlevel);
+CREATE INDEX META_HLEVEL_phi_idx ON phi USING btree (c_hlevel);
 --
--- Name: META_SYNONYM_IDX_phi; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: META_SYNONYM_phi_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX META_SYNONYM_IDX_phi ON phi USING btree (c_synonym_cd);
+CREATE INDEX META_SYNONYM_phi_idx ON phi USING btree (c_synonym_cd);
 --
 -- Name: phi_c_comment_char_length_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
 CREATE INDEX phi_c_comment_char_length_idx ON phi USING btree (c_comment, char_length((c_fullname)::text)); --not in i2b2
 --
--- Name: idx_phi_basecode_fullname; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: phi_basecode_fullname_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX idx_phi_basecode_fullname ON phi USING btree (c_basecode, c_fullname); --not in i2b2
+CREATE INDEX phi_basecode_fullname_idx ON phi USING btree (c_basecode, c_fullname); --not in i2b2
 --
--- Name: idx_phi_visatt; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: phi_visatt_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX idx_phi_visatt ON phi USING btree (c_visualattributes); --not in i2b2
+CREATE INDEX phi_visatt_idx ON phi USING btree (c_visualattributes); --not in i2b2

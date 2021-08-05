@@ -10,7 +10,7 @@ CREATE TABLE hive_cell_params (
     change_date timestamp,
     entry_date timestamp,
     changeby_char character varying(50),
-    status_cd character varying(50) NOT NULL
+    status_cd character varying(50)
 );
 --
 -- Name: hive_ce__pk; Type: CONSTRAINT; Schema: i2b2hive; Owner: -

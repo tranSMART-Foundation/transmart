@@ -13,15 +13,10 @@ CREATE TABLE bio_curation_dataset (
 );
 
 --
--- Name: bio_external_analysis_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_curation_dataset_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_curation_dataset
-    ADD CONSTRAINT bio_external_analysis_pk PRIMARY KEY (bio_curation_dataset_id);
-
---
--- Name: bio_curation_dataset_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_curation_dataset_pk ON bio_curation_dataset USING btree (bio_curation_dataset_id);
+    ADD CONSTRAINT bio_curation_dataset_pk PRIMARY KEY (bio_curation_dataset_id);
 
 --
 -- Name: tf_trg_bio_curation_dataset_id(); Type: FUNCTION; Schema: biomart; Owner: -

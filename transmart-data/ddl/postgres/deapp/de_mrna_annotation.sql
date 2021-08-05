@@ -12,10 +12,10 @@ CREATE TABLE de_mrna_annotation (
 );
 
 --
--- Name: de_mrna_annotation_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_mrna_annotation_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_mrna_annotation
-    ADD CONSTRAINT de_mrna_annotation_pkey PRIMARY KEY (de_mrna_annotation_id);
+    ADD CONSTRAINT de_mrna_annotation_pk PRIMARY KEY (de_mrna_annotation_id);
 
 --
 -- Name: de_mrna_annotation_idx1; Type: INDEX; Schema: deapp; Owner: -
@@ -26,6 +26,11 @@ CREATE INDEX de_mrna_annotation_idx1 ON de_mrna_annotation USING btree (gpl_id, 
 -- Name: de_mrna_annotation_idx2; Type: INDEX; Schema: deapp; Owner: -
 --
 CREATE INDEX de_mrna_annotation_idx2 ON de_mrna_annotation USING btree (gene_id, probeset_id);
+
+--
+-- Name: de_mrna_annotation_idx3; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_mrna_annotation_idx3 ON de_mrna_annotation USING btree (probeset_id);
 
 --
 -- Name: tf_trg_de_mrna_annotation_id(); Type: FUNCTION; Schema: deapp; Owner: -

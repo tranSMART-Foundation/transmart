@@ -37,8 +37,7 @@ CREATE INDEX pd_idx_dates ON patient_dimension USING btree (patient_num, vital_s
 --
 -- Name: PD_IDX_AllPatientDim; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX PD_IDX_AllPatientDim ON patient_dimension USING btree (patient_num, vital_status_cd, birth_date, death_date, sex_cd, age_in_years_num,
-	language_cd, race_cd, marital_status_cd, religion_cd, zip_cd, income_cd);
+CREATE INDEX PD_IDX_AllPatientDim ON patient_dimension USING btree (patient_num, vital_status_cd, birth_date, death_date, sex_cd, age_in_years_num, language_cd, race_cd, marital_status_cd, religion_cd, zip_cd, income_cd);
 
 --
 -- Name: PD_IDX_StateCityZip; Type: INDEX; Schema: i2b2demodata; Owner: -
@@ -46,14 +45,14 @@ CREATE INDEX PD_IDX_AllPatientDim ON patient_dimension USING btree (patient_num,
 CREATE INDEX PD_IDX_StateCityZip ON patient_dimension USING btree (statecityzip_path, patient_num);
 
 --
--- Name: PA_IDX_UPLOADID; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: PATD_UPLOADID_IDX; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX PA_IDX_UPLOADID ON patient_dimension USING btree (upload_id);
+CREATE INDEX PATD_UPLOADID_IDX ON patient_dimension USING btree (upload_id);
 
 --
--- Name: PA_IDX_UPLOADID; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: PATD_SOURCE_IDX; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX PA_IDX_SOURCESYSTEMCD ON patient_dimension USING btree (sourcesystem_cd);
+CREATE INDEX PATD_SOURCE_IDX ON patient_dimension USING btree (sourcesystem_cd);
 
 --
 -- Name: tf_trg_patient_dimension(); Type: FUNCTION; Schema: i2b2demodata; Owner: -

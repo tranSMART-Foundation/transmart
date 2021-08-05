@@ -24,11 +24,6 @@ ALTER TABLE ONLY bio_cell_line
     ADD CONSTRAINT celllinedictionary_pk PRIMARY KEY (bio_cell_line_id);
 
 --
--- Name: bio_cell_line_dict_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_cell_line_dict_pk ON bio_cell_line USING btree (bio_cell_line_id);
-
---
 -- Name: bio_cell_line_name_idx; Type: INDEX; Schema: biomart; Owner: -
 --
 CREATE INDEX bio_cell_line_name_idx ON bio_cell_line USING btree (cell_line_name, bio_cell_line_id);

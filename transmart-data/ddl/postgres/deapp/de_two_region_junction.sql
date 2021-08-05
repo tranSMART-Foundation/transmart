@@ -77,3 +77,17 @@ COMMENT ON COLUMN de_two_region_junction.is_in_frame IS 'whether junction is fra
 ALTER TABLE ONLY de_two_region_junction
     ADD CONSTRAINT de_two_region_junction_id_pk PRIMARY KEY (two_region_junction_id);
 
+--
+-- Name: tr_junction_assay; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX tr_junction_assay ON de_two_region_junction USING btree (assay_id);
+
+--
+-- Name: tr_junction_up_chr; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX tr_junction_up_chr ON de_two_region_junction USING btree (up_chr, up_pos);
+
+--
+-- Name: tr_junction_down_chr; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX tr_junction_down_chr ON de_two_region_junction USING btree (down_chr, down_pos);

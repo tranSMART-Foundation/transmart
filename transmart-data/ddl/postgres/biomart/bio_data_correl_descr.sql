@@ -12,15 +12,10 @@ CREATE TABLE bio_data_correl_descr (
 );
 
 --
--- Name: bio_marker_relationship_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_data_correl_descr_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_data_correl_descr
-    ADD CONSTRAINT bio_marker_relationship_pk PRIMARY KEY (bio_data_correl_descr_id);
-
---
--- Name: bio_data_correl_descr_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_data_correl_descr_pk ON bio_data_correl_descr USING btree (bio_data_correl_descr_id);
+    ADD CONSTRAINT bio_data_correl_descr_pk PRIMARY KEY (bio_data_correl_descr_id);
 
 --
 -- Name: tf_trg_bio_mkr_correl_descr_id(); Type: FUNCTION; Schema: biomart; Owner: -

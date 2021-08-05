@@ -15,11 +15,6 @@ ALTER TABLE ONLY bio_asy_analysis_pltfm
     ADD CONSTRAINT bio_assay_analysis_platform_pk PRIMARY KEY (bio_asy_analysis_pltfm_id);
 
 --
--- Name: bio_asy_analysis_pltfm_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_asy_analysis_pltfm_pk ON bio_asy_analysis_pltfm USING btree (bio_asy_analysis_pltfm_id);
-
---
 -- Name: tf_trg_bio_asy_analysis_pltfm_id(); Type: FUNCTION; Schema: biomart; Owner: -
 --
 CREATE FUNCTION tf_trg_bio_asy_analysis_pltfm_id() RETURNS trigger

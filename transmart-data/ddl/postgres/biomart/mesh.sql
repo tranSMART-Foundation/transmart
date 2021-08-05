@@ -12,15 +12,10 @@ CREATE TABLE mesh (
 -- Name: mesh_pkey; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY mesh
-    ADD CONSTRAINT mesh_pkey PRIMARY KEY (ui);
+    ADD CONSTRAINT mesh_pk PRIMARY KEY (ui);
 
 --
 -- Name: mesh_idx_mn; Type: INDEX; Schema: biomart; Owner: -
 --
 CREATE UNIQUE INDEX mesh_idx_mn ON mesh USING btree (mn);
-
---
--- Name: mesh_idx_ui; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX mesh_idx_ui ON mesh USING btree (ui);
 

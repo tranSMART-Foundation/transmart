@@ -30,13 +30,13 @@ CREATE TABLE birn (
     ) 
    ;
 --
--- Name: META_FULLNAME_IDX_birn; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: meta_fullname_birn_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX META_FULLNAME_IDX_birn ON birn USING btree (c_fullname)
+CREATE INDEX meta_fullname_birn_idx ON birn USING btree (c_fullname)
 ;
 
 --
--- Name: META_APPLIED_PATH_IDX_birn; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: meta_applied_path_birn_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX META_APPLIED_PATH_IDX_birn ON birn USING btree (m_applied_path)
+CREATE INDEX meta_applied_path_birn_idx ON birn USING btree (m_applied_path)
 ;

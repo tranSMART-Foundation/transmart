@@ -32,6 +32,26 @@ ALTER TABLE ONLY de_subject_rbm_data
     ADD CONSTRAINT pk_de_subject_rbm_data PRIMARY KEY (id);
 
 --
+-- Name: de_subject_rbm_mcidx1; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_subject_rbm_mcidx1 ON de_subject_rbm_data USING btree (trial_name);
+
+--
+-- Name: de_subject_rbm_mcidx2; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_subject_rbm_mcidx2 ON de_subject_rbm_data USING btree (antigen_name);
+
+--
+-- Name: de_subject_rbm_mcidx3; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_subject_rbm_mcidx3 ON de_subject_rbm_data USING btree (patient_id);
+
+--
+-- Name: de_subject_rbm_mcidx4; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_subject_rbm_mcidx4 ON de_subject_rbm_data USING btree (gene_symbol);
+
+--
 -- Name: tf_trg_de_subj_rbm_data_id(); Type: FUNCTION; Schema: deapp; Owner: -
 --
 CREATE FUNCTION tf_trg_de_subj_rbm_data_id() RETURNS trigger

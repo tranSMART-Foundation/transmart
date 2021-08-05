@@ -11,7 +11,7 @@ CREATE TABLE de_snp_copy_number (
 );
 
 --
--- Name: de_snp_copy_number_num_idx; Type: INDEX; Schema: deapp; Owner: -
+-- Name: idx_snp_copy_number_ps; Type: INDEX; Schema: deapp; Owner: -
 --
-CREATE INDEX de_snp_copy_number_num_idx ON de_snp_copy_number USING btree (patient_num);
+CREATE INDEX idx_snp_copy_number_ps ON de_snp_copy_number USING btree (patient_num, snp_name);
 

@@ -2,7 +2,7 @@
 -- Name: pm_project_request; Type: TABLE; Schema: i2b2pm; Owner: -
 --
 CREATE TABLE pm_project_request (
-    id int,
+    id int NOT NULL,
     title character varying(255),
     request_xml text NOT NULL,
     change_date timestamp,

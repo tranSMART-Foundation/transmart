@@ -16,11 +16,6 @@ ALTER TABLE ONLY bio_data_attribute
     ADD CONSTRAINT bio_data_attr_pk PRIMARY KEY (bio_data_attribute_id);
 
 --
--- Name: bio_data_attribute_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_data_attribute_pk ON bio_data_attribute USING btree (bio_data_attribute_id);
-
---
 -- Name: tf_trg_bio_data_attr_id(); Type: FUNCTION; Schema: biomart; Owner: -
 --
 CREATE FUNCTION tf_trg_bio_data_attr_id() RETURNS trigger

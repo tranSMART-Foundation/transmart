@@ -25,10 +25,10 @@ CREATE TABLE bio_experiment (
 );
 
 --
--- Name: experimentdim_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_experiment_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_experiment
-    ADD CONSTRAINT experimentdim_pk PRIMARY KEY (bio_experiment_id);
+    ADD CONSTRAINT bio_experiment_pk PRIMARY KEY (bio_experiment_id);
 
 --
 -- Name: bio_exp_acen_idx; Type: INDEX; Schema: biomart; Owner: -
@@ -39,11 +39,6 @@ CREATE INDEX bio_exp_acen_idx ON bio_experiment USING btree (accession);
 -- Name: bio_exp_type_idx; Type: INDEX; Schema: biomart; Owner: -
 --
 CREATE INDEX bio_exp_type_idx ON bio_experiment USING btree (bio_experiment_type);
-
---
--- Name: bio_experiment_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_experiment_pk ON bio_experiment USING btree (bio_experiment_id);
 
 --
 -- Name: tf_trg_bio_experiment_id(); Type: FUNCTION; Schema: biomart; Owner: -

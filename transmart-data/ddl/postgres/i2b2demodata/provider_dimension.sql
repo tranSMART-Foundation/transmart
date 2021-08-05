@@ -25,7 +25,7 @@ ALTER TABLE ONLY provider_dimension
 CREATE INDEX pd_idx_name_char ON provider_dimension USING btree (provider_id, name_char);
 
 --
--- Name: PD_IDX_UPLOADID; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: PROD_UPLOADID_IDX; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX pd_idx_uploadid ON provider_dimension USING btree (upload_id);
+CREATE INDEX prod_uploadid_idx ON provider_dimension USING btree (upload_id);
 

@@ -2,7 +2,7 @@
 -- Name: pm_approvals_params; Type: TABLE; Schema: i2b2pm; Owner: -
 --
 CREATE TABLE pm_approvals_params (
-    id int,
+    id int NOT NULL,
     approval_id character varying(50) NOT NULL,
     param_name_cd character varying(50) NOT NULL,
     value text,

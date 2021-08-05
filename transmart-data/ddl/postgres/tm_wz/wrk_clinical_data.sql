@@ -37,3 +37,7 @@ CREATE TABLE wrk_clinical_data (
     sample_cd character varying(200)
 );
 
+--
+-- Name: wrk_cd_idx; Type: INDEX; Schema: tm_wz; Owner: -
+--
+CREATE INDEX wrk_cd_idx ON wrk_clinical_data USING btree (data_type, data_value, visit_name, data_label, category_cd, usubjid);

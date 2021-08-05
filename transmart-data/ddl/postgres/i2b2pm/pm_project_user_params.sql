@@ -2,7 +2,7 @@
 -- Name: pm_project_user_params; Type: TABLE; Schema: i2b2pm; Owner: -
 --
 CREATE TABLE pm_project_user_params (
-    id int,
+    id int NOT NULL,
     datatype_cd character varying(50),
     project_id character varying(50) NOT NULL,
     user_id character varying(50) NOT NULL,

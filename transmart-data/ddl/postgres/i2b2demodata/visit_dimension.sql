@@ -26,17 +26,17 @@ ALTER TABLE ONLY visit_dimension
     ADD CONSTRAINT visit_dimension_pk PRIMARY KEY (encounter_num, patient_num);
 
 --
--- Name: INDEX VD_IDX_DATES; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: VISITDIM_STD_EDD_IDX; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX VD_IDX_DATES ON visit_dimension USING btree (start_date, end_date);
+CREATE INDEX VISITDIM_STD_EDD_IDX ON visit_dimension USING btree (start_date, end_date);
 
 --
 -- Name: INDEX VD_IDX_AllVisitDim; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX VD_IDX_AllVisitDim ON visit_dimension USING btree (encounter_num, patient_num,
-	inout_cd, location_cd, start_date, length_of_stay, end_date); -- i2b2 differs on oracle: uses location_path
-
+CREATE INDEX VD_IDX_AllVisitDim ON visit_dimension USING btree (encounter_num, patient_num, inout_cd, location_cd, start_date, length_of_stay, end_date);
+-- i2b2 differs on oracle: uses location_path
+ 
 --
--- Name: VD_IDX_UPLOADID; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: VD_UPLOADID_IDX; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX VD_IDX_UPLOADID ON visit_dimension USING btree (upload_id);
+CREATE INDEX VD_UPLOADID_IDX ON visit_dimension USING btree (upload_id);

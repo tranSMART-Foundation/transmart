@@ -24,15 +24,10 @@ CREATE TABLE bio_assay (
 );
 
 --
--- Name: rbmorderdim_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_assay_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_assay
-    ADD CONSTRAINT rbmorderdim_pk PRIMARY KEY (bio_assay_id);
-
---
--- Name: bio_assay_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_assay_pk ON bio_assay USING btree (bio_assay_id);
+    ADD CONSTRAINT bio_assay_pk PRIMARY KEY (bio_assay_id);
 
 --
 -- Name: tf_trg_bio_assay_id(); Type: FUNCTION; Schema: biomart; Owner: -

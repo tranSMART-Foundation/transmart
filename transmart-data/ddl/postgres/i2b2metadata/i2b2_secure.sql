@@ -34,7 +34,7 @@ CREATE TABLE i2b2_secure (
 --
 -- Name: i2b2_sec_srcsys; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX sec_srcsys ON i2b2_secure USING btree (sourcesystem_cd);
+CREATE INDEX i2b2_sec_srcsys ON i2b2_secure USING btree (sourcesystem_cd);
 
 --
 -- Name: i2b2_sec_name_cd_lvl; Type: INDEX; Schema: i2b2metadata; Owner: -
@@ -42,9 +42,9 @@ CREATE INDEX sec_srcsys ON i2b2_secure USING btree (sourcesystem_cd);
 CREATE INDEX i2b2_sec_name_cd_lvl ON i2b2_secure USING btree (c_fullname, c_synonym_cd, c_hlevel);
 
 --
--- Name: i2b2_sec_name_cd_vid; Type: INDEX; Schema: i2b2metadata; Owner: -
+-- Name: i2b2_sec_name_cd_vis; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX i2b2_sec_name_cd_vd ON i2b2_secure USING btree (c_fullname, c_basecode, c_visualattributes);
+CREATE INDEX i2b2_sec_name_cd_vis ON i2b2_secure USING btree (c_fullname, c_basecode, c_visualattributes);
 
 --
 -- Name: i2b2_sec_upname; Type: INDEX; Schema: i2b2metadata; Owner: -

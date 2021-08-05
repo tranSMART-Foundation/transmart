@@ -8,8 +8,8 @@ CREATE TABLE concept_counts (
 );
 
 --
--- Name: idx_count_concept_path; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: concept_counts_idx; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX idx_count_concept_path ON concept_counts USING btree (concept_path);
+CREATE INDEX concept_counts_IDX ON concept_counts USING btree (concept_path);
 
 

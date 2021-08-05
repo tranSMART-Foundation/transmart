@@ -36,6 +36,7 @@ $permissions = [
 	],
 	'i2b2demodata' => [
 		'tm_cz' => 'full',
+		'i2b2metadata' => 'read',
 		'biomart_user' => 'read',
 	],
 	'i2b2hive' => [

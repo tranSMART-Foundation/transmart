@@ -23,11 +23,6 @@ ALTER TABLE ONLY bio_assay_data
     ADD CONSTRAINT bio_experiment_data_fact_pk PRIMARY KEY (bio_assay_data_id);
 
 --
--- Name: bio_assay_data_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_assay_data_pk ON bio_assay_data USING btree (bio_assay_data_id);
-
---
 -- Name: tf_trg_bio_assay_data_id(); Type: FUNCTION; Schema: biomart; Owner: -
 --
 CREATE FUNCTION tf_trg_bio_assay_data_id() RETURNS trigger

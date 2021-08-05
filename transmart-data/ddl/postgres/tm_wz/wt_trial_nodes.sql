@@ -19,3 +19,12 @@ CREATE TABLE wt_trial_nodes (
     rec_num int
 );
 
+--
+-- Name: wt_trialnodes_idx; Type: INDEX; Schema: tm_wz; Owner: -
+--
+CREATE INDEX wt_trialnodes_idx ON wt_trial_nodes USING btree (leaf_node, node_name);
+
+--
+-- Name: wtn_load_clinical_idx; Type: INDEX; Schema: tm_wz; Owner: -
+--
+CREATE INDEX wtn_load_clinical_idx ON wt_trial_nodes USING btree (leaf_node, category_cd, data_label);

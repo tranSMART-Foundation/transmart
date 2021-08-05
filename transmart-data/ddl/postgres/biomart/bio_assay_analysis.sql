@@ -28,15 +28,10 @@ CREATE TABLE bio_assay_analysis (
 );
 
 --
--- Name: bio_data_anl_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_assay_anl_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_assay_analysis
-    ADD CONSTRAINT bio_data_anl_pk PRIMARY KEY (bio_assay_analysis_id);
-
---
--- Name: bio_assay_analysis_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_assay_analysis_pk ON bio_assay_analysis USING btree (bio_assay_analysis_id);
+    ADD CONSTRAINT bio_assay_anl_pk PRIMARY KEY (bio_assay_analysis_id);
 
 --
 -- Name: tf_trg_bio_assay_analysis_id(); Type: FUNCTION; Schema: biomart; Owner: -

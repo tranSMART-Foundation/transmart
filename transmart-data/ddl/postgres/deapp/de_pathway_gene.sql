@@ -15,6 +15,21 @@ ALTER TABLE ONLY de_pathway_gene
     ADD CONSTRAINT de_pathway_gene_pkey PRIMARY KEY (id);
 
 --
+-- Name: de_pathway_gene_index1; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_pathway_gene_index1 ON de_pathway_gene USING btree (pathway_id, gene_symbol);
+
+--
+-- Name: de_pathway_gene_pathway; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_pathway_gene_pathway ON de_pathway_gene USING btree (pathway_id);
+
+--
+-- Name: de_pathway_gene_idx4; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_pathway_gene_idx4 ON de_pathway_gene USING btree (gene_symbol);
+
+--
 -- Name: tf_trg_de_pathway_gene_id(); Type: FUNCTION; Schema: deapp; Owner: -
 --
 CREATE FUNCTION tf_trg_de_pathway_gene_id() RETURNS trigger

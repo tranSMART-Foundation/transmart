@@ -3,6 +3,6 @@
 --
 CREATE TABLE i2b2_load_path (
     path character varying(700),
-    record_id char(10),
+    record_id character(10),
     PRIMARY KEY (path, record_id)
 );

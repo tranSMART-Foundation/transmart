@@ -13,7 +13,7 @@ CREATE SEQUENCE concept_id
 --
 CREATE TABLE concept_dimension (
     concept_path character varying(700) NOT NULL,
-    concept_cd character varying(50) NOT NULL,
+    concept_cd character varying(50),
     name_char character varying(2000),
     concept_blob text,
     update_date timestamp,
@@ -35,14 +35,16 @@ ALTER TABLE ONLY concept_dimension
 CREATE INDEX cd_uploadid_idx ON concept_dimension USING btree (upload_id);
 
 --
--- Name: idx_concept_dim_1; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: cd_conceptcd_idx; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX idx_concept_dim_1 ON concept_dimension USING btree (concept_cd); -- not in i2b2
+-- not in i2b2
+CREATE INDEX cd_conceptcd_idx ON concept_dimension USING btree (concept_cd);
 
 --
--- Name: idx_concept_dim3; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: cd_path_cd_idx; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX idx_concept_dim3 ON concept_dimension USING btree (concept_path,concept_cd); -- not in i2b2
+-- not in i2b2
+CREATE INDEX cd_path_cd_idx ON concept_dimension USING btree (concept_path,concept_cd);
 
 --
 -- Name: tf_trg_concept_dimension_cd(); Type: FUNCTION; Schema: i2b2demodata; Owner: -

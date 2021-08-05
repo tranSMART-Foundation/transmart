@@ -11,15 +11,10 @@ CREATE TABLE bio_patient_event_attr (
 );
 
 --
--- Name: bio_patient_attribute_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_patient_event_attr_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_patient_event_attr
-    ADD CONSTRAINT bio_patient_attribute_pk PRIMARY KEY (bio_patient_attribute_id);
-
---
--- Name: bio_patient_event_attr_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_patient_event_attr_pk ON bio_patient_event_attr USING btree (bio_patient_attribute_id);
+    ADD CONSTRAINT bio_patient_event_attr_pk PRIMARY KEY (bio_patient_attribute_id);
 
 --
 -- Name: tf_trg_bio_pt_evt_attr_id(); Type: FUNCTION; Schema: biomart; Owner: -

@@ -21,6 +21,11 @@ ALTER TABLE ONLY de_snp_info
     ADD CONSTRAINT u_snp_info_name UNIQUE (name);
 
 --
+-- Name: u_snp_chrom; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX u_snp_chrom ON de_snp_info USING btree (chrom);
+
+--
 -- Name: tf_trg_de_snp_info_id(); Type: FUNCTION; Schema: deapp; Owner: -
 --
 CREATE FUNCTION tf_trg_de_snp_info_id() RETURNS trigger

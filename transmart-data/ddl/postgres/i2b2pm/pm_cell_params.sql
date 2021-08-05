@@ -2,7 +2,7 @@
 -- Name: pm_cell_params; Type: TABLE; Schema: i2b2pm; Owner: -
 --
 CREATE TABLE pm_cell_params (
-    id int,
+    id int NOT NULL,
     datatype_cd character varying(50),
     cell_id character varying(50) NOT NULL,
     project_path character varying(255) NOT NULL,

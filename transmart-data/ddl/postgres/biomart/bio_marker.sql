@@ -12,21 +12,16 @@ CREATE TABLE bio_marker (
 );
 
 --
--- Name: biomarker_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_marker_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_marker
-    ADD CONSTRAINT biomarker_pk PRIMARY KEY (bio_marker_id);
+    ADD CONSTRAINT bio_marker_pk PRIMARY KEY (bio_marker_id);
 
 --
 -- Name: biomarker_uk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_marker
     ADD CONSTRAINT biomarker_uk UNIQUE (organism, primary_external_id);
-
---
--- Name: bio_marker_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_marker_pk ON bio_marker USING btree (bio_marker_id);
 
 --
 -- Name: bio_mkr_ext_id; Type: INDEX; Schema: biomart; Owner: -

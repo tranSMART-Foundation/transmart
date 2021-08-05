@@ -9,15 +9,10 @@ CREATE TABLE bio_clinc_trial_attr (
 );
 
 --
--- Name: bio_clinical_trial_patient_grp; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_clinc_trial_attr_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_clinc_trial_attr
-    ADD CONSTRAINT bio_clinical_trial_patient_grp PRIMARY KEY (bio_clinc_trial_attr_id);
-
---
--- Name: bio_clinc_trial_attr_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_clinc_trial_attr_pk ON bio_clinc_trial_attr USING btree (bio_clinc_trial_attr_id);
+    ADD CONSTRAINT bio_clinc_trial_attr_pk PRIMARY KEY (bio_clinc_trial_attr_id);
 
 --
 -- Name: tf_trg_bio_cln_trl_attr_id(); Type: FUNCTION; Schema: biomart; Owner: -

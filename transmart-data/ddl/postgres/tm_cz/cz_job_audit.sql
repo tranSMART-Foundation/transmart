@@ -21,6 +21,11 @@ ALTER TABLE ONLY cz_job_audit
     ADD CONSTRAINT cz_job_audit_pk PRIMARY KEY (seq_id);
 
 --
+-- Name: cz_job_audit_jobid_date; Type: INDEX; Schema: tm_cz; Owner: -
+--
+CREATE INDEX cz_job_audit_jobid_date ON cz_job_audit USING btree (job_id, job_date);
+
+--
 -- Name: tf_trg_cz_seq_id(); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
 CREATE FUNCTION tf_trg_cz_seq_id() RETURNS trigger

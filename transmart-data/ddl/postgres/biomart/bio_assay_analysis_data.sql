@@ -27,73 +27,9 @@ CREATE TABLE bio_assay_analysis_data (
 );
 
 --
--- Name: baad_fgn_idx; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX baad_fgn_idx ON bio_assay_analysis_data USING btree (feature_group_name);
-
---
--- Name: baad_idx1; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX baad_idx1 ON bio_assay_analysis_data USING btree (bio_assay_feature_group_id, bio_experiment_id);
-
---
--- Name: baad_idx11; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX baad_idx11 ON bio_assay_analysis_data USING btree (bio_experiment_id, bio_assay_analysis_id, bio_asy_analysis_data_id);
-
---
--- Name: baad_idx12; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX baad_idx12 ON bio_assay_analysis_data USING btree (bio_experiment_id, bio_assay_analysis_id, bio_assay_feature_group_id);
-
---
--- Name: baad_idx14; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX baad_idx14 ON bio_assay_analysis_data USING btree (bio_assay_feature_group_id, bio_asy_analysis_data_id);
-
---
--- Name: baad_idx4; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX baad_idx4 ON bio_assay_analysis_data USING btree (bio_assay_platform_id);
-
---
--- Name: baad_idx6; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX baad_idx6 ON bio_assay_analysis_data USING btree (bio_experiment_id, bio_assay_analysis_id);
-
---
--- Name: baad_idx7; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX baad_idx7 ON bio_assay_analysis_data USING btree (bio_assay_analysis_id, bio_asy_analysis_data_id);
-
---
--- Name: bad_idx13; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE INDEX bad_idx13 ON bio_assay_analysis_data USING btree (bio_assay_analysis_id, bio_assay_feature_group_id);
-
---
 -- Name: pk_baad; Type: INDEX; Schema: biomart; Owner: -
 --
 CREATE UNIQUE INDEX pk_baad ON bio_assay_analysis_data USING btree (bio_asy_analysis_data_id);
-
---
--- Name: tf_trg_bio_asy_analysis_data_id(); Type: FUNCTION; Schema: biomart; Owner: -
---
-CREATE FUNCTION tf_trg_bio_asy_analysis_data_id() RETURNS trigger
-    LANGUAGE plpgsql
-AS $$
-begin
-    if new.bio_asy_analysis_data_id is null then
-	select nextval('seq_bio_data_id') into new.bio_asy_analysis_data_id;
-    end if;
-    return new;
-end
-$$;
-
---
--- Name: trg_bio_asy_analysis_data_id; Type: TRIGGER; Schema: biomart; Owner: -
---
-CREATE TRIGGER trg_bio_asy_analysis_data_id BEFORE INSERT ON bio_assay_analysis_data FOR EACH ROW EXECUTE PROCEDURE tf_trg_bio_asy_analysis_data_id();
 
 --
 -- Name: bio_assay_analysis_data_n_fk1; Type: FK CONSTRAINT; Schema: biomart; Owner: -
@@ -119,3 +55,66 @@ ALTER TABLE ONLY bio_assay_analysis_data
 ALTER TABLE ONLY bio_assay_analysis_data
     ADD CONSTRAINT bio_asy_ad_fg_fk FOREIGN KEY (bio_assay_feature_group_id) REFERENCES bio_assay_feature_group(bio_assay_feature_group_id);
 
+--
+-- Name: baad_fgn_idx; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX baad_fgn_idx ON bio_assay_analysis_data USING btree (feature_group_name);
+
+--
+-- Name: baad_idx1; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX baad_idx1 ON bio_assay_analysis_data USING btree (bio_assay_feature_group_id, bio_experiment_id);
+
+--
+-- Name: baad_idx4; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX baad_idx4 ON bio_assay_analysis_data USING btree (bio_assay_platform_id);
+
+--
+-- Name: baad_idx6; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX baad_idx6 ON bio_assay_analysis_data USING btree (bio_experiment_id, bio_assay_analysis_id);
+
+--
+-- Name: baad_idx7; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX baad_idx7 ON bio_assay_analysis_data USING btree (bio_assay_analysis_id, bio_asy_analysis_data_id);
+
+--
+-- Name: baad_idx11; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX baad_idx11 ON bio_assay_analysis_data USING btree (bio_experiment_id, bio_assay_analysis_id, bio_asy_analysis_data_id);
+
+--
+-- Name: baad_idx12; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX baad_idx12 ON bio_assay_analysis_data USING btree (bio_experiment_id, bio_assay_analysis_id, bio_assay_feature_group_id);
+
+--
+-- Name: bad_idx13; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX bad_idx13 ON bio_assay_analysis_data USING btree (bio_assay_analysis_id, bio_assay_feature_group_id);
+
+--
+-- Name: baad_idx14; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX baad_idx14 ON bio_assay_analysis_data USING btree (bio_assay_feature_group_id, bio_asy_analysis_data_id);
+
+--
+-- Name: tf_trg_bio_asy_analysis_data_id(); Type: FUNCTION; Schema: biomart; Owner: -
+--
+CREATE FUNCTION tf_trg_bio_asy_analysis_data_id() RETURNS trigger
+    LANGUAGE plpgsql
+AS $$
+begin
+    if new.bio_asy_analysis_data_id is null then
+	select nextval('seq_bio_data_id') into new.bio_asy_analysis_data_id;
+    end if;
+    return new;
+end
+$$;
+
+--
+-- Name: trg_bio_asy_analysis_data_id; Type: TRIGGER; Schema: biomart; Owner: -
+--
+CREATE TRIGGER trg_bio_asy_analysis_data_id BEFORE INSERT ON bio_assay_analysis_data FOR EACH ROW EXECUTE PROCEDURE tf_trg_bio_asy_analysis_data_id();

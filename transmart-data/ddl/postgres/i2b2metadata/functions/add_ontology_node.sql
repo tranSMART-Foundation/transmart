@@ -1,7 +1,7 @@
 --
 -- Name: add_ontology_node(character varying, character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: i2b2metadata; Owner: -
 --
-CREATE FUNCTION add_ontology_node(parent_path_src character varying, node_name character varying, is_leaf_src character varying, is_number character varying, prefix character varying) RETURNS void
+CREATE FUNCTION i2b2metadata.add_ontology_node(parent_path_src character varying, node_name character varying, is_leaf_src character varying, is_number character varying, prefix character varying) RETURNS void
     LANGUAGE plpgsql
     AS $$
 BEGIN

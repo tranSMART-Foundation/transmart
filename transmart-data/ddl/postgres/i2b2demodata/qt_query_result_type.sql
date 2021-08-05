@@ -17,7 +17,8 @@ CREATE TABLE qt_query_result_type (
     description character varying(200),
     display_type_id character varying(500),
     visual_attribute_type_id character varying(3),
-    user_role_cd character varying(255)
+    user_role_cd character varying(255),
+    classname character varying(200)
 );
 
 --

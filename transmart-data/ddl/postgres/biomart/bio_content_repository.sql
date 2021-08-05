@@ -10,15 +10,10 @@ CREATE TABLE bio_content_repository (
 );
 
 --
--- Name: external_file_repository_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_content_repository_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_content_repository
-    ADD CONSTRAINT external_file_repository_pk PRIMARY KEY (bio_content_repo_id);
-
---
--- Name: bio_content_repository_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_content_repository_pk ON bio_content_repository USING btree (bio_content_repo_id);
+    ADD CONSTRAINT bio_content_repository_pk PRIMARY KEY (bio_content_repo_id);
 
 --
 -- Name: tf_trg_bio_content_repo_id(); Type: FUNCTION; Schema: biomart; Owner: -

@@ -11,15 +11,10 @@ CREATE TABLE bio_curated_data (
 );
 
 --
--- Name: bio_externalanalysis_fact_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_curated_data_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_curated_data
-    ADD CONSTRAINT bio_externalanalysis_fact_pk PRIMARY KEY (bio_data_id);
-
---
--- Name: bio_curated_data_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_curated_data_pk ON bio_curated_data USING btree (bio_data_id);
+    ADD CONSTRAINT bio_curated_data_pk PRIMARY KEY (bio_data_id);
 
 --
 -- Name: bio_ext_analys_ext_anl_fk; Type: FK CONSTRAINT; Schema: biomart; Owner: -

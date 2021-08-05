@@ -11,15 +11,10 @@ CREATE TABLE bio_clinc_trial_time_pt (
 );
 
 --
--- Name: bio_clinical_trial_time_point_; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_clinc_trial_time_pt_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_clinc_trial_time_pt
-    ADD CONSTRAINT bio_clinical_trial_time_point_ PRIMARY KEY (bio_clinc_trial_tm_pt_id);
-
---
--- Name: bio_clinc_trial_time_pt_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_clinc_trial_time_pt_pk ON bio_clinc_trial_time_pt USING btree (bio_clinc_trial_tm_pt_id);
+    ADD CONSTRAINT bio_clinc_trial_time_pt_pk PRIMARY KEY (bio_clinc_trial_tm_pt_id);
 
 --
 -- Name: tf_trg_bio_cl_trl_time_pt_id(); Type: FUNCTION; Schema: biomart; Owner: -

@@ -11,15 +11,10 @@ CREATE TABLE bio_content_reference (
 );
 
 --
--- Name: bio_content_ref_n_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_content_reference_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_content_reference
-    ADD CONSTRAINT bio_content_ref_n_pk PRIMARY KEY (bio_content_reference_id);
-
---
--- Name: bio_content_reference_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_content_reference_pk ON bio_content_reference USING btree (bio_content_reference_id);
+    ADD CONSTRAINT bio_content_reference_pk PRIMARY KEY (bio_content_reference_id);
 
 --
 -- Name: tf_trg_bio_content_ref_id(); Type: FUNCTION; Schema: biomart; Owner: -

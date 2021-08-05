@@ -43,6 +43,11 @@ CREATE INDEX de_subject_smpl_mpng_idx1 ON de_subject_sample_mapping USING btree 
 CREATE INDEX de_subject_smpl_mpng_idx2 ON de_subject_sample_mapping USING btree (patient_id, timepoint_cd, platform_cd, assay_id, trial_name);
 
 --
+-- Name: de_subject_smpl_mpng_idx3; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_subject_smpl_mpng_idx3 ON de_subject_sample_mapping USING btree (sample_type_cd);
+
+--
 -- Name: idx_de_subj_smpl_trial_ccode; Type: INDEX; Schema: deapp; Owner: -
 --
 CREATE INDEX idx_de_subj_smpl_trial_ccode ON de_subject_sample_mapping USING btree (trial_name, concept_code);

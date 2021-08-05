@@ -2,7 +2,7 @@
 -- Name: pm_hive_params; Type: TABLE; Schema: i2b2pm; Owner: -
 --
 CREATE TABLE pm_hive_params (
-    id int,
+    id int NOT NULL,
     datatype_cd character varying(50),
     domain_id character varying(50) NOT NULL,
     param_name_cd character varying(50) NOT NULL,

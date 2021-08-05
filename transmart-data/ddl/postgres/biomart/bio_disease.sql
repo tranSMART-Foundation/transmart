@@ -15,15 +15,10 @@ CREATE TABLE bio_disease (
 );
 
 --
--- Name: diseasedim_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_disease_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_disease
-    ADD CONSTRAINT diseasedim_pk PRIMARY KEY (bio_disease_id);
-
---
--- Name: bio_disease_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_disease_pk ON bio_disease USING btree (bio_disease_id);
+    ADD CONSTRAINT bio_disease_pk PRIMARY KEY (bio_disease_id);
 
 --
 -- Name: tf_trg_bio_disease_id(); Type: FUNCTION; Schema: biomart; Owner: -

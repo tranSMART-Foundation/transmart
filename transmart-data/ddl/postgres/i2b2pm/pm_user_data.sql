@@ -6,6 +6,7 @@ CREATE TABLE pm_user_data (
     full_name character varying(255),
     password character varying(255),
     email character varying(255),
+    project_path character varying(255),
     change_date timestamp,
     entry_date timestamp,
     changeby_char character varying(50),

@@ -19,15 +19,10 @@ CREATE TABLE bio_compound (
 );
 
 --
--- Name: compounddim_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_compound_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_compound
-    ADD CONSTRAINT compounddim_pk PRIMARY KEY (bio_compound_id);
-
---
--- Name: bio_compound_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_compound_pk ON bio_compound USING btree (bio_compound_id);
+    ADD CONSTRAINT bio_compound_pk PRIMARY KEY (bio_compound_id);
 
 --
 -- Name: tf_trg_bio_compound_id(); Type: FUNCTION; Schema: biomart; Owner: -

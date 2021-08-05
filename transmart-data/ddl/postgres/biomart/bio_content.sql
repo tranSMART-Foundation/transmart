@@ -17,15 +17,10 @@ CREATE TABLE bio_content (
 );
 
 --
--- Name: external_file_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_content_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_content
-    ADD CONSTRAINT external_file_pk PRIMARY KEY (bio_file_content_id);
-
---
--- Name: bio_content_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_content_pk ON bio_content USING btree (bio_file_content_id);
+    ADD CONSTRAINT bio_content_pk PRIMARY KEY (bio_file_content_id);
 
 --
 -- Name: tf_trg_bio_file_content_id(); Type: FUNCTION; Schema: biomart; Owner: -

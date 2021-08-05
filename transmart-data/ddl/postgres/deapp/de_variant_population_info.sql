@@ -24,12 +24,12 @@ CREATE TABLE de_variant_population_info (
 -- Name: de_variant_population_info_id_idx; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_variant_population_info
-    ADD CONSTRAINT de_variant_population_info_id_idx PRIMARY KEY (variant_population_info_id);
+    ADD CONSTRAINT de_var_populat_info_id_idx PRIMARY KEY (variant_population_info_id);
 
 --
--- Name: variant_population_info_dataset_name; Type: INDEX; Schema: deapp; Owner: -
+-- Name: var_populat_info_dataset_name; Type: INDEX; Schema: deapp; Owner: -
 --
-CREATE INDEX variant_population_info_dataset_name ON de_variant_population_info USING btree (dataset_id, info_name);
+CREATE INDEX var_populat_info_dataset_name ON de_variant_population_info USING btree (dataset_id, info_name);
 
 --
 -- Name: de_variant_population_info_fk; Type: FK CONSTRAINT; Schema: deapp; Owner: -

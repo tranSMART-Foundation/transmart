@@ -10,7 +10,7 @@ CREATE TABLE de_snp_calls_by_gsm (
 );
 
 --
--- Name: de_snp_calls_by_gsm_patient_num_idx; Type: INDEX; Schema: deapp; Owner: -
+-- Name: idx_snp_calls_by_gsm_pg; Type: INDEX; Schema: deapp; Owner: -
 --
-CREATE INDEX de_snp_calls_by_gsm_patient_num_idx ON de_snp_calls_by_gsm USING btree (patient_num);
+CREATE INDEX idx_snp_calls_by_gsm_pg ON de_snp_calls_by_gsm USING btree (patient_num, gsm_num);
 

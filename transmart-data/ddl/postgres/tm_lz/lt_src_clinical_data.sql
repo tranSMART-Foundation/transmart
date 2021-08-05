@@ -28,3 +28,7 @@ CREATE TABLE lt_src_clinical_data (
     sample_cd character varying(200)
 );
 
+--
+-- Name: scd_study_idx; Type: INDEX; Schema: tm_lz; Owner: -
+--
+CREATE INDEX scd_study_idx ON lt_src_clinical_data USING btree (study_id);

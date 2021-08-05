@@ -33,15 +33,10 @@ CREATE TABLE bio_clinical_trial (
 );
 
 --
--- Name: clinicaltrialdim_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_clinical_trial_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_clinical_trial
-    ADD CONSTRAINT clinicaltrialdim_pk PRIMARY KEY (bio_experiment_id);
-
---
--- Name: bio_clinical_trial_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_clinical_trial_pk ON bio_clinical_trial USING btree (bio_experiment_id);
+    ADD CONSTRAINT bio_clinical_trial_pk PRIMARY KEY (bio_experiment_id);
 
 --
 -- Name: bio_clinical_trial_bio_experim; Type: FK CONSTRAINT; Schema: biomart; Owner: -

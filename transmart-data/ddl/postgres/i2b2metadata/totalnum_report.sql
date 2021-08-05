@@ -10,5 +10,5 @@ CREATE TABLE totalnum_report (
 --
 -- Name: totalnum_report_idx; Type: INDEX; Schema: i2b2metadata; Owner: -
 --
-CREATE INDEX totalnum_report_idx ON totalnum USING btree (c_fullname);
+CREATE INDEX totalnum_report_idx ON totalnum_report USING btree (c_fullname);
 

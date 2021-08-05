@@ -19,6 +19,16 @@ ALTER TABLE ONLY de_pathway
     ADD CONSTRAINT de_pathway_pkey PRIMARY KEY (id);
 
 --
+-- Name: de_pathway_name_idx; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_pathway_name_idx ON de_pathway USING btree (name);
+
+--
+-- Name: de_pathway_idx3; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX de_pathway_idx3 ON de_pathway USING btree (pathway_uid, id);
+
+--
 -- Name: tf_trg_de_pathway_id(); Type: FUNCTION; Schema: deapp; Owner: -
 --
 CREATE FUNCTION tf_trg_de_pathway_id() RETURNS trigger

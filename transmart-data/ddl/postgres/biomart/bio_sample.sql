@@ -16,15 +16,10 @@ CREATE TABLE bio_sample (
 );
 
 --
--- Name: biosample_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: bio_sample_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY bio_sample
-    ADD CONSTRAINT biosample_pk PRIMARY KEY (bio_sample_id);
-
---
--- Name: bio_sample_pk; Type: INDEX; Schema: biomart; Owner: -
---
-CREATE UNIQUE INDEX bio_sample_pk ON bio_sample USING btree (bio_sample_id);
+    ADD CONSTRAINT bio_sample_pk PRIMARY KEY (bio_sample_id);
 
 --
 -- Name: tf_trg_bio_sample_id(); Type: FUNCTION; Schema: biomart; Owner: -

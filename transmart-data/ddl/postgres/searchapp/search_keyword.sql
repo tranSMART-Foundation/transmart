@@ -25,19 +25,29 @@ ALTER TABLE ONLY search_keyword
     ADD CONSTRAINT search_kw_pk PRIMARY KEY (search_keyword_id);
 
 --
--- Name: search_keyword_index1; Type: INDEX; Schema: searchapp; Owner: -
+-- Name: sk_data_cat_idx; Type: INDEX; Schema: searchapp; Owner: -
 --
-CREATE INDEX search_keyword_index1 ON search_keyword USING btree (keyword);
+CREATE INDEX sk_data_cat_idx ON search_keyword USING btree (data_category);
 
 --
--- Name: search_keyword_index2; Type: INDEX; Schema: searchapp; Owner: -
+-- Name: sk_data_display_cat_idx; Type: INDEX; Schema: searchapp; Owner: -
 --
-CREATE INDEX search_keyword_index2 ON search_keyword USING btree (bio_data_id);
+CREATE INDEX sk_data_display_cat_idx ON search_keyword USING btree (data_category, display_data_category);
 
 --
--- Name: search_keyword_index3; Type: INDEX; Schema: searchapp; Owner: -
+-- Name: search_keyword_idx1; Type: INDEX; Schema: searchapp; Owner: -
 --
-CREATE INDEX search_keyword_index3 ON search_keyword USING btree (owner_auth_user_id);
+CREATE INDEX search_keyword_idx1 ON search_keyword USING btree (keyword);
+
+--
+-- Name: search_keyword_idx2; Type: INDEX; Schema: searchapp; Owner: -
+--
+CREATE INDEX search_keyword_idx2 ON search_keyword USING btree (bio_data_id);
+
+--
+-- Name: search_keyword_idx3; Type: INDEX; Schema: searchapp; Owner: -
+--
+CREATE INDEX search_keyword_idx3 ON search_keyword USING btree (owner_auth_user_id);
 
 --
 -- Name: tf_trg_search_keyword_id(); Type: FUNCTION; Schema: searchapp; Owner: -

@@ -30,14 +30,15 @@ ALTER TABLE ONLY de_gene_info
 ALTER TABLE ONLY de_gene_info
     ADD CONSTRAINT de_gene_info_uk UNIQUE (gene_source_id,gene_symbol);
 --
--- Name: de_gene_info_entrez_id_gene_source_id_idx; Type: INDEX; Schema: deapp; Owner: -
+-- Name: de_gi_eid_gs_id_idx; Type: INDEX; Schema: deapp; Owner: -
 --
-CREATE INDEX de_gene_info_entrez_id_gene_source_id_idx ON de_gene_info USING btree (entrez_id, gene_source_id);
+CREATE INDEX de_gi_eid_gs_id_idx ON de_gene_info USING btree (entrez_id, gene_source_id);
 
 --
--- Name: de_gene_info_gene_symbol_idx; Type: INDEX; Schema: deapp; Owner: -
+-- Name: de_gi_gs_idx; Type: INDEX; Schema: deapp; Owner: -
 --
-CREATE INDEX de_gene_info_gene_symbol_idx ON de_gene_info USING btree (gene_symbol);
+CREATE INDEX de_gi_gs_idx ON de_gene_info USING btree (gene_symbol);
+
 --
 -- Name: tf_trg_de_gene_info_id(); Type: FUNCTION; Schema: deapp; Owner: -
 --

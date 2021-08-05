@@ -18,3 +18,7 @@ CREATE TABLE bio_assay_analysis_ext (
     sensitive_desc character varying(500)
 );
 
+--
+-- Name: bio_assay_analysis_ext_idx1; Type: INDEX; Schema: biomart; Owner: -
+--
+CREATE INDEX bio_assay_analysis_ext_idx1 ON bio_assay_analysis_ext USING btree (bio_assay_analysis_id);

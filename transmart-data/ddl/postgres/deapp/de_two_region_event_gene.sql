@@ -40,3 +40,7 @@ ALTER TABLE ONLY de_two_region_event_gene
 ALTER TABLE ONLY de_two_region_event_gene
     ADD CONSTRAINT two_region_event_gene_fk FOREIGN KEY (event_id) REFERENCES de_two_region_event(two_region_event_id);
 
+--
+-- Name: tr_event_gene_gene_id; Type: INDEX; Schema: deapp; Owner: -
+--
+CREATE INDEX tr_event_gene_gene_ID ON de_two_region_event_gene USING btree (gene_id);

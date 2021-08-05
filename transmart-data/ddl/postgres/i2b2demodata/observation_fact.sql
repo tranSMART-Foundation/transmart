@@ -34,20 +34,20 @@ ALTER TABLE ONLY observation_fact
     ADD CONSTRAINT observation_fact_pk PRIMARY KEY (patient_num, concept_cd, modifier_cd, start_date, encounter_num, instance_num, provider_id);
 
 --
--- Name: OF_IDX_ClusteredConcept; Type: INDEX; Schema: i2b2demodata; Owner: -
+-- Name: of_text_search_unique; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX OF_IDX_ClusteredConcept ON observation_fact USING btree (concept_cd);
+ALTER TABLE ONLY observation_fact
+    ADD CONSTRAINT of_text_search_unique UNIQUE (text_search_index);
+
+--
+-- Name: fact_cnpt_idx; Type: INDEX; Schema: i2b2demodata; Owner: -
+--
+CREATE INDEX fact_cnpt_idx ON observation_fact USING btree (concept_cd);
 
 --
 -- Name: OF_IDX_ALLObservation_Fact; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
-CREATE INDEX OF_IDX_ALLObservation_Fact ON observation_fact USING btree (patient_num, encounter_num, concept_cd, start_date, provider_id, modifier_cd,
-	instance_num, valtype_cd, tval_char, nval_num, valueflag_cd, quantity_num, units_cd, end_date, location_cd, confidence_num);
-
---
--- Name: OF_IDX_Start_Date; Type: INDEX; Schema: i2b2demodata; Owner: -
---
-CREATE INDEX fact_modifier_patient ON observation_fact USING btree (start_date, patient_num);
+CREATE INDEX OF_IDX_ALLObservation_Fact ON observation_fact USING btree (patient_num, encounter_num, concept_cd, start_date, provider_id, modifier_cd, instance_num, valtype_cd, tval_char, nval_num, valueflag_cd, quantity_num, units_cd, end_date, location_cd, confidence_num);
 
 --
 -- Name: OF_IDX_Start_Date; Type: INDEX; Schema: i2b2demodata; Owner: -
@@ -73,11 +73,6 @@ CREATE INDEX OF_IDX_UPLOADID ON observation_fact USING btree (upload_id);
 -- Name: OF_IDX_SOURCESYSTEM_CD; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
 CREATE INDEX OF_IDX_SOURCESYSTEM_CD ON observation_fact USING btree (sourcesystem_cd);
-
---
--- Name: OF_TEXT_SEARCH_UNIQUE; Type: INDEX; Schema: i2b2demodata; Owner: -
---
-CREATE INDEX OF_TEXT_SEARCH_UNIQUE ON observation_fact USING btree (text_search_index);
 
 --
 -- Name: tf_trg_encounter_num(); Type: FUNCTION; Schema: i2b2demodata; Owner: -
