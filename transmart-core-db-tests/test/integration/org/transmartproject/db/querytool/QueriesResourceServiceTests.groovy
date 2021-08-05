@@ -26,7 +26,11 @@ import org.junit.rules.ExpectedException
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.exceptions.InvalidRequestException
 import org.transmartproject.core.exceptions.NoSuchResourceException
-import org.transmartproject.core.querytool.*
+import org.transmartproject.core.querytool.QueriesResource
+import org.transmartproject.core.querytool.QueryDefinition
+import org.transmartproject.core.querytool.QueryResult
+import org.transmartproject.core.querytool.QueryResultData
+import org.transmartproject.core.querytool.QueryStatus
 import org.transmartproject.db.i2b2data.ConceptDimension
 import org.transmartproject.db.i2b2data.ObservationFact
 import org.transmartproject.db.i2b2data.PatientDimension
