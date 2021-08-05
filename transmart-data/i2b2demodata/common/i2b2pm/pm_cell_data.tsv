@@ -1,0 +1,5 @@
+"CRC"	"/"	"Data Repository"	"REST"	"http://localhost:9091/i2b2/services/QueryToolService/"	1				"A"
+"FRC"	"/"	"File Repository"	"SOAP"	"http://localhost:9091/i2b2/services/FRService/"	1				"A"
+"ONT"	"/"	"Ontology Cell"	"REST"	"http://localhost:9091/i2b2/services/OntologyService/"	1				"A"
+"WORK"	"/"	"Workplace Cell"	"REST"	"http://localhost:9091/i2b2/services/WorkplaceService/"	1				"A"
+"IM"	"/"	"IM Cell"	"REST"	"http://localhost:9091/i2b2/services/IMService/"	1				"A"
