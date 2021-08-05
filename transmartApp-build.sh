@@ -844,7 +844,9 @@ if [ $buildcoretests == 1 ] ; then
 
     ./grailsw maven-install  >> $OUT/$PREFIX-$DIR.out 2>&1
 
+    # We have to expect errors etc. from tests that check failure conditions!
     egrep -i 'error[^-]|warning|fail' $OUT/$PREFIX-$DIR.out
+    ./test-results-parse.pl $OUT/$PREFIX-$DIR.out
 
     cd ..
 
