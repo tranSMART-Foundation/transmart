@@ -614,6 +614,7 @@ sub parseOracle($){
 	    $cfunc  = 0;
 	    $cproc  = 0;
 	    $cview  = 0;
+	    $ctype  = 0;
 	    $cseq = 0;
 	    $tseq = "";
 	    $forkey = 0;
@@ -727,7 +728,6 @@ sub parseOracle($){
 			}
 			elsif(defined($pk)){
 			    print STDERR "++ Oracle primary key unnamed for $schema.$table\n";
-#			    $oTablePrikeyName{"$schema.$table"} = $table."_PK"; # make up a name
 			    $oTablePrikeyName{"$schema.$table"} = "unnamed"; # There is no name
 			    $oTablePrikey{"$schema.$table"} = $pk;
 			}
@@ -758,21 +758,44 @@ sub parseOracle($){
 		    $tseq .= $1;
 		    if(defined($2)) {$cseq = 2}
 		}
-		if(/^\s*(.*\S)\s+(INDEX|index)\s+([^.]+)[.](\S+)\s+ON\s+([^.]+)[.]([^\( ]+)\s*\(([^\)]+)\)/) {
+		if(/^\s*(\S+)\s+BITMAP\s+(INDEX|index)\s+([^.]+)[.](\S+)\s+ON\s+([^.]+)[.]([^\( ]+)\s*\(([^\)]+)\)/) {
 		    $iuse = $1;
 		    $schema = $3;
 		    $idx = $4;
-		    $ischema = $5;
+		    $oschema = $5;
 		    $itable=$6;
 		    $icols=$7;
 		    $schema =~ s/"//g;
 		    $idx =~ s/"//g;
+		    $idx = uc($idx);
+		    $oschema =~ s/"//g;
 		    $ischema =~ s/"//g;
 		    $itable =~ s/"//g;
 		    $icols =~ s/"//g;
+		    $icols =~ s/\s//g;
 		    if($iuse =~ /^CREATE/) {
 			$oIndexFile{"$schema.$idx"} = "$d/$f";
-			$oIndex{"$ischema.$itable"} .= "$schema.$idx($icols)";
+			$oIndex{"$oschema.$itable"} .= "$schema.$idx($icols);";
+		    }
+		}
+		elsif(/^\s*(\S+.*)\s+(INDEX|index)\s+([^.]+)[.](\S+)\s+ON\s+([^.]+)[.]([^\( ]+)\s*\(([^\)]+)\)/) {
+		    $iuse = $1;
+		    $schema = $3;
+		    $idx = $4;
+		    $oschema = $5;
+		    $itable=$6;
+		    $icols=$7;
+		    $schema =~ s/"//g;
+		    $idx =~ s/"//g;
+		    $idx = uc($idx);
+		    $oschema =~ s/"//g;
+		    $ischema =~ s/"//g;
+		    $itable =~ s/"//g;
+		    $icols =~ s/"//g;
+		    $icols =~ s/\s//g;
+		    if($iuse =~ /^CREATE/) {
+			$oIndexFile{"$schema.$idx"} = "$d/$f";
+			$oIndex{"$oschema.$itable"} .= "$schema.$idx($icols);";
 		    }
 		}
 		if(/^\s*(.*\S)\s+(SEQUENCE|sequence)\s+([^.]+)[.](\S+)([^;]*)([;]?)/) {
@@ -841,6 +864,50 @@ sub parseOracle($){
 		    }
 		    else {
 			print STDERR "$d/$f unexpected view $view     $vuse     '$rest'\n";
+		    }
+		}
+		if(/^\s*(.*\S)\s+(TYPE BODY|type body)\s+([^.]+)[.](\S+)\s+[AI]S\s+(.*)/) {
+		    $tyuse = $1;
+		    $schema = $3;
+		    $type = $4;
+		    $rest = $5;
+		    $tyuse = uc($tyuse);
+		    $schema = uc($schema);
+		    $type = uc($type);
+		    $rest = uc($rest);
+		    $schema =~ s/\"//g;
+		    $type =~ s/\"//g;
+		    $rest =~ s/\"//g;
+		    $rest =~ s/^\(//g;
+		    $rest =~ s/\)$//g;
+		    if($tyuse =~ /^CREATE/) {
+			$oTypeFile{"$schema.$type"} = "$d/$f";
+			$ctype = 1;
+		    }
+		    else {
+			print STDERR "$d/$f unexpected type $type     $tyuse     '$rest'\n";
+		    }
+		}
+		elsif(/^\s*(.*\S)\s+(TYPE|type)\s+([^.]+)[.](\S+)\s+[AI]S\s+(.*)/) {
+		    $tyuse = $1;
+		    $schema = $3;
+		    $type = $4;
+		    $rest = $5;
+		    $tyuse = uc($tyuse);
+		    $schema = uc($schema);
+		    $type = uc($type);
+		    $rest = uc($rest);
+		    $schema =~ s/\"//g;
+		    $type =~ s/\"//g;
+		    $rest =~ s/\"//g;
+		    $rest =~ s/^\(//g;
+		    $rest =~ s/\)$//g;
+		    if($tyuse =~ /^CREATE/) {
+			$oTypeFile{"$schema.$type"} = "$d/$f";
+			$ctype = 1;
+		    }
+		    else {
+			print STDERR "$d/$f unexpected type $type     $tyuse     '$rest'\n";
 		    }
 		}
 	    }
@@ -1346,7 +1413,7 @@ sub parsePostgres($){
 			$pk = uc($1).uc($2);
 			$pk .= uc($schema);
 			$pk .= ".";	
-		$pk .= uc($3);
+			$pk .= uc($3);
 			$pk .= ";";
 			$pTableForkey{"$schema.$table"} .= $pk;
 		    }
@@ -1450,6 +1517,68 @@ sub parsePostgres($){
 		if($cseq == 1 && /([^;]*)/) {
 		    $tseq .= $1;
 		    if(/;/) {$cseq = 2}
+		}
+		if(/^\s*(\S+)\s+UNIQUE\s+(INDEX|index)\s+(\S+)\s+ON\s+(\S+)\s+USING\s+(\S+)\s+\(([^\)]+)\)/) {
+#		    print STDERR "Parsing postgres unique index: $_";
+		    $iuse = $1;
+		    $idx = $3;
+		    $itable = $4;
+		    $idxtype = $5;
+		    $icols = $6;
+		    ($schema) = ($d =~ /\/([^\/]+)$/);
+		    $schema = uc($schema);
+		    $idx =~ s/"//g;
+		    $idx = uc($idx);
+		    $itable =~ s/"//g;
+		    $itable = uc($itable);
+		    $icols =~ s/"//g;
+		    $icols =~ s/\s//g;
+		    $icols = uc($icols);
+		    if($iuse =~ /^CREATE/) {
+			$pTableUnikey{"$schema.$itable"} .= "$idx $icols;";
+		    }
+		}
+		elsif(/^\s*(\S+)\s+BINARY\s+(INDEX|index)\s+(\S+)\s+ON\s+(\S+)\s+USING\s+(\S+)\s+\(([^\)]+)\)/) {
+#		    print STDERR "Parsing postgres index: $_";
+		    $iuse = $1;
+		    $idx = $3;
+		    $itable = $4;
+		    $idxtype = $5;
+		    $icols = $6;
+		    ($schema) = ($d =~ /\/([^\/]+)$/);
+		    $schema = uc($schema);
+		    $idx =~ s/"//g;
+		    $idx = uc($idx);
+		    $itable =~ s/"//g;
+		    $itable = uc($itable);
+		    $icols =~ s/"//g;
+		    $icols =~ s/\s//g;
+		    $icols = uc($icols);
+		    if($iuse =~ /^CREATE/) {
+			$pIndexFile{"$schema.$idx"} = "$d/$f";
+			$pIndex{"$schema.$itable"} .= "$schema.$idx($icols);";
+		    }
+		}
+		elsif(/^\s*(\S+)\s+(INDEX|index)\s+(\S+)\s+ON\s+(\S+)\s+USING\s+(\S+)\s+\(([^\)]+)\)/) {
+#		    print STDERR "Parsing postgres index: $_";
+		    $iuse = $1;
+		    $idx = $3;
+		    $itable = $4;
+		    $idxtype = $5;
+		    $icols = $6;
+		    ($schema) = ($d =~ /\/([^\/]+)$/);
+		    $schema = uc($schema);
+		    $idx =~ s/"//g;
+		    $idx = uc($idx);
+		    $itable =~ s/"//g;
+		    $itable = uc($itable);
+		    $icols =~ s/"//g;
+		    $icols =~ s/\s//g;
+		    $icols = uc($icols);
+		    if($iuse =~ /^CREATE/) {
+			$pIndexFile{"$schema.$idx"} = "$d/$f";
+			$pIndex{"$schema.$itable"} .= "$schema.$idx($icols);";
+		    }
 		}
 		if(/^\s*(.*\S)\s+(SEQUENCE|sequence)\s+(\S+)(.*)/) {
 		    $suse = $1;
@@ -1573,6 +1702,9 @@ sub compareTypes($$$$){
     $ot =~ s/VARCHAR2 \(/VARCHAR2(/;
     $ot =~ s/VARCHAR \(/VARCHAR(/;
 
+    $pt =~ s/VARCHAR2 \(/VARCHAR2(/;
+    $pt =~ s/VARCHAR \(/VARCHAR(/;
+
     if($pt =~ /TIMESTAMP\)$/) {
 	$pt =~ s/\)$//;
     }
@@ -1624,6 +1756,14 @@ sub compareTypes($$$$){
 	}
     }
 
+    if($ot =~ / NOT NULL ENABLE$/ && $pt =~ /SERIAL$/) {
+	$ot =~ s/ NOT NULL ENABLE$//;
+    }
+
+    if($ot =~ / NOT NULL$/ && $pt =~ /SERIAL$/) {
+	$ot =~ s/ NOT NULL$//;
+    }
+
     $ot =~ s/ WITH LOCAL TIME ZONE//g; # only allows local time display, storage unchanged
 
     if($ot =~ / DEFAULT '1'$/ && $pt =~ / DEFAULT \(1\)$/) {
@@ -1631,13 +1771,13 @@ sub compareTypes($$$$){
 	$pt =~ s/ \S+ \S+$//;
     }
     
-    if($pt =~ / DEFAULT NOW\(\)$/ && $ot =~ / DEFAULT SYSDATE$/) {
-	$pt =~ s/ \S+ \S+$//;
-	$ot =~ s/ \S+ \S+$//;
+    if($pt =~ / DEFAULT NOW\(\)/ && $ot =~ / DEFAULT SYSDATE/) {
+	$pt =~ s/ DEFAULT \S+//;
+	$ot =~ s/ DEFAULT \S+//;
     }
-    if($pt =~ / DEFAULT CURRENT_TIMESTAMP$/ && $ot =~ / DEFAULT SYSDATE$/) {
-	$pt =~ s/ \S+ \S+$//;
-	$ot =~ s/ \S+ \S+$//;
+    if($pt =~ / DEFAULT CURRENT_TIMESTAMP/ && $ot =~ / DEFAULT SYSDATE/) {
+	$pt =~ s/ DEFAULT \S+//;
+	$ot =~ s/ DEFAULT \S+//;
     }
 
     if($pt =~ /^BIGINT/) {
@@ -1684,11 +1824,12 @@ sub compareTypes($$$$){
 	elsif($ot =~ /^NUMBER\((\d+),0\)/){
 	    $isize = 22;
 	    
-	    # Allowed exceptions where i2b2 uses a latger Oracle datatype
+	    # Allowed exceptions where i2b2 uses a larger Oracle datatype
 	    if($c eq "AGE_IN_YEARS_NUM") {$isize = 38}
 	    if($c eq "CRC_UPLOAD_ID") {$isize = 38}
 	    if($c eq "ENCOUNTER_NUM") {$isize = 38}
 	    if($c eq "I2B2_ID") {$isize = 38}
+	    if($c eq "INSTANCE_NUM") {$isize = 38}
 	    if($c eq "LENGTH_OF_STAY") {$isize = 38}
 	    if($c eq "PATIENT_COUNT") {$isize = 38}
 	    if($c eq "PATIENT_ID") {$isize = 38}
@@ -1966,6 +2107,10 @@ sub compareTypes($$$$){
 	    $ot =~ s/^\S+ \S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
+	if($ot =~ /ROWID/){
+	    $ot =~ s/^\S+/matched/;
+	    $pt =~ s/^\S+/matched/;
+	}
     }
 
     elsif($ot =~ /^CHAR\((\d+)\)/) {
@@ -1994,7 +2139,7 @@ sub compareTypes($$$$){
 
     elsif($pt =~ /^BYTEA/) {
 	$size = $1;
-	if($ot =~ /^CLOB/){
+	if($ot =~ /^[BC]LOB/){
 	    $ot =~ s/^\S+/matched/;
 	    $pt =~ s/^\S+/matched/;
 	}
@@ -2019,13 +2164,19 @@ sub compareTypes($$$$){
 	    $pt =~ s/^\S+ \S+ \S+ \S+/matched/;
 	    $ot =~ s/^\S+ \S+/matched/;
 	}
-	if($pt =~ / DEFAULT NOW\(\)$/ && $ot =~ / DEFAULT SYSDATE$/) {
-	    $pt =~ s/ \S+ \S+$//;
-	    $ot =~ s/ \S+ \S+$//;
+	if($pt =~ / DEFAULT NOW\(\)/ && $ot =~ / DEFAULT SYSDATE/) {
+	    $pt =~ s/ DEFAULT \S+//;
+	    $ot =~ s/ DEFAULT \S+//;
 	}
-	if($pt =~ / DEFAULT CURRENT_TIMESTAMP$/ && $ot =~ / DEFAULT SYSDATE$/) {
-	    $pt =~ s/ \S+ \S+$//;
-	    $ot =~ s/ \S+ \S+$//;
+	if($pt =~ / DEFAULT CURRENT_TIMESTAMP/ && $ot =~ / DEFAULT SYSDATE/) {
+	    $pt =~ s/ DEFAULT \S+//;
+	    $ot =~ s/ DEFAULT \S+//;
+	}
+    }
+    elsif($ot =~ /^TIMESTAMP (\(1\))/){
+	if($pt =~ /^TIMESTAMP$/) {
+	    $ot =~ s/^\S+ \S+/matched/;
+	    $pt =~ s/^\S+/matched/;
 	}
     }
     elsif($pt =~ /^TIMESTAMP (\(6\))/){
@@ -2058,9 +2209,9 @@ sub compareTypes($$$$){
 	    $ot =~ s/^(\S+)/matched/;
 	    $pt =~ s/^(\S+)/matched/;
 	}
-	if($pt =~ / DEFAULT NOW\(\)$/ && $ot =~ / DEFAULT SYSDATE$/) {
-	    $pt =~ s/ \S+ \S+$//;
-	    $ot =~ s/ \S+ \S+$//;
+	if($pt =~ / DEFAULT NOW\(\)/ && $ot =~ / DEFAULT SYSDATE/) {
+	    $pt =~ s/ DEFAULT \S+//;
+	    $ot =~ s/ DEFAULT \S+//;
 	}
     }
     elsif($pt =~ /^TEXT/){
@@ -2567,13 +2718,13 @@ sub compareOracleTypes($$$$){
 	    $ibt =~ s/^\S+ \S+/matched/;
 	    $tmt =~ s/^\S+ \S+ \S+ \S+/matched/;
 	}
-	if($tmt =~ / DEFAULT NOW\(\)$/ && $ibt =~ / DEFAULT SYSDATE$/) {
-	    $ibt =~ s/ \S+ \S+$//;
-	    $tmt =~ s/ \S+ \S+$//;
+	if($tmt =~ / DEFAULT NOW\(\)/ && $ibt =~ / DEFAULT SYSDATE/) {
+	    $ibt =~ s/ DEFAULT \S+//;
+	    $tmt =~ s/ DEFAULT \S+//;
 	}
-	if($tmt =~ / DEFAULT CURRENT TIMESTAMP$/ && $ibt =~ / DEFAULT SYSDATE$/) {
-	    $ibt =~ s/ \S+ \S+$//;
-	    $tmt =~ s/ \S+ \S+ \S+$//;
+	if($tmt =~ / DEFAULT CURRENT_TIMESTAMP/ && $ibt =~ / DEFAULT SYSDATE/) {
+	    $ibt =~ s/ DEFAULT \S+//;
+	    $tmt =~ s/ DEFAULT \S+//;
 	}
     }
     elsif($tmt =~ /^TIMESTAMP (\(6\))/){
@@ -2604,9 +2755,9 @@ sub compareOracleTypes($$$$){
 	    $ibt =~ s/\S+ \S+$//;
 	    $tmt =~ s/\S+$//;
 	}
-	if($tmt =~ / DEFAULT NOW\(\)$/ && $ibt =~ / DEFAULT SYSDATE$/) {
-	    $ibt =~ s/ \S+ \S+$//;
-	    $tmt =~ s/ \S+ \S+$//;
+	if($tmt =~ / DEFAULT NOW\(\)/ && $ibt =~ / DEFAULT SYSDATE/) {
+	    $ibt =~ s/ DEFAULT \S+//;
+	    $tmt =~ s/ DEFAULT \S+//;
 	}
     }
     elsif($tmt =~ /^DATE\b/){
@@ -2614,9 +2765,9 @@ sub compareOracleTypes($$$$){
 	    $ibt =~ s/^(\S+)/matched/;
 	    $tmt =~ s/^(\S+)/matched/;
 	}
-	if($tmt =~ / DEFAULT NOW\(\)$/ && $ibt =~ / DEFAULT SYSDATE$/) {
-	    $ibt =~ s/ \S+ \S+$//;
-	    $tmt =~ s/ \S+ \S+$//;
+	if($tmt =~ / DEFAULT NOW\(\)/ && $ibt =~ / DEFAULT SYSDATE/) {
+	    $ibt =~ s/ DEFAULT \S+//;
+	    $tmt =~ s/ DEFAULT \S+//;
 	}
     }
     elsif($tmt =~ /^TEXT/){
@@ -2679,6 +2830,10 @@ ALTER TRIGGER \"$s\".\"$trig\" ENABLE;
 
 sub compareColumns($$){
     my ($otc,$ptc) = @_;
+    if(!defined($ptc)){
+	print STDERR "Unknown compareColumns second table for $t\n";
+	return "Unknown compareColumns second table for $t\n";
+    }
     my @ocols = split(/;/,$otc);
     my @pcols = split(/;/,$ptc);
     my $c;
@@ -2903,6 +3058,53 @@ ALTER TABLE \"$ts\".\"$tt\" ADD CONSTRAINT \"$kn\" FOREIGN KEY (\"$ki\")
 	}
     }
 
+    # Compare index definitions
+
+    $okey = 0;
+    $pkey = 0;
+    @okey = ();
+    @pkey = ();
+
+    if(defined($oIndex{$t})){@okey = sort(split(/;/,$oIndex{$t}));$okey=$#okey+1}
+    if(defined($pIndex{$t})){@pkey = sort(split(/;/,$pIndex{$t}));$pkey=$#pkey+1}
+
+    if($okey && $pkey) {
+	my $jo = 0;
+	my $jp = 0;
+	my $cmp;
+	while($jo < $okey && $jp < $pkey) {
+	    $cmp = ($okey[$jo] cmp $pkey[$jp]);
+	    if($cmp == 0) {	# two indexes match
+#		$compstr .= "indexboth        oracle: $okey[$jo]\n";
+#		$compstr .= "indexboth      postgres: $pkey[$jp]\n";
+		++$jo;
+		++$jp;
+	    } elsif ($cmp < 0) { # okey extra
+		$compstr .= "INDEXONLY        oracle: $okey[$jo]\n";
+		++$jo;
+	    } else {	     # pkey extra
+		$compstr .= "INDEXONLY      postgres: $pkey[$jp]\n";
+		++$jp;
+	    }
+	}
+	while($jo < $okey) {
+	    $compstr .= "INDEXONLY        oracle: $okey[$jo]\n";
+	    ++$jo;
+	}
+	while($jp < $pkey) {
+	    $compstr .= "INDEXONLY      postgres: $pkey[$jp]\n";
+	    ++$jp;
+	}
+    } elsif($okey) {
+	for ($i = 0; $i < $okey; $i++) {
+	    $compstr .= "INDEXONLY        oracle: $okey[$i] for '$t'\n";
+	}
+    } elsif($pkey) {
+	for ($i = 0; $i < $pkey; $i++) {
+	    $compstr .= "INDEXONLY      postgres: $pkey[$i] for '$t'\n";
+	}
+    }
+
     if($head eq "") {$compstr .= "\n"}
     return $compstr;
 }
@@ -2999,18 +3201,18 @@ ALTER TABLE ONLY $tt\n";
 	if($okey == $pkey) {
 	    for ($i = 0; $i < $okey; $i++) {
 		if($okey[$i] ne $pkey[$i]) {
-		    $compstr .= "UNIQUE      oracle: $okey[$i]\n";
-		    $compstr .= "          postgres: $pkey[$i]\n";
+		    $compstr .= "UNIQUE      oracle i2b2: $okey[$i]\n";
+		    $compstr .= "          postgres i2b2: $pkey[$i]\n";
 		}
 	    }
 	}
 	else {
 	    $compstr .= "UNIQUE      count $okey    $pkey\n";
 	    for ($i = 0; $i < $okey; $i++) {
-		$compstr .= "            oracle: $okey[$i]\n";
+		$compstr .= "            oracle i2b2: $okey[$i]\n";
 	    }
 	    for ($i = 0; $i < $pkey; $i++) {
-		$compstr .= "          postgres: $pkey[$i]\n";
+		$compstr .= "          postgres i2b2: $pkey[$i]\n";
 	    }
 	}
     }
@@ -3018,7 +3220,7 @@ ALTER TABLE ONLY $tt\n";
 	$compstr .= "UNIQUE oracle i2b2 only $okey\n";
 	for ($i = 0; $i < $okey; $i++) {
 	    $pk = lc($okey[$i]);
-	    $compstr .= "            oracle: $pk\n";
+	    $compstr .= "            oracle i2b2: $pk\n";
 	}
 	for ($i = 0; $i < $okey; $i++) {
 	    ($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
@@ -3035,7 +3237,7 @@ ALTER TABLE ONLY $tt
     elsif($#pkey >= 0) {
 	$compstr .= "UNIQUE postgres i2b2 only $pkey\n";
 	for ($i = 0; $i < $pkey; $i++) {
-	    $compstr .= "          postgres: $pkey[$i]\n";
+	    $compstr .= "          postgres i2b2: $pkey[$i]\n";
 	}
 	($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
 	for ($i = 0; $i < $pkey; $i++) {
@@ -3096,10 +3298,10 @@ ALTER TABLE \"$ts\".\"$tt\"
 	else {
 	    $compstr .= "FOREIGN KEY count $okey    $pkey\n";
 	    for ($i = 0; $i < $okey; $i++) {
-		$compstr .= "            oracle: $okey[$i]\n";
+		$compstr .= "            oracle i2b2: $okey[$i]\n";
 	    }
 	    for ($i = 0; $i < $pkey; $i++) {
-		$compstr .= "          postgres: $pkey[$i]\n";
+		$compstr .= "          postgres i2b2: $pkey[$i]\n";
 	    }
 	}
     }
@@ -3107,13 +3309,13 @@ ALTER TABLE \"$ts\".\"$tt\"
 	$compstr .= "FOREIGN KEY oracle i2b2 only $okey\n";
 	    for ($i = 0; $i < $okey; $i++) {
 		$pk = lc($okey[$i]);
-		$compstr .= "            oracle: $pk\n";
+		$compstr .= "            oracle i2b2: $pk\n";
 	    }
     }
     elsif($#pkey >= 0) {
 	$compstr .= "FOREIGN KEY postgres i2b2 only $pkey\n";
 	for ($i = 0; $i < $pkey; $i++) {
-	    $compstr .= "          postgres: $pkey[$i]\n";
+	    $compstr .= "          postgres i2b2: $pkey[$i]\n";
 	}
 	($ts,$tt) = ($t =~ /([^.]+)[.](.*)/);
 	for ($i = 0; $i < $pkey; $i++) {
@@ -3124,6 +3326,52 @@ ALTER TABLE \"$ts\".\"$tt\"
 ALTER TABLE \"$ts\".\"$tt\" ADD CONSTRAINT \"$kn\" FOREIGN KEY (\"$ki\")
  REFERENCES \"$ks\".\"$kt\" (\"$kr\") ENABLE;
 ";
+	}
+    }
+
+    # Compare index definitions
+
+    $okey = 0;
+    $pkey = 0;
+    @okey = ();
+    @pkey = ();
+
+    if(defined($ioIndex{$t})){@okey = sort(split(/;/,$ioIndex{$t}));$okey=$#okey+1}
+    if(defined($ipIndex{$t})){@pkey = sort(split(/;/,$ipIndex{$t}));$pkey=$#pkey+1}
+    if($okey && $pkey) {
+	my $jo = 0;
+	my $jp = 0;
+	my $cmp;
+	while($jo < $okey && $jp < $pkey) {
+	    $cmp = ($okey[$jo] cmp $pkey[$jp]);
+	    if($cmp == 0) {	# two indexes match
+#		$compstr .= "indexboth   oracle i2b2: $okey[$jo]\n";
+#		$compstr .= "indexboth postgres i2b2: $pkey[$jp]\n";
+		++$jo;
+		++$jp;
+	    } elsif ($cmp < 0) { # okey extra
+		$compstr .= "INDEXONLY   oracle i2b2: $okey[$jo]\n";
+		++$jo;
+	    } else {	     # pkey extra
+		$compstr .= "INDEXONLY postgres i2b2: $pkey[$jp]\n";
+		++$jp;
+	    }
+	}
+	while($jo < $okey) {
+	    $compstr .= "INDEXONLY   oracle i2b2: $okey[$jo]\n";
+	    ++$jo;
+	}
+	while($jp < $pkey) {
+	    $compstr .= "INDEXONLY postgres i2b2: $pkey[$jp]\n";
+	    ++$jp;
+	}
+    } elsif($okey) {
+	for ($i = 0; $i < $okey; $i++) {
+	    $compstr .= "INDEXONLY   oracle i2b2: $okey[$i] for '$t'\n";
+	}
+    } elsif($pkey) {
+	for ($i = 0; $i < $pkey; $i++) {
+	    $compstr .= "INDEXONLY postgres i2b2: $pkey[$i] for '$t'\n";
 	}
     }
 
@@ -3197,11 +3445,11 @@ sub compareOracleColumns($$){
 # --------------------
     
     if(defined($ioTablePrikey{$t})){$ibkey = $ioTablePrikey{$t}}
-    if(defined($ipTablePrikey{$t})){$tmkey = $ipTablePrikey{$t}}
+    if(defined($oTablePrikey{$t})){$tmkey = $oTablePrikey{$t}}
     if($ibkey ne $tmkey) {
 	$compstr .= "PRIMARY KEY     $ibkey    $tmkey\n";
 	if($ibkey eq "undefined") {
-	    if(!defined($ipTablePrikeyName{$t})) {
+	    if(!defined($oTablePrikeyName{$t})) {
 		$compstr .= "PRIMARY KEY (\"$pTablePrikey{$t}\")\n";
 	    }else{
 		$compstr .= "CONSTRAINT \"$pTablePrikeyName{$t}\" PRIMARY KEY (\"$pTablePrikey{$t}\")\n";
@@ -3226,7 +3474,7 @@ ALTER TABLE ONLY $tt\n";
     $ibkey=0;
     $tmkey=0;
     if(defined($ioTableUnikey{$t})){@ibkey = sort(split(/;/,$ioTableUnikey{$t}));$ibkey=$#ibkey+1}
-    if(defined($ipTableUnikey{$t})){@tmkey = sort(split(/;/,$ipTableUnikey{$t}));$tmkey=$#tmkey+1}
+    if(defined($oTableUnikey{$t})){@tmkey = sort(split(/;/,$oTableUnikey{$t}));$tmkey=$#tmkey+1}
     if($ibkey && $tmkey) {
 	if($ibkey == $tmkey) {
 	    for ($i = 0; $i < $ibkey; $i++) {
@@ -3356,6 +3604,55 @@ ALTER TABLE \"$ts\".\"$tt\"
 ALTER TABLE \"$ts\".\"$tt\" ADD CONSTRAINT \"$kn\" FOREIGN KEY (\"$ki\")
  REFERENCES \"$ks\".\"$kt\" (\"$kr\") ENABLE;
 ";
+	}
+    }
+
+    # Compare index definitions
+
+    $ibkey = 0;
+    $tmkey = 0;
+    @ibkey = ();
+    @tmkey = ();
+
+    if(defined($ioIndex{$t})){@ibkey = sort(split(/;/,$ioIndex{$t}));$ibkey=$#ibkey+1}
+    if(defined($oIndex{$t})){@tmkey = sort(split(/;/,$oIndex{$t}));$tmkey=$#tmkey+1}
+    if($ibkey && $tmkey) {
+	print STDERR "Compare i2b2-TM $t counts $ibkey $tmkey INDEX i2b2: $ioIndex{$t} TM: $oIndex{$t}\n";
+	my $jib = 0;
+	my $jtm = 0;
+	my $cmp;
+	while($jib < $ibkey && $jtm < $tmkey) {
+	    $cmp = ($ibkey[$jib] cmp $tmkey[$jtm]);
+	    if($cmp == 0) {	# two indexes match
+#		$compstr .= "indexboth   i2b2 oracle: $ibkey[$jib]\n";
+#		$compstr .= "indexboth  tmart oracle: $tmkey[$jtm]\n";
+		++$jib;
+		++$jtm;
+	    } elsif ($cmp < 0) { # ibkey extra
+		$compstr .= "INDEXONLY   i2b2 oracle: $ibkey[$jib]\n";
+		++$jib;
+	    } else {	     # tmkey extra
+		$compstr .= "INDEXONLY  tmart oracle: $tmkey[$jtm]\n";
+		++$jtm;
+	    }
+	}
+	while($jib < $ibkey) {
+	    $compstr .= "INDEXONLY   i2b2 oracle: $ibkey[$jib]\n";
+	    ++$jib;
+	}
+	while($jtm < $tmkey) {
+	    $compstr .= "INDEXONLY  tmart oracle: $tmkey[$jtm]\n";
+	    ++$jtm;
+	}
+    } elsif($ibkey) {
+	print STDERR "Only i2b2 $t INDEX i2b2: $ioIndex{$t}\n";
+	for ($i = 0; $i < $ibkey; $i++) {
+	    $compstr .= "INDEXONLY   i2b2 oracle: $ibkey[$i] for '$t'\n";
+	}
+    } elsif($tmkey) {
+	print STDERR "Only tmart $t INDEX TM: $oIndex{$t}\n";
+	for ($i = 0; $i < $tmkey; $i++) {
+	    $compstr .= "INDEXONLY  tmart oracle: $tmkey[$i] for '$t'\n";
 	}
     }
 
@@ -3707,6 +4004,8 @@ sub parseI2b2Oracle($){
     my $subd = $d;
     my $target = "unknown";
     my $line = 0;
+    my $cindx = 0;
+    my $tindx = "";
 
     $subd =~ s/^$iplus\///g;
 
@@ -3878,7 +4177,7 @@ sub parseI2b2Oracle($){
 			}
 			else {$ioTableUnikey{"$schema.$table"} .= ". $pk;"}
 		    }
-		    elsif(/^\s*(CONSTRAINT (\S+)\s*)?FOREIGN KEY *(\([^\)]+\)) REFERENCES ([^\(]+)\(([^\) ]+)\s*\)/){
+		    elsif(/^\s*(CONSTRAINT (\S+)\s*)?FOREIGN KEY *(\([^\)]+\)) REFERENCES ([^\( ]+) *\(([^\) ]+)\s*\)/){
 			if(defined($1)) {$pk = uc($2).uc($3)." $schema.$4($5);"}
 			else{$pk = "unnamed ".uc($3)}
 			$pk =~ s/\"//g;
@@ -3889,11 +4188,14 @@ sub parseI2b2Oracle($){
 			else{$pk = "unnamed ".uc($3)}
 			$pk =~ s/\"//g;
 			$ioTableForkey{"$schema.$table"} .= $pk;
-#			print STDERR "Parsed Oracle forkey '$pk' from $_\n";
 			$forkey=1;
 		    }
-		    elsif(/^\s*REFERENCES (\S+)\s+(\([^\)]+\))/){
-			# skip rest of foreign key definition
+		    elsif(/^\s*ON COMMIT /i){
+			print STDERR "Commit skip $d/$f $_";
+			# skip commit options for temporary tables
+		    }
+		    elsif(/^\s*REFERENCES ([^\( ]+) *\(([^\)]+)\)/){
+			# skip tail of a foreign key definition
 		    }
 		    elsif(/^\s*(\S+)\s+(.*?),?$/) {
 			$col = $1;
@@ -3901,7 +4203,11 @@ sub parseI2b2Oracle($){
 			$col =~ s/\"//g;
 			$cdef =~ s/,\s*$//g;
 			if($cdef =~ / PRIMARY KEY/g) {
-			    $cdef =~ s/ PRIMARY KEY//g;
+			    if($cdef !~ / NOT NULL ENABLE/){
+				$cdef =~ s/ PRIMARY KEY/ NOT NULL ENABLE/g;
+			    } else {
+				$cdef =~ s/ PRIMARY KEY//g;
+			    }
 			    $ioTablePrikeyName{"$schema.$table"} = $col;
 			    $ioTablePrikey{"$schema.$table"} = $col;
 			}
@@ -3927,6 +4233,65 @@ sub parseI2b2Oracle($){
 		if($cseq == 1 && /([^;]*)(;?)/) {
 		    $tseq .= $1;
 		    if(defined($2)) {$cseq = 2}
+		}
+		if($cindx) {
+		    $tindx .= $_;
+		    if(/;/) {
+			$tindx =~ s/\s+/ /gosm;
+			if($tindx =~ /^\s*(\S+)\s+(INDEX|index)\s+(\S+)\s+ON\s+(\S[^\( ]+)\s*\(([^\)]+)\)/) {
+			    $iuse = $1;
+			    $idx = $3;
+			    $itable=$4;
+			    $icols=$5;
+			    $schema = $ischema;
+			    $schema =~ s/"//g;
+			    $idx =~ s/"//g;
+			    $idx = uc($idx);
+			    $ischema =~ s/"//g;
+			    $itable =~ s/"//g;
+			    $itable = uc($itable);
+			    $icols =~ s/"//g;
+			    $icols =~ s/\s//g;
+			    $icols = uc($icols);
+			    if($iuse =~ /^CREATE/) {
+				$ioIndexFile{"$schema.$idx"} = "$d/$f";
+				$ioIndex{"$ischema.$itable"} .= "$schema.$idx($icols);";
+			    } else {
+				print STDERR "Unexpected i2b2 oracle $iuse INDEX $d/$f\n$tindx\n";
+			    }
+			} else {
+			    print STDERR "Unexpected i2b2 oracle INDEX $d/$f\n$tindx\n";
+			}
+			$cindx = 0;
+			$tindx = "";
+		    }
+		}
+		if(/^\s*(\S+)\s+(INDEX|index)\s+(\S+)\s+ON\s+(\S[^\( ]+)\s*(\(([^\)]+)\))?/) {
+		    $iuse = $1;
+		    $idx = $3;
+		    $itable=$4;
+		    $icols=$6;
+		    if(/;/){
+			$schema = $ischema;
+			$schema =~ s/"//g;
+			$idx =~ s/"//g;
+			$idx = uc($idx);
+			$ischema =~ s/"//g;
+			$itable =~ s/"//g;
+			$itable = uc($itable);
+			$icols =~ s/"//g;
+			$icols =~ s/\s//g;
+			$icols = uc($icols);
+			if($iuse =~ /^CREATE/) {
+			    $ioIndexFile{"$schema.$idx"} = "$d/$f";
+			    $ioIndex{"$ischema.$itable"} .= "$schema.$idx($icols);";
+			} else {
+			    print STDERR "Unexpected i2b2 oracle oneline $iuse INDEX $d/$f\n$_";
+			}
+		    } else {
+			$cindx = 1;
+			$tindx = $_;
+		    }
 		}
 		if(/^\s*(.*\S)\s+(SEQUENCE|sequence)\s+(\S+)([^;]*)([;]?)/) {
 		    $suse = $1;
@@ -4264,6 +4629,8 @@ sub parseI2b2Postgres($){
     my $f;
     my ($tuse,$schema,$table);
     my $subd = $d;
+    my $cindx = 0;
+    my $tindx = "";
 
     $subd =~ s/^$iplus\///g;
 
@@ -4340,7 +4707,7 @@ sub parseI2b2Postgres($){
 			if(defined($pkc)){$ipTableUnikey{$altertable} .= "$pkc $pk;"}
 			else {$ipTableUnikey{$altertable} .= ". $pk;"}
 		    }
-		    if(/^\s*ADD CONSTRAINT (\S+ )FOREIGN KEY *(\(\S+\) )REFERENCES *([^\(]+\([^\)]+\))/){
+		    if(/^\s*ADD\s+CONSTRAINT\s+(\S+ )FOREIGN KEY *(\(\S+\) )REFERENCES *([^\(]+\([^\)]+\))/){
 			$pk = uc($1).uc($2);
 			$pk .= uc($schema);
 			$pk .= ".";
@@ -4348,9 +4715,22 @@ sub parseI2b2Postgres($){
 			$pk .= ";";
 			$ipTableForkey{"$schema.$table"} .= $pk;
 		    }
+		    if(/^\s*ADD\s+PRIMARY KEY\s*\(([^\)]+)\)/){
+			$pkc = $1;
+			$pk = uc($1);
+			$pk =~ s/\s//g;
+			$pk =~ s/\"//g;
+			if(defined($pkc)){
+			    $pkc = uc($pkc);
+			    $pkc =~ s/\s//g;
+			    $pkc =~ s/\"//g;
+			    $ipTablePrikeyName{"$schema.$table"} = $pkc;
+			}
+			$ipTablePrikey{"$schema.$table"} = $pk;
+		    }		    
 		    if(/;/) {$alterctable = 0}
 		}
-		if(/(\S+)\s+TEMPORARY\s+(TABLE|table)\s+(ONLY\s+)?(\S+)/) {
+		if(/(\S+)\s+GLOBAL\s+TEMPORARY\s+(TABLE|table)\s+(ONLY\s+)?(\S+)/) {
 		    $tuse = $1;
 		    $table = $4;
 		    if ($ischema ne "unknown") {
@@ -4433,12 +4813,12 @@ sub parseI2b2Postgres($){
 			else {$ipTableUnikey{"$schema.$table"} .= ". $pk;"}
 		    }
 		    elsif(/^\s*(CONSTRAINT (\S+)\s+)?FOREIGN KEY *(\([^\)]+\))\s*REFERENCES ([^\( ]+) *(\([^\)]+\))/){
-			if(defined($1)) {$pk = uc($2).uc($3)." $4($5)"}
+			if(defined($1)) {$pk = uc($2).uc($3)." $schema.$4$5"}
 			else{$pk = "unnamed ".uc($3)}
 			$pk =~ s/\"//g;
 			$pk =~ s/ \)/\)/g;
 			$ipTableForkey{"$schema.$table"} .= $pk;
-#			print STDERR "I2b2 postgres forkeyall '$pk' from $_\n";
+			print STDERR "I2b2 postgres forkeyall '$pk' from $_\n";
 		    }
 		    elsif(/^\s*(CONSTRAINT (\S+)\s+)?FOREIGN KEY *(\([^\)]+\))/){
 			if(defined($1)) {$pk = uc($2).uc($3)}
@@ -4448,10 +4828,12 @@ sub parseI2b2Postgres($){
 			$ipTableForkey{"$schema.$table"} .= $pk;
 #			print STDERR "I2b2 postgres forkey '$pk' from $_\n";
 		    }
-		    elsif(/^\s*REFERENCES ([^\( ]+) *(\([^\)]+\))/){
-			$pk = " $1($2);";
+		    elsif(/^\s*REFERENCES ([^\( ]+) *\(([^\)]+)\)/){
+			$pk = " $schema.$1($2);";
 			$ipTableForkey{"$schema.$table"} .= $pk;
 #			print STDERR "I2b2 postgres forkeyref '$pk' from $_\n";
+		    }
+		    elsif(/^\s*ON COMMIT PRESERVE ROWS/ig){
 		    }
 		    elsif(/^\s*([A-Za-z]\S+)\s+(.*?),?$/) {
 			$col = $1;
@@ -4460,6 +4842,11 @@ sub parseI2b2Postgres($){
 			$cdef = uc($cdef);
 			$cdef =~ s/,\s+$//g;
 			if($cdef =~ / PRIMARY KEY/g) {
+			    if($cdef !~ / NOT NULL/){
+				$cdef =~ s/ PRIMARY KEY/ NOT NULL/g;
+			    } else {
+				$cdef =~ s/ PRIMARY KEY//g;
+			    }
 			    $cdef =~ s/ PRIMARY KEY//g;
 			    $ipTablePrikeyName{"$schema.$table"} = $col;
 			    $ipTablePrikey{"$schema.$table"} = $col;
@@ -4477,6 +4864,83 @@ sub parseI2b2Postgres($){
 		if($cseq == 1 && /([^;]*)/) {
 		    $tseq .= $1;
 		    if(/;/) {$cseq = 2}
+		}
+		if($cindx) {
+		    $tindx .= $_;
+		    if(/;/) {
+			if($tindx =~ /^\s*(.*\S)\s+(INDEX|index)\s+(\S+)\s+ON\s+(\S+)\s*\(([^\)]+)\)\s*/) {
+			    $iuse = $1;
+			    $idx = $3;
+			    $itable=$4;
+			    $itable = uc($itable);
+			    $icols=$5;
+			    $schema = $ischema;
+			    $schema = uc($schema);
+			    $idx =~ s/"//g;
+			    $idx = uc($idx);
+			    $itable =~ s/"//g;
+			    $icols =~ s/"//g;
+			    $icols =~ s/\s//g;
+			    $icols = uc($icols);
+			    if($iuse =~ /^CREATE/) {
+				$ipIndexFile{"$schema.$idx"} = "$d/$f";
+				$ipIndex{"$schema.$itable"} .= "$schema.$idx($icols);";
+				#			print STDERR "Found i2b2 postgres index $schema.$itable.$idx\n";
+			    } else {
+				print STDERR "Unexpected i2b2 postgres INDEX $d/$f\n$tindx\n";
+			   }
+			}
+			$cindx = 0;
+			$tindx = "";
+		    }
+		}
+		if(/^\s*(.*\S)\s+UNIQUE\s+(INDEX|index)\s+(\S+)\s+ON\s+(\S[^\( ]+)\s*\(([^\)]+)\)\s*(;?)/) {
+		    $iuse = $1;
+		    $idx = $3;
+		    $itable=$4;
+		    $itable = uc($itable);
+		    $icols=$5;
+		    if(defined($6)){
+			$schema = $ischema;
+			$schema = uc($schema);
+			$idx =~ s/"//g;
+			$idx = uc($idx);
+			$itable =~ s/"//g;
+			$icols =~ s/"//g;
+			$icols =~ s/\s//g;
+			$icols = uc($icols);
+			if($iuse =~ /^CREATE/) {
+			    $ipTableUnikey{"$schema.$itable"} .= "$idx $icols;";
+			}
+		    } else {
+			$cindx = 1;
+			$tindx = $_;
+		    }
+		}
+		elsif(/^\s*(.*\S)\s+(INDEX|index)\s+(\S+)\s+ON\s+(\S[^\( ]+)\s*\(([^\)]+)\)\s*(;?)/) {
+		    $iuse = $1;
+		    $idx = $3;
+		    $itable=$4;
+		    $itable = uc($itable);
+		    $icols=$5;
+		    if(defined($6)){
+			$schema = $ischema;
+			$schema = uc($schema);
+			$idx =~ s/"//g;
+			$idx = uc($idx);
+			$itable =~ s/"//g;
+			$icols =~ s/"//g;
+			$icols =~ s/\s//g;
+			$icols = uc($icols);
+			if($iuse =~ /^CREATE/) {
+			    $ipIndexFile{"$schema.$idx"} = "$d/$f";
+			    $ipIndex{"$schema.$itable"} .= "$schema.$idx($icols);";
+			    #			print STDERR "Found i2b2 postgres index $schema.$itable.$idx\n";
+			}
+		    } else {
+			$cindx = 1;
+			$tindx = $_;
+		    }
 		}
 		if(/^\s*(.*\S)\s+(SEQUENCE|sequence)\s+(\S+)(.*)/) {
 		    $suse = $1;
@@ -5403,39 +5867,39 @@ foreach $it (sort(keys(%itemsView))){
 # Now check everything that should be in an items.json file was found there
 
 foreach $it (sort(keys(%oFunctionFile))){
-    if(!defined($itemsFunction{$it})){print STDERR "Oracle no itemsFunction $it\n"}
+    if(!defined($itemsFunction{$it})){print STDERR "Oracle no itemsFunction $it $oFunctionFile{$it}\n"}
 }
 
 foreach $it (sort(keys(%oIndexFile))){
-    if(!defined($itemsIndex{$it})){print STDERR "Oracle no itemsIndex $it\n"}
+    if(!defined($itemsIndex{$it})){print STDERR "Oracle no itemsIndex $it $oIndexFile{$it}\n"}
 }
 
 foreach $it (sort(keys(%oProcFile))){
-    if(!defined($itemsProcedure{$it})){print STDERR "Oracle no itemsProcedure $it\n"}
+    if(!defined($itemsProcedure{$it})){print STDERR "Oracle no itemsProcedure $it $oProcFile{$it}\n"}
 }
 
 foreach $it (sort(keys(%oForkey))){
-    if(!defined($itemsRefConstraint{$it})){print STDERR "Oracle no itemsRefConstraint $it\n"}
+    if(!defined($itemsRefConstraint{$it})){print STDERR "Oracle no itemsRefConstraint $it $oForkey{$it}\n"}
 }
 
 foreach $it (sort(keys(%oSequenceFile))){
-    if(!defined($itemsSequence{$it})){print STDERR "Oracle no itemsSequence $it\n"}
+    if(!defined($itemsSequence{$it})){print STDERR "Oracle no itemsSequence $it $oSequenceFile{$it}\n"}
 }
 
 foreach $it (sort(keys(%oTableFile))){
-    if(!defined($itemsTable{$it})){print STDERR "Oracle no itemsTable $it\n"}
+    if(!defined($itemsTable{$it})){print STDERR "Oracle no itemsTable $it $oTableFile{$it}\n"}
 }
 
 foreach $it (sort(keys(%oTriggerFile))){
-    if(!defined($itemsTrigger{$it})){print STDERR "Oracle no itemsTrigger $it\n"}
+    if(!defined($itemsTrigger{$it})){print STDERR "Oracle no itemsTrigger $it $oTriggerFile{$it}\n"}
 }
 
 foreach $it (sort(keys(%oTypeFile))){
-    if(!defined($itemsType{$it})){print STDERR "Oracle no itemsType $it\n"}
+    if(!defined($itemsType{$it})){print STDERR "Oracle no itemsType $it $oTypeFile{$it}\n"}
 }
 
 foreach $it (sort(keys(%oViewFile))){
-    if(!defined($itemsView{$it})&& !defined($itemsMaterializedView{$it})){print STDERR "Oracle no itemsView $it\n"}
+    if(!defined($itemsView{$it})&& !defined($itemsMaterializedView{$it})){print STDERR "Oracle no itemsView $it $oViewFile{$it}\n"}
 }
 
 
@@ -5727,7 +6191,7 @@ $diffindexuni = 0;
 foreach $t (sort(keys(%oTableUnikey))) {
     ++$noindexuni;
     if(!defined($pTableUnikey{$t})){
-	printf "Oracle unique index %-50s (%s) %s\n", $t, $oTableUnikey{$t};
+	printf "Oracle unique index %-50s %s\n", $t, $oTableUnikey{$t};
 	++$onlyoindexuni;
 	push @onlyoindexuni, $t;
     }
@@ -5763,7 +6227,7 @@ $diffindexfor = 0;
 foreach $t (sort(keys(%oTableForkey))) {
     ++$npindexfor;
     if(!defined($pTableForkey{$t})){
-	printf "Oracle foreign index %-50s (%s) %s\n", $t, $oTableForkey{$t};
+	printf "Oracle foreign index %-50s %s\n", $t, $oTableForkey{$t};
 	++$onlyoindexfor;
 	push @onlyoindexfor, $t;
     }
@@ -5792,6 +6256,41 @@ foreach $t (sort(keys(%pTableForkey))) {
     }
 }
 
+# Compare Indexes
+
+$noindex = 0;
+$onlyoindex = 0;
+$diffindex = 0;
+foreach $t (sort(keys(%oIndex))) {
+    ++$noindex;
+    if(!defined($pIndex{$t})){
+	printf "Oracle index %-50s %s\n", $t, $oIndex{$t};
+	++$onlyoindex;
+	push @onlyoindex, $t;
+    }
+    else {
+	if($oIndex{$t} eq $pIndex{$t}) {$pindex = "   (same)"}
+	else {
+	    $pindex = "$pIndex{$t}";
+	    ++$diffindex;
+	    push @diffindex, "$t $oIndex{$t} <=> $pindex";
+	}
+	if($showSame){
+	    printf "Both          index %-50s %s%s\n", $t, $oIndex{$t}, $pindex;
+	}
+    }
+}
+
+$npindex = 0;
+$onlypindex = 0;
+foreach $t (sort(keys(%pIndex))) {
+    ++$npindex;
+    if(!defined($oIndex{$t})){
+	printf "Postgres        index %-50s %s\n", $t, $pIndex{$t};
+	++$onlypindex;
+	push @onlypindex, $t;
+    }
+}
 
 
 # Check I2b2 Oracle + Postgres + Sqlserver
@@ -6018,9 +6517,11 @@ foreach $t (sort(keys(%ioTableFile))) {
 	$pfile =~ s/\/postgres\//\/oracle\//g;
 	if($pfile eq $ioTableFile{$t}) {$pfile = "  (same)"}
 	else{$pfile = "   $ipTableFile{$t}"}
-	printf "I2b2Both %3s %3d %3d %-50s %s%s\n",
-		  $diff, $npcol, $nocol, $t, $ioTableFile{$t}, $pfile;
-	print $compstr;
+	if($showSame || $compstr ne "") {
+	    printf "I2b2Both %3s %3d %3d %-50s %s%s\n",
+		$diff, $npcol, $nocol, $t, $ioTableFile{$t}, $pfile;
+	    print $compstr;
+	}
     }
 }
 
@@ -6056,8 +6557,10 @@ foreach $t (sort(keys(%ioSequenceFile))) {
 	else{$pfile = "   $ipSequenceFile{$t}"}
 	if($compstr eq "") {$diff = "   "}
 	else {$diff = "CMP"}
-	printf "I2b2Both %s sequence %-50s %s%s\n", $diff, $t, $ioSequenceFile{$t}, $pfile;
-	print $compstr;
+	if($showSame || $compstr ne "") {
+	    printf "I2b2Both %s sequence %-50s %s%s\n", $diff, $t, $ioSequenceFile{$t}, $pfile;
+	    print $compstr;
+	}
     }
 }
 
@@ -6273,7 +6776,7 @@ $idiffindexuni = 0;
 foreach $t (sort(keys(%ioTableUnikey))) {
     ++$inoindexuni;
     if(!defined($ipTableUnikey{$t})){
-	printf "I2b2Oracle unique index %-50s (%s) %s\n", $t, $ioTableUnikey{$t};
+	printf "I2b2Oracle unique index %-50s %s\n", $t, $ioTableUnikey{$t};
 	++$ionlyoindexuni;
 	push @ionlyoindexuni, $t;
     }
@@ -6309,7 +6812,7 @@ $idiffindexfor = 0;
 foreach $t (sort(keys(%ioTableForkey))) {
     ++$inpindexfor;
     if(!defined($ipTableForkey{$t})){
-	printf "I2b2Oracle foreign index %-50s (%s) %s\n", $t, $ioTableForkey{$t};
+	printf "I2b2Oracle foreign index %-50s %s\n", $t, $ioTableForkey{$t};
 	++$ionlyoindexfor;
 	push @ionlyoindexfor, $t;
     }
@@ -6338,6 +6841,42 @@ foreach $t (sort(keys(%ipTableForkey))) {
     }
 }
 
+
+# Compare Indexes
+
+$inoindex = 0;
+$ionlyoindex = 0;
+$idiffindex = 0;
+foreach $t (sort(keys(%ioIndex))) {
+    ++$inoindex;
+    if(!defined($ipIndex{$t})){
+	printf "Oracle index %-50s %s\n", $t, $ioIndex{$t};
+	++$ionlyoindex;
+	push @ionlyoindex, $t;
+    }
+    else {
+	if($ioIndex{$t} eq $ipIndex{$t}) {$ipindex = "   (same)"}
+	else {
+	    $pindex = "$ipIndex{$t}";
+	    ++$idiffindex;
+	    push @idiffindex, "$t $ioIndex{$t} <=> $pindex";
+	}
+	if($showSame){
+	    printf "Both          index %-50s %s%s\n", $t, $ioIndex{$t}, $pindex;
+	}
+    }
+}
+
+$inpindex = 0;
+$ionlypindex = 0;
+foreach $t (sort(keys(%ipIndex))) {
+    ++$inpindex;
+    if(!defined($ioIndex{$t})){
+	printf "Postgres        index %-50s %s\n", $t, $ipIndex{$t};
+	++$ionlypindex;
+	push @ionlypindex, $t;
+    }
+}
 
 # Check I2b2 Oracle + Postgres + Sqlserver
 # Also check against Oracle + Postgres
@@ -6403,7 +6942,7 @@ foreach $t (sort(keys(%ioTableFile))) {
     @icols = split(/;/,$ioTableColumn{$t});
     $nicol = 1 + $#icols;
     if(!defined($oTableFile{$t})){
-	printf "I-O I2b2 table %3d %-50s %s\n", $nicol, $t, $ioTableFile{$t};
+	printf "I-T I2b2 table %3d %-50s %s\n", $nicol, $t, $ioTableFile{$t};
 	++$onlyibtable;
 	push @onlyibtable, $t;
     }
@@ -6417,9 +6956,11 @@ foreach $t (sort(keys(%ioTableFile))) {
 	$ofile = $oTableFile{$t};
 	if($ofile eq $ioTableFile{$t}) {$ofile = ""}
 	else{$ofile = "   $oTableFile{$t}"}
-	printf "I-O Both %3s %3d %3d %-50s %s%s\n",
-		  $diff, $nocol, $nicol, $t, $ioTableFile{$t}, $ofile;
-	print $compstr;
+	if($showSame || $compstr ne "") {
+	    printf "I-T Both %3s %3d %3d %-50s %s%s\n",
+		$diff, $nocol, $nicol, $t, $ioTableFile{$t}, $ofile;
+	    print $compstr;
+	}
     }
 }
 
@@ -6430,7 +6971,7 @@ foreach $t (sort(keys(%oTableFile))) {
     if($t !~ /^I2B2/) {next}
     ++$ntmtable;
     if(!defined($ioTableFile{$t})){
-	printf "I-O Transmart table %-50s %s\n", $t, $oTableFile{$t};
+	printf "I-T Transmart table %-50s %s\n", $t, $oTableFile{$t};
 	++$onlytmtable;
 	push @onlytmtable, $t;
     }
@@ -6444,7 +6985,7 @@ $onlyibseq = 0;
 foreach $t (sort(keys(%ioSequenceFile))) {
     ++$nibseq;
     if(!defined($oSequenceFile{$t})){
-	printf "I-O I2b2 sequence %-50s %s\n", $t, $ioSequenceFile{$t};
+	printf "I-T I2b2 sequence %-50s %s\n", $t, $ioSequenceFile{$t};
 	++$onlyibseq;
 	push @onlyibseq, $t;
     }
@@ -6455,8 +6996,10 @@ foreach $t (sort(keys(%ioSequenceFile))) {
 	else{$ofile = "   $oSequenceFile{$t}"}
 	if($compstr eq "") {$diff = "   "}
 	else {$diff = "CMP"}
-	printf "I-O Both %s sequence %-50s %s%s\n", $diff, $t, $ioSequenceFile{$t}, $ofile;
-	print $compstr;
+	if($showSame || $compstr ne "") {
+	    printf "I-T Both %s sequence %-50s %s%s\n", $diff, $t, $ioSequenceFile{$t}, $ofile;
+	    print $compstr;
+	}
     }
 }
 
@@ -6466,7 +7009,7 @@ foreach $t (sort(keys(%oSequenceFile))) {
     if($t !~ /^I2B2/) {next}
     ++$ntmseq;
     if(!defined($ioSequenceFile{$t})){
-	printf "I-O Transmart sequence %-50s %s\n", $t, $oSequenceFile{$t};
+	printf "I-T Transmart sequence %-50s %s\n", $t, $oSequenceFile{$t};
 	++$onlytmseq;
 	push @onlytmseq, $t;
     }
@@ -6502,7 +7045,7 @@ foreach $t (sort(keys(%ioTriggerFile))) {
 	    }
 	}
 	if(!$pnext){
-	    printf "I2b2 trigger %-50s %s\n", $t, $ioTriggerFile{$t};
+	    printf "I-T I2b2 trigger %-50s %s\n", $t, $ioTriggerFile{$t};
 	    ++$onlyibtrig;
 	    push @onlyibtrig, $t;
 	}
@@ -6511,7 +7054,9 @@ foreach $t (sort(keys(%ioTriggerFile))) {
 	$ofile = $oTriggerFile{$t};
 	if($ofile eq $ioTriggerFile{$t}) {$ofile = ""}
 	else{$ofile = "   $oTriggerFile{$t}"}
-	printf "I-T Both   trigger %-50s %s%s\n", $t, $ioTriggerFile{$t}, $pfile;
+	if($showSame) {
+	    printf "I-T Both   trigger %-50s %s%s\n", $t, $ioTriggerFile{$t}, $pfile;
+	}
 #	$tfname = $t;
 #	$tfname =~ s/[.]/.TF_/g;
 #	if(!defined($oFunctionFile{"$tfname"})){
@@ -6553,7 +7098,9 @@ foreach $t (sort(keys(%ioFunctionFile))) {
 	$ofile = $oFunctionFile{$t};
 	if($ofile eq $ioFunctionFile{$t}) {$ofile = ""}
 	else{$ofile = "   $oFunctionFile{$t}"}
-	printf "I-T Both   function %-50s %s%s\n", $t, $ioFunctionFile{$t}, $ofile;
+	if($showSame) {
+	    printf "I-T Both   function %-50s %s%s\n", $t, $ioFunctionFile{$t}, $ofile;
+	}
     }
 }
 
@@ -6585,7 +7132,9 @@ foreach $t (sort(keys(%ioProcFile))) {
 	$ofile = $oProcFile{$t};
 	if($ofile eq $ioProcFile{$t}) {$ofile = ""}
 	else{$ofile = "   $oProcFile{$t}"}
-	printf "I-T Both   procedure %-50s %s%s\n", $t, $ioProcFile{$t}, $ofile;
+	if($showSame) {
+	    printf "I-T Both   procedure %-50s %s%s\n", $t, $ioProcFile{$t}, $ofile;
+	}
     }
 }
 
@@ -6618,7 +7167,9 @@ foreach $t (sort(keys(%ioViewFile))) {
 	$ofile = $oViewFile{$t};
 	if($ofile eq $ioViewFile{$t}) {$ofile = ""}
 	else{$ofile = "   $oViewFile{$t}"}
-	printf "I-T Both   view %-50s %s%s\n", $t, $ioViewFile{$t}, $ofile;
+	if($showSame) {
+	    printf "I-T Both   view %-50s %s%s\n", $t, $ioViewFile{$t}, $ofile;
+	}
     }
 }
 
@@ -6645,7 +7196,7 @@ $tmdiffindexprim = 0;
 foreach $t (sort(keys(%ioTablePrikey))) {
     ++$nibindexprim;
     if(!defined($oTablePrikey{$t})){
-	printf "OracleI2b2 primary index %-50s %s\n", $t, $ioTablePrikey{$t};
+	printf "I-T I2b2 primary index %-50s %s\n", $t, $ioTablePrikey{$t};
 	++$onlyibindexprim;
 	push @onlyibindexprim, $t;
     }
@@ -6657,7 +7208,7 @@ foreach $t (sort(keys(%ioTablePrikey))) {
 	    push @tmdiffindexprim, "$t $oTablePrikey{$t} <=> $pindex";
 	}
 	if($showSame){
-	    printf "OracleBoth   primary index %-50s %s%s\n", $t, $oTablePrikey{$t}, $pindex;
+	    printf "I-T Both   primary index %-50s %s%s\n", $t, $oTablePrikey{$t}, $pindex;
 	}
     }
 }
@@ -6668,7 +7219,7 @@ foreach $t (sort(keys(%oTablePrikey))) {
     if($t !~ /^I2B2/) {next}
     ++$ntmindexprim;
     if(!defined($ioTablePrikey{$t})){
-	printf "OracleTransmart primary index %-50s %s\n", $t, $oTablePrikey{$t};
+	printf "I-T Transmart primary index %-50s %s\n", $t, $oTablePrikey{$t};
 	++$onlytmindexprim;
 	push @onlytmindexprim, $t;
     }
@@ -6683,7 +7234,7 @@ $tmdiffindexuni = 0;
 foreach $t (sort(keys(%ioTableUnikey))) {
     ++$nibindexuni;
     if(!defined($oTableUnikey{$t})){
-	printf "OracleI2b2 unique index %-50s (%s) %s\n", $t, $ioTableUnikey{$t};
+	printf "I-T I2b2 unique index %-50s %s\n", $t, $ioTableUnikey{$t};
 	++$onlyibindexuni;
 	push @onlyibindexuni, $t;
     }
@@ -6695,7 +7246,7 @@ foreach $t (sort(keys(%ioTableUnikey))) {
 	    push @tmdiffindexuni, "$t ($ioTableUnikey{$t}) <=> $pindex";
 	}
 	if($showSame){
-	    printf "OracleBoth   unique index %-50s %s%s\n", $t, $ioTableUnikey{$t}, $pindex;
+	    printf "I-T Both   unique index %-50s %s%s\n", $t, $ioTableUnikey{$t}, $pindex;
 	}
     }
 }
@@ -6706,7 +7257,7 @@ foreach $t (sort(keys(%oTableUnikey))) {
     if($t !~ /^I2B2/) {next}
     ++$ntmindexuni;
     if(!defined($ioTableUnikey{$t})){
-	printf "OracleTransmart unique index %-50s %s\n", $t, $oTableUnikey{$t};
+	printf "I-T Transmart unique index %-50s %s\n", $t, $oTableUnikey{$t};
 	++$onlytmindexuni;
 	push @onlytmindexuni, $t;
     }
@@ -6720,7 +7271,7 @@ $tmdiffindexfor = 0;
 foreach $t (sort(keys(%ioTableForkey))) {
     ++$nibindexfor;
     if(!defined($oTableForkey{$t})){
-	printf "OracleI2b2 foreign index %-50s (%s) %s\n", $t, $ioTableForkey{$t};
+	printf "I-T I2b2 foreign index %-50s %s\n", $t, $ioTableForkey{$t};
 	++$onlyibindexfor;
 	push @onlyibindexfor, $t;
     }
@@ -6733,7 +7284,7 @@ foreach $t (sort(keys(%ioTableForkey))) {
 	    push @tmdiffindexfor, "$t\n($ioTableForkey{$t}) <=>\n$pindex\n$compareForkey";
 	}
 	if($showSame){
-	    printf "OracleBoth   foreign index %-50s %s%s\n", $t, $ioTableForkey{$t}, $pindex;
+	    printf "I-T Both   foreign index %-50s %s%s\n", $t, $ioTableForkey{$t}, $pindex;
 	}
     }
 }
@@ -6744,9 +7295,46 @@ foreach $t (sort(keys(%oTableForkey))) {
     if($t !~ /^I2B2/) {next}
     ++$ntmindexfor;
     if(!defined($ioTableForkey{$t})){
-	printf "OracleTransmart foreign index %-50s %s\n", $t, $oTableForkey{$t};
+	printf "I-T Transmart foreign index %-50s %s\n", $t, $oTableForkey{$t};
 	++$onlytmindexfor;
 	push @onlytmindexfor, $t;
+    }
+}
+
+# Compare Indexes
+
+$nibindex = 0;
+$onlyibindex = 0;
+$tmdiffindex = 0;
+foreach $t (sort(keys(%ioIndex))) {
+    ++$noindex;
+    if(!defined($oIndex{$t})){
+	printf "I-T I2b2   index %-50s %s\n", $t, $ioIndex{$t};
+	++$onlyibindex;
+	push @onlyibindex, $t;
+    }
+    else {
+	if($ioIndex{$t} eq $oIndex{$t}) {$pindex = "   (same)"}
+	else {
+	    $pindex = "$oIndex{$t}";
+	    ++$tmdiffindex;
+	    push @tmdiffindex, "$t $ioIndex{$t} <=> $pindex";
+	}
+	if($showSame){
+	    printf "I-T Both          index %-50s %s%s\n", $t, $ioIndex{$t}, $pindex;
+	}
+    }
+}
+
+$ntmindex = 0;
+$onlytmindex = 0;
+foreach $t (sort(keys(%oIndex))) {
+    if($t !~ /^I2B2/) {next}
+    ++$ntmindex;
+    if(!defined($ioIndex{$t})){
+	printf "I-T Transmart       index %-50s %s\n", $t, $oIndex{$t};
+	++$onlytmindex;
+	push @onlytmindex, $t;
     }
 }
 
@@ -6969,6 +7557,30 @@ if($diffindexfor) {
     }
 }
 
+if($onlypindex) {
+    print "\nTransmart Postgres <=> Oracle $onlypindex new index\n";
+    $i = 0;
+    foreach $t (@onlypindex) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlyoindex) {
+    print "\nTransmart Oracle <=> Postgres $onlyoindex new index\n";
+    $i = 0;
+    foreach $t (@onlyoindex) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($diffindex) {
+    print "\nTransmart Oracle <=> Postgres $diffindex changed index\n";
+    $i = 0;
+    foreach $t (@diffindex) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
 # Postgres <=> Oracle I2b2 (i2b2 comparison)
 # ============================================
 
@@ -7128,6 +7740,30 @@ if($idiffindexfor) {
     print "\nI2b2 Oracle <=> Postgres $idiffindexfor changed foreign index\n";
     $i = 0;
     foreach $t (@idiffindexfor) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlypindex) {
+    print "\nI2b2 Postgres <=> Oracle $ionlypindex new index\n";
+    $i = 0;
+    foreach $t (@ionlypindex) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($ionlyoindex) {
+    print "\nI2b2 Oracle <=> Postgres $ionlyoindex new index\n";
+    $i = 0;
+    foreach $t (@ionlyoindex) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($idiffindex) {
+    print "\nI2b2 Oracle <=> Postgres $idiffindex changed index\n";
+    $i = 0;
+    foreach $t (@idiffindex) {
 	printf "%3d %s\n", ++$i, $t;
     }
 }
@@ -7301,3 +7937,28 @@ if($tmdiffindexfor) {
 	printf "%3d %s\n", ++$i, $t;
     }
 }
+
+if($onlyibindex) {
+    print "\nOracle I2b2 <=> Transmart $onlyibindex new index\n";
+    $i = 0;
+    foreach $t (@onlyibindex) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($onlytmindex) {
+    print "\nOracle Transmart <=> I2b2 $onlytmindex new index\n";
+    $i = 0;
+    foreach $t (@onlytmindex) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
+if($tmdiffindex) {
+    print "\nOracle I2b2 <=> Transmart $tmdiffindex changed index\n";
+    $i = 0;
+    foreach $t (@tmdiffindex) {
+	printf "%3d %s\n", ++$i, $t;
+    }
+}
+
