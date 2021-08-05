@@ -23,12 +23,13 @@ biocmanager.packages <-
 					  "edgeR", "DESeq2", "limma",
 					  "snpStats", "preprocessCore", "GO.db",
 					  "AnnotationDbi", "QDNAseq"));
-if (length(biocmanager.packages))
+if (length(biocmanager.packages)) {
 	BiocManager::install(biocmanager.packages);
-download.file(url="http://bioconductor.org/packages/release/bioc/src/contrib/QDNAseq_1.26.0.tar.gz",
-	      dest="/tmp/QDNAseq_1.26.0.tar.gz", method="internal");
-install.packages("/tmp/QDNAseq_1.26.0.tar.gz",
+download.file(url="http://bioconductor.org/packages/release/bioc/src/contrib/QDNAseq_1.28.0.tar.gz",
+	      dest="/tmp/QDNAseq_1.28.0.tar.gz", method="internal");
+install.packages("/tmp/QDNAseq_1.28.0.tar.gz",
 		repos=NULL, type="source");
+}
 
 if (length(intersect(new.packages, c("CGHtest")))) {
 	download.file(
