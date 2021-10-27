@@ -105,7 +105,7 @@ if(defined($clinical{$loadstudy})) {
 		msg("   Clinical did NOT complete successfully\n");
 		$clinicalFail = 1;
 	    }
-	    if(/create_clinical_data - Finished  entry \[run i2b2_load_clinical_data\] \(result=\[false\]\)/) {
+	    if(/create_clinical_data - Finished job entry \[run i2b2_load_clinical_data\] \(result=\[false\]\)/) {
 		msg("   Clinical i2b2_load_clinical_data false\n");
 		$clinicalFail = 1;
 	    }
