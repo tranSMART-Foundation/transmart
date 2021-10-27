@@ -12,7 +12,9 @@ RSERVE_USER ?= tomcat8
 RSERVE_CONF ?= $(realpath .)/Rserv_nodaemon.conf
 RSERVE_LOG ?= /var/log/${RSERVE_USER}/rserve-transmart.log
 
-R_FLAGS ?= -O2 -march=native
+# drop -march=native flag - transmart-docker drops it 'to run on more than one CPU'
+#R_FLAGS ?= -O2 -march=native
+R_FLAGS ?= -O2
 
 $(R_SOURCE):
 	curl -f $(R_MIRROR)/src/base/R-4/$@.tar.gz | $(TAR_COMMAND) xzf -
