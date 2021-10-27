@@ -127,6 +127,15 @@ dataExport {
 /* }}} */
 
 
+/* {{{ I2B2 joint platform configuration */
+
+// If true, tranSMART will accept data loaded by I2B2 as study 'I2B2'
+//org.transmart.i2b2.view,enable = false
+
+/* }}} */
+
+
+
 // You MUST leave this at the end
 // Do not move it up, otherwise syntax errors may not be detected
 
