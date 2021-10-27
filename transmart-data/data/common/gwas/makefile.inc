@@ -2,9 +2,15 @@ SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 DATA_LOCATION := https://s3.amazonaws.com/thehyve-data/public/Reference%2520data
 
+# files retrieved 24-aug-21
+# to be updated to latest versions
+
 DE_RC_SNP_INFO_FILE := $(SELF_DIR)/de_rc_snp_info_b146_GRCh37p13.tsv.lz4
 DE_GENE_INFO_FILE := $(SELF_DIR)/de_gene_info_GRCh37p13.tsv.lz4
 RECOMBINATION_FILE_TARBALL := $(SELF_DIR)/genetic_map_HapMapII_GRCh37.tar.gz
+
+# These files were unavailable 24-aug-21
+
 RECOMBINATION_FILE := $(SELF_DIR)/bio_recombination_rates.tsv.lz4
 DE_SNP_GENE_MAP_SQL := $(SELF_DIR)/insert_snp_gene_map.sql
 
