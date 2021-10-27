@@ -40,8 +40,11 @@ PHP_BIN=php5/bin/php
 
 TRANSMART_LOADER=transmart-loader
 
+# 1.1 is the latest tranSMART version for transmart-batch
+# Others are 17.1 for the tranSMART-Pro project
+
 TRANSMART_BATCH_FILE=transmart-batch-capsule.jar
-TRANSMART_BATCH_URL=https://repo.thehyve.nl/service/local/artifact/maven/content?r=snapshots&g=org.transmartproject&a=transmart-batch&c=capsule&v=LATEST
+TRANSMART_BATCH_URL=https://repo.thehyve.nl/service/local/artifact/maven/content?r=snapshots&g=org.transmartproject&a=transmart-batch&c=capsule&v=1.1-SNAPSHOT
 
 include ../lib/makefile.inc
 
