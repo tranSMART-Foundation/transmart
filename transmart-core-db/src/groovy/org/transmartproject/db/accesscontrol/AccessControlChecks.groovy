@@ -62,12 +62,12 @@ class AccessControlChecks {
 
         if (user.admin) {
             /* administrators bypass all the checks */
-	    logger.debug 'Bypassing check for {} on {} for user {} because he is an administrator',
-		protectedOperation, study, this
+	    logger.debug 'Bypassing check for {} on {} for user {} because they are an administrator',
+		protectedOperation, study, user.username
             return true
         }
 
-	// Get the study's "token"
+	// Get the study "token"
 	I2b2Secure secure = I2b2Secure.findWhere(fullName: study.ontologyTerm.fullName)
         if (!secure) {
 	    logger.warn 'Could not find object "${}" in i2b2_secure; allowing access',
@@ -97,23 +97,23 @@ class AccessControlChecks {
             and soav.securedObject.dataType = 'BIO_CLINICAL_TRIAL' ''',
 		[token: token, user: user]) as List<AccessLevel>
 
-            logger.debug 'Got access levels for user {}, token {}: {}', this, token, results
+            logger.debug 'Got access levels for user {}, token {}: {}', user.username, token, results
 
 	if (!results) {
 	    logger.info 'No access level entries found for user {} and token {}; denying access',
-		this, token
+		user.username, token
             return false
         }
 
 	AccessLevel level = results.find { AccessLevel level -> protectedOperation in level }
         if (level) {
             logger.debug 'Access level of user {} for token {} granted through permission {}',
-		this, token, level
+		user.username, token, level
             true
         }
         else {
             logger.info 'Permissions of user {} for token {} are only {}; denying access',
-		this, token, results as Set
+		user.username, token, results as Set
             false
         }
     }
@@ -200,13 +200,13 @@ class AccessControlChecks {
         }
 
         if (!ok) {
-	    logger.warn 'User {} defined access for definition {} because it does' +
+	    logger.warn 'User {} denied access for definition {} because it does' +
 		' not include one non-inverted panel for which the user has ' +
-		'permission in all the terms\' studies', user, definition
+		'permission in all the terms\' studies', user.username, definition
         }
         else {
 	    logger.debug 'Granting access to user {} to use query definition {}',
-		user, definition
+		user.username, definition
         }
 
 	ok
@@ -242,7 +242,7 @@ class AccessControlChecks {
 		user, result, result.username, user.username
         }
         else {
-            logger.debug 'Granting {} access to {} (usernames match)', user, result
+            logger.debug 'Granting {} access to {} (usernames match)', user.username, result
         }
 
         ok
