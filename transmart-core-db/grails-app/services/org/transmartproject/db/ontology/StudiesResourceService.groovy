@@ -20,17 +20,21 @@
 package org.transmartproject.db.ontology
 
 import groovy.transform.CompileStatic
+import org.springframework.beans.factory.annotation.Value
 import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.core.exceptions.UnexpectedResultException
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.StudiesResource
 import org.transmartproject.core.ontology.Study
-import org.transmartproject.db.i2b2data.I2b2TrialNodes
+import org.transmartproject.db.i2b2data.TmTrialNodes
 
 @CompileStatic
 class StudiesResourceService implements StudiesResource {
 
     static transactional = false
+
+    @Value('${org.transmart.i2b2.view.enable:false}')
+    private boolean i2b2View
 
     Set<Study> getStudySet() {
         // we actually only search the i2b2 table here
@@ -40,10 +44,10 @@ class StudiesResourceService implements StudiesResource {
         // ontology tables at this point.
 	List<Object[]> rows = I2b2.executeQuery('''
 				SELECT I, TN.trial
-				FROM I2b2 I, I2b2TrialNodes TN
+				FROM I2b2 I, TmTrialNodes TN
 				WHERE (I.fullName = TN.fullName)''') as List<Object[]>
 	    // the query is awkward (cross join) due to the non-existence of an
-	    // association. See comment on I2b2TrialNodes
+	    // association. See comment on TmTrialNodes
 
 	    Set<Study> studies = []
 	for (Object[] row in rows) {
@@ -58,10 +62,14 @@ class StudiesResourceService implements StudiesResource {
 	List<I2b2> result = I2b2.executeQuery('''
 				SELECT I
 				FROM I2b2 I
-				WHERE fullName IN (SELECT fullName FROM I2b2TrialNodes WHERE trial = :trial)''',
+				WHERE fullName IN (SELECT fullName FROM TmTrialNodes WHERE trial = :trial)''',
 					      [trial: normalizedStudyId])
 
 	if (!result) {
+	    if(i2b2View) {
+//		return new StudyImpl(ontologyTerm: null, id: 'I2B2')
+		return new StudyImpl(id: 'I2B2')
+	    }
 	    throw new NoSuchResourceException("No study with id '$id' was found")
 	}
 	if (result.size() > 1) {
@@ -71,13 +79,13 @@ class StudiesResourceService implements StudiesResource {
     }
 
     Study getStudyByOntologyTerm(OntologyTerm term) throws NoSuchResourceException {
-	I2b2TrialNodes trialNodes
+	TmTrialNodes trialNodes
 	if (OntologyTerm.VisualAttributes.STUDY in term.visualAttributes &&
 	    term.hasProperty('studyId') && term['studyId']) {
 	    return new StudyImpl(ontologyTerm: term, id: (String) term['studyId'])
 	}
 
-	if ((trialNodes = I2b2TrialNodes.findWhere(fullName: term.fullName))) {
+	if ((trialNodes = TmTrialNodes.findWhere(fullName: term.fullName))) {
 	    return new StudyImpl(ontologyTerm: term, id: trialNodes.trial)
 	}
 

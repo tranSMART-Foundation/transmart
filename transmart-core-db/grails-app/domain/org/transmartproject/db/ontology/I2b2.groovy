@@ -19,9 +19,12 @@
 
 package org.transmartproject.db.ontology
 
+import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Value
 import org.transmartproject.core.exceptions.UnexpectedResultException
 import org.transmartproject.core.ontology.Study
 
+@Slf4j('logger')
 class I2b2 extends AbstractI2b2Metadata implements Serializable {
 
     static final String backingTable = 'I2B2'
@@ -65,39 +68,48 @@ class I2b2 extends AbstractI2b2Metadata implements Serializable {
         AbstractI2b2Metadata.constraints()
     }
 
+    @Value('${org.transmart.i2b2.view.enable:false}')
+    private boolean i2b2View
+
     String getStudyId() {
         def matcher = cComment =~ /(?<=^trial:).+/
+	String result
+	logger.debug 'getStudyId cComment {} matcher {} i2b2View {}', cComment, matcher, i2b2View
         if (matcher.find()) {
-            matcher.group 0
-        }
+            result = matcher.group 0
+	    if(result == null) {
+		logger.debug 'getStudyId matcher empty, no trial in comment, i2b2View true default to I2B2'
+		result = 'I2B2'
+	    }
+	    result
+	}
     }
 
     @Override
     Study getStudy() {
         def trial = studyId
-
-        if (!trial) {
-            return null
-        }
-
-        def query = sessionFactory.currentSession.createQuery '''
+	if (i2b2View && !trial) {
+	    trial = 'I2B2'
+	    return null
+	} else {
+            def query = sessionFactory.currentSession.createQuery '''
                 SELECT I
-                FROM I2b2 I, I2b2TrialNodes TN
+                FROM I2b2 I, TmTrialNodes TN
                 WHERE (I.fullName = TN.fullName) AND
                 TN.trial = :trial'''
+            query.setParameter 'trial', trial
 
-        query.setParameter 'trial', trial
-
-        def res = query.list()
-        if (res.size() > 1) {
-            throw new UnexpectedResultException("More than one study with name $trial")
-        }
-        if (res.size() == 1) {
-            new StudyImpl(ontologyTerm: res[0], id: trial)
-        }
-/*        else {
-            null
-        }
-*/
+            def res = query.list()
+            if (res.size() > 1) {
+		throw new UnexpectedResultException("More than one study with name $trial")
+            }
+            if (res.size() == 1) {
+		new StudyImpl(ontologyTerm: res[0], id: trial)
+            }
+            else {
+		logger.debug 'No study found with name "{}"', trial
+		null
+            }
+	}
     }
 }

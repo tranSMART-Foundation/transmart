@@ -21,6 +21,7 @@ package org.transmart.audit
 
 import grails.plugin.cache.Cacheable
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Value
 import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.ontology.OntologyTerm
@@ -37,6 +38,9 @@ class StudyIdService {
 
     @Resource QueriesResource queriesResourceService
     @Resource ConceptsResource conceptsResourceService
+
+    @Value('${org.transmart.i2b2.view.enable:false}')
+    private boolean i2b2View
 
     /**
      * Fetches the study id associated with a concept from the 
@@ -65,11 +69,12 @@ class StudyIdService {
         try {
 	    logger.debug 'Query study id for concept key: {} options {}', conceptKey, options
 	    OntologyTerm term = conceptsResourceService.getByKey(conceptKey)
+	    logger.debug 'term {}', term
             Study study = term?.study
             studyId = study?.id
-	    logger.debug 'studyId {} study.ontologyTerm {}', studyId, study?.ontologyTerm
+	    logger.debug 'study {} studyId {} study.ontologyTerm {}', study, studyId, study?.ontologyTerm
             if (options?.studyConceptOnly && study?.ontologyTerm != term) {
-		logger.debug 'studyId {} set to null ontologyTerm {} does not match term {}', studyId, study?.ontologyTerm, term
+		logger.debug 'studyId {} set to null ontologyTerm {} does not match term {}', studyId, study?.ontologyTerm?.fullName, term?.fullName
                 studyId = null
             }
 	    logger.debug 'Study id for concept key {} is: {}', conceptKey, studyId

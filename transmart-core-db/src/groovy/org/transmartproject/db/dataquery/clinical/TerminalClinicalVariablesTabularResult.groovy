@@ -21,15 +21,25 @@ package org.transmartproject.db.dataquery.clinical
 
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
+//import grails.util.Holders
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
+//import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.ScrollableResults
+//import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+//import org.springframework.context.ApplicationContext
+//import org.springframework.context.ApplicationContextAware
+//import org.springframework.stereotype.Component
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.exceptions.UnexpectedResultException
 import org.transmartproject.db.dataquery.CollectingTabularResult
 import org.transmartproject.db.dataquery.clinical.variables.TerminalClinicalVariable
 import org.transmartproject.db.dataquery.clinical.variables.TerminalConceptVariable
 
+//@Component
 @CompileStatic
+@Slf4j('logger')
 class TerminalClinicalVariablesTabularResult extends
         CollectingTabularResult<TerminalClinicalVariable, PatientIdAnnotatedDataRow> {
 
@@ -40,6 +50,18 @@ class TerminalClinicalVariablesTabularResult extends
     public static final int VALUE_TYPE_COLUMN_INDEX   = 2
     public static final int TEXT_VALUE_COLUMN_INDEX   = 3
     public static final int NUMBER_VALUE_COLUMN_INDEX = 4
+
+//    @Autowired
+//    GrailsApplication grailsApplication
+
+    @Value('${org.transmart.i2b2.view.enable:false}')
+    private boolean i2b2View
+
+//    GrailsApplication grailsApp = Holders.grailsApplication
+//    ApplicationContext ctx = grailsApp.config
+//    Boolean i2b2ViewAlt = ctx.org.transmart.i2b2.view.enable ? ctx.org.transmart.i2b2.view.enable :false
+
+//    Boolean i2b2ViewAltB = grailsApplication.config.org.transmart.i2b2.view.enable ? grailsApplication.config.org.transmart.i2b2.view.enable :false
 
     /* XXX: this class hierarchy needs some refactoring, we're depending on
      * implementation details of CollectingTabularResults and skipping quite
@@ -66,6 +88,7 @@ class TerminalClinicalVariablesTabularResult extends
         }
 
         localIndexMap.each { TerminalClinicalVariable var, Integer index ->
+	    logger.info 'codeToIndex[{}] = {}', var.code, index
             codeToIndex[var.code] = index
         }
 
@@ -112,11 +135,15 @@ class TerminalClinicalVariablesTabularResult extends
 
         Object[] transformedData = new Object[localIndexMap.size()]
 
+	logger.info 'transformedData {}', transformedData
+
         for (Object[] rawRow in list) {
 	    // array with 5 elements
             if (!rawRow) {
 		continue
             }
+
+	    logger.info 'rawRow {}', rawRow
 
 	    // find out the position of this concept in the final result
             Integer index = codeToIndex[rawRow[CODE_COLUMN_INDEX] as String]
@@ -130,18 +157,27 @@ class TerminalClinicalVariablesTabularResult extends
             TerminalClinicalVariable var = indexToColumn[index]
 
             if (transformedData[index] != null) {
-		throw new UnexpectedResultException("Got more than one fact for " +
-						    "patient ${rawRow[PATIENT_NUM_COLUMN_INDEX]} and " +
-						    "code $var.code. This is currently unsupported")
+		logger.info 'More than one clinical result i2b2View {} index {} result size {}', i2b2View, index, transformedData.size()
+		if(!i2b2View && 0) {
+		    throw new UnexpectedResultException("Got more than one fact for " +
+							"patient ${rawRow[PATIENT_NUM_COLUMN_INDEX]} and " +
+							"code $var.code. This is currently unsupported in tranSMART")
+		}
             }
-
-            transformedData[index] = getVariableValue(rawRow)
+	    else {
+		transformedData[index] = getVariableValue(rawRow)
+	    }
         }
+
+	logger.info 'patientId {}', (list.find { it != null})[PATIENT_NUM_COLUMN_INDEX] as Long
+	logger.info 'data: {}', Arrays.asList(transformedData)
+	logger.info 'columnToIndex: {}', localIndexMap as Map
 
         new PatientIdAnnotatedDataRow(
             patientId:     (list.find { it != null})[PATIENT_NUM_COLUMN_INDEX] as Long,
 	    data: Arrays.asList(transformedData),
-            columnToIndex: localIndexMap as Map)
+            columnToIndex: localIndexMap as Map
+	)
     }
 
     private getVariableValue(Object[] rawRow) {
