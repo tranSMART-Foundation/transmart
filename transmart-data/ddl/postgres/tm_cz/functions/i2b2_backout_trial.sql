@@ -84,14 +84,21 @@ begin
     stepCt := stepCt + 1;
     if (path_string is not null AND length(path_string) > 0) then
 	auditMessage := 'The use of the path_string argument for this stored procedure (tm_cz.i2b2_backout_trial) is deprecated';
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,0,stepCt,'Done');
+    end if;
+
+    -- I2B2 has an entry in tm_trial_nodes for the absolute top level
+    -- Do not allow it to be passed or all data could be deleted
+    if(trialid = 'I2B2') then
+	perform tm_cz.cz_write_error(jobId,databaseName,procedureName,'Error: I2B2 is not a tranSMART trial',0,stepCt,'FAIL');
+	return -16;
     end if;
 
     -- retrieve topNode for study with given trial id (trialid)
     -- ========================================================
 
     begin
-	select c_fullname from i2b2metadata.i2b2 where sourcesystem_cd = trialid and c_hlevel = 1 into topNode;
+	select c_fullname from i2b2metadata.tm_trial_nodes where trial = trialid into topNode;
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -112,9 +119,9 @@ begin
     if (topNode is null OR length(topNode) = 0) then
         -- Either due to erroneous trialid or inconsistent database content
         -- In case of erroneous trialid, the database does not contain any data associated with this trialid (trying to remove does not harm)
-        -- In case of inconsistencies in the database, we still might try to remove data associate with this trialid.
+        -- In case of inconsistencies in the database, we still might try to remove data associated with this trialid.
 	auditMessage := 'Not able to retrieve top node associated with trial id: ' || trialid;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,0,stepCt,'Done');
 	end if;
 
     -- check consistency between topNode and path_string
@@ -139,13 +146,13 @@ begin
     stepCt := stepCt + 1;
     if (topNode is null OR length(topNode) = 0) then
 	auditMessage := 'Not able to retrieve top node associated with trial id: ' || trialid;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,0,stepCt,'Done');
 
 	auditMessage := 'Start deleting all data for trial ' || trialid;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,0,stepCt,'Done');
     else
 	auditMessage := 'Start deleting all data for trial ' || trialid || ' and topNode ' || topNode;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,0,stepCt,'Done');
 
 	select tm_cz.i2b2_delete_all_nodes(topNode,jobId) into rtnCd;
 	if(rtnCd <> 1) then
@@ -615,10 +622,15 @@ begin
 	 where bio_data_unique_id = 'EXP:' || TrialId;
 
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete trial from search_secure_object',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete trial from search_secure_object',1,stepCt,'Done');
 
     end if;
 
+    delete from i2b2metadata.tm_trial_nodes where trial = trialid;
+    stepCt := stepCt + 1;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete trial from tm_trial_nodes',1,stepCt,'Done');
+
+    
     -- Checks for possible errors, or notes for deleted partially removed trial
     -- ========================================================================
 
@@ -628,7 +640,7 @@ begin
     if (topNode is null OR length(topNode) = 0) then
 	auditMessage := 'trialid argument possibly contained erroneous value ' || trialid;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,auditMessage,0,stepCt,'Done');
 	perform tm_cz.cz_end_audit (jobId, 'WARNING');
 	return -1;
     end if;

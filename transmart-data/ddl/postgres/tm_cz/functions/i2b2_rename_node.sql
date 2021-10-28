@@ -32,10 +32,13 @@ AS $$
     errorNumber    character varying;
     errorMessage  character varying;
     rtnCd integer;
+    TrialID		varchar(100);
 
 begin
 
     rtnCd := 1;
+    TrialID := upper(trial_id);
+
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
     jobID := currentJobID;
@@ -157,7 +160,9 @@ begin
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',rowCt,stepCt,'Done');
 
-	select tm_cz.i2b2_load_security_data(jobID) into rtnCd;
+	select tm_cz.i2b2_load_security_data(TrialId,jobID) into rtnCd;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2_secure with new path',rowCt,stepCt,'Done');
 
 	return rtnCd;
 

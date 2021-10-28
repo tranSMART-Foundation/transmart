@@ -397,7 +397,7 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Replace pipes with comma in data_label',rowCt,stepCt,'Done');
 
-    --	set visit_name to null when there's only a single visit_name for the catgory
+    --	set visit_name to null when there's only a single visit_name for the category
 
     begin
 	update tm_wz.wrk_clinical_data tpm
@@ -646,7 +646,7 @@ begin
 
     if rowCt > 0 then
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',rowCt,stepCt,'Done');
 	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
@@ -1297,7 +1297,7 @@ begin
     end loop;
 
     perform tm_cz.i2b2_create_security_inc_trial(TrialId, secureStudy, jobID);
-    select tm_cz.i2b2_load_security_data(jobID) into rtnCd;
+    select tm_cz.i2b2_load_security_data(TrialID,jobID) into rtnCd;
 
     stepCt := stepCt + 1;
     if(rtnCd <> 1) then
@@ -1305,6 +1305,16 @@ begin
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
     end if;
+
+    select tm_cz.load_tm_trial_nodes(TrialID,topNode,jobID,false) into rtnCd;
+
+    if(rtnCd <> 1) then
+       stepCt := stepCt + 1;
+       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
+       perform tm_cz.cz_end_audit (jobID, 'FAIL');
+       return -16;
+    end if;
+
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_clinical_inc_data',0,stepCt,'Done');
 
     ---Cleanup OVERALL JOB if this proc is being run standalone

@@ -26,8 +26,8 @@ AS $$
     -- This function is very similar to "i2b2_load_clinical_data()" except that this
     -- function does not delete existing clinical data in the tables.
     -- With this function you can "extend" the already existing clinical data for a study.
-    -- Note: You can not modify already existing data in de database with this function
-    --       It probably a good idea to combine this function with "i2b2_load_clinical_data()"
+    -- Note: You can not modify already existing data in the database with this function
+    --       It is probably a good idea to combine this function with "i2b2_load_clinical_data()"
     --       and do some refactoring on the way.
 
     declare
@@ -410,7 +410,7 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Replace pipes with comma in data_label',rowCt,stepCt,'Done');
 
-    --	set visit_name to null when there's only a single visit_name for the catgory
+    --	set visit_name to null when there's only a single visit_name for the category
 
     begin
 	update tm_wz.wrk_clinical_data tpm
@@ -650,7 +650,7 @@ begin
 
     if rowCt > 0 then
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',rowCt,stepCt,'Done');
 	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
@@ -1137,12 +1137,21 @@ begin
     end loop;
 
     perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
-    select tm_cz.i2b2_load_security_data(jobID) into rtnCd;
+    select tm_cz.i2b2_load_security_data(TrialID,jobID) into rtnCd;
     if(rtnCd <> 1) then
         stepCt := stepCt + 1;
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
+    end if;
+
+    select tm_cz.load_tm_trial_nodes(TrialID,topNode,jobID,false) into rtnCd;
+
+    if(rtnCd <> 1) then
+       stepCt := stepCt + 1;
+       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
+       perform tm_cz.cz_end_audit (jobID, 'FAIL');
+       return -16;
     end if;
 
     stepCt := stepCt + 1;

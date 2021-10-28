@@ -281,6 +281,15 @@ BEGIN
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in tm_lz.lt_src_mrna_subj_samp_map',rowCt,stepCt,'Done');
 
+    select tm_cz.load_tm_trial_nodes(TrialID,topNode,jobID,false) into rtnCd;
+
+    if(rtnCd <> 1) then
+       stepCt := stepCt + 1;
+       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
+       perform tm_cz.cz_end_audit (jobID, 'FAIL');
+       return -16;
+    end if;
+
     --	create records in patient_dimension for subject_ids if they do not exist
     --	format of sourcesystem_cd:  trial:[site:]subject_cd
 
@@ -789,7 +798,7 @@ BEGIN
 						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'TISSUETYPE') > 1 then a.tissue_type else '' end = coalesce(a2.tissue_type,'')
 						   and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '' end = coalesce(a2.attribute_1,'')
 						   and a2.node_type = 'ATTR2')
-		update deapp.de_subject_sample_mapping pd
+		update deapp.de_subject_sample_mapping ssm
 		set concept_code=upd.concept_code
 		,sample_type_cd=upd.sample_type_cd
 		,timepoint_cd=upd.timepoint_cd
@@ -803,12 +812,12 @@ BEGIN
 		,omic_patient_id=upd.patient_id
 		,partition_id=partitionId
 		from upd
-		where pd.trial_name = TrialID
-		and pd.source_cd = sourceCD
-		and coalesce(pd.site_id,'') = coalesce(upd.site_id,'')
-		and pd.subject_id = upd.subject_id
-		and pd.sample_cd = upd.sample_cd
-		and pd.platform = 'MRNA_AFFYMETRIX';
+		where ssm.trial_name = TrialID
+		and ssm.source_cd = sourceCD
+		and coalesce(ssm.site_id,'') = coalesce(upd.site_id,'')
+		and ssm.subject_id = upd.subject_id
+		and ssm.sample_cd = upd.sample_cd
+		and ssm.platform = 'MRNA_AFFYMETRIX';
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -993,7 +1002,7 @@ BEGIN
 	)
 	select distinct m.patient_id
 			,m.concept_code
-			,m.trial_name
+			,'@'
 			,'T' -- Text data type
 			,'E'  --Stands for Equals for Text Types
 			,m.trial_name
@@ -1058,7 +1067,7 @@ BEGIN
     --Also marks any i2B2 records with no underlying data as Hidden, need to do at Trial level because there may be multiple platform and there is no longer
     -- a unique top-level node for mRNA data
 
-    perform tm_cz.i2b2_create_concept_counts(TrialID, topNode ,jobID );
+    perform tm_cz.i2b2_create_concept_counts(TrialID, topNode, jobID );
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create concept counts',0,stepCt,'Done');
 
@@ -1084,7 +1093,7 @@ BEGIN
 
     --Reload Security: Inserts one record for every I2B2 record into the security table
 
-    select tm_cz.i2b2_load_security_data(jobId) into rtnCd;
+    select tm_cz.i2b2_load_security_data(TrialID,jobId) into rtnCd;
     stepCt := stepCt + 1;
     if(rtnCd <> 1) then
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');

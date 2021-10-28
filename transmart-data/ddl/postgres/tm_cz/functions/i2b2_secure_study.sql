@@ -37,7 +37,7 @@ AS $$
 
 begin
 
-    TrialId := trial_id;
+    TrialId := upper(trial_id);
 
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -63,7 +63,7 @@ begin
 
     --	load i2b2_secure
 
-    select tm_cz.i2b2_load_security_data(jobID) into rtnCd;
+    select tm_cz.i2b2_load_security_data(TrialID,jobID) into rtnCd;
     if(rtnCd <> 1) then
         stepCt := stepCt + 1;
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');

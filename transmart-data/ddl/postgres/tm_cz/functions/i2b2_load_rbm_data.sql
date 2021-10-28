@@ -245,6 +245,15 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Uppercase trial_name in LT_SRC_RBM_SUBJ_SAMP_MAP',rowCt,stepCt,'Done');
 
+    select tm_cz.load_tm_trial_nodes(TrialID,topNode,jobID,false) into rtnCd;
+
+    if(rtnCd <> 1) then
+       stepCt := stepCt + 1;
+       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
+       perform tm_cz.cz_end_audit (jobID, 'FAIL');
+       return -16;
+    end if;
+
     --	create records in patient_dimension for subject_ids if they do not exist
     --	format of sourcesystem_cd:  trial:[site:]subject_cd
 
@@ -1122,7 +1131,7 @@ begin
 
     --Reload Security: Inserts one record for every I2B2 record into the security table
 
-    select tm_cz.i2b2_load_security_data(jobId) into rtnCd;
+    select tm_cz.i2b2_load_security_data(TrialID,jobId) into rtnCd;
     stepCt := stepCt + 1;
     if(rtnCd <> 1) then
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');

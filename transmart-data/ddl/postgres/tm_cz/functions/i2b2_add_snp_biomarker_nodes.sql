@@ -282,7 +282,7 @@ begin
 
     --Reload Security: Inserts one record for every I2B2 record into the security table
 
-    select tm_cz.i2b2_load_security_data(jobId) into rtnCd;
+    select tm_cz.i2b2_load_security_data(TrialID,jobId) into rtnCd;
     if(rtnCd <> 1) then
         stepCt := stepCt + 1;
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');

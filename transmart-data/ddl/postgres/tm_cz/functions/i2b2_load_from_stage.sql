@@ -1,7 +1,7 @@
 --
 -- Name: i2b2_load_from_stage(character varying, character varying, bigint); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_from_stage(character varying, character varying, bigint) RETURNS integer
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_load_from_stage(trial_id character varying, data_type character varying, currentJobID bigint) RETURNS integer
     LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -24,9 +24,6 @@ AS $$
 
     --	Alias for parameters
 
-    trial_id  alias for $1;
-    data_type alias for $2;
-    currentJobID alias for $3;
     TrialId 		varchar(200);
     msgText			varchar(2000);
     dataType		varchar(50);
@@ -210,13 +207,13 @@ begin
             end if;
 	end if;
 
-	select tm_cz.i2b2_load_security_data(jobId) into rtnCd;
-    if(rtnCd <> 1) then
-        stepCt := stepCt + 1;
-        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
-	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	return -16;
-    end if;
+	select tm_cz.i2b2_load_security_data(TrialID, jobId) into rtnCd;
+	if(rtnCd <> 1) then
+            stepCt := stepCt + 1;
+            perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+	end if;
     end if;
 
     stepCt := stepCt + 1;

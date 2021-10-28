@@ -98,8 +98,8 @@ begin
 		,download_date
 		,import_date
 		,sourcesystem_cd)
-    VALUES
-	(cast(nextval('i2b2demodata.concept_id') as varchar)
+    VALUES (
+	'TM' || cast(nextval('i2b2demodata.concept_id') as varchar)
 	,path
 	,path_name
 	,current_timestamp

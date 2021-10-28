@@ -161,12 +161,14 @@ begin
     databaseName := 'tm_cz';
     procedureName := 'i2b2_load_security_data';
 
+    --Audit JOB Initialization
+    --If Job ID does not exist, then this is a single procedure run and we need to create it
     select case when coalesce(currentjobid, -1) < 1 then tm_cz.cz_start_audit(procedureName, databaseName) else currentjobid end into jobId;
 
     delete from i2b2metadata.i2b2_secure where sourcesystem_cd = sourcesystemCd;
 
     get diagnostics rowCt := ROW_COUNT;
-    stepCt := 0
+    stepCt := 0;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Clean-up I2B2METADATA i2b2_secure for '||sourcesystemcd,rowCt,stepCt,'Done');
 
@@ -218,11 +220,11 @@ begin
 	coalesce(f.tval_char,'EXP:PUBLIC')
       from i2b2metadata.i2b2 b
 	       left outer join (select distinct
-				    modifier_cd
+				    sourcesystem_cd
 				    ,tval_char
 				  from i2b2demodata.observation_fact
 				 where concept_cd = 'SECURITY') f
-				  on b.sourcesystem_cd = f.modifier_cd
+				  on b.sourcesystem_cd = f.sourcesystem_cd
      where b.sourcesystem_cd = sourcesystemCd;
 
     get diagnostics rowCt := ROW_COUNT;

@@ -108,6 +108,7 @@
 \i tm_cz/functions/isnumeric.sql
 \i tm_cz/functions/jnj_init_cap.sql
 \i tm_cz/functions/load_kegg_content_data.sql
+\i tm_cz/functions/load_tm_trial_nodes.sql
 \i tm_cz/functions/num_occurances.sql
 \i tm_cz/functions/number_parser.sql
 \i tm_cz/functions/nz_i2b2_copy_to_stage.sql
