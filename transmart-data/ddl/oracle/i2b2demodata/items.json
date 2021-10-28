@@ -343,7 +343,7 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "I2B2DEMODATA",
-      "name" : "TRG_ENCOUNTER_NUM"
+      "name" : "TRG_OF_ENCOUNTER_NUM"
     },
     "parents" : [ {
       "type" : "SEQUENCE",
@@ -358,7 +358,17 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "I2B2DEMODATA",
-      "name" : "TRG_PATIENT_DIMENSION"
+      "name" : "TRG_VISIT_DIMENSION"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "SEQ_ENCOUNTER_NUM"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "VISIT_DIMENSION"
+    } ]
     },
     "parents" : [ {
       "type" : "SEQUENCE",
@@ -2555,12 +2565,19 @@
       "owner" : "I2B2DEMODATA",
       "name" : "SEQ_ENCOUNTER_NUM"
     },
-    "file" : "i2b2demodata/observation_fact.sql"
+    "file" : "i2b2demodata/visit_dimension.sql"
   }, {
     "item" : {
       "type" : "TRIGGER",
       "owner" : "I2B2DEMODATA",
-      "name" : "TRG_ENCOUNTER_NUM"
+      "name" : "TRG_VISIT_DIMENSION"
+    },
+    "file" : "i2b2demodata/visit_dimension.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_OF_ENCOUNTER_NUM"
     },
     "file" : "i2b2demodata/observation_fact.sql"
   }, {

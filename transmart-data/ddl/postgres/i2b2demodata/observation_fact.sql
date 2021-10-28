@@ -34,12 +34,6 @@ ALTER TABLE ONLY observation_fact
     ADD CONSTRAINT observation_fact_pk PRIMARY KEY (patient_num, concept_cd, modifier_cd, start_date, encounter_num, instance_num, provider_id);
 
 --
--- Name: of_text_search_unique; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
---
-ALTER TABLE ONLY observation_fact
-    ADD CONSTRAINT of_text_search_unique UNIQUE (text_search_index);
-
---
 -- Name: fact_cnpt_idx; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
 CREATE INDEX fact_cnpt_idx ON observation_fact USING btree (concept_cd);
@@ -75,9 +69,9 @@ CREATE INDEX OF_IDX_UPLOADID ON observation_fact USING btree (upload_id);
 CREATE INDEX OF_IDX_SOURCESYSTEM_CD ON observation_fact USING btree (sourcesystem_cd);
 
 --
--- Name: tf_trg_encounter_num(); Type: FUNCTION; Schema: i2b2demodata; Owner: -
+-- Name: tf_trg_of_encounter_num(); Type: FUNCTION; Schema: i2b2demodata; Owner: -
 --
-CREATE FUNCTION tf_trg_encounter_num() RETURNS trigger
+CREATE FUNCTION tf_trg_of_encounter_num() RETURNS trigger
     LANGUAGE plpgsql
 AS $$
 begin
@@ -89,23 +83,15 @@ end;
 $$;
 
 --
--- Name: trg_encounter_num; Type: TRIGGER; Schema: i2b2demodata; Owner: -
+-- Name: trg_of_encounter_num; Type: TRIGGER; Schema: i2b2demodata; Owner: -
 --
-CREATE TRIGGER trg_encounter_num BEFORE INSERT ON observation_fact FOR EACH ROW EXECUTE PROCEDURE tf_trg_encounter_num();
-
---
--- Name: seq_encounter_num; Type: SEQUENCE; Schema: i2b2demodata; Owner: -
---
-CREATE SEQUENCE seq_encounter_num
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE TRIGGER trg_of_encounter_num BEFORE INSERT ON observation_fact FOR EACH ROW EXECUTE PROCEDURE tf_trg_of_encounter_num();
 
 --
 -- Make postgres-only serial-implied sequence start
 -- after possible i2b2 demodata load of 90753 rows
 --
 ALTER SEQUENCE observation_fact_text_search_index_seq
-    START WITH 100000;
+    RESTART WITH 100000;
+
+--SELECT setval('i2b2demodata.observation_fact_text_search_index_seq',100000,false);

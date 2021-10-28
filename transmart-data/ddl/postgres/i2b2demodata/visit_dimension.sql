@@ -40,3 +40,33 @@ CREATE INDEX VD_IDX_AllVisitDim ON visit_dimension USING btree (encounter_num, p
 -- Name: VD_UPLOADID_IDX; Type: INDEX; Schema: i2b2demodata; Owner: -
 --
 CREATE INDEX VD_UPLOADID_IDX ON visit_dimension USING btree (upload_id);
+
+--
+-- Name: tf_trg_visit_dimension(); Type: FUNCTION; Schema: i2b2demodata; Owner: -
+--
+CREATE FUNCTION tf_trg_visit_dimension() RETURNS trigger
+    LANGUAGE plpgsql
+AS $$
+begin
+    if new.encounter_num is null then
+	select nextval('i2b2demodata.seq_encounter_num') into new.encounter_num ;
+    end if;
+    return new;
+end;
+$$;
+
+--
+-- Name: trg_visit_dimension; Type: TRIGGER; Schema: i2b2demodata; Owner: -
+--
+CREATE TRIGGER trg_visit_dimension BEFORE INSERT ON visit_dimension FOR EACH ROW EXECUTE PROCEDURE tf_trg_visit_dimension();
+
+--
+-- Name: seq_encounter_num; Type: SEQUENCE; Schema: i2b2demodata; Owner: -
+--
+CREATE SEQUENCE seq_encounter_num
+    START WITH 12388
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
