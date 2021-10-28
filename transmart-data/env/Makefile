@@ -17,7 +17,7 @@ CENTOS7_PACKAGES=postgresql tomcat make git rsync \
 
 UBUNTU14_PACKAGES=php5-cli php5-json openjdk-8-jdk
 UBUNTU16_PACKAGES=php7.0-cli php7.0-json
-UBUNTU18_PACKAGES=php7.2-cli php7.2-json openjdk-8-jdk openjdk-8-jre \
+UBUNTU18_PACKAGES=php7.2-cli php7.2-json openjdk-8-jdk openjdk-8-jre tomcat8 \
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
 UBUNTU20_PACKAGES=php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
@@ -181,6 +181,8 @@ data-integration/.keep: $(KETTLE_ARCHIVE)
 
 	/bin/bash -c 'mkdir -p $@/{indx,transmart,i2b2,i2b2_index}'
 	chown -R postgres:postgres $@
+	chmod -R 700 $@
+	chmod go+rx $@
 
 ../vars: vars-ubuntu.php
 	php -d variables_order=E $< > $@
