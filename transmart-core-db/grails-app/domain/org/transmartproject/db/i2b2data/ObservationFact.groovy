@@ -39,7 +39,7 @@ class ObservationFact implements Serializable {
 
 
     // these are not used, but we need them because they're not nullable
-    BigDecimal encounterNum
+    Long       encounterNum
     String     providerId
     Date       startDate
     String     modifierCd
@@ -60,7 +60,7 @@ class ObservationFact implements Serializable {
 
     static mapping = {
         table 'i2b2demodata.observation_fact'
-        id           composite: ['encounterNum', 'patient', 'conceptCode', 'providerId', 'startDate', 'modifierCd']
+        id           composite: ['patient', 'conceptCode', 'modifierCd', 'startDate', 'encounterNum', 'instanceNum', 'providerId']
         version false
 
         conceptCode  column: 'concept_cd'
