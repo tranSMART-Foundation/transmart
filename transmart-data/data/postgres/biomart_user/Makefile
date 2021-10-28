@@ -4,5 +4,5 @@ include ../makefile.inc
 include ../../common/biomart_user/makefile.inc
 
 
-read_cms_file:
+read_cms_file: $(JDBC_DRIVER_PSQL_PATH)
 		groovy -cp '$(CP_PSQL)' read_cms_file.groovy
