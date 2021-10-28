@@ -100,7 +100,7 @@ class MrnaModule extends AbstractHighDimensionDataTypeModule {
             results:               results,
             allowMissingAssays:    true,
             assayIdFromRow:        { it[0].assayId },
-            inSameGroup:           { a, b -> a.probeId == b.probeId && a.geneSymbol == b.geneSymbol },
+            inSameGroup:           { a, b -> a.probeId == b.probeId && a.geneSymbol == b.geneSymbol && a.geneId == b.geneId},
             finalizeGroup:         { List list -> /* list of arrays with one element: a map */
                 /* we may have nulls if allowMissingAssays is true,
                  * but we're guaranteed to have at least one non-null */
