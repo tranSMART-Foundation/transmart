@@ -7,7 +7,7 @@ enum Sex {
 
     MALE,
     FEMALE,
-    UNKOWN
+    UNKNOWN
 
     String toString() {
         name().toLowerCase Locale.ENGLISH
@@ -16,6 +16,6 @@ enum Sex {
     static Sex fromString(String name) {
         values().find {
             it.toString() == name?.toLowerCase(Locale.ENGLISH)
-        } ?: UNKOWN
+        } ?: UNKNOWN
     }
 }
