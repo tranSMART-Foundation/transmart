@@ -10,6 +10,7 @@
 \i i2b2metadata/phi.sql
 \i i2b2metadata/schemes.sql
 \i i2b2metadata/table_access.sql
+\i i2b2metadata/tm_trial_nodes.sql
 \i i2b2metadata/tmp_secure_token.sql
 \i i2b2metadata/totalnum.sql
 \i i2b2metadata/totalnum_report.sql

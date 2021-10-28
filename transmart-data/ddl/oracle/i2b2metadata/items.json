@@ -355,6 +355,13 @@
     "parents" : [ ]
   }, {
     "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "TM_TRIAL_NODES"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
       "type" : "VIEW",
       "owner" : "I2B2METADATA",
       "name" : "I2B2_TRIAL_NODES"
@@ -799,6 +806,13 @@
       "name" : "ICD10_ICD9"
     },
     "file" : "i2b2metadata/icd10_icd9.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "TM_TRIAL_NODES"
+    },
+    "file" : "i2b2metadata/tm_trial_nodes.sql"
   }, {
     "item" : {
       "type" : "VIEW",
