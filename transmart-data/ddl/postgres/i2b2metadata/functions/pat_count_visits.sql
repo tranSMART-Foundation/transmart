@@ -60,11 +60,11 @@ BEGIN
    --                 and column_name = lower(curRecord.c_columnname)
    --              ) then 
 
-            -- simplified query to directly query distinct patient_num instead of querying list of patien_num to feed into outer query for the same
+            -- simplified query to directly query distinct patient_num instead of querying list of patient_num to feed into outer query for the same
             -- result.  New style runs in approximately half the time as tested with all patients with a particular sex_cd value.  Since all rows 
             -- Since c_facttablecolumn is ALWAYS populated with 'patient_num' for all rows accessed by this function the change to the function is 
             -- worthwhile.  Only in rare cases if changes to the ontology tables are made would the original query be needed, but only where 
-            -- c_facttablecolumn would not be 'patient_num AND the values saved in that column in the dimension table are shared between patients that 
+            -- c_facttablecolumn would not be 'patient_num' AND the values saved in that column in the dimension table are shared between patients that 
             -- don't otherwise have the same ontology would the original method return different results.  It is believed that those results would be 
             -- inaccurate since they would reflect the number of patients who have XXX like patients with this ontology rather than the number of patients
             -- with that ontology. 
