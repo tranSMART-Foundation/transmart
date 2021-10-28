@@ -3,7 +3,7 @@ package org.transmartproject.core.dataquery
 import org.transmartproject.core.dataquery.assay.Assay
 
 /**
- * A patient (or subject) is a individual for which we have clinical
+ * A patient (or subject) is an individual for which we have clinical
  * observations or other data.
  */
 interface Patient {
@@ -40,7 +40,7 @@ interface Patient {
     Sex getSex()
 
     /**
-     * The birth data of the patient, or null if not available.
+     * The birth date of the patient, or null if not available.
      *
      * @return patient birth date or null
      */
