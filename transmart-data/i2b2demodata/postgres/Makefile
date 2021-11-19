@@ -11,10 +11,7 @@ row_counts:
 analyze:
 	$(PSQL_COMMAND) -c 'ANALYZE VERBOSE'
 
-$(ENV_DIR)/$(TRANSMART_LOADER)/conf/Common.properties: Common.properties.php
-	php -d variables_order=E $< > $@
-
-.PHONY: row_counts analyze $(ENV_DIR)/$(TRANSMART_LOADER)/conf/Common.properties
+.PHONY: row_counts analyze
 
 SHELL := /bin/bash
 

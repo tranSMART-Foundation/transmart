@@ -5,6 +5,14 @@ if ($argc != 2) {
 	exit(1);
 }
 
+$depFile = __DIR__ . "/../../ddl/postgres/$argv[1]/dependencies.php";
+if (!file_exists($depFile)) {
+	fprintf(STDERR, "Expected the file %s to exist. Bad schema? Schema "
+			. "dependencies file not generated?\n", $depFile);
+	exit(1);
+}
+require $depFile;
+
 $listFile = __DIR__ . "/$argv[1]_list";
 $tableList = file($listFile, FILE_IGNORE_NEW_LINES);
 if ($tableList === false) {
