@@ -81,7 +81,8 @@ interface Feed {
     Set<DataSet> fetchDataSets()
 }
 
-@Canonical(excludes = 'URL')
+// behavior changed in groovy 2.5 'URL' not defined
+//@Canonical(excludes = 'URL')
 class DataSet {
     String baseLocation
     String relativePath
