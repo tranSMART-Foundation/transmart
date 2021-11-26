@@ -34,9 +34,9 @@ import groovy.util.logging.Slf4j
 import org.transmartproject.pipeline.util.Util
 
 @Slf4j('logger')
-class ConceptCounts {
+class TmConceptCounts {
 
-    Sql i2b2demodata
+    Sql i2b2metadata
     String basePath, platform
     Map subjects
 
@@ -70,16 +70,16 @@ class ConceptCounts {
 
     void insertConceptCount(String conceptPath, String parentConceptPath, int totalCnt ){
 
-	String qry = "insert into concept_counts(CONCEPT_PATH, PARENT_CONCEPT_PATH, PATIENT_COUNT) values(?, ?, ?)"
+	String qry = "insert into tm_concept_counts(CONCEPT_PATH, PARENT_CONCEPT_PATH, PATIENT_COUNT) values(?, ?, ?)"
 
 	String path = conceptPath.replace("/", "\\")
 	String parentPath = parentConceptPath.replace("/", "\\")
 
 	if(isConceptCountsExist(path)){
-	    logger.info "$conceptPath already exists in CONCEPT_COUNTS ..."
+	    logger.info "$conceptPath already exists in TM_CONCEPT_COUNTS ..."
 	}else{
-	    logger.info "Insert ($path, $totalCnt) into CONCEPT_COUNTS ..."
-	    i2b2demodata.execute(qry, [
+	    logger.info "Insert ($path, $totalCnt) into TM_CONCEPT_COUNTS ..."
+	    i2b2metadata.execute(qry, [
 		path,
 		parentPath,
 		totalCnt
@@ -88,8 +88,8 @@ class ConceptCounts {
     }
 
     boolean isConceptCountsExist(String conceptPath){
-	String qry = "select count(*) from concept_counts where concept_path=?"
-	def res = i2b2demodata.firstRow(qry, [conceptPath])
+	String qry = "select count(*) from tm_concept_counts where concept_path=?"
+	def res = i2b2metadata.firstRow(qry, [conceptPath])
 	if(res[0] > 0) return true
 	else return false
     }
@@ -106,7 +106,7 @@ class ConceptCounts {
 	this.platform = platform
     }
 
-    void setI2b2demodata(Sql i2b2demodata){
-	this.i2b2demodata = i2b2demodata
+    void setI2b2metadata(Sql i2b2metadata){
+	this.i2b2metadata = i2b2metadata
     }
 }

@@ -28,7 +28,7 @@
 
 package org.transmartproject.pipeline.loader
 
-import org.transmartproject.pipeline.i2b2.ConceptCounts
+import org.transmartproject.pipeline.i2b2.TmConceptCounts
 import org.transmartproject.pipeline.i2b2.ConceptDimension
 import org.transmartproject.pipeline.i2b2.I2b2
 import org.transmartproject.pipeline.i2b2.I2b2Secure
@@ -99,9 +99,9 @@ class Loader {
 	// loading records into OBSERVATION_FACT
 	loader.loadObservationFact(props, i2b2demodata, conceptPathToCode, subjectToPatient)
 
-	// loading records into CONCEPT_COUNTS
+	// loading records into TM_CONCEPT_COUNTS
 	// TO_BE_DONE: update parent node's count ...
-	loader.loadConceptCounts(props, i2b2demodata)
+	loader.loadConceptCounts(props, i2b2metadata)
 
 	// loading records into DE_GPL_INFO
 	loader.loadDeGPLInfo(props, deapp)
@@ -245,18 +245,18 @@ class Loader {
 	}
     }
 
-    void loadConceptCounts(Properties props, Sql i2b2demodata){
+    void loadConceptCounts(Properties props, Sql i2b2metadata){
 		if(props.get("skip_concept_counts").toString().toLowerCase().equals("yes")){
-	    logger.info "Skip loading records into CONCEPT_COUNTS table ..."
+	    logger.info "Skip loading records into TM_CONCEPT_COUNTS table ..."
 	}else{
-	    logger.info "Start loading records into CONCEPT_COUNTS table ..."
-	    ConceptCounts cc = new ConceptCounts()
-	    cc.setI2b2demodata(i2b2demodata)
+	    logger.info "Start loading records into TM_CONCEPT_COUNTS table ..."
+	    ConceptCounts cc = new TmConceptCounts()
+	    cc.setI2b2metadata(i2b2metadata)
 	    cc.setPlatform(props.get("platform_name"))
 	    cc.setBasePath(props.get("snp_base_node") + "/")
 	    cc.setSubjects(subjects)
 	    cc.loadConceptCounts()
-	    logger.info "End loading records into CONCEPT_COUNTS table ..."
+	    logger.info "End loading records into TM_CONCEPT_COUNTS table ..."
 	}
     }
 
@@ -337,7 +337,7 @@ class Loader {
      *  Using this method to load/process Subject Sample Mapping file, and then populate maps/lists:
      *  
      *     subjects:   subject id/sample_id -->  sample type mapping, and will be used for 
-     *     				loading PATIENT_DIMENSION, DOBSERVATION_FACT and CONCEPT_COUNTS
+     *     				loading PATIENT_DIMENSION, DOBSERVATION_FACT and TM_CONCEPT_COUNTS
      *     
      *     sampleTypes:  list of sample types, and is used to populate CONCEPPT_DIMENSION and I2B2
      *  
@@ -419,7 +419,7 @@ class Loader {
 	qry = "delete from concept_dimension where concept_path like '${conceptPath}%'"
 	i2b2demodata.execute(qry)
 
-	qry = "delete from concept_counts where concept_path like '${conceptPath}%'"
-	i2b2demodata.execute(qry)
+	qry = "delete from tm_concept_counts where concept_path like '${conceptPath}%'"
+	i2b2metadata.execute(qry)
     }
 }
