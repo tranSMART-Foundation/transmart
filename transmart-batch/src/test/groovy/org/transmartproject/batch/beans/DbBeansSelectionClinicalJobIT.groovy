@@ -17,7 +17,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.transmartproject.batch.clinical.ClinicalDataLoadJobConfiguration
 import org.transmartproject.batch.concept.ConceptPath
-import org.transmartproject.batch.concept.postgresql.PostgresInsertConceptCountsTasklet
+import org.transmartproject.batch.concept.postgresql.PostgresInsertTmConceptCountsTasklet
 
 import javax.sql.DataSource
 
@@ -58,7 +58,7 @@ class DbBeansSelectionClinicalJobIT {
     @Test
     void testPostgresBeanIsActive() {
         // this is a singleton that proxies the job scoped tasklet
-        def singletonBean = applicationContext.getBean('insertConceptCountsTasklet')
+        def singletonBean = applicationContext.getBean('insertTmConceptCountsTasklet')
         // and this is the job scoped bean name
         def jobScopedBeanName = singletonBean.targetSource.targetBeanName
         // so we need to make the scope active
@@ -70,7 +70,7 @@ class DbBeansSelectionClinicalJobIT {
         def bean = applicationContext.getBean(jobScopedBeanName)
 
         assertThat bean, allOf(
-                is(instanceOf(PostgresInsertConceptCountsTasklet)),
+                is(instanceOf(PostgresInsertTmConceptCountsTasklet)),
                 hasProperty('basePath', equalTo(new ConceptPath(topNode))))
     }
 }

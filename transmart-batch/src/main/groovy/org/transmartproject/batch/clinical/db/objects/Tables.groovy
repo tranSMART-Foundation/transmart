@@ -17,7 +17,7 @@ final class Tables {
     }
 
     public static final String CONCEPT_DIMENSION        = 'i2b2demodata.concept_dimension'
-    public static final String CONCEPT_COUNTS           = 'i2b2demodata.concept_counts'
+    public static final String TM_CONCEPT_COUNTS        = 'i2b2metadata.tm_concept_counts'
     public static final String TABLE_ACCESS             = 'i2b2metadata.table_access'
     public static final String I2B2                     = 'i2b2metadata.i2b2'
     public static final String I2B2_SECURE              = 'i2b2metadata.i2b2_secure'

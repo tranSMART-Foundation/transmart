@@ -10,7 +10,7 @@ import java.sql.SQLException
  * Inserts the concept counts from a study, based on the already inserted observation facts</br>
  * This will insert counts for all kinds of leaf concepts (both lowdim and highdim)
  */
-abstract class InsertConceptCountsTasklet extends GenericTableUpdateTasklet {
+abstract class InsertTmConceptCountsTasklet extends GenericTableUpdateTasklet {
 
     ConceptPath basePath
 

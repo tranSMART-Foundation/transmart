@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.transmartproject.batch.beans.JobScopeInterfaced
 import org.transmartproject.batch.beans.StepBuildingConfigurationTrait
-import org.transmartproject.batch.concept.oracle.OracleInsertConceptCountsTasklet
-import org.transmartproject.batch.concept.postgresql.PostgresInsertConceptCountsTasklet
+import org.transmartproject.batch.concept.oracle.OracleInsertTmConceptCountsTasklet
+import org.transmartproject.batch.concept.postgresql.PostgresInsertTmConceptCountsTasklet
 import org.transmartproject.batch.db.DatabaseImplementationClassPicker
 import org.transmartproject.batch.db.DbConfig
 import org.transmartproject.batch.secureobject.SecureObjectConfig
@@ -43,8 +43,8 @@ class ConceptStepsConfig implements StepBuildingConfigurationTrait {
     }
 
     @Bean
-    Step insertConceptCounts(Tasklet insertConceptCountsTasklet) {
-        allowStartStepOf('insertConceptCounts', insertConceptCountsTasklet)
+    Step insertTmConceptCounts(Tasklet insertTmConceptCountsTasklet) {
+        allowStartStepOf('insertTmConceptCounts', insertTmConceptCountsTasklet)
     }
 
     @Bean
@@ -61,11 +61,11 @@ class ConceptStepsConfig implements StepBuildingConfigurationTrait {
 
     @Bean
     @JobScopeInterfaced
-    Tasklet insertConceptCountsTasklet(
+    Tasklet insertTmConceptCountsTasklet(
             @Value("#{jobParameters['TOP_NODE']}") ConceptPath topNode) {
         picker.instantiateCorrectClass(
-                OracleInsertConceptCountsTasklet,
-                PostgresInsertConceptCountsTasklet).with { InsertConceptCountsTasklet t ->
+                OracleInsertTmConceptCountsTasklet,
+                PostgresInsertTmConceptCountsTasklet).with { InsertTmConceptCountsTasklet t ->
             t.basePath = topNode
             t
         }

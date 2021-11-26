@@ -2,7 +2,7 @@ package org.transmartproject.batch.concept.oracle
 
 import org.transmartproject.batch.beans.Oracle
 import org.transmartproject.batch.clinical.db.objects.Tables
-import org.transmartproject.batch.concept.InsertConceptCountsTasklet
+import org.transmartproject.batch.concept.InsertTmConceptCountsTasklet
 
 /**
  * Insert concept counts, Oracle version.
@@ -10,10 +10,10 @@ import org.transmartproject.batch.concept.InsertConceptCountsTasklet
  * Not implemented.
  */
 @Oracle
-class OracleInsertConceptCountsTasklet extends InsertConceptCountsTasklet {
+class OracleInsertTmConceptCountsTasklet extends InsertConceptTmCountsTasklet {
 
     String sql = """
-    INSERT INTO ${Tables.CONCEPT_COUNTS} (concept_path, parent_concept_path, patient_count)
+    INSERT INTO ${Tables.TM_CONCEPT_COUNTS} (concept_path, parent_concept_path, patient_count)
     WITH
         relevant_concepts(concept_path, concept_cd) AS (
           SELECT

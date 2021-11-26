@@ -24,9 +24,9 @@ import org.transmartproject.batch.beans.AbstractJobConfiguration
 import org.transmartproject.batch.beans.StepScopeInterfaced
 import org.transmartproject.batch.concept.ConceptPath
 import org.transmartproject.batch.concept.DeleteConceptCountsTasklet
-import org.transmartproject.batch.concept.InsertConceptCountsTasklet
-import org.transmartproject.batch.concept.oracle.OracleInsertConceptCountsTasklet
-import org.transmartproject.batch.concept.postgresql.PostgresInsertConceptCountsTasklet
+import org.transmartproject.batch.concept.InsertTmConceptCountsTasklet
+import org.transmartproject.batch.concept.oracle.OracleInsertTmConceptCountsTasklet
+import org.transmartproject.batch.concept.postgresql.PostgresInsertTmConceptCountsTasklet
 import org.transmartproject.batch.db.DatabaseImplementationClassPicker
 import org.transmartproject.batch.support.ExpressionResolver
 
@@ -103,7 +103,7 @@ class BackoutJobConfiguration extends BackoutJobConfigurationParent {
                 .to(deciderRecalculateCounts)
                 .on('CONTINUE')
                 .to(stepOf((MethodClosure) this.&deleteConceptCountsTasklet))
-                .next(stepOf('insertConceptCounts', insertConceptCountsTasklet(null, null)))
+                .next(stepOf('insertTmConceptCounts', insertTmConceptCountsTasklet(null, null)))
 
                 .from(deciderRecalculateCounts)
                 .on(ExitStatus.COMPLETED.exitCode)
@@ -121,12 +121,12 @@ class BackoutJobConfiguration extends BackoutJobConfigurationParent {
 
     @Bean
     @StepScopeInterfaced
-    Tasklet insertConceptCountsTasklet(
+    Tasklet insertTmConceptCountsTasklet(
             DatabaseImplementationClassPicker picker,
             @Value("#{jobExecutionContext['conceptCountsDirtyBase']}") ConceptPath topNode) {
         picker.instantiateCorrectClass(
-                OracleInsertConceptCountsTasklet,
-                PostgresInsertConceptCountsTasklet).with { InsertConceptCountsTasklet t ->
+                OracleInsertTmConceptCountsTasklet,
+                PostgresInsertTmConceptCountsTasklet).with { InsertTmConceptCountsTasklet t ->
             basePath = topNode
             t
         }

@@ -38,9 +38,9 @@ import org.transmartproject.batch.clinical.xtrial.XtrialMapping
 import org.transmartproject.batch.clinical.xtrial.XtrialMappingWriter
 import org.transmartproject.batch.concept.ConceptPath
 import org.transmartproject.batch.concept.DeleteConceptCountsTasklet
-import org.transmartproject.batch.concept.InsertConceptCountsTasklet
-import org.transmartproject.batch.concept.oracle.OracleInsertConceptCountsTasklet
-import org.transmartproject.batch.concept.postgresql.PostgresInsertConceptCountsTasklet
+import org.transmartproject.batch.concept.InsertTmConceptCountsTasklet
+import org.transmartproject.batch.concept.oracle.OracleInsertTmConceptCountsTasklet
+import org.transmartproject.batch.concept.postgresql.PostgresInsertTmConceptCountsTasklet
 import org.transmartproject.batch.db.DatabaseImplementationClassPicker
 import org.transmartproject.batch.facts.ClinicalFactsRowSet
 import org.transmartproject.batch.facts.DeleteObservationFactTasklet
@@ -122,8 +122,8 @@ class ClinicalDataLoadJobConfiguration extends AbstractJobConfiguration {
                 // insertion of ancillary data
                 .next(stepOf(this.&getCreateSecureStudyTasklet))         //bio_experiment, search_secure_object
                 .next(stepOf(this.&getInsertTableAccessTasklet))
-                .next(stepOf('insertConceptCounts',
-                             insertConceptCountsTasklet(null, null)))    //patientDimensionInsert concept_counts rows
+                .next(stepOf('insertTmConceptCounts',
+                             insertTmConceptCountsTasklet(null, null)))    //patientDimensionInsert tm_concept_counts rows
                 .build()
     }
 
@@ -294,12 +294,12 @@ class ClinicalDataLoadJobConfiguration extends AbstractJobConfiguration {
 
     @Bean
     @JobScopeInterfaced
-    Tasklet insertConceptCountsTasklet(DatabaseImplementationClassPicker picker,
+    Tasklet insertTmConceptCountsTasklet(DatabaseImplementationClassPicker picker,
                                        @Value("#{jobParameters['TOP_NODE']}") ConceptPath topNode) {
         picker.instantiateCorrectClass(
-                OracleInsertConceptCountsTasklet,
-                PostgresInsertConceptCountsTasklet)
-                .with { InsertConceptCountsTasklet t ->
+                OracleInsertTmConceptCountsTasklet,
+                PostgresInsertTmConceptCountsTasklet)
+                .with { InsertTmConceptCountsTasklet t ->
             t.basePath = topNode
             t
         }

@@ -2,13 +2,13 @@ package org.transmartproject.batch.concept.postgresql
 
 import org.transmartproject.batch.beans.Postgresql
 import org.transmartproject.batch.clinical.db.objects.Tables
-import org.transmartproject.batch.concept.InsertConceptCountsTasklet
+import org.transmartproject.batch.concept.InsertTmConceptCountsTasklet
 
 /**
  * Insert concept counts. Postgresql version.
  */
 @Postgresql
-class PostgresInsertConceptCountsTasklet extends InsertConceptCountsTasklet {
+class PostgresInsertTmConceptCountsTasklet extends InsertTmConceptCountsTasklet {
     final String sql =
         """
         WITH RECURSIVE
@@ -36,7 +36,7 @@ class PostgresInsertConceptCountsTasklet extends InsertConceptCountsTasklet {
             patient_num
           FROM code_patients WHERE code_patients.parent_concept_path != ?
         )
-        INSERT INTO ${Tables.CONCEPT_COUNTS} (concept_path, parent_concept_path, patient_count)
+        INSERT INTO ${Tables.TM_CONCEPT_COUNTS} (concept_path, parent_concept_path, patient_count)
         SELECT
             concept_path,
             parent_concept_path,

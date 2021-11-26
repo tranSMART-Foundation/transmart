@@ -52,7 +52,7 @@ abstract class AbstractTypicalHdDataJobConfig {
     @Resource
     Step insertConcepts
     @Resource
-    Step insertConceptCounts
+    Step insertTmConceptCounts
 
     @Resource
     Step validateHighDimensionalConcepts
@@ -104,7 +104,7 @@ abstract class AbstractTypicalHdDataJobConfig {
 
                 .next(insertConcepts)
                 .next(insertPseudoFacts)
-                .next(insertConceptCounts)
+                .next(insertTmConceptCounts)
                 .next(insertAssays)
                 .next(partitionDataTable)
                 .next(secondPass)
