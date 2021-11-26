@@ -57,38 +57,88 @@ buildi2b2=0
 buildgwava=0
 buildwar=0
 
+# By default, build war file from transmartApp 
 build="war"
 buildb=""
+buildc=""
+
+usagelist="war all api shared legacy fractalis das dalliance core coretests mydas java biomart search rest custom folder rmodules auth ipa smartr galaxy metacore xnatimport xnatviewer gwas plink gnome i2b2core i2b2 workspace"
+
 if  [ "$1" != "" ] ; then
-    echo "Argument '$1'"
-    build=$1
-fi
-if  [ "$2" != "" ] ; then
-    echo "Argument '$2'"
-    if  [ "$2" == "-noclean" ] ; then
+    arg="$1"
+    echo "Argument '$arg'"
+    if  [ "$arg" == "-noclean" ] ; then
 	clean=0
-    elif  [ "$2" == "-clean" ] ; then
+    elif  [ "$arg" == "-clean" ] ; then
 	clean=1
-    elif  [ "$2" == "-nocleangrails" ] ; then
+    elif  [ "$arg" == "-nocleangrails" ] ; then
 	cleangrails=0
-    elif  [ "$2" == "-cleangrails" ] ; then
+    elif  [ "$arg" == "-cleangrails" ] ; then
 	cleangrails=1
     else
-	buildb=$2
+	build=""
+	for item in $usagelist
+	do
+	    if [ "$arg" == "$item" ]; then
+		build=$arg
+		break
+	    fi
+	done
+	if [ -z "$build" ] ; then
+	    echo "Usage: transmartAppBuild.sh [ $usagelist ] -[no]clean -[no]cleangrails"
+	    exit
+	fi
+    fi
+fi
+
+if  [ "$2" != "" ] ; then
+    arg="$2"
+    echo "Argument '$arg'"
+    if  [ "$arg" == "-noclean" ] ; then
+	clean=0
+    elif  [ "$arg" == "-clean" ] ; then
+	clean=1
+    elif  [ "$arg" == "-nocleangrails" ] ; then
+	cleangrails=0
+    elif  [ "$arg" == "-cleangrails" ] ; then
+	cleangrails=1
+    else
+	for item in $usagelist
+	do
+	    if [ "$arg" == "$item" ]; then
+		buildb=$arg
+		break
+	    fi
+	done
+	if [ -z "$buildb" ] ; then
+	    echo "Usage: transmartAppBuild.sh [ $usagelist ] -[no]clean -[no]cleangrails"
+	    exit
+	fi
     fi
 fi
 if  [ "$3" != "" ] ; then
-    echo "Argument '$3'"
-    if  [ "$3" == "-noclean" ] ; then
+    arg="$3"
+    echo "Argument '$arg'"
+    if  [ "$arg" == "-noclean" ] ; then
 	clean=0
-    elif  [ "$3" == "-clean" ] ; then
+    elif  [ "$arg" == "-clean" ] ; then
 	clean=1
-    elif  [ "$3" == "-nocleangrails" ] ; then
+    elif  [ "$arg" == "-nocleangrails" ] ; then
 	cleangrails=0
-    elif  [ "$3" == "-cleangrails" ] ; then
+    elif  [ "$arg" == "-cleangrails" ] ; then
 	cleangrails=1
     else
-	buildb=$2
+	for item in $usagelist
+	do
+	    if [ "$arg" == "$item" ]; then
+		buildc=$arg
+		break
+	    fi
+	done
+	if [ -z "$buildc" ] ; then
+	    echo "Usage: transmartAppBuild.sh [ $usagelist ] -[no]clean -[no]cleangrails"
+	    exit
+	fi
     fi
 fi
 
@@ -139,119 +189,119 @@ if [ "$build" == "all" ] || [ "$buildb" == "all" ] ; then
     # buildi2b2core=1
 fi
 
-if [ "$build" == "api" ] || [ "$buildb" == "api" ] ; then
+if [ "$build" == "api" ] || [ "$buildb" == "api" ] || [ "$buildc" == "api" ] ; then
     buildapi=1
 fi
 
-if [ "$build" == "shared" ] || [ "$buildb" == "shared" ] ; then
+if [ "$build" == "shared" ] || [ "$buildb" == "shared" ] || [ "$buildc" == "shared" ] ; then
     buildshared=1
 fi
 
-if [ "$build" == "legacy" ] || [ "$buildb" == "legacy" ] ; then
+if [ "$build" == "legacy" ] || [ "$buildb" == "legacy" ] || [ "$buildc" == "legacy" ] ; then
     buildlegacy=1
 fi
 
-if [ "$build" == "fractalis" ] || [ "$buildb" == "fractalis" ] ; then
+if [ "$build" == "fractalis" ] || [ "$buildb" == "fractalis" ] || [ "$buildc" == "fractalis" ] ; then
     buildfractalis=1
 fi
 
-if [ "$build" == "das" ] || [ "$buildb" == "das" ] ; then
+if [ "$build" == "das" ] || [ "$buildb" == "das" ] || [ "$buildc" == "das" ] ; then
     builddas=1
 fi
 
-if [ "$build" == "dalliance" ] || [ "$buildb" == "dalliance" ] ; then
+if [ "$build" == "dalliance" ] || [ "$buildb" == "dalliance" ] || [ "$buildc" == "dalliance" ] ; then
     builddalliance=1
 fi
 
-if [ "$build" == "core" ] || [ "$buildb" == "core" ] ; then
+if [ "$build" == "core" ] || [ "$buildb" == "core" ] || [ "$buildc" == "core" ] ; then
     buildcore=1
 fi
 
-if [ "$build" == "coretests" ] || [ "$buildb" == "coretests" ] ; then
+if [ "$build" == "coretests" ] || [ "$buildb" == "coretests" ] || [ "$buildc" == "coretests" ] ; then
     buildcoretests=1
 fi
 
-if [ "$build" == "mydas" ] || [ "$buildb" == "mydas" ] ; then
+if [ "$build" == "mydas" ] || [ "$buildb" == "mydas" ] || [ "$buildc" == "mydas" ] ; then
     buildmydas=1
 fi
 
-if [ "$build" == "java" ] || [ "$buildb" == "java" ] ; then
+if [ "$build" == "java" ] || [ "$buildb" == "java" ] || [ "$buildc" == "java" ] ; then
     buildjava=1
 fi
 
-if [ "$build" == "biomart" ] || [ "$buildb" == "biomart" ] ; then
+if [ "$build" == "biomart" ] || [ "$buildb" == "biomart" ] || [ "$buildc" == "biomart" ] ; then
     buildbiomart=1
 fi
 
-if [ "$build" == "search" ] || [ "$buildb" == "search" ] ; then
+if [ "$build" == "search" ] || [ "$buildb" == "search" ] || [ "$buildc" == "search" ] ; then
     buildsearch=1
 fi
 
-if [ "$build" == "rest" ] || [ "$buildb" == "rest" ] ; then
+if [ "$build" == "rest" ] || [ "$buildb" == "rest" ] || [ "$buildc" == "rest" ] ; then
     buildrestapi=1
 fi
 
-if [ "$build" == "custom" ] || [ "$buildb" == "custom" ] ; then
+if [ "$build" == "custom" ] || [ "$buildb" == "custom" ] || [ "$buildc" == "custom" ] ; then
     buildcustom=1
 fi
 
-if [ "$build" == "folder" ] || [ "$buildb" == "folder" ] ; then
+if [ "$build" == "folder" ] || [ "$buildb" == "folder" ] || [ "$buildc" == "folder" ] ; then
     buildfolder=1
 fi
 
-if [ "$build" == "rmodules" ] || [ "$buildb" == "rmodules" ] ; then
+if [ "$build" == "rmodules" ] || [ "$buildb" == "rmodules" ] || [ "$buildc" == "rmodules" ] ; then
     buildrmodules=1
 fi
 
-if [ "$build" == "auth" ] || [ "$buildb" == "auth" ] ; then
+if [ "$build" == "auth" ] || [ "$buildb" == "auth" ] || [ "$buildc" == "auth" ] ; then
     buildauth=1
 fi
 
-if [ "$build" == "ipa" ] || [ "$buildb" == "ipa" ] ; then
+if [ "$build" == "ipa" ] || [ "$buildb" == "ipa" ] || [ "$buildc" == "ipa" ] ; then
     buildipa=1
 fi
 
-if [ "$build" == "smartr" ] || [ "$buildb" == "smartr" ] ; then
+if [ "$build" == "smartr" ] || [ "$buildb" == "smartr" ] || [ "$buildc" == "smartr" ] ; then
     buildsmartr=1
 fi
 
-if [ "$build" == "galaxy" ] || [ "$buildb" == "galaxy" ] ; then
+if [ "$build" == "galaxy" ] || [ "$buildb" == "galaxy" ] || [ "$buildc" == "galaxy" ] ; then
     buildgalaxy=1
 fi
 
-if [ "$build" == "metacore" ] || [ "$buildb" == "metacore" ] ; then
+if [ "$build" == "metacore" ] || [ "$buildb" == "metacore" ] || [ "$buildc" == "metacore" ] ; then
     buildmetacore=1
 fi
 
-if [ "$build" == "xnatimport" ] || [ "$buildb" == "xnatimport" ] ; then
+if [ "$build" == "xnatimport" ] || [ "$buildb" == "xnatimport" ] || [ "$buildc" == "xnatimport" ] ; then
     buildxnatimport=1
 fi
 
-if [ "$build" == "xnatviewer" ] || [ "$buildb" == "xnatviewer" ] ; then
+if [ "$build" == "xnatviewer" ] || [ "$buildb" == "xnatviewer" ] || [ "$buildc" == "xnatviewer" ] ; then
     buildxnatviewer=1
 fi
 
-if [ "$build" == "gwas" ] || [ "$buildb" == "gwas" ] ; then
+if [ "$build" == "gwas" ] || [ "$buildb" == "gwas" ]  || [ "$buildc" == "gwas" ] ; then
     buildgwas=1
 fi
 
-if [ "$build" == "plink" ] || [ "$buildb" == "plink" ] ; then
+if [ "$build" == "plink" ] || [ "$buildb" == "plink" ] || [ "$buildc" == "plink" ] ; then
     buildplink=1
 fi
 
-if [ "$build" == "gnome" ] || [ "$buildb" == "gnome" ] ; then
+if [ "$build" == "gnome" ] || [ "$buildb" == "gnome" ] || [ "$buildc" == "gnome" ] ; then
     buildgnome=1
 fi
 
-if [ "$build" == "i2b2core" ] || [ "$buildb" == "i2b2core" ] ; then
+if [ "$build" == "i2b2core" ] || [ "$buildb" == "i2b2core" ] || [ "$buildc" == "i2b2core" ] ; then
     buildi2b2core=1
 fi
 
-if [ "$build" == "i2b2" ] || [ "$buildb" == "i2b2" ] ; then
+if [ "$build" == "i2b2" ] || [ "$buildb" == "i2b2" ] || [ "$buildc" == "i2b2" ] ; then
     buildi2b2=1
 fi
 
-if [ "$build" == "workspace" ] || [ "$buildb" == "workspace" ] ; then
+if [ "$build" == "workspace" ] || [ "$buildb" == "workspace" ] || [ "$buildc" == "workspace" ] ; then
     buildworkspace=1
 fi
 
@@ -450,12 +500,15 @@ fi
 if [ $buildxnatimport == 1 ] ; then
     buildwar=1
 fi
+
 if [ $buildcustom == 1 ] ; then
     buildwar=1
 fi
+
 if [ $buildshared == 1 ] ; then
     buildwar=1
 fi
+
 if [ $buildauth == 1 ] ; then
     buildwar=1
 fi
@@ -1431,7 +1484,7 @@ if [ $buildwar == 1 ] ; then
 	./grailsw war            > $OUT/$PREFIX-$DIR.out 2>&1
     fi
 
-    ./grailsw war            > $OUT/$PREFIX-$DIR.out 2>&1
+    ./grailsw --stacktrace --verbose war            > $OUT/$PREFIX-$DIR.out 2>&1
 
     egrep -v '(warning[.]gif|error[.]gif|errors[.]css|Warnings[.][a-z]*)$' $OUT/$PREFIX-$DIR.out | egrep -i 'error[^-]|warning|fail'
 
