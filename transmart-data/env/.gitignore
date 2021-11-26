@@ -1,6 +1,7 @@
 /pdi-ce-*.tar.gz
 /pdi-ce-*.zip
 /tranSMART-ETL
+/transmart-etl
 /data-integration
 /groovy
 /groovy-*
