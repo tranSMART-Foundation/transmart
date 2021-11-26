@@ -24,7 +24,6 @@
 \i i2b2demodata/async_job.sql
 \i i2b2demodata/cd.sql
 \i i2b2demodata/code_lookup.sql
-\i i2b2demodata/concept_counts.sql
 \i i2b2demodata/concept_dimension.sql
 \i i2b2demodata/counter.sql
 \i i2b2demodata/crc_db_lookup.sql

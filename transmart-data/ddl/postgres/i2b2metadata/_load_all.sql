@@ -14,6 +14,7 @@
 \i i2b2metadata/tmp_secure_token.sql
 \i i2b2metadata/totalnum.sql
 \i i2b2metadata/totalnum_report.sql
+\i i2b2metadata/tm_concept_counts.sql
 \i i2b2metadata/_misc.sql
 \i i2b2metadata/functions/add_ontology_node.sql
 \i i2b2metadata/functions/random_normal.sql
