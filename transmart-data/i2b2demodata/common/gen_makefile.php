@@ -5,14 +5,6 @@ if ($argc != 2) {
 	exit(1);
 }
 
-$depFile = __DIR__ . "/../../ddl/postgres/$argv[1]/dependencies.php";
-if (!file_exists($depFile)) {
-	fprintf(STDERR, "Expected the file %s to exist. Bad schema? Schema "
-			. "dependencies file not generated?\n", $depFile);
-	exit(1);
-}
-require $depFile;
-
 $listFile = __DIR__ . "/$argv[1]_list";
 $tableList = file($listFile, FILE_IGNORE_NEW_LINES);
 if ($tableList === false) {
@@ -31,19 +23,6 @@ foreach ($tableList as $table) {
 	}
 
 	if (!key_exists($table, $dependencies)) {
-		continue;
-	}
-
-	$theseDeps = array_filter($dependencies[$table],
-			function ($d) use ($tableList, $table) {
-				$ret = in_array($d, $tableList);
-				if (!$ret) {
-					fprintf(STDERR, "\e[0;31mWARNING\e[0m: Table %s is missing "
-							. "data from dependency %s.\n", $table, $d);
-				}
-				return $ret;
-			});
-	if (empty($theseDeps)) {
 		continue;
 	}
 
