@@ -264,7 +264,6 @@ public class StudySelectionController {
 					
 					con = DriverManager.getConnection(connection, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
 					stmt = con.createStatement();
-					rs=stmt.executeQuery("delete from concept_counts where concept_path in(select concept_path from concept_dimension where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"')");
 					rs=stmt.executeQuery("delete from concept_dimension where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");
 					rs=stmt.executeQuery("delete from patient_dimension where patient_num in(select patient_num from patient_trial where trial='"+studyIdentifier.toUpperCase()+"')");
 					rs=stmt.executeQuery("delete from patient_trial where trial='"+studyIdentifier.toUpperCase()+"'");
@@ -273,6 +272,7 @@ public class StudySelectionController {
 					
 					con = DriverManager.getConnection(connection, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
 					stmt = con.createStatement();
+					rs=stmt.executeQuery("delete from tm_concept_counts where concept_path in(select concept_path from concept_dimension where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"')");
 					rs=stmt.executeQuery("delete from i2b2_tags where tag='"+studyIdentifier.toUpperCase()+"'");
 					rs=stmt.executeQuery("delete from i2b2 where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");
 					rs=stmt.executeQuery("delete from i2b2_secure where sourcesystem_cd='"+studyIdentifier.toUpperCase()+"'");

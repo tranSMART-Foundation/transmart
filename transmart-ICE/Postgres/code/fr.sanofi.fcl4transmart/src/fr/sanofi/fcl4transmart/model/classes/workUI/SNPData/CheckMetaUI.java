@@ -95,9 +95,9 @@ public class CheckMetaUI implements WorkItf {
 					tables=new Vector<String>();
 					tables.add("I2B2METADATA.I2B2");
 					tables.add("I2B2METADATA.I2B2_SECURE");
+					tables.add("I2B2METADATA.TM_CONCEPT_COUNTS");
 					tables.add("I2B2DEMODATA.PATIENT_DIMENSION");
 					tables.add("I2B2DEMODATA.CONCEPT_DIMENSION");
-					tables.add("I2B2DEMODATA.CONCEPT_COUNTS");
 					tables.add("I2B2DEMODATA.OBSERVATION_FACT");
 					tables.add("DEAPP.DE_SUBJECT_SAMPLE_MAPPING");
 					
@@ -157,9 +157,9 @@ public class CheckMetaUI implements WorkItf {
 						equals.set(3, "ERROR");
 					}
 					
-					//concept_counts
+					//tm_concept_counts
 					nI=paths.size();
-					nE=RetrieveData.getConceptsCountLines(paths);
+					nE=RetrieveData.getTmConceptCountsLines(paths);
 					expected.set(4, String.valueOf(nI));
 					inserted.set(4,String.valueOf(nE));
 					if(String.valueOf(nI).compareTo(String.valueOf(nE))==0){

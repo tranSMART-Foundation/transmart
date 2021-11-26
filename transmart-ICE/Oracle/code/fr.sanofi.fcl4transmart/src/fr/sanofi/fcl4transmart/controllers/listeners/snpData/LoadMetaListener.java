@@ -506,22 +506,24 @@ public class LoadMetaListener implements Listener {
 							String connection=RetrieveData.getConnectionString();
 							
 							Connection con = DriverManager.getConnection(connection, PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
+							Connection metacon = DriverManager.getConnection(connection, PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
 							
 							Statement stmt = con.createStatement();
+							Statement metastmt = metacon.createStatement();
 							
 							//update age_in_years_num from table patient_dimension to non null (for summary statistics to work)
 							ResultSet rs=stmt.executeQuery("update patient_dimension set age_in_years_num=0 where age_in_years_num is null and sourcesystem_cd like'"+dataType.getStudy().toString()+":%'");
 							
-							//update concept_counts for study node
+							//update tm_concept_counts for study node
 							String node=topNode;
 							String programNode="\\"+topNode.split("\\\\", -1)[1]+"\\";
 							rs=stmt.executeQuery("select count(*) from patient_dimension where sourcesystem_cd like'"+dataType.getStudy().toString()+":%'");
 							if(rs.next()){
 								int n=rs.getInt(1);
-								rs=stmt.executeQuery("insert into concept_counts (concept_path, parent_concept_path, patient_count) values('"+topNode+"', '"+programNode+"', "+n+")");
+								rs=stmt.executeQuery("insert into tm_concept_counts (concept_path, parent_concept_path, patient_count) values('"+topNode+"', '"+programNode+"', "+n+")");
 							}
 							
-							//update concept_counts for other nodes
+							//update tm_concept_counts for other nodes
 							splited=baseNode.split("/", -1);
 							String parentNode=topNode;
 							node=topNode;
@@ -531,7 +533,7 @@ public class LoadMetaListener implements Listener {
 									rs=stmt.executeQuery("select count(*) from deapp.de_subject_sample_mapping where trial_name='"+dataType.getStudy().toString()+"' and platform='SNP'");
 									if(rs.next()){
 										int n=rs.getInt(1);
-										rs=stmt.executeQuery("insert into concept_counts (concept_path, parent_concept_path, patient_count) values('"+node+"', '"+parentNode+"', "+n+")");
+										rs=stmt.executeQuery("insert into tm_concept_counts (concept_path, parent_concept_path, patient_count) values('"+node+"', '"+parentNode+"', "+n+")");
 										parentNode=node;
 									}				
 								}

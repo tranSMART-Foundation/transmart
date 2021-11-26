@@ -961,15 +961,15 @@ public class RetrieveData {
 		return n;
 	}
 	/**
-	*Returns the number of lines in I2B2DEMODATA.CONCEPT_COUNTS corresponding to a vector of paths 
+	*Returns the number of lines in I2B2METADATA.TM_CONCEPT_COUNTS corresponding to a vector of paths 
 	*/	
-	public static int getConceptsCountLines(HashSet<String> paths){
+	public static int getTmConceptCountsLines(HashSet<String> paths){
 		int n=0;
 		try{
 			Class.forName(RetrieveData.getDriverString());
-			Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getDemodataUser(), PreferencesHandler.getDemodataPwd());
+			Connection con = DriverManager.getConnection(RetrieveData.getConnectionString(), PreferencesHandler.getMetadataUser(), PreferencesHandler.getMetadataPwd());
 			Statement stmt = con.createStatement();
-			ResultSet rs=stmt.executeQuery("select count(*) from concept_counts where concept_path in "+getVectorForSQL(paths));
+			ResultSet rs=stmt.executeQuery("select count(*) from tm_concept_counts where concept_path in "+getVectorForSQL(paths));
 			if(rs.next()){
 				n=rs.getInt(1);
 			}
