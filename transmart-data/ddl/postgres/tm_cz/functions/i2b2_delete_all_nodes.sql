@@ -123,9 +123,9 @@ begin
 	get diagnostics rowCt := ROW_COUNT;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2METADATA i2b2_secure',rowCt,stepCt,'Done');
 
-	--concept_counts
+	-- tm_concept_counts
 	begin
-	    delete from i2b2demodata.concept_counts
+	    delete from i2b2metadata.tm_concept_counts
 	     where concept_path like path || '%' escape '`';
 	    get diagnostics rowCt := ROW_COUNT;
 	exception
@@ -139,7 +139,7 @@ begin
 		return -16;
 	end;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA concept_counts',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2METADATA tm_concept_counts',rowCt,stepCt,'Done');
 
     end if;
 

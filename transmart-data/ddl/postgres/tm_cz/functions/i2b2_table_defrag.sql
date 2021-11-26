@@ -15,7 +15,7 @@ begin
     -- JEA@20090923 - Removed I2B2DEMODATA.IDX_OB_FACT_3, Oracle doesn't need to index every column like SQL Server (per Aaron A.)
     -------------------------------------------------------------
     execute 'alter table i2b2metadata.i2b2 move';
-    execute 'alter table i2b2demodata.concept_counts move';
+    execute 'alter table i2b2metadata.tm_concept_counts move';
     execute 'alter table i2b2demodata.concept_dimension move';
     execute 'alter table i2b2demodata.observation_fact move';
     execute 'alter table i2b2demodata.patient_dimension move';
@@ -30,7 +30,7 @@ begin
     execute 'alter index i2b2metadata.idx_i2b2_a rebuild';
     execute 'alter index i2b2metadata.idx_i2b2_b rebuild';
 
-    execute 'alter index i2b2demodata.concept_counts_index1 rebuild';
+    execute 'alter index i2b2metadata.tm_concept_counts_index1 rebuild';
 
 end;
 

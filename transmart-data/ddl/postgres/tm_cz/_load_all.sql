@@ -44,6 +44,8 @@
 \i tm_cz/functions/dropsyn.sql
 \i tm_cz/functions/find_user.sql
 \i tm_cz/functions/fract_error_dist.sql
+\i tm_cz/functions/i2b2_pat_count_dimensions.sql
+\i tm_cz/functions/i2b2_pat_count_visits.sql
 \i tm_cz/functions/i2b2_create_concept_counts.sql
 \i tm_cz/functions/i2b2_add_node.sql
 \i tm_cz/functions/i2b2_add_root_node.sql
@@ -207,6 +209,13 @@
 \i tm_cz/stg_rbm_antigen_gene.sql
 \i tm_cz/stg_subject_rbm_data.sql
 \i tm_cz/stg_subject_rbm_data_raw.sql
+\i tm_cz/temp_concept_path.sql
+\i tm_cz/temp_dim_count_ont.sql
+\i tm_cz/temp_dim_ont_with_folders.sql
+\i tm_cz/temp_final_counts_by_concept.sql
+\i tm_cz/temp_ont_pat_visit_dims.sql
+\i tm_cz/temp_path_counts.sql
+\i tm_cz/temp_path_to_num.sql
 \i tm_cz/tmp_num_data_types.sql
 \i tm_cz/tmp_subject_info.sql
 \i tm_cz/tmp_trial_data.sql

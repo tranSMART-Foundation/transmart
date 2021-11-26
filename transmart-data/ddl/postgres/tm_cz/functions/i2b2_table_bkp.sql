@@ -37,11 +37,11 @@ begin
 
     select count(*) into tExists
       from information_schema.tables
-     where table_schema = 'i2b2demodata'
-       and table_name = 'concept_counts_bkp';
+     where table_schema = 'i2b2metadata'
+       and table_name = 'tm_concept_counts_bkp';
 
     if tExists > 0 then
-	execute('drop table i2b2demodata.concept_counts_bkp');
+	execute('drop table i2b2metadata.tm_concept_counts_bkp');
     end if;
 
     select count(*) into tExists
@@ -73,7 +73,7 @@ begin
 
     --Backup tables
     execute 'create table i2b2metadata.i2b2_bkp as select * from i2b2metadata.i2b2';
-    execute 'create table i2b2demodata.concept_counts_bkp as select * from i2b2demodata.concept_counts';
+    execute 'create table i2b2metadata.tm_concept_counts_bkp as select * from i2b2metadata.tm_concept_counts';
     execute 'create table i2b2demodata.concept_dimension_bkp as select * from i2b2demodata.concept_dimension';
     execute 'create table i2b2demodata.observation_fact_bkp as select * from i2b2demodata.observation_fact';
     execute 'create table i2b2demodata.patient_dimension_bkp as select * from i2b2demodata.patient_dimension';

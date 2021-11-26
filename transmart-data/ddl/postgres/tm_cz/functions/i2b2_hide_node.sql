@@ -75,7 +75,7 @@ begin
 
 
     begin
-	delete from i2b2demodata.concept_counts
+	delete from i2b2metadata.tm_concept_counts
 	 where concept_path like path || '%' escape '`';
     exception
 	when others then
@@ -89,7 +89,7 @@ begin
 	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted hidden nodes from i2b2demodata.concept_counts',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted hidden nodes from i2b2metadata.tm_concept_counts',rowCt,stepCt,'Done');
 
     --	reload i2b2_secure for hidden nodes
 

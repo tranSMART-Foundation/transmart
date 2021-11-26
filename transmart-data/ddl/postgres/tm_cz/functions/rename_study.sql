@@ -32,9 +32,9 @@ begin
     update i2b2metadata.i2b2_secure
        set c_name=newTitle where c_fullname=newTopNode;
 
-    update i2b2demodata.concept_counts
+    update i2b2metadata.tm_concept_counts
        set concept_path=regexp_replace(concept_path, regex1, regex2);
-    update i2b2demodata.concept_counts
+    update i2b2metadata.tm_concept_counts
        set parent_concept_path=regexp_replace(parent_concept_path, regex1, regex2);
 
     update i2b2demodata.concept_dimension

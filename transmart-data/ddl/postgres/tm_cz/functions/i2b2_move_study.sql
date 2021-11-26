@@ -171,24 +171,24 @@ begin
 
 
 
-	--	concept_counts
+	--	tm_concept_counts
 
-	update i2b2demodata.concept_counts
+	update i2b2metadata.tm_concept_counts
 	   set concept_path = replace(concept_path, oldPath, newPath)
 	       ,parent_concept_path = replace(parent_concept_path, oldPath, newPath)
 	 where concept_path like oldPathWild escape '`';
 	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_counts with new path',rowCt,stepCt,'Done');
-	update i2b2demodata.concept_counts
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update tm_concept_counts with new path',rowCt,stepCt,'Done');
+	update i2b2metadata.tm_concept_counts
 	   set parent_concept_path = newParent
 	 where concept_path = newPath;
 	get diagnostics rowCt := ROW_COUNT;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_counts study parent',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update tm_concept_counts study parent',rowCt,stepCt,'Done');
 
 
-	-- No other concept_counts update needed for the study node
+	-- No other tm_concept_counts update needed for the study node
 
 	--	fill in any upper levels
 

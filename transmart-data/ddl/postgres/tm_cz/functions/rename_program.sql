@@ -60,10 +60,10 @@ begin
        set c_table_cd=newProgramName
      where c_fullname=newTopNode;
 
-    update I2B2DEMODATA.concept_counts
+    update I2B2METADATA.tm_concept_counts
        set concept_path=regexp_replace(concept_path, regex1, regex2)
      where concept_path like oldTopNode||'%';
-    update I2B2DEMODATA.concept_counts
+    update I2B2METADATA.tm_concept_counts
        set parent_concept_path=regexp_replace(parent_concept_path, regex1, regex2)
      where parent_concept_path like oldTopNode||'%';
 

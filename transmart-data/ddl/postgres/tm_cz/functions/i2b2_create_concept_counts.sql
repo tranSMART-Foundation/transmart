@@ -1,11 +1,11 @@
 --
--- Name: i2b2_create_concept_counts(character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
+-- Name: i2b2_create_concept_counts(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
 CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_concept_counts(trialid character varying, path character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
-     * Copyright 2008-2012 Janssen Research & Development, LLC.
+     * Copyright 2021 Axiomedix Inc.
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
@@ -26,14 +26,23 @@ AS $$
     newJobFlag		integer;
     databaseName 	VARCHAR(100);
     procedureName 	VARCHAR(100);
-    jobID 			numeric(18,0);
-    stepCt 			numeric(18,0);
-    rowCt			numeric(18,0);
+    jobID 		numeric(18,0);
+    stepCt 		numeric(18,0);
+    rowCt		numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
     tExplain 		text;
 
+    curRecord		RECORD;
+    v_sqlstring		text = '';
+
+    tableName		character varying;
+
+    topPath		character varying;
+    testPath		character varying;
 begin
+
+    tableName := '@';
 
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -50,15 +59,52 @@ begin
     end if;
 
     stepCt := 0;
+    stepCt := stepCt + 1;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting with trialid '||trialid||' path '||path,0,stepCt,'Done');
 
-    raise NOTICE 'i2b2_create_concept_counts(%,%,0)', trialid, path;
-    select count(*) from i2b2demodata.concept_counts
+    -- find missing path from trialId
+    if(path is null or path = '') then
+	select c_fullname from i2b2metadata.tm_trial_nodes where trial = trialid into path;
+	get diagnostics rowCt := ROW_COUNT;
+	if(rowCt < 1) then
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No path for trial '||trialid,rowCt,stepCt,'FAIL');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+	    end if;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Found path '||path||' for trial '||trialid,rowCt,stepCt,'FAIL');
+    elsif(trialid != 'I2B2') then
+	select c_fullname from i2b2metadata.tm_trial_nodes where trial = trialid into testPath;
+	get diagnostics rowCt := ROW_COUNT;
+	if(rowCt < 1) then
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No path for trial '||trialid,rowCt,stepCt,'FAIL');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+	elsif(path != testPath) then
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Unmatched path for trial '||trialid||' found '||testPath,rowCt,stepCt,'FAIL');
+	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    return -16;
+	end if;
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Found path '||path||' for trial '||trialid,rowCt,stepCt,'FAIL');
+    end if;
+    
+    -- may need to replace \ to \\ and ' to '' in the path parameter
+
+    topPath := path;
+    topPath := replace(replace(topPath,'\','\\'),'''','''''');
+
+    select count(*) from i2b2metadata.tm_concept_counts
 	 where concept_path like path || '%' escape '`' into rowCt;
 
-    raise NOTICE 'Before delete: concept_counts % records below concept_path %', rowCt, path;
+    stepCt := stepCt + 1;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Before delete: tm_concept_counts records below concept_path ' || path,rowCt,stepCt,'Done');
 
     begin
-	delete from i2b2demodata.concept_counts
+	delete from i2b2metadata.tm_concept_counts
 	 where concept_path like path || '%' escape '`';
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -72,56 +118,60 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete counts for trial from I2B2DEMODATA concept_counts',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete counts for trial from I2B2METADATA tm_concept_counts',rowCt,stepCt,'Done');
 
-    select count(*) from i2b2demodata.concept_counts
-	 where concept_path = path into rowCt;
+    select count(*) from i2b2metadata.tm_concept_counts
+	 where concept_path = topPath into rowCt;
 
-    raise NOTICE 'After delete: concept_counts % records for concept_path %', rowCt, path;
-
-    --	Join each node (folder or leaf) in the path to its leaf in the work table to count patient numbers
-
-    begin
---    for tExplain in
---	EXPLAIN (ANALYZE, VERBOSE, BUFFERS)
-	insert into i2b2demodata.concept_counts (
-	    concept_path
-	    ,parent_concept_path
-	    ,patient_count)
-	select fa.c_fullname
-	       ,ltrim(SUBSTR(fa.c_fullname, 1,tm_cz.instr(fa.c_fullname, '\',-1,2)))
-	       ,count(distinct ob.patient_num)
-	  from i2b2metadata.i2b2 fa
-	       ,i2b2metadata.i2b2 la
-	left join i2b2demodata.observation_fact ob
-	on la.c_basecode = ob.concept_cd
-	 where fa.c_fullname like path || '%' escape '`'
-	   and substr(fa.c_visualattributes,2,1) != 'H'
-	   and la.c_fullname like fa.c_fullname || '%' escape '`'
-	   and la.c_visualattributes like 'L%'
-	group by fa.c_fullname
-	,ltrim(SUBSTR(fa.c_fullname, 1,tm_cz.instr(fa.c_fullname, '\',-1,2)))
---	LOOP
---	    raise notice 'explain: %', tExplain;
---	END LOOP
-           ;
-	get diagnostics rowCt := ROW_COUNT;
-    exception
-	when others then
-	    errorNumber := SQLSTATE;
-	    errorMessage := SQLERRM;
-	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return -16;
-    end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert counts for trial into I2B2DEMODATA concept_counts',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'After delete for concept_path ' || path || ' records remaining',rowCt,stepCt,'Done');
 
-    raise NOTICE 'Insert % counts for trial into I2B2DEMODATA concept_counts', rowCt;
+    -- code based on i2b2metadata functions for populating the i2b2 totalnum table
+    -- i2b2 temp tables substituted by temp_* tables in tm_cz
 
-    --SET ANY NODE WITH MISSING OR ZERO COUNTS TO HIDDEN
+    -- clear the working tables
+
+    execute ('truncate table tm_cz.temp_concept_path');
+    execute ('truncate table tm_cz.temp_dim_count_ont');
+    execute ('truncate table tm_cz.temp_dim_ont_with_folders');
+    execute ('truncate table tm_cz.temp_final_counts_by_concept');
+    execute ('truncate table tm_cz.temp_ont_pat_visit_dims');
+    execute ('truncate table tm_cz.temp_path_counts');
+    execute ('truncate table tm_cz.temp_path_to_num');
+    
+    stepCt := stepCt + 1;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncated working tables',0,stepCt,'Done');
+
+    for curRecord IN 
+        select distinct upper(c_table_name) as sqltext
+        from i2b2metadata.table_access 
+        where c_visualattributes like '%A%' 
+    LOOP 
+	IF tableName='@' OR tableName=curRecord.sqltext THEN
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_visits( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''' || path || ''' , '||jobID||')';
+            execute v_sqlstring;
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted visits in ' || curRecord.sqltext,0,stepCt,'Done');
+            
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'',  ''concept_cd'', ''concept_dimension'', ''concept_path'', ''' || path || '''  , '||jobID||')';
+            execute v_sqlstring;
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted concepts in ' || curRecord.sqltext,0,stepCt,'Done');
+            
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''provider_id'', ''provider_dimension'', ''provider_path'', ''' || path || '''  , '||jobID||')';
+            execute v_sqlstring;
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted providers in ' || curRecord.sqltext,0,stepCt,'Done');
+            
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''modifier_cd'', ''modifier_dimension'', ''modifier_path'', ''' || path || '''  , '||jobID||')';
+            execute v_sqlstring;
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted modifiers in ' || curRecord.sqltext,0,stepCt,'Done');
+
+--	    execute 'update i2b2metadata.table_access set c_totalnum=(select c_totalnum from ' || curRecord.sqltext || ' x where x.c_fullname=table_access.c_fullname)';
+        END IF;
+
+    END LOOP;
 
     begin
 --    for tExplain in
@@ -130,11 +180,11 @@ begin
 	   set c_visualattributes = substr(c_visualattributes,1,1) || 'H' || substr(c_visualattributes,3,1)
 	 where c_fullname like path || '%' escape '`'
 	       and (not exists
-		    (select 1 from i2b2demodata.concept_counts nc
+		    (select 1 from i2b2metadata.tm_concept_counts nc
 		      where c_fullname = nc.concept_path)
 		      or
 		      exists
-		      (select 1 from i2b2demodata.concept_counts zc
+		      (select 1 from i2b2metadata.tm_concept_counts zc
 			where c_fullname = zc.concept_path
 			  and zc.patient_count = 0)
 	       )
@@ -155,18 +205,39 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Nodes hidden with missing/zero counts for trial in I2B2DEMODATA concept_counts',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Nodes hidden with missing/zero counts for trial in I2B2METADATA tm_concept_counts',rowCt,stepCt,'Done');
 
-    raise NOTICE 'Hidden % nodes with missing/zero counts for trial in I2B2DEMODATA concept_counts', rowCt;
+    --    update i2b2metadata.table_access set c_totalnum=null where c_totalnum=0;
 
-    ---Cleanup OVERALL JOB if this proc is being run standalone
-    if newJobFlag = 1 then
-	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
-    end if;
+    -- tables populated in i2b2_pat_count_visits
+    stepCt := stepCt + 1;
+    select count(*) from tm_cz.temp_ont_pat_visit_dims into rowCt;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Visit table temp_ont_pat_visit_dims rows:',rowCt,stepCt,'Done');
+
+    -- tables populated in i2b2_pat_count_dimensions
+    stepCt := stepCt + 1;
+    select count(*) from tm_cz.temp_dim_count_ont into rowCt;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Table temp_dim_count_ont rows:',rowCt,stepCt,'Done');
+    stepCt := stepCt + 1;
+    select count(*) from tm_cz.temp_dim_ont_with_folders into rowCt;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Table temp_dim_ont_with_folders rows:',rowCt,stepCt,'Done');
+    stepCt := stepCt + 1;
+    select count(*) from tm_cz.temp_path_to_num into rowCt;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Table temp_path_to_num rows:',rowCt,stepCt,'Done');
+    stepCt := stepCt + 1;
+    select count(*) from tm_cz.temp_concept_path into rowCt;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Table temp_concept_path rows:',rowCt,stepCt,'Done');
+    stepCt := stepCt + 1;
+    select count(*) from tm_cz.temp_path_counts into rowCt;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Table temp_path_counts rows:',rowCt,stepCt,'Done');
+    stepCt := stepCt + 1;
+    select count(*) from tm_cz.temp_final_counts_by_concept into rowCt;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Table temp_final_counts_by_concept rows:',rowCt,stepCt,'Done');
+
 
     return 1;
 
-end;
-
-$$;
-
+end; 
+$$
+  VOLATILE
+  COST 100;

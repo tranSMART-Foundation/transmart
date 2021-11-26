@@ -61,10 +61,10 @@ begin
 
     if old_node != ''  and old_node != '%' and new_node != ''  and new_node != '%' then
 
-	--  Update concept_counts paths
+	--  Update tm_concept_counts paths
 
 	begin
-	    update i2b2demodata.concept_counts cc
+	    update i2b2metadata.tm_concept_counts cc
 	       set concept_path = replace(cc.concept_path, '\' || old_node || '\', '\' || new_node || '\')
 		   ,parent_concept_path = replace(cc.parent_concept_path, '\' || old_node || '\', '\' || new_node || '\')
 	     where cc.concept_path in
@@ -85,7 +85,7 @@ begin
 	end;
 
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_counts with new path',rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update tm_concept_counts with new path',rowCt,stepCt,'Done');
 
 	--Update path in i2b2_tags
 	begin

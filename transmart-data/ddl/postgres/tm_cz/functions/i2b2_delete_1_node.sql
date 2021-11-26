@@ -123,9 +123,9 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from i2b2_secure',rowCt,stepCt,'Done');
 
-    --concept_counts
+    -- tm_concept_counts
     begin
-	delete from i2b2demodata.concept_counts
+	delete from i2b2metadata.tm_concept_counts
 	 where concept_path = path;
     exception
 	when others then
@@ -139,7 +139,7 @@ begin
 	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from concept_counts',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data from tm_concept_counts',rowCt,stepCt,'Done');
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_delete_1_node',rowCt,stepCt,'Done');
