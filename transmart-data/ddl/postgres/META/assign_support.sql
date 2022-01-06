@@ -10,20 +10,40 @@ BEGIN
     -- Make sure we have array_accum aggregate
     SELECT proname
       INTO dummy
-      FROM
-              pg_proc p
-              JOIN pg_namespace n ON (p.pronamespace = n.oid)
-     WHERE
-        n.nspname = 'public'
-    AND proname = 'array_accum'
-    AND proargtypes = ARRAY[2283]::oidvector; --oid for anyelement
+      FROM pg_proc p
+      JOIN pg_namespace n
+      ON (p.pronamespace = n.oid)
+      WHERE n.nspname = 'public'
+      AND proname = 'array_accum'
+      AND proargtypes = ARRAY[2283]::oidvector; --oid for anyelement
 
     IF NOT FOUND THEN
-        CREATE AGGREGATE public.array_accum(anyelement) (
-            sfunc = array_append,
-            stype = anyarray,
-            initcond = '{}'
-        );
+	-- Next question - are we on Postgres 14
+	-- where array_append is incompatible with earlier versions?
+	SELECT pg_get_function_arguments(n.oid)
+	INTO dummy
+	FROM pg_proc p
+        JOIN pg_namespace n
+	ON (p.pronamespace = n.oid)
+	WHERE n.nspname = 'pg_catalog'
+	AND proname = 'array_append'
+	AND proargtypes = ARRAY[5078,5077]::oidvector; 
+	IF FOUND THEN
+	    -- Postgres 14
+	    raise notice 'Dummy %', dummy;
+	    CREATE AGGREGATE public.array_accum(anycompatible) (
+		sfunc = array_append,
+		stype = anycompatiblearray,
+		initcond = '{}'
+	    );
+        ELSE
+            -- Postgres up to 13
+	    CREATE AGGREGATE public.array_accum(anyelement) (
+		sfunc = array_append,
+		stype = anyarray,
+		initcond = '{}'
+	    );
+	END IF;
     END IF;
 
     -- Ensure biomart_write_tables exists
