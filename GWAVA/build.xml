@@ -118,7 +118,7 @@
     </taskdef>
 
 
-    <!--unsing Macro	-->
+    <!--unsign Macro	-->
     <macrodef name="unsignjar">
 
         <attribute name="jar"/>
