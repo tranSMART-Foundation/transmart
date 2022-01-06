@@ -4,14 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.sanofi.fcl4transmart</groupId>
   <artifactId>eclipse-repository</artifactId>
-  <version>1.4.3</version>
+  <version>19.1.0</version>
   <packaging>eclipse-repository</packaging>
   <name>fcl4transmart RCP</name>
 
   <parent>
     <groupId>fr.sanofi.fcl4transmart</groupId>
     <artifactId>code</artifactId>
-    <version>1.4.3</version>
+    <version>19.1.0</version>
     <relativePath>..</relativePath>
   </parent>
 

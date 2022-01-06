@@ -2,7 +2,7 @@
 <feature
       id="fr.sanofi.fcl4transmart.feature"
       label="Feature"
-      version="1.4.3">
+      version="19.1.0">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]

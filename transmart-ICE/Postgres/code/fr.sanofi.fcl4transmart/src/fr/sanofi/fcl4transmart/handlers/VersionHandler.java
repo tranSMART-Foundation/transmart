@@ -43,13 +43,13 @@ public class VersionHandler {
         gridData.widthHint=880;
         gridData.grabExcessHorizontalSpace = true;
         label2.setLayoutData(gridData);
-        label2.setText("Version 1.4.3\n"+
+        label2.setText("Version 19.1.0\n"+
                        "\n"+
                        "This version has been tested with tranSMART version 1.2.5, with Java Runtime Environment 1.7.\n"+
                        "\n"+
                        "This application has been developed by Sanofi-Aventis Recherche et Developpement, and is distributed under GNU General Public License version 3."+
                        "\n\n"+
-                       "Framework of Curation and Loading for tranSMART - Version 1.4.3\n"+  
+                       "Framework of Curation and Loading for tranSMART - Version 19.1.0\n"+  
                        "Copyright (C) 2012 Sanofi-Aventis Recherche et Developpement\n\n"+
                        "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n"+
                        "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n"+

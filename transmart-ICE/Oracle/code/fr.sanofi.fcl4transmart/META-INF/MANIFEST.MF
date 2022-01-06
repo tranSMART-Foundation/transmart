@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: fcl4transmart
 Bundle-SymbolicName: fr.sanofi.fcl4transmart;singleton:=true
-Bundle-Version: 1.4.3
+Bundle-Version: 19.1
 Bundle-Vendor: Sanofi
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.eclipse.core.runtime;version="3.4.0",
@@ -119,7 +119,7 @@ Bundle-ClassPath: lib/commons/commons-beanutils-1.8.0.jar,
  lib/rules/drools-core-5.0.1.jar,
  lib/rules/mvel2-2.0.10.jar,
  lib/proxy-vole_20120920.jar,
- lib/ojdbc6.jar,
+ lib/ojdbc8-21.1.0.0.jar,
  lib/pentaho/libbase-1.2.8.jar,
  lib/pentaho/pentaho-metadata-3.4.6.jar,
  lib/pentaho/pentaho-vfs-browser-2.0.5.jar,
@@ -127,8 +127,8 @@ Bundle-ClassPath: lib/commons/commons-beanutils-1.8.0.jar,
  lib/pentaho/pentaho-xul-swt-3.3.5.jar,
  lib/antlr-3.4-complete.jar,
  lib/edtftpj-2.1.0.jar,
- lib/log4j-1.2.16.jar,
+ lib/log4j-core-2.16.0.16.jar,
  lib/mail-1.4.1.jar,
- lib/slf4j-api-1.6.1.jar,
- lib/slf4j-log4j12-1.6.1.jar,
+ lib/slf4j-api-1.7.32.jar,
+ lib/slf4j-log4j12-1.7.32.jar,
  lib/xercesImpl-2.9.1.jar

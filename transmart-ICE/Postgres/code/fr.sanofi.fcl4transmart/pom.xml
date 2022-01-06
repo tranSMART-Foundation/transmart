@@ -5,11 +5,11 @@
   <parent>
     <groupId>fr.sanofi.fcl4transmart</groupId>
     <artifactId>code</artifactId>
-    <version>1.4.3</version>
+    <version>19.1.0</version>
     <relativePath>..</relativePath>
   </parent>
   <groupId>fr.sanofi.fcl4transmart</groupId>
   <artifactId>fr.sanofi.fcl4transmart</artifactId>
-  <version>1.4.3</version>
+  <version>19.1.0</version>
   <packaging>eclipse-plugin</packaging>
 </project>

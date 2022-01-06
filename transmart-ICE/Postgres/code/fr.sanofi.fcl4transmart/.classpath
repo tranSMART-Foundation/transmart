@@ -39,7 +39,8 @@
 	<classpathentry kind="lib" path="lib/jxl.jar"/>
 	<classpathentry kind="lib" path="lib/jzlib-1.0.7.jar"/>
 	<classpathentry kind="lib" path="lib/livetribe-jsr223-2.0.6.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-core-2.16.0.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2-api-2.16.0.jar"/>
 	<classpathentry kind="lib" path="lib/odfdom.jar"/>
 	<classpathentry kind="lib" path="lib/ognl-2.6.9.jar"/>
 	<classpathentry kind="lib" path="lib/opencsv-2.3.jar"/>
