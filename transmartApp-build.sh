@@ -62,7 +62,7 @@ build="war"
 buildb=""
 buildc=""
 
-usagelist="war all api shared legacy fractalis das dalliance core coretests mydas java biomart search rest custom folder rmodules auth ipa smartr galaxy metacore xnatimport xnatviewer gwas plink gnome i2b2core i2b2 workspace"
+usagelist="war all api shared legacy fractalis das dalliance core coretests mydas java biomart search rest custom folder rmodules auth ipa smartr galaxy metacore xnatimport xnatviewer gwas plink gnome i2b2core i2b2 workspace gwava"
 
 if  [ "$1" != "" ] ; then
     arg="$1"
@@ -1485,8 +1485,9 @@ if [ $buildwar == 1 ] ; then
     fi
 
     ./grailsw --stacktrace --verbose war            > $OUT/$PREFIX-$DIR.out 2>&1
+    ./grailsw refresh-dependencies dependencies.xml> $OUT/$PREFIX-dependencies.out 2>&1
 
-    egrep -v '(warning[.]gif|error[.]gif|errors[.]css|Warnings[.][a-z]*)$' $OUT/$PREFIX-$DIR.out | egrep -i 'error[^-]|warning|fail'
+    egrep -v '(warning(-[a-f0-9]*)?[.]gif|error(-[a-f0-9]*)?[.]gif|errors(-[a-f0-9]*)?[.]css|workflowWarnings(-[a-f0-9]*)?[.][a-z]*([.][a-z]*)?)$|^[0-9] warnings?|^warning: Implicitly compiled' $OUT/$PREFIX-$DIR.out | egrep -i 'error[^-]|warning|fail'
 
     cd ..
 
