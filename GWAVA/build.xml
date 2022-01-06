@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- This is version 19.0 -->
+<!-- This is version 19.0.1 -->
 
 <project name="ManhattanViz" default="run" basedir=".">
     <description>
@@ -118,7 +118,7 @@
     </taskdef>
 
 
-    <!--unsing Macro	-->
+    <!--unsign Macro	-->
     <macrodef name="unsignjar">
 
         <attribute name="jar"/>

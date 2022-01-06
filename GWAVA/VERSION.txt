@@ -1,7 +1,7 @@
 This repository is part of the tranSMART Foundation's release of 
 transmartApp and the accompanying projects.
 
-VERSION: 19.0
+VERSION: 19.0.1
 
 (The version number is also annotated in
 web-app/index.html and in comments in build.xml)
