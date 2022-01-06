@@ -1,4 +1,6 @@
 # Kettle (Pentaho data integration community edition) 07-sep-20
+#KETTLE_VERSION=9.2
+#KETTLE_ZIP=9.2.0.0-290
 KETTLE_VERSION=9.1
 KETTLE_ZIP=9.1.0.0-324
 
@@ -156,8 +158,10 @@ transmart-etl-release-19.1.zip:
 
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 
+# Note kettle to 9.1 had a space in the directory, 9.2 has a dash
 KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip 
 $(KETTLE_ARCHIVE):
+#	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho-$(KETTLE_VERSION)/client-tools/$@" > $@
 	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
 ## Updated for 9.1: Pentaho no longer has libext directory
