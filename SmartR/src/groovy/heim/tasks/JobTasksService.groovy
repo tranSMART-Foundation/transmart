@@ -3,6 +3,7 @@ package heim.tasks
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
 import com.google.common.util.concurrent.SettableFuture
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
@@ -20,6 +21,7 @@ import java.lang.reflect.UndeclaredThrowableException
 import java.util.concurrent.Callable
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executor
 
 /**
  * Created by glopes on 09-10-2015.
@@ -95,7 +97,6 @@ class JobTasksService implements DisposableBean {
 
         def publicFuture = new SettableFuture<TaskResult>()
         publicFutures[task.uuid] = publicFuture
-
         Futures.addCallback(future, new FutureCallback<TaskResult>() {
             void onSuccess(TaskResult taskResult1) {
                 assert taskResult1 != null :
@@ -115,7 +116,7 @@ class JobTasksService implements DisposableBean {
                     thrown = thrown.undeclaredThrowable
                 }
                 if (thrown instanceof CancellationException) {
-                    logger.debug('Task ' + task + ' was cancelled')
+                    logger.debug('Task ' + task + ' was canceled')
                 }
                 else {
                     logger.debug 'Task ' + task + ' terminated by throwing', thrown
@@ -143,7 +144,7 @@ class JobTasksService implements DisposableBean {
                 sessionService.touchSession(sessionId) // should not throw
                 logger.info 'Task ' + task + ' finished. Final result: ' + result
             }
-        }) // run on the same thread
+        }, MoreExecutors.directExecutor()) // run on the same thread
     }
 
     ListenableFuture<TaskResult> getTaskResultFuture(UUID taskId) {
