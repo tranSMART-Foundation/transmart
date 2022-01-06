@@ -1,8 +1,8 @@
 --
 -- Name: median(anyelement); Type: AGGREGATE; Schema: tm_cz; Owner: -
 --
-CREATE AGGREGATE median(anyelement) (
-    SFUNC = array_append,
+CREATE AGGREGATE median(anyarray) (
+    SFUNC = array_larger,
     STYPE = anyarray,
     INITCOND = '{}',
     FINALFUNC = tm_cz._final_median
