@@ -26,10 +26,12 @@ import org.junit.rules.ExpectedException
 import org.transmartproject.core.dataquery.Patient
 import org.transmartproject.core.exceptions.InvalidRequestException
 import org.transmartproject.core.exceptions.NoSuchResourceException
+import org.transmartproject.core.querytool.ConstraintByValue
+import org.transmartproject.core.querytool.Item
+import org.transmartproject.core.querytool.Panel
 import org.transmartproject.core.querytool.QueriesResource
 import org.transmartproject.core.querytool.QueryDefinition
 import org.transmartproject.core.querytool.QueryResult
-import org.transmartproject.core.querytool.QueryResultData
 import org.transmartproject.core.querytool.QueryStatus
 import org.transmartproject.db.i2b2data.ConceptDimension
 import org.transmartproject.db.i2b2data.ObservationFact
@@ -45,6 +47,8 @@ import static org.transmartproject.core.querytool.ConstraintByValue.ValueType.FL
 import static org.transmartproject.core.querytool.ConstraintByValue.ValueType.NUMBER
 import static org.transmartproject.db.ontology.ConceptTestData.addI2b2
 import static org.transmartproject.db.ontology.ConceptTestData.addTableAccess
+import static org.transmartproject.db.querytool.QueryResultData.createQueryResult
+import static org.transmartproject.db.querytool.QueryResultData.getQueryResultFromMaster
 
 @TestMixin(RuleBasedIntegrationTestMixin)
 class QueriesResourceServiceTests {

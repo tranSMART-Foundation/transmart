@@ -23,6 +23,7 @@ import groovy.util.logging.Slf4j
 import org.transmartproject.db.AbstractTestData
 import org.transmartproject.db.TestDataHelper
 import org.transmartproject.db.i2b2data.ConceptDimension
+import org.transmartproject.db.i2b2data.TmTrialNodes
 
 @Slf4j('logger')
 class ConceptTestData extends AbstractTestData {
@@ -59,6 +60,7 @@ class ConceptTestData extends AbstractTestData {
 '''
 
 	List<TableAccess> tableAccesses
+	List<TmTrialNodes> tmTrialNodes
 	List<I2b2> i2b2List
 	List<I2b2Tag> i2b2TagsList
 	List<ConceptDimension> conceptDimensions
@@ -67,6 +69,11 @@ class ConceptTestData extends AbstractTestData {
 
 		List<TableAccess> tableAccesses = []
 		tableAccesses << createTableAccess(level: 0, fullName: '\\foo\\', name: 'foo', tableCode: 'i2b2 main', tableName: 'i2b2')
+
+		List<TmTrialNodes> tmTrialNodes = []
+		tmTrialNodes << createTrialNodes(fullName: '\\foo\\study1\\', trial: 'STUDY_ID_1')
+		tmTrialNodes << createTrialNodes(fullName: '\\foo\\study2\\', trial: 'STUDY_ID_2')
+		tmTrialNodes << createTrialNodes(fullName: '\\foo\\study3\\', trial: 'STUDY_ID_3')
 
 		List<I2b2> i2b2List = []
 		i2b2List << createI2b2Concept(code: -1, level: 0, fullName: '\\foo\\',
@@ -102,6 +109,7 @@ class ConceptTestData extends AbstractTestData {
 
 		new ConceptTestData(
 				tableAccesses: tableAccesses,
+				tmTrialNodes: tmTrialNodes,
 				i2b2List: i2b2List,
 				conceptDimensions: conceptDimensions,
 				i2b2TagsList: i2b2Tags)
@@ -109,6 +117,7 @@ class ConceptTestData extends AbstractTestData {
 
 	void saveAll() {
 		saveAll tableAccesses, logger
+		saveAll tmTrialNodes, logger
 		saveAll i2b2List, logger
 		saveAll i2b2TagsList, logger
 		saveAll conceptDimensions, logger
@@ -169,6 +178,16 @@ class ConceptTestData extends AbstractTestData {
 
 	static addTableAccess(Map properties) {
 		save createTableAccess(properties), logger
+	}
+
+	static TmTrialNodes createTrialNodes(Map properties) {
+		TmTrialNodes tmTrialNodes = new TmTrialNodes()
+		tmTrialNodes.properties = properties
+		tmTrialNodes
+	}
+
+	static addTrialNodes(Map properties) {
+		save createTrialNodes(properties), logger
 	}
 
 	static List<I2b2> createMultipleI2B2(int count, String basePath = '\\test',

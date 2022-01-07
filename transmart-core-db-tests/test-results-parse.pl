@@ -15,3 +15,7 @@ while (<IN>) {
 }
 
 close IN;
+
+if($unitFail){
+    print "Unit tests failed $unitFail out of $unitDone\n";
+}

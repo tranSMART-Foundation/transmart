@@ -78,12 +78,12 @@ class HighDimensionDataTypeResourceTests {
 
         QueryResult result = queriesResourceService.runQuery(definition)
 
-//	assertThat result, allOf(isA(QueryResult))
+	assertThat result, allOf(isA(QueryResult))
 
         def ontologyTerms = resource.getAllOntologyTermsForDataTypeBy(result)
 
         assertThat ontologyTerms, allOf(
-//	    isA(LinkedHashSet),
+	    isA(LinkedHashSet),
             hasSize(1),
             contains(
                 hasProperty('key', equalTo(i2b2Node.key.toString()))
