@@ -181,6 +181,9 @@ function createPanelItemNew(panel, concept, hideUpdateMenuItems)
     //Find out the icon (this is a copy&paste from getTreeFromJSON
     var iconCls = false
 
+    if (concept.visualattributes.indexOf('EDITABLE') != -1) {
+	iconCls = 'eleaficon';
+    }
     if (concept.oktousevalues != "N") {
 	iconCls = "valueicon";
     }
@@ -193,9 +196,6 @@ function createPanelItemNew(panel, concept, hideUpdateMenuItems)
     }
     if (concept.visualattributes.indexOf('HIGH_DIMENSIONAL') != -1) {
 	iconCls = 'hleaficon';
-    }
-    if (concept.visualattributes.indexOf('EDITABLE') != -1) {
-	iconCls = 'eleaficon';
     }
     if (concept.visualattributes.indexOf('PROGRAM') != '-1') {
 	iconCls = "programicon";
