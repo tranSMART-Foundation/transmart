@@ -1,6 +1,6 @@
 package heim.session
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.beans.BeansException
 import org.springframework.beans.factory.ObjectFactory
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 /**
  * Managed the @SessionScope scope. Object storage is the session itself.
  */
-@Log4j
+@Slf4j('logger')
 @Component
 class SmartRSessionSpringScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
