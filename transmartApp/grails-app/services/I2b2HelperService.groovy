@@ -411,7 +411,7 @@ class I2b2HelperService implements InitializingBean {
         }
         else {
 	    String path = keyToPath(conceptKey)
-	    String sql = 'select * from I2B2DEMODATA.CONCEPT_COUNTS where parent_concept_path = ?'
+	    String sql = 'select * from I2B2METADATA.TM_CONCEPT_COUNTS where parent_concept_path = ?'
 
 	    logger.info 'getChildrenWithPatientCountsForConcept sql {}', sql
 

@@ -21,12 +21,12 @@ class DeleteConceptCountsTasklet extends GenericTableUpdateTasklet {
 
     final String sql = """
         DELETE
-        FROM i2b2demodata.concept_counts
+        FROM i2b2metadata.tm_concept_counts
         WHERE concept_path LIKE ? ESCAPE '\\'"""
 
     @Override
     RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        log.info("About to delete concept counts with base node $basePath")
+        log.info("About to delete tm_concept counts with base node $basePath")
         super.execute(contribution, chunkContext)
     }
 
