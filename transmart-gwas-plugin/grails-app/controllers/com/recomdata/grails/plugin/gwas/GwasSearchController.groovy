@@ -124,7 +124,8 @@ class GwasSearchController {
     <jar href="./lib/jersey-core-1.4.jar"/>
     <jar href="./lib/jgoodies-common-1.3.1.jar"/>
     <jar href="./lib/jgoodies-looks-2.5.1.jar"/>
-    <jar href="./lib/log4j-1.2.17.jar"/>
+    <jar href="./lib/log4j-core-2.17.1.jar"/>
+    <jar href="./lib/log4j-1.2-api-2.17.1.jar"/>
     <jar href="$webstartJar"/>
 
     <property name="jsessionid" value="$session.id" />
