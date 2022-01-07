@@ -10,7 +10,7 @@ CREATE TABLE temp_dim_count_ont (
 --
 -- Name: dimCountOntA; Type: INDEX; Schema: tm_cz; Owner: -
 --
-CREATE INDEX dimCountOntA ON temp_dim_count_ont using spgist (c_fullname);
+CREATE INDEX dimCountOntA ON temp_dim_count_ont(c_fullname);
 
 --
 -- Name: dimCountOntA; Type: INDEX; Schema: tm_cz; Owner: -
