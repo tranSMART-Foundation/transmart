@@ -1,8 +1,6 @@
 # Kettle (Pentaho data integration community edition) 07-sep-20
-#KETTLE_VERSION=9.2
-#KETTLE_ZIP=9.2.0.0-290
-KETTLE_VERSION=9.1
-KETTLE_ZIP=9.1.0.0-324
+KETTLE_VERSION=9.2
+KETTLE_ZIP=9.2.0.0-290
 
 TRANSMART_RELEASE_BRANCH=release-19.1
 
@@ -161,8 +159,8 @@ transmart-etl-release-19.1.zip:
 # Note kettle to 9.1 had a space in the directory, 9.2 has a dash
 KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip 
 $(KETTLE_ARCHIVE):
-#	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho-$(KETTLE_VERSION)/client-tools/$@" > $@
-	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
+	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho-$(KETTLE_VERSION)/client-tools/$@" > $@
+#	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
 ## Updated for 9.1: Pentaho no longer has libext directory
 KETTLE_ORACLE_DRIVER=data-integration/lib/$(JDBC_DRIVER_ORA)
@@ -173,12 +171,14 @@ data-integration-oracle: data-integration/.keep $(KETTLE_ORACLE_DRIVER)
 .PHONY: data-integration-oracle
 data-integration-oracle/.keep: $(KETTLE_ARCHIVE)
 	unzip -q $<
+	sed -i'' 's/log4j2.rootLogger.level = INFO/log4j2.rootLogger.level = WARN/g' data-integration/system/karaf/etc/org.ops4j.pax.logging.cfg
 	touch '$@'
 
 data-integration: data-integration/.keep
 .PHONY: data-integration
 data-integration/.keep: $(KETTLE_ARCHIVE)
 	unzip -q $<
+	sed -i'' 's/log4j2.rootLogger.level.*INFO/log4j2.rootLogger.level = WARN # updated for tranSMART/g' data-integration/system/karaf/etc/org.ops4j.pax.logging.cfg
 	touch '$@'
 
 /var/lib/postgresql/tablespaces:

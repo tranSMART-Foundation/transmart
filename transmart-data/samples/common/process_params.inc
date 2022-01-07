@@ -1,3 +1,8 @@
+# set loglevel for kitchen.sh to WARN to remove multiple messages from jetty
+# INFO messages from karaf removed by updating data-integration/system/karaf/etc/org.ops4j.pax.logging.cfg
+# log4j2.rootLogger.level = WARN
+export JAVA_TOOL_OPTIONS="-Dorg.eclipse.jetty.LEVEL=WARN $JAVA_TOOL_OPTIONS"	# oej* log messages
+
 # Expand UPLOAD_SCRIPTS_DIRECTORY - may be simply '.' and we change directory below
 UPLOAD_SCRIPTS_DIRECTORY=$( cd "$( dirname "$UPLOAD_SCRIPTS_DIRECTORY" )" && echo "$(pwd)" )
 
