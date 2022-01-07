@@ -19,6 +19,7 @@
 
 package org.transmartproject.db.ontology
 
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.exceptions.NoSuchResourceException
 import org.transmartproject.core.ontology.ConceptsResource
@@ -28,6 +29,7 @@ import org.transmartproject.core.ontology.OntologyTerm
  * Handles loading {@link OntologyTerm}s from <code>table_access</code> and
  * related tables.
  */
+@Slf4j('logger')
 class DefaultConceptsResource implements ConceptsResource {
 
     List<OntologyTerm> getAllCategories() {
@@ -40,11 +42,10 @@ class DefaultConceptsResource implements ConceptsResource {
 	if (!domainClass) {
 	    throw new NoSuchResourceException("Unknown or unmapped table code: $ck.tableCode")
 	}
-
 	OntologyTerm result = domainClass.findByFullNameAndCSynonymCd(ck.conceptFullName.toString(), 'N' as Character)
         if (!result) {
 	    throw new NoSuchResourceException('No non-synonym concept with fullName "' +
-					      ck.conceptFullName + '" found for type ' + domainClass.name)
+					      ck.conceptFullName.toString() + '" found for type ' + domainClass.name)
         }
 	result.tableCode = ck.tableCode
         result
