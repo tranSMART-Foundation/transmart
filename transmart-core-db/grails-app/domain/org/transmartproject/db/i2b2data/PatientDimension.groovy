@@ -89,10 +89,26 @@ class PatientDimension implements Patient {
         sourcesystemCd?.split(/:/, 2)[0]
     }
 
+    String getTrialI2b2() {
+	if(!sourcesystemCd.contains(':'))
+	    return 'i2b2'
+
+        sourcesystemCd?.split(/:/, 2)[0]
+    }
+
     String getInTrialId() {
         if (sourcesystemCd == null) {
             return null
         }
+        (sourcesystemCd.split(/:/, 2) as List)[1] /* cast to avoid exception */
+    }
+
+    String getInTrialIdI2b2() {
+        if (sourcesystemCd == null) {
+            return null
+        }
+//	if(!sourcesystemCd.contains(':')) //second part of sourcesystemCd after trialid;
+//	    return 'i2b2'                 //maybe null is the best answer
         (sourcesystemCd.split(/:/, 2) as List)[1] /* cast to avoid exception */
     }
 
