@@ -250,7 +250,7 @@ class Loader {
 	    logger.info "Skip loading records into TM_CONCEPT_COUNTS table ..."
 	}else{
 	    logger.info "Start loading records into TM_CONCEPT_COUNTS table ..."
-	    ConceptCounts cc = new TmConceptCounts()
+	    TmConceptCounts cc = new TmConceptCounts()
 	    cc.setI2b2metadata(i2b2metadata)
 	    cc.setPlatform(props.get("platform_name"))
 	    cc.setBasePath(props.get("snp_base_node") + "/")
