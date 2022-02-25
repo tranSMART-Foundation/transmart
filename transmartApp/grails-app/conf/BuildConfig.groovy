@@ -98,6 +98,7 @@ grails.project.dependency.resolution = {
     }
 
     dependencies {
+	compile 'org.codenarc:CodeNarc:0.21' // 2.2.0
 	compile 'axis:axis:1.4' // for GeneGo web services
 	compile 'com.google.guava:guava:30.1.1-jre'
 	compile 'commons-net:commons-net:3.3' // used for ftp transfers
@@ -138,8 +139,8 @@ grails.project.dependency.resolution = {
 	runtime 'xerces:xercesImpl:2.9.1'
 
 	// you can remove whichever you are not using
-	runtime 'org.postgresql:postgresql:42.2.24' // Java8+ 22-sep-21
-	runtime 'com.oracle.database.jdbc:ojdbc8:21.3.0.0' //Java 8+ 30-aug-21
+	runtime 'org.postgresql:postgresql:42.3.2' // Java8+ 02-feb-22
+	runtime 'com.oracle.database.jdbc:ojdbc8:21.4.0.0.1' //Java 8+ 30-dec-21
 
 	test 'org.gmock:gmock:0.9.0-r435-hyve2', { transitive = false }
 	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
@@ -168,7 +169,6 @@ grails.project.dependency.resolution = {
     plugins {
 	compile ':asset-pipeline:2.14.1.1'
 	compile ':cache-ehcache:1.0.5'
-	compile ':codenarc:0.21' // support for static code analysis - see codenarc.reports property below
 	compile ':hibernate:3.6.10.19'
 	compile ':quartz:1.0.2'
 	compile ':rest-client-builder:2.1.1'
