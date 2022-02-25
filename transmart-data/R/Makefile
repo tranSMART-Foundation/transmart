@@ -4,7 +4,7 @@ include ../makefile.inc
 # with RSERVE_USER defined as the user to run the server (e.g. tomcat8)
 
 R_MIRROR ?= http://cran.ma.imperial.ac.uk
-R_VERSION = 4.0.0
+R_VERSION = 4.1.2
 R_SOURCE = R-$(R_VERSION)
 R_PREFIX ?= $(realpath .)/root
 R_EXEC = $(R_PREFIX)/lib/R/bin/R
