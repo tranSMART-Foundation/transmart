@@ -1,13 +1,17 @@
 # Kettle (Pentaho data integration community edition) 07-sep-20
 KETTLE_VERSION=9.2
 KETTLE_ZIP=9.2.0.0-290
+KETTLE_HOST ?= http://downloads.sourceforge.net/project/pentaho
 
-TRANSMART_RELEASE_BRANCH=release-19.1
+TRANSMART_LIBRARY ?= http://library.transmartfoundation.org/release
+
+TRANSMART_RELEASE_BRANCH ?= release-19.1
+TRANSMART_RELEASE_DIR ?= release19_1_0
 
 UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
 				tar gfortran g++ unzip libreadline-dev \
 				libxt-dev libpango1.0-dev libprotoc-dev \
-				texlive-fonts-recommended tex-gyre liblz4-tool pv zip
+				texlive-fonts-recommended tex-gyre texlive-latex-extra liblz4-tool pv zip
 
 CENTOS7_PACKAGES=postgresql tomcat make git rsync \
 			gcc gcc-gfortran cpp gcc-c++ \
@@ -24,7 +28,7 @@ UBUNTU20_PACKAGES=php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
 
 # Latest version of groovy-binary for Java 8+ 
 
-GROOVY_VERSION=3.0.8
+GROOVY_VERSION=3.0.9
 
 ONDREJ_KEY=E5267A6C
 
@@ -146,21 +150,20 @@ update_repos = if [ ! -d $(1) ]; then \
 update_etl:
 	echo "for release build transmart-etl is not automatically updated from git, because it is assumed to be already loaded from a zip file"
 
-update_etl_git: transmart-etl-release-19.1.zip
-	test -d transmart-etl || unzip -qu transmart-etl-release-19.1.zip
-	test -d transmart-etl || mv transmart-etl-release-19.1 transmart-etl
+update_etl_git: transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip
+	test -d transmart-etl || unzip -qu transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip
+	test -d transmart-etl || mv transmart-etl-$(TRANSMART_RELEASE_BRANCH) transmart-etl
 
-transmart-etl-release-19.1.zip:
-	curl -L -f "http://library.transmartfoundation.org/beta/beta19_1_0_artifacts/transmart-etl-release-19.1.zip" > transmart-etl-release-19.1.zip
-#	curl -L -f "http://library.transmartfoundation.org/release/release19_1_0_artifacts/transmart-etl-release-19.1.zip" > transmart-etl-release-19.1.zip
+transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip:
+	curl -L -f "$(TRANSMART_LIBRARY)/$(TRANSMART_RELEASE_DIR)_artifacts/transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip" > transmart-etl-$(RTANSMART_RELEASE_BRANCH).zip
 
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 
-# Note kettle to 9.1 had a space in the directory, 9.2 has a dash
+# Note kettle to 9.0 had a space in the directory, 9.2 has a dash
 KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip 
 $(KETTLE_ARCHIVE):
-	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho-$(KETTLE_VERSION)/client-tools/$@" > $@
-#	curl -L -f "http://downloads.sourceforge.net/project/pentaho/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
+	curl -L -f "$(KETTLE_HOST)/Pentaho-$(KETTLE_VERSION)/client-tools/$@" > $@
+#	curl -L -f "$(KETTLE_HOST)/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
 ## Updated for 9.1: Pentaho no longer has libext directory
 KETTLE_ORACLE_DRIVER=data-integration/lib/$(JDBC_DRIVER_ORA)
