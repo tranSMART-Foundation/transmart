@@ -26,8 +26,8 @@ gpg --default-key ACC50501 --print-md MD5 transmart-batch-release-19.1.zip > tra
 gpg --default-key ACC50501 --print-md SHA1 transmart-batch-release-19.1.zip > transmart-batch-release-19.1.zip.sha
 
 gpg --default-key ACC50501 --armor --output transmart-etl-release-19.1.zip.sig --detach-sig transmart-etl-release-19.1.zip
-gpg --default-key ACC50501 --print-md MD5 transmart-etl-release-19.1.zip > tranSMART-ETL-release-19.1.zip.md5 
-gpg --default-key ACC50501 --print-md SHA1 transmart-etl-release-19.1.zip > tranSMART-ETL-release-19.1.zip.sha
+gpg --default-key ACC50501 --print-md MD5 transmart-etl-release-19.1.zip > transmart-etl-release-19.1.zip.md5 
+gpg --default-key ACC50501 --print-md SHA1 transmart-etl-release-19.1.zip > transmart-etl-release-19.1.zip.sha
 
 gpg --default-key ACC50501 --armor --output Scripts-release-19.1.zip.sig --detach-sig Scripts-release-19.1.zip
 gpg --default-key ACC50501 --print-md MD5 Scripts-release-19.1.zip > Scripts-release-19.1.zip.md5 
