@@ -153,13 +153,6 @@
 **/crashlytics.properties
 **/crashlytics-build.properties
 
-transmart-data/vars
-transmart-data/vars-*
-transmart-data/private-feeds
-
-transmart-batch/batchdb.properties
-transmart-batch/batgit add chdb-*.properties
-
 **/*.sublime-workspace
 **/.slcache
 **/cobertura.ser
