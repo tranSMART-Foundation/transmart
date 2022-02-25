@@ -110,12 +110,14 @@ TSUSER_HOME=$HOME/
 # }}}
 
 # If your distro uses an old version of groovy, do make -C env groovy,
-# Also if you use the ETL scripts with study.param as provided by the Cell-line use case
-# (depends on samples/postgres being in the PATH)
-# Uncomment these 2 lines. Groovy version 2.1.9 is known to work,
+# Groovy version 3.0.9 is known to work for the transmart-data scripts
 # Groovy versions before 2 are known not to work
-#DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-#export PATH=$DIR/env:$PATH:$DIR/samples/postgres
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PATH=$DIR/env:$PATH
+
+# Uncomment if you use the ETL scripts with study.param as provided by the Cell-line use case
+# (depends on samples/postgres being in the PATH)
+#export PATH=$PATH:$DIR/samples/postgres
 
 # To use transmart-batch where supported
 #export USE_TRANSMART_BATCH=1
