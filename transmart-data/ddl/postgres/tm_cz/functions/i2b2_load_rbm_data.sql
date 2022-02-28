@@ -1102,7 +1102,7 @@ begin
 	--	deletes hidden nodes for a trial one at a time
 
 	begin
-	    select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+	    select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname,jobId) into rtnCd;
 	    if(rtnCd <> 1) then
                 tText := 'Failed to delete node '|| r_delNodes.c_fullname;
                 perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');

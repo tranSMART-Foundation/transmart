@@ -136,6 +136,7 @@ begin
     begin
 	delete from tm_lz.lz_src_clinical_data
 	 where study_id = TrialID;
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -145,7 +146,6 @@ begin
 	--End Proc
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
-	    get diagnostics rowCt := ROW_COUNT;
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from lz_src_clinical_data',rowCt,stepCt,'Done');
@@ -185,6 +185,7 @@ begin
 --	    raise notice 'explain: %', tExplain;
 --	END LOOP
 	  ;
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -195,7 +196,6 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data into lz_src_clinical_data',rowCt,stepCt,'Done');
 
@@ -237,6 +237,7 @@ begin
 --	    raise notice 'explain: %', tExplain;
 --	END LOOP
 	  ;
+    get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -247,7 +248,6 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load lt_src_clinical_data to work table',rowCt,stepCt,'Done');
 
@@ -339,6 +339,7 @@ begin
     begin
 	delete from tm_wz.wrk_clinical_data
 	 where data_value is null;
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -349,7 +350,6 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete null data_values in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done');
 
@@ -361,6 +361,7 @@ begin
 	update tm_wz.wrk_clinical_data
 	   set data_value = replace(trim('|' from data_value), '|', '-')
 	 where data_value like '%|%';
+	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -371,7 +372,6 @@ begin
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
     end;
-    get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove pipes in data_value',rowCt,stepCt,'Done');
 
@@ -1223,7 +1223,7 @@ begin
 
 	--	deletes unused leaf nodes for a trial one at a time
 
-	select tm_cz.i2b2_delete_1_node(r_delUnusedLeaf.c_fullname) into rtnCd;
+	select tm_cz.i2b2_delete_1_node(r_delUnusedLeaf.c_fullname,jobId) into rtnCd;
 	stepCt := stepCt + 1;
 	if(rtnCd <> 1) then
 	    tText := 'Failed to delete node '|| r_delUnusedLeaf.c_fullname;
@@ -1599,6 +1599,15 @@ begin
 
     -- final procs
 
+    select tm_cz.load_tm_trial_nodes(TrialID,topNode,jobID,true) into rtnCd;
+
+    if(rtnCd <> 1) then
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
+        perform tm_cz.cz_end_audit (jobID, 'FAIL');
+        return -16;
+    end if;
+
     perform tm_cz.i2b2_create_concept_counts(TrialID, topNodeEscaped, jobID);
 
     --	delete each node that is hidden after create concept counts
@@ -1607,7 +1616,7 @@ begin
 
 	--	deletes hidden nodes for a trial one at a time
 
-	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname,jobId) into rtnCd;
 	stepCt := stepCt + 1;
 	if(rtnCd <> 1) then
 	    tText := 'Failed to delete node '|| r_delNodes.c_fullname;
@@ -1623,27 +1632,15 @@ begin
     perform tm_cz.i2b2_create_security_for_trial(TrialID, secureStudy, jobID);
     select tm_cz.i2b2_load_security_data(TrialID,jobID) into rtnCd;
 
-     if(rtnCd <> 1) then
+    if(rtnCd <> 1) then
        stepCt := stepCt + 1;
        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
     end if;
 
-   stepCt := stepCt + 1;
-   perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_clinical_data',0,stepCt,'Done');
-
-   select tm_cz.load_tm_trial_nodes(TrialID,topNode,jobID,true) into rtnCd;
-
-   if(rtnCd <> 1) then
-       stepCt := stepCt + 1;
-       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
-       perform tm_cz.cz_end_audit (jobID, 'FAIL');
-       return -16;
-   end if;
-
-   stepCt := stepCt + 1;
-   perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_clinical_data',0,stepCt,'Done');
+    stepCt := stepCt + 1;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_clinical_data',0,stepCt,'Done');
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then

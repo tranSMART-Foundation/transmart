@@ -1077,7 +1077,7 @@ BEGIN
 
 	--	deletes hidden nodes for a trial one at a time
 
-	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname,jobId) into rtnCd;
 	stepCt := stepCt + 1;
 	if(rtnCd <> 1) then
 	    tText := 'Failed to delete node '|| r_delNodes.c_fullname;

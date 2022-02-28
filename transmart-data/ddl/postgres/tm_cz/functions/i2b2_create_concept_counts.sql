@@ -39,7 +39,7 @@ AS $$
     tableName		character varying;
 
     topPath		character varying;
-    testPath		character varying;
+    testPath		character varying(700);
 begin
 
     tableName := '@';
@@ -68,15 +68,32 @@ begin
 	get diagnostics rowCt := ROW_COUNT;
 	if(rowCt < 1) then
 	    stepCt := stepCt + 1;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No path for trial '||trialid,rowCt,stepCt,'FAIL');
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No path defined for trial '||trialid,rowCt,stepCt,'FAIL');
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
 	    end if;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Found path '||path||' for trial '||trialid,rowCt,stepCt,'FAIL');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Found path '||path||' for trial '||trialid,rowCt,stepCt,'Done');
     elsif(trialid != 'I2B2') then
-	select c_fullname from i2b2metadata.tm_trial_nodes where trial = trialid into testPath;
-	get diagnostics rowCt := ROW_COUNT;
+	select count(*) from i2b2metadata.tm_trial_nodes into rowCt;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Count of all trial nodes', rowCt,stepCt,'Log');
+	select count(*) from i2b2metadata.tm_trial_nodes where trial = trialid into rowCt;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Count of trial nodes for trial '||trialid,rowCt,stepCt,'Log');
+	begin
+	    select c_fullname from i2b2metadata.tm_trial_nodes where trial = trialid into testPath;
+	    get diagnostics rowCt := ROW_COUNT;
+	exception
+	    when others then
+		errorNumber := SQLSTATE;
+		errorMessage := SQLERRM;
+	    --Handle errors.
+		perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    --End Proc
+		perform tm_cz.cz_end_audit (jobID, 'FAIL');
+		return -16;
+	end;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Testing tm_trial_nodes '||trialid,rowCt,stepCt,'Log');
+	testPath := replace(testPath, '_', '`_');
 	if(rowCt < 1) then
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No path for trial '||trialid,rowCt,stepCt,'FAIL');
@@ -89,7 +106,7 @@ begin
 	    return -16;
 	end if;
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Found path '||path||' for trial '||trialid,rowCt,stepCt,'FAIL');
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Found path '||path||' for trial '||trialid,rowCt,stepCt,'Done');
     end if;
     
     -- may need to replace \ to \\ and ' to '' in the path parameter

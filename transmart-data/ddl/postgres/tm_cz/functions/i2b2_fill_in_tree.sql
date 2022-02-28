@@ -40,11 +40,11 @@ AS $$
     rtnCd   integer;
 
     --Get the nodes
-    cNodes cursor for
-		      --Trimming off the last node as it would never need to be added.
-		      select distinct substr(c_fullname, 1,tm_cz.instr(c_fullname,'\',-2,1)) as c_fullname
-		      from i2b2metadata.i2b2
-		      where c_fullname like path || '%' escape '`';
+    --Trimming off the last node as it would never need to be added.
+    cNodes cursor is
+	       select distinct substr(c_fullname, 1,tm_cz.instr(c_fullname,'\',-2,1)) as c_fullname
+	       from i2b2metadata.i2b2
+	       where c_fullname like path || '%' escape '`';
 
 begin
     TrialID := upper(trial_id);

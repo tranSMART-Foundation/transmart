@@ -36,7 +36,7 @@ AS $$
     newJobFlag		integer;
     databaseName 	VARCHAR(100);
     procedureName 	VARCHAR(100);
-    jobID 			numeric(18,0);
+    jobId 			numeric(18,0);
     stepCt 			numeric(18,0);
     rowCt			numeric(18,0);
     errorNumber		character varying;
@@ -92,7 +92,7 @@ begin
     secureStudy := upper(secure_study);
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
-    jobID := currentJobID;
+    jobId := currentJobID;
 
     databaseName := 'tm_cz';
     procedureName := 'i2b2_extend_clinical_data';
@@ -100,9 +100,9 @@ begin
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
 
-    if(jobID IS NULL or jobID < 1) then
+    if(jobId IS NULL or jobId < 1) then
 	newJobFlag := 1; -- True
-	select tm_cz.cz_start_audit (procedureName, databaseName) into jobID;
+	select tm_cz.cz_start_audit (procedureName, databaseName) into jobId;
     end if;
 
     stepCt := 0;
@@ -125,8 +125,8 @@ begin
     if topLevel < 3 then
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path specified in top_node must contain at least 2 nodes',0,stepCt,'Done');
-	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
-	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_error_handler (jobId, procedureName, '-1', 'Application raised error');
+	perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	return -16;
     end if;
 
@@ -139,9 +139,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
 	    get diagnostics rowCt := ROW_COUNT;
     end;
@@ -182,9 +182,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     get diagnostics rowCt := ROW_COUNT;
@@ -228,9 +228,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     get diagnostics rowCt := ROW_COUNT;
@@ -273,7 +273,7 @@ begin
 	if(rtnCd <> 1) then
             tText := 'Failed to fill in tree '|| tPath;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
         end if;
     end if;
@@ -290,7 +290,7 @@ begin
 	if(rtnCd <> 1) then
             tText := 'Failed to add leaf node '|| topNode;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
         end if;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding top node for study',0,stepCt,'Done');
@@ -317,9 +317,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     get diagnostics rowCt := ROW_COUNT;
@@ -339,9 +339,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     get diagnostics rowCt := ROW_COUNT;
@@ -363,9 +363,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -383,9 +383,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -402,9 +402,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -426,9 +426,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -457,9 +457,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -482,9 +482,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -507,9 +507,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -528,9 +528,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -549,9 +549,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
 
@@ -569,9 +569,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -603,9 +603,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -640,9 +640,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -651,8 +651,8 @@ begin
     if rowCt > 0 then
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',rowCt,stepCt,'Done');
-	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
-	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_error_handler (jobId, procedureName, '-1', 'Application raised error');
+	perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	return -16;
     end if;
 
@@ -674,8 +674,8 @@ begin
     if pCount > 0 then
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Multiple visit names for category/label/value',0,stepCt,'Done');
-	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
-	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_error_handler (jobId, procedureName, '-1', 'Application raised error');
+	perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	return -16;
     end if;
 
@@ -694,9 +694,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -749,9 +749,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -768,9 +768,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -807,9 +807,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -838,8 +838,8 @@ begin
         stepCt := stepCt + 1;
         perform tm_cz.cz_write_audit(jobId,databaseName, procedureName,
 				    'You cannot overwrite existing observations when adding.', pExists, stepCt, 'Done');
-        perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
-        perform tm_cz.cz_end_audit (jobID, 'FAIL');
+        perform tm_cz.cz_error_handler (jobId, procedureName, '-1', 'Application raised error');
+        perform tm_cz.cz_end_audit (jobId, 'FAIL');
         return -16;
     end if;
 
@@ -858,8 +858,8 @@ begin
             stepCt := stepCt + 1;
             perform tm_cz.cz_write_audit(jobId,databaseName, procedureName,
 					'You cannot upload a different datatype for a concept already in the database.', pCount, stepCt, 'Error');
-            perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
-            perform tm_cz.cz_end_audit (jobID, 'FAIL');
+            perform tm_cz.cz_error_handler (jobId, procedureName, '-1', 'Application raised error');
+            perform tm_cz.cz_end_audit (jobId, 'FAIL');
             return -16;
 	end if;
     end;
@@ -898,9 +898,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -922,9 +922,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -960,9 +960,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -1026,9 +1026,9 @@ begin
 	    errorNumber := SQLSTATE;
 	    errorMessage := SQLERRM;
 	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
     end;
     stepCt := stepCt + 1;
@@ -1093,9 +1093,9 @@ begin
 		 errorNumber := SQLSTATE;
 		 errorMessage := SQLERRM;
 	     --Handle errors.
-		 perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+		 perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	     --End Proc
-		 perform tm_cz.cz_end_audit (jobID, 'FAIL');
+		 perform tm_cz.cz_end_audit (jobId, 'FAIL');
 		 return -16;
     end;
     stepCt := stepCt + 1;
@@ -1103,19 +1103,28 @@ begin
 
     -- final procs
 
-    select tm_cz.i2b2_fill_in_tree(TrialId, topNode, jobID) into rtnCd;
+    select tm_cz.i2b2_fill_in_tree(TrialId, topNode, jobId) into rtnCd;
     if(rtnCd <> 1) then
         stepCt := stepCt + 1;
         tText := 'Failed to fill in tree '|| r_addNodes.leaf_node;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
-	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	return -16;
     end if;
 
     --	set sourcesystem_cd, c_comment to null if any added upper-level nodes
 
 
-    perform tm_cz.i2b2_create_concept_counts(TrialID, topNode, jobID);
+    select tm_cz.load_tm_trial_nodes(TrialID,topNode,jobId,false) into rtnCd;
+
+    if(rtnCd <> 1) then
+       stepCt := stepCt + 1;
+       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
+       perform tm_cz.cz_end_audit (jobId, 'FAIL');
+       return -16;po
+    end if;
+
+    perform tm_cz.i2b2_create_concept_counts(TrialID, topNode, jobId);
 
     --	delete each node that is hidden after create concept counts
 
@@ -1123,12 +1132,12 @@ begin
 
 	--	deletes hidden nodes for a trial one at a time
 
-	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname) into rtnCd;
+	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname,jobId) into rtnCd;
 	stepCt := stepCt + 1;
 	if(rtnCd <> 1) then
 	    tText := 'Failed to delete node '|| r_delNodes.c_fullname;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	    return -16;
         end if;
 	tText := 'Deleted node: ' || r_delNodes.c_fullname;
@@ -1136,22 +1145,13 @@ begin
 
     end loop;
 
-    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
-    select tm_cz.i2b2_load_security_data(TrialID,jobID) into rtnCd;
+    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobId);
+    select tm_cz.i2b2_load_security_data(TrialID,jobId) into rtnCd;
     if(rtnCd <> 1) then
         stepCt := stepCt + 1;
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
-	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	return -16;
-    end if;
-
-    select tm_cz.load_tm_trial_nodes(TrialID,topNode,jobID,false) into rtnCd;
-
-    if(rtnCd <> 1) then
-       stepCt := stepCt + 1;
-       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
-       perform tm_cz.cz_end_audit (jobID, 'FAIL');
-       return -16;
     end if;
 
     stepCt := stepCt + 1;
@@ -1159,7 +1159,7 @@ begin
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
-	perform tm_cz.cz_end_audit (jobID, 'SUCCESS');
+	perform tm_cz.cz_end_audit (jobId, 'SUCCESS');
     end if;
 
     return 1;
@@ -1169,9 +1169,9 @@ exception
 	errorNumber := SQLSTATE;
 	errorMessage := SQLERRM;
 	--Handle errors.
-	perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+	perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
 	--End Proc
-	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	perform tm_cz.cz_end_audit (jobId, 'FAIL');
 	return -16;
 */
 

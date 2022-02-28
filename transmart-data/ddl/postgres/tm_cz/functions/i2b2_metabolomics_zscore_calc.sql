@@ -89,55 +89,6 @@ begin
 	end if;
     end if;
 
-    /*	remove Reload processing
-	--	For Reload, make sure that the TrialId passed as parameter has data in de_subject_metabolomics_data
-	--	If not, raise exception
-
-	if runType = 'R' then
-	select count(*) into idxExists
-	from deapp.de_subject_metabolomics_data
-	select sys_context('userenv', 'current_schema') INTO databaseName FROM dual;
-	procedureName := 'i2b2_metabolomics_zscore_calc';
-
-	--Audit JOB Initialization
-	--If Job ID does not exist, then this is a single procedure run and we need to create it
-	IF(jobID IS NULL or jobID < 1)
-	THEN
-	newJobFlag := 1; -- True
-	perform tm_cz.cz_start_audit (procedureName, databaseName, jobID);
-	END IF;
-
-	stepCt := 0;
-
-	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
-
-	if runType != 'L' then
-	stepCt := stepCt + 1;
-	get diagnostics rowCt := ROW_COUNT;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting',rowCt,stepCt,'Done');
-	--Handle errors.
-    	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-    	--End Proc
-    	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	return -16;
-	end if;
-
-	where trial_name = TrialId;
-
-	if idxExists = 0 then
-	stepCt := stepCt + 1;
-	get diagnostics rowCt := ROW_COUNT;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in de_subject_metabolomics_data - procedure exiting',rowCt,stepCt,'Done');
-	--Handle errors.
-    	perform tm_cz.cz_error_handler(jobId, procedureName, SQLSTATE, SQLERRM);
-    	--End Proc
-    	perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	return -16;
-	end if;
-	end if;
-     */
-
     --	truncate tmp tables
 
     execute('truncate table tm_wz.wt_subject_metabolomics_logs');
