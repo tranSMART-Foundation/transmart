@@ -9,14 +9,14 @@ JDBC_DRIVER_PSQL := postgresql-42.3.3.jar
 
 JDBC_DRIVER_PSQL_PATH := $(LIB_DIR)$(JDBC_DRIVER_PSQL)
 
-# Oracle driver 30-dec-21
+# Oracle driver 02-feb-22
 # https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc8
 # -------------------------------------------------------------------
 
-JDBC_DLO_ORA      := https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/21.4.0.0.1
-JDBC_DLX_ORA      := https://repo1.maven.org/maven2/com/oracle/database/xml/xdb/21.4.0.0.1
-JDBC_DRIVER_ORA  := ojdbc8-21.4.0.0.1.jar
-JDBC_XDB_ORA     := xdb-21.4.0.0.1.jar
+JDBC_DLO_ORA      := https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/21.5.0.0
+JDBC_DLX_ORA      := https://repo1.maven.org/maven2/com/oracle/database/xml/xdb/21.5.0.0
+JDBC_DRIVER_ORA  := ojdbc8-21.5.0.0.jar
+JDBC_XDB_ORA     := xdb-21.5.0.0.jar
 
 JDBC_DRIVER_ORA_PATH  := $(LIB_DIR)$(JDBC_DRIVER_ORA)
 JDBC_XDB_ORA_PATH     := $(LIB_DIR)$(JDBC_XDB_ORA)

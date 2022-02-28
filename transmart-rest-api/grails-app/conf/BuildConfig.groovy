@@ -74,8 +74,8 @@ grails.project.dependency.resolution = {
         compile 'com.google.protobuf:protobuf-java:2.5.0'
         compile 'org.transmartproject:transmart-core-api:' + tmVersion
 
-        runtime 'org.postgresql:postgresql:42.3.2', { export = false }
-        runtime 'com.oracle.database.jdbc:ojdbc8:21.4.0.0.1', { export = false }
+        runtime 'org.postgresql:postgresql:42.3.3', { export = false }
+        runtime 'com.oracle.database.jdbc:ojdbc8:21.5.0.0', { export = false }
 
 	// not included in 18.1 beta
 	compile 'org.javassist:javassist:3.16.1-GA'

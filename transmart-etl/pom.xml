@@ -195,8 +195,8 @@
 	</dependency>  
 <!--	<dependency>
 	  <groupId>ojdbc</groupId>
-	  <artifactId>ojdbc</artifactId>
-	  <version>14</version>
+	  <artifactId>${ojdbc.version}</artifactId>
+	  <version></version>
 	</dependency> -->
     </dependencies>
 
@@ -233,7 +233,7 @@
         <junit.version>4.13.2</junit.version>
         <groovy.version>2.4.5</groovy.version>
         <opencsv.version>2.3</opencsv.version>
-        <ojdbc.version>14</ojdbc.version>
+        <ojdbc.version>21.5.0.0</ojdbc.version>
         <postgresql.jdbc.version>42.3.3</postgresql.jdbc.version>
         <gmavenProviderSelection>2.0</gmavenProviderSelection>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

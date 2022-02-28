@@ -32,11 +32,11 @@ grails.project.dependency.resolution = {
         build 'org.apache.httpcomponents:httpclient:4.4.1'
 
 	// not included in 18.1 beta
-	runtime 'org.postgresql:postgresql:42.3.2', {
+	runtime 'org.postgresql:postgresql:42.3.3', {
             transitive = false
             export = false
         }
-        runtime 'com.oracle.database.jdbc:ojdbc8:21.4.0.0.1', {
+        runtime 'com.oracle.database.jdbc:ojdbc8:21.5.0.0', {
             transitive = false
             export = false
         }
