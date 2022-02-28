@@ -85,44 +85,6 @@ BEGIN
 	end if;
     end if;
 
-    /*	remove Reload processing
-	--	For Reload, make sure that the TrialId passed as parameter has data in de_subject_METABOLOMICS_data
-	--	If not, raise exception
-
-	if runType = 'R' then
-	select count(*) into idxExists
-	from deapp.de_subject_metabolomics_data
-	SELECT sys_context('USERENV', 'CURRENT_SCHEMA') INTO databaseName FROM dual;
-	procedureName := $$PLSQL_UNIT;
-
-	--Audit JOB Initialization
-	--If Job ID does not exist, then this is a single procedure run and we need to create it
-	IF(jobID IS NULL or jobID < 1) THEN
-	newJobFlag := 1; -- True
-	tm_cz.cz_start_audit (procedureName, databaseName, jobID);
-	END IF;
-
-	stepCt := 0;
-
-	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting zscore calc for ' || TrialId || ' RunType: ' || runType || ' dataType: ' || dataType,0,stepCt,'Done');
-
-	if runType != 'L' then
-	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Invalid runType passed - procedure exiting',SQL%ROWCOUNT,stepCt,'Done');
-	raise invalid_runType;
-	end if;
-
-	where trial_name = TrialId;
-
-	if idxExists = 0 then
-	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No data for TrialId in DE_SUBJECT_METABOLOMICS_DATA - procedure exiting',SQL%ROWCOUNT,stepCt,'Done');
-	raise trial_missing;
-	end if;
-	end if;
-     */
-
     --	truncate tmp tables
 
     execute immediate('truncate table tm_wz.WT_SUBJECT_METABOLOMICS_LOGS');
