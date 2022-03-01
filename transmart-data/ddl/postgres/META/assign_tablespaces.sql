@@ -22,6 +22,8 @@ BEGIN
         ['deapp',        'transmart', 'indx'      ],
         ['searchapp',    'transmart', 'indx'      ],
         ['biomart',      'transmart', 'indx'      ],
+        ['biomart_user', 'transmart', 'indx'      ],
+        ['biomart_stage','transmart', 'indx'      ],
         ['galaxy',       'transmart', 'indx'      ],
         ['gwas_plink',   'transmart', 'indx'      ],
         ['fmapp',        'transmart', 'indx'      ],

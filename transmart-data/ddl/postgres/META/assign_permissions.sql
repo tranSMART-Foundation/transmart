@@ -77,7 +77,7 @@ DECLARE
     dummy record;
 BEGIN
     IF NOT schema_name = ANY(ARRAY['i2b2demodata', 'i2b2metadata', 'i2b2hive', 'i2b2imdata', 'i2b2pm', 'i2b2workdata',
-            'searchapp', 'galaxy', 'gwas_plink', 'biomart', 'deapp', 'amapp', 'fmapp', 'biomart_user']) THEN
+            'searchapp', 'galaxy', 'gwas_plink', 'biomart', 'deapp', 'amapp', 'fmapp', 'biomart_user', 'biomart_stage']) THEN
         RETURN NULL;
     END IF;
 
@@ -283,6 +283,7 @@ BEGIN
             'gwas_plink',
             'biomart',
             'biomart_user',
+            'biomart_stage',
             'tm_cz',
             'tm_lz',
             'tm_wz',

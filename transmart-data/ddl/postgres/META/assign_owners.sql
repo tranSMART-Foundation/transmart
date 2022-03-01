@@ -67,6 +67,7 @@ BEGIN
         'deapp',
         'fmapp',
         'biomart_user',
+        'biomart_stage',
         'galaxy',
         'gwas_plink',
         'searchapp',
