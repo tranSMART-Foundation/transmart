@@ -155,7 +155,7 @@ update_etl_git: transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip
 	test -d transmart-etl || mv transmart-etl-$(TRANSMART_RELEASE_BRANCH) transmart-etl
 
 transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip:
-	curl -L -f "$(TRANSMART_LIBRARY)/$(TRANSMART_RELEASE_DIR)_artifacts/transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip" > transmart-etl-$(RTANSMART_RELEASE_BRANCH).zip
+	curl -L -f "$(TRANSMART_LIBRARY)/$(TRANSMART_RELEASE_DIR)_artifacts/transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip" > transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip
 
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 
