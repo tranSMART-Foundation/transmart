@@ -18,7 +18,7 @@ else
 endif
 
 solr-$(SOLR_VERSION).tgz:
-	curl -f '$(SOLR_DL)/$(SOLR_VERSION)/solr-$(SOLR_VERSION).tgz' -o $@
+	curl --silent --show-error -f '$(SOLR_DL)/$(SOLR_VERSION)/solr-$(SOLR_VERSION).tgz' -o $@
 
 ROOT_FILES=contrib dist
 EXAMPLE_FILES=etc contexts lib logs resources solr-webapp \
