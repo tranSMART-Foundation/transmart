@@ -8,7 +8,7 @@ TRANSMART_LIBRARY ?= http://library.transmartfoundation.org/release
 TRANSMART_RELEASE_BRANCH ?= release-19.1
 TRANSMART_RELEASE_DIR ?= release19_1_0
 
-UBUNTU_PACKAGES=postgresql make git rsync libcairo-dev curl \
+UBUNTU_PACKAGES=make git rsync libcairo-dev curl \
 				tar gfortran g++ unzip libreadline-dev \
 				libxt-dev libpango1.0-dev libprotoc-dev \
 				texlive-fonts-recommended tex-gyre texlive-latex-extra liblz4-tool pv zip
@@ -19,9 +19,7 @@ CENTOS7_PACKAGES=postgresql tomcat make git rsync \
 			xz-devel pcre2-devel libcurl-devel cairo-devel libxml2-devel \
 			openssl-devel
 
-UBUNTU14_PACKAGES=php5-cli php5-json openjdk-8-jdk
-UBUNTU16_PACKAGES=php7.0-cli php7.0-json
-UBUNTU18_PACKAGES=php7.2-cli php7.2-json openjdk-8-jdk openjdk-8-jre tomcat8 \
+UBUNTU18_PACKAGES=postgresql-14 php7.2-cli php7.2-json openjdk-8-jdk openjdk-8-jre tomcat8 \
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
 UBUNTU20_PACKAGES=php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
@@ -30,7 +28,7 @@ UBUNTU20_PACKAGES=php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
 
 GROOVY_VERSION=3.0.9
 
-ONDREJ_KEY=E5267A6C
+APTPSQL_KEY=ACCC4CF8.asc
 
 GROOVY_ZIP=apache-groovy-binary-$(GROOVY_VERSION).zip
 GROOVY_URL=https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/$(GROOVY_ZIP)
@@ -74,7 +72,7 @@ $(TRANSMART_LOADER)-latest-bamboo-snapshot: $(TRANSMART_LOADER)-latest-bamboo-sn
 # do a conditional request here.
 # We could also skip if we checked in the last hour or so (see ts-loader) below
 $(TRANSMART_BATCH_FILE):
-	curl -s -L -f -R -z '$@' -o '$@' '$(TRANSMART_BATCH_URL)'
+	curl -s -S -L -f -R -z '$@' -o '$@' '$(TRANSMART_BATCH_URL)'
 	@chmod +x '$@'
 
 batchdb-psql.properties: batchdb-psql.properties.php
@@ -110,21 +108,10 @@ $(PHP_BIN): $(PHP_SRCDIR)/.keep
 php: $(PHP_BIN)
 	ln -s $< $@
 
-install_ubuntu_packages14:
-	. /etc/lsb-release; \
-		test $$DISTRIB_RELEASE == '14.04' || \
-	    grep ondrej/php5 /etc/apt/sources.list || ( \
-				gpg --recv-keys --keyserver keyserver.ubuntu.com $(ONDREJ_KEY) && \
-				(gpg -a --export $(ONDREJ_KEY) | apt-key add -) && \
-				echo 'deb http://ppa.launchpad.net/ondrej/php5/ubuntu precise main' >> /etc/apt/sources.list)
-	apt-get update
-	apt-get install -y $(UBUNTU14_PACKAGES)
-
-install_ubuntu_packages16:
-	apt-get update
-	apt-get install -y $(UBUNTU16_PACKAGES)
-
 install_ubuntu_packages18:
+	. /etc/os-release; \
+	echo "deb http://apt.postgresql.org/pub/repos/apt $${UBUNTU_CODENAME}-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+	curl --silent --show-error https://www.postgresql.org/media/keys/$(APTPSQL_KEY) | apt-key add -
 	apt-get update
 	apt-get install -y $(UBUNTU18_PACKAGES)
 
