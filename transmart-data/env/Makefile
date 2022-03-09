@@ -8,7 +8,7 @@ TRANSMART_LIBRARY ?= http://library.transmartfoundation.org/release
 TRANSMART_RELEASE_BRANCH ?= release-19.1
 TRANSMART_RELEASE_DIR ?= release19_1_0
 
-UBUNTU_PACKAGES=make git rsync libcairo-dev curl \
+UBUNTU_PACKAGES=make git rsync libcairo-dev curl gnupg \
 				tar gfortran g++ unzip libreadline-dev \
 				libxt-dev libpango1.0-dev libprotoc-dev \
 				texlive-fonts-recommended tex-gyre texlive-latex-extra liblz4-tool pv zip
@@ -21,6 +21,7 @@ CENTOS7_PACKAGES=postgresql tomcat make git rsync \
 
 UBUNTU18_PACKAGES=postgresql-14 php7.2-cli php7.2-json openjdk-8-jdk openjdk-8-jre tomcat8 \
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
+
 UBUNTU20_PACKAGES=php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
 
