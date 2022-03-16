@@ -38,6 +38,7 @@ AS $$
 
     tableName		character varying;
 
+    pathEscaped		character varying;
     topPath		character varying;
     testPath		character varying(700);
 begin
@@ -74,7 +75,8 @@ begin
 	    end if;
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Found path '||path||' for trial '||trialid,rowCt,stepCt,'Done');
-    elsif(trialid != 'I2B2') then
+
+    elsif(trialid != 'I2B2') then		-- check path provided against known path in tm_trial_nodes
 	select count(*) from i2b2metadata.tm_trial_nodes into rowCt;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Count of all trial nodes', rowCt,stepCt,'Log');
 	select count(*) from i2b2metadata.tm_trial_nodes where trial = trialid into rowCt;
@@ -93,7 +95,6 @@ begin
 		return -16;
 	end;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Testing tm_trial_nodes '||trialid,rowCt,stepCt,'Log');
-	testPath := replace(testPath, '_', '`_');
 	if(rowCt < 1) then
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'No path for trial '||trialid,rowCt,stepCt,'FAIL');
@@ -113,16 +114,17 @@ begin
 
     topPath := path;
     topPath := replace(replace(topPath,'\','\\'),'''','''''');
+    pathEscaped := replace(topPath, '_', '`_');
 
     select count(*) from i2b2metadata.tm_concept_counts
-	 where concept_path like path || '%' escape '`' into rowCt;
+	 where concept_path like pathEscaped || '%' escape '`' into rowCt;
 
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Before delete: tm_concept_counts records below concept_path ' || path,rowCt,stepCt,'Done');
 
     begin
 	delete from i2b2metadata.tm_concept_counts
-	 where concept_path like path || '%' escape '`';
+	 where concept_path like pathEscaped || '%' escape '`';
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -195,7 +197,7 @@ begin
 --    EXPLAIN (ANALYZE, VERBOSE, BUFFERS)
 	update i2b2metadata.i2b2
 	   set c_visualattributes = substr(c_visualattributes,1,1) || 'H' || substr(c_visualattributes,3,1)
-	 where c_fullname like path || '%' escape '`'
+	 where c_fullname like pathEscaped || '%' escape '`'
 	       and (not exists
 		    (select 1 from i2b2metadata.tm_concept_counts nc
 		      where c_fullname = nc.concept_path)
