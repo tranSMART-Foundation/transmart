@@ -1,6 +1,7 @@
 target/
 target-eclipse/
 bin/
+dependencies.xml
 .buildpath
 .classpath
 .settings
