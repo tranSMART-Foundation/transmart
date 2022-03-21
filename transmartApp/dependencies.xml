@@ -362,6 +362,18 @@
     <dependency group='org.grails' name='grails-plugin-domain-class' version='2.5.4'>
       <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/dist/grails-plugin-domain-class-2.5.4.jar</jar>
     </dependency>
+    <dependency group='org.codenarc' name='CodeNarc' version='0.21'>
+      <jar>/home/pmr/.m2/repository/org/codenarc/CodeNarc/0.21/CodeNarc-0.21.jar</jar>
+    </dependency>
+    <dependency group='org.gmetrics' name='GMetrics' version='0.5'>
+      <jar>/home/pmr/.m2/repository/org/gmetrics/GMetrics/0.5/GMetrics-0.5.jar</jar>
+    </dependency>
+    <dependency group='org.apache.ant' name='ant' version='1.7.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/ant/ant/1.7.1/ant-1.7.1.jar</jar>
+    </dependency>
+    <dependency group='org.apache.ant' name='ant-launcher' version='1.7.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/ant/ant-launcher/1.7.1/ant-launcher-1.7.1.jar</jar>
+    </dependency>
     <dependency group='axis' name='axis' version='1.4'>
       <jar>/home/pmr/.m2/repository/axis/axis/1.4/axis-1.4.jar</jar>
     </dependency>
@@ -374,8 +386,26 @@
     <dependency group='commons-logging' name='commons-logging' version='1.0.4'>
       <jar>/home/pmr/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar</jar>
     </dependency>
-    <dependency group='com.google.guava' name='guava' version='18.0'>
-      <jar>/home/pmr/.m2/repository/com/google/guava/guava/18.0/guava-18.0.jar</jar>
+    <dependency group='com.google.guava' name='guava' version='30.1.1-jre'>
+      <jar>/home/pmr/.m2/repository/com/google/guava/guava/30.1.1-jre/guava-30.1.1-jre.jar</jar>
+    </dependency>
+    <dependency group='com.google.guava' name='failureaccess' version='1.0.1'>
+      <jar>/home/pmr/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar</jar>
+    </dependency>
+    <dependency group='com.google.guava' name='listenablefuture' version='9999.0-empty-to-avoid-conflict-with-guava'>
+      <jar>/home/pmr/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar</jar>
+    </dependency>
+    <dependency group='com.google.code.findbugs' name='jsr305' version='3.0.2'>
+      <jar>/home/pmr/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar</jar>
+    </dependency>
+    <dependency group='org.checkerframework' name='checker-qual' version='3.8.0'>
+      <jar>/home/pmr/.m2/repository/org/checkerframework/checker-qual/3.8.0/checker-qual-3.8.0.jar</jar>
+    </dependency>
+    <dependency group='com.google.errorprone' name='error_prone_annotations' version='2.5.1'>
+      <jar>/home/pmr/.m2/repository/com/google/errorprone/error_prone_annotations/2.5.1/error_prone_annotations-2.5.1.jar</jar>
+    </dependency>
+    <dependency group='com.google.j2objc' name='j2objc-annotations' version='1.3'>
+      <jar>/home/pmr/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar</jar>
     </dependency>
     <dependency group='commons-net' name='commons-net' version='3.3'>
       <jar>/home/pmr/.m2/repository/commons-net/commons-net/3.3/commons-net-3.3.jar</jar>
@@ -584,11 +614,8 @@
     <dependency group='org.apache.solr' name='solr-solrj' version='5.4.1'>
       <jar>/home/pmr/.m2/repository/org/apache/solr/solr-solrj/5.4.1/solr-solrj-5.4.1.jar</jar>
     </dependency>
-    <dependency group='org.jfree' name='jfreechart' version='1.0.19'>
-      <jar>/home/pmr/.m2/repository/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar</jar>
-    </dependency>
-    <dependency group='org.jfree' name='jcommon' version='1.0.23'>
-      <jar>/home/pmr/.m2/repository/org/jfree/jcommon/1.0.23/jcommon-1.0.23.jar</jar>
+    <dependency group='org.jfree' name='jfreechart' version='1.5.0'>
+      <jar>/home/pmr/.m2/repository/org/jfree/jfreechart/1.5.0/jfreechart-1.5.0.jar</jar>
     </dependency>
     <dependency group='org.jfree' name='jfreesvg' version='2.1'>
       <jar>/home/pmr/.m2/repository/org/jfree/jfreesvg/2.1/jfreesvg-2.1.jar</jar>
@@ -608,11 +635,11 @@
     <dependency group='xml-resolver' name='xml-resolver' version='1.2'>
       <jar>/home/pmr/.m2/repository/xml-resolver/xml-resolver/1.2/xml-resolver-1.2.jar</jar>
     </dependency>
-    <dependency group='org.rosuda' name='Rserve' version='1.7.3'>
-      <jar>/home/pmr/.m2/repository/org/rosuda/Rserve/1.7.3/Rserve-1.7.3.jar</jar>
+    <dependency group='org.rosuda.REngine' name='Rserve' version='1.8.1'>
+      <jar>/home/pmr/.m2/repository/org/rosuda/REngine/Rserve/1.8.1/Rserve-1.8.1.jar</jar>
     </dependency>
-    <dependency group='org.rosuda' name='REngine' version='1.7.3'>
-      <jar>/home/pmr/.m2/repository/org/rosuda/REngine/1.7.3/REngine-1.7.3.jar</jar>
+    <dependency group='org.rosuda.REngine' name='REngine' version='2.1.0'>
+      <jar>/home/pmr/.m2/repository/org/rosuda/REngine/REngine/2.1.0/REngine-2.1.0.jar</jar>
     </dependency>
     <dependency group='org.springframework.security.extensions' name='spring-security-saml2-core' version='1.0.0.RELEASE'>
       <jar>/home/pmr/.m2/repository/org/springframework/security/extensions/spring-security-saml2-core/1.0.0.RELEASE/spring-security-saml2-core-1.0.0.RELEASE.jar</jar>
@@ -632,32 +659,32 @@
     <dependency group='commons-httpclient' name='commons-httpclient' version='3.1'>
       <jar>/home/pmr/.m2/repository/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar</jar>
     </dependency>
-    <dependency group='org.apache.santuario' name='xmlsec' version='1.5.6'>
-      <jar>/home/pmr/.m2/repository/org/apache/santuario/xmlsec/1.5.6/xmlsec-1.5.6.jar</jar>
-    </dependency>
     <dependency group='org.apache.velocity' name='velocity' version='1.7'>
       <jar>/home/pmr/.m2/repository/org/apache/velocity/velocity/1.7/velocity-1.7.jar</jar>
     </dependency>
     <dependency group='org.owasp.esapi' name='esapi' version='2.0.1'>
       <jar>/home/pmr/.m2/repository/org/owasp/esapi/esapi/2.0.1/esapi-2.0.1.jar</jar>
     </dependency>
-    <dependency group='org.transmartproject' name='transmart-core-api' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.1/transmart-core-api-19.1.jar</jar>
+    <dependency group='org.bouncycastle' name='bcprov-jdk15on' version='1.68'>
+      <jar>/home/pmr/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.68/bcprov-jdk15on-1.68.jar</jar>
+    </dependency>
+    <dependency group='org.apache.santuario' name='xmlsec' version='2.2.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/santuario/xmlsec/2.2.1/xmlsec-2.2.1.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='asset-pipeline' version='2.14.1.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/asset-pipeline/2.14.1.1/asset-pipeline-2.14.1.1.zip</jar>
+    </dependency>
+    <dependency group='com.bertramlabs.plugins' name='asset-pipeline-core' version='2.14.1'>
+      <jar>/home/pmr/.m2/repository/com/bertramlabs/plugins/asset-pipeline-core/2.14.1/asset-pipeline-core-2.14.1.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='webxml' version='1.4.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/webxml/1.4.1/webxml-1.4.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='cache-ehcache' version='1.0.5'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/cache-ehcache/1.0.5/cache-ehcache-1.0.5.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='cache' version='1.1.8'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/cache/1.1.8/cache-1.1.8.zip</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='codenarc' version='0.21'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/codenarc/0.21/codenarc-0.21.zip</jar>
-    </dependency>
-    <dependency group='org.codenarc' name='CodeNarc' version='0.21'>
-      <jar>/home/pmr/.m2/repository/org/codenarc/CodeNarc/0.21/CodeNarc-0.21.jar</jar>
-    </dependency>
-    <dependency group='org.gmetrics' name='GMetrics' version='0.5'>
-      <jar>/home/pmr/.m2/repository/org/gmetrics/GMetrics/0.5/GMetrics-0.5.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='hibernate' version='3.6.10.19'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/hibernate/3.6.10.19/hibernate-3.6.10.19.zip</jar>
@@ -722,12 +749,6 @@
     <dependency group='org.springframework.security' name='spring-security-core' version='3.2.9.RELEASE'>
       <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-core/3.2.9.RELEASE/spring-security-core-3.2.9.RELEASE.jar</jar>
     </dependency>
-    <dependency group='org.springframework.security' name='spring-security-web' version='3.2.9.RELEASE'>
-      <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-web/3.2.9.RELEASE/spring-security-web-3.2.9.RELEASE.jar</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='webxml' version='1.4.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/webxml/1.4.1/webxml-1.4.1.zip</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='spring-security-kerberos' version='1.0.0'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-kerberos/1.0.0/spring-security-kerberos-1.0.0.zip</jar>
     </dependency>
@@ -758,23 +779,38 @@
     <dependency group='com.fasterxml.jackson.core' name='jackson-annotations' version='2.4.0'>
       <jar>/home/pmr/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.4.0/jackson-annotations-2.4.0.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.1/rdc-rmodules-19.1.zip</jar>
+    <dependency group='org.grails.plugins' name='smart-r' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/smart-r/19.1/smart-r-19.1.zip</jar>
+    </dependency>
+    <dependency group='org.javassist' name='javassist' version='3.16.1-GA'>
+      <jar>/home/pmr/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar</jar>
+    </dependency>
+    <dependency group='org.apache.logging.log4j' name='log4j-api' version='2.17.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/logging/log4j/log4j-api/2.17.1/log4j-api-2.17.1.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-core' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.1/transmart-core-19.1.zip</jar>
     </dependency>
     <dependency group='org.mapdb' name='mapdb' version='0.9.10'>
       <jar>/home/pmr/.m2/repository/org/mapdb/mapdb/0.9.10/mapdb-0.9.10.jar</jar>
     </dependency>
-    <dependency group='org.xhtmlrenderer' name='core-renderer' version='R8'>
-      <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.xhtmlrenderer/core-renderer/jars/core-renderer-R8.jar</jar>
+    <dependency group='org.apache.commons' name='commons-lang3' version='3.4'>
+      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-core' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.1/transmart-core-19.1.zip</jar>
+    <dependency group='org.transmartproject' name='transmart-core-api' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.1/transmart-core-api-19.1.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='transmart-gwas' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas/19.1/transmart-gwas-19.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='search-domain' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/search-domain/19.1/search-domain-19.1.zip</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-shared' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.1/transmart-shared-19.1.zip</jar>
+    </dependency>
+    <dependency group='com.auth0' name='java-jwt' version='3.2.0'>
+      <jar>/home/pmr/.m2/repository/com/auth0/java-jwt/3.2.0/java-jwt-3.2.0.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='mail' version='1.0.7'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/mail/1.0.7/mail-1.0.7.zip</jar>
@@ -809,6 +845,12 @@
     <dependency group='org.grails.plugins' name='plugin-config' version='0.2.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/plugin-config/0.2.1/plugin-config-0.2.1.zip</jar>
     </dependency>
+    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.1/rdc-rmodules-19.1.zip</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.1/transmart-metacore-plugin-19.1.zip</jar>
+    </dependency>
     <dependency group='org.grails.plugins' name='dalliance-plugin' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/dalliance-plugin/19.1/dalliance-plugin-19.1.zip</jar>
     </dependency>
@@ -824,32 +866,20 @@
     <dependency group='org.codehaus.jackson' name='jackson-xc' version='1.9.2'>
       <jar>/home/pmr/.m2/repository/org/codehaus/jackson/jackson-xc/1.9.2/jackson-xc-1.9.2.jar</jar>
     </dependency>
+    <dependency group='org.apache.logging.log4j' name='log4j-core' version='2.17.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/logging/log4j/log4j-core/2.17.1/log4j-core-2.17.1.jar</jar>
+    </dependency>
     <dependency group='xpp3' name='xpp3' version='1.1.3.4.O'>
       <jar>/home/pmr/.m2/repository/xpp3/xpp3/1.1.3.4.O/xpp3-1.1.3.4.O.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='transmart-rest-api' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-rest-api/19.1/transmart-rest-api-19.1.zip</jar>
     </dependency>
-    <dependency group='org.javassist' name='javassist' version='3.16.1-GA'>
-      <jar>/home/pmr/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='transmart-shared' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.1/transmart-shared-19.1.zip</jar>
-    </dependency>
-    <dependency group='com.auth0' name='java-jwt' version='3.2.0'>
-      <jar>/home/pmr/.m2/repository/com/auth0/java-jwt/3.2.0/java-jwt-3.2.0.jar</jar>
-    </dependency>
-    <dependency group='org.bouncycastle' name='bcprov-jdk15on' version='1.55'>
-      <jar>/home/pmr/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.55/bcprov-jdk15on-1.55.jar</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='spring-security-auth0' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-auth0/19.1/spring-security-auth0-19.1.zip</jar>
     </dependency>
     <dependency group='com.auth0' name='mvc-auth-commons' version='1.0.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/mvc-auth-commons/1.0.0/mvc-auth-commons-1.0.0.jar</jar>
-    </dependency>
-    <dependency group='org.apache.commons' name='commons-lang3' version='3.5'>
-      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar</jar>
     </dependency>
     <dependency group='com.auth0' name='auth0' version='1.1.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/auth0/1.1.0/auth0-1.1.0.jar</jar>
@@ -871,6 +901,9 @@
     </dependency>
     <dependency group='net.java.dev.javacc' name='javacc' version='4.1'>
       <jar>/home/pmr/.m2/repository/net/java/dev/javacc/javacc/4.1/javacc-4.1.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-custom' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.1/transmart-custom-19.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='galaxy-export-plugin' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/galaxy-export-plugin/19.1/galaxy-export-plugin-19.1.zip</jar>
@@ -914,9 +947,6 @@
     <dependency group='org.json' name='json' version='20090211'>
       <jar>/home/pmr/.m2/repository/org/json/json/20090211/json-20090211.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.1/transmart-metacore-plugin-19.1.zip</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='transmart-xnat-importer' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-xnat-importer/19.1/transmart-xnat-importer-19.1.zip</jar>
     </dependency>
@@ -935,11 +965,11 @@
     <dependency group='jfree' name='jcommon' version='1.0.14'>
       <jar>/home/pmr/.m2/repository/jfree/jcommon/1.0.14/jcommon-1.0.14.jar</jar>
     </dependency>
+    <dependency group='javax.xml' name='jaxrpc-api' version='1.1'>
+      <jar>/home/pmr/.m2/repository/javax/xml/jaxrpc-api/1.1/jaxrpc-api-1.1.jar</jar>
+    </dependency>
     <dependency group='org.grails.plugins' name='xnat-viewer' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/xnat-viewer/19.1/xnat-viewer-19.1.zip</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='transmart-custom' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.1/transmart-custom-19.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='transmart-fractalis' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-fractalis/19.1/transmart-fractalis-19.1.zip</jar>
@@ -1168,12 +1198,6 @@
     <dependency group='org.codehaus.gant' name='gant_groovy1.8' version='1.9.6'>
       <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.codehaus.gant/gant_groovy1.8/jars/gant_groovy1.8-1.9.6.jar</jar>
     </dependency>
-    <dependency group='org.apache.ant' name='ant' version='1.9.4'>
-      <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.apache.ant/ant/jars/ant-1.9.4.jar</jar>
-    </dependency>
-    <dependency group='org.apache.ant' name='ant-launcher' version='1.9.4'>
-      <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.apache.ant/ant-launcher/jars/ant-launcher-1.9.4.jar</jar>
-    </dependency>
     <dependency group='org.objenesis' name='objenesis' version='1.4'>
       <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.objenesis/objenesis/jars/objenesis-1.4.jar</jar>
     </dependency>
@@ -1198,6 +1222,18 @@
     <dependency group='org.grails' name='grails-resources' version='2.5.4'>
       <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/dist/grails-resources-2.5.4.jar</jar>
     </dependency>
+    <dependency group='org.codenarc' name='CodeNarc' version='0.21'>
+      <jar>/home/pmr/.m2/repository/org/codenarc/CodeNarc/0.21/CodeNarc-0.21.jar</jar>
+    </dependency>
+    <dependency group='org.gmetrics' name='GMetrics' version='0.5'>
+      <jar>/home/pmr/.m2/repository/org/gmetrics/GMetrics/0.5/GMetrics-0.5.jar</jar>
+    </dependency>
+    <dependency group='org.apache.ant' name='ant' version='1.7.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/ant/ant/1.7.1/ant-1.7.1.jar</jar>
+    </dependency>
+    <dependency group='org.apache.ant' name='ant-launcher' version='1.7.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/ant/ant-launcher/1.7.1/ant-launcher-1.7.1.jar</jar>
+    </dependency>
     <dependency group='axis' name='axis' version='1.4'>
       <jar>/home/pmr/.m2/repository/axis/axis/1.4/axis-1.4.jar</jar>
     </dependency>
@@ -1216,8 +1252,26 @@
     <dependency group='commons-discovery' name='commons-discovery' version='0.2'>
       <jar>/home/pmr/.m2/repository/commons-discovery/commons-discovery/0.2/commons-discovery-0.2.jar</jar>
     </dependency>
-    <dependency group='com.google.guava' name='guava' version='18.0'>
-      <jar>/home/pmr/.m2/repository/com/google/guava/guava/18.0/guava-18.0.jar</jar>
+    <dependency group='com.google.guava' name='guava' version='30.1.1-jre'>
+      <jar>/home/pmr/.m2/repository/com/google/guava/guava/30.1.1-jre/guava-30.1.1-jre.jar</jar>
+    </dependency>
+    <dependency group='com.google.guava' name='failureaccess' version='1.0.1'>
+      <jar>/home/pmr/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar</jar>
+    </dependency>
+    <dependency group='com.google.guava' name='listenablefuture' version='9999.0-empty-to-avoid-conflict-with-guava'>
+      <jar>/home/pmr/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar</jar>
+    </dependency>
+    <dependency group='com.google.code.findbugs' name='jsr305' version='3.0.2'>
+      <jar>/home/pmr/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar</jar>
+    </dependency>
+    <dependency group='org.checkerframework' name='checker-qual' version='3.8.0'>
+      <jar>/home/pmr/.m2/repository/org/checkerframework/checker-qual/3.8.0/checker-qual-3.8.0.jar</jar>
+    </dependency>
+    <dependency group='com.google.errorprone' name='error_prone_annotations' version='2.5.1'>
+      <jar>/home/pmr/.m2/repository/com/google/errorprone/error_prone_annotations/2.5.1/error_prone_annotations-2.5.1.jar</jar>
+    </dependency>
+    <dependency group='com.google.j2objc' name='j2objc-annotations' version='1.3'>
+      <jar>/home/pmr/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar</jar>
     </dependency>
     <dependency group='commons-net' name='commons-net' version='3.3'>
       <jar>/home/pmr/.m2/repository/commons-net/commons-net/3.3/commons-net-3.3.jar</jar>
@@ -1426,11 +1480,8 @@
     <dependency group='org.apache.solr' name='solr-solrj' version='5.4.1'>
       <jar>/home/pmr/.m2/repository/org/apache/solr/solr-solrj/5.4.1/solr-solrj-5.4.1.jar</jar>
     </dependency>
-    <dependency group='org.jfree' name='jfreechart' version='1.0.19'>
-      <jar>/home/pmr/.m2/repository/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar</jar>
-    </dependency>
-    <dependency group='org.jfree' name='jcommon' version='1.0.23'>
-      <jar>/home/pmr/.m2/repository/org/jfree/jcommon/1.0.23/jcommon-1.0.23.jar</jar>
+    <dependency group='org.jfree' name='jfreechart' version='1.5.0'>
+      <jar>/home/pmr/.m2/repository/org/jfree/jfreechart/1.5.0/jfreechart-1.5.0.jar</jar>
     </dependency>
     <dependency group='org.jfree' name='jfreesvg' version='2.1'>
       <jar>/home/pmr/.m2/repository/org/jfree/jfreesvg/2.1/jfreesvg-2.1.jar</jar>
@@ -1450,11 +1501,11 @@
     <dependency group='xml-resolver' name='xml-resolver' version='1.2'>
       <jar>/home/pmr/.m2/repository/xml-resolver/xml-resolver/1.2/xml-resolver-1.2.jar</jar>
     </dependency>
-    <dependency group='org.rosuda' name='Rserve' version='1.7.3'>
-      <jar>/home/pmr/.m2/repository/org/rosuda/Rserve/1.7.3/Rserve-1.7.3.jar</jar>
+    <dependency group='org.rosuda.REngine' name='Rserve' version='1.8.1'>
+      <jar>/home/pmr/.m2/repository/org/rosuda/REngine/Rserve/1.8.1/Rserve-1.8.1.jar</jar>
     </dependency>
-    <dependency group='org.rosuda' name='REngine' version='1.7.3'>
-      <jar>/home/pmr/.m2/repository/org/rosuda/REngine/1.7.3/REngine-1.7.3.jar</jar>
+    <dependency group='org.rosuda.REngine' name='REngine' version='2.1.0'>
+      <jar>/home/pmr/.m2/repository/org/rosuda/REngine/REngine/2.1.0/REngine-2.1.0.jar</jar>
     </dependency>
     <dependency group='org.springframework.security.extensions' name='spring-security-saml2-core' version='1.0.0.RELEASE'>
       <jar>/home/pmr/.m2/repository/org/springframework/security/extensions/spring-security-saml2-core/1.0.0.RELEASE/spring-security-saml2-core-1.0.0.RELEASE.jar</jar>
@@ -1474,9 +1525,6 @@
     <dependency group='commons-httpclient' name='commons-httpclient' version='3.1'>
       <jar>/home/pmr/.m2/repository/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar</jar>
     </dependency>
-    <dependency group='org.apache.santuario' name='xmlsec' version='1.5.6'>
-      <jar>/home/pmr/.m2/repository/org/apache/santuario/xmlsec/1.5.6/xmlsec-1.5.6.jar</jar>
-    </dependency>
     <dependency group='org.apache.velocity' name='velocity' version='1.7'>
       <jar>/home/pmr/.m2/repository/org/apache/velocity/velocity/1.7/velocity-1.7.jar</jar>
     </dependency>
@@ -1488,9 +1536,6 @@
     </dependency>
     <dependency group='xml-apis' name='xml-apis' version='1.4.01'>
       <jar>/home/pmr/.m2/repository/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar</jar>
-    </dependency>
-    <dependency group='org.transmartproject' name='transmart-core-api' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.1/transmart-core-api-19.1.jar</jar>
     </dependency>
     <dependency group='com.jcraft' name='jsch' version='0.1.42'>
       <jar>/home/pmr/.m2/repository/com/jcraft/jsch/0.1.42/jsch-0.1.42.jar</jar>
@@ -1507,23 +1552,164 @@
     <dependency group='oauth.signpost' name='signpost-core' version='1.2.1.1'>
       <jar>/home/pmr/.m2/repository/oauth/signpost/signpost-core/1.2.1.1/signpost-core-1.2.1.1.jar</jar>
     </dependency>
-    <dependency group='org.apache.poi' name='poi-contrib' version='3.1-FINAL'>
-      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-contrib/3.1-FINAL/poi-contrib-3.1-FINAL.jar</jar>
+    <dependency group='org.apache.poi' name='poi-scratchpad' version='5.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-scratchpad/5.0.0/poi-scratchpad-5.0.0.jar</jar>
     </dependency>
-    <dependency group='org.apache.poi' name='poi-scratchpad' version='3.1-FINAL'>
-      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-scratchpad/3.1-FINAL/poi-scratchpad-3.1-FINAL.jar</jar>
+    <dependency group='org.apache.poi' name='poi-ooxml' version='5.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-ooxml/5.0.0/poi-ooxml-5.0.0.jar</jar>
     </dependency>
-    <dependency group='org.apache.poi' name='poi' version='3.1-FINAL'>
-      <jar>/home/pmr/.m2/repository/org/apache/poi/poi/3.1-FINAL/poi-3.1-FINAL.jar</jar>
+    <dependency group='org.apache.poi' name='poi-ooxml-lite' version='5.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-ooxml-lite/5.0.0/poi-ooxml-lite-5.0.0.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlbeans' name='xmlbeans' version='4.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlbeans/xmlbeans/4.0.0/xmlbeans-4.0.0.jar</jar>
+    </dependency>
+    <dependency group='org.apache.commons' name='commons-compress' version='1.20'>
+      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-compress/1.20/commons-compress-1.20.jar</jar>
+    </dependency>
+    <dependency group='com.github.virtuald' name='curvesapi' version='1.06'>
+      <jar>/home/pmr/.m2/repository/com/github/virtuald/curvesapi/1.06/curvesapi-1.06.jar</jar>
+    </dependency>
+    <dependency group='org.bouncycastle' name='bcpkix-jdk15on' version='1.68'>
+      <jar>/home/pmr/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.68/bcpkix-jdk15on-1.68.jar</jar>
+    </dependency>
+    <dependency group='org.bouncycastle' name='bcprov-jdk15on' version='1.68'>
+      <jar>/home/pmr/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.68/bcprov-jdk15on-1.68.jar</jar>
+    </dependency>
+    <dependency group='org.apache.santuario' name='xmlsec' version='2.2.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/santuario/xmlsec/2.2.1/xmlsec-2.2.1.jar</jar>
+    </dependency>
+    <dependency group='com.fasterxml.woodstox' name='woodstox-core' version='5.2.1'>
+      <jar>/home/pmr/.m2/repository/com/fasterxml/woodstox/woodstox-core/5.2.1/woodstox-core-5.2.1.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-all' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-all/1.13/batik-all-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-anim' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-anim/1.13/batik-anim-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-shared-resources' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-shared-resources/1.13/batik-shared-resources-1.13.jar</jar>
+    </dependency>
+    <dependency group='xml-apis' name='xml-apis-ext' version='1.3.04'>
+      <jar>/home/pmr/.m2/repository/xml-apis/xml-apis-ext/1.3.04/xml-apis-ext-1.3.04.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-awt-util' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-awt-util/1.13/batik-awt-util-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='xmlgraphics-commons' version='2.4'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/xmlgraphics-commons/2.4/xmlgraphics-commons-2.4.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-bridge' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-bridge/1.13/batik-bridge-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-codec' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-codec/1.13/batik-codec-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-constants' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-constants/1.13/batik-constants-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-css' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-css/1.13/batik-css-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-dom' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-dom/1.13/batik-dom-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-ext' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-ext/1.13/batik-ext-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-extension' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-extension/1.13/batik-extension-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-gui-util' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-gui-util/1.13/batik-gui-util-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-gvt' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-gvt/1.13/batik-gvt-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-i18n' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-i18n/1.13/batik-i18n-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-parser' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-parser/1.13/batik-parser-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-rasterizer-ext' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-rasterizer-ext/1.13/batik-rasterizer-ext-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-rasterizer' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-rasterizer/1.13/batik-rasterizer-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-script' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-script/1.13/batik-script-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-slideshow' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-slideshow/1.13/batik-slideshow-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-squiggle-ext' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-squiggle-ext/1.13/batik-squiggle-ext-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-squiggle' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-squiggle/1.13/batik-squiggle-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svg-dom' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svg-dom/1.13/batik-svg-dom-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svgbrowser' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svgbrowser/1.13/batik-svgbrowser-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svggen' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svggen/1.13/batik-svggen-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svgpp' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svgpp/1.13/batik-svgpp-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svgrasterizer' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svgrasterizer/1.13/batik-svgrasterizer-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-swing' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-swing/1.13/batik-swing-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-transcoder' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-transcoder/1.13/batik-transcoder-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-util' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-util/1.13/batik-util-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-ttf2svg' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-ttf2svg/1.13/batik-ttf2svg-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-xml' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-xml/1.13/batik-xml-1.13.jar</jar>
+    </dependency>
+    <dependency group='de.rototor.pdfbox' name='graphics2d' version='0.30'>
+      <jar>/home/pmr/.m2/repository/de/rototor/pdfbox/graphics2d/0.30/graphics2d-0.30.jar</jar>
+    </dependency>
+    <dependency group='org.apache.pdfbox' name='pdfbox' version='2.0.22'>
+      <jar>/home/pmr/.m2/repository/org/apache/pdfbox/pdfbox/2.0.22/pdfbox-2.0.22.jar</jar>
+    </dependency>
+    <dependency group='org.apache.pdfbox' name='fontbox' version='2.0.22'>
+      <jar>/home/pmr/.m2/repository/org/apache/pdfbox/fontbox/2.0.22/fontbox-2.0.22.jar</jar>
+    </dependency>
+    <dependency group='org.apache.poi' name='poi' version='5.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/poi/poi/5.0.0/poi-5.0.0.jar</jar>
+    </dependency>
+    <dependency group='org.apache.commons' name='commons-collections4' version='4.4'>
+      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar</jar>
+    </dependency>
+    <dependency group='org.apache.commons' name='commons-math3' version='3.6.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-math3/3.6.1/commons-math3-3.6.1.jar</jar>
+    </dependency>
+    <dependency group='com.zaxxer' name='SparseBitSet' version='1.2'>
+      <jar>/home/pmr/.m2/repository/com/zaxxer/SparseBitSet/1.2/SparseBitSet-1.2.jar</jar>
     </dependency>
     <dependency group='xerces' name='xercesImpl' version='2.9.1'>
       <jar>/home/pmr/.m2/repository/xerces/xercesImpl/2.9.1/xercesImpl-2.9.1.jar</jar>
     </dependency>
-    <dependency group='org.postgresql' name='postgresql' version='42.2.2.jre7'>
-      <jar>/home/pmr/.m2/repository/org/postgresql/postgresql/42.2.2.jre7/postgresql-42.2.2.jre7.jar</jar>
+    <dependency group='org.postgresql' name='postgresql' version='42.3.3'>
+      <jar>/home/pmr/.m2/repository/org/postgresql/postgresql/42.3.3/postgresql-42.3.3.jar</jar>
     </dependency>
-    <dependency group='com.oracle' name='ojdbc7' version='12.1.0.1'>
-      <jar>/home/pmr/.m2/repository/com/oracle/ojdbc7/12.1.0.1/ojdbc7-12.1.0.1.jar</jar>
+    <dependency group='com.oracle.database.jdbc' name='ojdbc8' version='21.5.0.0'>
+      <jar>/home/pmr/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.5.0.0/ojdbc8-21.5.0.0.jar</jar>
     </dependency>
     <dependency group='org.gmock' name='gmock' version='0.9.0-r435-hyve2'>
       <jar>/home/pmr/.m2/repository/org/gmock/gmock/0.9.0-r435-hyve2/gmock-0.9.0-r435-hyve2.jar</jar>
@@ -1537,20 +1723,38 @@
     <dependency group='org.hamcrest' name='hamcrest-library' version='1.3'>
       <jar>/home/pmr/.m2/repository/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar</jar>
     </dependency>
+    <dependency group='org.springframework.security' name='spring-security-config' version='3.2.9.RELEASE'>
+      <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-config/3.2.9.RELEASE/spring-security-config-3.2.9.RELEASE.jar</jar>
+    </dependency>
+    <dependency group='org.springframework.security' name='spring-security-web' version='3.2.9.RELEASE'>
+      <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-web/3.2.9.RELEASE/spring-security-web-3.2.9.RELEASE.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='asset-pipeline' version='2.14.1.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/asset-pipeline/2.14.1.1/asset-pipeline-2.14.1.1.zip</jar>
+    </dependency>
+    <dependency group='org.mozilla' name='rhino' version='1.7R4'>
+      <jar>/home/pmr/.m2/repository/org/mozilla/rhino/1.7R4/rhino-1.7R4.jar</jar>
+    </dependency>
+    <dependency group='com.bertramlabs.plugins' name='asset-pipeline-core' version='2.14.1'>
+      <jar>/home/pmr/.m2/repository/com/bertramlabs/plugins/asset-pipeline-core/2.14.1/asset-pipeline-core-2.14.1.jar</jar>
+    </dependency>
+    <dependency group='com.google.javascript' name='closure-compiler-unshaded' version='v20160713'>
+      <jar>/home/pmr/.m2/repository/com/google/javascript/closure-compiler-unshaded/v20160713/closure-compiler-unshaded-v20160713.jar</jar>
+    </dependency>
+    <dependency group='com.google.javascript' name='closure-compiler-externs' version='v20160713'>
+      <jar>/home/pmr/.m2/repository/com/google/javascript/closure-compiler-externs/v20160713/closure-compiler-externs-v20160713.jar</jar>
+    </dependency>
+    <dependency group='args4j' name='args4j' version='2.0.26'>
+      <jar>/home/pmr/.m2/repository/args4j/args4j/2.0.26/args4j-2.0.26.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='webxml' version='1.4.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/webxml/1.4.1/webxml-1.4.1.zip</jar>
+    </dependency>
     <dependency group='org.grails.plugins' name='cache-ehcache' version='1.0.5'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/cache-ehcache/1.0.5/cache-ehcache-1.0.5.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='cache' version='1.1.8'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/cache/1.1.8/cache-1.1.8.zip</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='codenarc' version='0.21'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/codenarc/0.21/codenarc-0.21.zip</jar>
-    </dependency>
-    <dependency group='org.codenarc' name='CodeNarc' version='0.21'>
-      <jar>/home/pmr/.m2/repository/org/codenarc/CodeNarc/0.21/CodeNarc-0.21.jar</jar>
-    </dependency>
-    <dependency group='org.gmetrics' name='GMetrics' version='0.5'>
-      <jar>/home/pmr/.m2/repository/org/gmetrics/GMetrics/0.5/GMetrics-0.5.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='hibernate' version='3.6.10.19'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/hibernate/3.6.10.19/hibernate-3.6.10.19.zip</jar>
@@ -1621,12 +1825,6 @@
     <dependency group='org.springframework.security' name='spring-security-core' version='3.2.9.RELEASE'>
       <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-core/3.2.9.RELEASE/spring-security-core-3.2.9.RELEASE.jar</jar>
     </dependency>
-    <dependency group='org.springframework.security' name='spring-security-web' version='3.2.9.RELEASE'>
-      <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-web/3.2.9.RELEASE/spring-security-web-3.2.9.RELEASE.jar</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='webxml' version='1.4.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/webxml/1.4.1/webxml-1.4.1.zip</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='spring-security-kerberos' version='1.0.0'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-kerberos/1.0.0/spring-security-kerberos-1.0.0.zip</jar>
     </dependency>
@@ -1660,35 +1858,53 @@
     <dependency group='com.fasterxml.jackson.core' name='jackson-annotations' version='2.4.0'>
       <jar>/home/pmr/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.4.0/jackson-annotations-2.4.0.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='jquery-ui' version='1.10.4'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/jquery-ui/1.10.4/jquery-ui-1.10.4.zip</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='jquery' version='1.11.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/jquery/1.11.1/jquery-1.11.1.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='prototype' version='1.0'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/prototype/1.0/prototype-1.0.zip</jar>
+    <dependency group='org.grails.plugins' name='jquery-ui' version='1.10.4'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/jquery-ui/1.10.4/jquery-ui-1.10.4.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='resources' version='1.2.14'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/resources/1.2.14/resources-1.2.14.zip</jar>
+    <dependency group='org.grails.plugins' name='smart-r' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/smart-r/19.1/smart-r-19.1.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.1/rdc-rmodules-19.1.zip</jar>
+    <dependency group='org.javassist' name='javassist' version='3.16.1-GA'>
+      <jar>/home/pmr/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar</jar>
+    </dependency>
+    <dependency group='com.ittm_solutions.ipacore' name='IpaApi' version='19.1'>
+      <jar>/home/pmr/.m2/repository/com/ittm_solutions/ipacore/IpaApi/19.1/IpaApi-19.1.jar</jar>
+    </dependency>
+    <dependency group='org.apache.logging.log4j' name='log4j-core' version='2.17.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/logging/log4j/log4j-core/2.17.1/log4j-core-2.17.1.pom</jar>
+    </dependency>
+    <dependency group='org.apache.logging.log4j' name='log4j-api' version='2.17.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/logging/log4j/log4j-api/2.17.1/log4j-api-2.17.1.jar</jar>
+    </dependency>
+    <dependency group='org.ini4j' name='ini4j' version='0.5.4'>
+      <jar>/home/pmr/.m2/repository/org/ini4j/ini4j/0.5.4/ini4j-0.5.4.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-core' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.1/transmart-core-19.1.zip</jar>
     </dependency>
     <dependency group='org.mapdb' name='mapdb' version='0.9.10'>
       <jar>/home/pmr/.m2/repository/org/mapdb/mapdb/0.9.10/mapdb-0.9.10.jar</jar>
     </dependency>
-    <dependency group='org.xhtmlrenderer' name='core-renderer' version='R8'>
-      <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.xhtmlrenderer/core-renderer/jars/core-renderer-R8.jar</jar>
+    <dependency group='org.apache.commons' name='commons-lang3' version='3.4'>
+      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-core' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.1/transmart-core-19.1.zip</jar>
+    <dependency group='org.transmartproject' name='transmart-core-api' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.1/transmart-core-api-19.1.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='transmart-gwas' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas/19.1/transmart-gwas-19.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='search-domain' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/search-domain/19.1/search-domain-19.1.zip</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-shared' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.1/transmart-shared-19.1.zip</jar>
+    </dependency>
+    <dependency group='com.auth0' name='java-jwt' version='3.2.0'>
+      <jar>/home/pmr/.m2/repository/com/auth0/java-jwt/3.2.0/java-jwt-3.2.0.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='mail' version='1.0.7'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/mail/1.0.7/mail-1.0.7.zip</jar>
@@ -1726,6 +1942,12 @@
     <dependency group='org.grails.plugins' name='plugin-config' version='0.2.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/plugin-config/0.2.1/plugin-config-0.2.1.zip</jar>
     </dependency>
+    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.1/rdc-rmodules-19.1.zip</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.1/transmart-metacore-plugin-19.1.zip</jar>
+    </dependency>
     <dependency group='org.grails.plugins' name='dalliance-plugin' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/dalliance-plugin/19.1/dalliance-plugin-19.1.zip</jar>
     </dependency>
@@ -1741,32 +1963,20 @@
     <dependency group='org.codehaus.jackson' name='jackson-xc' version='1.9.2'>
       <jar>/home/pmr/.m2/repository/org/codehaus/jackson/jackson-xc/1.9.2/jackson-xc-1.9.2.jar</jar>
     </dependency>
+    <dependency group='org.apache.logging.log4j' name='log4j-core' version='2.17.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/logging/log4j/log4j-core/2.17.1/log4j-core-2.17.1.jar</jar>
+    </dependency>
     <dependency group='xpp3' name='xpp3' version='1.1.3.4.O'>
       <jar>/home/pmr/.m2/repository/xpp3/xpp3/1.1.3.4.O/xpp3-1.1.3.4.O.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='transmart-rest-api' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-rest-api/19.1/transmart-rest-api-19.1.zip</jar>
     </dependency>
-    <dependency group='org.javassist' name='javassist' version='3.16.1-GA'>
-      <jar>/home/pmr/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='transmart-shared' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.1/transmart-shared-19.1.zip</jar>
-    </dependency>
-    <dependency group='com.auth0' name='java-jwt' version='3.2.0'>
-      <jar>/home/pmr/.m2/repository/com/auth0/java-jwt/3.2.0/java-jwt-3.2.0.jar</jar>
-    </dependency>
-    <dependency group='org.bouncycastle' name='bcprov-jdk15on' version='1.55'>
-      <jar>/home/pmr/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.55/bcprov-jdk15on-1.55.jar</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='spring-security-auth0' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-auth0/19.1/spring-security-auth0-19.1.zip</jar>
     </dependency>
     <dependency group='com.auth0' name='mvc-auth-commons' version='1.0.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/mvc-auth-commons/1.0.0/mvc-auth-commons-1.0.0.jar</jar>
-    </dependency>
-    <dependency group='org.apache.commons' name='commons-lang3' version='3.5'>
-      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar</jar>
     </dependency>
     <dependency group='com.auth0' name='auth0' version='1.1.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/auth0/1.1.0/auth0-1.1.0.jar</jar>
@@ -1788,6 +1998,9 @@
     </dependency>
     <dependency group='net.java.dev.javacc' name='javacc' version='4.1'>
       <jar>/home/pmr/.m2/repository/net/java/dev/javacc/javacc/4.1/javacc-4.1.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-custom' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.1/transmart-custom-19.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='galaxy-export-plugin' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/galaxy-export-plugin/19.1/galaxy-export-plugin-19.1.zip</jar>
@@ -1831,9 +2044,6 @@
     <dependency group='org.json' name='json' version='20090211'>
       <jar>/home/pmr/.m2/repository/org/json/json/20090211/json-20090211.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.1/transmart-metacore-plugin-19.1.zip</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='transmart-xnat-importer' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-xnat-importer/19.1/transmart-xnat-importer-19.1.zip</jar>
     </dependency>
@@ -1852,11 +2062,11 @@
     <dependency group='jfree' name='jcommon' version='1.0.14'>
       <jar>/home/pmr/.m2/repository/jfree/jcommon/1.0.14/jcommon-1.0.14.jar</jar>
     </dependency>
+    <dependency group='javax.xml' name='jaxrpc-api' version='1.1'>
+      <jar>/home/pmr/.m2/repository/javax/xml/jaxrpc-api/1.1/jaxrpc-api-1.1.jar</jar>
+    </dependency>
     <dependency group='org.grails.plugins' name='xnat-viewer' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/xnat-viewer/19.1/xnat-viewer-19.1.zip</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='transmart-custom' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.1/transmart-custom-19.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='transmart-fractalis' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-fractalis/19.1/transmart-fractalis-19.1.zip</jar>
@@ -2076,6 +2286,18 @@
     <dependency group='org.grails' name='grails-resources' version='2.5.4'>
       <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/dist/grails-resources-2.5.4.jar</jar>
     </dependency>
+    <dependency group='org.codenarc' name='CodeNarc' version='0.21'>
+      <jar>/home/pmr/.m2/repository/org/codenarc/CodeNarc/0.21/CodeNarc-0.21.jar</jar>
+    </dependency>
+    <dependency group='org.gmetrics' name='GMetrics' version='0.5'>
+      <jar>/home/pmr/.m2/repository/org/gmetrics/GMetrics/0.5/GMetrics-0.5.jar</jar>
+    </dependency>
+    <dependency group='org.apache.ant' name='ant' version='1.7.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/ant/ant/1.7.1/ant-1.7.1.jar</jar>
+    </dependency>
+    <dependency group='org.apache.ant' name='ant-launcher' version='1.7.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/ant/ant-launcher/1.7.1/ant-launcher-1.7.1.jar</jar>
+    </dependency>
     <dependency group='axis' name='axis' version='1.4'>
       <jar>/home/pmr/.m2/repository/axis/axis/1.4/axis-1.4.jar</jar>
     </dependency>
@@ -2094,8 +2316,26 @@
     <dependency group='commons-discovery' name='commons-discovery' version='0.2'>
       <jar>/home/pmr/.m2/repository/commons-discovery/commons-discovery/0.2/commons-discovery-0.2.jar</jar>
     </dependency>
-    <dependency group='com.google.guava' name='guava' version='18.0'>
-      <jar>/home/pmr/.m2/repository/com/google/guava/guava/18.0/guava-18.0.jar</jar>
+    <dependency group='com.google.guava' name='guava' version='30.1.1-jre'>
+      <jar>/home/pmr/.m2/repository/com/google/guava/guava/30.1.1-jre/guava-30.1.1-jre.jar</jar>
+    </dependency>
+    <dependency group='com.google.guava' name='failureaccess' version='1.0.1'>
+      <jar>/home/pmr/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar</jar>
+    </dependency>
+    <dependency group='com.google.guava' name='listenablefuture' version='9999.0-empty-to-avoid-conflict-with-guava'>
+      <jar>/home/pmr/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar</jar>
+    </dependency>
+    <dependency group='com.google.code.findbugs' name='jsr305' version='3.0.2'>
+      <jar>/home/pmr/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar</jar>
+    </dependency>
+    <dependency group='org.checkerframework' name='checker-qual' version='3.8.0'>
+      <jar>/home/pmr/.m2/repository/org/checkerframework/checker-qual/3.8.0/checker-qual-3.8.0.jar</jar>
+    </dependency>
+    <dependency group='com.google.errorprone' name='error_prone_annotations' version='2.5.1'>
+      <jar>/home/pmr/.m2/repository/com/google/errorprone/error_prone_annotations/2.5.1/error_prone_annotations-2.5.1.jar</jar>
+    </dependency>
+    <dependency group='com.google.j2objc' name='j2objc-annotations' version='1.3'>
+      <jar>/home/pmr/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar</jar>
     </dependency>
     <dependency group='commons-net' name='commons-net' version='3.3'>
       <jar>/home/pmr/.m2/repository/commons-net/commons-net/3.3/commons-net-3.3.jar</jar>
@@ -2304,11 +2544,8 @@
     <dependency group='org.apache.solr' name='solr-solrj' version='5.4.1'>
       <jar>/home/pmr/.m2/repository/org/apache/solr/solr-solrj/5.4.1/solr-solrj-5.4.1.jar</jar>
     </dependency>
-    <dependency group='org.jfree' name='jfreechart' version='1.0.19'>
-      <jar>/home/pmr/.m2/repository/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar</jar>
-    </dependency>
-    <dependency group='org.jfree' name='jcommon' version='1.0.23'>
-      <jar>/home/pmr/.m2/repository/org/jfree/jcommon/1.0.23/jcommon-1.0.23.jar</jar>
+    <dependency group='org.jfree' name='jfreechart' version='1.5.0'>
+      <jar>/home/pmr/.m2/repository/org/jfree/jfreechart/1.5.0/jfreechart-1.5.0.jar</jar>
     </dependency>
     <dependency group='org.jfree' name='jfreesvg' version='2.1'>
       <jar>/home/pmr/.m2/repository/org/jfree/jfreesvg/2.1/jfreesvg-2.1.jar</jar>
@@ -2328,11 +2565,11 @@
     <dependency group='xml-resolver' name='xml-resolver' version='1.2'>
       <jar>/home/pmr/.m2/repository/xml-resolver/xml-resolver/1.2/xml-resolver-1.2.jar</jar>
     </dependency>
-    <dependency group='org.rosuda' name='Rserve' version='1.7.3'>
-      <jar>/home/pmr/.m2/repository/org/rosuda/Rserve/1.7.3/Rserve-1.7.3.jar</jar>
+    <dependency group='org.rosuda.REngine' name='Rserve' version='1.8.1'>
+      <jar>/home/pmr/.m2/repository/org/rosuda/REngine/Rserve/1.8.1/Rserve-1.8.1.jar</jar>
     </dependency>
-    <dependency group='org.rosuda' name='REngine' version='1.7.3'>
-      <jar>/home/pmr/.m2/repository/org/rosuda/REngine/1.7.3/REngine-1.7.3.jar</jar>
+    <dependency group='org.rosuda.REngine' name='REngine' version='2.1.0'>
+      <jar>/home/pmr/.m2/repository/org/rosuda/REngine/REngine/2.1.0/REngine-2.1.0.jar</jar>
     </dependency>
     <dependency group='org.springframework.security.extensions' name='spring-security-saml2-core' version='1.0.0.RELEASE'>
       <jar>/home/pmr/.m2/repository/org/springframework/security/extensions/spring-security-saml2-core/1.0.0.RELEASE/spring-security-saml2-core-1.0.0.RELEASE.jar</jar>
@@ -2352,9 +2589,6 @@
     <dependency group='commons-httpclient' name='commons-httpclient' version='3.1'>
       <jar>/home/pmr/.m2/repository/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar</jar>
     </dependency>
-    <dependency group='org.apache.santuario' name='xmlsec' version='1.5.6'>
-      <jar>/home/pmr/.m2/repository/org/apache/santuario/xmlsec/1.5.6/xmlsec-1.5.6.jar</jar>
-    </dependency>
     <dependency group='org.apache.velocity' name='velocity' version='1.7'>
       <jar>/home/pmr/.m2/repository/org/apache/velocity/velocity/1.7/velocity-1.7.jar</jar>
     </dependency>
@@ -2366,9 +2600,6 @@
     </dependency>
     <dependency group='xml-apis' name='xml-apis' version='1.4.01'>
       <jar>/home/pmr/.m2/repository/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar</jar>
-    </dependency>
-    <dependency group='org.transmartproject' name='transmart-core-api' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.1/transmart-core-api-19.1.jar</jar>
     </dependency>
     <dependency group='com.jcraft' name='jsch' version='0.1.42'>
       <jar>/home/pmr/.m2/repository/com/jcraft/jsch/0.1.42/jsch-0.1.42.jar</jar>
@@ -2385,38 +2616,197 @@
     <dependency group='oauth.signpost' name='signpost-core' version='1.2.1.1'>
       <jar>/home/pmr/.m2/repository/oauth/signpost/signpost-core/1.2.1.1/signpost-core-1.2.1.1.jar</jar>
     </dependency>
-    <dependency group='org.apache.poi' name='poi-contrib' version='3.1-FINAL'>
-      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-contrib/3.1-FINAL/poi-contrib-3.1-FINAL.jar</jar>
+    <dependency group='org.apache.poi' name='poi-scratchpad' version='5.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-scratchpad/5.0.0/poi-scratchpad-5.0.0.jar</jar>
     </dependency>
-    <dependency group='org.apache.poi' name='poi-scratchpad' version='3.1-FINAL'>
-      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-scratchpad/3.1-FINAL/poi-scratchpad-3.1-FINAL.jar</jar>
+    <dependency group='org.apache.poi' name='poi-ooxml' version='5.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-ooxml/5.0.0/poi-ooxml-5.0.0.jar</jar>
     </dependency>
-    <dependency group='org.apache.poi' name='poi' version='3.1-FINAL'>
-      <jar>/home/pmr/.m2/repository/org/apache/poi/poi/3.1-FINAL/poi-3.1-FINAL.jar</jar>
+    <dependency group='org.apache.poi' name='poi-ooxml-lite' version='5.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/poi/poi-ooxml-lite/5.0.0/poi-ooxml-lite-5.0.0.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlbeans' name='xmlbeans' version='4.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlbeans/xmlbeans/4.0.0/xmlbeans-4.0.0.jar</jar>
+    </dependency>
+    <dependency group='org.apache.commons' name='commons-compress' version='1.20'>
+      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-compress/1.20/commons-compress-1.20.jar</jar>
+    </dependency>
+    <dependency group='com.github.virtuald' name='curvesapi' version='1.06'>
+      <jar>/home/pmr/.m2/repository/com/github/virtuald/curvesapi/1.06/curvesapi-1.06.jar</jar>
+    </dependency>
+    <dependency group='org.bouncycastle' name='bcpkix-jdk15on' version='1.68'>
+      <jar>/home/pmr/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.68/bcpkix-jdk15on-1.68.jar</jar>
+    </dependency>
+    <dependency group='org.bouncycastle' name='bcprov-jdk15on' version='1.68'>
+      <jar>/home/pmr/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.68/bcprov-jdk15on-1.68.jar</jar>
+    </dependency>
+    <dependency group='org.apache.santuario' name='xmlsec' version='2.2.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/santuario/xmlsec/2.2.1/xmlsec-2.2.1.jar</jar>
+    </dependency>
+    <dependency group='com.fasterxml.woodstox' name='woodstox-core' version='5.2.1'>
+      <jar>/home/pmr/.m2/repository/com/fasterxml/woodstox/woodstox-core/5.2.1/woodstox-core-5.2.1.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-all' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-all/1.13/batik-all-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-anim' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-anim/1.13/batik-anim-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-shared-resources' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-shared-resources/1.13/batik-shared-resources-1.13.jar</jar>
+    </dependency>
+    <dependency group='xml-apis' name='xml-apis-ext' version='1.3.04'>
+      <jar>/home/pmr/.m2/repository/xml-apis/xml-apis-ext/1.3.04/xml-apis-ext-1.3.04.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-awt-util' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-awt-util/1.13/batik-awt-util-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='xmlgraphics-commons' version='2.4'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/xmlgraphics-commons/2.4/xmlgraphics-commons-2.4.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-bridge' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-bridge/1.13/batik-bridge-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-codec' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-codec/1.13/batik-codec-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-constants' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-constants/1.13/batik-constants-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-css' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-css/1.13/batik-css-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-dom' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-dom/1.13/batik-dom-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-ext' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-ext/1.13/batik-ext-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-extension' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-extension/1.13/batik-extension-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-gui-util' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-gui-util/1.13/batik-gui-util-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-gvt' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-gvt/1.13/batik-gvt-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-i18n' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-i18n/1.13/batik-i18n-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-parser' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-parser/1.13/batik-parser-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-rasterizer-ext' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-rasterizer-ext/1.13/batik-rasterizer-ext-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-rasterizer' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-rasterizer/1.13/batik-rasterizer-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-script' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-script/1.13/batik-script-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-slideshow' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-slideshow/1.13/batik-slideshow-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-squiggle-ext' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-squiggle-ext/1.13/batik-squiggle-ext-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-squiggle' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-squiggle/1.13/batik-squiggle-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svg-dom' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svg-dom/1.13/batik-svg-dom-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svgbrowser' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svgbrowser/1.13/batik-svgbrowser-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svggen' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svggen/1.13/batik-svggen-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svgpp' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svgpp/1.13/batik-svgpp-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-svgrasterizer' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-svgrasterizer/1.13/batik-svgrasterizer-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-swing' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-swing/1.13/batik-swing-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-transcoder' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-transcoder/1.13/batik-transcoder-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-util' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-util/1.13/batik-util-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-ttf2svg' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-ttf2svg/1.13/batik-ttf2svg-1.13.jar</jar>
+    </dependency>
+    <dependency group='org.apache.xmlgraphics' name='batik-xml' version='1.13'>
+      <jar>/home/pmr/.m2/repository/org/apache/xmlgraphics/batik-xml/1.13/batik-xml-1.13.jar</jar>
+    </dependency>
+    <dependency group='de.rototor.pdfbox' name='graphics2d' version='0.30'>
+      <jar>/home/pmr/.m2/repository/de/rototor/pdfbox/graphics2d/0.30/graphics2d-0.30.jar</jar>
+    </dependency>
+    <dependency group='org.apache.pdfbox' name='pdfbox' version='2.0.22'>
+      <jar>/home/pmr/.m2/repository/org/apache/pdfbox/pdfbox/2.0.22/pdfbox-2.0.22.jar</jar>
+    </dependency>
+    <dependency group='org.apache.pdfbox' name='fontbox' version='2.0.22'>
+      <jar>/home/pmr/.m2/repository/org/apache/pdfbox/fontbox/2.0.22/fontbox-2.0.22.jar</jar>
+    </dependency>
+    <dependency group='org.apache.poi' name='poi' version='5.0.0'>
+      <jar>/home/pmr/.m2/repository/org/apache/poi/poi/5.0.0/poi-5.0.0.jar</jar>
+    </dependency>
+    <dependency group='org.apache.commons' name='commons-collections4' version='4.4'>
+      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar</jar>
+    </dependency>
+    <dependency group='org.apache.commons' name='commons-math3' version='3.6.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-math3/3.6.1/commons-math3-3.6.1.jar</jar>
+    </dependency>
+    <dependency group='com.zaxxer' name='SparseBitSet' version='1.2'>
+      <jar>/home/pmr/.m2/repository/com/zaxxer/SparseBitSet/1.2/SparseBitSet-1.2.jar</jar>
     </dependency>
     <dependency group='xerces' name='xercesImpl' version='2.9.1'>
       <jar>/home/pmr/.m2/repository/xerces/xercesImpl/2.9.1/xercesImpl-2.9.1.jar</jar>
     </dependency>
-    <dependency group='org.postgresql' name='postgresql' version='42.2.2.jre7'>
-      <jar>/home/pmr/.m2/repository/org/postgresql/postgresql/42.2.2.jre7/postgresql-42.2.2.jre7.jar</jar>
+    <dependency group='org.postgresql' name='postgresql' version='42.3.3'>
+      <jar>/home/pmr/.m2/repository/org/postgresql/postgresql/42.3.3/postgresql-42.3.3.jar</jar>
     </dependency>
-    <dependency group='com.oracle' name='ojdbc7' version='12.1.0.1'>
-      <jar>/home/pmr/.m2/repository/com/oracle/ojdbc7/12.1.0.1/ojdbc7-12.1.0.1.jar</jar>
+    <dependency group='com.oracle.database.jdbc' name='ojdbc8' version='21.5.0.0'>
+      <jar>/home/pmr/.m2/repository/com/oracle/database/jdbc/ojdbc8/21.5.0.0/ojdbc8-21.5.0.0.jar</jar>
+    </dependency>
+    <dependency group='org.springframework.security' name='spring-security-config' version='3.2.9.RELEASE'>
+      <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-config/3.2.9.RELEASE/spring-security-config-3.2.9.RELEASE.jar</jar>
+    </dependency>
+    <dependency group='org.springframework.security' name='spring-security-web' version='3.2.9.RELEASE'>
+      <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-web/3.2.9.RELEASE/spring-security-web-3.2.9.RELEASE.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='asset-pipeline' version='2.14.1.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/asset-pipeline/2.14.1.1/asset-pipeline-2.14.1.1.zip</jar>
+    </dependency>
+    <dependency group='org.mozilla' name='rhino' version='1.7R4'>
+      <jar>/home/pmr/.m2/repository/org/mozilla/rhino/1.7R4/rhino-1.7R4.jar</jar>
+    </dependency>
+    <dependency group='com.bertramlabs.plugins' name='asset-pipeline-core' version='2.14.1'>
+      <jar>/home/pmr/.m2/repository/com/bertramlabs/plugins/asset-pipeline-core/2.14.1/asset-pipeline-core-2.14.1.jar</jar>
+    </dependency>
+    <dependency group='com.google.javascript' name='closure-compiler-unshaded' version='v20160713'>
+      <jar>/home/pmr/.m2/repository/com/google/javascript/closure-compiler-unshaded/v20160713/closure-compiler-unshaded-v20160713.jar</jar>
+    </dependency>
+    <dependency group='com.google.javascript' name='closure-compiler-externs' version='v20160713'>
+      <jar>/home/pmr/.m2/repository/com/google/javascript/closure-compiler-externs/v20160713/closure-compiler-externs-v20160713.jar</jar>
+    </dependency>
+    <dependency group='args4j' name='args4j' version='2.0.26'>
+      <jar>/home/pmr/.m2/repository/args4j/args4j/2.0.26/args4j-2.0.26.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='webxml' version='1.4.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/webxml/1.4.1/webxml-1.4.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='cache-ehcache' version='1.0.5'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/cache-ehcache/1.0.5/cache-ehcache-1.0.5.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='cache' version='1.1.8'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/cache/1.1.8/cache-1.1.8.zip</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='codenarc' version='0.21'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/codenarc/0.21/codenarc-0.21.zip</jar>
-    </dependency>
-    <dependency group='org.codenarc' name='CodeNarc' version='0.21'>
-      <jar>/home/pmr/.m2/repository/org/codenarc/CodeNarc/0.21/CodeNarc-0.21.jar</jar>
-    </dependency>
-    <dependency group='org.gmetrics' name='GMetrics' version='0.5'>
-      <jar>/home/pmr/.m2/repository/org/gmetrics/GMetrics/0.5/GMetrics-0.5.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='hibernate' version='3.6.10.19'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/hibernate/3.6.10.19/hibernate-3.6.10.19.zip</jar>
@@ -2487,12 +2877,6 @@
     <dependency group='org.springframework.security' name='spring-security-core' version='3.2.9.RELEASE'>
       <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-core/3.2.9.RELEASE/spring-security-core-3.2.9.RELEASE.jar</jar>
     </dependency>
-    <dependency group='org.springframework.security' name='spring-security-web' version='3.2.9.RELEASE'>
-      <jar>/home/pmr/.m2/repository/org/springframework/security/spring-security-web/3.2.9.RELEASE/spring-security-web-3.2.9.RELEASE.jar</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='webxml' version='1.4.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/webxml/1.4.1/webxml-1.4.1.zip</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='spring-security-kerberos' version='1.0.0'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-kerberos/1.0.0/spring-security-kerberos-1.0.0.zip</jar>
     </dependency>
@@ -2526,35 +2910,53 @@
     <dependency group='com.fasterxml.jackson.core' name='jackson-annotations' version='2.4.0'>
       <jar>/home/pmr/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.4.0/jackson-annotations-2.4.0.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='jquery-ui' version='1.10.4'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/jquery-ui/1.10.4/jquery-ui-1.10.4.zip</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='jquery' version='1.11.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/jquery/1.11.1/jquery-1.11.1.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='prototype' version='1.0'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/prototype/1.0/prototype-1.0.zip</jar>
+    <dependency group='org.grails.plugins' name='jquery-ui' version='1.10.4'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/jquery-ui/1.10.4/jquery-ui-1.10.4.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='resources' version='1.2.14'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/resources/1.2.14/resources-1.2.14.zip</jar>
+    <dependency group='org.grails.plugins' name='smart-r' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/smart-r/19.1/smart-r-19.1.zip</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.1/rdc-rmodules-19.1.zip</jar>
+    <dependency group='org.javassist' name='javassist' version='3.16.1-GA'>
+      <jar>/home/pmr/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar</jar>
+    </dependency>
+    <dependency group='com.ittm_solutions.ipacore' name='IpaApi' version='19.1'>
+      <jar>/home/pmr/.m2/repository/com/ittm_solutions/ipacore/IpaApi/19.1/IpaApi-19.1.jar</jar>
+    </dependency>
+    <dependency group='org.apache.logging.log4j' name='log4j-core' version='2.17.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/logging/log4j/log4j-core/2.17.1/log4j-core-2.17.1.pom</jar>
+    </dependency>
+    <dependency group='org.apache.logging.log4j' name='log4j-api' version='2.17.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/logging/log4j/log4j-api/2.17.1/log4j-api-2.17.1.jar</jar>
+    </dependency>
+    <dependency group='org.ini4j' name='ini4j' version='0.5.4'>
+      <jar>/home/pmr/.m2/repository/org/ini4j/ini4j/0.5.4/ini4j-0.5.4.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-core' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.1/transmart-core-19.1.zip</jar>
     </dependency>
     <dependency group='org.mapdb' name='mapdb' version='0.9.10'>
       <jar>/home/pmr/.m2/repository/org/mapdb/mapdb/0.9.10/mapdb-0.9.10.jar</jar>
     </dependency>
-    <dependency group='org.xhtmlrenderer' name='core-renderer' version='R8'>
-      <jar>/home/pmr/.grails/wrapper/2.5.4/grails-2.5.4/lib/org.xhtmlrenderer/core-renderer/jars/core-renderer-R8.jar</jar>
+    <dependency group='org.apache.commons' name='commons-lang3' version='3.4'>
+      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-core' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-core/19.1/transmart-core-19.1.zip</jar>
+    <dependency group='org.transmartproject' name='transmart-core-api' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/transmartproject/transmart-core-api/19.1/transmart-core-api-19.1.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='transmart-gwas' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-gwas/19.1/transmart-gwas-19.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='search-domain' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/search-domain/19.1/search-domain-19.1.zip</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-shared' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.1/transmart-shared-19.1.zip</jar>
+    </dependency>
+    <dependency group='com.auth0' name='java-jwt' version='3.2.0'>
+      <jar>/home/pmr/.m2/repository/com/auth0/java-jwt/3.2.0/java-jwt-3.2.0.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='mail' version='1.0.7'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/mail/1.0.7/mail-1.0.7.zip</jar>
@@ -2592,6 +2994,12 @@
     <dependency group='org.grails.plugins' name='plugin-config' version='0.2.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/plugin-config/0.2.1/plugin-config-0.2.1.zip</jar>
     </dependency>
+    <dependency group='org.grails.plugins' name='rdc-rmodules' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/rdc-rmodules/19.1/rdc-rmodules-19.1.zip</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.1/transmart-metacore-plugin-19.1.zip</jar>
+    </dependency>
     <dependency group='org.grails.plugins' name='dalliance-plugin' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/dalliance-plugin/19.1/dalliance-plugin-19.1.zip</jar>
     </dependency>
@@ -2607,32 +3015,20 @@
     <dependency group='org.codehaus.jackson' name='jackson-xc' version='1.9.2'>
       <jar>/home/pmr/.m2/repository/org/codehaus/jackson/jackson-xc/1.9.2/jackson-xc-1.9.2.jar</jar>
     </dependency>
+    <dependency group='org.apache.logging.log4j' name='log4j-core' version='2.17.1'>
+      <jar>/home/pmr/.m2/repository/org/apache/logging/log4j/log4j-core/2.17.1/log4j-core-2.17.1.jar</jar>
+    </dependency>
     <dependency group='xpp3' name='xpp3' version='1.1.3.4.O'>
       <jar>/home/pmr/.m2/repository/xpp3/xpp3/1.1.3.4.O/xpp3-1.1.3.4.O.jar</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='transmart-rest-api' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-rest-api/19.1/transmart-rest-api-19.1.zip</jar>
     </dependency>
-    <dependency group='org.javassist' name='javassist' version='3.16.1-GA'>
-      <jar>/home/pmr/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='transmart-shared' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-shared/19.1/transmart-shared-19.1.zip</jar>
-    </dependency>
-    <dependency group='com.auth0' name='java-jwt' version='3.2.0'>
-      <jar>/home/pmr/.m2/repository/com/auth0/java-jwt/3.2.0/java-jwt-3.2.0.jar</jar>
-    </dependency>
-    <dependency group='org.bouncycastle' name='bcprov-jdk15on' version='1.55'>
-      <jar>/home/pmr/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.55/bcprov-jdk15on-1.55.jar</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='spring-security-auth0' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/spring-security-auth0/19.1/spring-security-auth0-19.1.zip</jar>
     </dependency>
     <dependency group='com.auth0' name='mvc-auth-commons' version='1.0.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/mvc-auth-commons/1.0.0/mvc-auth-commons-1.0.0.jar</jar>
-    </dependency>
-    <dependency group='org.apache.commons' name='commons-lang3' version='3.5'>
-      <jar>/home/pmr/.m2/repository/org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar</jar>
     </dependency>
     <dependency group='com.auth0' name='auth0' version='1.1.0'>
       <jar>/home/pmr/.m2/repository/com/auth0/auth0/1.1.0/auth0-1.1.0.jar</jar>
@@ -2654,6 +3050,9 @@
     </dependency>
     <dependency group='net.java.dev.javacc' name='javacc' version='4.1'>
       <jar>/home/pmr/.m2/repository/net/java/dev/javacc/javacc/4.1/javacc-4.1.jar</jar>
+    </dependency>
+    <dependency group='org.grails.plugins' name='transmart-custom' version='19.1'>
+      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.1/transmart-custom-19.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='galaxy-export-plugin' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/galaxy-export-plugin/19.1/galaxy-export-plugin-19.1.zip</jar>
@@ -2697,9 +3096,6 @@
     <dependency group='org.json' name='json' version='20090211'>
       <jar>/home/pmr/.m2/repository/org/json/json/20090211/json-20090211.jar</jar>
     </dependency>
-    <dependency group='org.grails.plugins' name='transmart-metacore-plugin' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-metacore-plugin/19.1/transmart-metacore-plugin-19.1.zip</jar>
-    </dependency>
     <dependency group='org.grails.plugins' name='transmart-xnat-importer' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-xnat-importer/19.1/transmart-xnat-importer-19.1.zip</jar>
     </dependency>
@@ -2718,11 +3114,11 @@
     <dependency group='jfree' name='jcommon' version='1.0.14'>
       <jar>/home/pmr/.m2/repository/jfree/jcommon/1.0.14/jcommon-1.0.14.jar</jar>
     </dependency>
+    <dependency group='javax.xml' name='jaxrpc-api' version='1.1'>
+      <jar>/home/pmr/.m2/repository/javax/xml/jaxrpc-api/1.1/jaxrpc-api-1.1.jar</jar>
+    </dependency>
     <dependency group='org.grails.plugins' name='xnat-viewer' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/xnat-viewer/19.1/xnat-viewer-19.1.zip</jar>
-    </dependency>
-    <dependency group='org.grails.plugins' name='transmart-custom' version='19.1'>
-      <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-custom/19.1/transmart-custom-19.1.zip</jar>
     </dependency>
     <dependency group='org.grails.plugins' name='transmart-fractalis' version='19.1'>
       <jar>/home/pmr/.m2/repository/org/grails/plugins/transmart-fractalis/19.1/transmart-fractalis-19.1.zip</jar>
