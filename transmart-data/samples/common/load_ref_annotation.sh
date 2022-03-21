@@ -5,7 +5,12 @@ set -e
 source $1
 
 # Echo the platform, or list of platforms
-# The PLATFORM_DATA_TYPE here is ignored so can be multiple types
-# The PLATFORM_DATA_TYPE is taken from the PLATFORM annotation target
+# The PLATFORM_DATA_TYPE here is ignored as it can be multiple types
+# The PLATFORM_DATA_TYPE is taken from each PLATFORM annotation target
 
-echo "$PLATFORM $PLATFORMS"
+if [ -z "$PLATFORMS" ]; then
+    echo "$PLATFORM"
+else
+    echo "$PLATFORMS"
+fi
+
