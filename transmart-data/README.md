@@ -40,13 +40,13 @@ The following are required:
 * GNU make
 * PostgreSQL client utilities (`psql`, `psql_dump`, etc.)
 * curl
-* php (>= 5.4 or >= 7 for Ubuntu 16 onwards)
+* php >= 7.2 for Ubuntu 18 onwards
 * tar with support for the -J switch (GNU tar only?)
 * Groovy (>= 2.1). Can be installed with `make -C env groovy` and updating the
-  `PATH` (Oracle and some secondary functionality only)
+  `PATH`
 * [Kettle][kettle] (ETL only)
 * rsync (Solr only)
-* Java environment (JDK 7)
+* Java environment (JDK 8)
 * build-essentials tools and gcc-fortran (building R from source only)
 
 If you are using Ubuntu and you intend to use PostgreSQL, you should be able to
@@ -55,10 +55,10 @@ install all these dependencies by running
     sudo make -C env ubuntu_deps_root
 	make -C env ubuntu_deps_regular
 
-Using Ubuntu 16 you can run
+Using Ubuntu 18 you can run
 
-    sudo make -C env ubuntu_deps_root16
-	make -C env ubuntu_deps_regular16
+    sudo make -C env ubuntu_deps_root18
+	make -C env ubuntu_deps_regular18
 
 which will also prepare some directories for the tablespaces and assign them the
 correct ownership .
@@ -73,18 +73,16 @@ Start with copying the `vars.sample` file, editing it and sourcing it in:
     # edit file and save...
 	. ./vars
 
-If you ran `make -C env ubuntu_deps_regular` or `make -C env ubuntu_deps_regular16`, you will have a `vars` file
-created for you. You can skip the previous step and do only:
+If you ran `make -C env ubuntu_deps_regular` or `make -C env ubuntu_deps_regular18`,
+you will have a `vars` file created for you. You can skip the previous step and do only:
 
     . ./vars
 
-The several options are fairly self-explanatory.
+The various options are fairly self-explanatory.
 
 ### PostgreSQL-specific notes
 
-Release 16.3 upwards of tranSMART supports postgreSQL version 9.6. Earlier
-releases work with versions up to postgreSQL 9.5.
-
+Release 19.1 upwards of tranSMART supports postgreSQL version 9.6 to 14.
 
 The configured PostgreSQL user must be a database superuser. You can
 connect to PostgreSQL with UNIX sockets by specifying the parent
@@ -92,7 +90,7 @@ directory of the socket in `PGHOST`. In that case, `localhost` will be
 used in the situation where UNIX sockets are not supported, such as
 for JDBC connections.
 
-The variable `$TABLESPACES` is the parent directory for where the tablespaces
+The variable `$TABLESPACES` is the parent directory where the tablespaces
 will be created in the PostgreSQL server's filesystem.
 
 The database creation target assumes the PostgreSQL server runs on the same
@@ -101,7 +99,7 @@ exist, but it will nevertheless attempt to create the directories where it
 thinks the tablespaces should be according to `$TABLESPACES`.
 
 Note that if the tablespaces directories do not already exist or are not
-assigned the correct owner (i.e., the user PostgreSQL runs as), then the
+assigned the correct owner (the user PostgreSQL runs as), then the
 install target will run into problems when attempting to create the
 tablespaces. If the user PostgreSQL runs as and the user running the targets
 are not the same AND the tablespace directories do not already exist, then
@@ -113,7 +111,7 @@ and assigning them the correct owner.
 This install script assumes SYSDBA privileges in order to create the users that
 the application will use. 
 
-You will need to create the tablespaces `TRANSMART` and `INDX` (sic) manually 
+You will need to create the tablespaces `TRANSMART`,`INDX` (sic), `I2B2` and `I2B2_INDEX` manually 
 before creating the database. The install script can try to do this 
 automatically if you set `ORACLE_MANAGE_TABLESPACES=1`, but in that case you 
 will need to set `ORACLE_TABLESPACES_DIR` to a directory name (on the database 
@@ -121,7 +119,7 @@ server) where Oracle can automatically create the files to store the new
 tablespaces and other database objects.
 
 Transmart requires the 'Partitioning' feature of the database, so make sure that
-feature has not been disabled in the Oracle database. 'Partitioning' is (as of
+feature has not been disabled in the Oracle database. 'Partitioning' is (for
 Oracle Database 12) only supported in Oracle Database Enterprise Edition, so
 Transmart will not run against a lower level edition of Oracle.
 
@@ -163,8 +161,8 @@ These can be done with the targets `fix_permissions`, `fix_owners` and
 
 This project can be used to download public or privately available datasets and
 load these into the database. Typically, but not always, this loading involves
-using Kettle jobs (with kitchen) available in an existing checkout of
-(tranSMART-ETL)[ts-etl] .
+using Kettle jobs (with kitchen) available in an existing checkout including the
+(transmart-etl)[ts-etl] directory.
 
 Data fetching is done through a system of feeds that publish several data sets.
 A _data set_ is a combination of meta data and, for most data types, properly
@@ -178,7 +176,8 @@ The tarballs must follow the following rules:
 
   * they must be compressed with xz;
   * their filename must be in the form `<study name>_<data type>.tar.xz`;
-  * they must have a file named `<data type>.params` in their root;
+  * they must have a file named `<data type>.params` in their root or in the
+    `<data_type>` directory;
   * most data types require, under the root, a directory named `<data type>`,
     under which the data files should be located.
 
@@ -204,7 +203,7 @@ list of feeds in the following format:
 The two supported feed types are `http-index` and `ftp-flat`.
 Examples:
 ```
-http-index http://studies.thehyve.net/datasets_index
+http-index http://library.transmartfoundation.org/datasets_index
 ftp-flat ftp://studies.thehyve.net/
 ```
 
@@ -250,6 +249,14 @@ For instance:
 
 Do not forget to update your Solr index, if your setup requires it to be
 triggered manually.
+
+A single target can be used to find and load all data for a study
+
+    make -C samples/{oracle,postgres} load_study_GSE8581
+
+This will parse the stored datasets, and parse datasets separately places
+under `samples/studies/<study name>`. Clinical data will be loaded first, if available,
+then other data types and any `browse tab` metadata.
 
 ### For MacOSX
 The loading scripts use the -e option from the function readlink. This
