@@ -42,7 +42,7 @@ ALTER FUNCTION tm_cz.i2b2_create_security_for_trial(character varying, character
 
 ALTER FUNCTION tm_cz.i2b2_create_security_inc_trial(character varying,character varying,numeric) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, searchapp, biomart, pg_temp;
 
-ALTER FUNCTION tm_cz.i2b2_delete_1_node(character varying) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, pg_temp;
+ALTER FUNCTION tm_cz.i2b2_delete_1_node(character varying, numeric) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, pg_temp;
 
 ALTER FUNCTION tm_cz.i2b2_delete_all_nodes(character varying, numeric) SET search_path TO tm_cz, i2b2demodata, i2b2metadata, pg_temp;
 
