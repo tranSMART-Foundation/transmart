@@ -140,7 +140,9 @@ class SessionService implements DisposableBean {
                     UUID sessionId,
                     String taskType) {
         doWithSession(sessionId) {
+	    logger.debug 'calling createTask'
             def task = jobInstance.createTask(taskType, arguments)
+	    logger.debug 'calling submitTask'
             jobTasksService.submitTask(task)
             task.uuid
         }
@@ -199,6 +201,7 @@ class SessionService implements DisposableBean {
     }
 
     void removeAllFiles(UUID sessionUUID) {
+	logger.debug 'removeAll Files sessionUUID {}', sessionUUID
         doWithSession(sessionUUID) {
             sessionFiles.removeAll()
         }

@@ -1,8 +1,10 @@
 package smartR.plugin.rest
 
+import groovy.util.logging.Slf4j
 import heim.session.SessionService
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 
+@Slf4j('logger')
 class RSessionController {
 
     static scope = 'prototype'
@@ -49,12 +51,14 @@ class RSessionController {
     }
 
     /**
-     * Delete files assoiated with this session
+     * Delete files associated with this session
      */
     def deleteFiles() {
+	logger.info 'deleteFiles sessionId {}', sessionId
         sessionService.removeAllFiles(sessionId)
-
         response.status = 204
+	logger.info 'deleteFiles done, fixed response.status {}', response.status
+
         render ''
     }
 

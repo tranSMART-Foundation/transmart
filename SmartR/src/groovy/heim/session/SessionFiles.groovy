@@ -2,6 +2,7 @@ package heim.session
 
 import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
+import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Component
 import org.transmartproject.core.exceptions.NoSuchResourceException
 
@@ -13,6 +14,7 @@ import java.nio.file.NoSuchFileException
  */
 @Component
 @SmartRSessionScope
+@Slf4j('logger')
 class SessionFiles {
 
     private Table<UUID /* task */, String /* filename */, File> files =
@@ -27,13 +29,18 @@ class SessionFiles {
     }
 
     void removeAll() {
+	logger.debug 'removeAll'
         try {
             for (File f: files.values()) {
+		logger.debug 'delete file {}', f
                 f.delete()
             }
         }
-        catch(NoSuchFileException e) {}
+        catch(NoSuchFileException e) {
+	    logger.debug 'Exception {}', e
+	}
         finally {
+	    logger.debug 'removeAll done, create empty HashBasedTable'
             files = HashBasedTable.create()
         }
     }
