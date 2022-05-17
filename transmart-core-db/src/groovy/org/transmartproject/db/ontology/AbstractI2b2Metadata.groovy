@@ -20,6 +20,7 @@
 package org.transmartproject.db.ontology
 
 import groovy.transform.EqualsAndHashCode
+import groovy.util.logging.Slf4j
 import groovy.util.slurpersupport.GPathResult
 import org.transmart.plugin.shared.Utils
 import org.transmartproject.core.concept.ConceptKey
@@ -28,6 +29,7 @@ import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.Study
 
 @EqualsAndHashCode(includes = [ 'fullName', 'name' ])
+@Slf4j('logger')
 abstract class AbstractI2b2Metadata extends AbstractQuerySpecifyingType implements OntologyTerm {
 
     Integer      level

@@ -103,7 +103,7 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
     private RuntimeException initialException = new RuntimeException('Instantiated at this point')
 
     // We expect results.next() to already be called before the first time this method is called.
-    // Compiler crashes with the correct return type of R on groovy 2.2.0
+
     R getNextRow() {
         Object[] firstEntry = results.get()
         if (firstEntry == null) {
@@ -111,19 +111,25 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
         }
 
         List collectedEntries = new ArrayList(indicesList.size())
+	logger.debug 'getColumnEntityName start with first entry'
         addToCollectedEntries collectedEntries, firstEntry
 
         while (results.next() && inSameGroup(firstEntry, results.get())) {
+	    logger.debug 'getColumnEntityName next result'
             addToCollectedEntries collectedEntries, results.get()
         }
 
+	logger.debug 'getColumnEntityName retrieval done'
+
         finalizeCollectedEntries collectedEntries
 
+	logger.debug 'getColumnEntityName finalizeGroup closure {}', finalizeGroup
         finalizeGroup collectedEntries
     }
 
     protected void finalizeCollectedEntries(List collectedEntries) {
         if (collectedEntries.size() == indicesList.size()) {
+	    logger.debug 'finalizeCollectedEntries checked size {}', collectedEntries.size()
             return
         }
 
@@ -139,6 +145,7 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
         }
 
         if (allowMissingColumns) {
+	    logger.debug 'finalizeCollectedEntries fill with nulls till we have the expected size {} to {}', collectedEntries.size(), indicesList.size()
             /* fill with nulls till we have the expected size */
             collectedEntries.addAll Collections.nCopies(indicesList.size() - collectedEntries.size(), null)
             return
@@ -150,12 +157,13 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
             Set expectedColumnIds = indicesList*.getAt('id') as Set
 	    Set gottenColumnIds = collectedEntries.collect { row -> columnIdFromRow(row) } as Set
             columnsNotFound = expectedColumnIds - gottenColumnIds
-        }
+	}
+	logger.debug 'finalizeCollectedEntries {} columns not found and missing is not allowed: {}', columnEntityName.capitalize(), columnsNotFound
 
 	String message = "Expected row group to be of size ${indicesList.size()}; got ${collectedEntries.size()} objects"
         if (columnsNotFound) {
 	    message += ". ${columnEntityName.capitalize()} ids not found: ${columnsNotFound}"
-        }
+	}
 
         throw new UnexpectedResultException(message)
     }
@@ -165,16 +173,25 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
     }
 
     private void addToCollectedEntries(List collectedEntries, row) {
+
+        String rowAsString
+
+	logger.debug 'addToCollectedEntries row {}', row
+
         if (allowMissingColumns) {
 	    def currentColumnId = columnIdFromRow(row)
             int startSize = collectedEntries.size()
             int i
+
+	    logger.debug 'addToCollectedEntries allowMissingColumns currentColumnId {} startSize {} maxsize {}', currentColumnId, startSize, indicesList.size()
+
 	    for (i = startSize; indicesList[i] != null && getIndexObjectId(indicesList[i]) != currentColumnId; i++) {
+		logger.debug 'testing indicesList[{}] {}', i, getIndexObjectId(indicesList[i])
 		collectedEntries << null
             }
             if (indicesList[i] == null) {
-                String rowAsString
                 try {
+		    logger.debug 'indicesList[{}] null searching for currentColumnId from startSize {}', i, startSize
                     rowAsString = row.toString()
                 }
 		catch (e) {
@@ -189,9 +206,12 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
 						"Row was: $rowAsString. " +
 						"${columnEntityName.capitalize()} id list was " +
 						indicesList.collect { getIndexObjectId it })
-            }
-        }
-
+	    }
+	} else {
+            rowAsString = row.toString()
+	    logger.debug 'Single row {}', rowAsString
+	}
+	
 	collectedEntries << row
     }
 

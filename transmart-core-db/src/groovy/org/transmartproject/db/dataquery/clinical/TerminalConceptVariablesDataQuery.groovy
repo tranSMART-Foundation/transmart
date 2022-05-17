@@ -23,6 +23,7 @@ import com.google.common.collect.HashMultiset
 import com.google.common.collect.Lists
 import com.google.common.collect.Multiset
 import grails.orm.HibernateCriteriaBuilder
+import groovy.util.logging.Slf4j
 import org.hibernate.ScrollMode
 import org.hibernate.ScrollableResults
 import org.hibernate.engine.SessionImplementor
@@ -36,6 +37,7 @@ import org.transmartproject.db.i2b2data.PatientDimension
 import static org.transmartproject.db.util.GormWorkarounds.createCriteriaBuilder
 import static org.transmartproject.db.util.GormWorkarounds.getHibernateInCriterion
 
+@Slf4j('logger')
 class TerminalConceptVariablesDataQuery {
 
     private boolean initialized
@@ -120,6 +122,7 @@ class TerminalConceptVariablesDataQuery {
             }
 
             or {
+		logger.info 'Checking conceptPaths, conceptCodes keysets'
                 if (conceptPaths.keySet()) {
                     conceptPaths.keySet().asList().collate(1000).each { 'in' 'conceptPath', it } // used to avoid "ORA-01795: maximum number of expressions in a list is 1000" thanks to https://stackoverflow.com/a/21837744/535203
                 }
@@ -133,10 +136,14 @@ class TerminalConceptVariablesDataQuery {
 	    String conceptPath = concept[0]
 	    String conceptCode = concept[1]
 
+	    logger.info 'Checking conceptCode {} conceptPath {}', conceptCode, conceptPath
+
             if (conceptPaths[conceptPath]) {
+		logger.info 'Found conceptPath {}', conceptPath
 		conceptPaths[conceptPath].conceptCode = conceptCode
             }
             if (conceptCodes[conceptCode]) {
+		logger.info 'Found conceptCode {}', conceptCode
 		conceptCodes[conceptCode].conceptPath = conceptPath
             }
             // if both ifs manage we have the variable repeated (specified once
