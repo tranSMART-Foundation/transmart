@@ -2181,7 +2181,7 @@ class I2b2HelperService implements InitializingBean {
         dataWriter.close()
     }
 
-    private void getSNPDataByProbeByChromw(List<SnpDataset> datasetList,
+    private void getSNPDataByProbeByChrom(List<SnpDataset> datasetList,
 	                                  Map<String, List<SnpDataByProbe>> snpDataByChromMap,
 					  Collection snpIds) {
 	Assert.notEmpty datasetList, 'The datasetList is empty'
@@ -4072,7 +4072,7 @@ class I2b2HelperService implements InitializingBean {
 	    logger.trace 'ADMINISTRATOR, SKIPPING PERMISSION CHECKING'
         }
 	else { //level of nodes and not an admin
-	    logger.trace 'NOT AN ADMINISTRATOR CHECKING PERMISSIONS'
+	    logger.trace 'NOT AN ADMINISTRATOR, CHECKING PERMISSIONS'
             //3) get the secure paths that are in the list and secure them for later unlocking if necessary
 	    for (SecureObjectPath sop in SecureObjectPath.executeQuery('SELECT DISTINCT s FROM SecureObjectPath s')) {
 		setChildrenAccess access, sop.conceptPath, 'Locked'
@@ -4133,17 +4133,20 @@ class I2b2HelperService implements InitializingBean {
         Map<String, String> tokenmap = getSecureTokensWithAccessForUser()
         List<String> authStudies = []
 
+	logger.trace 'getAuthorizedStudies admin {} i2b2View {}', admin, i2b2View
         if (admin) {
 	    if(i2b2View) {
 		// add I2B2 study for i2b2 concepts
 		allStudies['I2B2'] = 'EXP:I2B2'
 	    }
             allStudies.each { key, value ->
+		logger.trace 'admin add study {} token {}', key, value
                 authStudies << key
             }
         }
         else {
             allStudies.each { key, value ->
+		logger.trace 'test study {} token {}', key, value
                 if (value == 'EXP:PUBLIC') {
                     authStudies<< key
                 } else if (tokenmap.containsKey('EXP:' + key)) {
@@ -4166,9 +4169,10 @@ class I2b2HelperService implements InitializingBean {
         Sql sql = new Sql(dataSource)
         String sqlt = 'SELECT sourcesystem_cd, secure_obj_token FROM i2b2metadata.i2b2_secure WHERE c_visualattributes like \'%S\''
 
-	logger.info 'getAllStudiesWithTokens sqlt {}', sqlt
+	logger.trace 'getAllStudiesWithTokens sqlt {}', sqlt
 
 	sql.eachRow(sqlt, [], { row ->
+	    logger.trace 'row {} token {}', row.sourcesystem_cd, row.secure_obj_token
             studies.put(row.sourcesystem_cd, row.secure_obj_token);
         })
         return studies;
@@ -4223,6 +4227,7 @@ class I2b2HelperService implements InitializingBean {
     }
 
     Map<String, String> getSecureTokensWithAccessForUser() {
+	logger.trace 'getSecureTokensWithAccessForUser {}', securityService.currentUserId()
 	List<String[]> results = AuthUserSecureAccess.executeQuery('''
 	    SELECT DISTINCT so.bioDataUniqueId, ausa.accessLevel.accessLevelName
             FROM AuthUserSecureAccess ausa
@@ -4235,6 +4240,7 @@ class I2b2HelperService implements InitializingBean {
 	Map<String, String> map = results.collectEntries { String[] result ->
 	    String bioDataUniqueIdToken = result[0]
 	    String accessLevelName = result[1]
+	    logger.trace 'bioDataUniqueIdToken {} accessLevelName {}', bioDataUniqueIdToken, accessLevelName
 	    [bioDataUniqueIdToken, accessLevelName]
 	}
 
@@ -4280,6 +4286,7 @@ class I2b2HelperService implements InitializingBean {
 	Map<String, String> access = [:] //new map to merge the other two
 
 	boolean admin = securityService.principal().isAdminOrDseAdmin()
+	logger.trace 'getAccess admin: {}', admin
 	if (admin) {
 	    logger.trace 'ADMINISTRATOR, SKIPPING PERMISSION CHECKING'
             //1)If we are an admin then grant admin to all the paths
@@ -4449,7 +4456,7 @@ class I2b2HelperService implements InitializingBean {
 			'WHERE c_hlevel IN (-1, 0) ' +
 			'ORDER BY c_fullname'
 
-	logger.info 'getRootPathsWithTokens sql {}', sql
+	logger.trace 'getRootPathsWithTokens sql {}', sql
 
 	eachRow(sql) { row ->
 	    String fullname = rowGet(row, 'c_fullname', String)
