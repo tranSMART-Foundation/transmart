@@ -418,7 +418,7 @@
             </driver>
             <driver>
               <name>geckodriver</name>
-              <version>0.29.0</version> <!-- for Firefox 60+ Selenium 3.11+ -->
+              <version>0.30.0</version> <!-- 16-sep-2021 -->
               <platform>linux</platform>
             </driver>
           </drivers>

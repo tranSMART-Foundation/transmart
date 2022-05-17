@@ -32,7 +32,7 @@ import pages.BrowsePage
 //baseUrl = 'http://postgres-demo.transmartfoundation.org/transmart/'
 
 // for local testing set here or use -Pfirefoxlocal below
-baseUrl = 'http://localhost:8080/transmart/'
+baseUrl = 'http://localhost/transmart/'
 
 // directory for copies of HTML and PNG image
 // for each test (for any driver unless overridden)
@@ -93,10 +93,19 @@ environments {
     
     firefox {
         driver = {
+	    println "Setting up firefox"
             ProfilesIni iniprofile = new org.openqa.selenium.firefox.ProfilesIni()
+	    println "Setting up firefox iniprofile ${iniprofile}"
             FirefoxProfile firefoxProfile = iniprofile.getProfile("tmtestProfile");
+	    println "fetched firefoxprofile tmtestprofile ${firefoxProfile}"
+            if (firefoxProfile == null) {
+		firefoxProfile = iniprofile.getProfile("default");
+		println "re-fetched firefoxprofile default ${firefoxProfile}"
+	    }
 
             firefoxProfile.setPreference("intl.accept_languages", "en-us")
+	    println "Managed first tmtestprofile setPreference ${firefoxProfile}"
+
             firefoxProfile.setPreference("browser.download.dir", "/data/scratch/git-master/transmart-test/functional_tests/savefiles")
             firefoxProfile.setPreference("browser.download.folderList", 2)
             firefoxProfile.setPreference("browser.helperApps.neverAsk.saveToDisk", "image/jpeg, image/jpg, image/png, image/gif, \
@@ -119,17 +128,17 @@ application/pdf, application/octet-stream, text/plain")
     }
     
     firefoxlocal {
-        baseUrl = 'http://localhost:8080/transmart/'
+        baseUrl = 'http://localhost/transmart/'
         driver = { new FirefoxDriver() }
     }
 
     firefoxoracle {
-        baseUrl = 'http://localhost:8080/transmart/'
+        baseUrl = 'http://localhost/transmart/'
         driver = { new FirefoxDriver() }
     }
 
     firefoxpostgres {
-        baseUrl = 'http://localhost:8080/transmart/'
+        baseUrl = 'http://localhost/transmart/'
         driver = { new FirefoxDriver() }
     }
 
@@ -155,7 +164,7 @@ LANDING_PAGE = new BrowsePage() // local configuration
 
 GSE8581_KEY = '\\\\Public Studies\\Public Studies\\GSE8581\\'
 
-if(baseUrl == 'http://localhost:8080/transmart/') {
+if(baseUrl == 'http://localhost/transmart/') {
     HOST_SERVER = 'localhost'
 } else if(baseUrl == 'http://postgres-ci.transmartfoundation.org/transmart/') {
     HOST_SERVER = 'TranSMART Oracle test server'
@@ -177,7 +186,7 @@ baseNavigatorWaiting = true
 // increase timeout for slow pages to 10 seconds
 // default timeout is 5 seconds
 waiting {
-    timeout = 10
+    timeout = 20
     retryInterval = 0.5
     includeCauseInMessage = true // Force Maven Surefire to include cause of exception
 }

@@ -20,11 +20,11 @@ class GebReportingSpecTransmart extends GebReportingSpec {
     void loginTransmart(Class<? extends Page> page, String userLevel = "guest", boolean firstCall = true) {
         via page
         println "loginTransmart ${page} autologin ${Constants.AUTO_LOGIN_ENABLED}"
-        if (printme("testing isAt(page ${page.class})") && isAt(page)) {
+        if (printme("testing isAt(page ${page})") && isAt(page)) {
             println "passed isAt"
             /* Already at required page */
             return
-        } else if (!Constants.AUTO_LOGIN_ENABLED && printme("testing isAt(LoginPage)") && isAt(LoginPage, false)) {
+        } else if (!Constants.AUTO_LOGIN_ENABLED && printme("testing 2 isAt(LoginPage)") && isAt(LoginPage, false)) {
             println "passed loginPage"
             /* At login page - login with user/password */
             LoginPage.login(userLevel)
@@ -33,12 +33,13 @@ class GebReportingSpecTransmart extends GebReportingSpec {
             println "autologin to landing page - redirect"
             /* Unexpectedly at landing page when not wanted */
             if (!firstCall) {
+		println "Unexpectedly at landing page when not wanted"
                 throw new AssertionFailedError('Redirection loop')
             }
             /* if auto-login is on, we're unfortunately forwarded here */
             loginTransmart(page, userLevel, false)
         } else {
-            println "Throw exception"
+            println "Throw exception in loginTransmart"
             throw new AssertionFailedError(
                     "Expected to be at either the LoginPage, Landing page ${Constants.LANDING_PAGE.class} or required page ${page.class}")
         }
