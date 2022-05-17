@@ -180,6 +180,70 @@ begin
 	stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert root_node ' || rootNode || ' to i2b2',rowCt,stepCt,'Done');
 
+	--	insert root_node into i2b2_secure
+
+	insert into i2b2metadata.i2b2_secure
+		    (c_hlevel
+		    ,c_fullname
+		    ,c_name
+		    ,c_synonym_cd
+		    ,c_visualattributes
+		    ,c_totalnum
+		    ,c_basecode
+		    ,c_metadataxml
+		    ,c_facttablecolumn
+		    ,c_tablename
+		    ,c_columnname
+		    ,c_columndatatype
+		    ,c_operator
+		    ,c_dimcode
+		    ,c_comment
+		    ,c_tooltip
+		    ,m_applied_path
+		    ,update_date
+		    ,download_date
+		    ,import_date
+		    ,sourcesystem_cd
+		    ,valuetype_cd
+		    ,m_exclusion_cd
+		    ,c_path
+		    ,c_symbol
+		    ,secure_obj_token
+		    )
+	select 0 as c_hlevel
+	       ,rootPath as c_fullname
+	       ,rootNode as c_name
+	       ,'N' as c_synonym_cd
+	       ,'CA' as c_visualattributes
+	       ,null as c_totalnum
+	       ,null as c_basecode
+	       ,null as c_metadataxml
+	       ,'CONCEPT_CD' as c_facttablecolumn
+	       ,'CONCEPT_DIMENSION' as c_tablename
+	       ,'CONCEPT_PATH' as c_columnname
+	       ,'T' as c_columndatatype
+	       ,'LIKE' as c_operator
+	       ,rootPath as c_dimcode
+	       ,null as c_comment
+	       ,rootPath as c_tooltip
+	       ,'@' as m_applied_path
+	       ,current_timestamp as update_date
+	       ,null as download_date
+	       ,current_timestamp as import_date
+	       ,null as sourcesystem_cd
+	       ,null as valuetype_cd
+	       ,null as m_exclusion_cd
+	       ,null as c_path
+	       ,null as c_symbol
+	       ,'EXP:PUBLIC'
+	 where not exists
+	       (select 1 from i2b2metadata.i2b2_secure x
+		 where x.c_name = rootNode);
+	get diagnostics rowCt := ROW_COUNT;
+
+	stepCt := stepCt + 1;
+	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert root_node ' || rootNode || ' to i2b2_secure',rowCt,stepCt,'Done');
+
     end;
 
     stepCt := stepCt + 1;
