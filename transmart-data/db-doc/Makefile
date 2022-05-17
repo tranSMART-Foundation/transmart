@@ -3,8 +3,9 @@ include ../lib/makefile.inc
 # need graphviz installed for older versions
 # added -vizjs to use javascript to generate diagrams
 
-# use -t pgsql11 to allow old reference to proisagg for postgres 10 and earlier in META/assign_suport.sql
-# -t pgsql complains and refuses to document functions/procedures
+# use -t pgsql11 to allow old reference to proisagg for postgres 10
+# and earlier in ddl/postgres/META/assign_support.sql
+# A simple -t pgsql complains and refuses to document functions/procedures
 
 generate_postgresql: $(SCHEMA_SPY_JAR_PATH) $(JDBC_DRIVER_PSQL_PATH)
 	java -jar $(SCHEMA_SPY_JAR_PATH) -t pgsql11 -dp $(JDBC_DRIVER_PSQL_PATH) -db $(PGDATABASE) -host
