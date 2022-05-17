@@ -1,6 +1,8 @@
 # Kettle (Pentaho data integration community edition) 07-sep-20
-KETTLE_VERSION=9.2
-KETTLE_ZIP=9.2.0.0-290
+#KETTLE_VERSION=9.2
+#KETTLE_ZIP=9.2.0.0-290
+KETTLE_VERSION=9.3
+KETTLE_ZIP=9.3.0.0-428
 KETTLE_HOST ?= http://downloads.sourceforge.net/project/pentaho
 
 TRANSMART_LIBRARY ?= http://library.transmartfoundation.org/release
@@ -67,13 +69,13 @@ $(TRANSMART_LOADER)-latest-bamboo-snapshot: $(TRANSMART_LOADER)-latest-bamboo-sn
 	if test "$$(find $@/$(TRANSMART_LOADER_SNAPSHOT_NAME) -mtime +1 2> /dev/null)" \
 		-o "$$FORCE_TS_LOADER_DOWNLOAD" = 1 \
 		-o ! -f $@/$(TRANSMART_LOADER_SNAPSHOT_NAME); then \
-		curl -L -f $(LATEST_TRANSMART_LOADER_SNAPSHOT_URL) > $@/$(TRANSMART_LOADER_SNAPSHOT_NAME); \
+		curl --location --silent --show-error $(LATEST_TRANSMART_LOADER_SNAPSHOT_URL) > $@/$(TRANSMART_LOADER_SNAPSHOT_NAME); \
 	fi
 
 # do a conditional request here.
 # We could also skip if we checked in the last hour or so (see ts-loader) below
 $(TRANSMART_BATCH_FILE):
-	curl -s -S -L -f -R -z '$@' -o '$@' '$(TRANSMART_BATCH_URL)'
+	curl --silent --location --show-error --fail --remote-time --time-cond '$@' -o '$@' '$(TRANSMART_BATCH_URL)'
 	@chmod +x '$@'
 
 batchdb-psql.properties: batchdb-psql.properties.php
@@ -86,7 +88,7 @@ batchdb-oracle.properties: batchdb-oracle.properties.php
 .PHONY: $(TRANSMART_BATCH_FILE) batchdb-psql.properties batchdb-oracle.properties
 
 $(GROOVY_ZIP):
-	curl -L "$(GROOVY_URL)" > $@
+	curl --location --silent --show-error "$(GROOVY_URL)" > $@
 
 $(GROOVY_BIN): $(GROOVY_ZIP)
 	unzip -q $<
@@ -96,7 +98,7 @@ groovy: $(GROOVY_BIN)
 	ln -sf $< $@
 
 $(PHP_TARBALL):
-	curl -f '$(PHP_URL)' > $@
+	curl --location --silent --show-error '$(PHP_URL)' > $@
 
 $(PHP_SRCDIR)/.keep: $(PHP_TARBALL)
 	tar -xf '$<'
@@ -143,15 +145,15 @@ update_etl_git: transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip
 	test -d transmart-etl || mv transmart-etl-$(TRANSMART_RELEASE_BRANCH) transmart-etl
 
 transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip:
-	curl -L -f "$(TRANSMART_LIBRARY)/$(TRANSMART_RELEASE_DIR)_artifacts/transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip" > transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip
+	curl --location --silent --show-error --fail "$(TRANSMART_LIBRARY)/$(TRANSMART_RELEASE_DIR)_artifacts/transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip" > transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip
 
 .PHONY: update_repos, $(TRANSMART_LOADER)-from-file-server, $(TRANSMART_LOADER)-latest-bamboo-snapshot
 
-# Note kettle to 9.0 had a space in the directory, 9.2 has a dash
+# Note kettle to 9.0 had a space in the directory, 9.1 onward has a dash
 KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip 
 $(KETTLE_ARCHIVE):
-	curl -L -f "$(KETTLE_HOST)/Pentaho-$(KETTLE_VERSION)/client-tools/$@" > $@
-#	curl -L -f "$(KETTLE_HOST)/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
+	curl --location --silent --show-error --fail "$(KETTLE_HOST)/Pentaho-$(KETTLE_VERSION)/client-tools/$@" > $@
+#	curl --location --silent --show-error --fail "$(KETTLE_HOST)/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
 ## Updated for 9.1: Pentaho no longer has libext directory
 KETTLE_ORACLE_DRIVER=data-integration/lib/$(JDBC_DRIVER_ORA)
