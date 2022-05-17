@@ -163,6 +163,11 @@ environments { development {
     com.recomdata.bugreportURL = 'https://jira.transmartfoundation.org'
 } }
 
+// Replacement HTML text for the Intro text on the Browse page
+//com.recomdata.transmartIntro = ""
+// Additional welcome paragraphs as HTML text below the Intro text on the Browse page
+//com.recomdata.transmartWelcome = ""
+
 // Keys without defaults (see Config-extra.php.sample):
 // name and URL of the supporter entity shown on the welcome page
 // com.recomdata.providerName = "tranSMART Foundation"
