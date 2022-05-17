@@ -11,7 +11,7 @@
 "1"	"38"	"0"	"12"	"Program publication author list"	"0"	"1"	"PROGRAM_PUBLICATION_AUTHOR_LIST"	"0"	"0"	"50"		"CUSTOM"	"0"	"FREETEXT"	
 "1"	"39"	"0"	"13"	"Program publication title"	"0"	"1"	"PROGRAM_PUBLICATION_TITLE"	"0"	"0"	"51"		"CUSTOM"	"0"	"FREETEXT"	
 "1"	"40"	"0"	"14"	"Program publication status"	"0"	"1"	"PROGRAM_PUBLICATION_STATUS"	"0"	"0"	"52"		"CUSTOM"	"0"	"FREETEXT"	
-"1"	"41"	"0"	"15"	"Program personname"	"0"	"1"	"PROGRAM_PERSON_NAME"	"0"	"0"	"41"		"CUSTOM"	"0"	"FREETEXT"	
+"1"	"41"	"0"	"15"	"Program person name"	"0"	"1"	"PROGRAM_PERSON_NAME"	"0"	"0"	"41"		"CUSTOM"	"0"	"FREETEXT"	
 "1"	"44"	"0"	"18"	"Program person email"	"0"	"1"	"PROGRAM_PERSON_EMAIL"	"0"	"0"	"56"		"CUSTOM"	"0"	"FREETEXT"	
 "1"	"45"	"0"	"19"	"Program person phone"	"0"	"1"	"PROGRAM_PERSON_PHONE"	"0"	"0"	"57"		"CUSTOM"	"0"	"FREETEXT"	
 "1"	"46"	"0"	"20"	"Program person fax"	"0"	"1"	"PROGRAM_PERSON_FAX"	"0"	"0"	"58"		"CUSTOM"	"0"	"FREETEXT"	
