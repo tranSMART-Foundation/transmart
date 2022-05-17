@@ -95,21 +95,29 @@ class ChartService {
 
 	subsets.findAll { n, Map p -> p.exists }.each { n, Map p ->
 
+//	    logger.info "computeChartsForSubsets subset {} instance {}", n, p.inspect()
+//	    logger.info "instance {}", p.instance
+
 	    // First we get the Query Definition
 	    i2b2HelperService.renderQueryDefinition p.instance,
 		'Query Summary for Subset ' + n, writer
 	    p.query = output.toStringAndFlush()
 
 	    // Let's fetch the patient count
+//	    logger.info "Fetch patientcount"
 	    p.patientCount = i2b2HelperService.getPatientSetSize(p.instance)
+//	    logger.info "patientcount {}", p.patientCount
+
 	    // Getting the age data
-	    p.ageData = i2b2HelperService.getPatientDemographicValueDataForSubset(
-		'AGE_IN_YEARS_NUM', p.instance) as List<Double>
-		if (p.ageData) {
+//	    logger.info "Fetch age data"
+	    p.ageData = i2b2HelperService.getPatientDemographicValueDataForSubset('age_in_years_num',
+			p.instance) as List<Double>
+	    if (p.ageData) {
 		p.ageStats = BoxAndWhiskerCalculator.calculateBoxAndWhiskerStatistics(p.ageData)
 		ageHistogramHandle['Subset ' + n] = p.ageData
 		agePlotHandle['Subset ' + n] = p.ageStats
 	    }
+//	    logger.info "age data: {}", p.ageData
 
 	    // Sex chart has to be generated for each subset
 	    p.sexData = i2b2HelperService.getPatientDemographicDataForSubset('sex_cd', p.instance)
