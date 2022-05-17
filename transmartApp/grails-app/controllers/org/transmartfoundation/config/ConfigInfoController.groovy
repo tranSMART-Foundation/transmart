@@ -1,5 +1,8 @@
 package org.transmartfoundation.config
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class ConfigInfoController {
 
     ConfigService configService
@@ -7,6 +10,8 @@ class ConfigInfoController {
     def index() {
 
         ConfigParams configParams = configService.getConfigParams()
+
+	logger.info 'In ConfigInfoController index'
 
         [configParams: configParams, paramDone: [:] ]
     }
