@@ -1,11 +1,13 @@
 package jobs.steps
 
 import au.com.bytecode.opencsv.CSVWriter
+import groovy.util.logging.Slf4j
 import jobs.UserParameters
 import org.transmartproject.core.dataquery.DataRow
 import org.transmartproject.core.dataquery.TabularResult
 import org.transmartproject.core.dataquery.highdim.AssayColumn
 
+@Slf4j('logger')
 abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
 
     final String statusName = 'Dumping high dimensional data'
@@ -79,15 +81,18 @@ abstract class AbstractDumpHighDimensionalDataStep extends AbstractDumpStep {
 
         List<AssayColumn> assayColumns = tabularResult.indicesList
 
+	logger.debug 'doSubset callPerColumn {} assayColumns {} subset {} series {}', callPerColumn, assayColumns.size(), subsetName, seriesName
         for (DataRow row in tabularResult) {
             if (callPerColumn) {
                 for(AssayColumn assay in assayColumns) {
+		    logger.debug 'doSubset assay {} row[assay] {}', assay, row[assay]
                     if (row[assay] != null) {
 			csvWriter.writeNext(computeCsvRow(subsetName, seriesName, row, assay, row[assay]) as String[])
                     }
 		}
 	    }
 	    else {
+		logger.debug 'doSubset single writeNext for row {}', row
 		csvWriter.writeNext(computeCsvRow(subsetName, seriesName, row, null, null) as String[])
             }
         }
