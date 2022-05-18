@@ -14,6 +14,8 @@ showdblog: $(JDBC_DRIVER)
 showdblog_%: $(JDBC_DRIVER)
 	groovy -cp '$(LIB_CLASSPATH)' ../common/dump_audit.groovy $(RDBMS) `tput cols` $*
 
+jdbcdriver: $(JDBC_DRIVER)
+
 .PHONY: showdblog
 
 export KETTLE_JOBS
