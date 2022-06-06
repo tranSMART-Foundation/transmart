@@ -2942,7 +2942,7 @@ function storeLoaded(jsonStore, rows, paramsObject) {
     }
 
     var bbar = new Ext.Toolbar({ height: 25 });
-    var tbar = new Ext.Toolbar({ height: 25 });
+    var gtbar = new Ext.Toolbar({ height: 25 });
 
     if (paramsObject && paramsObject.params) {
         jQuery.get(pageInfo.basePath + '/dataExport/isCurrentUserAllowedToExport?' + paramsObject.params, function(data) {
@@ -2993,13 +2993,13 @@ function storeLoaded(jsonStore, rows, paramsObject) {
         });
     }
 
-    console.log('create tbar Toolbar');
-    var tbar = new Ext.Toolbar({
+    console.log('create gtbar Toolbar');
+    var gtbar = new Ext.Toolbar({
 	id: 'gridViewToolbar',
 	items: [
 	    new Ext.Toolbar.Button ({
 		id: 'gridViewHelpIcon',
-		icon: 'help/helpicon_white.jpg',
+		icon: '/assets/help/helpicon_white.jpg',
                 disabled: false,
 		tabIndex: 2,
 		tooltip: 'Grid View Help',
@@ -3018,7 +3018,7 @@ function storeLoaded(jsonStore, rows, paramsObject) {
         viewConfig: {
             forceFit: true
         },
-        tbar: tbar,
+        tbar: gtbar,
         bbar: bbar,
         frame:true,
         layout: 'fit',
