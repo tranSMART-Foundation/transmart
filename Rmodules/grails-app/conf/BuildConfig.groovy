@@ -30,13 +30,15 @@ grails.project.dependency.resolution = {
     log 'warn'
 
     repositories {
-        grailsCentral()
+	grailsPlugins()
+	grailsCentral()
         mavenLocal()
         mavenCentral()
         mavenRepo 'https://repo.transmartfoundation.org/content/repositories/public/'
     }
 
     dependencies {
+	compile 'org.codenarc:CodeNarc:0.21' // 2.2.0
  	compile 'com.google.guava:guava:30.1.1-jre'
         compile 'net.sf.opencsv:opencsv:2.3'
         compile 'org.mapdb:mapdb:0.9.10'
@@ -60,7 +62,6 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-	compile ':codenarc:0.21'
         compile ':quartz:1.0.2'
 	compile ':spring-security-core:2.0.0'
 
