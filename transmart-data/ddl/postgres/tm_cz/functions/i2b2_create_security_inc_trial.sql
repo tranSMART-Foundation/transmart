@@ -193,10 +193,11 @@ begin
 
 	    if pExists = 0 then
 		begin
-		    insert into biomart.bio_experiment
-				(title
-				,accession
-				,etl_id)
+		    insert into biomart.bio_experiment (
+			title
+			,accession
+			,etl_id
+			)
 		    select 'Metadata not available'
 			   ,TrialId
 			   ,'METADATA:' || TrialId;

@@ -44,14 +44,11 @@ AS $$
     tPath		varchar(2000);
     pCount		integer;
     pExists		integer;
-    nCount		integer;
     rtnCode		integer;
     tText		varchar(2000);
-    thisPatient		bigint;
-    r_update		record;
-    thisName		varchar(700);
-    nChildren		integer;
     rtnCd		integer;
+    maxLen		integer;
+    factLen		integer;
     tExplain 		text;
 
     --	cursor to define the path for delete_one_node  this will delete any nodes that are hidden after i2b2_create_concept_counts
@@ -96,7 +93,7 @@ begin
     databaseName := 'tm_cz';
     procedureName := 'i2b2_load_clinical_data';
 
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_load_clinical_data ',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Start i2b2_load_clinical_data ',0,stepCt,'Done');
 
     --Audit JOB Initialization
     --If Job ID does not exist, then this is a single procedure run and we need to create it
@@ -109,7 +106,7 @@ begin
     stepCt := 0;
     stepCt := stepCt + 1;
     tText := 'Start i2b2_load_clinical_data for ' || TrialID;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,tText,0,stepCt,'Done');
 
     if (secureStudy not in ('Y','N') ) then
 	secureStudy := 'Y';
@@ -126,7 +123,7 @@ begin
 
     if topLevel < 3 then
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path specified in top_node must contain at least 2 nodes',0,stepCt,'Msg');
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Path specified in top_node must contain at least 2 nodes',0,stepCt,'Msg');
 	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
@@ -148,7 +145,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from lz_src_clinical_data',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Delete existing data from lz_src_clinical_data',rowCt,stepCt,'Done');
 
     begin
 --    for tExplain in
@@ -177,14 +174,14 @@ begin
                ,units_cd
                ,date_timestamp
 	       ,category_cd
-	       ,jobId
+	       ,jobID
 	       ,etlDate
 	       ,ctrl_vocab_code
 	  from tm_lz.lt_src_clinical_data
 --	LOOP
 --	    raise notice 'explain: %', tExplain;
 --	END LOOP
-	  ;
+	;
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -197,7 +194,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert data into lz_src_clinical_data',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert data into lz_src_clinical_data',rowCt,stepCt,'Done');
 
     --	truncate tm_wz.wrk_clinical_data and load data from external file
 
@@ -249,13 +246,11 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load lt_src_clinical_data to work table',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Load lt_src_clinical_data to work table',rowCt,stepCt,'Done');
 
     -- Get root_node from topNode
 
     select tm_cz.parse_nth_value(topNode, 2, '\') into root_node;
-
-    raise NOTICE 'topNode "%" root_node "%"', topNode, root_node;
 
     select count(*) into pExists
       from i2b2metadata.table_access
@@ -266,23 +261,19 @@ begin
      where c_name = root_node;
 
     if pExists = 0 or pCount = 0 then
-	perform tm_cz.i2b2_add_root_node(root_node, jobId);
+	perform tm_cz.i2b2_add_root_node(root_node, jobID);
     end if;
 
     select c_hlevel into root_level
       from i2b2metadata.table_access
      where c_name = root_node;
 
-    raise NOTICE 'Tested root_node in table_access pExists: %pCount: % root_level: %', pExists, pCount, root_level;
-
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Fetch root node "' || root_node ||'" and root_level ' || root_level::text,rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Fetch root node "' || root_node ||'" and root_level ' || root_level::text,rowCt,stepCt,'Done');
 
     -- Get study name from topNode
 
     select tm_cz.parse_nth_value(topNode, topLevel, '\') into study_name;
-
-    raise NOTICE 'study_name "%"', study_name;
 
     --	Add any upper level nodes as needed
 
@@ -291,11 +282,11 @@ begin
 
     if pCount > 2 then
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding upper-level nodes',0,stepCt,'Done');
-	select tm_cz.i2b2_fill_in_tree(null, tPath, jobId) into rtnCd;
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Adding upper-level nodes',0,stepCt,'Done');
+	select tm_cz.i2b2_fill_in_tree(null, tPath, jobID) into rtnCd;
 	if(rtnCd <> 1) then
 	    tText := 'Failed to fill in tree '|| tPath;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,tText,0,stepCt,'Message');
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
         end if;
@@ -308,15 +299,15 @@ begin
     --	add top node for study
 
     if pExists = 0 then
-	select tm_cz.i2b2_add_node(TrialID, topNode, study_name, jobId) into rtnCd;
+	select tm_cz.i2b2_add_node(TrialID, topNode, study_name, jobID) into rtnCd;
 	stepCt := stepCt + 1;
 	if(rtnCd <> 1) then
             tText := 'Failed to add leaf node '|| topNode;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,tText,0,stepCt,'Message');
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
         end if;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding top node for study',0,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Adding top node for study',0,stepCt,'Done');
     end if;
 
     --	Set data_type, category_path, and usubjid
@@ -332,7 +323,7 @@ begin
 				     '(::){1,}', ':', 'g');
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set columns in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Set columns in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done');
 
     --	Delete rows where data_value is null
 
@@ -351,7 +342,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete null data_values in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Delete null data_values in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done');
 
     --Remove Invalid pipes in the data values.
     --RULE: If Pipe is last or first, delete it
@@ -373,7 +364,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove pipes in data_value',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Remove pipes in data_value',rowCt,stepCt,'Done');
 
     --Remove invalid Parens in the data
     --They have appeared as empty pairs or only single ones.
@@ -396,7 +387,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove empty parentheses 1',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Remove empty parentheses 1',rowCt,stepCt,'Done');
 
     begin
 	update tm_wz.wrk_clinical_data
@@ -416,7 +407,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove empty parentheses 2',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Remove empty parentheses 2',rowCt,stepCt,'Done');
 
     --Replace the Pipes with Commas in the data_label column
     begin
@@ -435,7 +426,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Replace pipes with comma in data_label',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Replace pipes with comma in data_label',rowCt,stepCt,'Done');
 
     --	set visit_name to null when there's only a single visit_name for the category
 
@@ -459,7 +450,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set single visit_name to null',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Set single visit_name to null',rowCt,stepCt,'Done');
 
     --	set data_label to null when it duplicates the last part of the category_path
     --	Remove data_label from last part of category_path when they are the same
@@ -499,7 +490,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set data_label to null when found in category_path',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Set data_label to null when found in category_path',rowCt,stepCt,'Done');
 
     --	set visit_name to null if same as data_label
 
@@ -524,7 +515,7 @@ begin
       return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set visit_name to null when found in data_label',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Set visit_name to null when found in data_label',rowCt,stepCt,'Done');
 
     --	set visit_name to null if same as data_value
 
@@ -549,7 +540,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set visit_name to null when found in data_value',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Set visit_name to null when found in data_value',rowCt,stepCt,'Done');
 
     --	set visit_name to null if only DATALABEL in category_cd
 
@@ -570,7 +561,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set visit_name to null when only DATALABEL in category_cd',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Set visit_name to null when only DATALABEL in category_cd',rowCt,stepCt,'Done');
 
     --	change any % to Pct and & and + to ' and ' and _ to space in data_label only
 
@@ -611,7 +602,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove leading, trailing, double spaces',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Remove leading, trailing, double spaces',rowCt,stepCt,'Done');
 
     --1. DETERMINE THE DATA_TYPES OF THE FIELDS
     --	replaced cursor with update, used temp table to store category_cd/data_label because correlated subquery ran too long
@@ -651,7 +642,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert numeric data into WZ wt_num_data_types',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert numeric data into WZ wt_num_data_types',rowCt,stepCt,'Done');
 
     --	Check if any duplicate records of key columns (site_id, subject_id, visit_name, data_label, category_cd) for numeric data
     --	exist.  Raise error if yes
@@ -700,11 +691,11 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Check for duplicate key columns',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Check for duplicate key columns',rowCt,stepCt,'Done');
 
     if rowCt > 0 then
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Duplicate values found in key columns',rowCt,stepCt,'Msg');
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Duplicate values found in key columns',rowCt,stepCt,'Msg');
 	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
@@ -723,11 +714,11 @@ begin
 	     group by category_cd, data_label, data_value) x;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Check for multiple visit_names for category/label/value ',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Check for multiple visit_names for category/label/value ',rowCt,stepCt,'Done');
 
     if pCount > 0 then
 	stepCt := stepCt + 1;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Multiple visit names for category/label/value',0,stepCt,'Msg');
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Multiple visit names for category/label/value',0,stepCt,'Msg');
 	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
@@ -756,7 +747,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated data_type flag for numeric data_types',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Updated data_type flag for numeric data_types',rowCt,stepCt,'Done');
 
     begin
 	update tm_wz.wrk_clinical_data t
@@ -775,7 +766,34 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated data_type flag for text data_types',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Updated data_type flag for text data_types',rowCt,stepCt,'Done');
+
+    -- Check all text data values will fit in observation_fact
+
+    select character_maximum_length from information_schema.columns where table_schema = 'i2b2demodata' and table_name = 'observation_fact' and column_name = 'tval_char' into factLen;
+
+    raise NOTICE 'observation_fact tval_char size %', factLen;
+
+    select max(length(dval_char)) from tm_wz.wrk_clinical_data where data_type = 'T' into maxLen;
+
+    if(maxLen is NULL) then
+    	maxLen := 0;
+    end if;
+
+    raise NOTICE 'wrk_clinical_data max dval_char length %', maxLen;
+
+    stepCt := stepCt + 1;
+    if (maxLen > factLen) then
+        tText := 'tm_wz.wrk_clinical data has records with dval_char ' || maxLen || ' longer than observation_fact max ' || factLen || ' bytes';
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,tText,0,stepCt,'Msg');
+	perform tm_cz.cz_error_handler (jobID, procedureName, '-1', 'Application raised error');
+	perform tm_cz.cz_end_audit (jobID, 'FAIL');
+	return -16;
+    end if;
+
+    tText := 'Check tm_wz.wrk_clinical data max record length in column dval_char ' || maxLen || ' within observation_fact max ' || factLen || ' bytes';
+
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,tText,0,stepCt,'Done');
 
     -- Build all needed leaf nodes in one pass for both numeric and text nodes
 
@@ -836,7 +854,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create leaf nodes for trial',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Create leaf nodes for trial',rowCt,stepCt,'Done');
 
     --	set node_name
 
@@ -855,7 +873,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated node name for leaf nodes',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Updated node name for leaf nodes',rowCt,stepCt,'Done');
 
     execute ('truncate table tm_wz.wt_subject_info');
 
@@ -901,7 +919,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subject information into temp table',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert subject information into temp table',rowCt,stepCt,'Done');
 
     --	insert/update subjects in patient_mapping
 
@@ -928,7 +946,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete dropped subjects from patient_mapping',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Delete dropped subjects from patient_mapping',rowCt,stepCt,'Done');
 
     --	update patients with changed information (e.g. subject_id may have changed)
 
@@ -954,9 +972,9 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update subjects with changed demographics in patient_dimension',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Update subjects with changed demographics in patient_mapping',rowCt,stepCt,'Done');
 
-    --	insert new subjects into patient_mapping, generatng new patient_num
+    --	insert new subjects into patient_mapping, generating new patient_num
 
     begin
 --    for tExplain in
@@ -1005,8 +1023,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert new subjects into patient_mapping',rowCt,stepCt,'Done');
-
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert new subjects into patient_mapping',rowCt,stepCt,'Done');
 
     --	insert/update encounters in encounter_mapping
 
@@ -1033,7 +1050,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete dropped encounters from encounter_mapping',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Delete dropped encounters from encounter_mapping',rowCt,stepCt,'Done');
 
     --	update encounters with changed information (e.g. encounter_ide may have changed)
 
@@ -1060,7 +1077,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update encounters with changed values in encounter_mapping',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Update encounters with changed values in encounter_mapping',rowCt,stepCt,'Done');
 
     --	insert new encounters into encounter_mapping, generatng new encounter_num
 
@@ -1115,7 +1132,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert new subjects into encounter_mapping',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert new subjects into encounter_mapping',rowCt,stepCt,'Done');
 
     --	insert/update subjects in patient_dimension
 
@@ -1142,10 +1159,10 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete dropped subjects from patient_dimension',rowCt,stepCt,'Done');
-
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Delete dropped subjects from patient_dimension',rowCt,stepCt,'Done');
 
     --	update patients with changed information
+
     begin
 	with nsi as (select t.usubjid, t.sex_cd, t.age_in_years_num, t.race_cd from tm_wz.wt_subject_info t)
 		update i2b2demodata.patient_dimension
@@ -1166,7 +1183,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update subjects with changed demographics in patient_dimension',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Update subjects with changed demographics in patient_dimension',rowCt,stepCt,'Done');
 
     --	insert new subjects into patient_dimension
 
@@ -1215,7 +1232,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert new subjects into patient_dimension',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert new subjects into patient_dimension',rowCt,stepCt,'Done');
 
     --	delete leaf nodes that will not be reused, if any
 
@@ -1223,15 +1240,15 @@ begin
 
 	--	deletes unused leaf nodes for a trial one at a time
 
-	select tm_cz.i2b2_delete_1_node(r_delUnusedLeaf.c_fullname,jobId) into rtnCd;
+	select tm_cz.i2b2_delete_1_node(r_delUnusedLeaf.c_fullname,jobID) into rtnCd;
 	stepCt := stepCt + 1;
 	if(rtnCd <> 1) then
 	    tText := 'Failed to delete node '|| r_delUnusedLeaf.c_fullname;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,tText,0,stepCt,'Message');
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
         end if;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted unused leaf node: ' || r_delUnusedLeaf.c_fullname,1,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Deleted unused leaf node: ' || r_delUnusedLeaf.c_fullname,1,stepCt,'Done');
 
     end loop;
 
@@ -1254,7 +1271,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update name_char in concept_dimension for changed names',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Update name_char in concept_dimension for changed names',rowCt,stepCt,'Done');
 
     begin
 --    for tExplain in
@@ -1298,7 +1315,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted new leaf nodes into I2B2DEMODATA concept_dimension',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Inserted new leaf nodes into I2B2DEMODATA concept_dimension',rowCt,stepCt,'Done');
 
     --	update i2b2 with name, data_type and xml for leaf nodes
     begin
@@ -1324,7 +1341,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated name and data type in i2b2 if changed',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Updated name and data type in i2b2 if changed',rowCt,stepCt,'Done');
 
     begin
 --    for tExplain in
@@ -1395,7 +1412,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Inserted leaf nodes into I2B2METADATA i2b2',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Inserted leaf nodes into I2B2METADATA i2b2',rowCt,stepCt,'Done');
 
     begin
 	for ul in uploadI2b2 loop
@@ -1424,7 +1441,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated I2B2 for metadataXML',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Updated I2B2 for metadataXML',rowCt,stepCt,'Done');
 
 
     --	delete from observation_fact all concept_cds for trial that are clinical data, exclude concept_cds from biomarker data
@@ -1468,7 +1485,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete clinical data for study from observation_fact',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Delete clinical data for study from observation_fact',rowCt,stepCt,'Done');
 
     --Insert into observation_fact
 
@@ -1542,14 +1559,14 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert trial into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert trial into I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
     -- insert any missing nodes in the hierarchy now,
     -- so we can check parent and be sure of a match
     select tm_cz.i2b2_fill_in_tree(TrialID, topNodeEscaped, jobID) into rtnCd;
     if(rtnCd <> 1) then
-        tText := 'Failed to fill in tree '|| topNodeEscaped;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+        tText := 'Failed to fill in tree '|| topNode;
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,tText,0,stepCt,'Message');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
     end if;
@@ -1594,8 +1611,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set c_visualattributes in i2b2',rowCt,stepCt,'Done');
-
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Set c_visualattributes in i2b2',rowCt,stepCt,'Done');
 
     -- final procs
 
@@ -1603,7 +1619,7 @@ begin
 
     if(rtnCd <> 1) then
         stepCt := stepCt + 1;
-        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
+        perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Failed to load tm_trial_nodes',0,stepCt,'Message');
         perform tm_cz.cz_end_audit (jobID, 'FAIL');
         return -16;
     end if;
@@ -1612,20 +1628,20 @@ begin
 
     --	delete each node that is hidden after create concept counts
 
-    For r_delNodes in delNodes loop
+    for r_delNodes in delNodes loop
 
 	--	deletes hidden nodes for a trial one at a time
 
-	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname,jobId) into rtnCd;
+	select tm_cz.i2b2_delete_1_node(r_delNodes.c_fullname,jobID) into rtnCd;
 	stepCt := stepCt + 1;
 	if(rtnCd <> 1) then
 	    tText := 'Failed to delete node '|| r_delNodes.c_fullname;
-	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,0,stepCt,'Message');
+	    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,tText,0,stepCt,'Message');
 	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	    return -16;
         end if;
 	tText := 'Deleted hidden node: ' || r_delNodes.c_fullname;
-	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
+	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
     end loop;
 
@@ -1634,13 +1650,13 @@ begin
 
     if(rtnCd <> 1) then
        stepCt := stepCt + 1;
-       perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
+       perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Failed to load security data',0,stepCt,'Message');
 	perform tm_cz.cz_end_audit (jobID, 'FAIL');
 	return -16;
     end if;
 
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_clinical_data',0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'End i2b2_load_clinical_data',0,stepCt,'Done');
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     if newJobFlag = 1 then
@@ -1651,4 +1667,3 @@ begin
 end;
 
 $$;
-
