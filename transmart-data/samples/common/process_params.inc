@@ -3,8 +3,12 @@
 # log4j2.rootLogger.level = WARN
 export JAVA_TOOL_OPTIONS="-Dorg.eclipse.jetty.LEVEL=WARN $JAVA_TOOL_OPTIONS"	# oej* log messages
 
-# Expand UPLOAD_SCRIPTS_DIRECTORY - may be simply '.' and we change directory below
-UPLOAD_SCRIPTS_DIRECTORY=$( cd "$( dirname "$UPLOAD_SCRIPTS_DIRECTORY" )" && echo "$(pwd)" )
+# Expand UPLOAD_SCRIPTS_DIRECTORYUPLOAD_SCRIPTS_DIRECTORY - may be simply '.' and we change directory below
+if [ -d "$UPLOAD_SCRIPTS_DIRECTORY" ]; then
+   UPLOAD_SCRIPTS_DIRECTORY=$( cd "$( dirname "$UPLOAD_SCRIPTS_DIRECTORY/." )" && echo "$(pwd)" )
+else
+   UPLOAD_SCRIPTS_DIRECTORY=$( cd "$( dirname "$UPLOAD_SCRIPTS_DIRECTORY" )" && echo "$(pwd)" )
+fi
 
 # Requires that the UPLOAD_DATA_TYPE parameter is set and not empty
 # Optionally expecting values for the following parameters:
