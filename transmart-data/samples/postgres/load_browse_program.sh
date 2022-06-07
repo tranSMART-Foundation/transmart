@@ -11,7 +11,7 @@ set -e
 #   TOP_NODE_PREFIX, SECURITY_REQUIRED, USE_R_UPLOAD
 
 # locate this shell script, and source a generic shell script to process all params related settings
-UPLOAD_SCRIPTS_DIRECTORY=$(dirname $(realpath "$0"))
+UPLOAD_SCRIPTS_DIRECTORY=$(dirname $(realpath "$0"))/.
 UPLOAD_DATA_TYPE="program"
 echo "UPLOAD_SCRIPTS_DIRECTORY $UPLOAD_SCRIPTS_DIRECTORY"
 echo "Parameter '$1'"
@@ -49,5 +49,6 @@ fi
 # by adding in browser and checking content of column
 
 pwd
+echo "UPLOAD_SCRIPTS_DIRECTORY $UPLOAD_SCRIPTS_DIRECTORY"
 
 $UPLOAD_SCRIPTS_DIRECTORY/browse-add-program.pl $DATA_LOCATION/program.txt

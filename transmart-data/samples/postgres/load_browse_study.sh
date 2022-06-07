@@ -11,7 +11,7 @@ set -e
 #   TOP_NODE_PREFIX, SECURITY_REQUIRED, USE_R_UPLOAD
 
 # locate this shell script, and source a generic shell script to process all params related settings
-UPLOAD_SCRIPTS_DIRECTORY=$(dirname $(realpath "$0"))
+UPLOAD_SCRIPTS_DIRECTORY=$(dirname $(realpath "$0"))/.
 UPLOAD_DATA_TYPE="browse"
 echo "UPLOAD_SCRIPTS_DIRECTORY $UPLOAD_SCRIPTS_DIRECTORY"
 echo "Parameter '$1'"
