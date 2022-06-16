@@ -1180,6 +1180,19 @@ BEGIN
     --	insert into de_subject_microarray_data when dataType is T (transformed)
 
     if dataType = 'T' or dataType = 'Z' then -- Z is for compatibility with TR ETL default settings
+        select count(*) into pExists
+          from information_schema.tables
+         where table_name = partitionIndx;
+
+        if pExists = 0 then
+	    sqlText := 'create table ' || partitionName || ' ( constraint mrna_' || partitionId::text || '_check check ( partition_id = ' || partitionId::text ||
+	        ')) inherits (deapp.de_subject_microarray_data)';
+	    raise notice 'sqlText= %', sqlText;
+	    execute sqlText;
+	    stepCt := stepCt + 1;
+	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Create partition ' || partitionName,1,stepCt,'Done');
+	end if;
+
 	sqlText := 'insert into ' || partitionName || ' (partition_id, trial_name, probeset_id, assay_id, patient_id, log_intensity, zscore) ' ||
 	    'select ' || partitionId::text || ', trial_name, probeset_id, assay_id, patient_id, intensity_value, ' ||
 	    'case when intensity_value < -2.5 then -2.5 when intensity_value > 2.5 then 2.5 else intensity_value end ' ||
@@ -1194,7 +1207,7 @@ BEGIN
 
 	if dataType = 'R' or dataType = 'L' then
 	    begin
-		select tm_cz.i2b2_mrna_zscore_calc(TrialID, partitionName, partitionindx,partitionId,'L',jobId,dataType,logBase,sourceCD) into rtnCd;
+		select tm_cz.i2b2_mrna_zscore_calc(TrialID, partitionName, partitionIndx,partitionId,'L',jobId,dataType,logBase,sourceCD) into rtnCd;
 		get diagnostics rowCt := ROW_COUNT;
 	        stepCt := stepCt + 1;
 	        if(rtnCd <> 1) then
