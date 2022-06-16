@@ -2,17 +2,17 @@
 
 
 $loadstudy = $ARGV[0];
-$doreload = 0;
+$doreload = 1;
 $msg = "";
 
-if(defined($ARGV[1]) && $ARGV[1] eq "-reload") {$doreload = 1; print "Reloading $loadstudy\n";}
+if(defined($ARGV[1]) && $ARGV[1] eq "-update") {$doreload = 0; print "Updating $loadstudy\n";}
 
 defined($ENV{TRANSMARTDATA}) || die "Undefined path: TRANSMARTDATA";
 $datatop = $ENV{TRANSMARTDATA};
 
 (-d "$datatop") || die "Cannot find directory TRANSMARTDATA: '$datatop'";
 
-chdir("$datatop") || die "Failed to chdir to $dbtop";
+chdir("$datatop") || die "Failed to chdir to $datatop";
 
 open(DATASETS,"samples/studies/datasets") || die "Cannot find samples/studies/datasets";
 

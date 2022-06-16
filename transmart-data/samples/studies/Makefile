@@ -13,6 +13,12 @@ update_datasets:
 
 vpath %/annotation.params annotation
 
+# all study data calls a script to check targets exist
+# and create an (unused) loadall.params file
+# listing the targets found in the datasets file
+%/loadall.params:
+	./find_study.pl $*
+
 # study needs params file and load.sh script to cascade to all other scripts
 %/study.params %/load.sh:
 	$(MAKE) $*/$*_study.tar.xz

@@ -33,28 +33,36 @@ DUMMY := $(shell $(MAKE) -C ../studies datasets)
 $(info Finished fetching datasets)
 endif
 
+LOAD_ALL_TARGETS := $(shell perl ../studies/find_studies.pl)
+
 LOAD_STUDY_TARGETS := $(shell php ../studies/enumerate.php load_targets study)
 LOAD_PROGRAM_TARGETS := $(shell php ../studies/enumerate.php load_targets program)
 LOAD_BROWSE_TARGETS := $(shell php ../studies/enumerate.php load_targets browse)
+
 LOAD_CLINICAL_TARGETS := $(shell php ../studies/enumerate.php load_targets clinical)
+
 LOAD_ANNOTATION_TARGETS := $(shell php ../studies/enumerate.php load_targets annotation)
+LOAD_SAMPLES_TARGETS := $(shell php ../studies/enumerate.php load_targets samples)
+
 LOAD_REF_ANNOTATION_TARGETS := $(shell php ../studies/enumerate.php load_targets ref_annotation)
-LOAD_EXPRESSION_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets expression)
+
 LOAD_ACGH_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets acgh)
-LOAD_PROTEOMICS_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets proteomics)
-LOAD_MSPROTEOMICS_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets msproteomics)
+LOAD_EXPRESSION_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets expression)
+LOAD_METABOLOMICS_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets metabolomics)
 LOAD_MIRNA_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets mirna)
 LOAD_MIRNAQPCR_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets mirnaqpcr)
 LOAD_MIRNASEQ_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets mirnaseq)
-LOAD_METABOLOMICS_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets metabolomics)
+LOAD_MSPROTEOMICS_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets msproteomics)
+LOAD_PROTEOMICS_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets proteomics)
 LOAD_RBM_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets rbm)
 LOAD_RNASEQ_PARAMS_TARGETS := $(shell php ../studies/enumerate.php load_targets rnaseq)
-LOAD_SAMPLES_TARGETS := $(shell php ../studies/enumerate.php load_targets samples)
 LOAD_VCF_PARAMS_TARGETS := $(patsubst ../studies/%/vcf.params,load_vcf_%, $(VCF_PARAMS_FILES))
 
 KETTLE_TARGETS := $(LOAD_CLINICAL_TARGETS) $(LOAD_EXPRESSION_PARAMS_TARGETS) $(LOAD_ACGH_PARAMS_TARGETS) $(LOAD_PROTEOMICS_PARAMS_TARGETS) $(LOAD_MSPROTEOMICS_PARAMS_TARGETS) $(LOAD_MIRNA_PARAMS_TARGETS) $(LOAD_MIRNAQPCR_PARAMS_TARGETS) $(LOAD_MIRNASEQ_PARAMS_TARGETS) $(LOAD_METABOLOMICS_PARAMS_TARGETS) $(LOAD_RBM_PARAMS_TARGETS) $(LOAD_RNASEQ_PARAMS_TARGETS)
 
 $(KETTLE_TARGETS): kettle-home/kettle.properties
+
+
 #these ones are here just for autocompletion:
 $(LOAD_ANNOTATION_TARGETS):
 $(LOAD_PROGRAM_TARGETS):
@@ -64,6 +72,7 @@ $(LOAD_STUDY_TARGETS):
 $(LOAD_REF_ANNOTATION_TARGETS):
 $(LOAD_SAMPLE_TARGETS):
 $(LOAD_VCF_PARAMS_TARGETS):
+$(LOAD_ALL_TARGETS):
 
 kettle-home/kettle.properties: gen_kettle_properties.php
 	php -d variables_order=E $< > $@
@@ -88,6 +97,11 @@ load_ref_annotation_%: ../studies/%/ref_annotation.params
 	$(foreach  refplatform, $(shell ./load_ref_annotation.sh $<), \
 	    KETTLE_HOME="$(realpath kettle-home)" $(MAKE) load_annotation_$(refplatform); $(shell echo "refplatform=$(refplatform)" ); )
 
+# Load all data for a study
+
+load_all_%: ../studies/%/loadall.params
+	    ./load_study.sh $*
+
 # Browse tab study - check and load program, then load study
 
 load_browse_%: ../studies/%/browse.params
@@ -103,10 +117,23 @@ load_program_%: ../studies/%/program.params
 			KETTLE_HOME="$(realpath kettle-home)" \
 			./load_browse_program.sh $<
 
+# load targets for each data type identified by params file
+
+load_acgh_%: ../studies/%/acgh.params ../studies/%/acgh
+	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/acgh)" \
+			PSQL_COMMAND="$(PSQL_COMMAND)" \
+			KETTLE_HOME="$(realpath kettle-home)" \
+			./load_acgh.sh $<
+
 load_expression_%: ../studies/%/expression.params ../studies/%/expression
 	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/expression)" \
 			KETTLE_HOME="$(realpath kettle-home)" \
 			./load_expression.sh $<
+
+load_metabolomics_%: ../studies/%/metabolomics.params ../studies/%/metabolomics
+	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/metabolomics)" \
+			KETTLE_HOME="$(realpath kettle-home)" \
+			./load_metabolomics.sh $<
 
 load_mirnaqpcr_%: ../studies/%/mirnaqpcr.params ../studies/%/mirnaqpcr
 	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/mirnaqpcr)" \
@@ -118,6 +145,11 @@ load_mirnaseq_%: ../studies/%/mirnaseq.params ../studies/%/mirnaseq
 			KETTLE_HOME="$(realpath kettle-home)" \
 			./load_mirnaseq.sh $<
 
+load_msproteomics_%: ../studies/%/msproteomics.params ../studies/%/msproteomics
+	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/msproteomics)" \
+			KETTLE_HOME="$(realpath kettle-home)" \
+			./load_msproteomics.sh $<
+
 load_rbm_%: ../studies/%/rbm.params ../studies/%/rbm
 	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/rbm)" \
 			KETTLE_HOME="$(realpath kettle-home)" \
@@ -127,22 +159,6 @@ load_rnaseq_%: ../studies/%/rnaseq.params ../studies/%/rnaseq
 	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/rnaseq)" \
 			KETTLE_HOME="$(realpath kettle-home)" \
 			./load_rnaseq.sh $<
-
-load_metabolomics_%: ../studies/%/metabolomics.params ../studies/%/metabolomics
-	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/metabolomics)" \
-			KETTLE_HOME="$(realpath kettle-home)" \
-			./load_metabolomics.sh $<
-
-load_msproteomics_%: ../studies/%/msproteomics.params ../studies/%/msproteomics
-	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/msproteomics)" \
-			KETTLE_HOME="$(realpath kettle-home)" \
-			./load_msproteomics.sh $<
-
-load_acgh_%: ../studies/%/acgh.params ../studies/%/acgh
-	STUDY_ID=$* DATA_LOCATION="$(realpath ../studies/$*/acgh)" \
-			PSQL_COMMAND="$(PSQL_COMMAND)" \
-			KETTLE_HOME="$(realpath kettle-home)" \
-			./load_acgh.sh $<
 
 PROTEOMICS_SSM_FILE     ?= proteomics_subject_sample_mapping.txt
 PROTEOMICS_CM_FILE      ?= proteomics_column_mapping.txt
