@@ -29,7 +29,7 @@
     <parameter>
       <name>DATA_TYPE</name>
       <default_value>L</default_value>
-      <description>R - data is raw intensity, L - data has been log-transformed, T- data is fully transformed</description>
+      <description>R - data is raw intensity, L - data has been log-transformed, T - data is fully transformed</description>
     </parameter>
     <parameter>
       <name>FilePivot_LOCATION</name>
