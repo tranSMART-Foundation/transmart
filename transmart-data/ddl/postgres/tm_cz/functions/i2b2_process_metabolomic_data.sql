@@ -184,7 +184,7 @@ begin
 
     -- Get root_node from topNode
 
-    select tm_czparse_nth_value(topNode, 2, '\') into RootNode ;
+    select tm_cz.parse_nth_value(topNode, 2, '\') into RootNode ;
 
     select count(*) into pExists
       from i2b2metadata.table_access
