@@ -167,22 +167,22 @@ begin
         where c_visualattributes like '%A%' 
     LOOP 
 	IF tableName='@' OR tableName=curRecord.sqltext THEN
-            v_sqlstring := 'select tm_cz.i2b2_pat_count_visits( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''' || path || ''' , '||jobID||')';
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_visits( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''' || topPath || ''' , '||jobID||')';
             execute v_sqlstring;
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted visits in ' || curRecord.sqltext,0,stepCt,'Done');
             
-            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'',  ''concept_cd'', ''concept_dimension'', ''concept_path'', ''' || path || '''  , '||jobID||')';
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'',  ''concept_cd'', ''concept_dimension'', ''concept_path'', ''' || topPath || '''  , '||jobID||')';
             execute v_sqlstring;
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted concepts in ' || curRecord.sqltext,0,stepCt,'Done');
             
-            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''provider_id'', ''provider_dimension'', ''provider_path'', ''' || path || '''  , '||jobID||')';
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''provider_id'', ''provider_dimension'', ''provider_path'', ''' || topPath || '''  , '||jobID||')';
             execute v_sqlstring;
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted providers in ' || curRecord.sqltext,0,stepCt,'Done');
             
-            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''modifier_cd'', ''modifier_dimension'', ''modifier_path'', ''' || path || '''  , '||jobID||')';
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''modifier_cd'', ''modifier_dimension'', ''modifier_path'', ''' || topPath || '''  , '||jobID||')';
             execute v_sqlstring;
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted modifiers in ' || curRecord.sqltext,0,stepCt,'Done');
