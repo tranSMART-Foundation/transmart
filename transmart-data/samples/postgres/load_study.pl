@@ -177,10 +177,10 @@ if(defined($clinical{$loadstudy})) {
     }
 }
 
-#if(defined($samples{$loadstudy})) {
-#    msg("Loading samples\n");
+if(defined($samples{$loadstudy})) {
+    msg("Loading samples data to be added in a future release\n");
 #    ++$nload;
-#}
+}
 
 
 # ref_annotation
