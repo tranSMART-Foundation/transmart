@@ -1,8 +1,2 @@
-http-index      https://tm-library.axiomedix.net/datasets/Platforms/platform_index
-http-index      https://tm-library.axiomedix.net/datasets/CoVid19/covid_index
-http-index      https://tm-library.axiomedix.net/datasets/SARS/sars_index
-http-index      https://tm-library.axiomedix.net/datasets/MERS/mers_index
-http-index      https://tm-library.axiomedix.net/datasets/Corona/corona_index
-http-index      https://tm-library.axiomedix.net/datasets/CovidRelated/covidrelated_index
-http-index      https://tm-library.axiomedix.net/datasets/Programs/program_index
-http-index	http://library.transmartfoundation.org/datasets/datasets_index
+http-index     http://library.transmartfoundation.org/datasets/datasets_index
+http-index     http://library.transmartfoundation.org/Programs/program_index
