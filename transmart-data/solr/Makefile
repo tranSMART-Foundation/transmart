@@ -2,7 +2,7 @@ include ../makefile.inc
 
 include ../lib/makefile.inc
 
-SOLR_DL=http://files.thehyve.net/solr
+SOLR_DL=https://archive.apache.org/dist/lucene/solr
 SOLR_VERSION=4.5.0
 SOLR_PREFIX ?= $(realpath .)
 SOLR_LOG ?= $(realpath .)/solr.log
