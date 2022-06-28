@@ -75,9 +75,12 @@ else
 	echo "The tranSMART manual web pages are available"
 fi
 
-probe=$(curl -L $transmartUrl | grep "title" | grep "Transmart")
+# curl -L redirects for ever, missing the userLanding redirect
+# we have to use -b "" or --cookie "" giving it an empty cookie file - then it preserves the session
+# 
+probe=$(curl --silent -L --cookie "" $transmartUrl | grep "<title>" | grep -i  "transmart")
 if [ -z "$probe" ] ; then
-	echo "The tranSMART web site (at $transmartUrl) is not delivering the login home page;"
+	echo "The tranSMART web site (at $transmartUrl) is not delivering the login or home page;"
 	echo "  see tomcat log file, /var/lib/tomcat8/logs/transmart.log for possible errors "
 	exitResults=1
 else
