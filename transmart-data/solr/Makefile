@@ -37,7 +37,7 @@ $(DRIVER): $(JDBC_DRIVER_PATH)
 
 solr: solr-$(SOLR_VERSION).tgz
 	$(TAR_COMMAND) xzf $< --touch --strip-components=2 \
-		--exclude $(SOLR_VERSION)/solr/collection1 \
+		--exclude solr-$(SOLR_VERSION)/example/solr/collection1 \
 		solr-$(SOLR_VERSION)/example/solr
 
 solr/collection1:
