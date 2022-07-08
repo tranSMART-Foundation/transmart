@@ -15,10 +15,13 @@ var nodesBeforeSelect = new Array();
 // will still fire but is stopped immediately); and set this flag back to true at the end of the event so it can be triggered again.  
 var allowOnSelectEvent = true;
 var uploader;
+
+jQuery.noConflict();
+
 // Method to add the categories for the select box
 function addSelectCategories()	{
     if (sessionSearchCategory == "") { sessionSearchCategory = "ALL"; }
-	
+
     jQuery("#search-categories").append(jQuery("<option></option>").attr("value", "ALL").text("All").attr('id', 'allCategory'));
 	
     jQuery("#search-categories").change(function() {
@@ -81,7 +84,6 @@ function addFilterCategories() {
 //Method to add the autocomplete for the search keywords
 function addSearchAutoComplete()	{
     jQuery("#search-ac").autocomplete({
-	disabled: true,
 	position:{my:"left top",at:"left bottom",collision:"none"},
 	source: sourceURL,
 	minLength:1,
@@ -103,7 +105,7 @@ function addSearchAutoComplete()	{
 	else {
 	    resulta += '</a>';
 	}
-		
+
 	return jQuery('<li></li>')
 	    .data("ui-autocomplete-item", item )
 	    .append(resulta)
@@ -308,7 +310,7 @@ function showSearchResults(openInAnalyze, datasetExplorerPath)	{
 	
     // call method which retrieves facet counts and search results
     showFacetResults(openInAnalyze, datasetExplorerPath);
-	
+
     //all analyses will be closed when doing a new search, so clear this array
     openAnalyses = [];
 }
@@ -390,7 +392,7 @@ function showFacetResults(openInAnalyze, datasetExplorerPath)	{
     }
     var operatorString = operators.join(";");
 
-    queryString += "&searchTerms=" + encodeURIComponent(savedSearchTerms) + "&searchOperators=" + operatorString + "&globaloperator=" + globalLogicOperator;
+    queryString += "&searchTerms=" + encodeURIComponent(savedSearchTerms) + "&searchOperators=" +  encodeURIComponent(operatorString) + "&globalOperator=" + globalLogicOperator;
 
     if(!openInAnalyze){
 	if (searchPage == 'RWG') {
@@ -871,7 +873,7 @@ jQuery(document).ready(function() {
 	        }
 	    });
 	}else{
-            setUploderEndPoint(id);
+            setUploaderEndPoint(id);
 	}
     });
 
@@ -1123,7 +1125,7 @@ jQuery(document).ready(function() {
     }
 });
 
-function incrementeDocumentCount(folderId) {
+function incrementDocumentCount(folderId) {
     var documentCount = jQuery('#folder-header-' + folderId + ' .document-count');
     if (documentCount.size() > 0) {
 	var currentValue = documentCount.text();
@@ -1283,7 +1285,7 @@ function createUploader() {
 		    jQuery('#file-' + id + " #progress").html('');
 
 		    var folderId=responseJSON.folderId;
-		    incrementeDocumentCount(folderId);
+		    incrementDocumentCount(folderId);
 
 		    if(folderId == jQuery('#parentFolderId').val()){
 			jQuery('#metadata-viewer').empty().addClass('ajaxloading');
@@ -1340,7 +1342,7 @@ function createUploader() {
 		    jQuery('#file-' + id + " #progress").html('');
 
 		    var folderId=responseJSON.folderId;
-		    incrementeDocumentCount(folderId);
+		    incrementDocumentCount(folderId);
 
 		    if(folderId == jQuery('#parentFolderId').val()){
 			jQuery('#metadata-viewer').empty().addClass('ajaxloading');
@@ -1357,7 +1359,7 @@ function createUploader() {
     });
 }
 
-function setUploderEndPoint(id) {
+function setUploaderEndPoint(id) {
     uploader.setEndpoint(uploadActionURL+'?parentId='+id);
 }
 
