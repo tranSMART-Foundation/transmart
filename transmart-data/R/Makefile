@@ -30,7 +30,7 @@ build/Makefile: $(R_SOURCE)
 		--enable-R-shlib --with-readline \
 		--enable-R-profiling --enable-memory-profiling \
 		--with-libpng --without-jpeglib --without-libtiff \
-		--without-system-xz --without-ICU \
+		--without-ICU \
 		--without-recommended-packages
 
 # for the default prefix, expose a relative path target
