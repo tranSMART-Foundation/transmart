@@ -139,7 +139,7 @@ grails.project.dependency.resolution = {
 	runtime 'xerces:xercesImpl:2.9.1'
 
 	// you can remove whichever you are not using
-	runtime 'org.postgresql:postgresql:42.4.2'           // Java 8+ 17-aug-22
+	runtime 'org.postgresql:postgresql:42.4.3'           // Java 8+ 05-dec-22
 	runtime 'com.oracle.database.jdbc:ojdbc8:21.6.0.0.1' // Java 8+ 14-jun-22
 
 	test 'org.gmock:gmock:0.9.0-r435-hyve2', { transitive = false }
