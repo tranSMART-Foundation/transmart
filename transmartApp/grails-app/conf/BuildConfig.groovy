@@ -139,8 +139,8 @@ grails.project.dependency.resolution = {
 	runtime 'xerces:xercesImpl:2.9.1'
 
 	// you can remove whichever you are not using
-	runtime 'org.postgresql:postgresql:42.3.3'           // Java 8+ 15-feb-22
-	runtime 'com.oracle.database.jdbc:ojdbc8:21.5.0.0'   // Java 8+ 02-feb-22
+	runtime 'org.postgresql:postgresql:42.4.2'           // Java 8+ 17-aug-22
+	runtime 'com.oracle.database.jdbc:ojdbc8:21.6.0.0.1' // Java 8+ 14-jun-22
 
 	test 'org.gmock:gmock:0.9.0-r435-hyve2', { transitive = false }
 	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
