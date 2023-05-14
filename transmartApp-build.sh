@@ -672,9 +672,9 @@ if [ $buildapi == 1 ] ; then
 	rm -rf ~/.m2/repository/org/transmartproject/$PNAME
     fi
 
-    ./gradlew clean build publishToMavenLocal  >  $OUT/$PREFIX-$DIR.out 2>&1
+    ./gradlew clean build publishToMavenLocal >  $OUT/$PREFIX-$DIR.out 2>&1
 
-    egrep -i 'error[^-]|warning|fail!' $OUT/$PREFIX-$DIR.out
+    egrep -i 'Could not|error[^-]|warning|failure|fail!' $OUT/$PREFIX-$DIR.out
 
     cd ..
 
@@ -1481,7 +1481,7 @@ if [ $buildwar == 1 ] ; then
     if [ $cleangrails == 1 ] || [ $buildcoretests == 1 ] ; then
 	./grailsw clean-all
 	# initial build to resolve transmart-core-db-tests
-	./grailsw war            > $OUT/$PREFIX-$DIR.out 2>&1
+	./grailsw war              > $OUT/$PREFIX-$DIR.out 2>&1
     fi
 
     ./grailsw --stacktrace --verbose war            > $OUT/$PREFIX-$DIR.out 2>&1
