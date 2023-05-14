@@ -170,7 +170,7 @@ BEGIN
 	    select probeset
 		   ,intensity_value
 		   ,assay_id
-		   ,round((CASE WHEN intensity_value <= 0 THEN 0
+		   ,round((CASE WHEN intensity_value <= 0 THEN ln(0.001) -- intensity should already be corrected to 0.001
 			   ELSE ln(intensity_value)/ln(logBase::double precision) END)::numeric,5)
 		   ,patient_id
 	      from tm_wz.wt_subject_rna_probeset
