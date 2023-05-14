@@ -10,6 +10,6 @@ CREATE TABLE wt_mrna_subj_sample_map (
     tissue_type character varying(100),
     attribute_1 character varying(256),
     attribute_2 character varying(200),
-    category_cd character varying(200)
+    category_cd character varying(2000)
 );
 
