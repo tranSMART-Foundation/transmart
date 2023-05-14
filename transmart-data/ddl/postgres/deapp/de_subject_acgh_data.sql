@@ -34,10 +34,10 @@ COMMENT ON COLUMN de_subject_acgh_data.segmented IS 'segmented log2ratio';
 COMMENT ON COLUMN de_subject_acgh_data.flag IS 'call  -2:homloss, -1:loss, 0:normal, 1:gain, 2:amp';
 
 --
--- Name: de_subject_acgh_data_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_subject_acgh_data_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_subject_acgh_data
-    ADD CONSTRAINT de_subject_acgh_data_pkey PRIMARY KEY (assay_id, region_id);
+    ADD CONSTRAINT de_subject_acgh_data_pk PRIMARY KEY (assay_id, region_id);
 
 --
 -- Name: de_subject_acgh_data_patient; Type: INDEX; Schema: deapp; Owner: -

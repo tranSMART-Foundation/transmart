@@ -9,10 +9,10 @@ CREATE TABLE de_pathway_gene (
 );
 
 --
--- Name: de_pathway_gene_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_pathway_gene_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_pathway_gene
-    ADD CONSTRAINT de_pathway_gene_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT de_pathway_gene_pk PRIMARY KEY (id);
 
 --
 -- Name: de_pathway_gene_index1; Type: INDEX; Schema: deapp; Owner: -

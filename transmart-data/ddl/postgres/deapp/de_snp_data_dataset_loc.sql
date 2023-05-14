@@ -9,10 +9,10 @@ CREATE TABLE de_snp_data_dataset_loc (
 );
 
 --
--- Name: de_snp_data_dataset_loc_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_snp_data_dataset_loc_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_snp_data_dataset_loc
-    ADD CONSTRAINT de_snp_data_dataset_loc_pkey PRIMARY KEY (snp_data_dataset_loc_id);
+    ADD CONSTRAINT de_snp_data_dataset_loc_pk PRIMARY KEY (snp_data_dataset_loc_id);
 
 --
 -- Name: tf_trg_snp_data_dataset_loc_id(); Type: FUNCTION; Schema: deapp; Owner: -

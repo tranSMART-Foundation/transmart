@@ -12,10 +12,10 @@ CREATE TABLE de_rbm_annotation (
 );
 
 --
--- Name: de_rbm_annotation_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_rbm_annotation_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_rbm_annotation
-    ADD CONSTRAINT de_rbm_annotation_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT de_rbm_annotation_pk PRIMARY KEY (id);
 
 --
 -- Name: tf_rbm_id_trigger(); Type: FUNCTION; Schema: deapp; Owner: -

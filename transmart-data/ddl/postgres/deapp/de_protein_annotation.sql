@@ -25,8 +25,8 @@ CREATE TABLE de_protein_annotation (
 );
 
 --
--- Name: de_protein_annotation_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_protein_annotation_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_protein_annotation
-    ADD CONSTRAINT de_protein_annotation_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT de_protein_annotation_pk PRIMARY KEY (id);
 

@@ -11,10 +11,10 @@ CREATE TABLE de_snp_probe_sorted_def (
 );
 
 --
--- Name: sys_c0020600; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: snp_probe_sorted_def_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_snp_probe_sorted_def
-    ADD CONSTRAINT sys_c0020600 PRIMARY KEY (snp_probe_sorted_def_id);
+    ADD CONSTRAINT snp_probe_sorted_def_pk PRIMARY KEY (snp_probe_sorted_def_id);
 
 --
 -- Name: tf_trg_de_snp_probe_sorted_def_id(); Type: FUNCTION; Schema: deapp; Owner: -

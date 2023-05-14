@@ -12,10 +12,10 @@ CREATE TABLE de_snp_data_by_patient (
 );
 
 --
--- Name: sys_c0020602; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_snp_data_by_patient_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_snp_data_by_patient
-    ADD CONSTRAINT sys_c0020602 PRIMARY KEY (snp_data_by_patient_id);
+    ADD CONSTRAINT de_snp_data_by_patient_pk PRIMARY KEY (snp_data_by_patient_id);
 
 --
 -- Name: tf_trg_snp_data_by_patient_id(); Type: FUNCTION; Schema: deapp; Owner: -

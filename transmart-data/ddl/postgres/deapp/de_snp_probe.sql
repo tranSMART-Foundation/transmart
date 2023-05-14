@@ -10,10 +10,10 @@ CREATE TABLE de_snp_probe (
 );
 
 --
--- Name: sys_c0020609; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_snp_probe_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_snp_probe
-    ADD CONSTRAINT sys_c0020609 PRIMARY KEY (snp_probe_id);
+    ADD CONSTRAINT de_snp_probe_pk PRIMARY KEY (snp_probe_id);
 
 --
 -- Name: u_snp_probe_name; Type: CONSTRAINT; Schema: deapp; Owner: -

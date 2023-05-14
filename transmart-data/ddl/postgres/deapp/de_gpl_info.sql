@@ -13,8 +13,8 @@ CREATE TABLE de_gpl_info (
 );
 
 --
--- Name: de_gpl_info_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_gpl_info_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_gpl_info
-    ADD CONSTRAINT de_gpl_info_pkey PRIMARY KEY (platform);
+    ADD CONSTRAINT de_gpl_info_pk PRIMARY KEY (platform);
 

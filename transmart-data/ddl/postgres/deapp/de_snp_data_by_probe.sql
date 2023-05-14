@@ -12,10 +12,10 @@ CREATE TABLE de_snp_data_by_probe (
 );
 
 --
--- Name: sys_c0020601; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_snp_data_by_probe_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_snp_data_by_probe
-    ADD CONSTRAINT sys_c0020601 PRIMARY KEY (snp_data_by_probe_id);
+    ADD CONSTRAINT de_snp_data_by_probe_pk PRIMARY KEY (snp_data_by_probe_id);
 
 --
 -- Name: tf_trg_snp_data_by_probe_id(); Type: FUNCTION; Schema: deapp; Owner: -

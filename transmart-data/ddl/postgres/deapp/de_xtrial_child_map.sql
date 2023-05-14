@@ -9,10 +9,10 @@ CREATE TABLE de_xtrial_child_map (
 );
 
 --
--- Name: sys_c0020605; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_xtrial_child_map_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_xtrial_child_map
-    ADD CONSTRAINT sys_c0020605 PRIMARY KEY (concept_cd);
+    ADD CONSTRAINT de_xtrial_child_map_pk PRIMARY KEY (concept_cd);
 
 --
 -- Name: dexcm_parent_cd_fk; Type: FK CONSTRAINT; Schema: deapp; Owner: -

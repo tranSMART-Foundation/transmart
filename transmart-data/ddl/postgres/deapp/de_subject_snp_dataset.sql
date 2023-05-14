@@ -16,10 +16,10 @@ CREATE TABLE de_subject_snp_dataset (
 );
 
 --
--- Name: sys_c0020606; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_subject_snp_dataset_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_subject_snp_dataset
-    ADD CONSTRAINT sys_c0020606 PRIMARY KEY (subject_snp_dataset_id);
+    ADD CONSTRAINT de_subject_snp_dataset_pk PRIMARY KEY (subject_snp_dataset_id);
 
 --
 -- Name: tf_trg_de_subject_snp_dataset_id(); Type: FUNCTION; Schema: deapp; Owner: -

@@ -11,10 +11,10 @@ CREATE TABLE de_gene_source (
 
 
 --
--- Name: de_gene_source_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_gene_source_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_gene_source
-    ADD CONSTRAINT de_gene_source_pkey PRIMARY KEY (gene_source_id);
+    ADD CONSTRAINT de_gene_source_pk PRIMARY KEY (gene_source_id);
 
 
 --

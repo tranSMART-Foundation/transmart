@@ -14,10 +14,10 @@ ALTER TABLE ONLY de_xtrial_parent_names
     ADD CONSTRAINT dextpn_parent_node_u UNIQUE (across_path);
 
 --
--- Name: sys_c0020604; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_xtrial_parent_names_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_xtrial_parent_names
-    ADD CONSTRAINT sys_c0020604 PRIMARY KEY (parent_cd);
+    ADD CONSTRAINT de_xtrial_parent_names_pk PRIMARY KEY (parent_cd);
 
 --
 -- Name: tf_de_parent_cd_trg(); Type: FUNCTION; Schema: deapp; Owner: -

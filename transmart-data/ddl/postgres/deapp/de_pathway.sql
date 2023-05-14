@@ -13,10 +13,10 @@ CREATE TABLE de_pathway (
 );
 
 --
--- Name: de_pathway_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_pathway_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_pathway
-    ADD CONSTRAINT de_pathway_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT de_pathway_pk PRIMARY KEY (id);
 
 --
 -- Name: de_pathway_name_idx; Type: INDEX; Schema: deapp; Owner: -

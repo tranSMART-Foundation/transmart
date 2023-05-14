@@ -14,8 +14,8 @@ CREATE TABLE de_subject_mirna_data (
 );
 
 --
--- Name: de_subject_mirna_data_pkey; Type: CONSTRAINT; Schema: deapp; Owner: -
+-- Name: de_subject_mirna_data_pk; Type: CONSTRAINT; Schema: deapp; Owner: -
 --
 ALTER TABLE ONLY de_subject_mirna_data
-    ADD CONSTRAINT de_subject_mirna_data_pkey PRIMARY KEY (assay_id, probeset_id);
+    ADD CONSTRAINT de_subject_mirna_data_pk PRIMARY KEY (assay_id, probeset_id);
 
