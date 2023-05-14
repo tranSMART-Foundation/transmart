@@ -72,7 +72,7 @@ begin
 	sysdate,
 	sysdate,
 	regexp_replace(s.trial_cd || ':S:' || s.site_cd || ':' || s.subject_cd || ':' || s.sample_cd,
-	'(::){1,}', ':')
+	'(:){2,}', ':')
 	from (select distinct trial_cd
 	,site_cd
 	,subject_cd
@@ -83,7 +83,7 @@ begin
 	(select 1 from i2b2demodata.patient_dimension x
 	where x.sourcesystem_cd =
 	regexp_replace(s.trial_cd || ':S:' || s.site_cd || ':' || s.subject_cd || ':' || s.sample_cd,
-	'(::){1,}', ':'))
+	'(:){2,}', ':'))
 	) s;
 
 	stepCt := stepCt + 1;

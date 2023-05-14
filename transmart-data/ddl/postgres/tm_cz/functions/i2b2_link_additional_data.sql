@@ -88,7 +88,7 @@ begin
       from tm_lz.lt_src_mrna_subj_samp_map t
 	   ,i2b2demodata.patient_dimension pd
      where regexp_replace(t.trial_name || ':' || coalesce(t.site_id,'') || ':' || t.subject_id,
-			  '(::){1,}', ':') = pd.sourcesystem_cd
+			  '(:){2,}', ':') = pd.sourcesystem_cd
        and not exists
 	   (select 1 from deapp.de_gpl_info g
 	     where t.platform = g.platform);
@@ -219,7 +219,7 @@ begin
       from tm_lz.lt_src_mrna_subj_samp_map t
 	   ,i2b2demodata.patient_dimension pd
      where REGEXP_REPLACE(t.trial_name || ':' || coalesce(t.site_id,'') || ':' || t.subject_id,
-			  '(::){1,}', ':') = pd.sourcesystem_cd
+			  '(:){2,}', ':') = pd.sourcesystem_cd
        and not exists
 	   (select 1 from deapp.de_gpl_info g
 	     where t.platform = g.platform);
