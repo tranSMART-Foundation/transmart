@@ -204,8 +204,45 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete SECURITY data for trial from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
 
+    -- delete encounter data
+    -- =====================
+
+    begin
+	delete from i2b2demodata.encounter_mapping
+	 where sourcesystem_cd like trialid || ':%';
+	get diagnostics rowCt := ROW_COUNT;
+    exception
+	when others then
+	    errorNumber := SQLSTATE;
+	    errorMessage := SQLERRM;
+	--Handle errors.
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
+	--End Proc
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
+	    return -16;
+    end;
+    stepCt := stepCt + 1;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA encounter_mapping',rowCt,stepCt,'Done');
+
     -- delete patient data
     -- ===================
+
+    begin
+	delete from i2b2demodata.patient_mapping
+	 where sourcesystem_cd like trialid || ':%';
+	get diagnostics rowCt := ROW_COUNT;
+    exception
+	when others then
+	    errorNumber := SQLSTATE;
+	    errorMessage := SQLERRM;
+	--Handle errors.
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
+	--End Proc
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
+	    return -16;
+    end;
+    stepCt := stepCt + 1;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA patient_mapping',rowCt,stepCt,'Done');
 
     begin
 	delete from i2b2demodata.patient_dimension
@@ -627,8 +664,10 @@ begin
     end if;
 
     delete from i2b2metadata.tm_trial_nodes where trial = trialid;
+    get diagnostics rowCt := ROW_COUNT;
+
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete trial from tm_trial_nodes',1,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete trial from tm_trial_nodes',rowCt,stepCt,'Done');
 
     
     -- Checks for possible errors, or notes for deleted partially removed trial
