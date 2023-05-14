@@ -21,10 +21,10 @@ CREATE TABLE am_tag_item (
 );
 
 --
--- Name: am_tag_item_pkey; Type: CONSTRAINT; Schema: amapp; Owner: -
+-- Name: am_tag_item_pk; Type: CONSTRAINT; Schema: amapp; Owner: -
 --
 ALTER TABLE ONLY am_tag_item
-    ADD CONSTRAINT am_tag_item_pkey PRIMARY KEY (tag_template_id, tag_item_id);
+    ADD CONSTRAINT am_tag_item_pk PRIMARY KEY (tag_template_id, tag_item_id);
 
 --
 -- Name: tf_trg_am_tag_item_id(); Type: FUNCTION; Schema: amapp; Owner: -

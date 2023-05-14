@@ -9,8 +9,8 @@ CREATE TABLE am_tag_association (
 );
 
 --
--- Name: am_tag_association_pkey; Type: CONSTRAINT; Schema: amapp; Owner: -
+-- Name: am_tag_association_pk; Type: CONSTRAINT; Schema: amapp; Owner: -
 --
 ALTER TABLE ONLY am_tag_association
-    ADD CONSTRAINT am_tag_association_pkey PRIMARY KEY (subject_uid, object_uid);
+    ADD CONSTRAINT am_tag_association_pk PRIMARY KEY (subject_uid, object_uid);
 

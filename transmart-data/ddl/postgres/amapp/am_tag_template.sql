@@ -10,10 +10,10 @@ CREATE TABLE am_tag_template (
 );
 
 --
--- Name: am_tag_template_pkey; Type: CONSTRAINT; Schema: amapp; Owner: -
+-- Name: am_tag_template_pk; Type: CONSTRAINT; Schema: amapp; Owner: -
 --
 ALTER TABLE ONLY am_tag_template
-    ADD CONSTRAINT am_tag_template_pkey PRIMARY KEY (tag_template_id);
+    ADD CONSTRAINT am_tag_template_pk PRIMARY KEY (tag_template_id);
 
 --
 -- Name: tf_trg_am_tag_template_id(); Type: FUNCTION; Schema: amapp; Owner: -
