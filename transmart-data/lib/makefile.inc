@@ -1,23 +1,23 @@
 LIB_DIR          := $(dir $(lastword $(MAKEFILE_LIST)))
 
-# PostgreSQL driver 05-dec-22
+# PostgreSQL driver 18-mar-23
 # https://jdbc.postgresql.org/
 # ----------------------------
 
 JDBC_DL_PSQL     := https://jdbc.postgresql.org/download
-JDBC_DRIVER_PSQL := postgresql-42.4.3.jar
+JDBC_DRIVER_PSQL := postgresql-42.6.0.jar
 
 JDBC_DRIVER_PSQL_PATH := $(LIB_DIR)$(JDBC_DRIVER_PSQL)
 
-# Oracle driver 20-jun-22
+# Oracle driver 07-apr-23
 # https:/repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/
 # https:/repo1.maven.org/maven2/com/oracle/database/xml/xdb/
 # -------------------------------------------------------------------
 
-JDBC_DLO_ORA      := https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/21.6.0.0.1
-JDBC_DLX_ORA      := https://repo1.maven.org/maven2/com/oracle/database/xml/xdb/21.6.0.0.1
-JDBC_DRIVER_ORA  := ojdbc8-21.6.0.0.1.jar
-JDBC_XDB_ORA     := xdb-21.6.0.0.1.jar
+JDBC_DLO_ORA      := https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/23.2.0.0
+JDBC_DLX_ORA      := https://repo1.maven.org/maven2/com/oracle/database/xml/xdb/23.2.0.0
+JDBC_DRIVER_ORA  := ojdbc8-23.2.0.0.jar
+JDBC_XDB_ORA     := xdb-23.2.0.0.jar
 
 JDBC_DRIVER_ORA_PATH  := $(LIB_DIR)$(JDBC_DRIVER_ORA)
 JDBC_XDB_ORA_PATH     := $(LIB_DIR)$(JDBC_XDB_ORA)
@@ -35,12 +35,22 @@ $(JDBC_DRIVER_ORA_PATH): $(JDBC_XDB_ORA_PATH)
 $(JDBC_XDB_ORA_PATH):
 	curl -f $(JDBC_DLX_ORA)/$(JDBC_XDB_ORA) > $@
 
-NETTY_JAR        := netty-3.5.13.Final.jar
-NETTY_JAR_DL     := http://files.thehyve.net
-NETTY_JAR_PATH   := $(LIB_DIR)$(NETTY_JAR)
+# Used by The Hyve (maybe for development). This version has log4j and protobuf vulnerabilities.
+# Version 4 is alpha on maven
+# Version 5 on netty project github
+# =================================
 
-$(NETTY_JAR_PATH):
-	curl -f $(NETTY_JAR_DL)/$(NETTY_JAR) > $@
+# Not used by current codebase.
+# NETTY_JAR        := netty-3.10.6.Final.jar
+# NETTY_JAR_DL     := https://mvnrepository.com/artifact/io.netty/netty/
+# NETTY_JAR_PATH   := $(LIB_DIR)$(NETTY_JAR)
+
+# $(NETTY_JAR_PATH):
+#	curl -f $(NETTY_JAR_DL)/$(NETTY_JAR) > $@
+
+# SchemaSpy 17-sep-19
+# No sign of active development
+# =============================
 
 SCHEMA_SPY_VERSION=6.1.0
 SCHEMA_SPY_JAR=schemaSpy_$(SCHEMA_SPY_VERSION).jar
