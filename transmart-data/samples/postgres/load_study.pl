@@ -54,7 +54,7 @@ $annotation = 0;
 
 # Process in this order:
 # Browse Study (and missing Program) - can be loaded without clinical and other data
-# Clinical - can be issing e.g. for one Sanofi test study
+# Clinical - can be missing e.g. for one Sanofi test study
 # Ref_Annotation - Load (or check) all annotation platforms
 # High-dimensional data in alphabetical order:
 #	acgh expression metabolomics mirna mirnaqpcr mirnaseq msproteomics proteomics rbm rnaseq vcf
@@ -920,7 +920,7 @@ if($annotation && defined($rbm{$loadstudy})) {
     }
 }
 
-if($clinical && $annotation && defined($rnaseq{$loadstudy})) {
+if($annotation && defined($rnaseq{$loadstudy})) {
     $rnaseq = 0;
     $jobRnaseq = 0;
     $timeRnaseq = "unknown time";
