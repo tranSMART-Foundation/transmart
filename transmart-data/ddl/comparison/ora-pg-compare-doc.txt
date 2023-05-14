@@ -1,4 +1,5 @@
-The script ora-pg-compare reads the files in ddl/oracle and ddl/postgres and reports differences.
+The script ora-pg-compare.pl reads the files in ddl/oracle and ddl/postgres and reports differences.
+it also checks i2b2-data to compare the i2b2 and transmart schemas
 
 The major issues reported to standard error are:
 
