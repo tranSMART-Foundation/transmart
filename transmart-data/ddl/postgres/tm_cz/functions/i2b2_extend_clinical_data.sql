@@ -302,7 +302,7 @@ begin
        set data_type = 'T'
 	   ,category_path = replace(replace(category_cd,'_',' '),'+','\')
 	   ,usubjid = REGEXP_REPLACE(TrialID || ':' || coalesce(site_id,'') || ':' || subject_id,
-				     '(::){1,}', ':', 'g');
+				     '(:){2,}', ':', 'g');
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Set columns in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done');
@@ -1145,7 +1145,7 @@ begin
 
     end loop;
 
-    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobId);
+    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, topLevel, jobId);
     select tm_cz.i2b2_load_security_data(TrialID,jobId) into rtnCd;
     if(rtnCd <> 1) then
         stepCt := stepCt + 1;
