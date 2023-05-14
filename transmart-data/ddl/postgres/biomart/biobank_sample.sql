@@ -11,8 +11,8 @@ CREATE TABLE biobank_sample (
 );
 
 --
--- Name: biobank_sample_pkey; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: biobank_sample_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY biobank_sample
-    ADD CONSTRAINT biobank_sample_pkey PRIMARY KEY (sample_tube_id);
+    ADD CONSTRAINT biobank_sample_pk PRIMARY KEY (sample_tube_id);
 

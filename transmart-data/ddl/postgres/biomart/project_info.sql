@@ -66,8 +66,8 @@ ALTER TABLE ONLY project_info
     ADD CONSTRAINT project_info_file_name_key UNIQUE (file_name);
 
 --
--- Name: project_info_pkey; Type: CONSTRAINT; Schema: biomart; Owner: -
+-- Name: project_info_pk; Type: CONSTRAINT; Schema: biomart; Owner: -
 --
 ALTER TABLE ONLY project_info
-    ADD CONSTRAINT project_info_pkey PRIMARY KEY (file_id);
+    ADD CONSTRAINT project_info_pk PRIMARY KEY (file_id);
 
