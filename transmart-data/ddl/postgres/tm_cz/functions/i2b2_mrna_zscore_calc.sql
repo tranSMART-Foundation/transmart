@@ -309,8 +309,15 @@ begin
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Calculate Z-Score for trial in TM_WZ wt_subject_microarray_med',rowCt,stepCt,'Done');
 
     begin
-	sqlText := 'insert into ' || partitionName || ' (partition_id, trial_name, probeset_id, assay_id, patient_id, raw_intensity, log_intensity, zscore) ' ||
-	    'select ' || partitionId::text || ', d.trial_name, d.probeset_id, d.assay_id, d.patient_id, d.raw_intensity, d.log_intensity, ' ||
+	sqlText := 'insert into ' || partitionName || ' (partition_id, trial_name, probeset_id, assay_id, patient_id' ||
+	    ', raw_intensity' ||
+	    ', log_intensity' ||
+	    ', zscore) ' ||
+	    'select ' || partitionId::text || ', d.trial_name, d.probeset_id, d.assay_id, d.patient_id' ||
+	    ', round(case when ''' || dataType || '''= ''R'' then d.intensity_value::numeric' ||
+	    ' when '''||  dataType || '''= ''L'' then case when ' || logBase || '= -1 then null else power(' || logBase || ', d.log_intensity::numeric) end ' ||
+	    ' else null end, 4) as raw_intensity ' ||
+	    ', d.log_intensity, ' ||
 	    'case when c.stddev_intensity = 0 then 0 else ' ||
 	    'case when (d.log_intensity - c.median_intensity ) / c.stddev_intensity < -2.5 then -2.5 ' ||
 	    'when (d.log_intensity - c.median_intensity ) / c.stddev_intensity > 2.5 then 2.5 else ' ||
