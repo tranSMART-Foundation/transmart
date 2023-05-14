@@ -64,6 +64,7 @@ nConn = nConn.toInteger()
 
 Integer loadFile(Sql sql, File file) {
     def i = 0
+    Log.out "Loading $file ($i)"
     file.withReader 'UTF-8', { reader ->
         new SqlSplitter(reader).each { statement ->
             i++
@@ -92,6 +93,7 @@ def takeSql(BlockingQueue<Sql> sqls, Closure closure) {
 
 Integer loadFileParallel(ForkJoinPool pool, BlockingQueue<Sql> sqls, File file) {
     AtomicInteger i = new AtomicInteger(0)
+    Log.out " Loading parallel $file ($i)"
     withExistingPool(pool) {
         file.withReader 'UTF-8', { reader ->
             def allStatements = []
@@ -241,10 +243,12 @@ withPool nConn, { pool ->
     // Calculate file dependencies and cross schema grants
     def repositories = new Vector<ItemRepository>()
 
+    Log.out "++ withPool make dependencies and cross schema grants"
     users.collectParallel { String user ->
         File userDir = new File(user.toLowerCase(Locale.ENGLISH))
         File itemsFile = new File(userDir, 'items.json')
 
+	Log.out "user ${user} userDir ${userDir} itemsFile ${itemsFile}"
         ItemRepository repository = objectReader.readValue itemsFile
         repositories << repository
 
