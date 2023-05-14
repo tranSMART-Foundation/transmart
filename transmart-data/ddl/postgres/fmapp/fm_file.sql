@@ -17,10 +17,10 @@ CREATE TABLE fm_file (
 );
 
 --
--- Name: fm_file_pkey; Type: CONSTRAINT; Schema: fmapp; Owner: -
+-- Name: fm_file_pk; Type: CONSTRAINT; Schema: fmapp; Owner: -
 --
 ALTER TABLE ONLY fm_file
-    ADD CONSTRAINT fm_file_pkey PRIMARY KEY (file_id);
+    ADD CONSTRAINT fm_file_pk PRIMARY KEY (file_id);
 
 --
 -- Name: tf_trg_fm_file_id(); Type: FUNCTION; Schema: fmapp; Owner: -

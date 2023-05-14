@@ -14,10 +14,10 @@ CREATE TABLE fm_folder (
 );
 
 --
--- Name: fm_folder_pkey; Type: CONSTRAINT; Schema: fmapp; Owner: -
+-- Name: fm_folder_pk; Type: CONSTRAINT; Schema: fmapp; Owner: -
 --
 ALTER TABLE ONLY fm_folder
-    ADD CONSTRAINT fm_folder_pkey PRIMARY KEY (folder_id);
+    ADD CONSTRAINT fm_folder_pk PRIMARY KEY (folder_id);
 
 --
 -- Name: tf_trg_fm_folder_id(); Type: FUNCTION; Schema: fmapp; Owner: -
