@@ -1,4 +1,4 @@
-# assume ../plugin_module.tsv has is a dump and regenerate the files here
+# assume ../plugin_module.tsv is a dump and regenerate the files here
 process_dump:
 	php extract_params.php < ../plugin_module.tsv > plugin_module-template.tsv
 
