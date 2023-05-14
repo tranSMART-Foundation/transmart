@@ -42,4 +42,4 @@ CREATE TABLE wrk_clinical_data (
 --
 -- Name: wrk_cd_idx; Type: INDEX; Schema: tm_wz; Owner: -
 --
-CREATE INDEX wrk_cd_idx ON wrk_clinical_data USING btree (data_type, data_value, visit_name, data_label, category_cd, usubjid);
+-- CREATE INDEX wrk_cd_idx ON wrk_clinical_data USING btree (data_type, data_value, visit_name, data_label, category_cd, usubjid);
