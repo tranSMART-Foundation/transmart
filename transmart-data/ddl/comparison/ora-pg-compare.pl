@@ -3617,7 +3617,7 @@ ALTER TABLE \"$ts\".\"$tt\" ADD CONSTRAINT \"$kn\" FOREIGN KEY (\"$ki\")
     if(defined($ioIndex{$t})){@ibkey = sort(split(/;/,$ioIndex{$t}));$ibkey=$#ibkey+1}
     if(defined($oIndex{$t})){@tmkey = sort(split(/;/,$oIndex{$t}));$tmkey=$#tmkey+1}
     if($ibkey && $tmkey) {
-	print STDERR "Compare i2b2-TM $t counts $ibkey $tmkey INDEX i2b2: $ioIndex{$t} TM: $oIndex{$t}\n";
+	if($ioIndex{$t} ne $oIndex{$t}) {print STDERR "Compare i2b2-TM $t counts $ibkey $tmkey INDEX i2b2: $ioIndex{$t} TM: $oIndex{$t}\n"}
 	my $jib = 0;
 	my $jtm = 0;
 	my $cmp;
@@ -4191,7 +4191,7 @@ sub parseI2b2Oracle($){
 			$forkey=1;
 		    }
 		    elsif(/^\s*ON COMMIT /i){
-			print STDERR "Commit skip $d/$f $_";
+			print STDERR "Commit skip $d/$f $_\n";
 			# skip commit options for temporary tables
 		    }
 		    elsif(/^\s*REFERENCES ([^\( ]+) *\(([^\)]+)\)/){
@@ -4818,7 +4818,7 @@ sub parseI2b2Postgres($){
 			$pk =~ s/\"//g;
 			$pk =~ s/ \)/\)/g;
 			$ipTableForkey{"$schema.$table"} .= $pk;
-			print STDERR "I2b2 postgres forkeyall '$pk' from $_\n";
+#			print STDERR "I2b2 postgres forkeyall '$pk' from $_\n";
 		    }
 		    elsif(/^\s*(CONSTRAINT (\S+)\s+)?FOREIGN KEY *(\([^\)]+\))/){
 			if(defined($1)) {$pk = uc($2).uc($3)}
