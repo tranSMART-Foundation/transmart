@@ -23,7 +23,7 @@ CREATE FUNCTION tf_trg_i2b2_tag_id() RETURNS trigger
 AS $$
 begin
     if new.tag_id is null then
-	select nextval('i2b2metadata.seq_i2b2_data_id') into new.tag_id ;
+	select nextval('i2b2metadata.seq_i2b2_tag_id') into new.tag_id ;
     end if;
     return new;
 end;
@@ -38,9 +38,9 @@ SET default_with_oids = false;
 CREATE TRIGGER trg_i2b2_tag_id BEFORE INSERT ON i2b2_tags FOR EACH ROW EXECUTE PROCEDURE tf_trg_i2b2_tag_id();
 
 --
--- Name: seq_i2b2_data_id; Type: SEQUENCE; Schema: i2b2metadata; Owner: -
+-- Name: seq_i2b2_tag_id; Type: SEQUENCE; Schema: i2b2metadata; Owner: -
 --
-CREATE SEQUENCE seq_i2b2_data_id
+CREATE SEQUENCE seq_i2b2_tag_id
     START WITH 1789
     INCREMENT BY 1
     NO MINVALUE

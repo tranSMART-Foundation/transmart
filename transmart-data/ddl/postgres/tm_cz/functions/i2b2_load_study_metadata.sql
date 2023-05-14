@@ -935,7 +935,7 @@ BEGIN
 	begin
 	insert into i2b2metadata.i2b2_tags
 	(tag_id, path, tag, tag_type, tags_idx)
-	select nextval('i2b2metadata.sq_i2b2_tag_id')
+	select nextval('i2b2metadata.seq_i2b2_tag_id')
 		  ,min(b.c_fullname) as path
 		  ,be.accession as tag
 		  ,'Trial' as tag_type

@@ -51,7 +51,7 @@
       "parents" : [ {
       "type" : "SEQUENCE",
       "owner" : "I2B2METADATA",
-      "name" : "SEQ_I2B2_DATA_ID"
+      "name" : "SEQ_I2B2_TAG_ID"
       }, {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
@@ -505,7 +505,7 @@
     "child" : {
       "type" : "SEQUENCE",
       "owner" : "I2B2METADATA",
-      "name" : "SQ_I2B2_TAG_ID"
+      "name" : "SEQ_I2B2_TAG_ID"
     },
     "parents" : [ ]
   }, {
@@ -815,6 +815,13 @@
     "file" : "i2b2metadata/tm_trial_nodes.sql"
   }, {
     "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "TM_TN_TRIAL"
+    },
+    "file" : "i2b2metadata/tm_trial_nodes.sql"
+  }, {
+    "item" : {
       "type" : "VIEW",
       "owner" : "I2B2METADATA",
       "name" : "I2B2_TRIAL_NODES"
@@ -929,9 +936,9 @@
     "item" : {
       "type" : "SEQUENCE",
       "owner" : "I2B2METADATA",
-      "name" : "SQ_I2B2_TAG_ID"
+      "name" : "SEQ_I2B2_TAG_ID"
     },
-    "file" : "i2b2metadata/_misc.sql"
+    "file" : "i2b2metadata/i2b2_tags.sql"
   }, {
     "item" : {
       "type" : "TABLE",
