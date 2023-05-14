@@ -59,7 +59,7 @@ begin
 
     --	create security records in observation_fact
 
-    perform tm_cz.i2b2_create_security_for_trial(TrialId, 'Y', jobID);
+    perform tm_cz.i2b2_create_security_for_trial(TrialId, 'Y', 2, jobID);
 
     --	load i2b2_secure
 

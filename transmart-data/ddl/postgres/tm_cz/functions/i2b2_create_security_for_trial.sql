@@ -1,8 +1,8 @@
 SET search_path = tm_cz, pg_catalog;
 --
--- Name: i2b2_create_security_for_trial(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
+-- Name: i2b2_create_security_for_trial(character varying, character varying, numeric, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_security_for_trial(trial_id character varying, secured_study character varying DEFAULT 'N'::character varying, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_security_for_trial(trial_id character varying, secured_study character varying DEFAULT 'N'::character varying, top_level numeric DEFAULT 2, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -27,20 +27,22 @@ AS $$
     newJobFlag		integer;
     databaseName 	VARCHAR(100);
     procedureName 	VARCHAR(100);
-    jobID 			numeric(18,0);
-    stepCt 			numeric(18,0);
-    rowCt			numeric(18,0);
+    jobID 		numeric(18,0);
+    stepCt 		numeric(18,0);
+    rowCt		numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
 
-    TrialID varchar(100);
-    securedStudy varchar(5);
-    pExists			integer;
+    topLevel		integer;
+    TrialID 		varchar(100);
+    securedStudy 	varchar(5);
+    pExists		integer;
     v_bio_experiment_id	numeric(18,0);
 
 begin
     TrialID := trial_id;
     securedStudy := secured_study;
+    topLevel := top_level;
 
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -225,9 +227,9 @@ begin
 		       ,'EXP:' || TrialId as bio_data_unique_id
 		  from i2b2metadata.i2b2 md
 		 where md.sourcesystem_cd = TrialId
-		   and md.c_hlevel =
-		       (select min(x.c_hlevel) from i2b2metadata.i2b2 x
-			 where x.sourcesystem_cd = TrialId)
+		   and md.c_hlevel = topLevel
+--		       (select min(x.c_hlevel) from i2b2metadata.i2b2 x
+--			 where x.sourcesystem_cd = TrialId)
 		   and not exists
 		       (select 1 from searchapp.search_secure_object so
 			 where v_bio_experiment_id = so.bio_data_id);
