@@ -244,6 +244,21 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "BIOMART_USER",
+      "name" : "TRG_APPLICATION_SETTINGS_ID"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "BIOMART_USER",
+      "name" : "APPLICATION_SETTINGS"
+    }, {
+      "type" : "SEQUENCE",
+      "owner" : "BIOMART_USER",
+      "name" : "APPLICATION_SETTINGS_ID_SEQ"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "BIOMART_USER",
       "name" : "TRG_CMS_FILE_ID"
     },
     "parents" : [ {
@@ -313,6 +328,13 @@
       "name" : "BROWSE_STUDIES_VIEW"
     },
     "file" : "biomart_user/_cross.sql"
+  }, {
+    "item" : {
+      "type" : "TYPE",
+      "owner" : "BIOMART_USER",
+      "name" : "PATIENTS_TAB"
+    },
+    "file" : "biomart_user/_misc.sql"
   }, {
     "item" : {
       "type" : "TYPE",
@@ -392,11 +414,11 @@
     "file" : "biomart_user/gene_ontology_data.sql"
   }, {
     "item" : {
-      "type" : "TYPE",
+      "type" : "TRIGGER",
       "owner" : "BIOMART_USER",
-      "name" : "PATIENTS_TAB"
+      "name" : "TRG_APPLICATION_SETTINGS_ID"
     },
-    "file" : "biomart_user/_misc.sql"
+    "file" : "biomart_user/application_settings.sql"
   }, {
     "item" : {
       "type" : "TRIGGER",
