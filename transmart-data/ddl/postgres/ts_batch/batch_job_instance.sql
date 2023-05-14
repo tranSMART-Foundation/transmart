@@ -9,10 +9,10 @@ CREATE TABLE batch_job_instance (
 );
 
 --
--- Name: batch_job_instance_pkey; Type: CONSTRAINT; Schema: ts_batch; Owner: -
+-- Name: batch_job_instance_pk; Type: CONSTRAINT; Schema: ts_batch; Owner: -
 --
 ALTER TABLE ONLY batch_job_instance
-    ADD CONSTRAINT batch_job_instance_pkey PRIMARY KEY (job_instance_id);
+    ADD CONSTRAINT batch_job_instance_pk PRIMARY KEY (job_instance_id);
 
 --
 -- Name: job_inst_un; Type: CONSTRAINT; Schema: ts_batch; Owner: -

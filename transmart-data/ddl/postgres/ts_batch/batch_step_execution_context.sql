@@ -8,10 +8,10 @@ CREATE TABLE batch_step_execution_context (
 );
 
 --
--- Name: batch_step_execution_context_pkey; Type: CONSTRAINT; Schema: ts_batch; Owner: -
+-- Name: batch_step_execution_context_pk; Type: CONSTRAINT; Schema: ts_batch; Owner: -
 --
 ALTER TABLE ONLY batch_step_execution_context
-    ADD CONSTRAINT batch_step_execution_ctxt_pkey PRIMARY KEY (step_execution_id);
+    ADD CONSTRAINT batch_step_execution_ctxt_pk PRIMARY KEY (step_execution_id);
 
 --
 -- Name: step_exec_ctx_fk; Type: FK CONSTRAINT; Schema: ts_batch; Owner: -

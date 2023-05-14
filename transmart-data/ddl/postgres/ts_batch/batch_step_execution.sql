@@ -23,10 +23,10 @@ CREATE TABLE batch_step_execution (
 );
 
 --
--- Name: batch_step_execution_pkey; Type: CONSTRAINT; Schema: ts_batch; Owner: -
+-- Name: batch_step_execution_pk; Type: CONSTRAINT; Schema: ts_batch; Owner: -
 --
 ALTER TABLE ONLY batch_step_execution
-    ADD CONSTRAINT batch_step_execution_pkey PRIMARY KEY (step_execution_id);
+    ADD CONSTRAINT batch_step_execution_pk PRIMARY KEY (step_execution_id);
 
 --
 -- Name: job_exec_step_fk; Type: FK CONSTRAINT; Schema: ts_batch; Owner: -

@@ -16,10 +16,10 @@ CREATE TABLE batch_job_execution (
 );
 
 --
--- Name: batch_job_execution_pkey; Type: CONSTRAINT; Schema: ts_batch; Owner: -
+-- Name: batch_job_execution_; Type: CONSTRAINT; Schema: ts_batch; Owner: -
 --
 ALTER TABLE ONLY batch_job_execution
-    ADD CONSTRAINT batch_job_execution_pkey PRIMARY KEY (job_execution_id);
+    ADD CONSTRAINT batch_job_execution_pk PRIMARY KEY (job_execution_id);
 
 --
 -- Name: job_inst_exec_fk; Type: FK CONSTRAINT; Schema: ts_batch; Owner: -
