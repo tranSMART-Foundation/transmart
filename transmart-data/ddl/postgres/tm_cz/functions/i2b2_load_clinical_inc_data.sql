@@ -79,8 +79,9 @@ AS $$
 
     -- added by Cognizant for requirement 3 and 4 under #1
     uploadI2b2 cursor is
-		   select category_cd,display_value,display_label,display_unit from
-		   tm_lz.lt_src_display_mapping group by category_cd,display_value,display_label,display_unit;
+		   select category_cd,display_value,display_label,display_unit
+		     from tm_lz.lt_src_display_mapping
+		 group by category_cd,display_value,display_label,display_unit;
 
 begin
 
@@ -112,7 +113,7 @@ begin
 	secureStudy := 'Y';
     end if;
 
-    topNode := REGEXP_REPLACE('\' || top_node || '\','(\\){2,}', '\', 'g');
+    topNode := regexp_replace('\' || top_node || '\','(\\){2,}', '\', 'g');
     topNodeEscaped := replace(topNode, '_', '`_');
 
     --	figure out how many nodes (folders) are at study name and above
@@ -131,72 +132,73 @@ begin
 
     --  inc-change delete only data to be replaced
 
+    -- SKIP: the lz_src_clinical_data table is never used
     --	delete any existing data from lz_src_clinical_data and load new data
-    begin
-	delete from tm_lz.lz_src_clinical_data
-	 where (study_id||subject_id||category_cd) in( select (study_id||subject_id||category_cd ) from lt_src_clinical_data);
-	 get diagnostics rowCt := ROW_COUNT;
-    exception
-	when others then
-	    errorNumber := SQLSTATE;
-	    errorMessage := SQLERRM;
-	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return -16;
-    end;
-    stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Delete existing data from lz_src_clinical_data',rowCt,stepCt,'Done');
-
-    begin
---    for tExplain in
---    EXPLAIN (ANALYZE, VERBOSE, BUFFERS)
-	insert into tm_lz.lz_src_clinical_data
-		    (study_id
-		    ,site_id
-		    ,subject_id
-		    ,visit_name
-		    ,data_label
-		    ,modifier_cd
-		    ,data_value
-		    ,units_cd
-		    ,date_timestamp
-		    ,category_cd
-		    ,etl_job_id
-		    ,etl_date
-		    ,ctrl_vocab_code)
-	select study_id
-	       ,site_id
-	       ,subject_id
-	       ,visit_name
-	       ,data_label
-               ,modifier_cd
-	       ,data_value
-               ,units_cd
-               ,date_timestamp
-	       ,category_cd
-	       ,jobID
-	       ,etlDate
-	       ,ctrl_vocab_code
-	  from tm_lz.lt_src_clinical_data
---	LOOP
---	    raise notice 'explain: %', tExplain;
---	END LOOP
-	;
-	get diagnostics rowCt := ROW_COUNT;
-    exception
-	when others then
-	    errorNumber := SQLSTATE;
-	    errorMessage := SQLERRM;
-	--Handle errors.
-	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
-	--End Proc
-	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
-	    return -16;
-    end;
-    stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert data into lz_src_clinical_data',rowCt,stepCt,'Done');
+--    begin
+--	delete from tm_lz.lz_src_clinical_data
+--	 where (study_id||subject_id||category_cd) in( select (study_id||subject_id||category_cd ) from lt_src_clinical_data);
+--	 get diagnostics rowCt := ROW_COUNT;
+--    exception
+--	when others then
+--	    errorNumber := SQLSTATE;
+--	    errorMessage := SQLERRM;
+--	--Handle errors.
+--	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+--	--End Proc
+--	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+--	    return -16;
+--    end;
+--    stepCt := stepCt + 1;
+--    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Delete existing data from lz_src_clinical_data',rowCt,stepCt,'Done');
+--
+--    begin
+-- --    for tExplain in
+-- --    EXPLAIN (ANALYZE, VERBOSE, BUFFERS)
+--	insert into tm_lz.lz_src_clinical_data
+--		    (study_id
+--		    ,site_id
+--		    ,subject_id
+--		    ,visit_name
+--		    ,data_label
+--		    ,modifier_cd
+--		    ,data_value
+--		    ,units_cd
+--		    ,date_timestamp
+--		    ,category_cd
+--		    ,etl_job_id
+--		    ,etl_date
+--		    ,ctrl_vocab_code)
+--	select study_id
+--	       ,site_id
+--	       ,subject_id
+--	       ,visit_name
+--	       ,data_label
+--               ,modifier_cd
+--	       ,data_value
+--               ,units_cd
+--               ,date_timestamp
+--	       ,category_cd
+--	       ,jobID
+--	       ,etlDate
+--	       ,ctrl_vocab_code
+--	  from tm_lz.lt_src_clinical_data
+-- --	LOOP
+-- --	    raise notice 'explain: %', tExplain;
+-- --	END LOOP
+--	;
+--	get diagnostics rowCt := ROW_COUNT;
+--    exception
+--	when others then
+--	    errorNumber := SQLSTATE;
+--	    errorMessage := SQLERRM;
+--	--Handle errors.
+--	    perform tm_cz.cz_error_handler (jobID, procedureName, errorNumber, errorMessage);
+--	--End Proc
+--	    perform tm_cz.cz_end_audit (jobID, 'FAIL');
+--	    return -16;
+--    end;
+--    stepCt := stepCt + 1;
+--    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert data into lz_src_clinical_data',rowCt,stepCt,'Done');
 
     --	truncate tm_wz.wrk_clinical_data and load data from external file
 
@@ -279,7 +281,7 @@ begin
 
     --	Add any upper level nodes as needed
 
-    tPath := REGEXP_REPLACE(replace(top_node,study_name,''),'(\\){2,}', '\', 'g');
+    tPath := regexp_replace(replace(top_node,study_name,''),'(\\){2,}', '\', 'g');
     select length(tPath) - length(replace(tPath,'\','')) into pCount;
 
     if pCount > 2 then
@@ -312,17 +314,25 @@ begin
 	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Adding top node for study',0,stepCt,'Done');
     end if;
 
-    --	Set data_type, category_path, and usubjid
+    --	Set data_type, category_path, sourcesystem_cd, usubjid and uencid
+    --	category_path: change underscore to space, multi backslash to \, \ to +
+    --	sourcesystem_cd: TrialID:subject_id replace double colon with single
+    --	usubjid: TrialID:site_id:subject_id replace double colon with single
+    --	uencid: TrialID:site_id:subject_id:visit_name replace multiple colon with single
 
     update tm_wz.wrk_clinical_data
        set data_type = 'T'
 	   ,category_path = regexp_replace(regexp_replace(replace(category_cd,'_',' '),'([^\\])\+','\1\','g'),'\\\+','+','g')
-	   ,sourcesystem_cd = REGEXP_REPLACE(TrialID || ':' || subject_id,
-				     '(::){1,}', ':', 'g')
-	   ,usubjid = REGEXP_REPLACE(TrialID || ':' || coalesce(site_id,'') || ':' || subject_id,
-				     '(::){1,}', ':', 'g')
-	   ,uencid = REGEXP_REPLACE(TrialID || ':' || coalesce(site_id,'') || ':' || subject_id || ':' || coalesce(visit_name,''),
-				     '(::){1,}', ':', 'g');
+	   ,sourcesystem_cd = concat_ws(':',TrialID,subject_id)
+	   ,usubjid = concat_ws(':',TrialID,site_id,subject_id)
+	   ,uencid = concat_ws(':',TrialID,site_id,subject_id,visit_name)
+--	   ,sourcesystem_cd = replace(TrialID || ':' || subject_id,
+--				     '::', ':')
+--	   ,usubjid = replace(TrialID || ':' || coalesce(site_id,'') || ':' || subject_id,
+--				     '::', ':')
+--	   ,uencid = regexp_replace(TrialID || ':' || coalesce(site_id,'') || ':' || subject_id || ':' || coalesce(visit_name,''),
+--				     '(:){2,}', ':', 'g')
+	;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Set columns in tm_wz.wrk_clinical_data',rowCt,stepCt,'Done');
@@ -469,6 +479,10 @@ begin
 		       = upper(t.data_label)
 		   and t.data_label is not null)
 	       and tpm.data_label is not null;
+	get diagnostics rowCt := ROW_COUNT;
+	stepCt := stepCt + 1;
+    	perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Remove data_label from last part of category_path if they are the same',rowCt,stepCt,'Done');
+
         update tm_wz.wrk_clinical_data tpm
            set data_label = null
          where tm_cz.instr(tpm.category_path,'\',-1,1) = 0 and (tpm.category_cd, tpm.data_label) in
@@ -590,7 +604,8 @@ begin
 	   set data_label  = trim(trailing ',' from trim(replace(replace(data_label,'  ', ' '),' ,',','))),
 	       data_value  = trim(trailing ',' from trim(replace(replace(data_value,'  ', ' '),' ,',','))),
 	    -- sample_type = trim(trailing ',' from trim(replace(replace(sample_type,'  ', ' '),' ,',','))),
-	       visit_name  = trim(trailing ',' from trim(replace(replace(visit_name,'  ', ' '),' ,',',')));
+	       visit_name  = trim(trailing ',' from trim(replace(replace(visit_name,'  ', ' '),' ,',',')))
+	;
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -603,7 +618,7 @@ begin
 	    return -16;
     end;
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Remove leading, trailing, double spaces',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Remove leading, trailing, double spaces from data_label data_value visit_name',rowCt,stepCt,'Done');
 
     --1. DETERMINE THE DATA_TYPES OF THE FIELDS
     --	replaced cursor with update, used temp table to store category_cd/data_label because correlated subquery ran too long
@@ -771,11 +786,16 @@ begin
 
     -- Check all text data values will fit in observation_fact
 
-    select character_maximum_length from information_schema.columns where table_schema = 'i2b2demodata' and table_name = 'observation_fact' and column_name = 'tval_char' into factLen;
+    select character_maximum_length from information_schema.columns
+     where table_schema = 'i2b2demodata'
+       and table_name = 'observation_fact'
+       and column_name = 'tval_char'
+      into factLen;
 
     raise NOTICE 'observation_fact tval_char size %', factLen;
 
-    select max(length(dval_char)) from tm_wz.wrk_clinical_data where data_type = 'T' into maxLen;
+--    select max(length(dval_char)) from tm_wz.wrk_clinical_data where data_type = 'T' into maxLen;
+    select max(length(dval_char)) from tm_wz.wrk_clinical_data into maxLen;
 
     if(maxLen is NULL) then
     	maxLen := 0;
@@ -819,7 +839,7 @@ begin
 		then regexp_replace(topNode || replace(replace(coalesce(a.category_path,''),'DATALABEL',coalesce(a.data_label,'')),'VISITNAME',coalesce(a.visit_name,'')) || '\' || coalesce(a.data_value,'') || '\','(\\){2,}', '\', 'g')
 		when a.category_path like '%DATALABEL%'
 		then regexp_replace(topNode || replace(coalesce(a.category_path,''),'DATALABEL',coalesce(a.data_label,'')) || '\' || coalesce(a.data_value,'') || '\','(\\){2,}', '\', 'g')
-		else REGEXP_REPLACE(topNode || coalesce(a.category_path,'') ||
+		else regexp_replace(topNode || coalesce(a.category_path,'') ||
 				    '\'  || coalesce(a.data_label,'') || '\' || coalesce(a.data_value,'') || '\' || coalesce(a.visit_name,'') || '\',
 				    '(\\){2,}', '\', 'g')
 		end
@@ -828,7 +848,7 @@ begin
 		then regexp_replace(topNode || replace(replace(coalesce(a.category_path,''),'DATALABEL',coalesce(a.data_label,'')),'VISITNAME',coalesce(a.visit_name,'')) || '\','(\\){2,}', '\', 'g')
 		when a.category_path like '%DATALABEL%'
 		then regexp_replace(topNode || replace(coalesce(a.category_path,''),'DATALABEL',coalesce(a.data_label,'')) || '\','(\\){2,}', '\', 'g')
-		else REGEXP_REPLACE(topNode || coalesce(a.category_path,'') ||
+		else regexp_replace(topNode || coalesce(a.category_path,'') ||
 				    '\'  || coalesce(a.data_label,'') || '\' || coalesce(a.visit_name,'') || '\',
 				    '(\\){2,}', '\', 'g')
 		end
@@ -921,6 +941,8 @@ begin
     end;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert subject information into temp table',rowCt,stepCt,'Done');
+
+    --	insert/update subjects in patient_mapping
 
     --	incremental: Skip
     --  Delete dropped subjects from patient_mapping if they do not exist in de_subject_sample_mapping
@@ -1054,19 +1076,19 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Delete dropped encounters from encounter_mapping',rowCt,stepCt,'Done');
 
-    --	update encounters with changed information (e.g. encounter_ide may have changed)
+    --	update encounters with changed information
 
     begin
-	with nsi as (select distinct t.uencid, t.usubjid, t.subject_id, t.sourcesystem_cd from tm_wz.wrk_clinical_data t)
+	with nsi as (select distinct t.uencid, t.usubjid, t.sourcesystem_cd from tm_wz.wrk_clinical_data t)
 		update i2b2demodata.encounter_mapping em
-		set encounter_ide = nsi.uencid
-		,encounter_ide_source = 'transmart'
+		set encounter_ide_source = 'transmart'
+		,patient_ide_source = 'transmart'
 		,project_id = TrialID
 		,patient_ide = nsi.usubjid
-		,patient_ide_source = 'transmart'
 		,update_date = current_timestamp
 		from nsi
-		where em.sourcesystem_cd = nsi.sourcesystem_cd;
+		where em.sourcesystem_cd = nsi.sourcesystem_cd
+		  and em.encounter_ide = nsi.uencid;
 	get diagnostics rowCt := ROW_COUNT;
     exception
 	when others then
@@ -1081,7 +1103,7 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Update encounters with changed values in encounter_mapping',rowCt,stepCt,'Done');
 
-    --	insert new encounters into encounter_mapping, generatng new encounter_num
+    --	insert new encounters into encounter_mapping, generating new encounter_num
 
     begin
 --    for tExplain in
@@ -1136,8 +1158,9 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert new subjects into encounter_mapping',rowCt,stepCt,'Done');
 
-    -- inc-change: do not drop existing subjects
+    --	insert/update subjects in patient_dimension
 
+    -- inc-change: do not drop existing subjects
     --	Delete dropped subjects from patient_dimension if they do not exist in de_subject_sample_mapping
 
     /*
@@ -1239,10 +1262,9 @@ begin
     perform tm_cz.cz_write_audit(jobID,databaseName,procedureName,'Insert new subjects into patient_dimension',rowCt,stepCt,'Done');
 
     -- inc-change: keep all existing leaf nodes
-
-    /*
     --	delete leaf nodes that will not be reused, if any
 
+    /*
     for r_delUnusedLeaf in delUnusedLeaf loop
 
 	--	deletes unused leaf nodes for a trial one at a time
@@ -1648,7 +1670,7 @@ begin
 
     end loop;
 
-    perform tm_cz.i2b2_create_security_inc_trial(TrialID, secureStudy, jobID);
+    perform tm_cz.i2b2_create_security_inc_trial(TrialID, secureStudy, topLevel, jobID);
     select tm_cz.i2b2_load_security_data(TrialID,jobID) into rtnCd;
 
     if(rtnCd <> 1) then
