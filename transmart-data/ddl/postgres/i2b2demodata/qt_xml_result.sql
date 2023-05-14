@@ -18,10 +18,10 @@ CREATE TABLE qt_xml_result (
 );
 
 --
--- Name: qt_xml_result_pkey; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: qt_xml_result_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY qt_xml_result
-    ADD CONSTRAINT qt_xml_result_pkey PRIMARY KEY (xml_result_id);
+    ADD CONSTRAINT qt_xml_result_pk PRIMARY KEY (xml_result_id);
 
 --
 -- Name: qt_fk_xmlr_riid; Type: FK CONSTRAINT; Schema: i2b2demodata; Owner: -

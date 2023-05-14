@@ -9,8 +9,8 @@ CREATE TABLE jms_subscriptions (
 );
 
 --
--- Name: jms_subscriptions_pkey; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: jms_subscriptions_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY jms_subscriptions
-    ADD CONSTRAINT jms_subscriptions_pkey PRIMARY KEY (clientid, subname);
+    ADD CONSTRAINT jms_subscriptions_pk PRIMARY KEY (clientid, subname);
 

@@ -16,8 +16,8 @@ CREATE TABLE async_job (
 );
 
 --
--- Name: async_job_pkey; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: async_job_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY async_job
-    ADD CONSTRAINT async_job_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT async_job_pk PRIMARY KEY (id);
 

@@ -27,10 +27,10 @@ CREATE TABLE qt_query_result_instance (
 );
 
 --
--- Name: qt_query_result_instance_pkey; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: qt_query_result_instance_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY qt_query_result_instance
-    ADD CONSTRAINT qt_query_result_instance_pkey PRIMARY KEY (result_instance_id);
+    ADD CONSTRAINT qt_query_result_instance_pk PRIMARY KEY (result_instance_id);
 
 --
 -- Name: qt_fk_qri_rid; Type: FK CONSTRAINT; Schema: i2b2demodata; Owner: -

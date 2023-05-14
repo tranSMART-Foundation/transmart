@@ -19,10 +19,10 @@ CREATE TABLE qtm_patient_set_collection (
 );
 
 --
--- Name: qtm_patient_set_collection_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: qtm_patient_set_coll_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY qtm_patient_set_collection
-    ADD CONSTRAINT qtm_patient_set_collection_pk PRIMARY KEY (patient_set_coll_id);
+    ADD CONSTRAINT qtm_patient_set_coll_pk PRIMARY KEY (patient_set_coll_id);
 
 --
 -- Name: qtm_fk_psc_ri; Type: FK CONSTRAINT; Schema: i2b2demodata; Owner: -

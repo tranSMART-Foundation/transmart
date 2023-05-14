@@ -7,8 +7,8 @@ CREATE TABLE jms_roles (
 );
 
 --
--- Name: jms_roles_pkey; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: jms_roles_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY jms_roles
-    ADD CONSTRAINT jms_roles_pkey PRIMARY KEY (userid, roleid);
+    ADD CONSTRAINT jms_roles_pk PRIMARY KEY (userid, roleid);
 

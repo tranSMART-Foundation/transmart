@@ -8,8 +8,8 @@ CREATE TABLE jms_users (
 );
 
 --
--- Name: jms_users_pkey; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: jms_users_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY jms_users
-    ADD CONSTRAINT jms_users_pkey PRIMARY KEY (userid);
+    ADD CONSTRAINT jms_users_pk PRIMARY KEY (userid);
 

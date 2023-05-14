@@ -10,10 +10,10 @@ CREATE TABLE jms_messages (
 );
 
 --
--- Name: jms_messages_pkey; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: jms_messages_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY jms_messages
-    ADD CONSTRAINT jms_messages_pkey PRIMARY KEY (messageid, destination);
+    ADD CONSTRAINT jms_messages_pk PRIMARY KEY (messageid, destination);
 
 --
 -- Name: jms_messages_destination; Type: INDEX; Schema: i2b2demodata; Owner: -

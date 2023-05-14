@@ -18,8 +18,8 @@ CREATE TABLE qt_query_status_type (
 );
 
 --
--- Name: qt_query_status_type_pkey; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
+-- Name: qt_query_status_type_pk; Type: CONSTRAINT; Schema: i2b2demodata; Owner: -
 --
 ALTER TABLE ONLY qt_query_status_type
-    ADD CONSTRAINT qt_query_status_type_pkey PRIMARY KEY (status_type_id);
+    ADD CONSTRAINT qt_query_status_type_pk PRIMARY KEY (status_type_id);
 
