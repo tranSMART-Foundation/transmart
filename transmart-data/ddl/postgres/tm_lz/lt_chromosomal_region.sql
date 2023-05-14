@@ -26,8 +26,8 @@ CREATE TABLE lt_chromosomal_region (
 );
 
 --
--- Name: lt_chromosomal_region_pkey; Type: CONSTRAINT; Schema: tm_lz; Owner: -
+-- Name: lt_chromosomal_region_pk; Type: CONSTRAINT; Schema: tm_lz; Owner: -
 --
 ALTER TABLE ONLY lt_chromosomal_region
-    ADD CONSTRAINT lt_chromosomal_region_pkey PRIMARY KEY (region_id);
+    ADD CONSTRAINT lt_chromosomal_region_pk PRIMARY KEY (region_id);
 
