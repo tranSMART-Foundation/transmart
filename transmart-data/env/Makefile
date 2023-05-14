@@ -1,9 +1,14 @@
-# Kettle (Pentaho data integration community edition) 07-sep-20
+# Kettle (Pentaho data integration community edition) 9.3 07-may-22
 #KETTLE_VERSION=9.2
 #KETTLE_ZIP=9.2.0.0-290
 KETTLE_VERSION=9.3
 KETTLE_ZIP=9.3.0.0-428
 KETTLE_HOST ?= http://downloads.sourceforge.net/project/pentaho
+
+# No longer on SourceForge servers 
+#KETTLE_VERSION=9.4
+#KETTLE_ZIP=9.4.0.0-343
+#KETTLE_HOST ?= https://privatefilesbucket-community-edition.s3.us-west-2.amazonaws.com
 
 TRANSMART_LIBRARY ?= http://library.transmartfoundation.org/release
 
@@ -152,25 +157,31 @@ transmart-etl-$(TRANSMART_RELEASE_BRANCH).zip:
 # Note kettle to 9.0 had a space in the directory, 9.1 onward has a dash
 KETTLE_ARCHIVE=pdi-ce-$(KETTLE_ZIP).zip 
 $(KETTLE_ARCHIVE):
-	curl --location --silent --show-error --fail "$(KETTLE_HOST)/Pentaho-$(KETTLE_VERSION)/client-tools/$@" > $@
+	curl --location --silent --show-error --fail "$(KETTLE_HOST)/$(KETTLE_ZIP)/ce/client-tools/$@" > $@
 #	curl --location --silent --show-error --fail "$(KETTLE_HOST)/Pentaho%20$(KETTLE_VERSION)/client-tools/$@" > $@
 
-## Updated for 9.1: Pentaho no longer has libext directory
+## Updated for 9.1+: Pentaho no longer has libext directory
 KETTLE_ORACLE_DRIVER=data-integration/lib/$(JDBC_DRIVER_ORA)
 $(KETTLE_ORACLE_DRIVER): $(JDBC_DRIVER_ORA_PATH) data-integration/.keep
 	cp --reflink=auto "$<" "$@"
+
+# Unzipping. 9.4+ no longer has configuration files to raise log4j2.rootLogger.level
 
 data-integration-oracle: data-integration/.keep $(KETTLE_ORACLE_DRIVER)
 .PHONY: data-integration-oracle
 data-integration-oracle/.keep: $(KETTLE_ARCHIVE)
 	unzip -q $<
-	sed -i'' 's/log4j2.rootLogger.level = INFO/log4j2.rootLogger.level = WARN/g' data-integration/system/karaf/etc/org.ops4j.pax.logging.cfg
+# 9.4 version
+#	sed -i'' 's/<ThresholdFilter level="INFO"\/>/<ThresholdFilter level="WARN"\/> <!-- updated for tranSMART -->/g' data-integration/classes/log4j2.xml
+	sed -i'' 's/log4j2.rootLogger.level = INFO/log4j2.rootLogger.level = WARN # updated for tranSMART/g' data-integration/system/karaf/etc/org.ops4j.pax.logging.cfg
 	touch '$@'
 
 data-integration: data-integration/.keep
 .PHONY: data-integration
 data-integration/.keep: $(KETTLE_ARCHIVE)
 	unzip -q $<
+# 9.4 version
+#	sed -i'' 's/<ThresholdFilter level="INFO"\/>/<ThresholdFilter level="WARN"\/> <!-- updated for tranSMART -->/g' data-integration/classes/log4j2.xml
 	sed -i'' 's/log4j2.rootLogger.level.*INFO/log4j2.rootLogger.level = WARN # updated for tranSMART/g' data-integration/system/karaf/etc/org.ops4j.pax.logging.cfg
 	touch '$@'
 
