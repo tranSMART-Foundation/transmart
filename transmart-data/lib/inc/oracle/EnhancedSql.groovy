@@ -77,15 +77,17 @@ class EnhancedSql extends Sql {
 
     static void printWarnings(String statementString, Statement statement) {
         SQLWarning warning = statement.getWarnings()
-        def abbreviatedStatement = statementString[0..((Math.min(65, statementString.size() - 1)))]
+        def abbreviatedStatement = statementString[0..((Math.min(255, statementString.size() - 1)))]
         if (statementString.size() > 65) {
             abbreviatedStatement += '...'
         }
         if (warning) {
             Log.warn "Warnings for statement $abbreviatedStatement"
             while (warning) {
-                Log.warn warning.message
-                Log.warn "${warning.getErrorCode()}: ${warning.getSQLState()}; ${warning.getMessage()}; ${warning.getCause()}"
+                Log.warn "Warning message: ${warning.message}"
+                Log.warn "SQLState: ${warning.getSQLState()}"
+		Log.warn "Vendor error code: ${warning.getErrorCode()}"
+		Log.warn "Cause: ${warning.getCause()}"
                 warning = warning.nextWarning
             }
         }
