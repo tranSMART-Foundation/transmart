@@ -315,7 +315,7 @@ BEGIN
 	  from (select distinct 'Unknown' as sex_cd
 				,null::integer as age_in_years_num
 				,null as race_cd
-				,regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g') as sourcesystem_cd
+				,regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g') as sourcesystem_cd
 		  from tm_lz.lt_src_mrna_subj_samp_map s
 		       ,deapp.de_gpl_info g
 		 where s.subject_id is not null
@@ -326,7 +326,7 @@ BEGIN
 		   and not exists
 		       (select 1 from i2b2demodata.patient_dimension x
 			 where x.sourcesystem_cd =
-			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g'))
+			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g'))
 	  ) x;
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -345,7 +345,7 @@ BEGIN
     --	add security for trial if new subjects added to patient_dimension
 
     if pCount > 0 then
-	perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
+	perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, topLevel, jobID);
     end if;
 
     --	Delete existing observation_fact data, will be repopulated
@@ -762,7 +762,7 @@ BEGIN
 			    , a.platform as gpl_id
 		       from tm_lz.lt_src_mrna_subj_samp_map a
 				inner join i2b2demodata.patient_dimension pd
-					on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':', 'g') = pd.sourcesystem_cd
+					on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':', 'g') = pd.sourcesystem_cd
 				inner join tm_wz.wt_mrna_nodes ln
 					on  a.platform = ln.platform
 					and a.category_cd = ln.category_cd
@@ -910,7 +910,7 @@ BEGIN
 		  from tm_lz.lt_src_mrna_subj_samp_map a
 		    --Joining to Pat_dim to ensure the IDs match. If not I2B2 won't work.
 			   inner join i2b2demodata.patient_dimension b
-				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':','g') = b.sourcesystem_cd
+				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':','g') = b.sourcesystem_cd
 			   inner join tm_wz.wt_mrna_nodes ln
 				   on a.platform = ln.platform
 				   and a.tissue_type = ln.tissue_type
@@ -1105,7 +1105,7 @@ BEGIN
     if (dataType = 'R') then
         begin
             delete from tm_lz.lt_src_mrna_data
-	     where intensity_value <= 0.0;
+	     where intensity_value::double precision <= 0.0;
 	    get diagnostics rowCt := ROW_COUNT;
         exception
 	    when others then
@@ -1168,7 +1168,7 @@ BEGIN
     end;
 
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into DEAPP wt_subject_mrna_probeset',rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert into TM_WZ wt_subject_mrna_probeset',rowCt,stepCt,'Done');
 
     if rowCt = 0 then
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Unable to match probesets to platform in de_mrna_annotation',0,rowCt,'Done');

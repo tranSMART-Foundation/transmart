@@ -25,34 +25,34 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_acgh_data(trial_id character varyi
     newJobFlag		integer;
     databaseName 	VARCHAR(100);
     procedureName 	VARCHAR(100);
-    jobId 			numeric(18,0);
-    stepCt 			numeric(18,0);
-    rowCt			numeric(18,0);
+    jobId 		numeric(18,0);
+    stepCt 		numeric(18,0);
+    rowCt		numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
 
-    TrialID			varchar(100);
+    TrialID		varchar(100);
     RootNode		varchar(2000);
     root_level		integer;
-    topNode			varchar(2000);
+    topNode		varchar(2000);
     topLevel		integer;
-    tPath			varchar(2000);
+    tPath		varchar(2000);
     study_name		varchar(100);
     sourceCd		varchar(50);
     secureStudy		varchar(1);
 
     dataType		varchar(10);
-    sqlText			varchar(1000);
-    tText			varchar(1000);
+    sqlText		varchar(1000);
+    tText		varchar(1000);
     gplTitle		varchar(1000);
-    pExists			numeric;
+    pExists		numeric;
     partTbl   		numeric;
     partExists 		numeric;
     sampleCt		numeric;
     idxExists 		numeric;
-    logBase			numeric;
-    pCount			integer;
-    sCount			integer;
+    logBase		numeric;
+    pCount		integer;
+    sCount		integer;
     tablespaceName	varchar(200);
     partitioniD		numeric(18,0);
     partitionName	varchar(100);
@@ -304,7 +304,7 @@ begin
 		    distinct 'Unknown' as sex_cd,
 		    null::integer as age_in_years_num,
 		    null as race_cd,
-		    regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g') as sourcesystem_cd
+		    regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g') as sourcesystem_cd
 		  from tm_lz.lt_src_mrna_subj_samp_map s
 		       ,deapp.de_gpl_info g
 		 where s.subject_id is not null
@@ -315,7 +315,7 @@ begin
 		   and not exists
 		       (select 1 from i2b2demodata.patient_dimension x
 			 where x.sourcesystem_cd =
-			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g'))
+			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g'))
 	  ) x;
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -334,7 +334,7 @@ begin
     --	add security for trial if new subjects added to patient_dimension
 
     if pCount > 0 then
-	perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobId);
+	perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, topLevel, jobId);
     end if;
 
     --	Delete existing observation_fact data, will be repopulated
@@ -782,7 +782,7 @@ begin
 			    ln.tissue_type as tissue_type, ln.attribute_1 as sample_type, ln.attribute_2 as timepoint, a.platform as gpl_id
 		       from tm_lz.lt_src_mrna_subj_samp_map a
 				inner join i2b2demodata.patient_dimension pd
-					on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':', 'g') = pd.sourcesystem_cd
+					on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':', 'g') = pd.sourcesystem_cd
 				inner join tm_wz.wt_mrna_nodes ln
 					on 	a.platform = ln.platform
 					and a.tissue_type = ln.tissue_type
@@ -924,7 +924,7 @@ begin
 		  from tm_lz.lt_src_mrna_subj_samp_map a
 		    --Joining to Pat_dim to ensure the ID's match. If not I2B2 won't work.
 			   inner join i2b2demodata.patient_dimension b
-				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':','g') = b.sourcesystem_cd
+				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':','g') = b.sourcesystem_cd
 			   inner join tm_wz.wt_mrna_nodes ln
 				   on a.platform = ln.platform
 				   and a.tissue_type = ln.tissue_type

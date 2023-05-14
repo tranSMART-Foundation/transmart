@@ -21,38 +21,38 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_metabolomic_data(trial_id characte
     Declare
     TrialID		varchar(100);
     RootNode		varchar(2000);
-    root_level	integer;
+    root_level		integer;
     topNode		varchar(2000);
     topLevel		integer;
-    tPath			varchar(2000);
-    study_name	varchar(100);
+    tPath		varchar(2000);
+    study_name		varchar(100);
     sourceCd		varchar(50);
-    secureStudy	varchar(1);
+    secureStudy		varchar(1);
 
     dataType		varchar(10);
     sqlText		varchar(1000);
-    tText			varchar(1000);
+    tText		varchar(1000);
     gplTitle		varchar(1000);
     pExists		bigint;
-    partTbl   	bigint;
+    partTbl   		bigint;
     sampleCt		bigint;
-    idxExists 	bigint;
+    idxExists 		bigint;
     logBase		numeric;
     pCount		integer;
     sCount		integer;
     tablespaceName	varchar(200);
     v_bio_experiment_id	bigint;
-    partitioniD	numeric(18,0);
+    partitioniD		numeric(18,0);
     partitionName	varchar(100);
     partitionIndx	varchar(100);
 
     --Audit variables
-    newJobFlag integer;
-    databaseName varchar(100);
-    procedureName varchar(100);
-    jobId bigint;
-    stepCt bigint;
-    rowCt			numeric(18,0);
+    newJobFlag		integer;
+    databaseName 	varchar(100);
+    procedureName 	varchar(100);
+    jobId 		bigint;
+    stepCt 		bigint;
+    rowCt		numeric(18,0);
     errorNumber		character varying;
     errorMessage	character varying;
     rtnCd		integer;
@@ -273,7 +273,7 @@ begin
 		    distinct 'Unknown' as sex_cd,
 		    null::integer as age_in_years_num,
 		    null as race_cd,
-		    regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g') as sourcesystem_cd
+		    regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g') as sourcesystem_cd
 		  from tm_lz.lt_src_metabolomic_map s
 		       ,deapp.de_gpl_info g
 		 where (s.subject_id IS NOT NULL AND s.subject_id::text <> '')
@@ -284,7 +284,7 @@ begin
 		   and not exists
 		       (select 1 from i2b2demodata.patient_dimension x
 			 where x.sourcesystem_cd =
-			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g'))
+			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g'))
 	  ) as x;
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -301,7 +301,7 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',rowCt,stepCt,'Done');
 
-    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobId);
+    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, topLevel, jobId);
 
     --	Delete existing observation_fact data, will be repopulated
 
@@ -786,7 +786,7 @@ begin
 		  from tm_lz.lt_src_metabolomic_map a
 		    --Joining to Pat_dim to ensure the ID's match. If not I2B2 won't work.
 			   inner join patient_dimension b
-				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':', 'g') = b.sourcesystem_cd
+				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':', 'g') = b.sourcesystem_cd
 			   inner join tm_wz.wt_metabolomic_nodes ln
 				   on a.platform = ln.platform
 				   and a.tissue_type = ln.tissue_type
@@ -818,7 +818,7 @@ begin
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(a2.attribute_1,'@')
 					      and a2.node_type = 'ATTR2'
 			   left outer join patient_dimension sid
-					      on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':','g') = sid.sourcesystem_cd
+					      on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':','g') = sid.sourcesystem_cd
 		 where a.trial_name = TrialID
 		   and a.source_cd = sourceCD
 		   and  (ln.concept_cd IS NOT NULL AND ln.concept_cd::text <> '')) t;

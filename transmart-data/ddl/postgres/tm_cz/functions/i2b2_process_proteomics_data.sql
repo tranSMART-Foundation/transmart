@@ -21,22 +21,22 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_proteomics_data(trial_id character
     Declare
     TrialID		character varying(100);
     RootNode		character varying(2000);
-    root_level	integer;
+    root_level		integer;
     topNode		character varying(2000);
     topLevel		integer;
-    tPath			character varying(2000);
-    study_name	character varying(100);
+    tPath		character varying(2000);
+    study_name		character varying(100);
     sourceCd		character varying(50);
-    secureStudy	character varying(1);
-    rtnCd			integer;
+    secureStudy		character varying(1);
+    rtnCd		integer;
     dataType		character varying(10);
     sqlText		character varying(1000);
-    tText			character varying(1000);
+    tText		character varying(1000);
     gplTitle		character varying(1000);
     pExists		numeric;
-    partTbl   	numeric;
+    partTbl   		numeric;
     sampleCt		numeric;
-    idxExists 	numeric;
+    idxExists 		numeric;
     logBase		numeric;
     pCount		integer;
     sCount		integer;
@@ -46,12 +46,12 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_proteomics_data(trial_id character
     errorMessage	character varying;
 
     --Audit variables
-    newJobFlag numeric(1);
-    databaseName character varying(100);
-    procedureName character varying(100);
-    jobId numeric(18,0);
-    stepCt numeric(18,0);
-    rowCt numeric(18,0);
+    newJobFlag		numeric(1);
+    databaseName 	character varying(100);
+    procedureName 	character varying(100);
+    jobId 		numeric(18,0);
+    stepCt 		numeric(18,0);
+    rowCt 		numeric(18,0);
 
     addNodes CURSOR is
     select distinct t.leaf_node
@@ -260,7 +260,7 @@ begin
 		    distinct 'Unknown' as sex_cd,
 		    null::integer as age_in_years_num,
 		    null as race_cd,
-		    regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g') as sourcesystem_cd
+		    regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g') as sourcesystem_cd
 		  from tm_lz.lt_src_proteomics_sub_sam_map s
 		       ,deapp.de_gpl_info g
 		 where s.subject_id is not null
@@ -271,7 +271,7 @@ begin
 		   and not exists
 		       (select 1 from i2b2demodata.patient_dimension x
 			 where x.sourcesystem_cd =
-			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g'))
+			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g'))
 	  ) x;
     exception
 	when others then
@@ -283,7 +283,7 @@ begin
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',rowCt,stepCt,'Done');
-    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobId);
+    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, topLevel, jobId);
 
     --	Delete existing observation_fact data, will be repopulated
 
@@ -717,7 +717,7 @@ begin
 		  from tm_lz.lt_src_proteomics_sub_sam_map a
 		    --Joining to Pat_dim to ensure the ID's match. If not I2B2 won't work.
 			   inner join patient_dimension b
-				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':', 'g') = b.sourcesystem_cd
+				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':', 'g') = b.sourcesystem_cd
 			   inner join tm_wz.wt_proteomics_nodes ln
 				   on a.platform = ln.platform
 				   and a.category_cd = ln.category_cd
@@ -759,7 +759,7 @@ begin
 					      and a2.node_type = 'ATTR2'
 			   left outer join i2b2demodata.patient_dimension sid
 					      on  regexp_replace(TrialId || ':S:' || coalesce(a.site_id,'') || ':' || a.subject_id || ':' || a.sample_cd,
-								 '(::){1,}', ':', 'g') = sid.sourcesystem_cd
+								 '(:){2,}', ':', 'g') = sid.sourcesystem_cd
 		 where a.trial_name = TrialID
 		   and a.source_cd = sourceCD
 		   and  ln.concept_cd is not null) t;

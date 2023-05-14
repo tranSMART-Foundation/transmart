@@ -257,7 +257,7 @@ begin
 	  from (select distinct 'Unknown' as sex_cd
 				,null::integer as age_in_years_num
 				,null as race_cd
-				,regexp_replace(TrialId || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g') as sourcesystem_cd
+				,regexp_replace(TrialId || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g') as sourcesystem_cd
 		  from tm_lz.lt_src_rna_subj_samp_map s
 		 where (s.subject_id IS NOT NULL AND s.subject_id::text <> '')
 		   and s.trial_name = TrialID
@@ -265,7 +265,7 @@ begin
 		   and not exists
 		       (select 1 from i2b2demodata.patient_dimension x
 			 where x.sourcesystem_cd =
-			       regexp_replace(TrialID || ':' || coalesce(s.site_id, '') || ':' || s.subject_id,'(::){1,}', ':'))
+			       regexp_replace(TrialID || ':' || coalesce(s.site_id, '') || ':' || s.subject_id,'(:){2,}', ':'))
 	  ) as x;
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -282,7 +282,7 @@ begin
     stepCt := stepCt + 1;
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension',rowCt,stepCt,'Done');
 
-    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobId);
+    perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, topLevel, jobId);
 
     --	Delete existing observation_fact data, will be repopulated
     begin
@@ -762,7 +762,7 @@ begin
 		  from tm_lz.lt_src_rna_subj_samp_map a
 		    --Joining to Pat_dim to ensure the IDs match. If not I2B2 won't work.
 			   inner join i2b2demodata.patient_dimension b
-				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':', 'g') = b.sourcesystem_cd
+				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':', 'g') = b.sourcesystem_cd
 			   inner join tm_wz.wt_rna_nodes ln
 				   on  a.platform = ln.platform
 				   and a.category_cd = ln.category_cd
@@ -799,7 +799,7 @@ begin
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(a2.attribute_1,'@')
 					      and a2.node_type = 'ATTR2'
 			   left outer join i2b2demodata.patient_dimension sid --mrna expression used inner join here
-					      on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':','g') = sid.sourcesystem_cd
+					      on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':','g') = sid.sourcesystem_cd
 		 where a.trial_name = TrialID
 		   and a.source_cd = sourceCD
 		   and ln.concept_cd IS NOT NULL
@@ -1021,7 +1021,23 @@ begin
     if (dataType = 'R') then
         begin
             delete from tm_lz.lt_src_rna_data
-	          where intensity_value <= 0.0;
+	          where intensity_value::double precision < 0.0; -- allow zero, handle in zscore function
+	    get diagnostics rowCt := ROW_COUNT;
+            exception
+	        when others then
+	            errorNumber := SQLSTATE;
+	            errorMessage := SQLERRM;
+	        --Handle errors.
+	    perform tm_cz.cz_error_handler (jobId, procedureName, errorNumber, errorMessage);
+	    --End Proc
+	    perform tm_cz.cz_end_audit (jobId, 'FAIL');
+	    return -16;
+        end;
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove unusable negative intensity_value from lt_src_rna_data for dataType R',rowCt,stepCt,'Done');
+        begin
+            update tm_lz.lt_src_rna_data
+	          set intensity_value = '0.001' where intensity_value::double precision = 0.0; -- update zero for
 	    get diagnostics rowCt := ROW_COUNT;
             exception
 	        when others then
@@ -1153,7 +1169,7 @@ begin
 		     ,patient_id
 		     ,trial_name
 		    ) select md.probeset
-			     ,avg(md.intensity_value) as intensity_value
+			     ,avg(md.intensity_value::double precision)
 			     ,sd.assay_id
 			     ,sd.patient_id
 			     ,TrialId as trial_name

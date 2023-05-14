@@ -21,37 +21,37 @@ CREATE OR REPLACE FUNCTION tm_cz.i2b2_process_qpcr_mirna_data(trial_id character
     Declare
     TrialID		varchar(100);
     RootNode		varchar(2000);
-    root_level	integer;
+    root_level		integer;
     topNode		varchar(2000);
     topLevel		integer;
-    tPath			varchar(2000);
-    study_name	varchar(100);
+    tPath		varchar(2000);
+    study_name		varchar(100);
     sourceCd		varchar(50);
-    secureStudy	varchar(1);
+    secureStudy		varchar(1);
 
     dataType		varchar(10);
     sqlText		varchar(1000);
-    tText			varchar(1000);
+    tText		varchar(1000);
     gplTitle		varchar(1000);
     pExists		numeric;
-    partTbl   	numeric;
+    partTbl   		numeric;
     sampleCt		numeric;
-    idxExists 	numeric;
+    idxExists 		numeric;
     logBase		numeric;
     pCount		integer;
     sCount		integer;
     tablespaceName	varchar(200);
     v_bio_experiment_id	numeric(18,0);
-    mirnaType varchar(15);
-    -- mirnaPlatform varchar(20);
+    mirnaType 		varchar(15);
+    -- mirnaPlatform 	varchar(20);
 
     --Audit variables
-    newJobFlag numeric(1);
-    databaseName varchar(100);
-    procedureName varchar(100);
-    jobID numeric(18,0);
-    stepCt numeric(18,0);
-    rowCt	integer;
+    newJobFlag		numeric(1);
+    databaseName 	varchar(100);
+    procedureName 	varchar(100);
+    jobID 		numeric(18,0);
+    stepCt 		numeric(18,0);
+    rowCt		integer;
     errorNumber		character varying;
     errorMessage	character varying;
     rtnCd		integer;
@@ -265,7 +265,7 @@ begin
 	  from (select distinct 'Unknown' as sex_cd,
 				null::integer as age_in_years_num,
 				null as race_cd,
-				regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g') as sourcesystem_cd
+				regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g') as sourcesystem_cd
 		  from tm_lz.lt_src_mirna_subj_samp_map s
 		       ,deapp.de_gpl_info g
 		 where s.subject_id is not null
@@ -276,7 +276,7 @@ begin
 		   and not exists
 		       (select 1 from i2b2demodata.patient_dimension x
 			 where x.sourcesystem_cd =
-			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(::){1,}', ':', 'g'))
+			       regexp_replace(TrialID || ':' || coalesce(s.site_id,'') || ':' || s.subject_id,'(:){2,}', ':', 'g'))
 	  ) x;
     exception
 	when others then
@@ -295,7 +295,7 @@ begin
     perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert subjects to patient_dimension.',pCount,stepCt,'Done');
 
     begin
-	perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, jobID);
+	perform tm_cz.i2b2_create_security_for_trial(TrialId, secureStudy, topLevel, jobID);
     exception
 	when others then
 	    errorNumber := SQLSTATE;
@@ -778,7 +778,7 @@ begin
 		  from tm_lz.lt_src_mirna_subj_samp_map a
 		    --Joining to Pat_dim to ensure the ID's match. If not I2B2 won't work.
 			   inner join i2b2demodata.patient_dimension b
-				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':', 'g') = b.sourcesystem_cd
+				   on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':', 'g') = b.sourcesystem_cd
 			   inner join tm_wz.wt_qpcr_mirna_nodes ln
 				   on a.platform = ln.platform
 				   and a.category_cd=ln.category_cd
@@ -819,7 +819,7 @@ begin
 					      and case when tm_cz.instr(substr(a.category_cd,1,tm_cz.instr(a.category_cd,'ATTR2')+5),'ATTR1') > 1 then a.attribute_1 else '@' end = coalesce(a2.attribute_1,'@')
 					      and a2.node_type = 'ATTR2'
 			   left outer join i2b2demodata.patient_dimension sid
-					      on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(::){1,}', ':','g') = sid.sourcesystem_cd
+					      on regexp_replace(TrialID || ':' || coalesce(a.site_id,'') || ':' || a.subject_id,'(:){2,}', ':','g') = sid.sourcesystem_cd
 		 where a.trial_name = TrialID
 		   and a.source_cd = sourceCD
 		   and  ln.concept_cd is not null) t;
