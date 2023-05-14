@@ -24,7 +24,7 @@ ALTER TABLE ONLY bio_data_uid
 -- Name: seq_bio_data_id; Type: SEQUENCE; Schema: biomart; Owner: -
 --
 CREATE SEQUENCE seq_bio_data_id
-    START WITH 868894
+    START WITH 896347
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
