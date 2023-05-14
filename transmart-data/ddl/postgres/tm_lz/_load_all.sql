@@ -48,7 +48,6 @@
 \i tm_lz/lt_src_study_metadata_ad_hoc.sql
 \i tm_lz/lt_src_subj_enroll_date.sql
 \i tm_lz/lz_src_analysis_metadata.sql
-\i tm_lz/lz_src_clinical_data.sql
 \i tm_lz/lz_src_mrna_data.sql
 \i tm_lz/lz_src_mrna_subj_samp_map.sql
 \i tm_lz/lz_src_study_metadata.sql
