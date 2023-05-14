@@ -38,7 +38,8 @@ AS $BODY$
     -- using cursor defined within FOR RECORD IN QUERY loop below.
     curRecord		RECORD;
     v_num		integer;
-
+ 
+    pathEscaped		character varying;
     topPath		character varying;
     tabName		character varying;
     tableSchema		character varying;
@@ -67,7 +68,8 @@ BEGIN
     -- may need to replace \ to \\ and ' to '' in the path parameter
 
     topPath := path;
-    topPath := replace(replace(topPath,'\','\\'),'''','''''');
+--    topPath := replace(replace(topPath,'\','\\'),'''','''''');
+    pathEscaped := replace(topPath, '_', '`_');
 
     tabName     := lower(p_tabname);
     tableSchema := lower(p_tableschema);
@@ -102,8 +104,9 @@ BEGIN
 	    ' ,null::integer AS numpats' ||
 	    ' from i2b2metadata.' || tabname ||
 	    ' where m_applied_path = ''@''' ||
-	    ' and c_fullname like ''' || topPath || '%''' ||
+	    ' and c_fullname like ''' || pathEscaped || '%'' escape ''`''' ||
 	    ' and lower(c_tablename) in (''patient_dimension'', ''visit_dimension'' )';
+--	raise notice 'execute %', v_sqlstr;
 	execute(v_sqlstr);
 	get diagnostics rowCt := ROW_COUNT;
     exception
@@ -169,6 +172,7 @@ BEGIN
             ' and numpats is null';
     
 	begin
+--	    raise notice 'execute %', v_sqlstr;
             execute v_sqlstr;
 	    get diagnostics thisRowCt := ROW_COUNT;
 	    rowCt := rowCt + thisRowCt;
@@ -198,6 +202,7 @@ BEGIN
     --display count and timing information to the user
     select count(*) into v_num from tm_cz.temp_ont_pat_visit_dims where numpats is not null and numpats <> 0;
              
+--    raise notice 'execute %', v_sqlstr;
     execute v_sqlstr;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;

@@ -39,6 +39,7 @@ declare
     curRecord RECORD;
     v_num integer;
 
+    pathEscaped		character varying;
     topPath		character varying;
     metadataTable	character varying;
     schemaName		character varying;
@@ -72,7 +73,8 @@ BEGIN
     -- may need to replace \ to \\ and ' to '' in the path parameter
 
     topPath := path;
-    topPath := replace(replace(topPath,'\','\\'),'''','''''');
+--    topPath := replace(replace(topPath,'\','\\'),'''','''''');
+    pathEscaped := replace(topPath, '_', '`_');
 
     metadataTable    := lower(p_metadatatable);
     schemaName 	     := lower(p_schemaname);
@@ -82,7 +84,7 @@ BEGIN
     columnName       := lower(p_columnname);
 
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Selecting '||topPath||' concepts for column '||columnname||' as '|| facttablecolumn|| ' from i2b2metadata.'||metadataTable||' for '||schemaName||'.'||observationTable,0,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Selecting '||path||' concepts for column '||columnname||' as '|| facttablecolumn|| ' from i2b2metadata.'||metadataTable||' for '||schemaName||'.'||observationTable,0,stepCt,'Done');
 
     -- truncate the tables used in this function
     execute ('truncate table tm_cz.temp_dim_count_ont');
@@ -98,9 +100,9 @@ BEGIN
 	' ,c_hlevel)' ||
 	' select c_fullname, c_basecode, c_hlevel ' ||
 	' from i2b2metadata.' || metadataTable ||
-	' where c_fullname like ''' || topPath || '%'''
-	' and lower(c_facttablecolumn) = ''' || facttableColumn || ''' '
-	' and lower(c_columnname) = ''' || columnName || ''' '
+	' where c_fullname like ''' || pathEscaped || '%'' escape ''`''' ||
+	' and lower(c_facttablecolumn) = ''' || facttableColumn || ''' ' ||
+	' and lower(c_columnname) = ''' || columnName || ''' ' ||
 	' and lower(c_synonym_cd) = ''n'' ' ||
         ' and lower(c_columndatatype) = ''t'' ' ||
         ' and lower(c_operator) = ''like'' ' ||
@@ -108,6 +110,7 @@ BEGIN
 	' and coalesce(c_fullname, '''') <> '''' ' ||
 	' and (c_visualattributes not like ''L%'' or c_basecode in (select distinct concept_cd from ' || schemaName || '.' || observationTable || ')) ';
 
+--    raise notice 'execute %', v_sqlstr;
     execute v_sqlstr;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;
@@ -121,6 +124,7 @@ BEGIN
 		|| 'select c_fullname, c_hlevel, c_basecode '
 		|| 'from tm_cz.temp_dim_count_ont '
 		|| 'where c_fullname like ''' || replace(curRecord.c_fullname,'\','\\') || '%'' '
+		|| ' and c_fullname like ''' || pathEscaped || '%'' escape ''`'''
 		|| 'union all ' 
 		|| 'select cast( '
 		|| ' 	left(c_fullname, length(c_fullname)-position(''\'' in right(reverse(c_fullname), length(c_fullname)-1))) '
@@ -134,7 +138,9 @@ BEGIN
 		|| 'select distinct c_fullname, c_basecode '
 		|| ' from concepts '
 		|| ' where c_fullname like ''' || replace(curRecord.c_fullname,'\','\\') || '%'' '
+		|| ' and c_fullname like ''' || pathEscaped || '%'' escape ''`'''
 		|| ' order by c_fullname, c_basecode ';
+--	    raise notice 'execute %', v_sqlstr;
 	    execute v_sqlstr;
 	    get diagnostics rowCt := ROW_COUNT;
 	    stepCt := stepCt + 1;
@@ -183,6 +189,7 @@ BEGIN
 	|| 'and coalesce(p1.c_basecode, '''') <> ''''  '
 	|| 'group by p1.path_num';
 
+--    raise notice 'execute %', v_sqlstr;
     execute v_sqlstr;
     get diagnostics rowCt := ROW_COUNT;
     stepCt := stepCt + 1;

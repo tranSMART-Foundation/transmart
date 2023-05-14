@@ -114,13 +114,13 @@ begin
 
     topPath := path;
     topPath := replace(replace(topPath,'\','\\'),'''','''''');
-    pathEscaped := replace(topPath, '_', '`_');
+    pathEscaped := replace(path, '_', '`_');
 
     select count(*) from i2b2metadata.tm_concept_counts
 	 where concept_path like pathEscaped || '%' escape '`' into rowCt;
 
     stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Before delete: tm_concept_counts records below concept_path ' || path,rowCt,stepCt,'Done');
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Before delete: tm_concept_counts records below concept_path "' || pathEscaped || '"',rowCt,stepCt,'Done');
 
     begin
 	delete from i2b2metadata.tm_concept_counts
@@ -167,22 +167,26 @@ begin
         where c_visualattributes like '%A%' 
     LOOP 
 	IF tableName='@' OR tableName=curRecord.sqltext THEN
-            v_sqlstring := 'select tm_cz.i2b2_pat_count_visits( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''' || topPath || ''' , '||jobID||')';
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_visits( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''' || path || ''' , '||jobID||')';
+--	    raise notice 'execute %', v_sqlstring;
             execute v_sqlstring;
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted visits in ' || curRecord.sqltext,0,stepCt,'Done');
             
-            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'',  ''concept_cd'', ''concept_dimension'', ''concept_path'', ''' || topPath || '''  , '||jobID||')';
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'',  ''concept_cd'', ''concept_dimension'', ''concept_path'', ''' || path || '''  , '||jobID||')';
+--	    raise notice 'execute %', v_sqlstring;
             execute v_sqlstring;
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted concepts in ' || curRecord.sqltext,0,stepCt,'Done');
             
-            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''provider_id'', ''provider_dimension'', ''provider_path'', ''' || topPath || '''  , '||jobID||')';
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''provider_id'', ''provider_dimension'', ''provider_path'', ''' || path || '''  , '||jobID||')';
+--	    raise notice 'execute %', v_sqlstring;
             execute v_sqlstring;
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted providers in ' || curRecord.sqltext,0,stepCt,'Done');
             
-            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''modifier_cd'', ''modifier_dimension'', ''modifier_path'', ''' || topPath || '''  , '||jobID||')';
+            v_sqlstring := 'select tm_cz.i2b2_pat_count_dimensions( ''' || curRecord.sqltext || ''' , ''i2b2demodata'', ''observation_fact'' ,  ''modifier_cd'', ''modifier_dimension'', ''modifier_path'', ''' || path || '''  , '||jobID||')';
+--	    raise notice 'execute %', v_sqlstring;
             execute v_sqlstring;
 	    stepCt := stepCt + 1;
 	    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Counted modifiers in ' || curRecord.sqltext,0,stepCt,'Done');
