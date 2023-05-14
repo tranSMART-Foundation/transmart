@@ -458,7 +458,39 @@ sub findTemplate($) {
 ######################################################################
 
 sub findDisease($) {
-    my ($disease) = (@_);
+    my ($testdisease) = (@_);
+    my $disease = $testdisease;
+
+    # check with synonyms using search_keyword DISEASE keywords
+    # use the approved name
+
+    my $dosql = "select sk.keyword,sk.unique_id from searchapp.search_keyword sk, searchapp.search_keyword_term skt where sk.data_category = 'DISEASE' and sk.search_keyword_id = skt.search_keyword_id and skt.keyword_term = upper('$disease')";
+
+    if($ispostgres) {
+	open(PSQL, "psql -A -t -c \"$dosql\"|") || die "Failed to start psql";
+	while(<PSQL>){
+	    chomp;
+	    if(/[|]/) {
+		@col = split (/[|]/);
+		$disease = $col[0];
+		last;
+	    }
+	}
+	close PSQL;
+    } else {
+	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	while(<OSQL>){
+	    chomp;
+	    s/^\s+//;
+	    if(/[|]/) {
+		@col = split (/[|]/);
+		$disease = $col[0];
+		last;
+	    }
+	}
+	close OSQL;
+    }
+
     my $dosql = "select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_disease_id from biomart.bio_disease where (disease = '$disease' or mesh_code = '$disease' or icd9_code = '$disease' or icd10_code = '$disease'))";
 
     if($ispostgres) {
@@ -565,7 +597,7 @@ sub findTag($) {
 
 sub findAccession($) {
     my ($access) = @_;
-    my $dosql = "select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_experiment_id from biomart.bio_experiment where accession = '$access' and bio_experiment_type = 'Experiment')";
+    my $dosql = "select bio_experiment_id, title from biomart.bio_experiment where accession = '$access' and bio_experiment_type = 'Experiment'";
 
     if($ispostgres) {
 	open(PSQL, "psql -A -t -c \"$dosql\"|") || die "Failed to start psql";
@@ -1021,7 +1053,7 @@ if($ispostgres) {
     print DOSQL "set search_path = fmapp, pg_catalog;
 
 insert into fmapp.fm_folder_association (folder_id,object_uid,object_type)
-       values ('$studyid','$experimentcode','org.transmart.biomart.Experiment');
+       values ('$studyid','EXP:$accession','org.transmart.biomart.Experiment');
 ";
     close DOSQL;
     print STDERR "Link experiment\n";
