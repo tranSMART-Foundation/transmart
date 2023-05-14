@@ -60,6 +60,7 @@ begin
      where c_name = root_node;
 
     if path = ''  or path = '%' or path_name = '' then
+        stepCt := stepCt + 1;
 	perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Path or Path name missing, no action taken',0,stepCt,'Done');
 	return 1;
     end if;
@@ -70,22 +71,28 @@ begin
     delete from i2b2demodata.observation_fact
      where concept_cd in (select c_basecode from i2b2metadata.i2b2 where c_fullname = path);
     get diagnostics rowCt := ROW_COUNT;
-    stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted any concepts for path from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
+    if (rowCt > 0) then
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted any concepts for path from I2B2DEMODATA observation_fact',rowCt,stepCt,'Done');
+    end if;
 
     --concept dimension
     delete from i2b2demodata.concept_dimension
      where concept_path = path;
     get diagnostics rowCt := ROW_COUNT;
-    stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted any concepts for path from I2B2DEMODATA concept_dimension',rowCt,stepCt,'Done');
+    if (rowCt > 0) then
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted any concepts for path from I2B2DEMODATA concept_dimension',rowCt,stepCt,'Done');
+    end if;
 
     --i2b2
     delete from i2b2metadata.i2b2
      where c_fullname = path;
     get diagnostics rowCt := ROW_COUNT;
-    stepCt := stepCt + 1;
-    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted path from I2B2METADATA i2b2',rowCt,stepCt,'Done');
+    if (rowCt > 0) then
+        stepCt := stepCt + 1;
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted path from I2B2METADATA i2b2',rowCt,stepCt,'Done');
+    end if;
 
     --	Insert new node
 
