@@ -369,6 +369,11 @@
       "owner" : "I2B2DEMODATA",
       "name" : "VISIT_DIMENSION"
     } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_PATIENT_DIMENSION"
     },
     "parents" : [ {
       "type" : "SEQUENCE",
