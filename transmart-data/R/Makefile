@@ -4,7 +4,7 @@ include ../makefile.inc
 # with RSERVE_USER defined as the user to run the server (e.g. tomcat8)
 
 R_MIRROR ?= http://cran.ma.imperial.ac.uk
-R_VERSION = 4.1.2
+R_VERSION = 4.3.0
 R_SOURCE = R-$(R_VERSION)
 R_PREFIX ?= $(realpath .)/root
 R_EXEC = $(R_PREFIX)/lib/R/bin/R
@@ -88,7 +88,7 @@ install_rserve_upstart: /etc/init/rserve.conf
 
 install_rserve_unit: /etc/systemd/system/rserve.service
 /etc/systemd/system/rserve.service: $(RSERVE_CONF)
-	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) RSERVE_LOG="file:$(RSERVE_LOG)" \
+	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) RSERVE_LOG="append:$(RSERVE_LOG)" \
 		RSERVE_USER=$(RSERVE_USER) php \
 		-d variables_order=E -d open_basedir=/ rserve.service.php > $@
 	systemctl daemon-reload

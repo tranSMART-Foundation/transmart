@@ -25,26 +25,30 @@ biocmanager.packages <-
 					  "AnnotationDbi", "QDNAseq"));
 if (length(biocmanager.packages)) {
 	BiocManager::install(biocmanager.packages);
-download.file(url="http://bioconductor.org/packages/release/bioc/src/contrib/QDNAseq_1.32.0.tar.gz",
-	      dest="/tmp/QDNAseq_1.32.0.tar.gz", method="internal");
-install.packages("/tmp/QDNAseq_1.32.0.tar.gz",
+download.file(url="http://bioconductor.org/packages/release/bioc/src/contrib/QDNAseq_1.36.0.tar.gz",
+	      dest="/tmp/QDNAseq_1.36.0.tar.gz", method="curl");
+install.packages("/tmp/QDNAseq_1.36.0.tar.gz",
 		repos=NULL, type="source");
 }
+
+# Have to change method "internal" to "curl" or similar for latest BioConductor.
 
 if (length(intersect(new.packages, c("CGHtest")))) {
 	download.file(
 			url="http://files.thehyve.net/CGHtest_1.1.tar.gz",
-			dest="/tmp/CGHtest_1.1.tar.gz", method="internal");
+			dest="/tmp/CGHtest_1.1.tar.gz", method="curl");
 	install.packages("/tmp/CGHtest_1.1.tar.gz",
 			repos=NULL, type="source")
 }
+
 if (length(intersect(new.packages, c("CGHtestpar")))) {
 	download.file(
 			url="http://files.thehyve.net/CGHtestpar_0.0.tar.gz",
-			dest="/tmp/CGHtestpar_0.0.tar.gz", method="internal");
+			dest="/tmp/CGHtestpar_0.0.tar.gz", method="curl");
 	install.packages("/tmp/CGHtestpar_0.0.tar.gz",
 			repos=NULL, type="source")
 }
+
 if (length(intersect(new.packages, c("WGCNA")))) {
 	install.packages("WGCNA", repos=Sys.getenv("CRAN_MIRROR"));
 }

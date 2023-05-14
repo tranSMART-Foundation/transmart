@@ -14,7 +14,7 @@ User=<?= $u, "\n" ?>
 TimeoutSec=15s
 Restart=always
 Nice=19
-StandardOutput=<?= $l, "\n" ?>
+StandardOutput=<?= "$l", "\n" ?>
 # test this for production:
 #ReadOnlyDirectories=/
 #ReadWriteDirectories=/var/cache/jobs
