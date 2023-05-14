@@ -27,7 +27,7 @@ begin
 -- You can optionally specify a single table name, to count using only one ontology table. This is case sensitive.
 -----------------------------------------------------------------------------------------------------------------
 
-    raise info 'At %, running RunTotalnum()',clock_timestamp();
+--    raise info 'At %, running RunTotalnum()',clock_timestamp();
     v_startime := clock_timestamp();
 
     for curRecord IN 
@@ -35,31 +35,31 @@ begin
         from i2b2metadata.table_access 
         where c_visualattributes like '%A%' 
     LOOP 
-        raise info 'At %: Running: %',clock_timestamp(), curRecord.sqltext;
+--        raise info 'At %: Running: %',clock_timestamp(), curRecord.sqltext;
 
         IF tableName='@' OR tableName=curRecord.sqltext THEN
             v_sqlstring := 'select i2b2metadata.pat_count_visits( ''' || curRecord.sqltext || ''' ,''' || schemaName || '''   )';
             execute v_sqlstring;
             v_duration := clock_timestamp()-v_startime;
-            raise info '(BENCH) %,PAT_COUNT_VISITS,%',curRecord,v_duration;
+--            raise info '(BENCH) %,PAT_COUNT_VISITS,%',curRecord,v_duration;
             v_startime := clock_timestamp();
             
             v_sqlstring := 'select i2b2metadata.pat_count_dimensions( ''' || curRecord.sqltext || ''' ,''' || schemaName || ''' , ''' || observationTable || ''' ,  ''concept_cd'', ''concept_dimension'', ''concept_path''  )';
             execute v_sqlstring;
             v_duration :=  clock_timestamp()-v_startime;
-            raise info '(BENCH) %,PAT_COUNT_concept_dimension,%',curRecord,v_duration;
+--            raise info '(BENCH) %,PAT_COUNT_concept_dimension,%',curRecord,v_duration;
             v_startime := clock_timestamp();
             
             v_sqlstring := 'select i2b2metadata.pat_count_dimensions( ''' || curRecord.sqltext || ''' ,''' || schemaName || ''' , ''' || observationTable || ''' ,  ''provider_id'', ''provider_dimension'', ''provider_path''  )';
             execute v_sqlstring;
             v_duration := clock_timestamp()-v_startime;
-            raise info '(BENCH) %,PAT_COUNT_provider_dimension,%',curRecord,v_duration;
+--            raise info '(BENCH) %,PAT_COUNT_provider_dimension,%',curRecord,v_duration;
             v_startime := clock_timestamp();
             
             v_sqlstring := 'select i2b2metadata.pat_count_dimensions( ''' || curRecord.sqltext || ''' ,''' || schemaName || ''' , ''' || observationTable || ''' ,  ''modifier_cd'', ''modifier_dimension'', ''modifier_path''  )';
             execute v_sqlstring;
             v_duration := clock_timestamp()-v_startime;
-            raise info '(BENCH) %,PAT_COUNT_modifier_dimension,%',curRecord,v_duration;
+--            raise info '(BENCH) %,PAT_COUNT_modifier_dimension,%',curRecord,v_duration;
             v_startime := clock_timestamp();
             
              -- New 11/20 - update counts in top levels (table_access) at the end

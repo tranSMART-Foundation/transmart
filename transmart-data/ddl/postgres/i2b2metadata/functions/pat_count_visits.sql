@@ -136,11 +136,11 @@ BEGIN
              || ' from ontPatVisitDims b '
              || ' where a.c_fullname=b.c_fullname and b.numpats>0';
 
-    raise info 'At %: Running: %',clock_timestamp()e, v_sqlstr;
+--    raise info 'At %: Running: %',clock_timestamp()e, v_sqlstr;
  
     --display count and timing information to the user
     select count(*) into v_num from ontPatVisitDims where numpats is not null and numpats <> 0;
-    raise info 'At %, updating c_totalnum in % for % records',clock_timestamp(), tabname, v_num;
+--    raise info 'At %, updating c_totalnum in % for % records',clock_timestamp(), tabname, v_num;
              
 	execute v_sqlstr;
 	

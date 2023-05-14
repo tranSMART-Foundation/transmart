@@ -21,7 +21,7 @@ BEGIN
 --     select i2b2metadata.PAT_COUNT_DIMENSIONS( 'I2B2' ,'i2b2demodata' , 'observation_fact' ,  'concept_cd', 'concept_dimension', 'concept_path'xs)
 --   (replace 'i2b2demodata' by the schema name for the fact table)
 
-    raise info 'At %, running PAT_COUNT_DIMENSIONS(''%'')',clock_timestamp(), metadataTable;
+--    raise info 'At %, running PAT_COUNT_DIMENSIONS(''%'')',clock_timestamp(), metadataTable;
     v_startime := clock_timestamp();
 
     DISCARD TEMP;
@@ -42,7 +42,7 @@ BEGIN
 	-- NEW: Sparsify the working ontology by eliminating leaves with no data. HUGE win in ACT meds ontology (10x speedup).
         -- From 1.47M entries to 300k entries!
            
-    raise info 'SQL: %',v_sqlstr;
+--    raise info 'SQL: %',v_sqlstr;
     execute v_sqlstr;
 
     create index dimCountOntA on dimCountOnt using spgist (c_fullname);
@@ -90,11 +90,11 @@ v_sqlstr := 'with recursive concepts (c_fullname, c_hlevel, c_basecode) as ('
 	|| '  from concepts '
 	|| '  where c_fullname like ''' || replace(curRecord.c_fullname,'\','\\') || '%'' '
 	|| '  order by c_fullname, c_basecode ';
-    raise info 'SQL_dimOntWithFolders: %',v_sqlstr;
+--    raise info 'SQL_dimOntWithFolders: %',v_sqlstr;
 	execute v_sqlstr;
 	--raise notice 'At %, collected concepts for % %',clock_timestamp(),curRecord.c_table_name,curRecord.c_fullname;
 	v_duration := clock_timestamp()-v_startime;
-	raise info '(BENCH) %,collected_concepts,%',curRecord,v_duration;
+--	raise info '(BENCH) %,collected_concepts,%',curRecord,v_duration;
 	v_startime := clock_timestamp();
  end if;
     END LOOP;
@@ -143,7 +143,7 @@ v_sqlstr := 'with recursive concepts (c_fullname, c_hlevel, c_basecode) as ('
         order by p.c_fullname;
     --raise notice 'At %, done counting.',clock_timestamp();
 	v_duration := clock_timestamp()-v_startime;
-	raise info '(BENCH) %,counted_concepts,%',curRecord,v_duration;
+--	raise info '(BENCH) %,counted_concepts,%',curRecord,v_duration;
 	v_startime := clock_timestamp();
     create index on finalCountsbyConcept using btree (c_fullname);
     v_sqlstr := ' update i2b2metadata.' || metadataTable || ' a set c_totalnum=b.num_patients '
@@ -153,7 +153,7 @@ v_sqlstr := 'with recursive concepts (c_fullname, c_hlevel, c_basecode) as ('
 	     || ' and lower(a.c_tablename) = ''' || tablename || ''' '
 	     || ' and lower(a.c_columnname) = ''' || columnname || ''' ';
     select count(*) into v_num from finalCountsByConcept where num_patients is not null and num_patients <> 0;
-    raise info 'At %, updating c_totalnum in % %',clock_timestamp(), metadataTable, v_num;
+--    raise info 'At %, updating c_totalnum in % %',clock_timestamp(), metadataTable, v_num;
     
 	execute v_sqlstr;
 	
