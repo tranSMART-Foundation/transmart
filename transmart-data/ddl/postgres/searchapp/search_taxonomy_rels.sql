@@ -8,10 +8,10 @@ CREATE TABLE search_taxonomy_rels (
 );
 
 --
--- Name: search_taxonomy_rels_pkey; Type: CONSTRAINT; Schema: searchapp; Owner: -
+-- Name: search_taxonomy_rels_pk; Type: CONSTRAINT; Schema: searchapp; Owner: -
 --
 ALTER TABLE ONLY search_taxonomy_rels
-    ADD CONSTRAINT search_taxonomy_rels_pkey PRIMARY KEY (search_taxonomy_rels_id);
+    ADD CONSTRAINT search_taxonomy_rels_pk PRIMARY KEY (search_taxonomy_rels_id);
 
 --
 -- Name: u_child_id_parent_id; Type: CONSTRAINT; Schema: searchapp; Owner: -

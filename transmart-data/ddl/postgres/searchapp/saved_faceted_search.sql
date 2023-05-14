@@ -13,10 +13,10 @@ CREATE TABLE saved_faceted_search (
 );
 
 --
--- Name: saved_faceted_search_pkey; Type: CONSTRAINT; Schema: searchapp; Owner: -
+-- Name: saved_faceted_search_pk; Type: CONSTRAINT; Schema: searchapp; Owner: -
 --
 ALTER TABLE ONLY saved_faceted_search
-    ADD CONSTRAINT saved_faceted_search_pkey PRIMARY KEY (saved_faceted_search_id);
+    ADD CONSTRAINT saved_faceted_search_pk PRIMARY KEY (saved_faceted_search_id);
 
 --
 -- Name: u_saved_search__user_id_name; Type: CONSTRAINT; Schema: searchapp; Owner: -

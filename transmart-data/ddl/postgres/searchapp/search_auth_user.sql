@@ -20,10 +20,10 @@ ALTER TABLE ONLY search_auth_user
     ADD CONSTRAINT sau_fed_id_key UNIQUE (federated_id);
 
 --
--- Name: sys_c0011119; Type: CONSTRAINT; Schema: searchapp; Owner: -
+-- Name: search_auth_user_pk; Type: CONSTRAINT; Schema: searchapp; Owner: -
 --
 ALTER TABLE ONLY search_auth_user
-    ADD CONSTRAINT sys_c0011119 PRIMARY KEY (id);
+    ADD CONSTRAINT search_auth_user_pk PRIMARY KEY (id);
 
 --
 -- Name: sh_auth_user_id_fk; Type: FK CONSTRAINT; Schema: searchapp; Owner: -

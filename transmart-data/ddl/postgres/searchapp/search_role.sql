@@ -9,8 +9,8 @@ CREATE TABLE search_role (
 );
 
 --
--- Name: sys_c0011120; Type: CONSTRAINT; Schema: searchapp; Owner: -
+-- Name: search_role_pk; Type: CONSTRAINT; Schema: searchapp; Owner: -
 --
 ALTER TABLE ONLY search_role
-    ADD CONSTRAINT sys_c0011120 PRIMARY KEY (id);
+    ADD CONSTRAINT search_role_pk PRIMARY KEY (id);
 

@@ -9,10 +9,10 @@ CREATE TABLE search_user_settings (
 );
 
 --
--- Name: search_user_settings_pkey; Type: CONSTRAINT; Schema: searchapp; Owner: -
+-- Name: search_user_settings_pk; Type: CONSTRAINT; Schema: searchapp; Owner: -
 --
 ALTER TABLE ONLY search_user_settings
-    ADD CONSTRAINT search_user_settings_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT search_user_settings_pk PRIMARY KEY (id);
 
 --
 -- Name: search_user_settings_uk; Type: CONSTRAINT; Schema: searchapp; Owner: -
