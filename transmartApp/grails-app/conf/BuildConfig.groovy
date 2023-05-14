@@ -114,6 +114,15 @@ grails.project.dependency.resolution = {
 	compile 'org.apache.solr:solr-solrj:5.4.1'
 	compile 'org.jfree:jfreechart:1.5.0'
 	compile 'org.jfree:jfreesvg:2.1'
+	compile 'org.jfree:jcommon:1.0.24'
+	compile 'xpp3:xpp3_min:1.1.4c'
+	compile 'net.sf.ezmorph:ezmorph:1.0.6'
+	compile 'com.thoughtworks.xstream:xstream:1.3'   // latest 1.4.20
+	compile 'net.sourceforge.jtds:jtds:1.2.2'
+//	compile 'net.sf.json-lib:json-lib:2.3'
+	compile 'xml-resolver:xml-resolver:1.2'
+//	compile 'mage:MAGEstk:2006-07-v1.x-compatible'
+//	compile 'com.sun.pdfview:PDFRenderer:0.9.1'
 	compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.2', {
 	    excludes 'groovy', 'nekohtml', 'httpclient', 'httpcore'
 	}
@@ -127,7 +136,7 @@ grails.project.dependency.resolution = {
 ////	compile 'org.transmartproject:transmart-core-api:' + tmVersion
 
 	runtime 'com.jcraft:jsch:0.1.42'
-	runtime 'com.lowagie:itext:2.0.8', { transitive = false }
+//	runtime 'com.lowagie:itext:2.0.8', { transitive = false }
 	runtime 'gov.nist.math:jama:1.0.1'
 	runtime 'oauth.signpost:signpost-commonshttp4:1.2.1.1'
 	runtime 'oauth.signpost:signpost-core:1.2.1.1'
@@ -139,8 +148,8 @@ grails.project.dependency.resolution = {
 	runtime 'xerces:xercesImpl:2.9.1'
 
 	// you can remove whichever you are not using
-	runtime 'org.postgresql:postgresql:42.4.3'           // Java 8+ 05-dec-22
-	runtime 'com.oracle.database.jdbc:ojdbc8:21.6.0.0.1' // Java 8+ 14-jun-22
+	runtime 'org.postgresql:postgresql:42.6.0'           // Java 8+ 18-mar-23
+	runtime 'com.oracle.database.jdbc:ojdbc8:23.2.0.0' // Java 8+ 07-apr-23
 
 	test 'org.gmock:gmock:0.9.0-r435-hyve2', { transitive = false }
 	test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
