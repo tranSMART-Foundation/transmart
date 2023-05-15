@@ -43,7 +43,7 @@ grails.project.dependency.resolution = {
 	compile 'org.apache.lucene:lucene-highlighter:2.4.0'
 
 	// runtime 'mysql:mysql-connector-java:5.1.21'
-        runtime 'com.oracle:ojdbc7:12.1.0.1', {
+        runtime 'com.oracle.database.jdbc:ojdbc8:23.2.0.0', {
             export = false
         }
 
