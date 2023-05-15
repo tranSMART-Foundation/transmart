@@ -3,7 +3,7 @@
 buildscript {
     repositories {
 	mavenLocal()
-	jcenter()
+	mavenCentral()
         maven { url 'https://repo.transmartfoundation.org/content/repositories/public' }
     }
     dependencies {
@@ -24,7 +24,7 @@ version file('version.txt').text.trim()
 
 repositories {
 	mavenLocal()
-	jcenter()
+	mavenCentral()
 }
 
 dependencies {
