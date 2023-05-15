@@ -20,13 +20,13 @@ class GalaxyExportPluginController {
 
         for (String script in scripts) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
-	    logger.info 'loading GalaxyExport script {} asset{}', script, assetRes.getPath()
+	    logger.info 'GalaxyExport loadScripts script {} at {}', script, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
         }
 
         for (String style in styles) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
-	    logger.info 'loading GalaxyExport style {} asset {}', style, assetRes.getPath()
+	    logger.info 'GalaxyExport loadScripts style {} at {}', style, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
         }
 
