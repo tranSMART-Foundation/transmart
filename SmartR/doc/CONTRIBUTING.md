@@ -78,15 +78,15 @@ resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/controllers', file: '
 resource url: [plugin: 'smart-r', dir: 'js/smartR/_angular/viz', file: 'plotlyBoxplot.js']
 ```
 
-#### Code your vizualisation in `web-app/js/smartR/_angular/viz/plotlyBoxplot.js`
+#### Code your vizualisation in `grails-app/assets/javascripts/smartR/_angular/viz/plotlyBoxplot.js`
 
 This is a standard angular directive that watches the model where the R results will be stored. The vizualization code is stored within the link function.
 
-#### Add your workflow controller in `web-app/js/smartR/_angular/controllers/boxplot.js`
+#### Add your workflow controller in `grails-app/assets/javascripts/smartR/_angular/controllers/boxplot.js`
 
 This is the controller that "manages" the workflow elements. It is recommended to stay close to the already existing workflows for consistent behaviour.
 
-#### Apply your css in `web-app/css/boxplot.css`
+#### Apply your css in `grails-app/assets/stylesheets/boxplot.css`
 
 Just dome CSS for the code in plotlyBoxplot.js
 
@@ -149,7 +149,7 @@ filename: If you are generating a file instead of returning json directly from t
 params: Arguments that you would like to call the main() method with
 ```
 
-#### Add the R code in `web-app/HeimScripts/boxplot/run.R`
+#### Add the R code in `src/main/resources/HeimScripts/boxplot/run.R`
 
 The R code here will be executed by clicking the `<run-button>`.
 Every .R file that you execute from SmartR must have a main() function, which is the entry point for each call to that script.
