@@ -16,7 +16,7 @@ library(WGCNA)
 
 
 if (!exists("remoteScriptDir")) {  #  Needed for unit-tests
-  remoteScriptDir <- "web-app/HeimScripts"
+  remoteScriptDir <- "WEB-INF/HeimScripts"
 }
 
 ## Loading functions ##
