@@ -1,6 +1,7 @@
 //# sourceURL=biomarkerSelection.js
 
 'use strict';
+// console.log("initialize Directive biomarkerSelection.js");
 
 window.smartRApp.directive('biomarkerSelection', [
     '$rootScope',

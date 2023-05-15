@@ -1,6 +1,7 @@
 //# sourceURL=cohortSummaryInfo.js
 
 'use strict';
+// console.log("initialize Directive cohortSummaryInfo.js");
 
 window.smartRApp.directive('cohortSummaryInfo', [function() {
 

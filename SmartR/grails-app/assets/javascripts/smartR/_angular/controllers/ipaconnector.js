@@ -1,6 +1,7 @@
 //# sourceURL=ipaconnector.js
 
 'use strict';
+// console.log("initialize Controller ipaconnector.js");
 
 window.smartRApp.controller('IpaconnectorController', [
     '$scope',
@@ -127,3 +128,5 @@ window.smartRApp.controller('IpaconnectorController', [
             $scope.runAnalysis.disabled = fetchRunning || !fetchLoaded;
         });
     }]);
+
+// console.log("initialize Controller ipaconnector.js DONE");

@@ -1,6 +1,7 @@
 //# sourceURL=sortingCriteria.js
 
 'use strict';
+// console.log("initialize Directive sortingCriteria.js");
 
 window.smartRApp.directive('sortingCriteria', [
     '$rootScope',

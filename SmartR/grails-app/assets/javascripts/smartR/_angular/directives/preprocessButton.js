@@ -1,6 +1,7 @@
 //# sourceURL=preprocessButton.js
 
 'use strict';
+// console.log("initialize Directive preprocessButton.js");
 
 window.smartRApp.directive('preprocessButton', [
     'rServeService',

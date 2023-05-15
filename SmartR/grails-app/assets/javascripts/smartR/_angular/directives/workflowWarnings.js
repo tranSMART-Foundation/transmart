@@ -1,6 +1,7 @@
 //# sourceURL=workflowWarnings.js
 
 'use strict';
+// console.log("initialize Directive workflowWarnings.js");
 
 window.smartRApp.directive('workflowWarnings', [
     '$rootScope',

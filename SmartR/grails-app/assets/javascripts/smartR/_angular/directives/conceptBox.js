@@ -1,6 +1,7 @@
 //# sourceURL=conceptBox.js
 
 'use strict';
+// console.log("initialize Directive conceptBox.js");
 
 window.smartRApp.directive('conceptBox', [
     '$rootScope',

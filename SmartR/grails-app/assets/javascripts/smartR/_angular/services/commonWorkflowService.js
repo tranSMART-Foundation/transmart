@@ -1,6 +1,7 @@
 //# sourceURL=commonWorkflowService.js
 
 'use strict';
+// console.log("initialize Service commonWorkflowService.js");
 
 window.smartRApp.factory('commonWorkflowService', ['rServeService', '$css', function(rServeService, $css) {
 

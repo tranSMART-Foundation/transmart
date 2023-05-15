@@ -1,6 +1,7 @@
 //# sourceURL=workflowTab.js
 
 'use strict';
+// console.log("initialize Directive workflowTab.js");
 
 window.smartRApp.directive('workflowTab', ['smartRUtils', function(smartRUtils) {
     return {

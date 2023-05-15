@@ -1,6 +1,7 @@
 //# sourceURL=rServeService.js
 
 'use strict';
+// console.log("initialize Service rServeService.js");
 
 window.smartRApp.factory('rServeService', [
     'smartRUtils',
@@ -154,6 +155,8 @@ window.smartRApp.factory('rServeService', [
             var taskData = $.extend({}, taskDataOrig); // clone the thing
             state.currentRequestAbort();
 
+//	    console.log('startScriptExecution taskType: ' + taskData.taskType + ' phase: ' + taskData.phase);
+
             var canceler = $q.defer();
             var runRequest = $http({
                 url: pageInfo.basePath + '/ScriptExecution/run',
@@ -250,6 +253,10 @@ window.smartRApp.factory('rServeService', [
         };
 
         service.loadDataIntoSession = function(conceptKeys, dataConstraints, projection) {
+//	    console.log("rServeService loadDataIntoSession");
+//	    console.log("... conceptKeys: " + conceptKeys);
+//	    console.log("... typeof dataConstraints: "+ typeof dataConstraints);
+//	    console.log("... typeof projection: "+ typeof projection);
             projection = typeof projection === 'undefined' ? 'log_intensity' : projection; // default to log_intensity
             return $q(function(resolve, reject) {
                 smartRUtils.getSubsetIds().then(
@@ -281,7 +288,9 @@ window.smartRApp.factory('rServeService', [
 
         service.executeSummaryStats = function(phase, projection) {
             projection = typeof projection === 'undefined' ? 'log_intensity' : projection; // default to log_intensity
+//	    console.log ('executeSummaryStats phase: ' + phase + ' projection: ' + projection);
             return $q(function(resolve, reject) {
+//		console.log('executeSummaryStats start');
                 service.startScriptExecution({
                     taskType: 'summary',
                     arguments: {
@@ -290,6 +299,7 @@ window.smartRApp.factory('rServeService', [
                     }
                 }).then(
                     function(response) {
+//			console.log('executeSummaryStats response.result.artifacts.files.length ' + response.result.artifacts.files.length + ' executionId ' + response.executionId);
                         if (response.result.artifacts.files.length > 0) {
                             service.composeSummaryResults(response.result.artifacts.files, response.executionId, phase)
                                 .then(

@@ -1,6 +1,7 @@
 //# sourceURL=fetchButton.js
 
 'use strict';
+// console.log("initialize Directive fetchButton.js");
 
 window.smartRApp.directive('fetchButton', [
     '$rootScope',

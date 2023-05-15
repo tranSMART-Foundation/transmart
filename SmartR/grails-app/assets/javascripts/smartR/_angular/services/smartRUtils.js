@@ -1,6 +1,7 @@
 //# sourceURL=smartRUtils.js
 
 'use strict';
+// console.log("initialize Service smartRUtils.js");
 
 window.smartRApp.factory('smartRUtils', [
     '$q',

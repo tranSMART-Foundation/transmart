@@ -1,6 +1,7 @@
 //# sourceURL=capturePlotButton.js
 
 'use strict';
+// console.log("initialize Directive captureplotbutton.js");
 
 window.smartRApp.directive('capturePlotButton', [function() {
 

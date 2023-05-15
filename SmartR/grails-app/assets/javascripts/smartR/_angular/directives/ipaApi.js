@@ -1,6 +1,7 @@
 //# sourceURL=ipaApi.js
 
 'use strict';
+// console.log("initialize Directive ipaApi.js");
 
 angular.module('ipaApi',['ngTable'])
     .directive('ipaSimpleTable', [

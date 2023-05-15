@@ -1,6 +1,7 @@
 //# sourceURL=d3Heatmap.js
 
 'use strict';
+// console.log("initialize Viz 3dHeatmap.js");
 
 window.smartRApp.directive('heatmapPlot', [
     'smartRUtils',

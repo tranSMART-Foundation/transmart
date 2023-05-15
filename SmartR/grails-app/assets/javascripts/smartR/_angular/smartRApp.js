@@ -1,6 +1,7 @@
 //# sourceURL=smartRApp.js
 
 'use strict';
+// console.log("initialize angular smartRApp.js");
 
 window.smartRApp = angular.module('smartRApp', ['ngRoute', 'door3.css', 'ipaApi'])
     .config(['$httpProvider', function($httpProvider) {

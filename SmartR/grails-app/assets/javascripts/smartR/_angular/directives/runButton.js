@@ -1,6 +1,7 @@
 //# sourceURL=runButton.js
 
 'use strict';
+// console.log("initialize Directive runButton.js");
 
 window.smartRApp.directive('runButton', [
     '$rootScope',

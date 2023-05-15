@@ -1,6 +1,7 @@
 //# sourceURL=ngTranscludeReplace.js
 
 'use strict';
+// console.log("initialize Directive ngTranscludeReplace.js");
 
 window.smartRApp.directive('ngTranscludeReplace', [
     '$log',

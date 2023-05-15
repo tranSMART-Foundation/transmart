@@ -1,6 +1,7 @@
 //# sourceURL=heatmap.js
 
 'use strict';
+// console.log("initialize Controller heatmap.js");
 
 window.smartRApp.controller('HeatmapController', [
     '$scope',

@@ -1,5 +1,7 @@
 //# sourceURL=downloadResultsButton.js
 
+// console.log("initialize Directive downloadResultsButton.js");
+
 window.smartRApp.directive('downloadResultsButton', ['rServeService', function(rServeService)
 {
     function downloadFile(data) {
