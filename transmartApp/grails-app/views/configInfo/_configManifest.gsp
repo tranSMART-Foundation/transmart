@@ -11,6 +11,14 @@
 	define style="display: none;" in tbody
 --}%
 
+<p>
+<b>Very long list of all files included in the manifest of the unpacked tranSMART server.</b>
+<p>
+
+<p>
+<b>This table is closed by default. Expand to see the full contents.</b>
+<p>
+
 <table id="configManifest"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Manifest (${configParams.manifestParams.size()})"

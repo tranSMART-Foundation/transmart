@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Configuration options for administrator users.</b>
+</p>
+
 <table id="configAdmin"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Admin (${configParams.adminParams.size()})"

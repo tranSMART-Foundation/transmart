@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Data source parameters for the database and JDBC driver.</b>
+</p>
+
 <table id="configDataSource"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="DataSource (${configParams.dataSourceParams.size()})"

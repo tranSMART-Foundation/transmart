@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Oauth spring security parameters.</b>
+</p>
+
 <table id="configOauth"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Oauth (${configParams.oauthParams.size()})"

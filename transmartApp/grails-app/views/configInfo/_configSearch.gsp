@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Parameters for text and filter searches.</b>
+</p>
+
 <table id="configSearch"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Search (${configParams.searchParams.size()})"

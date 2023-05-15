@@ -110,7 +110,7 @@ class ConfigService {
 	    'edu.harvard.transmart.email.logo': [
 		desc: 'Logo for email to display on new user page'],
 	    'edu.harvard.transmart.email.notify': [
-		desc: 'admin email to notify of new user registration by auth0']
+		desc: 'Admin email to notify of new user registration by auth0']
 	]
 
         Map browseParams = [
@@ -127,23 +127,11 @@ class ConfigService {
             'com.recomdata.FmFolderService.fileTypes': [
                 default: 'xml,<br>json,<br>csv,<br>pdf,<br>doc,<br>docx,<br>ppt,<br>pptx,<br>xls,<br>xlsx,<br>odt,<br>odp,<br>ods,<br>ott,<br>otp,<br>ots,<br>rtf,<br>htm,<br>html,<br>txt,<br>lo',
                 desc: 'List of known file types for saving in Browse tab folders'],
-            'com.recomdata.solr.baseURL': [
-                desc: 'Browse URL for solR, required for Browse file import'],
-            'com.rwg.solr.scheme': [
-                desc: 'Browse/Faceted search solR protocol'],
-            'com.rwg.solr.host': [
-                desc: 'Browse/Faceted search solR host'],
-            'com.rwg.solr.path': [
-                desc: 'Browse/Faceted search solR path (remainder of URL)'],
-            'com.rwg.solr.browse.path': [
-                desc: 'Browse search path (remainder of URL)'],
-            'com.rwg.solr.update.path': [
-                desc: 'Browse solR data import path (remainder of URL)'],
             'transmartproject.mongoFiles.enableMongo': [
                 default: false,
                 desc: 'If true, store Browse tab files in MongoDB, else use server filesystem'],
             'transmartproject.mongoFiles.useDriver': [
-                desc: 'if true, use local MongoDB local server'],
+                desc: 'If true, use local MongoDB local server'],
             'transmartproject.mongoFiles.dbServer': [
                 desc: 'Local MongoDB server host'],
             'transmartproject.mongoFiles.dbPort': [
@@ -175,9 +163,9 @@ class ConfigService {
             'com.recomdata.adminEmail': [
                 desc: 'Email address to request administrator support, or to request a login username'],
             'com.recomdata.contactUs': [
-                desc: 'contact email address'],
+                desc: 'Contact email address for support'],
             'com.recomdata.dataUpload.adminEmail': [
-                desc: 'Contact email for analysis ETL administrator']
+                desc: 'Contact email for data loader/curator']
         ]
 
         Map dataSourceParams = [
@@ -225,7 +213,7 @@ class ConfigService {
 
         Map exportParams = [
             'com.recomdata.export.jobs.sweep.startDelay': [
-                desc: 'start delay for the sweep job (msec)'],
+                desc: 'Start delay for the sweep job (msec)'],
             'com.recomdata.export.jobs.sweep.repeatInterval': [
                 desc: 'Repeat interval for file sweep job (msec)'],
             'com.recomdata.export.jobs.sweep.fileAge': [
@@ -253,7 +241,7 @@ class ConfigService {
             'com.recomdata.transmart.data.export.ftp.remote.path': [
                 desc: 'Data Export FTP file path'],
             'com.recomdata.transmart.data.export.max.export.jobs.loaded': [
-                desc: 'Data Export maximum jobs loaded ']
+                desc: 'Data Export maximum jobs loaded']
         ]
 
         Map fractalisParams = [
@@ -280,9 +268,9 @@ class ConfigService {
             'com.recomdata.appTitle': [
                 desc: 'Application title, usually including the release'],
             'com.recomdata.largeLogo': [
-                desc: 'application logo to be used in the login page (path appended to transmart URL)'],
+                desc: 'Application logo to be used in the login page (path appended to transmart URL)'],
             'com.recomdata.smallLogo': [
-                desc: 'application logo to be used in the search page (path appended to transmart URL)'],
+                desc: 'Application logo to be used in the search page (path appended to transmart URL)'],
             'com.recomdata.projectName': [
                 desc: 'Project name for welcome/login/query screens'],
             'com.recomdata.projectLogo': [
@@ -413,6 +401,9 @@ class ConfigService {
             'com.recomdata.i2b2.subject.password': [
 		default: '(undefined)',
                 desc: 'DatasetExplorer i2b2 server password'],
+            'org.transmart.i2b2.view.enable': [
+		default: false,
+                desc: 'Accept data loaded by i2b2 (without a study) as study I2B2'],
             'org.transmartproject.i2b2.instance': [
 		default: '(undefined)',
                 desc: 'I2b2 plugin server instance'],
@@ -444,13 +435,13 @@ class ConfigService {
                 default: false,
                 desc: 'If true, and LDAP provider is included in providerNames, LDAP authentication is used'],
             'org.transmart.security.ldap.newUsernamePattern':[
-                desc: 'pattern for newly created user, can include &lt;ID&gt; for record id or &lt;FEDERATED_ID&gt; for external user name'],
+                desc: 'Pattern for newly created user, can include &lt;ID&gt; for record id or &lt;FEDERATED_ID&gt; for external user name'],
             'org.transmart.security.ldap.defaultAuthorities':[
-                desc: 'comma separated list of new user authorities'],
+                desc: 'Comma separated list of new user authorities'],
             'org.transmart.security.ldap.inheritPassword':[
-                desc: 'if inheritPassword == false specified user will not be able to login without LDAP'],
+                desc: 'If inheritPassword == false specified user will not be able to login without LDAP'],
             'org.transmart.security.ldap.mappedUsernameProperty':[
-                desc: 'can be \'username\' or \'federatedId\''],
+                desc: 'Can be \'username\' or \'federatedId\''],
             'org.transmart.security.ldap.ad.domain':[
                 desc: 'Active Directory extension'],
             'org.transmart.security.ldap.context.server':[
@@ -522,15 +513,15 @@ class ConfigService {
             'RModules.pluginScriptDirectory': [
                 desc: 'Path to R scripts'],
             'RModules.tempFolderDirectory': [
-                desc: 'working directory for R scripts, where the jobs are created and output files are generated'],
+                desc: 'Working directory for R scripts, where the jobs are created and output files are generated'],
 	    'RModules.deployment.dataexportRscripts': [
-		desc: 'directory to copy R scripts for data export'],
+		desc: 'Directory to copy R scripts for data export'],
 	    'RModules.deployment.rscripts': [
-		desc: 'directory to copy R scripts for advanced workflows'],
+		desc: 'Directory to copy R scripts for advanced workflows'],
             'org.transmartproject.rmodules.deployment.dataexportRscripts': [
-                desc: 'temp directory to deploy R scripts for data export'],
+                desc: 'Temp directory to deploy R scripts for data export'],
             'org.transmartproject.rmodules.deployment.rscripts': [
-                desc: 'temp directory to deploy R scroipts for advanced workflows'],
+                desc: 'Temp directory to deploy R scroipts for advanced workflows'],
             'ui.tabs.datasetExplorer.analysisJobs.show': [
                 default: true,
                 desc: 'If defined as true, display \'Analysis Jobs\' tab in the Analyze tab pages']
@@ -572,6 +563,33 @@ class ConfigService {
        ]
 
         Map searchParams = [
+            'com.recomdata.category.hide.country': [
+		default: false,
+                desc: 'In the pull-down category search list, hide \'Country\''],
+            'com.recomdata.category.hide.disease': [
+		default: false,
+                desc: 'In the pull-down category search list, hide \'Disease\''],
+            'com.recomdata.category.hide.file_type': [
+		default: false,
+                desc: 'In the pull-down category search list, hide \'File_type\''],
+            'com.recomdata.category.hide.freetext': [
+		default: false,
+                desc: 'In the pull-down category search list, hide \'Free Text\''],
+            'com.recomdata.category.hide.gene': [
+		default: false,
+                desc: 'In the pull-down category search list, hide \'Gene\''],
+            'com.recomdata.category.hide.metabolite': [
+		default: false,
+                desc: 'In the pull-down category search list, hide \'Metabolite\''],
+            'com.recomdata.category.hide.mirna': [
+		default: false,
+                desc: 'In the pull-down category search list, hide \'MiRNA\''],
+            'com.recomdata.category.hide.organism': [
+		default: false,
+                desc: 'In the pull-down category search list, hide \'Organism\''],
+            'com.recomdata.category.hide.protein': [
+		default: false,
+                desc: 'In the pull-down category search list, hide \'Protein\''],
             'com.recomdata.searchengine.index': [
                 desc: 'Search tool Lucene index location'],
             'com.recomdata.search.paginate.max': [
@@ -606,22 +624,33 @@ class ConfigService {
         ]
 
         Map solrParams = [
-            :
+            'com.recomdata.solr.baseURL': [
+                desc: 'Browse URL for solR, required for Browse file import'],
+            'com.rwg.solr.scheme': [
+                desc: 'Browse/Faceted search solR protocol'],
+            'com.rwg.solr.host': [
+                desc: 'Browse/Faceted search solR host'],
+            'com.rwg.solr.path': [
+                desc: 'Browse/Faceted search solR path (remainder of URL)'],
+            'com.rwg.solr.browse.path': [
+                desc: 'Browse search path (remainder of URL)'],
+            'com.rwg.solr.update.path': [
+                desc: 'Browse solR data import path (remainder of URL)']
         ]
 
         Map springParams = [
             'grails.plugin.springsecurity.userLookup.userDomainClassName': [
-                desc: 'customized user GORM class (org.transmart.searchapp.AuthUser)'],
+                desc: 'Customized user GORM class (org.transmart.searchapp.AuthUser)'],
             'grails.plugin.springsecurity.userLookup.passwordPropertyName': [
-                desc: 'customized password field (passwd)'],
+                desc: 'Customized password field (passwd)'],
             'grails.plugin.springsecurity.userLookup.authorityJoinClassName': [
-                desc: 'customized user /role join GORM class (org.transmart.searchapp.AuthUser)'],
+                desc: 'Customized user /role join GORM class (org.transmart.searchapp.AuthUser)'],
             'grails.plugin.springsecurity.authority.className': [
-                desc: 'customized role GORM class (org.transmart.searchapp.Role)'],
+                desc: 'Customized role GORM class (org.transmart.searchapp.Role)'],
             'grails.plugin.springsecurity.requestMap.className': [
                 desc: '(Obsolete) request map GORM class name - request map is stored in the db (org.transmart.searchapp.Requestmap)'],
             'grails.plugin.springsecurity.securityConfigType': [
-                desc: 'requestmap in db (InterceptUrlMap to use oauth)'],
+                desc: 'Requestmap in db (InterceptUrlMap to use oauth)'],
             'grails.plugin.springsecurity.successHandler.defaultTargetUrl': [
                 desc: 'URL to redirect after login. Defaults to value of org.transmart.defaultLoginRedirect else /userLanding'],
             'grails.plugin.springsecurity.logout.afterLogoutUrl': [
@@ -636,9 +665,13 @@ class ConfigService {
             'com.recomdata.bugreportURL': [
                 desc: 'Bug tracking system URL to enable Utilities menu \'Report a Bug\''],
             'com.recomdata.debug.jsCallbacks': [
-                desc: 'used to debug JavaScript callbacks in the dataset explorer in Chrome. Unfortunately, it also sometimes causes chrome to segfault'],
+                desc: 'Used to debug JavaScript callbacks in the dataset explorer in Chrome. Unfortunately, it also sometimes causes chrome to segfault'],
             'com.recomdata.defaults.landing': [
                 desc: 'Landing page after login. If undefined use Browse page or (if Browse is disabled) Analyze page'],
+	    'com.recomdata.welcome.intro': [
+		desc: 'Welcome introduction message to override default'],
+	    'com.recomdata.welcome.summary': [
+		desc: 'Welcome summary to override default'],
 
 	    'fractalis.active': [
 		default: false,
@@ -648,7 +681,7 @@ class ConfigService {
                 default: false,
                 desc: 'If true, xnat importer is an option on the admin page'],
             'org.transmart.defaultLoginRedirect': [
-                desc: 'default page displayed after login'],
+                desc: 'Default page displayed after login'],
             'ui.jirareport.hide': [
                 default: false,
                 desc: 'If true, remove \'Report a bug\' button on bottom left of every page'],
@@ -708,7 +741,7 @@ class ConfigService {
             'org.transmart.data.location': [
                 desc: 'Local directory of transmart-data files for XNAT import scripts<br>Defaults to /transmart-data under /transmart'],
             'org.transmart.importxnatplugin.etldir': [
-                desc: 'Local directory to write imported XNAT clinical data<br>Defaults to end/data-integration/ under org.transmart.data.location'],
+                desc: 'Local directory to write imported XNAT clinical data<br>Defaults to env/data-integration/ under org.transmart.data.location'],
             'org.transmart.importxnatplugin.kettlehome': [
                 desc: 'Local Kettle home directory for XNAT import<br>Defaults to samples/postgres/kettle-home under transmart-data'],
             'org.transmart.importxnatplugin.location': [
@@ -801,12 +834,6 @@ class ConfigService {
             else if(k == 'com.recomdata.FmFolderService.filestoreDirectory'){addConfig(browseParams,k,v,'')}
             else if(k == 'com.recomdata.FmFolderService.importDirectory'){addConfig(browseParams,k,v,'')}
             else if(k == 'com.recomdata.FmFolderService.fileTypes'){addConfigWrapCommas(browseParams,k,v,'')}
-            else if(k == 'com.recomdata.solr.baseURL'){addConfig(browseParams,k,v,'')}
-            else if(k == 'com.rwg.solr.scheme'){addConfig(browseParams,k,v,'')}
-            else if(k == 'com.rwg.solr.host'){addConfig(browseParams,k,v,'')}
-            else if(k == 'com.rwg.solr.path'){addConfig(browseParams,k,v,'')}
-            else if(k == 'com.rwg.solr.browse.path'){addConfig(browseParams,k,v,'')}
-            else if(k == 'com.rwg.solr.update.path'){addConfig(browseParams,k,v,'')}
             else if(k == 'transmartproject.mongoFiles.enableMongo'){addConfig(browseParams,k,v,'')}
             else if(k == 'transmartproject.mongoFiles.useDriver'){addConfig(browseParams,k,v,'')}
             else if(k == 'transmartproject.mongoFiles.dbServer'){addConfig(browseParams,k,v,'')}
@@ -999,12 +1026,13 @@ class ConfigService {
             else if(k == 'org.transmartproject.i2b2.user_id'){addConfig(i2b2Params,k,encodeConfigUsername(v),'')}
             else if(k == 'org.transmartproject.i2b2.group_id'){addConfig(i2b2Params,k,v,'')}
             else if(k == 'org.transmartproject.i2b2.pool'){addConfig(i2b2Params,k,v,'')}
-            else if(k == 'org.transmartproject.i2b2.waitTimeMilliseconds'){addConfig(i2b2Params,k,v,'')}
 
             else if(k == 'com.recomdata.i2b2.sample.domain'){addConfig(i2b2Params,k,v,'')}
             else if(k == 'com.recomdata.i2b2.sample.projectid'){addConfig(i2b2Params,k,v,'')}
             else if(k == 'com.recomdata.i2b2.sample.username'){addConfig(i2b2Params,k,encodeConfigUsername(v),'')}
             else if(k == 'com.recomdata.i2b2.sample.password'){addConfig(i2b2Params,k,encodeConfigPassword(v),'')}
+
+            else if(k == 'org.transmart.i2b2.view.enable'){addConfig(i2b2Params,k,v,'')}
 
             else if(k == 'com.recomdata.i2b2helper.i2b2demodata'){addConfig(i2b2Params,k,v,'')}
             else if(k == 'com.recomdata.i2b2helper.i2b2hive'){addConfig(i2b2Params,k,v,'')}
@@ -1218,6 +1246,15 @@ class ConfigService {
             else if(k == 'sampleExplorer.fieldMapping.columns'){addConfigLink(sampleParams,k,linkSampleMapping(grailsApplication.config.sampleExplorer.fieldMapping.columns),'Click link to see full list')}
 
             // search
+            else if(k == 'com.recomdata.category.hide.country'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.hide.disease'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.hide.file_type'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.hide.freetext'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.hide.gene'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.hide.metabolite'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.hide.mirna'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.hide.organism'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.hide.protein'){addConfig(searchParams,k,v,'')}
             else if(k == 'com.recomdata.searchengine.index'){addConfig(searchParams,k,v,'')}
             else if(k == 'com.recomdata.search.paginate.max'){addConfig(searchParams,k,v,'')}
             else if(k == 'com.recomdata.search.paginate.maxsteps'){addConfig(searchParams,k,v,'')}
@@ -1240,6 +1277,12 @@ class ConfigService {
             else if(k == 'grails.plugin.transmartGwasPlink.enabled'){addConfig(smartrParams,k,v,'')}
 
             // solr
+            else if(k == 'com.recomdata.solr.baseURL'){addConfig(solrParams,k,v,'')}
+            else if(k == 'com.rwg.solr.scheme'){addConfig(solrParams,k,v,'')}
+            else if(k == 'com.rwg.solr.host'){addConfig(solrParams,k,v,'')}
+            else if(k == 'com.rwg.solr.path'){addConfig(solrParams,k,v,'')}
+            else if(k == 'com.rwg.solr.browse.path'){addConfig(solrParams,k,v,'')}
+            else if(k == 'com.rwg.solr.update.path'){addConfig(solrParams,k,v,'')}
 
             // spring
             else if(k == 'grails.spring.bean.packages'){addConfig(springParams,k,v,'')}
@@ -1386,6 +1429,8 @@ class ConfigService {
             else if(k == 'com.recomdata.heartbeatLaps'){addConfig(uiParams,k,v,'')}
             else if(k == 'com.recomdata.bugreportURL'){addConfig(uiParams,k,v,'')}
             else if(k == 'com.recomdata.defaults.landing'){addConfig(uiParams,k,v,'')}
+            else if(k == 'com.recomdata.welcome.intro'){addConfig(uiParams,k,v,'')}
+            else if(k == 'com.recomdata.welcome.summary'){addConfig(uiParams,k,v,'')}
             else if(k == 'fractalis.active'){addConfig(uiParams,k,v,'')}
             else if(k == 'org.transmart.defaultLoginRedirect'){addConfig(uiParams,k,v,'')}
             else if(k == 'org.transmart.xnatImporterEnable'){addConfig(uiParams,k,v,'')}

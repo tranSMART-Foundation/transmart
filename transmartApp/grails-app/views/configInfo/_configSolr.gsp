@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Parameters for SolR searches.</b>
+</p>
+
 <table id="configSolr"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Solr (${configParams.solrParams.size()})"

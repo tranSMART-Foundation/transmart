@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Sample Explorer parameters.</b>
+</p>
+
 <table id="configSample"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Sample (${configParams.sampleParams.size()})"

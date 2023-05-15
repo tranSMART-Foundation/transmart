@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Analyze tab options including jobs directories on the server.</b>
+</p>
+
 <table id="configAnalyze"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Analyze (${configParams.analyzeParams.size()})"

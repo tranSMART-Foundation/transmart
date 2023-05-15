@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Authentication options.</b>
+</p>
+
 <table id="configAuth"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Auth (${configParams.authParams.size()})"

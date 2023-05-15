@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Admin BuildInfo page options.</b>
+</p>
+
 <table id="configBuildInfo"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="BuildInfo (${configParams.buildInfoParams.size()})"

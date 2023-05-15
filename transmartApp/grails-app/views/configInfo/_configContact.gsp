@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Contact details parameters.</b>
+</p>
+
 <table id="configContact"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Contact (${configParams.contactParams.size()})"

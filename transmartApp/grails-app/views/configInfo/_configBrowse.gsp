@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Browse Tab options.</b>
+</p>
+
 <table id="configBrowse"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Browse (${configParams.browseParams.size()})"

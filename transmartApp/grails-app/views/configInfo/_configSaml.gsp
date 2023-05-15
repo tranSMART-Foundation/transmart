@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>SAML security parameters.</b>
+</p>
+
 <table id="configSaml"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Saml (${configParams.samlParams.size()})"

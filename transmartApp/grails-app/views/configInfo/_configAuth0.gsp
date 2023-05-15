@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Auth0 security options.</b>
+</p>
+
 <table id="configAuth0"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Auth0 (${configParams.auth0Params.size()})"

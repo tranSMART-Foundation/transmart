@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Kerberos authentication parameters.</b>
+</p>
+
 <table id="configKerberos"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Kerberos (${configParams.kerberosParams.size()})"

@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Options for Data Upload.</b>
+<p>
+
 <table id="configUpload"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Upload (${configParams.uploadParams.size()})"

@@ -9,6 +9,7 @@
     var treeURL = "${createLink([controller:'RWG', action:'getDynatree'])}";
     var sourceURL = "${createLink([controller:'RWG', action:'searchAutoComplete'])}";
     var getCategoriesURL = "${createLink([controller:'RWG', action:'getSearchCategories'])}";
+    var getCategoryConfigURL = "${createLink([controller:'RWG', action:'getSearchCategoryConfig'])}";
     var getFilterCategoriesURL = "${createLink([controller:'RWG', action:'getFilterCategories'])}";
     var getHeatmapNumberProbesURL = "${createLink([controller:'RWG', action:'getHeatmapNumberProbes'])}";
     var getHeatmapDataURL = "${createLink([controller:'RWG', action:'getHeatmapData'])}";

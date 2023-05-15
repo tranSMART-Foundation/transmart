@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Fractalis analysis parameters.</b>
+</p>
+
 <table id="configFractalis"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Fractalis (${configParams.fractalisParams.size()})"

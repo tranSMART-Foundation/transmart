@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Genome Wide Association Studies parameters.</b>
+</p>
+
 <table id="configGwas"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Gwas (${configParams.gwasParams.size()})"

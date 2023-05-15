@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Configuration for writing to the server log file.</b>
+</p>
+
 <table id="configLog"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Log (${configParams.logParams.size()})"

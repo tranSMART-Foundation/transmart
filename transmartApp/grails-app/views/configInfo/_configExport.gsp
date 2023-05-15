@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Data export parameters.</b>
+</p>
+
 <table id="configExport"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Export (${configParams.exportParams.size()})"

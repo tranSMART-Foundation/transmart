@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>General configuration parameters.</b>
+</p>
+
 <table id="configGeneral"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="General (${configParams.generalParams.size()})"

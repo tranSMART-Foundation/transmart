@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Analysis configuration for GenePattern, plink, etc.</b>
+</p>
+
 <table id="configAnalysis"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Analysis (${configParams.analysisParams.size()})"

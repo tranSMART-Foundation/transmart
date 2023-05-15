@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Advanced workflows (Rmodules) parameters.</b>
+</p>
+
 <table id="configRmodules"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Rmodules (${configParams.rmodulesParams.size()})"

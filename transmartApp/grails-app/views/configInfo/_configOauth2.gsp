@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>OAuth2 parameters for database access.</b>
+</p>
+
 <table id="configOauth2"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Oauth2 (${configParams.oauth2Params.size()})"

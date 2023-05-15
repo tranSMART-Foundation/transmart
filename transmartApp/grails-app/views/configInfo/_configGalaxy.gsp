@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Galaxy export parameters.</b>
+</p>
+
 <table id="configGalaxy"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Galaxy (${configParams.galaxyParams.size()})"

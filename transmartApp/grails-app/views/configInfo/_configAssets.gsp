@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Asset pipeline options.</b>
+</p>
+
 <table id="configAssets"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Assets (${configParams.assetsParams.size()})"

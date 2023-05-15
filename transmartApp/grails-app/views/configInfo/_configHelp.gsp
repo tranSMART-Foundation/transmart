@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Help and documentation parameters.</b>
+</p>
+
 <table id="configHelp"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Help (${configParams.helpParams.size()})"

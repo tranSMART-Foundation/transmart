@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>LDAP authentication options.</b>
+</p>
+
 <table id="configLdap"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Ldap (${configParams.ldapParams.size()})"

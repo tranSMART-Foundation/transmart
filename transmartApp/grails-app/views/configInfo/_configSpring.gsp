@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Spring security parameters.</b>
+<p>
+
 <table id="configSpring"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Spring (${configParams.springParams.size()})"
@@ -21,7 +25,7 @@
             <tr>
 	        <td>${paramData.key}</td>
 		<g:if test="${paramData.value.value != null}">
-		    <td nowrap>${paramData.value.value}</td>
+		    <td>${paramData.value.value}</td>
 		</g:if>
 		<g:elseif test="${paramData.value.default != null}">
 		    <td>Default: ${paramData.value.default}</td>

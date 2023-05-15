@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Parameters for SmartR analysis.</b>
+</p>
+
 <table id="configSmartr"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Smartr (${configParams.smartrParams.size()})"

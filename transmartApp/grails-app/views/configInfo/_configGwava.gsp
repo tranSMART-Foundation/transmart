@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>GWAVA server parameters.</b>
+</p>
+
 <table id="configGwava"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Gwava (${configParams.gwavaParams.size()})"

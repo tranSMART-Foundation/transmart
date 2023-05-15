@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>XNAT Importer administrator utility options.</b>
+<p>
+
 <table id="configXmatImport"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="XnatImport (${configParams.xnatImportParams.size()})"

@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Parameters to access i2b2 data loaded in tranSMART.</b>
+</p>
+
 <table id="configI2b2"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="I2b2 (${configParams.i2b2Params.size()})"

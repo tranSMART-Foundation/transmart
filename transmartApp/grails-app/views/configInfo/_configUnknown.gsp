@@ -5,6 +5,14 @@
     </a>
 </h2>
 
+<p>
+<b>Parameters not defined in the configuration status page. This should include all parameters actually used by tranSMART.</b>
+<p>
+
+<p>
+<b>Any parameters appearing here may be mistyped names or newly developed options not yet described here.</b>
+<p>
+
 <table id="configUnknown"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Unknown (${configParams.unknownParams.size()})"

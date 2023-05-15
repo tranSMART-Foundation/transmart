@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>X509 parameters for spring security.</b>
+<p>
+
 <table id="configX509"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="X509 (${configParams.x509Params.size()})"

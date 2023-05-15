@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>User interface parameters.</b>
+<p>
+
 <table id="configUi"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Ui (${configParams.uiParams.size()})"
@@ -14,17 +18,17 @@
         <tr>
 	    <th>Parameter</th>
 	    <th>Value</th>
-	    <th width="100%">Description</th>
+	    <th>Description</th>
 	</tr>
 
         <g:each in="${configParams.uiParams}" var="paramData">
             <tr>
 	        <td>${paramData.key}</td>
 		<g:if test="${paramData.value.value != null}">
-		    <td nowrap>${paramData.value.value}</td>
+		    <td>${paramData.value.value}</td>
 		</g:if>
 		<g:elseif test="${paramData.value.default != null}">
-		    <td nowrap>Default: ${paramData.value.default}</td>
+		    <td>Default: ${paramData.value.default}</td>
 		</g:elseif>
 		<g:else>
 		    <td>&nbsp;</td>

@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Hibernate options for database access.</b>
+</p>
+
 <table id="configHibernate"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Hibernate (${configParams.hibernateParams.size()})"

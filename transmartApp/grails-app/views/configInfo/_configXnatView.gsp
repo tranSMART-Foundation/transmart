@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>XNAT image view options.</b>
+<p>
+
 <table id="configXnatView"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="XnatView (${configParams.xnatViewParams.size()})"

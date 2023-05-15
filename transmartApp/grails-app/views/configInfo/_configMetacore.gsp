@@ -5,6 +5,10 @@
     </a>
 </h2>
 
+<p>
+<b>Metacore analysis parameters.</b>
+</p>
+
 <table id="configMetacore"  class="detail" style="width: 100%">
     <g:tableHeaderToggle
         label="Metacore (${configParams.metacoreParams.size()})"
