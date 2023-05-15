@@ -62,7 +62,7 @@ SmartR is a grails plugin seeking to improve the visual analytics of the tranSMA
 		smartRDir = ctx.getResource(pluginPath).file
             }
             else {
-		smartRDir = new File(smartRDir, 'web-app')
+		smartRDir = new File(smartRDir, 'src/main/resources')
             }
 	}
         if (!smartRDir) {
