@@ -1,4 +1,4 @@
-source("web-app/HeimScripts/heatmap/downloadData.R")
+source("src/main/resources/HeimScripts/heatmap/downloadData.R")
 
 .setUp <- function() {
   assign("origDirectory", getwd(), envir = .GlobalEnv)

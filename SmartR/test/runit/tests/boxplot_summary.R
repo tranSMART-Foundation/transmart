@@ -1,4 +1,4 @@
-source("web-app/HeimScripts/boxplot/summary.R")
+source("src/main/resources/HeimScripts/boxplot/summary.R")
 
 
 ### main test data ###

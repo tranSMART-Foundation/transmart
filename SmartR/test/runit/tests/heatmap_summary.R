@@ -1,4 +1,4 @@
-source("web-app/HeimScripts/heatmap/summary.R")
+source("src/main/resources/HeimScripts/heatmap/summary.R")
 
 
 ### main test data ###

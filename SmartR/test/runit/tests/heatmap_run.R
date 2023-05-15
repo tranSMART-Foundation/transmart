@@ -1,4 +1,4 @@
-source("web-app/HeimScripts/heatmap/run.R")
+source("src/main/resources/HeimScripts/heatmap/run.R")
 
 ##SE: Fct not used anymore
 # # Test slash being removed - issue that used to broke sorting

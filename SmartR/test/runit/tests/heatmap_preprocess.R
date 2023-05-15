@@ -1,4 +1,4 @@
-source("web-app/HeimScripts/heatmap/preprocess.R")
+source("src/main/resources/HeimScripts/heatmap/preprocess.R")
 
 test_data_aggregate <- data.frame(Row.Label=c("a1","a2","b1","b2") , Bio.marker= c("a","a","b","b"), Assay1 = c(4,1,4,1), Assay2 = c(4,1,4,1)  )
 
