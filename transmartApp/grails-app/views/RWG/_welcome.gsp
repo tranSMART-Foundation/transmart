@@ -1,8 +1,8 @@
 <div style="text-align: center;">
     <div class="welcome"
          style="margin: 40px auto; background: #F4F4F4; border: 1px solid #DDD; padding: 20px; width: 400px; text-align: center; border-top-left-radius: 20px; border-bottom-right-radius: 20px">
-        <g:set var="transmartIntro" value="${grailsApplication.config?.com?.recomdata?.transmartIntro}"/>
-        <g:set var="transmartSummary" value="${grailsApplication.config?.com?.recomdata?.transmartSummary}"/>
+        <g:set var="transmartIntro" value="${grailsApplication.config?.com?.recomdata?.welcome?.intro}"/>
+        <g:set var="transmartSummary" value="${grailsApplication.config?.com?.recomdata?.welcome?.summary}"/>
         <g:set var="projectName" value="${grailsApplication.config?.com?.recomdata?.projectName}"/>
         <g:set var="projectLogo" value="${grailsApplication.config?.com?.recomdata?.projectLogo}"/>
         <g:set var="providerName" value="${grailsApplication.config?.com?.recomdata?.providerName}"/>

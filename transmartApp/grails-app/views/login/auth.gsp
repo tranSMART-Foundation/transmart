@@ -191,12 +191,12 @@
 		<tr><td>&nbsp;</td></tr>
 		<tr>
 		    <td style="text-align:center;vertical-align:middle;margin-left:-40px; padding-top: 10px;">
-			<g:set var="projectName" value="${projectName}"/>
-			<g:set var="projectLogo" value="${projectLogo}"/>
-			<g:set var="providerName" value="${providerName}"/>
-			<g:set var="providerLogo" value="${providerLogo}"/>
+			<g:set var="projectName" value="${grailsApplication.config?.com?.recomdata?.projectName}"/>
+			<g:set var="projectLogo" value="${grailsApplication.config?.com?.recomdata?.projectLogo}"/>
+			<g:set var="providerName" value="${grailsApplication.config?.com?.recomdata?.providerName}"/>
+			<g:set var="providerLogo" value="${grailsApplication.config?.com?.recomdata?.providerLogo}"/>
 			<g:if test="${projectName}">
-			    <span style="font-size:10px;display: inline-block;line-height: 35px; height: 35px;">Provided by&nbsp;</span>
+			    <span style="font-size:10px;display: inline-block;line-height: 35px; height: 35px;">Project&nbsp;</span>
 			    <a id="projectpowered" target="_blank"
 			       href="${projectURL}" style="text-decoration: none;">
 				<g:if test="${projectLogo}">
