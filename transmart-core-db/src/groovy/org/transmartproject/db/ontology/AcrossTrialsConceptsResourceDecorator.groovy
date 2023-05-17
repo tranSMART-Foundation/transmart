@@ -21,6 +21,7 @@ package org.transmartproject.db.ontology
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.transmartproject.core.concept.ConceptFullName
 import org.transmartproject.core.concept.ConceptKey
 import org.transmartproject.core.exceptions.NoSuchResourceException
@@ -30,6 +31,7 @@ import org.transmartproject.core.ontology.OntologyTerm
 import static org.transmartproject.db.ontology.AbstractAcrossTrialsOntologyTerm.ACROSS_TRIALS_TABLE_CODE
 import static org.transmartproject.db.ontology.AbstractAcrossTrialsOntologyTerm.ACROSS_TRIALS_TOP_TERM_NAME
 
+@Slf4j('logger')
 @CompileStatic
 class AcrossTrialsConceptsResourceDecorator implements ConceptsResource {
 
@@ -38,6 +40,8 @@ class AcrossTrialsConceptsResourceDecorator implements ConceptsResource {
     private final OntologyTerm topTerm = new AcrossTrialsTopTerm()
 
     List<OntologyTerm> getAllCategories() {
+//	logger.info 'getAllCategories acrosstrials CODE {} NAME {}', ACROSS_TRIALS_TABLE_CODE, ACROSS_TRIALS_TOP_TERM_NAME
+//	logger.info 'getAllCategories acrosstrials topTerm {} inner {}', topTerm, inner
 	([topTerm] + inner.allCategories) as List
     }
 
@@ -45,6 +49,7 @@ class AcrossTrialsConceptsResourceDecorator implements ConceptsResource {
 	ConceptKey conceptKeyObj = new ConceptKey(conceptKey)
 
         if (conceptKeyObj.tableCode != ACROSS_TRIALS_TABLE_CODE) {
+//	    logger.info 'getByKey notacross conceptKey {} inner {}', conceptKey, inner
             return inner.getByKey(conceptKey)
         }
 
@@ -55,7 +60,9 @@ class AcrossTrialsConceptsResourceDecorator implements ConceptsResource {
 		    ACROSS_TRIALS_TOP_TERM_NAME)
         }
 
+//	logger.info 'getByKey acrosstrials fullName {}', fullName
         if (fullName.length == 1) {
+//	    logger.info 'getByKey acrosstrials topTerm {}', topTerm
             topTerm
 	}
 	else { // > 1
@@ -66,6 +73,8 @@ class AcrossTrialsConceptsResourceDecorator implements ConceptsResource {
 		    'Could not find across trials node with modifier_path ' + modifierPath)
             }
 
+//	    logger.info 'getByKey acrosstrials modifierPath {} xtrialNode level {} code {} name {} path {}',
+//		modifierPath, xtrialNode.level, xtrialNode.code, xtrialNode.name, xtrialNode.path
             new AcrossTrialsOntologyTerm(deXtrialNode: xtrialNode)
         }
     }
