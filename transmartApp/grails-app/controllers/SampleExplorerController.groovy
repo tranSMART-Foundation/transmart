@@ -236,10 +236,10 @@ class SampleExplorerController implements InitializingBean {
     }
 
     def sampleValidateAdvancedWorkflow() {
-	// first retrieve the list of Sample ID's for the dataset we have selected.
+	// first retrieve the list of Sample IDs for the dataset we have selected.
 
-	//Get the list of Sample IDs based on the criteria in the JSON object.
-	//get an ID list per subset. The JSON we recieved should be [1:[category:[]]]
+	// Get the list of Sample IDs based on the criteria in the JSON object.
+	// get an ID list per subset. The JSON we received should be [1:[category:[]]]
         def subsetList = request.JSON.SearchJSON
 
 	Map result = [:]
