@@ -44,8 +44,10 @@ grails.project.dependency.resolution = {
         compile 'org.mapdb:mapdb:0.9.10'
         compile 'org.rosuda.REngine:Rserve:1.8.1'
 	compile 'org.transmartproject:transmart-core-api:' + tmVersion
-//	compile 'com.lowagie:itext:2.0.8' //latest 4.2.2
-//	compile 'org.xhtmlrenderer:core-renderer:R8'
+
+	compile 'org.jsoup:jsoup:1.13.1'
+	compile 'org.xhtmlrenderer:flying-saucer-core:9.1.22'
+	compile 'org.xhtmlrenderer:flying-saucer-pdf-openpdf:9.1.22'
 
         build 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.1', {
             excludes 'groovy', 'nekohtml'
