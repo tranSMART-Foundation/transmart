@@ -131,13 +131,13 @@ class MetacoreEnrichmentController {
 
 	for (String script in scripts) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
-	    logger.info 'loading Metacore script {} asset {}', script, assetRes.getPath()
+	    logger.info 'Metacore loadScripts script {} at {}', script, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
         }
 
 	for (String style in styles) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
-	    logger.info 'loading Metacore style {} asset{}', style, assetRes.getPath()
+	    logger.info 'Metacore loadScripts style {} at {}', style, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
 	}
 
