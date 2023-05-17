@@ -499,8 +499,11 @@ function loadHighDimensionalParameters(formParams)
     if(dependentGPL) dependentGPL = dependentGPL[0];
     if(independentGPL) independentGPL = independentGPL[0];		
 	
-    //If we are using High Dimensional data we need to create variables that represent genes from both independent and dependent selections (In the event they are both of a single high dimensional type).
-    //Check to see if the user selected GEX in the independent input.
+    // If we are using High Dimensional data we need to create variables that
+    // represent genes from both independent and dependent selections
+    // (In the event they are both of a single high dimensional type).
+
+    // Check to see if the user selected GEX in the independent input.
     if(independentType == "Gene Expression")
     {
 	//Put the independent filters in the GEX variables.
@@ -588,42 +591,48 @@ function loadHighDimensionalParameters(formParams)
 		
     //If we don't have a platform, fill in Clinical.
     if(dependentPlatform == null || dependentPlatform == "") dependentType = "CLINICAL"
-    if(independentPlatform == null || independentPlatform == "") independentType = "CLINICAL"
+    if(independgentPlatform == null || independentPlatform == "") independentType = "CLINICAL"
 	
-    formParams["divDependentVariabletimepoints"] 			= window['divDependentVariabletimepoints1'];
-    formParams["divDependentVariablesamples"] 				= window['divDependentVariablesamples1'];
-    formParams["divDependentVariablerbmPanels"]				= window['divDependentVariablerbmPanels1'];
-    formParams["divDependentVariableplatforms"]				= dependentPlatform
-    formParams["divDependentVariablegpls"]					= window['divDependentVariablegplsValue1'];
-    formParams["divDependentVariabletissues"]				= window['divDependentVariabletissues1'];
+    formParams["divDependentVariabletimepoints"] 		= window['divDependentVariabletimepoints1'];
+    formParams["divDependentVariablesamples"] 			= window['divDependentVariablesamples1'];
+    formParams["divDependentVariablerbmPanels"]			= window['divDependentVariablerbmPanels1'];
+    formParams["divDependentVariableplatforms"]			= dependentPlatform
+    formParams["divDependentVariablegpls"]			= window['divDependentVariablegplsValue1'];
+    formParams["divDependentVariablegplsValue"]			= window['divDependentVariablegplsValue1'];
+    formParams["divDependentVariabletissues"]			= window['divDependentVariabletissues1'];
     formParams["divDependentVariableprobesAggregation"]	 	= window['divDependentVariableprobesAggregation'];
-    formParams["divDependentVariableSNPType"]				= window['divDependentVariableSNPType'];
-    formParams["divDependentVariableType"]					= dependentType;
-    formParams["divDependentVariablePathway"]				= dependentGeneList;
-    formParams["divIndependentVariabletimepoints"]			= window['divIndependentVariabletimepoints1'];
-    formParams["divIndependentVariablesamples"]				= window['divIndependentVariablesamples1'];
-    formParams["divIndependentVariablerbmPanels"]			= window['divIndependentVariablerbmPanels1'];
-    formParams["divIndependentVariableplatforms"]			= independentPlatform;
-    formParams["divIndependentVariablegpls"]				= window['divIndependentVariablegplsValue1'];
-    formParams["divIndependentVariabletissues"]				= window['divIndependentVariabletissues1'];
+    formParams["divDependentVariableSNPType"]			= window['divDependentVariableSNPType'];
+    formParams["divDependentVariableType"]			= dependentType;
+    formParams["divDependentVariablePathway"]			= dependentGeneList;
+    formParams["divIndependentVariabletimepoints"]		= window['divIndependentVariabletimepoints1'];
+    formParams["divIndependentVariablesamples"]			= window['divIndependentVariablesamples1'];
+    formParams["divIndependentVariablerbmPanels"]		= window['divIndependentVariablerbmPanels1'];
+    formParams["divIndependentVariableplatforms"]		= independentPlatform;
+    formParams["divIndependentVariablegpls"]			= window['divIndependentVariablegplsValue1'];
+    formParams["divIndependentVariablegplsValue"]		= window['divIndependentVariablegplsValue1'];
+    formParams["divIndependentVariabletissues"]			= window['divIndependentVariabletissues1'];
     formParams["divIndependentVariableprobesAggregation"]	= window['divIndependentVariableprobesAggregation'];
-    formParams["divIndependentVariableSNPType"]				= window['divIndependentVariableSNPType'];
-    formParams["divIndependentVariableType"]				= independentType;
-    formParams["divIndependentVariablePathway"]				= independentGeneList;
-    formParams["gexpathway"]								= fullGEXGeneList;
-    //formParams["gextime"]									= fullGEXTime;
-    //formParams["gextissue"]									= fullGEXTissueType;
-    //formParams["gexsample"]									= fullGEXSampleType;
-    formParams["snppathway"]								= fullSNPGeneList;
-    //formParams["snptime"]									= fullSNPTime;
-    //formParams["snptissue"]									= fullSNPTissueType;
-    //formParams["snpsample"]									= fullSNPSampleType;
-    formParams["divIndependentPathwayName"]					= window['divIndependentVariablepathwayName'];
-    formParams["divDependentPathwayName"]					= window['divDependentVariablepathwayName'];
-    formParams["mrnaData"]									= mrnaData;
-    formParams["snpData"]									= snpData;
-    formParams["gexgpl"]									= fullGEXGPL;
-    formParams["snpgpl"]									= fullSNPGPL;
+    formParams["divIndependentVariableSNPType"]			= window['divIndependentVariableSNPType'];
+    formParams["divIndependentVariableType"]			= independentType;
+    formParams["divIndependentVariablePathway"]			= independentGeneList;
+    formParams["divIndependentPathwayName"]			= window['divIndependentVariablepathwayName'];
+    formParams["divDependentPathwayName"]			= window['divDependentVariablepathwayName'];
+
+    //formParams["gextime"]					= fullGEXTime;
+    //formParams["gextissue"]					= fullGEXTissueType;
+    //formParams["gexsample"]					= fullGEXSampleType;
+
+    formParams["gexpathway"]					= fullGEXGeneList;
+    formParams["snppathway"]					= fullSNPGeneList;
+
+    //formParams["snptime"]					= fullSNPTime;
+    //formParams["snptissue"]					= fullSNPTissueType;
+    //formParams["snpsample"]					= fullSNPSampleType;
+
+    formParams["mrnaData"]					= mrnaData;
+    formParams["snpData"]					= snpData;
+    formParams["gexgpl"]					= fullGEXGPL;
+    formParams["snpgpl"]					= fullSNPGPL;
 	
     return true;
 }
