@@ -17,12 +17,16 @@
 package com.recomdata.transmart.data.association.pdf
 
 import groovy.util.logging.Slf4j
+import javax.xml.parsers.DocumentBuilderFactory
 import org.apache.commons.lang.StringUtils
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.springframework.beans.factory.annotation.Value
-import org.w3c.dom.Document
+import org.springframework.core.io.Resource
+//import org.w3c.dom.Document
+import org.xhtmlrenderer.layout.SharedContext
 import org.xhtmlrenderer.pdf.ITextRenderer
 
-import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * Handles generating PDF file from HTML content.
@@ -32,6 +36,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  */
 @Slf4j('logger')
 class PDFController {
+    def assetResourceLocator
 
     @Value('${RModules.tempFolderDirectory:}')
     private String tempFolderDirectory
@@ -39,20 +44,42 @@ class PDFController {
     def generatePDF(String htmlStr, String filename) {
 	// parse our markup into an xml Document
 	try {
-	    String css = 'file://' + servletContext.getRealPath('') + '/css/datasetExplorer.css'
-	    String html = "<html><head><link rel='stylesheet' type='text/css' href='" + css +
-		"' media='print'/></head><body>" + htmlStr + '</body></html>'
+	    Resource assetDE = assetResourceLocator.findAssetForURI('datasetExplorer.css')
+	    Resource assetRM = assetResourceLocator.findAssetForURI('rmodules.css')
+	    String cssDE = 'file://' + servletContext.getRealPath('') + assetDE.getPath()
+	    String cssRM = 'file://' + servletContext.getRealPath('') + assetRM.getPath()
+	    String html = '<html><head>' +
+		'<link rel="stylesheet" type="text/css" href="' + cssDE + '" media="print">' +
+		'<link rel="stylesheet" type="text/css" href="' + cssRM + '" media="print">' +
+//		'<meta name="viewport" content="width=device-width, initial-scale=0.2" />' +
+//		'<style>  @page {size: a3 landscape; } </style>' +
+		'</head>' +
+		'<body>' + htmlStr + '</body></html>'
+
+	    // replace URL path with local path to analysis files
 	    String finalHtml = StringUtils.replace(html.toString(), '/transmart/analysisFiles',
 						   'file://' + tempFolderDirectory)
-	    logger.info 'generatePDF replacing "{}" ==> "{}"', html, finalHtml
+//	    finalHtml = StringUtils.replace(finalHtml.toString(), 'img-result-size',
+//					    'img-result-pdf')
 
-	    //TODO Check if the htmlStr is a Well-Formatted XHTML string
 	    if (htmlStr) {
-		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-		    new ByteArrayInputStream(finalHtml.getBytes('UTF-8')))
+		logger.info 'generatePDF filename {} finalHtml {}', filename, finalHtml
+
+		// Parse and clean the provided and edited HTML string
+		Document doc = Jsoup.parse(finalHtml)
+		logger.info 'doc created html: {}', doc.html()
+
+		// Convert the HTML format into XHTML to direct the renderer
+		doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+		logger.info 'doc converted to XHTML'
+
+		// Generate the PDF file
 		ITextRenderer renderer = new ITextRenderer()
-		renderer.setDocument doc, null
+		logger.info 'renderer created {}', renderer
+		renderer.setDocumentFromString(doc.html())
+		logger.info 'renderer setDocument'
 		renderer.layout()
+		logger.info 'logger.layout done'
 
 		response.contentType = 'application/pdf'
 		header 'Content-disposition', 'attachment; filename=' + (filename ?: 'document.pdf')
