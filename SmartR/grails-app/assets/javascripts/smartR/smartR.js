@@ -48,6 +48,7 @@ window.smartRPanel = new Ext.Panel({
             updater.on('update', function() {
                 var panelBody = jQuery(arguments[0].dom);
                 var scripts = panelBody.children('script');
+//		console.log("smartRPanel Scripts: " + scripts);
                 scripts.remove(); // remove scripts from panel body
                 panelBody.append(scripts); // re-append again
             });
@@ -61,6 +62,7 @@ window.smartRPanel = new Ext.Panel({
 });
 
 window.addSmartRPanel = function addSmartRPanel(parentPanel) {
+//    console.log("smartR/smartR.js: addSmartRPanel");
     parentPanel.insert(4, window.smartRPanel);
 };
 
