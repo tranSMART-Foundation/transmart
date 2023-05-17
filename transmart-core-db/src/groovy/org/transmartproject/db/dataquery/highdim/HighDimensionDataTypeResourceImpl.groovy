@@ -82,18 +82,32 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
 
     TabularResult retrieveData(List<AssayConstraint> assayConstraints, List<DataConstraint> dataConstraints,
                                Projection projection) {
-
+//	logger.info 'retrieveData stack trace {}', Arrays.toString(Thread.currentThread().getStackTrace()).replace( ',', '\n\t' )
+	
+//	logger.info 'retrieveData for module {} {}', module.name, module
+//	logger.info 'retrieveData module supportedAssayConstraints {}', module.supportedAssayConstraints
+//	logger.info 'retrieveData module supportedDataConstraints {}', module.supportedDataConstraints
+//	logger.info 'retrieveData module supportedProjections {}', module.supportedProjections
+	
+//	logger.info 'retrieveData assayConstraints {}', assayConstraints
+	
         // Each module should only return assays that match 
         // the markertypes specified, in addition to the 
         // constraints given
         assayConstraints << new MarkerTypeCriteriaConstraint(platformNames: module.platformMarkerTypes)
 
+//	logger.info 'retrieveData add assayconstraint platformNames: {}', module.platformMarkerTypes
+
         AssayQuery assaysQuery = new AssayQuery(assayConstraints)
 
-        List<Assay> assays = assaysQuery.list()
+	List<Assay> assays = assaysQuery.list()
         if (!assays) {
             throw new EmptySetException('No assays satisfy the provided criteria')
         }
+
+//	logger.info 'retrieveData assays {}', assays
+
+//	logger.info 'retrieveData calling {}.prepareDataQuery', module
 
         HibernateCriteriaBuilder criteriaBuilder = module.prepareDataQuery(projection, openSession())
 
@@ -103,15 +117,19 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
 
         /* apply changes to criteria from projection, if any */
         if (projection instanceof CriteriaProjection) {
+//	    logger.info 'retrieveData add projection {}', projection
             projection.doWithCriteriaBuilder criteriaBuilder
         }
 
         /* apply data constraints */
         for (CriteriaDataConstraint dataConstraint in dataConstraints) {
+//	    logger.info 'retrieveData add dataConstraint {}', dataConstraint
             dataConstraint.doWithCriteriaBuilder criteriaBuilder
         }
 
         criteriaBuilder.instance.fetchSize = FETCH_SIZE
+
+//	logger.info 'retrieveData call {}.transformResults', module.name
 
         module.transformResults(
                 criteriaBuilder.instance.scroll(ScrollMode.FORWARD_ONLY),
@@ -217,7 +235,11 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
 
         // get the aggregator for our marker type
         Closure aggregator = highDimensionConstraintValuesAggregator(constraint)
-        data.each {it.value = aggregator(it.value)} // set the value of each Map.Entry to the aggregated value
+        data.each {
+//	    logger.info 'aggregate  key {} value {}', it.key, it.value
+	    it.value = aggregator(it.value) // set the value of each Map.Entry to the aggregated value
+//	    logger.info 'aggregated key {} value {}', it.key, it.value
+	}
 
         // get the filter so we can apply it to the aggregated values
         Closure filter = highDimensionConstraintClosure(constraint)

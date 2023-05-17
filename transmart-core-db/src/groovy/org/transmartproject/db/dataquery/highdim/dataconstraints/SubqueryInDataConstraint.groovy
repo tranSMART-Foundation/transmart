@@ -16,5 +16,6 @@ class SubqueryInDataConstraint implements CriteriaDataConstraint {
 
     void doWithCriteriaBuilder(HibernateCriteriaBuilder criteria) {
         criteria.add Subqueries.propertyIn(field, detachedCriteria)
+//	logger.info 'doWithCriteriaBuilder field {} detachedCriteria {}', field, detachedCriteria
     }
 }

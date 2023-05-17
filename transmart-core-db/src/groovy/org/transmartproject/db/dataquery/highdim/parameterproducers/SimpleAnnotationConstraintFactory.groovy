@@ -29,16 +29,23 @@ class SimpleAnnotationConstraintFactory extends AbstractMethodBasedParameterFact
 		    "['property','term','concept_key' OR 'concept_code'], but got " + params)
 	}
 
+//	logger.info 'createAnnotationConstraint params {}', params
+
         DetachedCriteria dc = DetachedCriteria.forClass(annotationClass)
 	dc.setProjection Projections.distinct(Projections.property('id'))
 	dc.add Restrictions.eq(params.property, params.term)
         if (params.containsKey('concept_code')) {
+//	    logger.info 'createAnnotationConstraint concept_code platform {}',
+//		DeSubjectSampleMapping.findByConceptCode(params.concept_code).platform
 	    dc.add Restrictions.eq(
 		'platform',
 		DeSubjectSampleMapping.findByConceptCode(params.concept_code).platform)
         }
         else if (params.containsKey('concept_key')) {
 	    String conceptPath = keyToPath(params.concept_key)
+//	    logger.info 'createAnnotationConstraint concept_key code {} platform {}',
+//		ConceptDimension.findByConceptPath(conceptPath).conceptCode,
+//		DeSubjectSampleMapping.findByConceptCode(ConceptDimension.findByConceptPath(conceptPath).conceptCode).platform
 	    dc.add Restrictions.eq(
 		'platform',
 		DeSubjectSampleMapping.findByConceptCode(
