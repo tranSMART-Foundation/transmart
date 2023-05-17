@@ -1,6 +1,3 @@
-<asset:stylesheet href="smartR_all.css"/>
-<asset:javascript src="smartR_all.js"/>
-
 <div id="sr-loading">Loading...</div>
 <div id="sr-index" data-ng-app="smartRApp" style="padding: 10px;">
     <h1 style="font-size: 14px">SmartR - Dynamic Data Visualization and Interaction</h1>
