@@ -65,6 +65,9 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
     @Autowired CorrelationTypesRegistry correlationTypesRegistry
 
     HibernateCriteriaBuilder prepareDataQuery(Projection projection, SessionImplementor session) {
+
+//	logger.info '{} prepareDataQuery start', name
+	
 	HibernateCriteriaBuilder criteriaBuilder = createCriteriaBuilder(
 	    DeSubjectRnaData, 'rnadata', session)
 
@@ -84,8 +87,10 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
             order 'assay.id',       'asc' // important! See assumption below
 
             // because we're using this transformer, every column has to have an alias
-            instance.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+            instance.resultTransformer = Transformers.ALIAS_TO_ENTITY_MAP
         }
+
+//	logger.info '{} prepareDataQuery done', name
 
         criteriaBuilder
     }
@@ -93,7 +98,9 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
     TabularResult transformResults(ScrollableResults results, List<AssayColumn> assays, Projection projection) {
 	Map assayIndexMap = createAssayIndexMap(assays)
 
-//	logger.info 'transformResults rnaseq_cog assayIndexMap {}', assayIndexMap.size()
+//	logger.info 'transformResults stack trace {}', Arrays.toString(Thread.currentThread().getStackTrace()).replace( ',', '\n' )
+//	logger.info 'transformResults assayIndexMap {} size {}', name, assayIndexMap.size()
+
 	DefaultHighDimensionTabularResult preliminaryResult = new DefaultHighDimensionTabularResult(
             rowsDimensionLabel:    'Transcripts',
             columnsDimensionLabel: 'Sample codes',
@@ -101,10 +108,9 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
             results:               results,
             allowMissingAssays:    true,
             assayIdFromRow:        { it[0].assayId },
-            inSameGroup:           { a, b -> a.annotationId == b.annotationId && a.geneSymbol == b.geneSymbol },
+            inSameGroup:           { a, b -> a.annotationId == b.annotationId && a.geneSymbol == b.geneSymbol && a.geneId == b.geneId },
             finalizeGroup:         { List list -> /* list of arrays with one element: a map */
                 def firstNonNullCell = list.find()
-//		logger.info 'preliminaryResult starts {}', firstNonNullCell[0]
                 new RnaSeqCogDataRow(
                     annotationId:  firstNonNullCell[0].annotationId,
                     geneSymbol:    firstNonNullCell[0].geneSymbol,
@@ -115,16 +121,13 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
             }
         )
 
-//	logger.info 'transformResults rnaseq_cog preliminaryResult indicesList{}', preliminaryResult.getIndicesList()
+//	logger.info 'transformResults {} preliminaryResult indicesList {}', name, preliminaryResult.getIndicesList()
 
         new RepeatedEntriesCollectingTabularResult(
             tabularResult: preliminaryResult,
             collectBy: { it.annotationId },
             resultItem: { collectedList ->
                 if (collectedList) {
-//		    logger.info 'RepeatedEntries...Result {} ({})',collectedList[0], collectedList.size()
-//		    logger.info 'RepeatedEntries...genesymbol {} geneid {} Result {}',
-//			collectedList*.geneSymbol.join('/'), collectedList*.geneId.join('/')
                     new RnaSeqCogDataRow(
                         annotationId:  collectedList[0].annotationId,
                         geneSymbol:    collectedList*.geneSymbol.join('/'),
@@ -162,20 +165,20 @@ class RnaSeqCogModule extends AbstractHighDimensionDataTypeModule {
      */
     List<String> searchAnnotation(String conceptCode, String searchTerm, String searchProperty) {
 	if (!getSearchableAnnotationProperties().contains(searchProperty)) {
-//	    logger.info 'searchAnnotation rnaseq_cog no such property {}', searchProperty
+//	    logger.info 'searchAnnotation {} no such property {}', name, searchProperty
             return []
 	}
 
-//	logger.info 'searchAnnotation rnaseq_cog concept {} term {} property {}', conceptCode, searchTerm, searchProperty
+//	logger.info 'searchAnnotation {} concept {} term {} property {}', name, conceptCode, searchTerm, searchProperty
 
         DeRnaAnnotation.createCriteria().list {
 	    eq 'gplId', DeSubjectSampleMapping.createCriteria().get {
 		eq 'conceptCode', conceptCode
                 projections {distinct 'platform.id'}
 	    }
-            ilike(searchProperty, searchTerm + '%')
+            ilike searchProperty, searchTerm + '%'
             projections { distinct(searchProperty) }
-            order(searchProperty, 'ASC')
+            order searchProperty, 'ASC'
             maxResults 100
         }
     }
