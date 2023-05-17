@@ -106,34 +106,48 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
 
     R getNextRow() {
         Object[] firstEntry = results.get()
+        Object[] latestEntry = firstEntry
+
         if (firstEntry == null) {
             return null
         }
 
         List collectedEntries = new ArrayList(indicesList.size())
-	logger.debug 'getColumnEntityName start with first entry'
+//	logger.info 'getNextRow start with first entry row {} indicesList.size {} firstEntry {}',
+//	    results.getRowNumber(), indicesList.size(), firstEntry
         addToCollectedEntries collectedEntries, firstEntry
 
         while (results.next() && inSameGroup(firstEntry, results.get())) {
-	    logger.debug 'getColumnEntityName next result'
+	    if(latestEntry.assayId == results.get().assayId) {
+//		logger.info 'DUPLICATE RECORD for assayId {} row {} latestEntry {} next result {}',
+//		    latestEntry.assayId, results.getRowNumber(), latestEntry, results.get()
+		continue
+	    }
+	    latestEntry = results.get()
+//	    logger.info 'getNextRow next result same group (annotationId+geneSymbol) row {} latestEntry {} next result {}',
+//		results.getRowNumber(), latestEntry, results.get()
             addToCollectedEntries collectedEntries, results.get()
         }
 
-	logger.debug 'getColumnEntityName retrieval done'
+//	logger.info 'getNextRow retrieval done at row {} {}', results.getRowNumber(), results.get()
 
         finalizeCollectedEntries collectedEntries
 
-	logger.debug 'getColumnEntityName finalizeGroup closure {}', finalizeGroup
+//	logger.info 'getNextRow finalizeGroup closure {}', finalizeGroup
         finalizeGroup collectedEntries
     }
 
     protected void finalizeCollectedEntries(List collectedEntries) {
+//	logger.info 'finalizeCollectedEntries stack trace {}', Arrays.toString(Thread.currentThread().getStackTrace()).replace( ',', '\n' )
+//	logger.info 'finalizeCollectedEntries collectedEntries {} indicesList {}', collectedEntries.size(), indicesList.size()
         if (collectedEntries.size() == indicesList.size()) {
-	    logger.debug 'finalizeCollectedEntries checked size {}', collectedEntries.size()
+//	    logger.info 'finalizeCollectedEntries DONE checked size {}', collectedEntries.size()
             return
         }
 
+
         if (collectedEntries.size() > indicesList.size()) {
+//	    logger.info 'collected too many entries {} entries from {} indicesList {}, throw exception', collectedEntries.size(), indicesList.size()
             throw new UnexpectedResultException(
 		"Got more ${columnEntityName}s than expected in a row group. " +
 		    "This can generally only happen if primary keys on " +
@@ -145,7 +159,7 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
         }
 
         if (allowMissingColumns) {
-	    logger.debug 'finalizeCollectedEntries fill with nulls till we have the expected size {} to {}', collectedEntries.size(), indicesList.size()
+//	    logger.info 'finalizeCollectedEntries fill with nulls till we have the expected size {} to {}', collectedEntries.size(), indicesList.size()
             /* fill with nulls till we have the expected size */
             collectedEntries.addAll Collections.nCopies(indicesList.size() - collectedEntries.size(), null)
             return
@@ -158,7 +172,7 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
 	    Set gottenColumnIds = collectedEntries.collect { row -> columnIdFromRow(row) } as Set
             columnsNotFound = expectedColumnIds - gottenColumnIds
 	}
-	logger.debug 'finalizeCollectedEntries {} columns not found and missing is not allowed: {}', columnEntityName.capitalize(), columnsNotFound
+//	logger.info 'finalizeCollectedEntries {} columns not found and missing is not allowed: {}', columnEntityName.capitalize(), columnsNotFound
 
 	String message = "Expected row group to be of size ${indicesList.size()}; got ${collectedEntries.size()} objects"
         if (columnsNotFound) {
@@ -176,22 +190,22 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
 
         String rowAsString
 
-	logger.debug 'addToCollectedEntries row {}', row
+//	logger.info 'addToCollectedEntries row {}', row
 
         if (allowMissingColumns) {
 	    def currentColumnId = columnIdFromRow(row)
             int startSize = collectedEntries.size()
             int i
 
-	    logger.debug 'addToCollectedEntries allowMissingColumns currentColumnId {} startSize {} maxsize {}', currentColumnId, startSize, indicesList.size()
+//	    logger.info 'addToCollectedEntries allowMissingColumns currentColumnId {} startSize {} maxsize {}', currentColumnId, startSize, indicesList.size()
 
 	    for (i = startSize; indicesList[i] != null && getIndexObjectId(indicesList[i]) != currentColumnId; i++) {
-		logger.debug 'testing indicesList[{}] {}', i, getIndexObjectId(indicesList[i])
+//		logger.info 'skipping indicesList[{}] {}', i, getIndexObjectId(indicesList[i])
 		collectedEntries << null
             }
             if (indicesList[i] == null) {
                 try {
-		    logger.debug 'indicesList[{}] null searching for currentColumnId from startSize {}', i, startSize
+//		    logger.info 'indicesList[{}] null searching for currentColumnId from startSize {}', i, startSize
                     rowAsString = row.toString()
                 }
 		catch (e) {
@@ -206,12 +220,15 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
 						"Row was: $rowAsString. " +
 						"${columnEntityName.capitalize()} id list was " +
 						indicesList.collect { getIndexObjectId it })
+//	    } else {
+//		logger.info 'Found at indicesList[{}] {} with id {}', i, columnEntityName, currentColumnId
 	    }
-	} else {
-            rowAsString = row.toString()
-	    logger.debug 'Single row {}', rowAsString
+//	} else {
+//            rowAsString = row.toString()
+//	    logger.info 'Single row {}', rowAsString
 	}
-	
+
+
 	collectedEntries << row
     }
 
@@ -226,9 +243,11 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
         }
 
         // Load first result
+//	logger.info 'getRows ... load first result'
         results.next()
+//	logger.info 'first result ... rownumber {} {}', results.getRowNumber(), results.get()
 
-        // A correctly typed AbstractIterator<R> crashes the compiler on groovy 2.2.0
+	// A correctly typed AbstractIterator<R> crashes the compiler on groovy 2.2.0
         return new AbstractIterator() {
 	    def computeNext() {
                 getNextRow() ?: endOfData()
