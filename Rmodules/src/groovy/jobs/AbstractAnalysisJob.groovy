@@ -50,6 +50,8 @@ abstract class AbstractAnalysisJob {
 
         List<Step> stepList = []
 
+//	logger.info 'run'
+
         /* we need the parameters file not just for troubleshooting
          * but also because we need later to read the result instance
          * ids and determine if we should create the zip with the
@@ -63,11 +65,15 @@ abstract class AbstractAnalysisJob {
 
         for (Step step in stepList) {
             if (step.statusName) {
+//		logger.info 'run updateStatus {}', step.statusName
                 updateStatus step.statusName
             }
 
+//	    logger.info 'run execute step {}', step
             step.execute()
         }
+
+//	logger.info 'run COMPLETED'
 
         updateStatus 'Completed', forwardPath
     }
