@@ -33,6 +33,7 @@ import org.transmartproject.core.ontology.OntologyTerm
 class DefaultConceptsResource implements ConceptsResource {
 
     List<OntologyTerm> getAllCategories() {
+//	logger.info 'getAllCategories default from TableAccess'
         TableAccess.getCategories(true, true)
     }
 
