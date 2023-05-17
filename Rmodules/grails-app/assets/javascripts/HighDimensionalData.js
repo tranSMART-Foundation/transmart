@@ -621,34 +621,42 @@ HighDimensionalData.prototype.load_parameters = function (formParams) {
     var _dependentDataType = document.getElementById('dependentVarDataType').value ? document.getElementById('dependentVarDataType').value : 'CLINICAL';
     var _independentDataType = document.getElementById('independentVarDataType').value ? document.getElementById('independentVarDataType').value : 'CLINICAL';
 
-    formParams["divDependentVariabletimepoints"] = window['divDependentVariabletimepoints1'];
-    formParams["divDependentVariablesamples"] = window['divDependentVariablesamples1'];
-    formParams["divDependentVariablerbmPanels"] = window['divDependentVariablerbmPanels1'];
-    formParams["divDependentVariableplatforms"] = dependentPlatform;
-    formParams["divDependentVariablegpls"] = window['divDependentVariablegplsValue1'];
-    formParams["divDependentVariabletissues"] = window['divDependentVariabletissues1'];
-    formParams["divDependentVariableprobesAggregation"] = window['divDependentVariableprobesAggregation'];
-    formParams["divDependentVariableSNPType"] = window['divDependentVariableSNPType'];
-    formParams["divDependentVariableType"] = _dependentDataType;
-    formParams["divDependentVariablePathway"] = dependentGeneList;
-    formParams["divIndependentVariabletimepoints"] = window['divIndependentVariabletimepoints1'];
-    formParams["divIndependentVariablesamples"] = window['divIndependentVariablesamples1'];
-    formParams["divIndependentVariablerbmPanels"] = window['divIndependentVariablerbmPanels1'];
-    formParams["divIndependentVariableplatforms"] = independentPlatform;
-    formParams["divIndependentVariablegpls"] = window['divIndependentVariablegplsValue1'];
-    formParams["divIndependentVariabletissues"] = window['divIndependentVariabletissues1'];
+    formParams["divDependentVariabletimepoints"]          = window['divDependentVariabletimepoints1'];
+    formParams["divDependentVariablesamples"]             = window['divDependentVariablesamples1'];
+    formParams["divDependentVariablerbmPanels"]           = window['divDependentVariablerbmPanels1'];
+    formParams["divDependentVariableplatforms"]           = dependentPlatform;
+    formParams["divDependentVariablegpls"]                = window['divDependentVariablegplsValue1'];
+    formParams["divDependentVariablegplsValue"]           = window['divDependentVariablegplsValue1'];
+    formParams["divDependentVariabletissues"]             = window['divDependentVariabletissues1'];
+    formParams["divDependentVariableprobesAggregation"]   = window['divDependentVariableprobesAggregation'];
+    formParams["divDependentVariableSNPType"]             = window['divDependentVariableSNPType'];
+    formParams["divDependentVariableType"]                = _dependentDataType;
+    formParams["divDependentVariablePathway"]             = dependentGeneList;
+    formParams["divIndependentVariabletimepoints"]        = window['divIndependentVariabletimepoints1'];
+    formParams["divIndependentVariablesamples"]           = window['divIndependentVariablesamples1'];
+    formParams["divIndependentVariablerbmPanels"]         = window['divIndependentVariablerbmPanels1'];
+    formParams["divIndependentVariableplatforms"]         = independentPlatform;
+    formParams["divIndependentVariablegpls"]              = window['divIndependentVariablegplsValue1'];
+    formParams["divIndependentVariablegplsValue"]         = window['divIndependentVariablegplsValue1'];
+    formParams["divIndependentVariabletissues"]           = window['divIndependentVariabletissues1'];
     formParams["divIndependentVariableprobesAggregation"] = window['divIndependentVariableprobesAggregation'];
-    formParams["divIndependentVariableSNPType"] = window['divIndependentVariableSNPType'];
-    formParams["divIndependentVariableType"] = _independentDataType;
-    formParams["divIndependentVariablePathway"] = independentGeneList;
-    formParams["gexpathway"] = fullGEXGeneList;
-    formParams["snppathway"] = fullSNPGeneList;
-    formParams["divIndependentPathwayName"] = window['divIndependentVariablepathwayName'];
-    formParams["divDependentPathwayName"] = window['divDependentVariablepathwayName'];
+    formParams["divIndependentVariableSNPType"]           = window['divIndependentVariableSNPType'];
+    formParams["divIndependentVariableType"]              = _independentDataType;
+    formParams["divIndependentVariablePathway"]           = independentGeneList;
+    formParams["divIndependentPathwayName"]               = window['divIndependentVariablepathwayName'];
+    formParams["divDependentPathwayName"]                 = window['divDependentVariablepathwayName'];
+
+    formParams["gexpathway"]                              = fullGEXGeneList;
+    formParams["snppathway"]                              = fullSNPGeneList;
+
     formParams["mrnaData"] = mrnaData;
     formParams["snpData"] = snpData;
     formParams["gexgpl"] = fullGEXGPL;
     formParams["snpgpl"] = fullSNPGPL;
+
+    console.log("HighDimensionalData.load_parameters: formParams divIndependentVariablegpls " + formParams["divIndependentVariablegpls"]);
+    console.log("HighDimensionalData.load_parameters: formParams divIndependentVariablegplsValue " + formParams["divIndependentVariablegplsValue"]);
+    console.log("HighDimensionalData.load_parameters: formParams " + formParams);
 
     return true;
 }
