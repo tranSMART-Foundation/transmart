@@ -261,13 +261,13 @@ class ChartService {
 	    Map conceptHistogramHandle = [:]
 	    Map<String, BoxAndWhiskerItem> conceptPlotHandle = [:]
 
-	    HighDimensionDataTypeResource resource =
+	    HighDimensionDataTypeResource hdResource =
 		highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept)
 
 	    result.findAll { n, p -> p.exists }.each { n, p ->
 
                 // Getting the concept data
-                p.conceptData = resource.getDistribution(
+                p.conceptData = hdResource.getDistribution(
                     new ConstraintByOmicsValue(projectionType: result.commons.omics_params.omics_projection_type,
                                                property: result.commons.omics_params.omics_property,
                                                selector: result.commons.omics_params.omics_selector),
