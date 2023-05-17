@@ -147,7 +147,7 @@ class RModulesController {
         }
 
         params[PARAM_USER_PARAMETERS] = userParams
-        params[PARAM_USER_IN_CONTEXT] =  currentUserBean.targetSource.target
+        params[PARAM_USER_IN_CONTEXT] = currentUserBean.targetSource.target
 
 	JobDetail jobDetail = new JobDetailImpl(params.jobName, params.jobType, AnalysisQuartzJobAdapter)
 	jobDetail.jobDataMap = new JobDataMap(params)
@@ -156,7 +156,7 @@ class RModulesController {
     }
 
     static AnalysisConstraints createAnalysisConstraints(Map params) {
-	logger.info 'createAnalysisConstraints {}', params
+//	logger.info 'createAnalysisConstraints params {}', params
 
         Map map = validateParamAnalysisConstraints(params) as Map
         map.data_type = lookup[map.data_type]
@@ -192,7 +192,7 @@ class RModulesController {
 
         if (!(constraints instanceof Map)) {
             throw new InvalidArgumentsException(
-                    "Expected $PARAM_ANALYSIS_CONSTRAINTS to be an map (JSON object); got ${constraints.getClass().name}")
+                    "Expected $PARAM_ANALYSIS_CONSTRAINTS to be a map (JSON object); got ${constraints.getClass().name}")
         }
 
         // great naming consistency here!
