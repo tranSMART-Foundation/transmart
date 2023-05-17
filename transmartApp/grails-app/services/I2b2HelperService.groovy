@@ -155,7 +155,7 @@ class I2b2HelperService implements InitializingBean {
 	              'ON pt.patient_num = pd.patient_num ' +
                      'AND (pt.trial IN (' + authStudiesString + ')' + (i2b2View ? ' OR pt.trial IS NULL':'') + ')'
 
-	logger.info 'getPatientDemographicValueDataForSubset sql {}', sql
+//	logger.info 'getPatientDemographicValueDataForSubset sql {}', sql
 
 	eachRow(sql, [resultInstanceId]) { row ->
 	    String id = rowGet(row, 1, String)
@@ -236,7 +236,7 @@ class I2b2HelperService implements InitializingBean {
 	StringBuilder concepts = new StringBuilder()
 	String sql = 'SELECT CONCEPT_CD FROM I2B2DEMODATA.CONCEPT_DIMENSION c WHERE CONCEPT_PATH = ?'
 
-	logger.info 'getConceptCodeFromKey sql {}', sql
+//	logger.info 'getConceptCodeFromKey sql {}, key: {}', sql, key
 
 	eachRow(sql, [path]) { row ->
 	    if (concepts) {
@@ -251,7 +251,7 @@ class I2b2HelperService implements InitializingBean {
         String path = null
 	String sql = 'SELECT CONCEPT_PATH FROM I2B2DEMODATA.CONCEPT_DIMENSION c WHERE CONCEPT_CD = ?'
 
-	logger.info 'getConceptPathFromCode sql {}', sql
+//	logger.info 'getConceptPathFromCode sql {}, code: {}', sql, code
 
 	eachRow(sql, [code]) { row ->
 	    path = rowGet(row, 'CONCEPT_PATH', String)
@@ -266,7 +266,7 @@ class I2b2HelperService implements InitializingBean {
     String getConceptKeyForAnalysis(String conceptKey) {
 	if (isLeafConceptKey(conceptKey)) {
 	    if (isValueConceptKey(conceptKey) || isHighDimensionalConceptKey(conceptKey)) {
-		conceptKey //just use me cause im a value node
+		conceptKey //just use me because I'm a value node
             }
             else {
 		//get parent folder (could make recursive)
@@ -287,7 +287,7 @@ class I2b2HelperService implements InitializingBean {
         int res = 0
 	String sql = 'SELECT c_hlevel FROM i2b2metadata.i2b2 WHERE C_FULLNAME = ?'
 
-	logger.info 'getLevelFromKey sql {}', sql
+//	logger.info 'getLevelFromKey sql {}', sql
 
 	eachRow(sql, [fullname]) { row ->
 	    res = rowGet(row, 'c_hlevel', Integer)
@@ -303,7 +303,7 @@ class I2b2HelperService implements InitializingBean {
 			 'AND cd.concept_cd = ?'
 	String markerType = ''
 
-	logger.info 'getMarkerTypeFromConceptCd sql {}', sql
+	logger.info 'getMarkerTypeFromConceptCd sql {} conceptCd: {}', sql, conceptCd
 
 	eachRow(sql, [conceptCd]) { row ->
 	    markerType = rowGet(row, 'marker_type', String)
@@ -359,7 +359,7 @@ class I2b2HelperService implements InitializingBean {
 	boolean res = false
 	String sql = 'SELECT C_VISUALATTRIBUTES FROM I2B2METADATA.I2B2 WHERE C_FULLNAME = ?'
 
-	logger.info 'isLeafConceptKey sql {}', sql
+//	logger.info 'isLeafConceptKey sql {}', sql
 
 	eachRow(sql, [fullname]) { row ->
 	    res = rowGet(row, 'c_visualattributes', String).contains('L')
@@ -407,17 +407,19 @@ class I2b2HelperService implements InitializingBean {
 	    OntologyTerm node = conceptsResourceService.getByKey(conceptKey)
 	    for (OntologyTerm term in node.children) {
 		counts[term.fullName] = getObservationCountForXTrialsNode((AcrossTrialsOntologyTerm) term)
+//		logger.info 'getChildrenWithPatientCountsForConcept xTrialsCase {} ({})', term.fullName, counts[term.fullName]
             }
         }
         else {
 	    String path = keyToPath(conceptKey)
 	    String sql = 'select * from I2B2METADATA.TM_CONCEPT_COUNTS where parent_concept_path = ?'
 
-	    logger.info 'getChildrenWithPatientCountsForConcept sql {}', sql
+//	    logger.info 'getChildrenWithPatientCountsForConcept sql {}', sql
 
 	    eachRow(sql, [path]) { row ->
 		String conceptPath = rowGet(row, 'concept_path', String)
 		counts[conceptPath] = rowGet(row, 'patient_count', Integer)
+//		logger.info 'getChildrenWithPatientCountsForConcept {} ({})', conceptPath, counts[conceptPath]
 	    }
         }
 
@@ -432,7 +434,7 @@ class I2b2HelperService implements InitializingBean {
 	List<Double> values = []
 	String sql = 'SELECT NVAL_NUM FROM I2B2DEMODATA.OBSERVATION_FACT f WHERE CONCEPT_CD = ?'
 
-	logger.info 'getConceptDistributionDataForValueConcept sql {}', sql
+//	logger.info 'getConceptDistributionDataForValueConcept sql {}', sql
 
 	eachRow(sql, [conceptCode]) { row ->
 	    Double nval = rowGet(row, 'NVAL_NUM', Double)
@@ -471,7 +473,7 @@ class I2b2HelperService implements InitializingBean {
 		'where result_instance_id = CAST(? AS numeric) ' +
 		')'
 
-	    logger.info 'getConceptDistributionDataForValueConcept sql {}', sql
+//	    logger.info 'getConceptDistributionDataForValueConcept sql {}', sql
 	    
 	    values = []
             try {
@@ -508,7 +510,7 @@ class I2b2HelperService implements InitializingBean {
 	               'WHERE result_instance_id = CAST(? AS numeric) ' +
 	          ')'
 
-	logger.info 'getConceptDistributionDataForValueConceptFromCode sql {}', sql
+//	logger.info 'getConceptDistributionDataForValueConceptFromCode sql {}', sql
 
 	eachRow(sql, [conceptCode, resultInstanceId]) { row ->
 	    Double nval = rowGet(row, 'NVAL_NUM', Double)
@@ -540,14 +542,14 @@ class I2b2HelperService implements InitializingBean {
                                   'AND (pt.trial IN (' + authStudiesString + ')' + (i2b2View ? ' OR pt.trial IS NULL':'') + ')' +
             ') patient_set'
 
-	logger.info 'getPatientSetSize i2b2View: {} sql: {}', i2b2View, sql
+//	logger.info 'getPatientSetSize i2b2View: {} sql: {}', i2b2View, sql
 
 	int i = 0
 	eachRow(sql, [resultInstanceId]) { row ->
 	    i = rowGet(row, 'patcount', Integer)
 	}
 
-	logger.info 'getPatientSetSize({}): {}', resultInstanceId, i
+//	logger.info 'getPatientSetSize({}): {}', resultInstanceId, i
 
 	i
     }
@@ -576,14 +578,14 @@ class I2b2HelperService implements InitializingBean {
 	                   'AND (pt.trial IN (' + authStudiesString + ')' + (i2b2View ? ' OR pt.trial IS NULL':'') + ') ' +
             ') qtm_patient_set'
 
-	logger.info 'getPatientSetIntersectionSize sql {}', sql
+//	logger.info 'getPatientSetIntersectionSize sql {}', sql
 
 	int i = 0
 	eachRow(sql, [resultInstanceId1, resultInstanceId2]) { row ->
 	    i = rowGet(row, 'patcount', Integer)
 	}
 
-	logger.info 'getPatientSetIntersectionSize({},{}): {}', resultInstanceId1, resultInstanceId2, i
+//	logger.info 'getPatientSetIntersectionSize({},{}): {}', resultInstanceId1, resultInstanceId2, i
 
 	i
     }
@@ -614,7 +616,7 @@ class I2b2HelperService implements InitializingBean {
 	String sql = 'SELECT C_METADATAXML FROM I2B2METADATA.I2B2 WHERE C_BASECODE = ?'
         String xml = ''
 
-	logger.info 'isValueConceptCode sql {}', sql
+//	logger.info 'isValueConceptCode sql {}', sql
 
 	eachRow(sql, [conceptCode]) { row ->
 	    def clob = rowGet(row, 'c_metadataxml', Object)
@@ -635,7 +637,7 @@ class I2b2HelperService implements InitializingBean {
 	boolean res = false
 	String sql = 'SELECT C_VISUALATTRIBUTES FROM I2B2METADATA.I2B2 WHERE C_BASECODE = ?'
 
-	logger.info 'isDimensionConceptCode sql {}', sql
+//	logger.info 'isDimensionConceptCode sql {}', sql
 
 	eachRow(sql, [conceptCode]) { row ->
 	    res = rowGet(row, 'c_visualattributes', String) == 'LAH'
@@ -694,7 +696,7 @@ class I2b2HelperService implements InitializingBean {
 			  AND c_hlevel = ?
 			ORDER BY C_FULLNAME'''
 
-	    logger.info 'getConceptDistributionDataForConcept sql {}', sql
+//	    logger.info 'getConceptDistributionDataForConcept sql {}', sql
 
 	    eachRow(sql, [Utils.asLikeLiteral(full) + '%', i]) { row ->
 		String name = rowGet(row, 0, String)
@@ -719,7 +721,7 @@ class I2b2HelperService implements InitializingBean {
 				from i2b2demodata.concept_dimension c
 				where concept_path LIKE ? escape '\\')'''
 
-	logger.info 'getPatientCountForConcept sql {}', sql
+//	logger.info 'getPatientCountForConcept sql {}', sql
 
 	int i = 0
 	eachRow(sql, [Utils.asLikeLiteral(fullname) + '%']) { row ->
@@ -753,7 +755,7 @@ class I2b2HelperService implements InitializingBean {
 	             ')' +
 	    ') subjectList'
 
-	logger.info 'getObservationCountForXTrialsNode sql {}', sql
+//	logger.info 'getObservationCountForXTrialsNode sql {}', sql
 
 	int count = 0
 	eachRow(sql, [resultInstanceId]) { row ->
@@ -784,7 +786,7 @@ class I2b2HelperService implements InitializingBean {
                     AND f.concept_cd != 'SECURITY'
 		) subjectList'''
 		
-	logger.info 'getObservationCountForXTrialsNode sql {}', sql
+//	logger.info 'getObservationCountForXTrialsNode sql {}', sql
 	
         int count = 0
 	eachRow(sql) { row ->
@@ -832,7 +834,7 @@ class I2b2HelperService implements InitializingBean {
 		    ') ' +
 		') subjectList'
 
-	logger.info 'getObservationCountForConceptForSubset sql {}', sql
+//	logger.info 'getObservationCountForConceptForSubset sql {}', sql
 	
 	int i = 0
 	eachRow(sql, [fullnameLike, resultInstanceId]) { row ->
@@ -878,7 +880,7 @@ class I2b2HelperService implements InitializingBean {
 		') i ' +
 		'ORDER BY i.patient_num'
 
-	logger.info 'addAllPatientDemographicDataForSubsetToTable sql {}', sql
+//	logger.info 'addAllPatientDemographicDataForSubsetToTable sql {}', sql
 
 	eachRow(sql, [resultInstanceId]) { row ->
 	    // If I already have this subject
@@ -935,7 +937,7 @@ class I2b2HelperService implements InitializingBean {
 	    ') ' +
             'ORDER BY patient_id, sample_cd'
 
-	logger.info 'buildMapOfSampleCdsByPatientNum sql {}', sql
+//	logger.info 'buildMapOfSampleCdsByPatientNum sql {}', sql
 
 	for (row in new Sql(dataSource).rows(sql, resultInstanceId)) {
 	    Long patientNum = rowGet(row, 'PATIENT_ID', Long)
@@ -1223,7 +1225,7 @@ class I2b2HelperService implements InitializingBean {
 	                       'WHERE result_instance_id =  CAST(? AS numeric) ' +
 	                ')'
 
-	logger.info 'fetchConceptData sql {}', sql
+//	logger.info 'fetchConceptData sql {}', sql
 
 	eachRow(sql, [conceptCode, resultInstanceId]) { row ->
 	    def value
@@ -1292,7 +1294,7 @@ class I2b2HelperService implements InitializingBean {
 		    'AND result_instance_id = CAST(? AS numeric) ' +
 	    ')'
 
-	logger.info 'fetchAcrossTrialsData sql {}', sql
+//	logger.info 'fetchAcrossTrialsData sql {}', sql
 
 	eachRow(sql, [modifierCode, resultInstanceId]) { row ->
 	    // If I already have this subject mark it in the subset column as belonging to both subsets
@@ -1346,7 +1348,7 @@ class I2b2HelperService implements InitializingBean {
 	    'GROUP BY cat ' +
 	    'ORDER BY cat'
 
-	logger.info 'getPatientDemographicDataForSubset sql {}', sql
+//	logger.info 'getPatientDemographicDataForSubset sql {}', sql
 
 	eachRow(sql, [resultInstanceId]) { row ->
 	    String cat = rowGet(row, 0, String)
@@ -1373,7 +1375,7 @@ class I2b2HelperService implements InitializingBean {
 	                'ON a.query_instance_id = b.query_instance_id ' +
 		'WHERE result_instance_id = CAST(? AS numeric)'
 
-	logger.info 'getConceptKeysInSubset sql {}', sql
+//	logger.info 'getConceptKeysInSubset sql {}', sql
 
         String xmlrequest = ''
 	eachRow(sql, [resultInstanceId]) { row ->
@@ -1427,7 +1429,7 @@ class I2b2HelperService implements InitializingBean {
 			'INNER JOIN i2b2demodata.concept_dimension cd ON xcm.concept_cd=cd.concept_cd ' +
 			'WHERE concept_path = ?'
 
-	    logger.info 'lookupParentConcept sql {}', sql
+//	    logger.info 'lookupParentConcept sql {}', sql
 
 	    String parentConcept = ''
 	    eachRow(sql, [conceptPath]) { row ->
@@ -1481,7 +1483,7 @@ class I2b2HelperService implements InitializingBean {
         }
 	sql += ')'
 
-	logger.info 'lookupChildConcepts sql {}', sql
+//	logger.info 'lookupChildConcepts sql {}', sql
 	
         try {
 	    eachRow(sql) { row ->
@@ -1535,7 +1537,7 @@ class I2b2HelperService implements InitializingBean {
         String xmlrequest = ''
 	String sqlt = '''select REQUEST_XML from I2B2DEMODATA.QTM_QUERY_MASTER WHERE QUERY_MASTER_ID = ?'''
 
-	logger.info 'getQueryDefinitionXMLFromQID sql {}', sql
+//	logger.info 'getQueryDefinitionXMLFromQID sql {}', sql
 
 	eachRow(sqlt, [qid]) { row ->
 	    def clob = rowGet(row, 'REQUEST_XML', Object)
@@ -1559,7 +1561,7 @@ class I2b2HelperService implements InitializingBean {
 	    'ON a.query_instance_id=b.query_instance_id ' +
 		'WHERE result_instance_id = CAST(? AS numeric)'
 
-	logger.info 'getQueryDefinitionXML sql {}', sql
+//	logger.info 'getQueryDefinitionXML sql {}', sql
 
 	eachRow(sql, [resultInstanceId]) { row ->
 	    def clob = rowGet(row, 'REQUEST_XML', Object)
@@ -1587,7 +1589,7 @@ class I2b2HelperService implements InitializingBean {
 	               'ON pt.patient_num = ps.patient_num ' +
                       'AND (pt.trial IN (' + authStudiesString + ')' + (i2b2View ? ' OR pt.trial IS NULL':'') + ')'
 
-	logger.info 'getSubjects sql {}', sql
+//	logger.info 'getSubjects sql {}', sql
 
 	List<Long> ids = []
 	eachRow(sql, [resultInstanceId]) { row ->
@@ -1628,7 +1630,7 @@ class I2b2HelperService implements InitializingBean {
 		'from DEAPP.DE_SUBJECT_SAMPLE_MAPPING ' +
 		'where SAMPLE_ID in (' + listToIN(sampleIdList) + ')'
 
-	logger.info 'getSubjectsAsListFromSample sql {}', sql
+//	logger.info 'getSubjectsAsListFromSample sql {}', sql
 
 	eachRow(sql) { row ->
 	    subjectIds << rowGet(row, 'PATIENT_ID', String)
@@ -1648,7 +1650,7 @@ class I2b2HelperService implements InitializingBean {
 		'FROM deapp.de_subject_sample_mapping ' +
 		'WHERE sample_id IN (' + listToIN(sampleIdList) + ')'
 
-	logger.info 'getSubjectsAsListFromSampleLong sql {}', sql
+//	logger.info 'getSubjectsAsListFromSampleLong sql {}', sql
 
 	eachRow(sql) { row ->
 	    subjectIds << rowGet(row, 'patient_id', Long)
@@ -1708,7 +1710,7 @@ class I2b2HelperService implements InitializingBean {
 		'FROM DEAPP.de_subject_sample_mapping s ' +
 		'WHERE s.patient_id IN (' + ids + ')'
 
-	logger.info 'filterSubjectIdByBiomarkerData sql {}', sql
+//	logger.info 'filterSubjectIdByBiomarkerData sql {}', sql
 
 	StringBuilder fids = new StringBuilder()
 
@@ -2050,7 +2052,7 @@ class I2b2HelperService implements InitializingBean {
 	    sql += ' and PATIENT_NUM in (' + subjectIdListInStr + ')'
 	}
 
-	logger.info 'getSurvivalDataForSurvivalTime sql {}', sql
+//	logger.info 'getSurvivalDataForSurvivalTime sql {}', sql
 
 	eachRow(sql, [conceptSurvivalTime.baseCode]) { row ->
 	    SurvivalData survivalData = new SurvivalData(
@@ -2213,7 +2215,7 @@ class I2b2HelperService implements InitializingBean {
 		  'AND b.snp_info_id IN (' + snpIdListStr + ') ' +
             'ORDER BY b.chrom, b.chrom_pos'
 
-	logger.info 'getSurvivalDataForSurvivalTime sql {}', sql
+//	logger.info 'getSurvivalDataForSurvivalTime sql {}', sql
 
 	eachRow(sql, sqlStr, [trialName]) { row ->
 	    String dataByProbe = clobToString(rowGet(row, 'data_by_probe', Object))
@@ -2322,7 +2324,7 @@ class I2b2HelperService implements InitializingBean {
 		'WHERE data_category = \'GENE\' ' +
 		'AND search_keyword_id IN (' + geneSearchIdListStr + ')'
 
-	logger.info 'getGeneWithSnpMapForGenes sqlStr {}', sqlStr
+//	logger.info 'getGeneWithSnpMapForGenes sqlStr {}', sqlStr
 
 	StringBuilder geneEntrezIdListStr = new StringBuilder()
 	Sql sql = new Sql(dataSource)
@@ -2346,7 +2348,7 @@ class I2b2HelperService implements InitializingBean {
 		'WHERE a.snp_id = b.snp_info_id ' +
 		  'AND a.entrez_gene_id IN (' + geneEntrezIdListStr + ')'
 
-	logger.info 'getGeneWithSnpMapForGenes sqlStr {}', sqlStr
+//	logger.info 'getGeneWithSnpMapForGenes sqlStr {}', sqlStr
 
 	eachRow(sql, sqlStr) { row ->
 	    Long snpId = rowGet(row, 'snp_info_id', Long)
@@ -2408,7 +2410,7 @@ class I2b2HelperService implements InitializingBean {
 		'WHERE a.snp_id = b.snp_info_id ' +
 		  'AND b.name in (' + snpNameListStr + ')'
 
-	logger.info 'getGeneWithSnpMapForSnps 1 sqlStr {}', sqlStr
+//	logger.info 'getGeneWithSnpMapForSnps 1 sqlStr {}', sqlStr
 
 	eachRow(sql, sqlStr) { row ->
 	    Long snpId = rowGet(row, 'snp_info_id', Long)
@@ -2450,7 +2452,7 @@ class I2b2HelperService implements InitializingBean {
 		'WHERE data_category = \'GENE\' ' +
 		  'AND unique_id in (' + geneSearchStr + ')'
 
-	logger.info 'getGeneWithSnpMapForSnps 2 sqlStr {}', sqlStr
+//	logger.info 'getGeneWithSnpMapForSnps 2 sqlStr {}', sqlStr
 
 	eachRow(sql, sqlStr) { row ->
 	    String uniqueId = rowGet(row, 'unique_id', String)
@@ -2545,7 +2547,7 @@ class I2b2HelperService implements InitializingBean {
 
 	String sql = 'SELECT * FROM deapp.de_subject_snp_dataset WHERE patient_num IN (' + subjectListStr + ')'
 
-	logger.info 'getSnpDatasetBySubjectMap sql {}', sql
+//	logger.info 'getSnpDatasetBySubjectMap sql {}', sql
 
 	eachRow(sql) { row ->
 	    String conceptId = rowGet(row, 'concept_cd', String)
@@ -2601,7 +2603,7 @@ class I2b2HelperService implements InitializingBean {
 		'FROM i2b2demodata.patient_dimension ' +
 		'WHERE patient_num in (' + subjectListStr + ')'
 
-	logger.info 'getPatientGenderMap sql {}', sql
+//	logger.info 'getPatientGenderMap sql {}', sql
 
 	eachRow(sql) { row ->
 	    Long patientNum = rowGet(row, 'patient_num', Long)
@@ -2610,7 +2612,7 @@ class I2b2HelperService implements InitializingBean {
 		patientGenderMap[patientNum] = gender
             }
         }
-	logger.info 'patientGenderMap size {}', patientGenderMap.size()
+//	logger.info 'patientGenderMap size {}', patientGenderMap.size()
     }
 
     private Set<Long> getSnpSet(Map<String, SortedMap<Long, Map<Long, GeneWithSnp>>> allGeneSnpMap) {
@@ -3218,7 +3220,7 @@ class I2b2HelperService implements InitializingBean {
         Sql sql = new Sql(dataSource)
 	String sqlStr = 'select * from DEAPP.de_snp_gene_map where snp_name in (' + snpNamesBuf + ')'
 
-	logger.info 'getSnpGeneGwasScore 1 sqlStr {}', sqlStr
+//	logger.info 'getSnpGeneGwasScore 1 sqlStr {}', sqlStr
 
 	eachRow(sql, sqlStr) { row ->
 	    String snpName = rowGet(row, 'snp_name', String)
@@ -3249,7 +3251,7 @@ class I2b2HelperService implements InitializingBean {
 	}
 	sqlStr = 'select keyword, unique_id from SEARCHAPP.search_keyword where unique_id in (' + entrezListBuf + ')'
 
-	logger.info 'getSnpGeneGwasScore 2 {}', sqlStr
+//	logger.info 'getSnpGeneGwasScore 2 {}', sqlStr
 
 	eachRow(sql, sqlStr) { row ->
 	    String geneName = rowGet(row, 'keyword', String)
@@ -3301,7 +3303,7 @@ class I2b2HelperService implements InitializingBean {
 		  'AND a.patient_num IN (' + subjectIds + ') ' +
 		  'AND b.chrom IN (' + getSqlStrFromChroms(chroms) + ')'
 
-	logger.info 'getSNPDataByDatasetByChrom sql {}', sql
+//	logger.info 'getSNPDataByDatasetByChrom sql {}', sql
 
 	eachRow(sql) { row ->
 	    Long datasetId = rowGet(row, 'subject_snp_dataset_id', Long)
@@ -3376,7 +3378,7 @@ class I2b2HelperService implements InitializingBean {
 		'FROM deapp.de_subject_snp_dataset ' +
 		'WHERE patient_num IN (' + subjectIds + ')'
 
-	logger.info 'getSNPDatasetIdList sql {}', sql
+//	logger.info 'getSNPDatasetIdList sql {}', sql
 
 	eachRow(sql) { row ->
 	    idList << rowGet(row, 'id', Long)
@@ -3402,7 +3404,7 @@ class I2b2HelperService implements InitializingBean {
 		  'AND chrom IN (' + getSqlStrFromChroms(chroms) + ') ' +
 		'ORDER BY chrom'
 
-	logger.info 'getSNPProbeDefMap sql {}', sql
+//	logger.info 'getSNPProbeDefMap sql {}', sql
 
 	eachRow(sql) { row ->
 	    SnpProbeSortedDef probeDef = new SnpProbeSortedDef(
@@ -3429,7 +3431,7 @@ class I2b2HelperService implements InitializingBean {
 	    sql += ' and PATIENT_NUM in (' + subjectIdListInStr + ')'
         }
 
-	logger.info 'fillCensoringToSurvivalData sql {}', sql
+//	logger.info 'fillCensoringToSurvivalData sql {}', sql
 
 	eachRow(sql, [conceptCensoring.baseCode]) { row ->
 	    String subjectId = rowGet(row, 'patient_num', String)
@@ -3457,7 +3459,7 @@ class I2b2HelperService implements InitializingBean {
 	    sql += ' AND patient_num IN (' + subjectIdListInStr + ')'
 	}
 
-	logger.info 'fillEventToSurvivalData sql {}', sql
+//	logger.info 'fillEventToSurvivalData sql {}', sql
 
 	eachRow(sql, [conceptEvent.baseCode]) { row ->
 	    String subjectId = rowGet(row, 'patient_num', String)
@@ -3482,7 +3484,7 @@ class I2b2HelperService implements InitializingBean {
 		'WHERE s.patient_id IN (' + ids + ') ' +
 		  'AND s.platform = \'MRNA_AFFYMETRIX\' '
 
-	logger.info 'getTrialName sql {}', sql
+//	logger.info 'getTrialName sql {}', sql
 
 	StringBuilder trialNames = new StringBuilder()
 	eachRow(sql) { row ->
@@ -3517,7 +3519,7 @@ class I2b2HelperService implements InitializingBean {
         }
 	sql << ' ORDER BY s.assay_id'
 
-	logger.info 'getAssayIds sql {}', sql
+//	logger.info 'getAssayIds sql {}', sql
 
 	List assayIds = []
 	eachRow(sql.toString()) { row ->
@@ -3568,7 +3570,7 @@ class I2b2HelperService implements InitializingBean {
 			'AND sk.unique_id = ?'
         }
 
-	logger.info 'getGenes sql {}', sql
+//	logger.info 'getGenes sql {}', sql
 
 	List<String> genesArray = []
 	eachRow(sql, [pathwayName]) { row ->
@@ -3644,7 +3646,7 @@ class I2b2HelperService implements InitializingBean {
 		'WHERE patient_num IN (' + ids + ') ' +
 		'ORDER BY patient_num'
 
-	logger.info 'getSubjectNameList sql {}', sql
+//	logger.info 'getSubjectNameList sql {}', sql
 
 	List<String> nameList = []
 	eachRow(sql) { row ->
@@ -3959,7 +3961,7 @@ class I2b2HelperService implements InitializingBean {
 			  'AND a.trial_name IN (' + trialNames + ') ' +
 			  'AND a.assay_id IN (' + assayIds + ')'
 
-	    logger.info 'createMRNAHeatmapPathwayQuery sql {}', sql
+//	    logger.info 'createMRNAHeatmapPathwayQuery sql {}', sql
 
 	    eachRow(sql) { row ->
 		goodPct = rowGet(row, 0, Float)
@@ -4045,7 +4047,7 @@ class I2b2HelperService implements InitializingBean {
                 'WHERE result_instance_id = CAST(? AS numeric) ' +
                 'ORDER BY gene ASC'
 
-	logger.info 'getGenesForHaploviewFromResultInstanceId sql {}', sql
+//	logger.info 'getGenesForHaploviewFromResultInstanceId sql {}', sql
 
 	eachRow(sql, [resultInstanceId as Long]) { row ->
 	    String gene = rowGet(row, 'gene', String)
@@ -4194,7 +4196,7 @@ class I2b2HelperService implements InitializingBean {
 			  'AND c_hlevel = ? ' +
 			'ORDER BY c_fullname'
 
-	logger.info 'getChildPathsWithTokensFromParentKey sql {}', sql
+//	logger.info 'getChildPathsWithTokensFromParentKey sql {}', sql
 
 	eachRow(sql, [Utils.asLikeLiteral(fullname) + '%', i]) { row ->
 	    String conceptkey = prefix + rowGet(row, 'c_fullname', String)
@@ -4216,11 +4218,12 @@ class I2b2HelperService implements InitializingBean {
 			'WHERE sourcesystem_cd IN (' + listToIN(studyIds) + ') ' +
 			'AND c_visualattributes like \'%S\' '
 
-	logger.info 'getSecureTokensForStudies sql {}', sql
+//	logger.info 'getSecureTokensForStudies sql {}', sql
 
 	eachRow(sql) { row ->
 	    String code = rowGet(row, 'sourcesystem_cd', String)
 	    tokens[code] = rowGet(row, 'secure_obj_token', String)
+//	    logger.info 'getSecureTokensForStudies tokens[{}] value {}', code, tokens[code]
         }
 
         tokens
@@ -4228,16 +4231,16 @@ class I2b2HelperService implements InitializingBean {
 
     Map<String, String> getSecureTokensWithAccessForUser() {
 	logger.trace 'getSecureTokensWithAccessForUser {}', securityService.currentUserId()
-	List<String[]> results = AuthUserSecureAccess.executeQuery('''
+	ArrayList results = AuthUserSecureAccess.executeQuery('''
 	    SELECT DISTINCT so.bioDataUniqueId, ausa.accessLevel.accessLevelName
             FROM AuthUserSecureAccess ausa
             JOIN ausa.accessLevel
             JOIN ausa.secureObject so
 		WHERE ausa.authUser IS NULL
 		   OR ausa.authUser.id = :userId''',
-	    [userId: securityService.currentUserId()]) as List<String[]>
+	    [userId: securityService.currentUserId()])
 
-	Map<String, String> map = results.collectEntries { String[] result ->
+	Map<String, String> map = results.collectEntries { result ->
 	    String bioDataUniqueIdToken = result[0]
 	    String accessLevelName = result[1]
 	    logger.trace 'bioDataUniqueIdToken {} accessLevelName {}', bioDataUniqueIdToken, accessLevelName
@@ -4547,7 +4550,7 @@ class I2b2HelperService implements InitializingBean {
 	    'GROUP BY platform, timepoint, timepoint_cd, sample_type_cd,' +
 	    ' sample_type, tissue_type, tissue_type_cd'
 
-	logger.info 'fillHeatmapValidatorFor sqlt {}', sqlt
+//	logger.info 'fillHeatmapValidatorFor sqlt {}', sqlt
 
 	eachRow(sql, sqlt) { row ->
 	    String platform = rowGet(row, 'PLATFORM', String)
@@ -4606,7 +4609,7 @@ class I2b2HelperService implements InitializingBean {
                 }
                 sqlt += 'concept_cd IN (' + listToIN(conids) + ')'
 
-		logger.info 'fillCohortInformation 1 {} ', sqlt
+//		logger.info 'fillCohortInformation 1 {} ', sqlt
 
 		eachRow(sql, sqlt) { row ->
 		    ci.trials << rowGet(row, 'modifier_cd', String)
@@ -4615,7 +4618,7 @@ class I2b2HelperService implements InitializingBean {
 		if (!ci.trials) {
 		    sqlt = 'select distinct sourcesystem_cd from I2B2METADATA.i2b2 where c_basecode in (' + listToIN(conids) + ')'
 
-		    logger.info 'fillCohortInformation 2 {} ', sqlt
+//		    logger.info 'fillCohortInformation 2 {} ', sqlt
 
 		    eachRow(sql, sqlt) { row ->
 			ci.trials << rowGet(row, 'sourcesystem_cd', String)
@@ -4630,7 +4633,7 @@ class I2b2HelperService implements InitializingBean {
 				'WHERE trial_name IN (' + listToIN(ci.trials) + ') ' +
 				'ORDER BY platform'
 
-		logger.info 'fillCohortInformation 3 sqlt {}', sqlt
+//		logger.info 'fillCohortInformation 3 sqlt {}', sqlt
 
 		eachRow(sql, sqlt) { row ->
 		    String platform = rowGet(row, 'platform', String)
@@ -4661,7 +4664,7 @@ class I2b2HelperService implements InitializingBean {
                 }
                 sqlt += ' ORDER BY timepoint'
 
-		logger.info 'fillCohortInformation 4 sqlt {}', sqlt
+//		logger.info 'fillCohortInformation 4 sqlt {}', sqlt
 
 		eachRow(sql, sqlt) { row ->
 		    String timepointCode = rowGet(row, 'timepoint_cd', String)
@@ -4682,7 +4685,7 @@ class I2b2HelperService implements InitializingBean {
                 }
                 sqlt += ' ORDER BY sample_type'
 
-		logger.info 'fillCohortInformation 5 sqlt {}', sqlt
+//		logger.info 'fillCohortInformation 5 sqlt {}', sqlt
 
 		eachRow(sql, sqlt) { row ->
 		    ci.samples << [sample     : rowGet(row, 'sample_type_cd', String),
@@ -4703,7 +4706,7 @@ class I2b2HelperService implements InitializingBean {
                 }
                 sqlt += ' ORDER BY tissue_type'
 
-		logger.info 'fillCohortInformation 6 sqlt {}', sqlt
+//		logger.info 'fillCohortInformation 6 sqlt {}', sqlt
 
 		eachRow(sql, sqlt) { row ->
 		    String tissueTypeCode = rowGet(row, 'tissue_type_cd', String)
@@ -4723,7 +4726,7 @@ class I2b2HelperService implements InitializingBean {
 			  'AND dssm.gpl_id = rgi.platform'
                 sqlt += ' ORDER BY rgi.title'
 
-		logger.info 'fillCohortInformation 7 sqlt {}', sqlt
+//		logger.info 'fillCohortInformation 7 sqlt {}', sqlt
 
 		eachRow(sql, sqlt) { row ->
 		    ci.gpls << [gpl: rowGet(row, 'platform', String), gplLabel: rowGet(row, 'title', String)]
@@ -4736,7 +4739,7 @@ class I2b2HelperService implements InitializingBean {
 			'WHERE dssm.trial_name IN (' + listToIN(ci.trials) + ') ' +
 			  'AND dssm.platform IN (' + listToIN(ci.platforms) + ')'
 
-		logger.info 'fillCohortInformation 8 sqlt {}', sqlt
+//		logger.info 'fillCohortInformation 8 sqlt {}', sqlt
 		
 		eachRow(sql, sqlt) { row ->
 		    String panel = rowGet(row, 'rbm_panel', String)
@@ -4771,7 +4774,7 @@ class I2b2HelperService implements InitializingBean {
 		  'AND dssm.gpl_id = rgi.platform ' +
 		'ORDER BY rgi.title'
 
-	    logger.info ' sql {}', sql
+//	    logger.info ' sql {}', sql
 
 	    eachRow(sql) { row ->
 		hv.gpls << rowGet(row, 'platform', String)
@@ -4800,7 +4803,7 @@ class I2b2HelperService implements InitializingBean {
 		'AND dssm.platform IN (' + listToIN(ci.platforms) + ')' +
 		'AND dssm.concept_code IN (' + listToIN(concepts) + ')'
 
-	    logger.info 'fillDefaultRbmpanelInHeatMapValidator sql {}'. sql
+//	    logger.info 'fillDefaultRbmpanelInHeatMapValidator sql {}'. sql
 
 	    eachRow(sql) { row ->
 		String panel = rowGet(row, 'rbm_panel', String)
@@ -4840,7 +4843,7 @@ class I2b2HelperService implements InitializingBean {
 		args = [rid1 ?: rid2]
             }
 
-	    logger.info 'getDistinctTrialsInPatientSets sql {}', sql
+//	    logger.info 'getDistinctTrialsInPatientSets sql {}', sql
 
 	    eachRow(sql, args) { row ->
 		String token = rowGet(row, 'SECURE_OBJ_TOKEN', String)
@@ -4865,7 +4868,7 @@ class I2b2HelperService implements InitializingBean {
             'WHERE psc.result_instance_id = CAST(? AS numeric) ' +
 	'ORDER BY trial'
 
-	logger.info 'trialsForResultSet sql {}', sql
+//	logger.info 'trialsForResultSet sql {}', sql
 	eachRow(sql, [resultInstanceId]) { row ->
 	    trials << [rowGet(row, 'trial', String), rowGet(row, 'secure_obj_token', String)]
 	}
