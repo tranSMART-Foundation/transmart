@@ -34,8 +34,9 @@ class FmFolderAssociation implements Serializable {
 
     // TODO BB move this and lookupDomainClass() to a service and call that directly
     def getBioObject() {
-	logger.info 'ObjectUID={}', objectUid
+//	logger.info 'ObjectUID={}', objectUid
 	BioData bioData = BioData.findByUniqueId(objectUid)
+//	logger.info 'bioData={}', bioData
 	if (bioData) {
 	    lookupDomainClass()?.get(bioData.id)
         }

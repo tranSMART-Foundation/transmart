@@ -55,12 +55,14 @@ class FmFolder implements Buildable {
      */
     String getUniqueId() {
 	if (uniqueId) {
+//	    logger.info 'FmFolder uniqueId {}', uniqueId
 	    return uniqueId
 	}
 
 	// TODO BB ..
         FmData data = FmData.get(id)
 	if (data) {
+//	    logger.info 'FmFolder data.uniqueId {}', data.uniqueId
             uniqueId = data.uniqueId
             return uniqueId
 	}

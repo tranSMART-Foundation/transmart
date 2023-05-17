@@ -604,31 +604,38 @@ class FmFolderService {
         if (!isAdmin) {
             studyFolderStudyIdMap = foldersByStudy.keySet().findAll().collectEntries {
 		String studyId = FmFolderAssociation.findByFmFolder(it)?.bioObject?.accession
+//		logger.info 'getAccessLevelInfoForFoldersfolder {} studyid {}', it, studyId
                 [(it): studyId]
             }
 
             studyTokensMap = i2b2HelperService.getSecureTokensForStudies(studyFolderStudyIdMap.values().findAll())
-
+//	    logger.info 'getAccessLevelInfoForFoldersfolder studyTokensMap {}', studyTokensMap
 	    userAssignedTokens = i2b2HelperService.getSecureTokensWithAccessForUser()
+//	    logger.info 'getAccessLevelInfoForFoldersfolder userAssignedTokens {}', userAssignedTokens
         }
 
 	Map<FmFolder, String> results = [:]
         foldersByStudy.each { FmFolder studyFolder, List<FmFolder> folders ->
             if (studyFolder) {
                 if (isAdmin) {
+//		    logger.info 'getAccessLevelInfoForFoldersfolder isAdmin putAll ADMIN'
 		    results.putAll folders.collectEntries { [(it): 'ADMIN'] }
                 }
                 else {
 		    String studyId = studyFolderStudyIdMap[studyFolder]
 		    String token = studyTokensMap[studyId]
 		    String accessLevelInfo = userAssignedTokens[token] ?: 'LOCKED'
+//		    logger.info 'getAccessLevelInfoForFoldersfolder studyId {} token {} accessLevelInfo {}', studyId, token, accessLevelInfo
 		    results.putAll folders.collectEntries { [(it): accessLevelInfo] }
                 }
             }
             else {
+//		logger.info 'getAccessLevelInfoForFoldersfolder not a study folder {} putAll NA', folders
 		results.putAll folders.collectEntries { [(it): 'NA'] }
             }
         }
+
+//	logger.info 'getAccessLevelInfoForFoldersfolder results {}', results
 
         results
     }
@@ -649,9 +656,14 @@ class FmFolderService {
         }
 
 	if (fmFolder.folderType == FolderType.STUDY.name()) {
+//	    def folderAssoc =  FmFolderAssociation.findByFmFolder(fmFolder)
+//	    logger.info 'getAssociatedAccession Folder {}', fmFolder.folderFullName
+//	    logger.info 'getAssociatedAccession Folder {} FolderAssociation {}', fmFolder.folderFullName, folderAssoc
+//	    logger.info 'getAssociatedAccession Folder {} FolderAssociation {} bioObject {}', fmFolder.folderFullName, folderAssoc, folderAssoc?.bioObject
 	    def experiment = FmFolderAssociation.findByFmFolder(fmFolder)?.bioObject
+//	    logger.info 'getAssociatedAccession experiment {}', experiment
             if (!experiment) {
-		logger.error 'No experiment associated with study folder: {}', fmFolder.folderFullName
+		logger.error 'No experiment associated with study folder: {} fullname {}', fmFolder.folderFullName, fmFolder.folderName
             }
 	    experiment?.accession
         }

@@ -497,15 +497,21 @@ class FmFolderController {
 
 	Boolean auto = params.boolean('auto')
         //Flag for whether folder was automatically opened - if not, then it shouldn't respect the folder mask
+//	logger.info 'getFolderContents auto {}', auto
 	Map<FmFolder, String> folderContentsAccessLevelMap = fmFolderService.getFolderContentsWithAccessLevelInfo(id)
 	List<FmFolder> folderContents = folderContentsAccessLevelMap.keySet() as List
+//	logger.info 'getFolderContents folderContentsAccessLevelMap {}', folderContentsAccessLevelMap
+//	logger.info 'getFolderContents folderContents {}', folderContents
 	def folderSearchLists = session.folderSearchList
         if (!folderSearchLists) {
             folderSearchLists = [[], []]
         }
+//	logger.info 'getFolderContents folderSearchLists {}', folderSearchLists
 	String folderSearchString = folderSearchLists[0] ? folderSearchLists[0].join(',') + ',' : ''
         //Extra , - used to identify leaves
+//	logger.info 'getFolderContents folderSearchString {}', folderSearchString
 	String uniqueLeavesString = folderSearchLists[1] ? folderSearchLists[1].join(',') + ',' : ''
+//	logger.info 'getFolderContents uniqueLeavesString {}', uniqueLeavesString
 	def nodesToExpand = session.rwgOpenedNodes
         //check that all folders from folderContents are in the search path, or children of nodes in the search path
 	if (folderSearchLists[0]) {
