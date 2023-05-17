@@ -735,6 +735,8 @@ Ext.onReady(function () {
     /* load the tabs registered with the extension mechanism */
     (function loadAnalysisTabExtensions() {
         GLOBAL.analysisTabExtensions.forEach(function(tabExtension) {
+//	    console.log("load extension: " + tabExtension.resourcesUrl);
+//	    console.log("load extension config: " + tabExtension.config);
             loadPlugin(null, tabExtension.resourcesUrl, function () {
                 (window[tabExtension.bootstrapFunction])(resultsTabPanel, tabExtension.config);
             });
@@ -2918,7 +2920,7 @@ function getSummaryGridData() {
         result_instance_id2: GLOBAL.CurrentSubsetIDs[2]
     });
 
-    console.log('Calling gridstore.load params: '+myparams );
+//    console.log('Calling gridstore.load params: '+myparams );
     gridstore.load({
         params: myparams,
         callback: function () {
@@ -2929,15 +2931,15 @@ function getSummaryGridData() {
 
 function storeLoaded(jsonStore, rows, paramsObject) {
 
-    console.log('storeloaded jsonStore '+jsonStore);
-    console.log('storeloaded rows '+rows);
-    console.log('storeloaded paramsObject '+paramsObject);
+//    console.log('storeloaded jsonStore '+jsonStore);
+//    console.log('storeloaded rows '+rows);
+//    console.log('storeloaded paramsObject '+paramsObject);
 
     var cm = buildColumnModel(gridstore.reader.meta.fields);
     var grid = analysisGridPanel.getComponent('gridView');
 
     if (grid) {
-	console.log('remove previous gridView '+grid)
+//	console.log('remove previous gridView '+grid)
         analysisGridPanel.remove(grid);
     }
 
@@ -2993,13 +2995,13 @@ function storeLoaded(jsonStore, rows, paramsObject) {
         });
     }
 
-    console.log('create gtbar Toolbar');
+//    console.log('create gtbar Toolbar');
     var gtbar = new Ext.Toolbar({
 	id: 'gridViewToolbar',
 	items: [
 	    new Ext.Toolbar.Button ({
 		id: 'gridViewHelpIcon',
-		icon: '/assets/help/helpicon_white.jpg',
+		icon: '../assets/help/helpicon_white.jpg',
                 disabled: false,
 		tabIndex: 2,
 		tooltip: 'Grid View Help',
@@ -3009,9 +3011,9 @@ function storeLoaded(jsonStore, rows, paramsObject) {
 	    })
 	]
     });
-    console.log('create grid GridViewPanel');
-    console.log('cm: '+cm);
-    console.log('store: '+gridstore);
+//    console.log('create grid GridViewPanel');
+//    console.log('cm: '+cm);
+//    console.log('store: '+gridstore);
     grid = new GridViewPanel({
         id: 'gridView',
         title: 'Grid View',
@@ -3025,7 +3027,7 @@ function storeLoaded(jsonStore, rows, paramsObject) {
         cm: cm,
         store: gridstore
     });
-    console.log('grid created');
+//    console.log('grid created');
     analysisGridPanel.add(grid);
     analysisGridPanel.doLayout();
 }
@@ -3035,7 +3037,7 @@ function getAnalysisGridData(concept_key) {
 }
 
 function getAnalysisGridData(concept_key, omics_params) {
-    console.log('getAnalysisGridData concept_key: '+concept_key+' omics_params: '+omics_params);
+//    console.log('getAnalysisGridData concept_key: '+concept_key+' omics_params: '+omics_params);
     gridstore = new Ext.data.JsonStore(
         {
             url : pageInfo.basePath+'/chart/analysisGrid',
@@ -3048,7 +3050,7 @@ function getAnalysisGridData(concept_key, omics_params) {
     var myparams;
 
     if (omics_params) {
-	console.log('analysisgrid omics');
+//	console.log('analysisgrid omics');
         myparams = Ext.urlEncode(
             {
                 charttype : "analysisgrid",
@@ -3063,7 +3065,7 @@ function getAnalysisGridData(concept_key, omics_params) {
             });
     }
     else {
-	console.log('analysisgrid clinical concept_key: '+concept_key);
+//	console.log('analysisgrid clinical concept_key: '+concept_key);
         myparams = Ext.urlEncode(
             {
                 charttype : "analysisgrid",
