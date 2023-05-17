@@ -1,7 +1,11 @@
 import grails.util.Environment
 import grails.util.Metadata
+
+import groovy.util.logging.Slf4j
+
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager
 
+@Slf4j('logger')
 class BuildInfoController {
 
     private static final List<String> buildInfoProperties = [
@@ -19,11 +23,15 @@ class BuildInfoController {
 
     def index() {
 	List<String> customProperties = [] + buildInfoProperties
-	if (grailsApplication.config.buildInfo.exclude) {
-	    customProperties.removeAll grailsApplication.config.buildInfo.exclude
+//	logger.info 'BuildInfo customProperties size {}', customProperties.size()
+	if (grailsApplication.config.buildInfo.properties.exclude) {
+	    customProperties.removeAll grailsApplication.config.buildInfo.properties.exclude
+//	    logger.info 'BuildInfo customProperties exclude "{}" size {}', grailsApplication.config.buildInfo.properties.exclude, customProperties.size()
         }
-	if (grailsApplication.config.buildInfo.include) {
-	    customProperties.addAll grailsApplication.config.buildInfo.include
+	
+	if (grailsApplication.config.buildInfo.properties.include) {
+	    customProperties.addAll grailsApplication.config.buildInfo.properties.include
+//	    logger.info 'BuildInfo customProperties include "{}" size {}', grailsApplication.config.buildInfo.properties.include, customProperties.size()
         }
 
 	[buildInfoProperties: customProperties.sort(),
