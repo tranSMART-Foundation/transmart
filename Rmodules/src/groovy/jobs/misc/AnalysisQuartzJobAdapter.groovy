@@ -49,6 +49,8 @@ class AnalysisQuartzJobAdapter implements Job {
         String jobName = jobDataMap[PARAM_JOB_NAME]
         BOUND_JOB_NAME.set jobName
 
+//	logger.info 'execute jobName {} context {}', jobName, context
+
         setupDefaultScopeBeans()
 
         PersistenceContextInterceptor interceptor
@@ -58,6 +60,7 @@ class AnalysisQuartzJobAdapter implements Job {
 
             AbstractAnalysisJob job
             try {
+//		logger.info 'execute calling createAnalysisJob'
                 job = createAnalysisJob()
             }
             catch (e) {
@@ -68,6 +71,7 @@ class AnalysisQuartzJobAdapter implements Job {
             }
 
             try {
+//		logger.info 'execute calling job.run job: {}', job
                 job.run()
             }
             catch (e) {
@@ -80,6 +84,7 @@ class AnalysisQuartzJobAdapter implements Job {
             cleanJobBeans()
             interceptor.flush()
             interceptor.destroy()
+//	    logger.info 'execute COMPLETED'
         }
     }
 
@@ -103,7 +108,7 @@ class AnalysisQuartzJobAdapter implements Job {
 
         /* wire things up */
         job.updateStatus = { String status, String viewerUrl = null ->
-            job.logger.info "updateStatus called for status:$status, viewerUrl:$viewerUrl"
+//            job.logger.info "updateStatus called for status:$status, viewerUrl:$viewerUrl"
             asyncJobService.updateStatus job.name, status, viewerUrl
         }
         job.setStatusList = { List<String> statusList ->
