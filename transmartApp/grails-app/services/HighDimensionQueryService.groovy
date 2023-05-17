@@ -22,13 +22,13 @@ import static org.transmart.authorization.QueriesResourceAuthorizationDecorator.
 @Slf4j('logger')
 class HighDimensionQueryService {
 
-	static transactional = false
+    static transactional = false
 
-	@Autowired private DataSource dataSource
-	@Autowired private I2b2HelperService i2b2HelperService
-	@Autowired private HighDimensionResourceService highDimensionResourceService
+    @Autowired private DataSource dataSource
+    @Autowired private I2b2HelperService i2b2HelperService
+    @Autowired private HighDimensionResourceService highDimensionResourceService
 
-	List<Map> getHighDimensionalConceptSet(String result_instance_id1, String result_instance_id2) {
+    List<Map> getHighDimensionalConceptSet(String result_instance_id1, String result_instance_id2) {
 	List<Map> result = []
 
 	if (result_instance_id1) {
@@ -37,6 +37,8 @@ class HighDimensionQueryService {
 	if (result_instance_id2) {
 	    result.addAll getHighDimensionalConceptKeysInSubset(result_instance_id2)
 	}
+
+//	logger.info 'getHighDimensionalConceptSet result {}', result
 
         result
     }
@@ -75,7 +77,7 @@ class HighDimensionQueryService {
             }
         }
 
-	logger.debug 'High dimensional concepts found: {}', concepts
+//	logger.info 'getHighDimensionalConceptKeysInSubset High dimensional concepts found: {}', concepts
         concepts
     }
 

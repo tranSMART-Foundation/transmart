@@ -43,7 +43,14 @@ class HighDimensionFilterController {
             return
         }
 
+//	logger.info 'filterDialog concept+key {} gpl_id {} platform {}', concept_key, gpl_id, platform
+
 	HighDimensionDataTypeResource resource = highDimensionResourceService.getHighDimDataTypeResourceFromConcept(concept_key)
+
+//	logger.info 'filterDialog resource {}', resource
+//	logger.info 'filterDialog platform id {} markerType {}', platform.id, platform.id
+//	logger.info 'filterDialog resource filter_type {}', resource.highDimensionFilterType
+//	logger.info 'filterDialog filter {}', filter
 
 	render template: template, model: [
 	    gpl_id               : platform.id,
