@@ -31,12 +31,30 @@ function addSelectCategories()	{
 	    data: {id: jQuery("#search-categories").val()}
 	});
     });
-	
+
+    var hide = {};
+    
+    jQuery.getJSON(getCategoryConfigURL, function(json) {
+	//console.log("getCategoryConfig found " + json.length + " rows");
+	for (var i=0; i<json.length; i++)	{
+	    //console.log("json[" + i + "] " + json[i])
+	    var category = json[i].category;
+	    var value = json[i].value;
+	    hide[category] = (value === "hide");
+	    //console.log("category: " + category + " type: " + typeof(category) + " value: " + value + " type: " + typeof value + " hide: " + hide[category]);
+	}
+    });
+
     jQuery.getJSON(getCategoriesURL, function(json) {
+	//console.log("getSearchCategories found " + json.length + " rows");
 	for (var i=0; i<json.length; i++)	{
 	    var category = json[i].category;
 	    var catText = convertCategory(category);
-	    jQuery("#search-categories").append(jQuery("<option></option>").attr("value", category).text(catText));
+	    var catLower = catText.replace(/\s+/g,"").toLowerCase();
+	    //console.log("addSelectCategories [" + i + "] " + catLower + " hide: " +  hide[catLower] + " datatype " + typeof hide[catLower]);
+	    if(!hide[catLower]) {
+		jQuery("#search-categories").append(jQuery("<option></option>").attr("value", category).text(catText));
+	    }
 	}
 		
 	jQuery("#search-categories").html(jQuery("option", jQuery("#search-categories")).sort(function(a, b) {
@@ -135,16 +153,21 @@ function addSearchAutoComplete()	{
     return false;
 }
 
-//Helper method to only capitalize the first letter of each word
+//Helper method to expand or replace short names
+//or only capitalize the first letter of word
 function convertCategory(valueToConvert)	{
     var convertedValue = valueToConvert.toLowerCase();
     if (convertedValue == "genesig") {
 	return "Gene Signature";
-    }if (convertedValue == "genelist") {
+    }
+    if (convertedValue == "genelist") {
 	return "Gene List";
     }
     if (convertedValue == "species") {
 	return "Organism";
+    }
+    if (convertedValue == "mirna") {
+	return "MiRNA";
     }
     return convertedValue.slice(0,1).toUpperCase() + convertedValue.slice(1);
 }

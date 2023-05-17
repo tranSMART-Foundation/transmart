@@ -1,14 +1,19 @@
 import fm.FmFile
 import fm.FmFolder
 import fm.FmFolderService
+
 import grails.converters.JSON
+
 import groovy.util.logging.Slf4j
 import groovy.xml.StreamingMarkupBuilder
+
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.json.JSONArray
 import org.json.JSONObject
 import org.transmart.SearchKeywordService
 import org.transmart.searchapp.SearchTaxonomy
 import org.transmartproject.db.log.AccessLogService
+
 import transmartapp.SolrFacetService
 
 @Slf4j('logger')
@@ -21,6 +26,8 @@ class RWGController {
     SearchKeywordService searchKeywordService
     SolrFacetService solrFacetService
     TrialQueryService trialQueryService
+
+    GrailsApplication grailsApplication
 
     def index() {
 
@@ -374,6 +381,32 @@ class RWGController {
     // Return search categories for the drop down
     def getSearchCategories() {
         render searchKeywordService.findSearchCategories() as JSON
+    }
+
+    // Return search categories configuration for the drop down
+    def getSearchCategoryConfig() {
+
+        List result = []
+
+	//logger.info 'getSearchCategoryConfig start'
+
+	def properties = grailsApplication.config.com.recomdata.category.hide.toProperties().sort()
+
+	properties.eachWithIndex{it, i ->
+	    //logger.info 'getSearchCategoryConfig hide [{}] {} : {}', i, it.key, it.value
+	    if(it.value == 'true') {
+		result.add([category:it.key, value:'hide'])
+	    } else {
+		result.add([category:it.key, value:'show'])
+	    }
+	}
+
+	//logger.info 'getSearchCategoryConfig found {} hide values', result.size()
+
+	//result.eachWithIndex{it,i ->
+	    //logger.info 'result[{}] {}', i, it
+	//}
+	render result as JSON
     }
 
     def getFilterCategories() {
