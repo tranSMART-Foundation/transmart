@@ -16,6 +16,9 @@
 
 package com.recomdata.transmart.data.association
 
+import groovy.util.logging.Slf4j
+
+@Slf4j('logger')
 class RHeatmapController {
 
     RModulesOutputRenderService RModulesOutputRenderService
@@ -23,6 +26,8 @@ class RHeatmapController {
     def heatmapOut(String jobName) {
 	List<String> imageLinks = []
 	RModulesOutputRenderService.initializeAttributes jobName, 'Heatmap', imageLinks
+
+//	logger.info 'heatmapOut jobName {} imageLinks {}', jobName, imageLinks
 
 	render template: '/plugin/heatmap_out', contextPath: pluginContextPath, model: [
 	    imageLocations: imageLinks,
