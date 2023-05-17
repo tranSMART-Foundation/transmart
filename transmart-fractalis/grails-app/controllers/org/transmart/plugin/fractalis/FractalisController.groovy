@@ -42,20 +42,20 @@ class FractalisController {
 	// for all js files
 	for (String script in scripts) {
 	    assetRes = assetResourceLocator.findAssetForURI(script)
-	    logger.info 'loading Fractalis script {} asset {}', script, assetRes.getPath()
+	    logger.info 'Fractalis loadScripts script {} at {}', script, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: "script"]
 	}
 
 	// fractalis script for required version
 	assetRes = assetResourceLocator.findAssetForURI("resources/fractalis-${version}.js")
-	logger.info 'loading Fractalis version {} script {} asset {}',
+	logger.info 'Fractalis loadScripts version {} script {} at {}',
 	    version, "resources/fractalis-${version}.js", assetRes.getPath()
 	rows << [path: servletContext.contextPath + assetRes.getPath(), type: "script"]
 
 	// for all css files
 	for (String style in styles) {
 	    assetRes = assetResourceLocator.findAssetForURI(style)
-	    logger.info 'loading Fractalis style {} asset {}', style, assetRes.getPath()
+	    logger.info 'Fractalis loadScripts style {} at {}', style, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: "css"]
 	}
 
