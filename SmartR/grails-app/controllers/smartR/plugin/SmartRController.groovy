@@ -43,12 +43,14 @@ class SmartRController {
         // for all js files
         for (String script in scripts) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(script)
+//	    logger.info 'smartR loadScripts script {} at {}', script, assetRes.getPath()
  	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'script']
        }
 
         // for all css files
         for (String style in styles) {
 	    Resource assetRes = assetResourceLocator.findAssetForURI(style)
+//	    logger.info 'smartR loadScripts style {} at {}', style, assetRes.getPath()
 	    rows << [path: servletContext.contextPath + assetRes.getPath(), type: 'css']
         }
 

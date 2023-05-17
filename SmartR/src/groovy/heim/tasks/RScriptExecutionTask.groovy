@@ -33,8 +33,13 @@ class RScriptExecutionTask extends AbstractTask {
         rServeSession.doWithRConnection { RConnection conn ->
             def outputManager = new RScriptOutputManager(conn, sessionId, uuid, constants)
 
+//	    logger.info 'RScript taskresult constants {}', constants
+
             REXP res = callR(conn)
             List<File> fileNames = outputManager.downloadFiles()
+
+//	    logger.info 'RScript taskresult fileNames {}', fileNames
+//	    fileNames.eachWithIndex { it, i -> logger.info 'fileNames[{}] {}', i, it.getPath()}
 
             convertSuccessfulResult(res, fileNames)
         }
@@ -92,6 +97,12 @@ class RScriptExecutionTask extends AbstractTask {
          * of the list. Invert this and unwrap the values
          */
         def builder = ImmutableMap.builder()
+//        asNative.each { k, v ->
+//	    logger.info 'massage k: {} v: {}', k, v
+//	    logger.info 'k.getClass {} k.length {}', k.getClass(), ((Object[])k).length
+//	    logger.info 'v.getClass {}', v.getClass()
+//	    logger.info 'v.length {}', ((Object[])v).length
+//	}
         asNative.each { k, v ->
             if (k == []) {
                 return

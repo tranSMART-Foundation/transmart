@@ -123,8 +123,8 @@ class DataFetchTask extends AbstractTask {
                 res = createClinicalDataResult ontologyTerm, resultInstanceId
             }
 
-            logger.info('Fetch for ' + ontologyTerm + ' (rid ' + resultInstanceId + ') ' +
-                    'finished in ' + stopwatch)
+//            logger.info('Fetch for ' + ontologyTerm + ' (rid ' + resultInstanceId + ') ' +
+//                    'finished in ' + stopwatch)
             res
         }
 
@@ -264,7 +264,7 @@ class DataFetchTask extends AbstractTask {
             OutputStream os = new BufferedOutputStream(
                     conn.createFile(filename), 81920)
 
-            logger.info('Will start writing tabular result in file ' + filename)
+//            logger.info('Will start writing tabular result in file ' + filename)
             final Stopwatch stopwatch = Stopwatch.createStarted()
 
             Writer writer = new OutputStreamWriter(os, Charsets.UTF_8)
@@ -294,7 +294,7 @@ class DataFetchTask extends AbstractTask {
             }
 
 
-            logger.info('Finished writing file ' + filename + ' in ' + stopwatch)
+//            logger.info('Finished writing file ' + filename + ' in ' + stopwatch)
         }
 
         filename

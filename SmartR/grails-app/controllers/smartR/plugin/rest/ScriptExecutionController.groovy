@@ -1,12 +1,14 @@
 package smartR.plugin.rest
 
 import grails.validation.Validateable
+import groovy.util.logging.Slf4j
 import heim.session.SessionService
 import heim.tasks.TaskResult
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import sendfile.SendFileService
 
+@Slf4j('logger')
 class ScriptExecutionController {
 
     static scope = 'request'
@@ -22,13 +24,20 @@ class ScriptExecutionController {
     ]
 
     def run(RunCommand runCommand) {
+
+//	logger.info 'run test runCommand'
+
         throwIfInvalid runCommand
+
+//	logger.info 'run runCommand: {} {}', runCommand.taskType, runCommand.arguments
 
         UUID executionId =
                 sessionService.createTask(
                         runCommand.arguments,
                         runCommand.sessionId,
                         runCommand.taskType,)
+
+//	logger.info 'run executionId {}', executionId.toString()
 
         render(contentType: 'text/json') {
             [executionId: executionId.toString()]
@@ -38,7 +47,9 @@ class ScriptExecutionController {
     def status(StatusCommand statusCommand) {
         throwIfInvalid statusCommand
 
-        Map status = sessionService.getTaskData(
+//	logger.info 'calling status'
+
+	Map status = sessionService.getTaskData(
                 statusCommand.sessionId,
                 statusCommand.executionId,
                 statusCommand.waitForCompletion)
@@ -57,6 +68,13 @@ class ScriptExecutionController {
                     artifacts: res.artifacts,
             ]
         }
+
+//	if(res != null)
+//	    logger.info 'status state {} resultValue successful {} exception {} artifacts {}',
+//	    status.state.toString(),
+//	    resultValue.successful,
+//	    resultValue.exception,
+//	    resultValue.artifacts
 
         render(contentType: 'text/json') {
             [

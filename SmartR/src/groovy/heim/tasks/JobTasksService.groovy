@@ -76,12 +76,12 @@ class JobTasksService implements DisposableBean {
 
         tasks[task.uuid] = taskAndState
 
-        logger.debug 'Task ' + task + ' will be submitted now'
+        logger.debug 'Task uuid {} will be submitted now', task.uuid
         ListenableFuture<TaskResult> future = smartRExecutorService.submit(
                 new Callable() {
                     @Override
                     Object call() throws Exception {
-                        logger.debug 'Task ' + task + ' entered running state'
+                    logger.debug 'Task {} entered running state', task.uuid
                         tasks[task.uuid] = new TaskAndState(
                                 task: task,
                                 state: TaskState.RUNNING,
@@ -93,6 +93,7 @@ class JobTasksService implements DisposableBean {
                     }
                 })
 
+//	logger.info 'Task {} running', task.uuid
         futures[task.uuid] = future
 
         def publicFuture = new SettableFuture<TaskResult>()
@@ -101,8 +102,7 @@ class JobTasksService implements DisposableBean {
             void onSuccess(TaskResult taskResult1) {
                 assert taskResult1 != null :
                         'Task must return TaskResult or throw'
-                logger.debug('Task ' + task + ' terminated without throwing. ' +
-                        'Successful? ' + taskResult1.successful)
+                logger.debug 'Task {} terminated without throwing. Successful? {}', task.uuid, taskResult1.successful
                 tasks[task.uuid] = new TaskAndState(
                         task: task,
                         state: taskResult1.successful ?
@@ -116,10 +116,10 @@ class JobTasksService implements DisposableBean {
                     thrown = thrown.undeclaredThrowable
                 }
                 if (thrown instanceof CancellationException) {
-                    logger.debug('Task ' + task + ' was canceled')
+                    logger.debug 'Task {} was canceled', task
                 }
                 else {
-                    logger.debug 'Task ' + task + ' terminated by throwing', thrown
+                    logger.debug 'Task {} terminated by throwing {}', task, thrown
                 }
 
                 tasks[task.uuid] = new TaskAndState(
@@ -142,7 +142,7 @@ class JobTasksService implements DisposableBean {
                 }
                 publicFuture.set(result.taskResult)
                 sessionService.touchSession(sessionId) // should not throw
-                logger.info 'Task ' + task + ' finished. Final result: ' + result
+                logger.info 'Task {} finished. Final result: {}', task.uuid, result
             }
         }, MoreExecutors.directExecutor()) // run on the same thread
     }

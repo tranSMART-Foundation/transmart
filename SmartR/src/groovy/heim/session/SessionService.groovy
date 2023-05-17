@@ -141,8 +141,11 @@ class SessionService implements DisposableBean {
                     String taskType) {
         doWithSession(sessionId) {
 	    logger.debug 'calling createTask'
+//	    logger.info 'calling createTask taskType {}', taskType
             def task = jobInstance.createTask(taskType, arguments)
 	    logger.debug 'calling submitTask'
+//	    logger.info 'calling submitTask uuid {}', task.uuid
+//	    arguments.each {k, v -> logger.info 'argument {} : {}', k, v}
             jobTasksService.submitTask(task)
             task.uuid
         }
@@ -170,6 +173,11 @@ class SessionService implements DisposableBean {
                 // not great code, this may be out of sync with the state we got before
                 result = jobTasksService.getTaskResult(taskUUID)
             }
+
+//	    if (result != null) {
+//		logger.info 'result from getTaskData session {} task {} waitForCompletion {}', sessionUUID, taskUUID, waitForCompletion
+//		logger.info 'result {}', result
+//	    }
 
             [
                     state : state,

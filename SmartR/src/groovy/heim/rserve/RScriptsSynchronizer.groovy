@@ -68,7 +68,7 @@ class RScriptsSynchronizer {
                 try {
                     copyFilesOver()
                 } catch (Throwable t) {
-                    throw new IllegalStateException("Can't copy the smartR scripts to the Rserver machine", t)
+                    throw new IllegalStateException('Can\'t copy the smartR scripts to the Rserve machine', t)
                 }
                 copySuccessful = true
                 logger.info('Finished copying over the smartR scripts to the Rserve machine')
@@ -87,6 +87,7 @@ class RScriptsSynchronizer {
         RConnection rConnection = rConnectionProvider.get()
         try {
             RFileOutputStream os = rConnection.createFile(BUNDLE_FIX)
+//	    logger.info 'copyFilesOver createZip {}', BUNDLE_FIX
             // buffering the output improves performance (otherwise writing just
             // one byte would send a packet on itself) and goes around a bug
             // in RFileOutputStream::write(byte b), which always writes a NUL
@@ -97,12 +98,15 @@ class RScriptsSynchronizer {
             String escapedRemoteDir =
                     RUtil.escapeRStringContent(constants.remoteScriptDirectoryDir.absoluteFile.toString())
             assert escapedRemoteDir != '/'
+//	    logger.info 'copyFilesOver unlink R remote dir {}', escapedRemoteDir
             RUtil.runRCommand(rConnection,
                     "unlink('$escapedRemoteDir', recursive = TRUE)")
 
             String escapedZipName = RUtil.escapeRStringContent(BUNDLE_FIX)
+//	    logger.info 'copyFilesOver unzip {} in {}', escapedZipName, escapedRemoteDir
             RUtil.runRCommand(rConnection,
-                    "unzip('$escapedZipName', exdir = '$escapedRemoteDir')")
+			      "unzip('$escapedZipName', exdir = '$escapedRemoteDir')")
+//	    logger.info 'copyFilesOver done'
         } finally {
             rConnection.close()
         }
