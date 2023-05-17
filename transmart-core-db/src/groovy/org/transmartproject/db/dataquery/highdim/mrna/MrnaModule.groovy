@@ -59,6 +59,9 @@ class MrnaModule extends AbstractHighDimensionDataTypeModule {
     @Autowired CorrelationTypesRegistry correlationTypesRegistry
 
     HibernateCriteriaBuilder prepareDataQuery(Projection projection, SessionImplementor session) {
+
+//	logger.info '{} prepareDataQuery start', name
+	
 	HibernateCriteriaBuilder criteriaBuilder = createCriteriaBuilder(
 	    DeSubjectMicroarrayDataCoreDb, 'mrnadata', session)
 
@@ -85,6 +88,8 @@ class MrnaModule extends AbstractHighDimensionDataTypeModule {
 	    instance.resultTransformer = Transformers.ALIAS_TO_ENTITY_MAP
         }
 
+//	logger.info '{} prepareDataQuery done', name
+
         criteriaBuilder
     }
 
@@ -93,6 +98,9 @@ class MrnaModule extends AbstractHighDimensionDataTypeModule {
          * order as the assays in the result set */
 	Map assayIndexMap = createAssayIndexMap(assays)
 
+//	logger.info 'transformResults stack trace {}', Arrays.toString(Thread.currentThread().getStackTrace()).replace( ',', '\n' )
+//	logger.info 'transformResults {} assayIndexMap {}', name, assayIndexMap.size()
+
 	DefaultHighDimensionTabularResult preliminaryResult = new DefaultHighDimensionTabularResult(
             rowsDimensionLabel:    'Probes',
             columnsDimensionLabel: 'Sample codes',
@@ -100,7 +108,7 @@ class MrnaModule extends AbstractHighDimensionDataTypeModule {
             results:               results,
             allowMissingAssays:    true,
             assayIdFromRow:        { it[0].assayId },
-            inSameGroup:           { a, b -> a.probeId == b.probeId && a.geneSymbol == b.geneSymbol && a.geneId == b.geneId},
+            inSameGroup:           { a, b -> a.probeId == b.probeId && a.geneSymbol == b.geneSymbol && a.geneId == b.geneId },
             finalizeGroup:         { List list -> /* list of arrays with one element: a map */
                 /* we may have nulls if allowMissingAssays is true,
                  * but we're guaranteed to have at least one non-null */
@@ -115,6 +123,8 @@ class MrnaModule extends AbstractHighDimensionDataTypeModule {
             }
         )
 
+//	logger.info 'transformResults {} preliminaryResult indicesList {}', name, preliminaryResult.getIndicesList()
+
         /* In some implementations, probeset_id is actually not a primary key on
          * the annotations table and several rows will be returned for the same
          * probeset_id, just with different genes.
@@ -124,6 +134,9 @@ class MrnaModule extends AbstractHighDimensionDataTypeModule {
             collectBy: { it.probe },
             resultItem: {collectedList ->
                 if (collectedList) {
+//		    logger.info 'RepeatedEntries...Result {} ({})',collectedList[0], collectedList.size()
+//		    logger.info 'RepeatedEntries...genesymbol {} geneid {} Result {}',
+//			collectedList*.geneSymbol.join('/'), collectedList*.geneId.join('/'), collectedList[0]
                     new ProbeRow(
                         probe:         collectedList[0].probe,
                         geneSymbol:    collectedList*.geneSymbol.join('/'),
@@ -157,8 +170,11 @@ class MrnaModule extends AbstractHighDimensionDataTypeModule {
 
     List<String> searchAnnotation(String conceptCode, String searchTerm, String searchProperty) {
 	if (!getSearchableAnnotationProperties().contains(searchProperty)) {
+//	    logger.info 'searchAnnotation {} no such property {}', name, searchProperty
             return []
 	}
+
+//	logger.info 'searchAnnotation {} concept {} term {} property {}', name, conceptCode, searchTerm, searchProperty
 
         DeMrnaAnnotationCoreDb.createCriteria().list {
 	    eq 'gplId', DeSubjectSampleMapping.createCriteria().get {
