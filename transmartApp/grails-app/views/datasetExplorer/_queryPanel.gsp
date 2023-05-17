@@ -78,7 +78,7 @@
             </g:if>
 	    <g:else>
                 <asset:image src="project_logo.png" alt="${projectName}"
-		     style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+			     style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
             </g:else>
 	</a>
     </g:if>
@@ -88,12 +88,12 @@
     <g:if test="${providerName}">
         <a id="providerpowered" target="_blank" href="${grailsApplication.config?.com?.recomdata?.providerURL}"
            style="text-decoration: none;">
-            <g:if test="${providerLogo}">
-                <img src="${providerLogo}" alt="${providerName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+        <g:if test="${providerLogo}">
+	    <img src="${providerLogo}" alt="${providerName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
         </g:if>
 	<g:else>
-            <asset:image src="provider_logo.png" alt="${providerName}"
-		 style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+	    <asset:image src="provider_logo.png" alt="${providerName}"
+			 style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
         </g:else>
         </a>
     </g:if>
