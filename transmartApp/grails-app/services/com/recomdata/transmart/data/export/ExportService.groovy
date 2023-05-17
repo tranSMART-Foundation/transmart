@@ -121,13 +121,15 @@ class ExportService {
 
     Map<String, Map> getsubsetSelectedPlatformsByFiles(checkboxList) {
 	Map<String, Map> subsetSelectedPlatformsByFiles = [:]
-        //Split the list on commas first, each box is seperated by ','.
+        //Split the list on commas first, each box is separated by ','.
 		for (checkboxItem in checkboxList) {
             //Split the item by '_' to get the different attributes.
             // Attributes are: <subset_id>_<datatype>_<exportformat>_<platform>
             // e.g. subset1_mrna_TSV_GPL570
             String[] checkboxItemArray = StringUtils.split(checkboxItem, '_')
 
+//	    logger.info 'getsubsetSelectedPlatformsByFiles {}', checkboxList
+	    
             //The first item is the subset name.
 	    String currentSubset = checkboxItemArray[0].trim().replace(' ', '')
 
@@ -135,6 +137,8 @@ class ExportService {
             if (checkboxItemArray.size() > 3) {
 		String fileName = checkboxItemArray[1].trim() + checkboxItemArray[2].trim()
 		String platform = checkboxItemArray[3].trim()
+//		logger.info 'platform: {} fileName: {}', platform, fileName
+
                 if (subsetSelectedPlatformsByFiles.containsKey(currentSubset)) {
                     if (subsetSelectedPlatformsByFiles.get(currentSubset).containsKey(fileName)) {
 			subsetSelectedPlatformsByFiles.get(currentSubset).get(fileName) << platform
@@ -148,6 +152,8 @@ class ExportService {
                 }
             }
         }
+
+//	logger.info 'getsubsetSelectedPlatformsByFiles returns {}', subsetSelectedPlatformsByFiles
 
         subsetSelectedPlatformsByFiles
     }
