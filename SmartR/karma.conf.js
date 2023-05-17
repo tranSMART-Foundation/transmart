@@ -20,25 +20,25 @@ module.exports = function(config) {
         // list of files / patterns to load in the browser
         files: [
             // libraries
-            'web-app/js/resource/jquery-2.1.4.min.js',
-            'web-app/js/resource/angular.js',
-            'web-app/js/resource/angular-route.js',
-            'web-app/js/resource/angular-css.js',
-            'web-app/js/resource/d3.min.js',
+            'grails-app/assets/javascripts/resource/jquery-2.1.4.min.js',
+            'grails-app/assets/javascripts/js/resource/angular.js',
+            'grails-app/assets/javascripts/js/resource/angular-route.js',
+            'grails-app/assets/javascripts/js/resource/angular-css.js',
+            'grails-app/assets/javascripts/js/resource/d3.min.js',
 
             // stuff for testing only
-            'web-app/js/resource/angular-mocks.js',
+            'grails-app/assets/javascripts/resource/angular-mocks.js',
             'test/unit/javascript/testSetup.js',
             // 'node_modules/karma-ng-html2js-preprocessor/lib/html2js.js',
 
             // application code
-            'web-app/js/smartR/_angular/services/smartRUtils.js',
-            'web-app/js/smartR/_angular/services/rServeService.js',
-            'web-app/js/smartR/_angular/directives/fetchButton.js',
-            'web-app/js/smartR/_angular/directives/runButton.js',
+            'grails-app/assets/javascripts/smartR/_angular/services/smartRUtils.js',
+            'grails-app/assets/javascripts/smartR/_angular/services/rServeService.js',
+            'grails-app/assets/javascripts/smartR/_angular/directives/fetchButton.js',
+            'grails-app/assets/javascripts/smartR/_angular/directives/runButton.js',
 
             // templates
-            'web-app/js/smartR/_angular/templates/*.html',
+            'grails-app/assets/javascripts/smartR/_angular/templates/*.html',
 
             // test files
             'test/unit/javascript/**/*.js'
@@ -52,11 +52,11 @@ module.exports = function(config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'web-app/js/smartR/_angular/templates/*.html': 'ng-html2js'
+            'grails-app/assets/javascripts/smartR/_angular/templates/*.html': 'ng-html2js'
         },
 
         ngHtml2JsPreprocessor: {
-            stripPrefix: 'web-app',
+            stripPrefix: 'WEB-INF',
             moduleName: 'smartRTemplates'
         },
         
