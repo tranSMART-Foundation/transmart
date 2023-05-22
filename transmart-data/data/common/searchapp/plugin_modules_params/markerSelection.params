@@ -70,7 +70,7 @@ array (
         meltData       = FALSE,
         imageWidth     = as.integer(\'||IMAGE_WIDTH||\'),
         imageHeight    = as.integer(\'||IMAGE_HEIGHT||\'),
-        pxPerCell      = as.integer(\'||PXPERCELL||\'),
+        pxPerCell      = as.integer(\'||PXPERCELL||\'))',
     ),
   ),
   'renderer' => 

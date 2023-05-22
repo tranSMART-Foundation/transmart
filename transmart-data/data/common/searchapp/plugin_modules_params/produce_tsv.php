@@ -6,7 +6,7 @@ function myfputcsv($stream, $data) {
 	//as a means of escaping it
 	//however, it is not an actual "escape" because a sequence \" will still
 	//mean the same literally, not just ", unlike "" which is the escape
-	//sequence for ". If then \ ia thens given as the escape character to
+	//sequence for ". If \ is then given as the escape character to
 	//fgetcsv, the sequence \" will be inerpreted as a literal \" instead of
 	//having the " end the enclosed sequence.
 	//This behavior doesn't seem very useful and postgres can't deal with it

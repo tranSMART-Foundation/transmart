@@ -70,8 +70,8 @@ array (
         clusters.number = \'||CLUSTERS||\',
         imageWidth      = \'||IMAGE_WIDTH||\',
         imageHeight     = \'||IMAGE_HEIGHT||\',
-        maxDrawNumber   = as.integer(\'||MAXDRAWNUMBER||\'))',
-        pxPerCell      = as.integer(\'||PXPERCELL||\'),
+        maxDrawNumber   = as.integer(\'||MAXDRAWNUMBER||\'),
+        pxPerCell      = as.integer(\'||PXPERCELL||\'))',
     ),
   ),
   'renderer' => 
