@@ -76,10 +76,10 @@ zscore.file = "zscores.txt"
 	  write.table(mRNAData,zscore.file,quote=F,sep="\t",row.names=F,col.names=T)
 	}
   
-    if (aggregate.probes) {
-        # probe aggregation function adapted from dataBuilder.R to heatmap's specific data-formats
-        mRNAData <- MS.probe.aggregation(mRNAData, collapseRow.method = "MaxMean", collapseRow.selectFewestMissing = TRUE)
-    }
+	if (aggregate.probes) {
+          # probe aggregation function adapted from dataBuilder.R to heatmap's specific data-formats
+          mRNAData <- MS.probe.aggregation(mRNAData, collapseRow.method = "MaxMean", collapseRow.selectFewestMissing = TRUE)
+    	}
 
 	#Create a data.frame with unique probe/gene ids.
 	geneStatsData <- data.frame(mRNAData$PROBE.ID,mRNAData$GENE_SYMBOL);
@@ -215,19 +215,22 @@ zscore.file = "zscores.txt"
 	finalHeatmapData.zscore = t(scale(t(finalHeatmapData[,-1])))
 	finalHeatmapData.zscore = cbind(finalHeatmapData[,1], finalHeatmapData.zscore)
 	
-# 	#---------------------
+ 	#---------------------
  	#WRITE TO FILE
-  #Before we write the CMS file we need to replace any empty genes with NA.
-  topgenes$GENE_SYMBOL[which(topgenes$GENE_SYMBOL=="")] <- NA
-  #Write the file with the stats by gene. This will get read into the UI.
-  write.table(topgenes,output.file,sep = "\t", , quote=F, row.names=F)
-  #Write the data file we will use for the heatmap.
-  write.table(finalHeatmapData,'heatmapdata',sep = "\t", quote=F, row.names=F)
-	#---------------------
-	
+
+	#Before we write the CMS file we need to replace any empty genes with NA.
+	topgenes$GENE_SYMBOL[which(topgenes$GENE_SYMBOL=="")] <- NA
+
+	#Write the file with the stats by gene. This will get read into the UI.
+	write.table(topgenes,output.file,sep = "\t", , quote=F, row.names=F)
+
+	#Write the data file we will use for the heatmap.
+	write.table(finalHeatmapData,'heatmapdata',sep = "\t", quote=F, row.names=F)
+
 	print("-------------------")
 	##########################################
 }
+
 MS.probe.aggregation <- function(mRNAData, collapseRow.method,
                                  collapseRow.selectFewestMissing, 
                                  output.file = "aggregated_data.txt") {

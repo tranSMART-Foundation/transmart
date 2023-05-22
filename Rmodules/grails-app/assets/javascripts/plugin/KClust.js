@@ -68,7 +68,8 @@ KMeansClusteringView.prototype.get_form_params = function () {
         var inputConceptPathVar = readConceptVariables("divIndependentVariable");
         var clusters = inputArray[1].el.value;
         var maxDrawNum = inputArray[2].el.value;
-        var calculateZscore = inputArray[3].el.checked;
+        var pxPerCell = inputArray[3].el.value;
+        var calculateZscore = inputArray[4].el.checked;
 
         // assign values to form parameters
         formParameters['jobType'] = 'RKClust';
@@ -76,6 +77,7 @@ KMeansClusteringView.prototype.get_form_params = function () {
         formParameters['variablesConceptPaths'] = inputConceptPathVar;
         formParameters['txtClusters'] = clusters;
         formParameters['txtMaxDrawNumber'] = maxDrawNum;
+        formParameters['txtPixelsPerCell'] = pxPerCell;
         formParameters['calculateZscore'] = calculateZscore;
 
         //get analysis constraints
@@ -118,9 +120,14 @@ KMeansClusteringView.prototype.get_inputs = function (form_params) {
             "validations" : [{type:"REQUIRED"}, {type:"INTEGER", min:1}]
         },
         {
-            "label" : "Max Row to Display",
+            "label" : "Max Rows to Display",
             "el" : document.getElementById("txtMaxDrawNumber"),
             "validations" : [{type:"INTEGER", min:1}]
+        },
+        {
+            "label" : "Pixels per Cell",
+            "el" : document.getElementById("txtPixelsPerCell"),
+            "validations" : [{type:"INTEGER", min:10, max:50}]
         },
         {
             "label" : "Calculate z-score on the fly",

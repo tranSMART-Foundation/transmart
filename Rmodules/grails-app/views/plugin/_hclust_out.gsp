@@ -2,8 +2,8 @@
 
 <p>
     <div class="plot_hint">
-	Click on the heatmap image to open it in a new window as this may increase readability.
-	<br><br>
+	<i>Click on the heatmap image to open it in a new window as this may increase readability.</i>
+	<br/><br/>
     </div>
 
     <g:each var='location' in="${imageLocations}">

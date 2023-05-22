@@ -29,8 +29,8 @@ array (
     '||GPL2||' => 'divIndependentVariablegplsValue2',
     '||IMAGE_HEIGHT||' => 'txtImageHeight',
     '||IMAGE_WIDTH||' => 'txtImageWidth',
-    '||TEXT_POINT_SIZE||' => 'txtImagePointsize',
     '||MAXDRAWNUMBER||' => 'txtMaxDrawNumber',
+    '||PXPERCELL||' => 'txtPixelsPercell',
   ),
   'converter' => 
   array (
@@ -65,8 +65,8 @@ array (
         input.filename = \'outputfile\',
         imageWidth     = as.integer(\'||IMAGE_WIDTH||\'),
         imageHeight    = as.integer(\'||IMAGE_HEIGHT||\'),
-        pointsize      = as.integer(\'||TEXT_POINT_SIZE||\'),
         maxDrawNumber  = as.integer(\'||MAXDRAWNUMBER||\'))',
+        pxPerCell      = as.integer(\'||PXPERCELL||\'),
     ),
   ),
   'renderer' => 

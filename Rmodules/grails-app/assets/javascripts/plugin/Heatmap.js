@@ -27,6 +27,8 @@ HeatMapView.prototype.submit_job = function () {
         // get formParams
         var formParams = job.get_form_params();
 
+	console.log("formParams: " + formParams);
+
         if (formParams) { // if formParams is not null
             submitJob(formParams);
         }
@@ -66,14 +68,16 @@ HeatMapView.prototype.get_form_params = function () {
         // get values
         var inputConceptPathVar = readConceptVariables("divIndependentVariable");
         var maxDrawNum = inputArray[1].el.value;
-        var doGroupBySubject = inputArray[2].el.checked;
-        var calculateZscore = inputArray[3].el.checked;
+        var pxPerCell = inputArray[2].el.value;
+        var doGroupBySubject = inputArray[3].el.checked;
+        var calculateZscore = inputArray[4].el.checked;
 
         // assign values to form parameters
         formParameters['jobType'] = 'RHeatmap';
         formParameters['independentVariable'] = inputConceptPathVar;
         formParameters['variablesConceptPaths'] = inputConceptPathVar;
         formParameters['txtMaxDrawNumber'] = maxDrawNum;
+        formParameters['txtPixelsPerCell'] = pxPerCell;
         formParameters['doGroupBySubject'] = doGroupBySubject;
         formParameters['calculateZscore'] = calculateZscore;
 
@@ -112,9 +116,14 @@ HeatMapView.prototype.get_inputs = function (form_params) {
             ]
         },
         {
-            "label" : "Max Row to Display",
+            "label" : "Max Rows to Display",
             "el" : document.getElementById("txtMaxDrawNumber"),
             "validations" : [{type:"INTEGER", min:1}]
+        },
+        {
+            "label" : "Pixels per Cell",
+            "el" : document.getElementById("txtPixelsPerCell"),
+            "validations" : [{type:"INTEGER", min:10, max:50}]
         },
         {
             "label" : "Do Group by Subject",

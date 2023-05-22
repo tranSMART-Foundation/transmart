@@ -23,8 +23,8 @@ input.filename,
 output.file ="Heatmap",
 meltData = TRUE,
 imageWidth = 1200,
-imageHeight = 800,
-pointsize = 15,
+imageHeight = 1200,
+pxPerCell = 0,
 maxDrawNumber = Inf,
 color.range.clamps = c(-2.5,2.5),
 aggregate.probes = FALSE,
@@ -48,7 +48,7 @@ zscore.file = "zscores.txt"
     #Pull the GEX data from the file.
     mRNAData <- data.frame(read.delim(input.filename))
     if (nrow(mRNAData) == 0) {
-        CairoPNG(file = paste(output.file,".png",sep=""), width=1200, height=600,units = "px")
+        CairoPNG(file = paste(output.file,".png",sep=""), width=as.numeric(imageWidth), height=as.numeric(imageHeight), units = "px")
         Plot.error.message("Your selection yielded an empty dataset,\nplease check your subset and biomarker selection."); return()
     }
 
@@ -143,18 +143,17 @@ zscore.file = "zscores.txt"
     n_remaining_sample<-ncol(mRNAData)
     if (is.null(color.range.clamps)) color.range.clamps = c(min(mRNAData), max(mRNAData))
     if (n_remaining_marker>1 & n_remaining_sample >1) {
-        plotHeatmap(mRNAData, colcolor, cluster.by.rows, cluster.by.columns, color.range.clamps, output.file)
+        plotHeatmap(mRNAData, colcolor, cluster.by.rows, cluster.by.columns, color.range.clamps, as.numeric(pxPerCell), output.file)
     } else {
         #Prepare the package to capture the image file.
         CairoPNG(file=paste(output.file,".png",sep=""),width=as.numeric(imageWidth),height=as.numeric(imageHeight),pointsize=as.numeric(pointsize))
-
         Plot.error.message("Not enough marker/samples to draw heatmap"); return()
     }
 
     print("-------------------")
 }
 
-plotHeatmap <- function(data, colcolors, cluster.by.rows, cluster.by.columns, color.range.clamps, output.file = "Heatmap") {
+plotHeatmap <- function(data, colcolors, cluster.by.rows, cluster.by.columns, color.range.clamps, pxPerCell, output.file = "Heatmap") {
     require(Cairo)
     require(gplots)
 
@@ -165,18 +164,21 @@ plotHeatmap <- function(data, colcolors, cluster.by.rows, cluster.by.columns, co
     onlyOneSubset <- length(unique(colcolors))==1
     if (onlyOneSubset) { colcolors <- "white" }
 
-    # The Cairo graphical backend has a width and heigth resolution restriction which depends upon environment settings
+    # The Cairo graphical backend has a width and height resolution restriction which depends upon environment settings
     # The number of pixels (width and heigth) for each boxplot's cell is therefore dependent on the max number of row or column cells
     # These numbers were found experimentally to generate legible plots, but might need to be further reduced if problems occur
-    maxDim <- max(dim(data)[1], dim(data)[2])
-    if (maxDim < 250) {pxPerCell <- 30}
-    else if (maxDim < 500) {pxPerCell <- 25}
-    else if (maxDim < 1000) {pxPerCell <- 20}
-    else if (maxDim < 2000) {pxPerCell <- 15}
-    else {pxPerCell <- 10} # less than 10 pixels per cell makes the plot illegible
 
-    # all paramaters determining the sizes of elements in the heatmap scale with the set pxPerCell (eg. fontsizes, legendsizes)
-    hmPars <- list(pointSize = pxPerCell / 1, labelPointSize = pxPerCell / 9)
+    maxDim <- max(dim(data)[1], dim(data)[2])
+
+    if(pxPerCell < 10) {
+        if (maxDim < 250) {pxPerCell <- 30}
+        else if (maxDim < 500) {pxPerCell <- 25}
+    	else if (maxDim < 1000) {pxPerCell <- 20}
+    	else if (maxDim < 2000) {pxPerCell <- 15}
+    	else {pxPerCell <- 10} # less than 10 pixels per cell makes the plot illegible
+    }
+
+    # all parameters determining the sizes of elements in the heatmap scale with the set pxPerCell (eg. fontsizes, legendsizes)
 
     # The heatmap is split into a grid for each of its elements to be drawn in (see lmat argument in heatmap.2 function)
     # the heatmap plot is split in 6 columns (left border, rows-dendrogram, rowcolors (not used), heatmap, labelStarts/legends, labelOverflow)
@@ -187,9 +189,11 @@ plotHeatmap <- function(data, colcolors, cluster.by.rows, cluster.by.columns, co
     rowLabelSizeMax <- max(0, max(nchar(colnames(data))) - (legendSizesInCells / letterSizeInCells))
     colLabelSizeMax <- max(0, max(nchar(rownames(data))) - (legendSizesInCells / letterSizeInCells))
 
-    # define the heatmap's grid sizes
-    columnSizes <- c(1, 5, 0, ncol(data), legendSizesInCells, letterSizeInCells * colLabelSizeMax) * pxPerCell
+    hmPars <- list(pointSize = pxPerCell * letterSizeInCells, labelPointSize = pxPerCell / 9)
+
+# define the heatmap's grid sizes
     rowSizes <- c(1, 5, ifelse(onlyOneSubset, 0.5, 3), nrow(data), legendSizesInCells, letterSizeInCells * rowLabelSizeMax) * pxPerCell
+    columnSizes <- c(1, 5, 0, ncol(data), legendSizesInCells, letterSizeInCells * colLabelSizeMax) * pxPerCell
     totalWidth <- sum(columnSizes)
     totalHeight <- sum(rowSizes)
     hmCanvasColumnRatios <- columnSizes / totalWidth

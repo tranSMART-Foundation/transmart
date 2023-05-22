@@ -29,6 +29,7 @@ class HierarchicalClustering extends HighDimensionalOnlyJob {
                             cluster.by.rows = '$doClusterRows' == 'true',
                             cluster.by.columns = '$doClusterColumns' == 'true',
                             ${ txtMaxDrawNumber ? ", maxDrawNumber  = as.integer('$txtMaxDrawNumber')" : ''},
+                            ${ txtPixelsPerCell ? ", pxPerCell  = as.integer('$txtPixelsPerCell')" : ''},
                             calculateZscore = '$calculateZscore'
                             )'''
 

@@ -29,6 +29,7 @@ class KMeansClustering extends HighDimensionalOnlyJob {
                             aggregate.probes = '$divIndependentVariableprobesAggregation' == 'true',
                             clusters.number  = as.integer('$txtClusters'),
                             ${ txtMaxDrawNumber ? ", maxDrawNumber  = as.integer('$txtMaxDrawNumber')" : ''},
+                            ${ txtPixelsPerCell ? ", pxPerCell  = as.integer('$txtPixelsPerCell')" : ''},
                             calculateZscore = '$calculateZscore'
                             )'''
 

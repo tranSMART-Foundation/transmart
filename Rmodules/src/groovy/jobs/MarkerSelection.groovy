@@ -35,6 +35,7 @@ class MarkerSelection extends HighDimensionalOnlyJob {
         // generate the actual heatmap png picture
         String createHeatmap = '''Heatmap.loader(
                             input.filename   = \'heatmapdata\',
+                            ${ txtPixelsPerCell ? ", pxPerCell  = as.integer('$txtPixelsPerCell')" : ''},
                             meltData         = FALSE
                             )'''
 

@@ -66,15 +66,17 @@ HierarchicalClusteringView.prototype.get_form_params = function () {
         // get values
         var inputConceptPathVar = readConceptVariables("divIndependentVariable");
         var maxDrawNum = inputArray[1].el.value;
-        var doClusterRows = inputArray[2].el.checked;
-        var doClusterColumns = inputArray[3].el.checked;
-        var calculateZscore = inputArray[4].el.checked;
+        var pxPerCell = inputArray[2].el.value;
+        var doClusterRows = inputArray[3].el.checked;
+        var doClusterColumns = inputArray[4].el.checked;
+        var calculateZscore = inputArray[5].el.checked;
 
         // assign values to form parameters
         formParameters['jobType'] = 'RHClust';
         formParameters['independentVariable'] = inputConceptPathVar;
         formParameters['variablesConceptPaths'] = inputConceptPathVar;
         formParameters['txtMaxDrawNumber'] = maxDrawNum;
+        formParameters['txtPixelsPerCell'] = pxPerCell;
         formParameters['doClusterRows'] = doClusterRows;
         formParameters['doClusterColumns'] = doClusterColumns;
         formParameters['calculateZscore'] = calculateZscore;
@@ -113,9 +115,14 @@ HierarchicalClusteringView.prototype.get_inputs = function (form_params) {
             ]
         },
         {
-            "label" : "Max Row to Display",
+            "label" : "Max Rows to Display",
             "el" : document.getElementById("txtMaxDrawNumber"),
             "validations" : [{type:"INTEGER", min:1}]
+        },
+        {
+            "label" : "Pixels per Cell",
+            "el" : document.getElementById("txtPixelsPerCell"),
+            "validations" : [{type:"INTEGER", min:10, max:50}]
         },
         {
             "label" : "Do cluster rows",
