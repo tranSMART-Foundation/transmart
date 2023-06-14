@@ -31,7 +31,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>30.1-jre</version>	<!-- was 22.0 now select 30.1-jre or android flavour -->
+      <version>32.0.0-jre</version>	<!-- was 22.0 now select 32.0.0-jre or android flavour -->
       <scope>test</scope>
     </dependency>
     <dependency>
