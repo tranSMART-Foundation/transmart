@@ -95,6 +95,9 @@ class RScriptExecutionTask extends AbstractTask {
         /* list(a=1, b='a') results in a map where the keys (!) are arrays
          * with one element with value 1.0 and 'a' and the values are the names
          * of the list. Invert this and unwrap the values
+	 *
+	 * possible changed behavior in latest R versions.
+	 * handle both possibilities
          */
         def builder = ImmutableMap.builder()
 //        asNative.each { k, v ->
@@ -107,9 +110,11 @@ class RScriptExecutionTask extends AbstractTask {
             if (k == []) {
                 return
             }
-            assert k.getClass().isArray() && ((Object[])k).length == 1
-            assert v instanceof String
-            builder.put(v,  ((Object[])k)[0])
+            if(k.getClass().isArray() && ((Object[])k).length == 1) {
+		builder.put(v, ((Object[])k)[0])
+	    } else if (v.getClass().isArray() && ((Object[])v).length == 1) {
+		builder.put(k, ((Object[])v)[0])
+	    }
         }
 
         builder.build()
