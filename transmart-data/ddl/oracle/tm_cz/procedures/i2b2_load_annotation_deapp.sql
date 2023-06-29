@@ -169,7 +169,7 @@ BEGIN
 	   ;
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into DEAPP de_mrna_annotation',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Load annotation data into deapp de_mrna_annotation',SQL%ROWCOUNT,stepCt,'Done');
 
     --	update gene_id if null
 
@@ -209,7 +209,7 @@ BEGIN
 	       and upper(x.bio_marker_type) = 'GENE');
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_id in de_mrna_annotation',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Updated missing gene_symbol in de_mrna_annotation',SQL%ROWCOUNT,stepCt,'Done');
 
     --	insert probesets into biomart.bio_assay_feature_group
 
@@ -228,6 +228,7 @@ BEGIN
 
     --	insert probesets into biomart.bio_assay_data_annotation
 
+/*
     insert into biomart.bio_assay_data_annotation (
 	bio_assay_feature_group_id
 	,bio_marker_id)
@@ -249,6 +250,33 @@ BEGIN
 	   (select 1 from biomart.bio_assay_data_annotation x
 	     where fg.bio_assay_feature_group_id = x.bio_assay_feature_group_id
 	       and coalesce(bgs.bio_marker_id,bgi.bio_marker_id,-1) = x.bio_marker_id);
+*/
+
+    insert into biomart.bio_assay_data_annotation (
+	bio_assay_feature_group_id
+	,bio_marker_id)
+		with bio_gene (bio_marker_id, probe_id) as (
+		    select
+			bm.bio_marker_id
+			,an.probe_id
+		      from tm_lz.lt_src_deapp_annot an,
+			   biomart.bio_marker bm
+		     where upper(coalesce(an.organism,'Homo sapiens')) = upper(bm.organism)
+		       and bm.bio_marker_id is not null
+		       and ((an.gene_symbol is not null and an.gene_symbol = bm.bio_marker_name)
+			    or (an.gene_id is not null and to_char(an.gene_id) = bm.primary_external_id))
+		)
+    select
+	distinct fg.bio_assay_feature_group_id
+	,bg.bio_marker_id
+      from biomart.bio_assay_feature_group fg
+	       join bio_gene bg
+	       on fg.feature_group_name = bg.probe_id
+     where not exists
+	 (select 1 from biomart.bio_assay_data_annotation x
+	   where fg.bio_assay_feature_group_id = x.bio_assay_feature_group_id
+	     and bg.probe_id = fg.feature_group_name
+	     and bg.bio_marker_id = x.bio_marker_id);
 
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.bio_assay_data_annotation',SQL%ROWCOUNT,stepCt,'Done');
