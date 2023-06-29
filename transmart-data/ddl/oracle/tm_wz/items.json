@@ -31,17 +31,6 @@
     "child" : {
       "type" : "INDEX",
       "owner" : "TM_WZ",
-      "name" : "WRK_CD_IDX"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "TM_WZ",
-      "name" : "WRK_CLINICAL_DATA"
-    } ]
-  }, {
-    "child" : {
-      "type" : "INDEX",
-      "owner" : "TM_WZ",
       "name" : "WTN_LOAD_CLINICAL_IDX"
     },
     "parents" : [ {
@@ -626,13 +615,6 @@
       "name" : "I2B2_LOAD_PATH_WITH_COUNT"
     },
     "file" : "tm_wz/i2b2_load_path_with_count.sql"
-  }, {
-    "item" : {
-      "type" : "INDEX",
-      "owner" : "TM_WZ",
-      "name" : "WRK_CD_IDX"
-    },
-    "file" : "tm_wz/wrk_clinical_data.sql"
   }, {
     "item" : {
       "type" : "INDEX",
