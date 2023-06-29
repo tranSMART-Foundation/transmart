@@ -60,24 +60,6 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
-    },
-    "parents" : [ ]
-  }, {
-    "child" : {
-      "type" : "INDEX",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS_IDX"
-    },
-    "parents" : [ {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
-    } ]
-  }, {
-    "child" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
       "name" : "CONCEPT_DIMENSION"
     },
     "parents" : [ ]
@@ -1612,20 +1594,6 @@
       "name" : "CODE_LOOKUP"
     },
     "file" : "i2b2demodata/code_lookup.sql"
-  }, {
-    "item" : {
-      "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
-    },
-    "file" : "i2b2demodata/concept_counts.sql"
-  }, {
-    "item" : {
-      "type" : "INDEX",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS_IDX"
-    },
-    "file" : "i2b2demodata/concept_counts.sql"
   }, {
     "item" : {
       "type" : "TRIGGER",
