@@ -66,7 +66,7 @@ AS
     unmapped_platform exception;
     multiple_platform	exception;
     no_probeset_recs	exception;
-
+    
     CURSOR addNodes is
 	select distinct t.leaf_node
 			,t.node_name
@@ -884,6 +884,20 @@ BEGIN
 
     commit;
 
+    if dataType = 'R' then
+        delete from tm_lz.lt_src_rna_data
+	where to_number(intensity_value) < 0.0; -- allow zero, handle in zscore function
+        stepCt := stepCt + 1;
+        tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove unusable negative intensity_value from lt_src_rna_data for dataType R',SQL%ROWCOUNT,stepCt,'Done');
+	commit;
+	update tm_lz.lt_src_rna_data
+	   set intensity_value = '0.001'
+	 where to_number(intensity_value) = 0.0; -- update zero as small number with a valid log
+        stepCt := stepCt + 1;
+        tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update zero intensity_value from lt_src_rna_data for dataType R',SQL%ROWCOUNT,stepCt,'Done');
+	commit;
+    end if;
+
     insert into tm_cz.probeset_deapp (
 	probeset,
 	platform
@@ -1081,4 +1095,3 @@ EXCEPTION
 
 END;
 /
-

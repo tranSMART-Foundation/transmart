@@ -129,7 +129,7 @@ BEGIN
     END IF;
 
     stepCt := 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_rna_data',0,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_process_rna_inc_data',0,stepCt,'Done');
 
     --	Get count of records in lt_src_rna_subj_samp_map
 
@@ -1041,7 +1041,7 @@ BEGIN
     ---Cleanup OVERALL JOB if this proc is being run standalone
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_rna_data',0,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_process_rna_inc_data',0,stepCt,'Done');
 
     IF newJobFlag = 1 THEN
 	tm_cz.cz_end_audit (jobID, 'SUCCESS');

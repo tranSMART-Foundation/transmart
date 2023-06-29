@@ -296,32 +296,32 @@ BEGIN
     select count(*) into nbrRecs
       from tm_wz.wt_subject_microarray_med;
 
-    if nbrRecs > 10000000 then
+    if nbrRecs > 1000000 then
 	tm_cz.i2b2_mrna_index_maint('DROP','',jobId);
 	stepCt := stepCt + 1;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Drop indexes on DEAPP de_subject_microarray_data',0,stepCt,'Done');
     else
 	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Less than 10M records, index drop bypassed',0,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Less than 1M new records, index drop bypassed',0,stepCt,'Done');
     end if;
 
     insert into deapp.de_subject_microarray_data (
-	trial_source
-	,trial_name
-	,assay_id
+	trial_name
 	,probeset_id
+	,assay_id
+	,patient_id
 	,raw_intensity
 	,log_intensity
 	,zscore
-	,patient_id
+	,trial_source
 	--,sample_id
 	--,subject_id
     )
     select
-	TrialId || ':' || sourceCD
-	,TrialId
+	TrialId
 	,m.assay_id
 	,m.probeset_id
+	,m.patient_id
 	,round(case when dataType = 'R' then m.intensity_value
 	       when dataType = 'L'
 		   then case when logBase = -1 then null else power(logBase, m.log_intensity) end
@@ -330,7 +330,7 @@ BEGIN
 	--  ,decode(dataType,'R',m.intensity_value,'L',power(logBase, m.log_intensity),null)
 	,round(m.log_intensity,4)
 	,(CASE WHEN m.zscore < -2.5 THEN -2.5 WHEN m.zscore >  2.5 THEN  2.5 ELSE round(m.zscore,5) END)
-	,m.patient_id
+	,TrialId || ':' || sourceCD
 	--	  ,m.sample_id
 	--	  ,m.subject_id
       from tm_wz.wt_subject_microarray_med m;

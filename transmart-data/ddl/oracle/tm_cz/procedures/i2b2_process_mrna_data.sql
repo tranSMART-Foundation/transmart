@@ -312,13 +312,13 @@ BEGIN
 		'NOLOGGING COMPRESS TABLESPACE "TRANSMART" ';
 	    execute immediate(sqlText);
 	    stepCt := stepCt + 1;
-	    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding partition to de_subject_microarray_data',0,stepCt,'Done');
+	    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Adding TrialID partition to de_subject_microarray_data',0,stepCt,'Done');
 
 	else
 	    sqlText := 'alter table deapp.de_subject_microarray_data truncate partition "' || TrialID || '"';
 	    execute immediate(sqlText);
 	    stepCt := stepCt + 1;
-	    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncating partition in de_subject_microarray_data',0,stepCt,'Done');
+	    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Truncating TrialID partition in de_subject_microarray_data',0,stepCt,'Done');
 	end if;
 
     end if;

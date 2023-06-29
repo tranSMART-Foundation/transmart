@@ -61,13 +61,13 @@ BEGIN
     stepCt := stepCt + 1;
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from annotation_deapp',SQL%ROWCOUNT,stepCt,'Done');
 
-    --	delete any existing data from deapp.de_mrna_annotation
+    --	delete any existing data from deapp.de_rbm_annotation
 
     delete from deapp.de_rbm_annotation
      where gpl_id = gplId;
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_mrna_annotation',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete existing data from de_rbm_annotation',SQL%ROWCOUNT,stepCt,'Done');
 
     --	update organism for existing probesets in probeset_deapp
     /*

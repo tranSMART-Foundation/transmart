@@ -25,14 +25,15 @@ AS
      ******************************************************************/
 
     root_node		varchar2(2000);
-    root_level	int;
+    root_level		int;
+    tText		varchar2(2000);
 
     --Audit variables
-    newJobFlag INTEGER(1);
-    databaseName VARCHAR(100);
-    procedureName VARCHAR(100);
-    jobID number(18,0);
-    stepCt number(18,0);
+    newJobFlag		INTEGER(1);
+    databaseName 	VARCHAR(100);
+    procedureName 	VARCHAR(100);
+    jobID 		number(18,0);
+    stepCt 		number(18,0);
 
 BEGIN
 
@@ -62,9 +63,12 @@ BEGIN
   	stepCt := stepCt + 1;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Missing path or name - path:' || path || ' name: ' || path_name,SQL%ROWCOUNT,stepCt,'Done');
     else
+	stepCt := stepCt + 1;
+	tText := 'Add path ' || path;
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,SQL%ROWCOUNT,stepCt,'Done');
 	--Delete existing node.
 	--I2B2
-	DELETE FROM OBSERVATION_FACT
+	DELETE FROM i2b2demodata.observation_fact
 	 WHERE concept_cd IN (
 	     SELECT C_BASECODE FROM I2B2 WHERE C_FULLNAME = PATH);
 	stepCt := stepCt + 1;
@@ -80,7 +84,7 @@ BEGIN
 
 	--I2B2
 	delete from i2b2metadata.i2b2
-	 where c_fullname = PATH;
+	 where c_fullname = path;
 	stepCt := stepCt + 1;
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Deleted path from I2B2METADATA i2b2',SQL%ROWCOUNT,stepCt,'Done');
 	COMMIT;
@@ -128,25 +132,25 @@ BEGIN
 	    , c_comment
 	    , m_applied_path)
 	SELECT (
-	    length(concept_path) - nvl(length(replace(concept_path, '\')),0)) / length('\') - 2 + root_level,
-	       CONCEPT_PATH,
-	       NAME_CHAR,
-	       'FA',
-	       'N',
-	       'CONCEPT_CD',
-	       'CONCEPT_DIMENSION',
-	       'CONCEPT_PATH',
-	       CONCEPT_PATH,
-	       CONCEPT_PATH,
-	       sysdate,
-	       sysdate,
-	       sysdate,
-	       SOURCESYSTEM_CD,
-	       CONCEPT_CD,
-	       'LIKE',
-	       'T',
-	       decode(TrialID,null,null,'trial:' || TrialID),
-	       '@'
+	    length(concept_path) - nvl(length(replace(concept_path, '\')),0)) / length('\') - 2 + root_level
+	       ,CONCEPT_PATH
+	       ,NAME_CHAR
+	       ,'FA'
+	       ,'N'
+	       ,'CONCEPT_CD'
+	       ,'CONCEPT_DIMENSION'
+	       ,'CONCEPT_PATH'
+	       ,CONCEPT_PATH
+	       ,CONCEPT_PATH
+	       ,sysdate
+	       ,sysdate
+	       ,sysdate
+	       ,SOURCESYSTEM_CD
+	       ,CONCEPT_CD
+	       ,'LIKE'
+	       ,'T'
+	       ,decode(TrialID,null,null,'trial:' || TrialID)
+	       ,'@'
 	  from i2b2demodata.concept_dimension
 	 where CONCEPT_PATH = path;
 	stepCt := stepCt + 1;

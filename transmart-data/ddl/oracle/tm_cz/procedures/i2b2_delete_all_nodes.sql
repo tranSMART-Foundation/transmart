@@ -79,10 +79,10 @@ Begin
 	COMMIT;
 
 	--concept_counts
-	delete from i2b2demodata.concept_counts
+	delete from i2b2metadata.tm_concept_counts
 	 WHERE concept_path LIKE PATH || '%';
 	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2DEMODATA concept_counts',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete data for trial from I2B2METADATA tm_concept_counts',SQL%ROWCOUNT,stepCt,'Done');
 	COMMIT;
     end if;
 

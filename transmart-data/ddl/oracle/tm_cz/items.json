@@ -1000,6 +1000,10 @@
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
       "name" : "I2B2_CREATE_CONCEPT_COUNTS"
     }, {
       "type" : "PROCEDURE",
@@ -1176,8 +1180,8 @@
     },
     "parents" : [ {
       "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -1336,8 +1340,8 @@
     },
     "parents" : [ {
       "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
     }, {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
@@ -1379,8 +1383,8 @@
     },
     "parents" : [ {
       "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
     }, {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
@@ -1449,8 +1453,8 @@
     },
     "parents" : [ {
       "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
     }, {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
@@ -1554,6 +1558,33 @@
     "child" : {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "TM_TRIAL_NODES"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_END_AUDIT"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_ERROR_HANDLER"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_START_AUDIT"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "CZ_WRITE_AUDIT"
+    } ]
+  }, {
+    "child" : {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
       "name" : "I2B2_LOAD_CLINICAL_DATA"
     },
     "parents" : [ {
@@ -1612,6 +1643,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -1759,6 +1794,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -2345,6 +2384,10 @@
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
       "name" : "I2B2_CREATE_CONCEPT_COUNTS"
     }, {
       "type" : "PROCEDURE",
@@ -2477,6 +2520,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -3110,8 +3157,8 @@
     },
     "parents" : [ {
       "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
     }, {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
@@ -3366,6 +3413,10 @@
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
       "name" : "I2B2_CREATE_CONCEPT_COUNTS"
     }, {
       "type" : "PROCEDURE",
@@ -3494,6 +3545,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -3640,6 +3695,10 @@
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
       "name" : "I2B2_CREATE_CONCEPT_COUNTS"
     }, {
       "type" : "PROCEDURE",
@@ -3775,6 +3834,10 @@
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
       "name" : "I2B2_CREATE_CONCEPT_COUNTS"
     }, {
       "type" : "PROCEDURE",
@@ -3907,6 +3970,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -4049,6 +4116,10 @@
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
       "name" : "I2B2_CREATE_CONCEPT_COUNTS"
     }, {
       "type" : "PROCEDURE",
@@ -4181,6 +4252,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -4320,6 +4395,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -4470,6 +4549,10 @@
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
       "name" : "I2B2_CREATE_CONCEPT_COUNTS"
     }, {
       "type" : "PROCEDURE",
@@ -4586,6 +4669,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -4720,6 +4807,10 @@
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
       "name" : "I2B2_CREATE_CONCEPT_COUNTS"
     }, {
       "type" : "PROCEDURE",
@@ -4848,6 +4939,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -4983,6 +5078,10 @@
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
       "name" : "I2B2_ADD_ROOT_NODE"
+    }, {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
     }, {
       "type" : "PROCEDURE",
       "owner" : "TM_CZ",
@@ -5450,8 +5549,8 @@
     },
     "parents" : [ {
       "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
     }, {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
@@ -6035,8 +6134,8 @@
     },
     "parents" : [ {
       "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
     }, {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
@@ -6062,8 +6161,8 @@
     },
     "parents" : [ {
       "type" : "TABLE",
-      "owner" : "I2B2DEMODATA",
-      "name" : "CONCEPT_COUNTS"
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
     }, {
       "type" : "TABLE",
       "owner" : "I2B2DEMODATA",
@@ -7409,6 +7508,13 @@
       "name" : "I2B2_LOAD_CHROM_REGION"
     },
     "file" : "tm_cz/procedures/i2b2_load_chrom_region.sql"
+  }, {
+    "item" : {
+      "type" : "PROCEDURE",
+      "owner" : "TM_CZ",
+      "name" : "LOAD_TM_TRIAL_NODES"
+    },
+    "file" : "tm_cz/procedures/load_tm_trial_nodes.sql"
   }, {
     "item" : {
       "type" : "PROCEDURE",

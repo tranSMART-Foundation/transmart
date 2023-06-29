@@ -55,8 +55,8 @@ BEGIN
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Start i2b2_rename_node',0,stepCt,'Done');
 
     if old_node != ''  and old_node != '%' and new_node != ''  and new_node != '%' then
-	--	Update concept_counts paths
-	update i2b2demodata.concept_counts cc
+	--	Update tm_concept_counts paths
+	update i2b2metadata.tm_concept_counts cc
 	set CONCEPT_PATH = replace(cc.concept_path, '\' || old_node || '\', '\' || new_node || '\'),
 	parent_concept_path = replace(cc.parent_concept_path, '\' || old_node || '\', '\' || new_node || '\')
 	where cc.concept_path in
@@ -64,7 +64,7 @@ BEGIN
 	  where cd.sourcesystem_cd = trial_id
             and cd.concept_path like '%' || old_node || '%');
 	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update concept_counts with new path',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update tm_concept_counts with new path',SQL%ROWCOUNT,stepCt,'Done');
 
 	COMMIT;
 

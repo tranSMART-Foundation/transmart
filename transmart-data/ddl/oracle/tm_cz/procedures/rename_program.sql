@@ -37,8 +37,8 @@ BEGIN
     update i2b2metadata.table_access set c_name=newProgramName where c_fullname=newTopNode;
     update i2b2metadata.table_access set c_table_cd=newProgramName where c_fullname=newTopNode;
 
-    update i2b2demodata.concept_counts set concept_path=REGEXP_REPLACE(concept_path, regex1, regex2) where concept_path like oldTopNode||'%';
-    update i2b2demodata.concept_counts set parent_concept_path=REGEXP_REPLACE(parent_concept_path, regex1, regex2)where parent_concept_path like oldTopNode||'%';
+    update i2b2metadata.tm_concept_counts set concept_path=REGEXP_REPLACE(concept_path, regex1, regex2) where concept_path like oldTopNode||'%';
+    update i2b2metadata.tm_concept_counts set parent_concept_path=REGEXP_REPLACE(parent_concept_path, regex1, regex2)where parent_concept_path like oldTopNode||'%';
 
     update i2b2demodata.concept_dimension set concept_path=REGEXP_REPLACE(concept_path, regex1, regex2) where concept_path like oldTopNode||'%';
 

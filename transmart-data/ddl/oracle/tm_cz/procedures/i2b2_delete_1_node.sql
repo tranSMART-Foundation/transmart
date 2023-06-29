@@ -82,11 +82,11 @@ begin
 	tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete data for node from I2B2METADATA i2b2_secure',SQL%ROWCOUNT,stepCt,'Done');
 	COMMIT;
 
-	--concept_counts
-	DELETE FROM i2b2demodata.concept_counts
+	--tm_concept_counts
+	DELETE FROM i2b2metadata.tm_concept_counts
 	 WHERE concept_path = PATH;
 	stepCt := stepCt + 1;
-	tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete data for node from I2B2DEMODATA concept_counts',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.czx_write_audit(jobId,databaseName,procedureName,'Delete data for node from I2B2METADATA tm_concept_counts',SQL%ROWCOUNT,stepCt,'Done');
 	COMMIT;
 
     END IF;

@@ -31,7 +31,7 @@ BEGIN
 	set c_visualattributes=substr(b.c_visualattributes,1,1) || 'H' || substr(b.c_visualattributes,3,1)
 	where c_fullname like path || '%';
 
-	delete from i2b2demodata.concept_counts
+	delete from i2b2metadata.tm_concept_counts
 	 where concept_path like path || '%';
 
 	commit;

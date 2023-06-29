@@ -106,15 +106,15 @@ BEGIN
 	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update i2b2 with new path',SQL%ROWCOUNT,stepCt,'Done');
 	COMMIT;
 
-	--	concept_counts
+	--	tm_concept_counts
 
-	update i2b2demodata.concept_counts
+	update i2b2metadata.tm_concept_counts
 	   set concept_path = replace(concept_path, old_path, newPath)
 	       ,parent_concept_path = replace(parent_concept_path, old_path, newPath)
 	 where concept_path like old_path || '%';
 
 	--	update parent_concept_path for new_path (replace doesn't work)
-	update i2b2demodata.concept_counts
+	update i2b2metadata.tm_concept_counts
 	   set parent_concept_path=ltrim(SUBSTR(concept_path, 1,instr(concept_path, '\',-1,2)))
 	 where concept_path = newPath;
 

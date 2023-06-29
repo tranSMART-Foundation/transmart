@@ -39,7 +39,7 @@ BEGIN
     END IF;
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_MIRNA_annot_deapp',0,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Starting i2b2_load_mirna_annot_deapp',0,stepCt,'Done');
 
     --	get  id_ref  from external table
 
@@ -273,7 +273,7 @@ BEGIN
     tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Link feature_group to bio_marker in biomart.mirna_bio_assay_data_annotation',SQL%ROWCOUNT,stepCt,'Done');
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_MIRNA_annot_deapp',0,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'End i2b2_load_mirna_annot_deapp',0,stepCt,'Done');
 
     ---Cleanup OVERALL JOB if this proc is being run standalone
     IF newJobFlag = 1 THEN
