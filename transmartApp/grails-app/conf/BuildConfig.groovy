@@ -100,7 +100,7 @@ grails.project.dependency.resolution = {
     dependencies {
 	compile 'org.codenarc:CodeNarc:0.21' // 2.2.0
 	compile 'axis:axis:1.4' // for GeneGo web services
-	compile 'com.google.guava:guava:30.1.1-jre'
+	compile 'com.google.guava:guava:32.0.1-jre'
 	compile 'commons-net:commons-net:3.3' // used for ftp transfers
 	compile 'net.sf.ehcache:ehcache:2.9.0'
 	compile 'net.sf.opencsv:opencsv:2.3'

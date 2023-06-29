@@ -61,7 +61,7 @@ grails.project.dependency.resolution = {
         compile 'org.mapdb:mapdb:0.9.10'
         compile 'org.apache.commons:commons-lang3:3.4'
 
-        compile 'com.google.guava:guava:30.1.1-jre'
+        compile 'com.google.guava:guava:32.0.1-jre'
         compile 'org.transmartproject:transmart-core-api:' + tmVersion
         //test 'com.jayway.restassured:rest-assured:2.4.1'
 

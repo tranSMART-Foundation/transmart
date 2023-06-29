@@ -39,7 +39,7 @@ grails.project.dependency.resolution = {
 
     dependencies {
 	compile 'org.codenarc:CodeNarc:0.21' // 2.2.0
- 	compile 'com.google.guava:guava:30.1.1-jre'
+ 	compile 'com.google.guava:guava:32.0.1-jre'
         compile 'net.sf.opencsv:opencsv:2.3'
         compile 'org.mapdb:mapdb:0.9.10'
         compile 'org.rosuda.REngine:Rserve:1.8.1'
