@@ -100,7 +100,12 @@ load_ref_annotation_%: ../studies/%/ref_annotation.params
 # Load all data for a study
 
 load_all_%: ../studies/%/loadall.params
-	    ./load_study.sh $*
+	    ./load_study.sh $* -reload
+
+# Reload all data for a study
+
+load_more_%: ../studies/%/loadall.params
+	    ./load_study.sh $* -resume
 
 # Browse tab study - check and load program, then load study
 

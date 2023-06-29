@@ -18,9 +18,9 @@ echo "Parameter '$1'"
 source "$UPLOAD_SCRIPTS_DIRECTORY/process_params.inc"
 
 # Check if mandatory variables are set
-if [ -z "$PROGRAM" ] || [ -z "$DATA_LOCATION" ]; then
+if [ -z "$PROGRAM_ID" ] || [ -z "$DATA_LOCATION" ]; then
 	echo "Following variables need to be set:"
-	echo "    PROGRAM=$PROGRAM"
+	echo "    PROGRAM_ID=$PROGRAM_ID"
 	echo "    DATA_LOCATION=$DATA_LOCATION"
 	exit -1
 fi

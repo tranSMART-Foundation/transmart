@@ -98,6 +98,7 @@ if(!defined($ARGV[0])){
 
 @time = localtime(time());
 $currenttime = sprintf "%4d-%02d-%02d %02d:%02d:%02d", 1900+$time[5], 1+$time[4], $time[3], $time[2], $time[1], $time[0];
+$ocurrenttime = sprintf "to_timestamp('%4d-%02d-%02d %02d:%02d:%02d','YYYY-MM-DD HH24:MI:SS')", 1900+$time[5], 1+$time[4], $time[3], $time[2], $time[1], $time[0];
 print "Running at $currenttime\n";
 
 $dovalidate=0;
@@ -125,7 +126,7 @@ if(!$ispostgres) {
     # Require ORAPASSWORD and ORAHOST defined
     # ORAPORT defaults to "1521"
     # ORASID defaults to "transmart"
-    $sqlplus = "sqlplus -S \"sys";
+    $sqlplus = "sqlplus -M \"CSV on delimiter '|' QUOTE OFF\" -S \"sys";
     $var = $ENV{"ORAPASSWORD"} || die "ORAPASSWORD not defined";
     $sqlplus .= "/$var";
     $var = $ENV{"ORAHOST"} || die "ORAHOST not defined";
@@ -163,8 +164,8 @@ if(!$ispostgres) {
 	      "Citation" => 1,		# Citation or .
 	      "Authors" => 1,		# Authorlist or . (clean characters)
 	      "Pubtitle" => 1,		# Title or . (clean characters)
-	      "Status" => 1,		# test BioConceptCode STUDY_PLUBLICATION_STATUS .
-	      "Name" => 1,		# name or .
+	      "Status" => 1,		# test BioConceptCode STUDY_PUBLICATION_STATUS .
+	      "Namepi" => 1,		# name or .
 	      "Roles" => 2,		# free text with standard parts
 	      "Contact" => 1,		# name or .
 	      "Institution" => 1,	# Institute, department, laboratory
@@ -187,7 +188,7 @@ while (<IN>) {
     chomp;
     if(/^[\#]/) {next}
     if(/^\s*$/) {next}
-    if(/^([A-Z][a-z]+):\s+(.*)/){
+    if(/^([A-Z][a-z]+):\s*(.*)/){
 	++$line;
 #	print "Read line $line: $_\n";
 	$type = $1;
@@ -220,7 +221,9 @@ for($i = 0; $i < $line; $i++) {
 #    print "Found line $i: $linetype[$i]\n";
     $type = $linetype[$i];
     $data = $input[$i];
-    
+
+    if($type eq "Name") {$type="Namepi"}
+
     $required{$type}++;
     if($type eq "Program"){
 	$program = $data;
@@ -260,10 +263,10 @@ for($i = 0; $i < $line; $i++) {
     elsif($type eq "Access"){
 	$accesstype = $data;
     }
-    elsif($type eq "Startdate" || $type eq "Submissiondate"){
+    elsif($type eq "Startdate"){
 	$startdate = $data;
     }
-    elsif($type eq "Completedate" || $type eq "Submissiondate"){
+    elsif($type eq "Completedate"){
 	$completedate = $data;
     }
     elsif($type eq "Pubmed"){
@@ -284,8 +287,8 @@ for($i = 0; $i < $line; $i++) {
     elsif($type eq "Status"){
 	$status = $data;
     }
-    elsif($type eq "Name"){
-	$name = $data;
+    elsif($type eq "Namepi"){
+	$namepi = $data;
     }
     elsif($type eq "Roles"){
 	if($roles ne "") {$roles .= ", "}
@@ -341,6 +344,21 @@ if(!$dovalidate && $validateMsg ne "") {
     exit;
 }
 
+sub testData($$) {
+    my ($name,$data) = @_;
+    if(!defined($data)) {print STDERR "$name undefined\n";$err++}
+    elsif($data eq "") {print STDERR "Empty data value found for $name\n";$err++}
+    else{return 1}
+    return 0;
+}
+
+sub useData($$) {
+    my ($name,$data) = @_;
+    if(!defined($data)) {print STDERR "$name undefined\n";$err++}
+    elsif($data eq "") {print STDERR "Empty data value found for $name\n";$err++}
+    else{print "Test text '$name' '$data'\n"}
+}
+
 #############################################################
 #
 # findFolder: Find a program or study folder by type and name
@@ -369,6 +387,8 @@ sub findFolder($$$) {
 	close PSQL;
     } else {
 	open(OSQL, "echo  \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -415,6 +435,8 @@ sub findTemplate($) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -441,8 +463,42 @@ sub findTemplate($) {
 ######################################################################
 
 sub findDisease($) {
-    my ($disease) = (@_);
-    my $dosql = "select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_disease_id from biomart.bio_disease where (disease = '$disease' or mesh_code = '$disease' or icd9_code = '$disease' or icd10_code = '$disease'))";
+    my ($testdisease) = (@_);
+    my $disease = $testdisease;
+
+    # check with synonyms using search_keyword DISEASE keywords
+    # use the approved name
+
+    my $dosql = "select sk.keyword,sk.unique_id from searchapp.search_keyword sk, searchapp.search_keyword_term skt where sk.data_category = 'DISEASE' and sk.search_keyword_id = skt.search_keyword_id and skt.keyword_term = upper('$disease')";
+
+    if($ispostgres) {
+	open(PSQL, "psql -A -t -c \"$dosql\"|") || die "Failed to start psql";
+	while(<PSQL>){
+	    chomp;
+	    if(/[|]/) {
+		@col = split (/[|]/);
+		$disease = $col[0];
+		last;
+	    }
+	}
+	close PSQL;
+    } else {
+	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
+	while(<OSQL>){
+	    chomp;
+	    s/^\s+//;
+	    if(/[|]/) {
+		@col = split (/[|]/);
+		$disease = $col[0];
+		last;
+	    }
+	}
+	close OSQL;
+    }
+
+    $dosql = "select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_disease_id from biomart.bio_disease where (disease = '$disease' or mesh_code = '$disease' or icd9_code = '$disease' or icd10_code = '$disease'))";
 
     if($ispostgres) {
 	open(PSQL, "psql -A -t -c \"$dosql\"|") || die "Failed to start psql";
@@ -456,6 +512,8 @@ sub findDisease($) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -491,6 +549,8 @@ sub findConcept($$) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -526,6 +586,8 @@ sub findTag($) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -548,7 +610,7 @@ sub findTag($) {
 
 sub findAccession($) {
     my ($access) = @_;
-    my $dosql = "select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_experiment_id from biomart.bio_experiment where accession = '$access' and bio_experiment_type = 'Experiment')";
+    my $dosql = "select bio_experiment_id, title from biomart.bio_experiment where accession = '$access' and bio_experiment_type = 'Experiment'";
 
     if($ispostgres) {
 	open(PSQL, "psql -A -t -c \"$dosql\"|") || die "Failed to start psql";
@@ -562,6 +624,8 @@ sub findAccession($) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    if(/[|]/) {
@@ -630,17 +694,32 @@ sub testPubmed($) {
     close WEB;
 }
 
+$studyProgram = $ENV{STUDY_PROGRAM};
+if(defined($studyProgram)) {
+    print "Overriding program '$program' - using STUDY_PROGRAM '$studyProgram'\n";
+    $program = $studyProgram;
+}
+
 print "Looking for program '$program'\n";
 print STDERR "Looking for program '$program'\n";
 $programid = findFolder("PROGRAM", $program, 0);
 
-if(!$programid) {print STDERR "program '$program' not found\n";exit}
-else {print "program '$program' found with ID $programid\n"}
+if(!$programid) {
+    print STDERR "program '$program' not found\n";
+    exit;
+} else {
+    print "program '$program' found with ID $programid\n";
+}
 
 $studyid = findFolder("STUDY", $title, 1);
 
-if(!$studyid) {print "study '$title' not found, can create\n"}
-else {print STDERR "study '$title' found with ID $studyid\n";exit}
+if(!$studyid) {
+    print "study '$title' not found, can create\n";
+} else {
+    print STDERR "study '$title' found with ID $studyid\n";
+    print STDERR "Study exists. Load canceled\n";
+    exit;
+}
 
 #Accession .... what do we need to check?
 
@@ -695,7 +774,7 @@ foreach $objective (@objective){
 
 #Description - what do we need to check e.g. length, character set
 
-$description =~ s/<[pP]>/<br\/><br\/>/g; # Use E'$description' to escape characters in PSQL
+$description =~ s/<[pP]>/<br\/><br\/>/g; # remove empty paragraphs
 $description =~ s/<\/[pP]>//g;		 # remove any end-of-paragraph tags
 
 print "Edited description: '$description'\n";
@@ -705,6 +784,9 @@ if(length($description) > $maxdesc)  {
     print STDERR $msg;
     $validateMsg .= $msg;
 }
+
+$overalldesign =~ s/<[pP]>/<br\/><br\/>/g; # remove empty paragraphs
+$overalldesign =~ s/<\/[pP]>//g;	   # remove any end-of-paragraph tags
 
 if(length($overalldesign) > $maxdesign)  {
     $msg = "OverallDesign too long: ".length($overalldesign)."\n";
@@ -797,6 +879,7 @@ else {print "Accesstype '$accesstype' id '$accessid', code '$accesscode'\n"}
 
 $countryall = "";
 foreach $country (@country){
+    if($country eq "."){$country = "Not Applicable"}
     ($id, $code) = findConcept($country,"COUNTRY");
 
     if(!defined($code)){print STDERR "Country '$country' not found\n";exit}
@@ -871,11 +954,14 @@ if($dovalidate) {
     exit;
 }
 
+$nametag = findTag("STUDY_PERSON_NAME");
+if(testData("Namepi",$namepi)){print "NamePI '$namepi' tag '$nametag'\n"}
+
 $rolestag = findTag("STUDY_PERSON_ROLES");
-print "Roles '$roles' untested tag '$rolestag'\n";
+if(testData("Roles",$roles)){print "Roles '$roles' tag '$rolestag'\n"}
 
 $addresstag = findTag("STUDY_PERSON_ADDRESS");
-print "Address '$address' untested tag '$addresstag'\n";
+if(testData("Address",$address)){print "Address '$address' tag '$addresstag'\n"}
 
 
 $titletag = findTag("STUDY_PUBLICATION_TITLE");
@@ -898,20 +984,24 @@ if($pubmedtitle ne "") {
 
 if(!$studyid) {
     if($ispostgres) {
-	$psqlstatus = system "psql -c \"set search_path = fmapp, pg_catalog;
+	open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+	print DOSQL "set search_path = fmapp, pg_catalog;";
 
-insert into fmapp.fm_folder (folder_name,parent_id,folder_level,folder_type,active_ind,description)
-       values ('$title',$programid,1,'STUDY',true,E'$description');
-\"";
-	if($psqlstatus) {
-	    print STDERR "Create study failed: status $psqlstatus\n";
+	print DOSQL "insert into fmapp.fm_folder (folder_name,parent_id,folder_level,folder_type,active_ind,description)
+values ('$title',$programid,1,'STUDY',true,E'$description');\n";
+	close DOSQL;
+	print STDERR "Create study\n";
+	open(OUT, "psql.out") || die "No psql results found";
+	while(<OUT>){
+	    if(/^SET$/){next}
+	    if(/\S/) {print "OUT: $_";}
 	}
+	close OUT;
     } else {
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
 	print DOSQL "insert into fmapp.fm_folder (folder_name,parent_id,folder_level,folder_type,active_ind,description)
-       values ('$title',$programid,1,'STUDY','1','$description');
-";
+values ('$title',$programid,1,'STUDY','1','$description');\n";
 	close DOSQL;
 	print STDERR "Create study\n";
 	open(OUT, "sqlplus.out") || die "No sqlplus results found";
@@ -936,30 +1026,50 @@ print STDERR "Study template id '$studytemplate'\n";
 
 if(!defined($experimentcode)){
     if($ispostgres) {
-	$psqlstatus = system "psql -c \"set search_path = biomart, pg_catalog;
+	open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+	print DOSQL "set search_path = biomart, pg_catalog;";
 
-insert into biomart.bio_experiment
+	print DOSQL "insert into biomart.bio_experiment
     (bio_experiment_type,title,description,design,start_date,completion_date,primary_investigator,contact_field,
      etl_id,status,overall_design,accession,entrydt,updated,institution,country,biomarker_type,target,access_type)
-    values ('Experiment','$title',E'$description','$designcode','$startdate','$completedate','$name','$contact',
+    values ('Experiment','$title',E'$description','$designcode','$startdate','$completedate','$namepi','$contact',
 	    '$etlid','$statuscode',E'$overalldesign','$accession','$currenttime','$currenttime','$institution','$countryall','$biomarkerall','$target','$accesscode');
+";
 
-set search_path = amapp, pg_catalog;
+	print DOSQL "set search_path = amapp, pg_catalog;";
 
-insert into amapp.am_tag_template_association (tag_template_id,object_uid)
+	print DOSQL "insert into amapp.am_tag_template_association (tag_template_id,object_uid)
        values ($studytemplate,'FOL:$studyid');
-\"";
-
-	if($psqlstatus) {
-	    print STDERR "Create experiment failed: status $psqlstatus\n";
+";
+	close DOSQL;
+	print STDERR "Create experiment\n";
+	open(OUT, "psql.out") || die "No psql results found";
+	while(<OUT>){
+	    if(/^SET$/){next}
+	    if(/\S/) {print "OUT: $_";}
 	}
+	close OUT;
     } else {
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "insert into biomart.bio_experiment (bio_experiment_type,title,description,design,accession,country,biomarker_type,access_type)
-       values ('Experiment','$title','$description','$designcode','$accession','$countryall','$biomarkerall','$accesscode');
-
-insert into amapp.am_tag_template_association (tag_template_id,object_uid)
+	print STDERR "insert into biomart.bio_experiment
+    (bio_experiment_type,title,description,design,start_date,completion_date,primary_investigator,contact_field,
+     etl_id,status,overall_design,accession,entrydt,updated,institution,country,biomarker_type,target,access_type)
+    values ('Experiment','$title','$description','$designcode',to_date('$startdate','YYYY-MM-DD'),to_date('$completedate','YYYY-MM-DD'),'$namepi','$contact',
+	    '$etlid','$statuscode','$overalldesign','$accession',$ocurrenttime,$ocurrenttime,'$institution','$countryall','$biomarkerall','$target','$accesscode');
+";
+	
+	print DOSQL "insert into amapp.am_tag_template_association (tag_template_id,object_uid)
+       values ($studytemplate,'FOL:$studyid');
+";
+	print DOSQL "insert into biomart.bio_experiment
+    (bio_experiment_type,title,description,design,start_date,completion_date,primary_investigator,contact_field,
+     etl_id,status,overall_design,accession,entrydt,updated,institution,country,biomarker_type,target,access_type)
+    values ('Experiment','$title','$description','$designcode',to_date('$startdate','YYYY-MM-DD'),to_date('$completedate','YYYY-MM-DD'),'$namepi','$contact',
+	    '$etlid','$statuscode','$overalldesign','$accession',$ocurrenttime,$ocurrenttime,'$institution','$countryall','$biomarkerall','$target','$accesscode');
+	";
+	
+	print DOSQL "insert into amapp.am_tag_template_association (tag_template_id,object_uid)
        values ($studytemplate,'FOL:$studyid');
 ";
 	close DOSQL;
@@ -976,28 +1086,34 @@ insert into amapp.am_tag_template_association (tag_template_id,object_uid)
 }
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = fmapp, pg_catalog;
-
-insert into fmapp.fm_folder_association (folder_id,object_uid,object_type)
-       values ('$studyid','$experimentcode','org.transmart.biomart.Experiment');
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Link experiment failed: status $psqlstatus\n";
-    }
-} else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
-
-	print DOSQL "insert into fmapp.fm_folder_association (folder_id,object_uid,object_type)
-       values ('$studyid','$experimentcode','org.transmart.biomart.Experiment');
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = fmapp, pg_catalog;
+    ";
+    
+    print DOSQL "insert into fmapp.fm_folder_association (folder_id,object_uid,object_type)
+       values ('$studyid','EXP:$accession','org.transmart.biomart.Experiment');
 ";
-	close DOSQL;
-	print STDERR "Link experiment\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Link experiment\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
+} else {
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+
+    print DOSQL "insert into fmapp.fm_folder_association (folder_id,object_uid,object_type)
+       values ('$studyid','EXP:$accession','org.transmart.biomart.Experiment');
+";
+    close DOSQL;
+    print STDERR "Link experiment\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 # add tags
@@ -1020,14 +1136,21 @@ insert into fmapp.fm_folder_association (folder_id,object_uid,object_type)
 
 foreach $pathologycode (@pathologycode){
     if($ispostgres) {
-	$psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
-    values('FOL:$studyid','$pathologycode','BIO_DISEASE',$pathologytag)
-\"";
+	open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+	print DOSQL "set search_path = amapp, pg_catalog;
+";
 
-	if($psqlstatus) {
-	    print STDERR "Add tag for pathology '$pathologycode' failed: status $psqlstatus\n";
+	print DOSQL "insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
+    values('FOL:$studyid','$pathologycode','BIO_DISEASE',$pathologytag)
+";
+	close DOSQL;
+	print STDERR "Add tag for pathology '$pathologycode'\n";
+	open(OUT, "psql.out") || die "No psql results found";
+	while(<OUT>){
+	    if(/^SET$/){next}
+	    if(/\S/) {print "OUT: $_";}
 	}
+	close OUT;
     } else {
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
@@ -1050,14 +1173,21 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 
 foreach $phasecode (@phasecode) {
     if($ispostgres) {
-	$psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
-    values('FOL:$studyid','$phasecode','STUDY_PHASE',$phasetag)
-\"";
+	open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+	print DOSQL "set search_path = amapp, pg_catalog;
+";
 
-	if($psqlstatus) {
-	    print STDERR "Add tag for study phase '$phasecode' failed: status $psqlstatus\n";
+	print DOSQL "insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
+    values('FOL:$studyid','$phasecode','STUDY_PHASE',$phasetag)
+";
+	close DOSQL;
+	print STDERR "Add tag for study phase '$phasecode'\n";
+	open(OUT, "psql.out") || die "No psql results found";
+	while(<OUT>){
+	    if(/^SET$/){next}
+	    if(/\S/) {print "OUT: $_";}
 	}
+	close OUT;
     } else {
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
@@ -1080,14 +1210,21 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 
 foreach $objectivecode (@objectivecode) {
     if($ispostgres) {
-	$psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
-    values('FOL:$studyid','$objectivecode','STUDY_OBJECTIVE',$objectivetag)
-\"";
+	open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+	print DOSQL "set search_path = amapp, pg_catalog;
+";
 
-	if($psqlstatus) {
-	    print STDERR "Add tag for study objective '$objectivecode' failed: status $psqlstatus\n";
+	print DOSQL "insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
+    values('FOL:$studyid','$objectivecode','STUDY_OBJECTIVE',$objectivetag)
+";
+	close DOSQL;
+	print STDERR "Add tag for study objective '$objectivecode'\n";
+	open(OUT, "psql.out") || die "No psql results found";
+	while(<OUT>){
+	    if(/^SET$/){next}
+	    if(/\S/) {print "OUT: $_";}
 	}
+	close OUT;
     } else {
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
@@ -1109,21 +1246,27 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 #####################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-with tagvalue as (insert into amapp.am_tag_value (value) values ('$link') returning tag_value_id)
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+";
+
+    print DOSL "with tagvalue as (insert into amapp.am_tag_value (value) values ('$link') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$linktag)
-\"";
-
-
-    if($psqlstatus) {
-	print STDERR "Add tag for study link failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for study link\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1133,13 +1276,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for study link\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for study link\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 #############################
@@ -1147,21 +1290,28 @@ end;
 #############################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-with tagvalue as (insert into amapp.am_tag_value (value)
-    values ('$subjects') returning tag_value_id)
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+";
 
+    print DOSQL "with tagvalue as (insert into amapp.am_tag_value (value)
+    values ('$subjects') returning tag_value_id)
+    
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$subjectstag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for number of subjects failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for number of subjects\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1171,13 +1321,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for number of subjects\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for number of subjects\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 ############################
@@ -1185,21 +1335,28 @@ end;
 ############################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-with tagvalue as (insert into amapp.am_tag_value (value)
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+";
+
+    print DOSQL "with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$samples') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$samplestag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for number of samples failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for number of samples\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1209,13 +1366,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for number of samples\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for number of samples\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 ###################
@@ -1224,14 +1381,20 @@ end;
 
 foreach $organismcode (@organismcode) {
     if($ispostgres) {
-	$psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
+	open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+	print DOSQL "set search_path = amapp, pg_catalog;
+";
+	print DOSQL "insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','$organismcode','SPECIES',$organismtag)
-\"";
-
-	if($psqlstatus) {
-	    print STDERR "Add tag for organism '$organismcode' failed: status $psqlstatus\n";
+";
+	close DOSQL;
+	print STDERR "Add tag for organism '$organismcode'\n";
+	open(OUT, "psql.out") || die "No psql results found";
+	while(<OUT>){
+	    if(/^SET$/){next}
+	    if(/\S/) {print "OUT: $_";}
 	}
+	close OUT;
     } else {
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
@@ -1253,21 +1416,27 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 #####################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-with tagvalue as (insert into amapp.am_tag_value (value)
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+";
+print DOSQL "with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$startdate') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$startdatetag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for study date failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for study start date\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1277,13 +1446,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for study date\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for study start date\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 ##########################
@@ -1291,21 +1460,27 @@ end;
 ##########################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-with tagvalue as (insert into amapp.am_tag_value (value)
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+";
+print DOSQL "with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$completedate') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$completedatetag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for study date failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for study completion date\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1315,13 +1490,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for study date\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for study completion date\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 ####################
@@ -1329,21 +1504,27 @@ end;
 ####################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+
 with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$pubmed') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$pubmedtag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for pubmed ID failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for pubmed ID\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1353,13 +1534,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for pubmed ID\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for pubmed ID\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 ##################
@@ -1367,21 +1548,27 @@ end;
 ##################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+
 with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$doi') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$doitag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for DOI failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for DOI\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1391,13 +1578,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for DOI\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for DOI\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 #######################
@@ -1405,37 +1592,43 @@ end;
 #######################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+
 with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$citation') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$citationtag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for DOI failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for citation\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
-    values ('$doi') returning tag_value_id INTO v_tv_id;
+    values ('$citation') returning tag_value_id INTO v_tv_id;
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
-    values('FOL:$studyid','TAG:'||v_tv_id,'AM_TAG_VALUE',$doitag);
+    values('FOL:$studyid','TAG:'||v_tv_id,'AM_TAG_VALUE',$citationtag);
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for DOI\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for citation\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 #########################
@@ -1443,21 +1636,27 @@ end;
 #########################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-with tagvalue as (insert into amapp.am_tag_value (value)
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+";
+    print DOSQL "with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$authors') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$authorstag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for authorlist failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for authorlist\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1467,13 +1666,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for authorlist\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for authorlist\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 ####################
@@ -1481,21 +1680,27 @@ end;
 ####################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-with tagvalue as (insert into amapp.am_tag_value (value)
+   open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+   print DOSQL "set search_path = amapp, pg_catalog;
+";
+   print DOSQL "with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$pubtitle') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$titletag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for publication title failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for publication title\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1505,13 +1710,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for publication title\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for publication title\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 ################
@@ -1519,21 +1724,27 @@ end;
 ################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-with tagvalue as (insert into amapp.am_tag_value (value)
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+";
+    print DOSQL "with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$roles') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$rolestag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for roles failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for roles\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1543,13 +1754,13 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for roles\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for roles\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 
 ##################
@@ -1557,21 +1768,27 @@ end;
 ##################
 
 if($ispostgres) {
-    $psqlstatus = system "psql -c \"set search_path = amapp, pg_catalog;
-with tagvalue as (insert into amapp.am_tag_value (value)
+    open (DOSQL, "|psql > psql.out") || die "Failed to run psql";
+    print DOSQL "set search_path = amapp, pg_catalog;
+";
+    print DOSQL "with tagvalue as (insert into amapp.am_tag_value (value)
     values ('$address') returning tag_value_id)
 
 insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
     values('FOL:$studyid','TAG:'||(select tag_value_id from tagvalue),'AM_TAG_VALUE',$addresstag)
-\"";
-
-    if($psqlstatus) {
-	print STDERR "Add tag for address failed: status $psqlstatus\n";
+";
+    close DOSQL;
+    print STDERR "Add tag for address\n";
+    open(OUT, "psql.out") || die "No psql results found";
+    while(<OUT>){
+	if(/^SET$/){next}
+	if(/\S/) {print "OUT: $_";}
     }
+    close OUT;
 } else {
-	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
+    open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "declare
+    print DOSQL "declare
   v_tv_id int;
 begin
 insert into amapp.am_tag_value (value)
@@ -1581,12 +1798,12 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 end;
 /
 ";
-	close DOSQL;
-	print STDERR "Add tag for address\n";
-	open(OUT, "sqlplus.out") || die "No sqlplus results found";
-	while(<OUT>){
-	    if(/\S/) {print "OUT: $_";}
-	}
-	close OUT;
+    close DOSQL;
+    print STDERR "Add tag for address\n";
+    open(OUT, "sqlplus.out") || die "No sqlplus results found";
+    while(<OUT>){
+	if(/\S/) {print "OUT: $_";}
+    }
+    close OUT;
 }
 

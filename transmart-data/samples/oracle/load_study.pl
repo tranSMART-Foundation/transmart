@@ -2,10 +2,11 @@
 
 
 $loadstudy = $ARGV[0];
-$doreload = 0;
+$doreload = 1;
 $msg = "";
 $jobClinical = $jobExpression = $jobRnaseq = 0;
 
+if(defined($ARGV[1]) && $ARGV[1] eq "-resume") {$doreload = 0; print "Resuming $loadstudy\n";}
 if(defined($ARGV[1]) && $ARGV[1] eq "-reload") {$doreload = 1; print "Reloading $loadstudy\n";}
 
 defined($ENV{TRANSMARTDATA}) || die "Undefined path: TRANSMARTDATA";
@@ -56,7 +57,7 @@ if(defined($browse{$loadstudy})) {
     if(-e "samples/studies/$loadstudy/$browse{$loadstudy}") {
 	unlink("samples/studies/$loadstudy/$browse{$loadstudy}");
     }
-    system "make -C samples/postgres load_browse_$loadstudy 2>\&1 | tee browse.log ";
+    system "make -C samples/oracle load_browse_$loadstudy 2>\&1 | tee browse.log ";
     open(BLOG, "browse.log") || die "Cannot read browse.log";
     while(<BLOG>) {
 	if(/program '.*' found with ID \d+/){
@@ -101,7 +102,7 @@ if(defined($clinical{$loadstudy})) {
     }
     if(!$clinical) {
 	$clintime = "unknown time";
-	system "make -C samples/postgres load_clinical_$loadstudy 2>\&1 > clinical.log ";
+	system "make -C samples/oracle load_clinical_$loadstudy 2>\&1 > clinical.log ";
 	open(CLOG, "clinical.log") || die "Cannot read clinical.log";
 	while(<CLOG>) {
 	    if(/Write to log.0 - top_node = .*\\([^\\]+)\\$/) {
@@ -134,7 +135,7 @@ if(defined($clinical{$loadstudy})) {
 	close CLOG;
 
 	if($clinicalFail) {
-	    system "make -C samples/postgres showdblog > clinical.showdblog";
+	    system "make -C samples/oracle showdblog > clinical.showdblog";
 	    open(CDBLOG, "clinical.showdblog");
 	    $dashes = 0;
 	    while(<CDBLOG>) {
@@ -172,36 +173,38 @@ if(defined($clinical{$loadstudy})) {
 # as other studies will also depend on it
 
 if($clinical && defined($ref_annotation{$loadstudy})) {
-    $annotation = $ref_annotation = 0;
+    $annotation = 0;
     msg("Annotation loading\n");
     if(-e "samples/studies/$loadstudy/$ref_annotation{$loadstudy}") {
 	unlink("samples/studies/$loadstudy/$ref_annotation{$loadstudy}");
     }
-    system "make -C samples/postgres load_ref_annotation_$loadstudy 2>\&1 | tee ref_annotation.log ";
+    system "make -C samples/oracle load_ref_annotation_$loadstudy 2>\&1 | tee ref_annotation.log ";
     open(ALOG, "ref_annotation.log") || die "Cannot read ref_annotation.log";
     while(<ALOG>) {
-	if(/WARNING.*: Platform (\S+) already loaded; skipping/) {
+	if(/Platform (\S+) already loaded; skipping/) {
+	    $platform = $1;
 	    msg("   Annotation $1 already loaded\n");
 	    $annotation = 1;
 	}
-	if(/^running load_([^_]+)_annotation.sh .*\/([^\/]*?)_annotation.tar.xz/){
+	if(/^(\S+) platform$/){
 	    $annotationType = $1;
-	    $platform = $2;
-	    msg("   Annotation $annotationType platform: $platform\n");
+	    msg("   Annotation $annotationType\n");
 	}
-	if(/make ([^\/]+)\/(.*?)_annotation.tar.xz/) {
+	if(/make ([^\/]+)\/([^\/]?)_annotation.tar.xz/) {
 	    $platform = $1;
 	}
-	if(/Number of rows uploaded: (\d+)/) {
+	if(/[.][.][.][.] Done after (\d+) rows/) {
 	    msg("   Annotation loaded: $1 rows\n");
 	    $annotation = 2;
 	}
-	if(/load_rna_annotation - Finished job entry \[Success\] \(result=\[true\]\)/) {
+	if(/Platform (\S+) added to DE_GPL_INFO/) {
+	    $platform = $1;
 	    msg("   Annotation loaded rnaseq platform: $platform\n");
 	    $annotation = 2;
 	}
-	if(/load_rna_annotation - Finished job entry .* \(result=\[false\]\)/) {
+	if(/Completed in \d+ minutes \d+ seconds/) {
 	    msg("   Annotation: $_");
+	    $annotation = 2;
 	}
     }
     close ALOG;
@@ -228,7 +231,7 @@ if($annotation && defined($expression{$loadstudy})) {
     }
     if(!$expression) {
 	$expressiontime = "unknown time";
-	system "make -C samples/postgres load_expression_$loadstudy 2>\&1 > expression.log ";
+	system "make -C samples/oracle load_expression_$loadstudy 2>\&1 > expression.log ";
 	open(ELOG, "expression.log") || die "Cannot read expression.log";
 	while(<ELOG>) {
 	    if(/Write to log 2[.]0 - did NOT complete successfully/) {
@@ -256,7 +259,7 @@ if($annotation && defined($expression{$loadstudy})) {
 	}
 	close ELOG;
 	if($expressionFail) {
-	    system "make -C samples/postgres showdblog > expression.showdblog";
+	    system "make -C samples/oracle showdblog > expression.showdblog";
 	    open(EDBLOG, "expression.showdblog");
 	    $dashes = 0;
 	    while(<EDBLOG>) {
@@ -296,7 +299,7 @@ if($annotation && defined($rnaseq{$loadstudy})) {
 	}
     }
     if(!$rnaseq) {
-	system "make -C samples/postgres load_rnaseq_$loadstudy 2>\&1 > rnaseq.log ";
+	system "make -C samples/oracle load_rnaseq_$loadstudy 2>\&1 > rnaseq.log ";
 	open(RLOG, "rnaseq.log") || die "Cannot read rnaseq.log";
 	while(<RLOG>) {
 	    if(/Write to log 2[.]0 - did NOT complete successfully/) {
@@ -324,7 +327,7 @@ if($annotation && defined($rnaseq{$loadstudy})) {
 	}
 	close RLOG;
 	if($rnaseqFail) {
-	    system "make -C samples/postgres showdblog > rnaseq.showdblog";
+	    system "make -C samples/oracle showdblog > rnaseq.showdblog";
 	    open(RDBLOG, "rnaseq.showdblog");
 	    $dashes = 0;
 	    while(<RDBLOG>) {

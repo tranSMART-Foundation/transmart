@@ -98,6 +98,7 @@ if(!defined($ARGV[0])){
 
 @time = localtime(time());
 $currenttime = sprintf "%4d-%02d-%02d %02d:%02d:%02d", 1900+$time[5], 1+$time[4], $time[3], $time[2], $time[1], $time[0];
+$ocurrenttime = sprintf "to_timestamp('%4d-%02d-%02d %02d:%02d:%02d','YYYY-MM-DD HH24-MI-SS')", 1900+$time[5], 1+$time[4], $time[3], $time[2], $time[1], $time[0];
 print "Running at $currenttime\n";
 
 $dovalidate=0;
@@ -125,7 +126,7 @@ if(!$ispostgres) {
     # Require ORAPASSWORD and ORAHOST defined
     # ORAPORT defaults to "1521"
     # ORASID defaults to "transmart"
-    $sqlplus = "sqlplus -S \"sys";
+    $sqlplus = "sqlplus -M \"CSV on delimiter '|' QUOTE OFF\" -S \"sys";
     $var = $ENV{"ORAPASSWORD"} || die "ORAPASSWORD not defined";
     $sqlplus .= "/$var";
     $var = $ENV{"ORAHOST"} || die "ORAHOST not defined";
@@ -386,6 +387,8 @@ sub findFolder($$$) {
 	close PSQL;
     } else {
 	open(OSQL, "echo  \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -432,6 +435,8 @@ sub findTemplate($) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -479,6 +484,8 @@ sub findDisease($) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -491,7 +498,7 @@ sub findDisease($) {
 	close OSQL;
     }
 
-    my $dosql = "select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_disease_id from biomart.bio_disease where (disease = '$disease' or mesh_code = '$disease' or icd9_code = '$disease' or icd10_code = '$disease'))";
+    $dosql = "select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_disease_id from biomart.bio_disease where (disease = '$disease' or mesh_code = '$disease' or icd9_code = '$disease' or icd10_code = '$disease'))";
 
     if($ispostgres) {
 	open(PSQL, "psql -A -t -c \"$dosql\"|") || die "Failed to start psql";
@@ -505,6 +512,8 @@ sub findDisease($) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -540,6 +549,8 @@ sub findConcept($$) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -575,6 +586,8 @@ sub findTag($) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    s/^\s+//;
@@ -611,6 +624,8 @@ sub findAccession($) {
 	close PSQL;
     } else {
 	open(OSQL, "echo \"$dosql;\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    chomp;
 	    if(/[|]/) {
@@ -680,12 +695,21 @@ sub testPubmed($) {
 }
 
 $studyProgram = $ENV{STUDY_PROGRAM};
+if(defined($studyProgram)) {
+    print "Overriding program '$program' - using STUDY_PROGRAM '$studyProgram'\n";
+    $program = $studyProgram;
+}
+
 print "Looking for program '$program'\n";
 print STDERR "Looking for program '$program'\n";
 $programid = findFolder("PROGRAM", $program, 0);
 
-if(!$programid) {print STDERR "program '$program' not found\n";exit}
-else {print "program '$program' found with ID $programid\n"}
+if(!$programid) {
+    print STDERR "program '$program' not found\n";
+    exit;
+} else {
+    print "program '$program' found with ID $programid\n";
+}
 
 $studyid = findFolder("STUDY", $title, 1);
 
@@ -694,7 +718,7 @@ if(!$studyid) {
 } else {
     print STDERR "study '$title' found with ID $studyid\n";
     print STDERR "Study exists. Load canceled\n";
-    exit
+    exit;
 }
 
 #Accession .... what do we need to check?
@@ -750,7 +774,7 @@ foreach $objective (@objective){
 
 #Description - what do we need to check e.g. length, character set
 
-$description =~ s/<[pP]>/<br\/><br\/>/g; # Use E'$description' to escape characters in PSQL
+$description =~ s/<[pP]>/<br\/><br\/>/g; # remove empty paragraphs
 $description =~ s/<\/[pP]>//g;		 # remove any end-of-paragraph tags
 
 print "Edited description: '$description'\n";
@@ -761,8 +785,8 @@ if(length($description) > $maxdesc)  {
     $validateMsg .= $msg;
 }
 
-$overalldesign =~ s/<[pP]>/<br\/><br\/>/g; # Use E'$description' to escape characters in PSQL
-$overalldesign =~ s/<\/[pP]>//g;		 # remove any end-of-paragraph tags
+$overalldesign =~ s/<[pP]>/<br\/><br\/>/g; # remove empty paragraphs
+$overalldesign =~ s/<\/[pP]>//g;	   # remove any end-of-paragraph tags
 
 if(length($overalldesign) > $maxdesign)  {
     $msg = "OverallDesign too long: ".length($overalldesign)."\n";
@@ -1029,8 +1053,20 @@ insert into amapp.am_tag_template_association (tag_template_id,object_uid)
     } else {
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
-	print DOSQL "insert into biomart.bio_experiment (bio_experiment_type,title,description,design,accession,country,biomarker_type,access_type)
-       values ('Experiment','$title','$description','$designcode','$accession','$countryall','$biomarkerall','$accesscode');
+	print STDERR "insert into biomart.bio_experiment
+    (bio_experiment_type,title,description,design,start_date,completion_date,primary_investigator,contact_field,
+     etl_id,status,overall_design,accession,entrydt,updated,institution,country,biomarker_type,target,access_type)
+    values ('Experiment','$title','$description','$designcode',to_date('$startdate','YYYY-MM-DD'),to_date('$completedate','YYYY-MM-DD'),'$namepi','$contact',
+	    '$etlid','$statuscode','$overalldesign','$accession',$ocurrenttime,$ocurrenttime,'$institution','$countryall','$biomarkerall','$target','$accesscode');
+
+insert into amapp.am_tag_template_association (tag_template_id,object_uid)
+       values ($studytemplate,'FOL:$studyid');
+";
+	print DOSQL "insert into biomart.bio_experiment
+    (bio_experiment_type,title,description,design,start_date,completion_date,primary_investigator,contact_field,
+     etl_id,status,overall_design,accession,entrydt,updated,institution,country,biomarker_type,target,access_type)
+    values ('Experiment','$title','$description','$designcode',to_date('$startdate','YYYY-MM-DD'),to_date('$completedate','YYYY-MM-DD'),'$namepi','$contact',
+	    '$etlid','$statuscode','$overalldesign','$accession',$ocurrenttime,$ocurrenttime,'$institution','$countryall','$biomarkerall','$target','$accesscode');
 
 insert into amapp.am_tag_template_association (tag_template_id,object_uid)
        values ($studytemplate,'FOL:$studyid');

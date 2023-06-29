@@ -34,7 +34,7 @@ if(!defined($ARGV[0])){
 }
 
 $dovalidate=0;
-$dodebug=0;
+$dodebug=1;
 $ispostgres=0;
 $iarg=0;
 foreach $arg (@ARGV) {
@@ -43,7 +43,7 @@ foreach $arg (@ARGV) {
     }
     else {
 	if($arg eq "-validate") {$dovalidate = 1}
-	elsif($arg eq "-debug") {$dodebug = 1}
+
 	elsif($arg eq "-oracle") {$ispostgres = 0}
 	elsif($arg eq "-postgres") {$ispostgres = 1}
 	else {
@@ -58,7 +58,7 @@ if(!$ispostgres) {
     # Require ORAPASSWORD and ORAHOST defined
     # ORAPORT defaults to "1521"
     # ORASID defaults to "transmart"
-    $sqlplus = "sqlplus -S \"sys";
+    $sqlplus = "sqlplus -M \"CSV on delimiter '|' QUOTE OFF\" -S \"sys";
     $var = $ENV{"ORAPASSWORD"} || die "ORAPASSWORD not defined";
     $sqlplus .= "/$var";
     $var = $ENV{"ORAHOST"} || die "ORAHOST not defined";
@@ -172,6 +172,8 @@ sub findFolder($$$) {
     else {
 	if($dodebug){print "echo \"select folder_id,folder_type from fmapp.fm_folder where folder_level = $level and folder_name = '$folder';\"  | $sqlplus\n"}
 	open(OSQL, "echo \"select folder_id,folder_type from fmapp.fm_folder where folder_level = $level and folder_name = '$folder';\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    if($dodebug){print}
 	    chomp;
@@ -207,6 +209,8 @@ sub findTemplate($) {
     } else {
 	if($dodebug){print "echo \"select tag_template_id,tag_template_type from amapp.am_tag_template where tag_template_type = '$type';\" | $sqlplus\n"}
 	open(OSQL, "echo \"select tag_template_id,tag_template_type from amapp.am_tag_template where tag_template_type = '$type';\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    if($dodebug){print}
 	    chomp;
@@ -241,6 +245,8 @@ sub findDisease($) {
     } else {
 	if($dodebug){print "echo \"select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_disease_id from biomart.bio_disease where (disease = '$disease' or mesh_code = '$disease' or icd9_code = '$disease' or icd10_code = '$disease'));\" | $sqlplus\n"}
 	open(OSQL, "echo \"select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_disease_id from biomart.bio_disease where (disease = '$disease' or mesh_code = '$disease' or icd9_code = '$disease' or icd10_code = '$disease'));\" | $sqlplus|") || die "Failed to start sqlplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    if($dodebug){print}
 	    chomp;
@@ -273,6 +279,8 @@ sub findConcept($$) {
     } else {
 	if($dodebug){print "echo \"select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_concept_code_id from biomart.bio_concept_code where (code_name = '$concept' or bio_concept_code = '$concept') and code_type_name = '$type');\" | $sqlplus\n"}
 	open(OSQL, "echo \"select bio_data_id, unique_id from biomart.bio_data_uid where bio_data_id = (select bio_concept_code_id from biomart.bio_concept_code where (code_name = '$concept' or bio_concept_code = '$concept') and code_type_name = '$type');\" | $sqlplus|") || die "Failed to start sqplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    if($dodebug){print}
 	    chomp;
@@ -305,6 +313,8 @@ sub findTag($) {
     } else {
 	if($dodebug){print "echo \"select tag_item_id,code_type_name from amapp.am_tag_item where code_type_name = '$type';\" | $sqlplus\n"}
 	open(OSQL, "echo \"select tag_item_id,code_type_name from amapp.am_tag_item where code_type_name = '$type';\" | $sqlplus|") || die "Failed to start sqplus";
+	<OSQL>;
+	<OSQL>;
 	while(<OSQL>){
 	    if($dodebug){print}
 	    chomp;
@@ -431,8 +441,8 @@ insert into amapp.am_tag_template_association (tag_template_id,object_uid)
 \n"}
     print DOSQL "insert into amapp.am_tag_template_association (tag_template_id,object_uid)
        select (select tag_template_id from amapp.am_tag_template where tag_template_name = 'Program'),
-              (select 'FOL:'||folder_id from fmapp.fm_folder where folder_name = '$program')
-              from DUAL where not exists (select NULL from amapp.am_tag_template_association where object_uid = 
+              (select 'FOL:'||folder_id from fmapp.fm_folder where folder_name = '$program') from DUAL
+              where not exists (select NULL from amapp.am_tag_template_association where object_uid = 
                       (select 'FOL:'||folder_id from fmapp.fm_folder where folder_name = '$program'));
 ";
     close DOSQL;

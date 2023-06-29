@@ -5,7 +5,9 @@ $loadstudy = $ARGV[0];
 $doreload = 1;
 $msg = "";
 
-if(defined($ARGV[1]) && $ARGV[1] eq "-update") {$doreload = 0; print "Updating $loadstudy\n";}
+if(defined($ARGV[1]) && $ARGV[1] eq "-resume") {$doreload = 0; print "Resuming $loadstudy\n";}
+if(defined($ARGV[1]) && $ARGV[1] eq "-reload") {$doreload = 1; print "Reloading $loadstudy\n";}
+
 
 defined($ENV{TRANSMARTDATA}) || die "Undefined path: TRANSMARTDATA";
 $datatop = $ENV{TRANSMARTDATA};
