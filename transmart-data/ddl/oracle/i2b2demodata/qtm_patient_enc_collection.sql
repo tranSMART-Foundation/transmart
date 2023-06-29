@@ -27,15 +27,15 @@ CREATE SEQUENCE  "I2B2DEMODATA"."QTM_SQ_QPER_PECID"  MINVALUE 1 MAXVALUE 9999999
 --
 -- Type: TRIGGER; Owner: I2B2DEMODATA; Name: TRG_QTM_PEC_PEC_ID
 --
----  CREATE OR REPLACE TRIGGER "I2B2DEMODATA"."TRG_QTM_PEC_PEC_ID"
----   before insert on "I2B2DEMODATA"."QTM_PATIENT_ENC_COLLECTION"
----   for each row
----begin
----   if inserting then
----      if :NEW."PATIENT_ENC_COLL_ID" is null then
----         select QTM_SQ_QPER_PECID.nextval into :NEW."PATIENT_ENC_COLL_ID" from dual;
----      end if;
----   end if;
----end;
----/
----ALTER TRIGGER "I2B2DEMODATA"."TRG_QTM_PEC_PEC_ID" ENABLE;
+CREATE OR REPLACE TRIGGER "I2B2DEMODATA"."TRG_QTM_PEC_PEC_ID"
+   before insert on "I2B2DEMODATA"."QTM_PATIENT_ENC_COLLECTION"
+   for each row
+begin
+   if inserting then
+      if :NEW."PATIENT_ENC_COLL_ID" is null then
+         select QTM_SQ_QPER_PECID.nextval into :NEW."PATIENT_ENC_COLL_ID" from dual;
+      end if;
+   end if;
+end;
+/
+ALTER TRIGGER "I2B2DEMODATA"."TRG_QTM_PEC_PEC_ID" ENABLE;

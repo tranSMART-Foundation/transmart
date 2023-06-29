@@ -325,6 +325,81 @@
     "child" : {
       "type" : "TRIGGER",
       "owner" : "I2B2DEMODATA",
+      "name" : "TRG_QTM_QI_QI_ID"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_SQ_QI_QIID"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_QUERY_INSTANCE"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_QTM_QM_QM_ID"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_SQ_QM_QMID"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_QUERY_MASTER"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_QTM_QRI_RI_ID"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_SQ_QRI_QRIID"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_QUERY_RESULT_INSTANCE"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TR_QTM_PSC_PSC_ID"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_SQ_QPR_PCID"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_PATIENT_SET_COLLECTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_QTM_PEC_PEC_ID"
+    },
+    "parents" : [ {
+      "type" : "SEQUENCE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_SQ_QPER_PECID"
+    }, {
+      "type" : "TABLE",
+      "owner" : "I2B2DEMODATA",
+      "name" : "QTM_PATIENT_ENC_COLLECTION"
+    } ]
+  }, {
+    "child" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
       "name" : "TRG_OF_ENCOUNTER_NUM"
     },
     "parents" : [ {
@@ -2567,6 +2642,48 @@
       "name" : "TRG_PATIENT_DIMENSION"
     },
     "file" : "i2b2demodata/patient_dimension.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_VISIT_DIMENSION"
+    },
+    "file" : "i2b2demodata/visit_dimension.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_QTM_PEC_PEC_ID"
+    },
+    "file" : "i2b2demodata/qtm_patient_enc_collection.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TR_QTM_PSC_PSC_ID"
+    },
+    "file" : "i2b2demodata/qtm_patient_set_collection.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_QTM_QI_QI_ID"
+    },
+    "file" : "i2b2demodata/qtm_query_instance.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_QTM_QM_QM_ID"
+    },
+    "file" : "i2b2demodata/qtm_query_master.sql"
+  }, {
+    "item" : {
+      "type" : "TRIGGER",
+      "owner" : "I2B2DEMODATA",
+      "name" : "TRG_QTM_QRI_RI_ID"
+    },
+    "file" : "i2b2demodata/qtm_query_result_instance.sql"
   }, {
     "item" : {
       "type" : "TABLE",

@@ -47,15 +47,15 @@ CREATE SEQUENCE  "I2B2DEMODATA"."QTM_SQ_QM_QMID"  MINVALUE 1 MAXVALUE 9999999999
 --
 -- Type: TRIGGER; Owner: I2B2DEMODATA; Name: TRG_QTM_QM_QM_ID
 --
----  CREATE OR REPLACE TRIGGER "I2B2DEMODATA"."TRG_QTM_QM_QM_ID"
----   before insert on "I2B2DEMODATA"."QTM_QUERY_MASTER"
----   for each row
----begin
----   if inserting then
----      if :NEW."QUERY_MASTER_ID" is null then
----         select QTM_SQ_QM_QMID.nextval into :NEW."QUERY_MASTER_ID" from dual;
----      end if;
----   end if;
----end;
----/
----ALTER TRIGGER "I2B2DEMODATA"."TRG_QTM_QM_QM_ID" ENABLE;
+CREATE OR REPLACE TRIGGER "I2B2DEMODATA"."TRG_QTM_QM_QM_ID"
+   before insert on "I2B2DEMODATA"."QTM_QUERY_MASTER"
+   for each row
+begin
+   if inserting then
+      if :NEW."QUERY_MASTER_ID" is null then
+         select QTM_SQ_QM_QMID.nextval into :NEW."QUERY_MASTER_ID" from dual;
+      end if;
+   end if;
+end;
+/
+ALTER TRIGGER "I2B2DEMODATA"."TRG_QTM_QM_QM_ID" ENABLE;

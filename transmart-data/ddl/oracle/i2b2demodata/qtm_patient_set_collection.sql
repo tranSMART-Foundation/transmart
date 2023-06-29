@@ -32,15 +32,15 @@ CREATE SEQUENCE  "I2B2DEMODATA"."QTM_SQ_QPR_PCID"  MINVALUE 1 MAXVALUE 999999999
 --
 -- Type: TRIGGER; Owner: I2B2DEMODATA; Name: TR_QTM_PSC_PSC_ID
 --
----  CREATE OR REPLACE TRIGGER "I2B2DEMODATA"."TR_QTM_PSC_PSC_ID"
----   before insert on "I2B2DEMODATA"."QTM_PATIENT_SET_COLLECTION"
----   for each row
----begin
----   if inserting then
----      if :NEW."PATIENT_SET_COLL_ID" is null then
----         select QTM_SQ_QPR_PCID.nextval into :NEW."PATIENT_SET_COLL_ID" from dual;
----      end if;
----   end if;
----end;
----/
----ALTER TRIGGER "I2B2DEMODATA"."TR_QTM_PSC_PSC_ID" ENABLE;
+CREATE OR REPLACE TRIGGER "I2B2DEMODATA"."TR_QTM_PSC_PSC_ID"
+   before insert on "I2B2DEMODATA"."QTM_PATIENT_SET_COLLECTION"
+   for each row
+begin
+   if inserting then
+      if :NEW."PATIENT_SET_COLL_ID" is null then
+         select QTM_SQ_QPR_PCID.nextval into :NEW."PATIENT_SET_COLL_ID" from dual;
+      end if;
+   end if;
+end;
+/
+ALTER TRIGGER "I2B2DEMODATA"."TR_QTM_PSC_PSC_ID" ENABLE;

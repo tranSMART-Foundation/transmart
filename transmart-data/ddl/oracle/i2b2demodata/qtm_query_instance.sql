@@ -50,15 +50,15 @@ CREATE INDEX "I2B2DEMODATA"."QTM_IDX_QI_MSTARTID" ON "I2B2DEMODATA"."QTM_QUERY_I
 --
 -- Type: TRIGGER; Owner: I2B2DEMODATA; Name: TRG_QTM_QI_QI_ID
 --
----  CREATE OR REPLACE TRIGGER "I2B2DEMODATA"."TRG_QTM_QI_QI_ID"
----   before insert on "I2B2DEMODATA"."QTM_QUERY_INSTANCE"
----   for each row
----begin
----   if inserting then
----      if :NEW."QUERY_INSTANCE_ID" is null then
----         select QTM_SQ_QI_QIID.nextval into :NEW."QUERY_INSTANCE_ID" from dual;
----      end if;
----   end if;
----end;
----/
----ALTER TRIGGER "I2B2DEMODATA"."TRG_QTM_QI_QI_ID" ENABLE;
+CREATE OR REPLACE TRIGGER "I2B2DEMODATA"."TRG_QTM_QI_QI_ID"
+   before insert on "I2B2DEMODATA"."QTM_QUERY_INSTANCE"
+   for each row
+begin
+   if inserting then
+      if :NEW."QUERY_INSTANCE_ID" is null then
+         select QTM_SQ_QI_QIID.nextval into :NEW."QUERY_INSTANCE_ID" from dual;
+      end if;
+   end if;
+end;
+/
+ALTER TRIGGER "I2B2DEMODATA"."TRG_QTM_QI_QI_ID" ENABLE;
