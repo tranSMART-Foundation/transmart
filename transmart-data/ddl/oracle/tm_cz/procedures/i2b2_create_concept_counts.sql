@@ -22,6 +22,9 @@ AS
      * limitations under the License.
      ******************************************************************/
 
+    tText		varchar2(2000);
+    pCount		int;
+
     --Audit variables
     newJobFlag INTEGER(1);
     databaseName VARCHAR(100);
@@ -47,10 +50,11 @@ BEGIN
 
     stepCt := 0;
 
-    delete from i2b2demodata.concept_counts
+    delete from i2b2metadata.tm_concept_counts
      where concept_path like path || '%';
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Delete counts for trial from I2B2DEMODATA concept_counts',SQL%ROWCOUNT,stepCt,'Done');
+    tText := 'Delete counts for path ' || path || ' from I2B2METADATA tm_concept_counts';
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,SQL%ROWCOUNT,stepCt,'Done');
 
     commit;
 
@@ -81,7 +85,7 @@ BEGIN
 	and la.c_fullname like path || '%' || gi.title || '%';
 
 	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert mRNA leaf counts for trial into I2B2DEMODATA concept_counts',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert mRNA leaf counts for trial into I2B2METADATA tm_concept_counts',SQL%ROWCOUNT,stepCt,'Done');
 	commit;
 
 	--	insert data for remaining leaf nodes and exclude Biomarker mRNA leaf nodes
@@ -102,36 +106,50 @@ BEGIN
 	where la.c_fullname = cx.leaf_path);
 
 	stepCt := stepCt + 1;
-	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert all remaining leaf counts for trial into I2B2DEMODATA concept_counts',SQL%ROWCOUNT,stepCt,'Done');
+	tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert all remaining leaf counts for trial into I2B2METADATA tm_concept_counts',SQL%ROWCOUNT,stepCt,'Done');
 	commit;
      */
 
     --	Join each node (folder or leaf) in the path to its leaf in the work table to count patient numbers
 
-    insert into i2b2demodata.concept_counts (
+    select count(*) into pCount
+    	   from i2b2metadata.i2b2 fa
+	   where fa.c_fullname like path || '%';
+    stepCt := stepCt + 1;
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Count for path in I2B2METADATA i2b2',SQL%ROWCOUNT,stepCt,'Done');
+
+    select count(*) into pCount
+    	   from i2b2metadata.i2b2 fa
+	   	,i2b2metadata.i2b2 la
+	   where fa.c_fullname like path || '%'
+	   and la.c_fullname like fa.c_fullname || '%';
+    stepCt := stepCt + 1;
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Count for children of path in I2B2METADATA i2b2',SQL%ROWCOUNT,stepCt,'Done');
+
+    insert into i2b2metadata.tm_concept_counts (
 	concept_path
 	,parent_concept_path
 	,patient_count
     )
     select fa.c_fullname
 	   ,ltrim(SUBSTR(fa.c_fullname, 1,instr(fa.c_fullname, '\',-1,2)))
-	   ,count(distinct tpm.patient_num)
+	   ,count(distinct ob.patient_num)
       from i2b2metadata.i2b2 fa
 	   ,i2b2metadata.i2b2 la
-	   ,i2b2demodata.observation_fact tpm
-	   ,i2b2demodata.patient_dimension p
+	   ,i2b2demodata.observation_fact ob
+--	   ,i2b2demodata.patient_dimension p
      where fa.c_fullname like path || '%'
        and substr(fa.c_visualattributes,2,1) != 'H'
        and la.c_fullname like fa.c_fullname || '%'
        and la.c_visualattributes like 'L%'
-       and tpm.patient_num = p.patient_num
-       and p.sourcesystem_cd not like '%:S:%'
-       and la.c_basecode = tpm.concept_cd(+)
+--       and ob.patient_num = p.patient_num
+--       and p.sourcesystem_cd not like '%:S:%'
+       and la.c_basecode = ob.concept_cd(+)
      group by fa.c_fullname
 	      ,ltrim(SUBSTR(fa.c_fullname, 1,instr(fa.c_fullname, '\',-1,2)));
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert counts for trial into I2B2DEMODATA concept_counts',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Insert counts for trial into I2B2METADATA tm_concept_counts',SQL%ROWCOUNT,stepCt,'Done');
 
     commit;
 
@@ -143,18 +161,18 @@ BEGIN
        set c_visualattributes = substr(c_visualattributes,1,1) || 'H' || substr(c_visualattributes,3,1)
      where c_fullname like path || '%'
 	   and (not exists
-		(select 1 from i2b2demodata.concept_counts nc
+		(select 1 from i2b2metadata.tm_concept_counts nc
 		  where c_fullname = nc.concept_path)
 		  or
 		  exists
-		  (select 1 from i2b2demodata.concept_counts zc
+		  (select 1 from i2b2metadata.tm_concept_counts zc
 		    where c_fullname = zc.concept_path
 		      and zc.patient_count = 0)
 	   )
 	   and c_name != 'SECURITY';
 
     stepCt := stepCt + 1;
-    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Nodes hidden with missing/zero counts for trial into I2B2DEMODATA concept_counts',SQL%ROWCOUNT,stepCt,'Done');
+    tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Hide nodes with missing/zero counts in I2B2METADATA tm_concept_counts',SQL%ROWCOUNT,stepCt,'Done');
 
     commit;
 
@@ -210,7 +228,7 @@ END;
    and b.c_fullname like path || '%';
 
   insert
-   into concept_counts(
+   into i2b2metadata.tm_concept_counts(
    patient_count,
    concept_path)
    select
@@ -231,7 +249,7 @@ END;
    commit;
 
    --determine the parent_path
-   update concept_counts
+   update i2b2metadata.tm_concept_counts
    set parent_concept_path = ltrim(SUBSTR(concept_path, 1,instr(Concept_Path, '\',-1,2)))
    where concept_path like path || '%';
    commit;
@@ -240,7 +258,7 @@ END;
    set c_visualattributes = 'FH'
    where c_fullname like path || '%'
    and c_visualattributes like 'F%'
-   and c_fullname in (select concept_path from i2b2demodata.concept_counts where patient_count = 0 and concept_path like path || '%')
+   and c_fullname in (select concept_path from i2b2metadata.tm_concept_counts where patient_count = 0 and concept_path like path || '%')
    and c_name != 'SECURITY';
    commit;
 
@@ -248,7 +266,7 @@ END;
    set c_visualattributes = 'LH'
    where c_fullname like path || '%'
    and c_visualattributes like 'L%'
-   and c_fullname in (select concept_path from i2b2demodata.concept_counts where patient_count = 0 and concept_path like path || '%')
+   and c_fullname in (select concept_path from i2b2data.tm_concept_counts where patient_count = 0 and concept_path like path || '%')
    and c_name != 'SECURITY';
 
 */
@@ -287,8 +305,8 @@ END;
 	END LOOP;
 	END LOOP;
 
-	--aggregate the temp table and load into concept_counts
-	insert into i2b2demodata.concept_counts
+	--aggregate the temp table and load into tm_concept_counts
+	insert into i2b2metadata.tm_concept_counts
 	(
 	concept_path,
 	patient_count
