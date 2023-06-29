@@ -1037,7 +1037,7 @@ begin
         perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove unusable negative intensity_value from lt_src_rna_data for dataType R',rowCt,stepCt,'Done');
         begin
             update tm_lz.lt_src_rna_data
-	          set intensity_value = '0.001' where intensity_value::double precision = 0.0; -- update zero for
+	          set intensity_value = '0.001' where intensity_value::double precision = 0.0; -- update zero as small number with a valid log
 	    get diagnostics rowCt := ROW_COUNT;
             exception
 	        when others then
@@ -1050,7 +1050,7 @@ begin
 	    return -16;
         end;
         stepCt := stepCt + 1;
-        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Remove unusable negative intensity_value from lt_src_rna_data for dataType R',rowCt,stepCt,'Done');
+        perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,'Update zero intensity_value from lt_src_rna_data for dataType R',rowCt,stepCt,'Done');
     end if;
 
     begin
