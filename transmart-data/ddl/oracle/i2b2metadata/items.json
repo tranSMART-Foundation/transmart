@@ -39,6 +39,13 @@
     "child" : {
       "type" : "TABLE",
       "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
+    },
+    "parents" : [ ]
+  }, {
+    "child" : {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
       "name" : "PHI"
     },
     "parents" : [ ]
@@ -67,6 +74,17 @@
         "type" : "TABLE",
 	"owner" : "I2B2METADATA",
 	"name" : "TOTALNUM"
+    } ]
+  }, {
+    "child" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS_IDX"
+    },
+    "parents" : [ {
+      "type" : "TABLE",
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
     } ]
   }, {
     "child" : {
@@ -624,6 +642,20 @@
       "name" : "I2B2"
     },
     "file" : "i2b2metadata/i2b2.sql"
+  }, {
+    "item" : {
+      "type" : "TABLE",
+	"owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS"
+    },
+    "file" : "i2b2metadata/tm_concept_counts.sql"
+  }, {
+    "item" : {
+      "type" : "INDEX",
+      "owner" : "I2B2METADATA",
+      "name" : "TM_CONCEPT_COUNTS_IDX"
+    },
+    "file" : "i2b2metadata/tm_concept_counts.sql"
   }, {
     "item" : {
       "type" : "INDEX",
