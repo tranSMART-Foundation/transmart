@@ -1,14 +1,18 @@
 # Kettle (Pentaho data integration community edition) 9.3 07-may-22
+# No longer on SourceForge servers 
+#KETTLE_HOST ?= http://downloads.sourceforge.net/project/pentaho
+
 #KETTLE_VERSION=9.2
 #KETTLE_ZIP=9.2.0.0-290
+
+# verson 9.3 is the latest supported version
 KETTLE_VERSION=9.3
 KETTLE_ZIP=9.3.0.0-428
-KETTLE_HOST ?= http://downloads.sourceforge.net/project/pentaho
+KETTLE_HOST ?= https://privatefilesbucket-community-edition.s3.us-west-2.amazonaws.com
 
-# No longer on SourceForge servers 
+# version 9.4 has completely different configuration and is not yet working with transmart ETL
 #KETTLE_VERSION=9.4
 #KETTLE_ZIP=9.4.0.0-343
-#KETTLE_HOST ?= https://privatefilesbucket-community-edition.s3.us-west-2.amazonaws.com
 
 TRANSMART_LIBRARY ?= http://library.transmartfoundation.org/release
 
