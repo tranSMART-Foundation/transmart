@@ -2,7 +2,7 @@ SET search_path = tm_cz, pg_catalog;
 --
 -- Name: i2b2_create_security_for_trial(character varying, character varying, numeric, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_security_for_trial(trial_id character varying, secured_study character varying DEFAULT 'N'::character varying, top_level numeric DEFAULT 2, currentjobid numeric DEFAULT 0) RETURNS numeric
+CREATE OR REPLACE FUNCTION tm_cz.i2b2_create_security_for_trial(trial_id character varying, secured_study character varying DEFAULT 'N'::character varying, top_hlevel numeric DEFAULT 0, currentjobid numeric DEFAULT 0) RETURNS numeric
     LANGUAGE plpgsql SECURITY DEFINER
 AS $$
     /*************************************************************************
@@ -30,10 +30,11 @@ AS $$
     jobID 		numeric(18,0);
     stepCt 		numeric(18,0);
     rowCt		numeric(18,0);
+    tText		varchar(2000);
     errorNumber		character varying;
     errorMessage	character varying;
 
-    topLevel		integer;
+    topHlevel		integer;
     TrialID 		varchar(100);
     securedStudy 	varchar(5);
     pExists		integer;
@@ -42,7 +43,7 @@ AS $$
 begin
     TrialID := trial_id;
     securedStudy := secured_study;
-    topLevel := top_level;
+    topHlevel := top_hlevel;
 
     --Set Audit Parameters
     newJobFlag := 0; -- False (Default)
@@ -59,6 +60,10 @@ begin
     end if;
 
     stepCt := 0;
+
+    stepCt := stepCt + 1;
+    tText := 'Security for TrialID '||TrialID||' topHlevel '||topHlevel;
+    perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
 
     begin
 	delete from i2b2demodata.observation_fact
@@ -214,6 +219,18 @@ begin
 	      from biomart.bio_experiment
 	     where accession = TrialId;
 
+	    if (topHlevel = 0) then
+		begin
+		    select min(c_hlevel) into topHlevel
+		      from i2b2metadata.i2b2 x
+		     where x.sourcesystem_cd = TrialId;
+		    get diagnostics rowCt := ROW_COUNT;
+		end;
+		stepCt := stepCt + 1;
+		tText := 'Find topHlevel '||topHlevel||' for trialID';
+		perform tm_cz.cz_write_audit(jobId,databaseName,procedureName,tText,rowCt,stepCt,'Done');
+	    end if;
+
 	    begin
 		insert into searchapp.search_secure_object
 			    (bio_data_id
@@ -227,9 +244,7 @@ begin
 		       ,'EXP:' || TrialId as bio_data_unique_id
 		  from i2b2metadata.i2b2 md
 		 where md.sourcesystem_cd = TrialId
-		   and md.c_hlevel = topLevel
---		       (select min(x.c_hlevel) from i2b2metadata.i2b2 x
---			 where x.sourcesystem_cd = TrialId)
+		   and md.c_hlevel = topHlevel
 		   and not exists
 		       (select 1 from searchapp.search_secure_object so
 			 where v_bio_experiment_id = so.bio_data_id);

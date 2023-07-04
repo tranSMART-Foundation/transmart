@@ -35,6 +35,7 @@ AS $$
     topNode		varchar(2000);
     topNodeEscaped	varchar(2000);
     topLevel		numeric(10,0);
+    topHlevel		numeric(10,0);
     root_node		varchar(2000);
     root_level		integer;
     study_name		varchar(2000);
@@ -1670,7 +1671,8 @@ begin
 
     end loop;
 
-    perform tm_cz.i2b2_create_security_inc_trial(TrialID, secureStudy, topLevel, jobID);
+    topHlevel := topLevel - 2 + root_level;
+    perform tm_cz.i2b2_create_security_inc_trial(TrialID, secureStudy, topHlevel, jobID);
     select tm_cz.i2b2_load_security_data(TrialID,jobID) into rtnCd;
 
     if(rtnCd <> 1) then
