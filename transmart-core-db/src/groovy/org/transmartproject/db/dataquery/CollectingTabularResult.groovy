@@ -113,18 +113,23 @@ abstract class CollectingTabularResult<C, R extends DataRow> implements TabularR
         }
 
         List collectedEntries = new ArrayList(indicesList.size())
-//	logger.info 'getNextRow start with first entry row {} indicesList.size {} firstEntry {}',
-//	    results.getRowNumber(), indicesList.size(), firstEntry
+//	logger.info 'getNextRow start with first entry row {} indicesList.size {} firstEntry {} columnEntityName {}',
+//	    results.getRowNumber(), indicesList.size(), firstEntry, columnEntityName
         addToCollectedEntries collectedEntries, firstEntry
 
         while (results.next() && inSameGroup(firstEntry, results.get())) {
-	    if(latestEntry.assayId == results.get().assayId) {
-//		logger.info 'DUPLICATE RECORD for assayId {} row {} latestEntry {} next result {}',
-//		    latestEntry.assayId, results.getRowNumber(), latestEntry, results.get()
+//	    logger.info 'columnEntityName {} test latestEntry {} results.get {}', columnEntityName, latestEntry, results.get()
+
+	    // Skip duplicate assays for high-dimensional data
+	    if(columnEntityName == 'assay' && latestEntry.assayId == results.get().assayId) {
+		logger.info 'DUPLICATE RECORD for assayId {} row {} latestEntry {} next result {}',
+		    latestEntry[columnEntityName], results.getRowNumber(), latestEntry, results.get()
 		continue
 	    }
 	    latestEntry = results.get()
-//	    logger.info 'getNextRow next result same group (annotationId+geneSymbol) row {} latestEntry {} next result {}',
+
+	    // other entries append to group
+//	    logger.info 'getNextRow next result same group (e.g. annotationId+geneSymbol) row {} latestEntry {} next result {}',
 //		results.getRowNumber(), latestEntry, results.get()
             addToCollectedEntries collectedEntries, results.get()
         }
