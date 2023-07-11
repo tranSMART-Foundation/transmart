@@ -4,6 +4,15 @@ echo "Starting at $(date)"
 echo "+++++++++++++++++++++++++++++++++++++++++"
 echo "+  Checking locations of Script Directory"
 echo "+++++++++++++++++++++++++++++++++++++++++"
+
+TMSCRIPTS_BASE="$(dirname -- "$(readlink -f "${BASH_SOURCE}")")"
+export TMSCRIPTS_BASE
+TMINSTALL_BASE="$(dirname -- "$(dirname -- "$(readlink -f "${TMSCRIPTS_BASE}")")")"
+export TMINSTALL_BASE
+
+echo "Set TMSCRIPTS_BASE ${TMSCRIPTS_BASE}"
+echo "Set TMINSTALL_BASE ${TMINSTALL_BASE}"
+
 if ! [ -d "$TMINSTALL_BASE/Scripts" ] ; then
 	echo "This script assumes that the Scripts directory is installed at $TMINSTALL_BASE/Scripts"
 	echo "It does not appear to be there. Please fix that and restart this script."
@@ -20,7 +29,7 @@ echo "Finished checking locations of Script Directory at $(date)"
 echo "----------------------------------------------------------------"
 echo "To load datasets, use the these two files"
 echo "in the Scripts/install directory:"
-echo "    datasetsList.txt - the list of posible datasets to load, and"
+echo "    datasetsList.txt - the list of possible datasets to load, and"
 echo "    load_datasets.sh - the script to load the datasets. "
 echo ""
 echo "First, in the file datasetsList.txt, un-comment the lines that"

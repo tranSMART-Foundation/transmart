@@ -8,9 +8,9 @@
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallManual starting"
 
-echo "+++++++++++++++++++++++++++++++"
-echo "+  NN. Install transmart-manual"
-echo "+++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++"
+echo "+  07.01 Install transmart-manual +"
+echo "+++++++++++++++++++++++++++++++++++"
 
 cd $TMINSTALL_BASE
 

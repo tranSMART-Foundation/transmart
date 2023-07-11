@@ -8,9 +8,9 @@
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallWarfiles starting"
 
-echo "++++++++++++++++++++++++++++++++"
-echo "+  NN. Install war files"
-echo "++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++"
+echo "+  04.01 Install war files +"
+echo "++++++++++++++++++++++++++++"
 
 cd $TMINSTALL_BASE
 sudo -v

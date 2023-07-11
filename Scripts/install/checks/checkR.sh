@@ -35,8 +35,8 @@ else
     fi
 fi
 
-# check R version, exactly 4.1.2
-desiredRVersion="4.1.2"
+# check R version, exactly 4.3.1
+desiredRVersion="4.3.1"
 RVersion=$(R --version | awk -F '^R version ' '{print $2}')
 reportCheckExact "R" $desiredRVersion $RVersion
 returnFlag=$?

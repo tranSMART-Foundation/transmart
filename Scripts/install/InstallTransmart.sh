@@ -133,29 +133,37 @@ for test in "$tmosdist" "$tmosid"
 do
     if [ "$test" == "debian" ]; then	# debian 7-10+; ubuntu 14-22+
 	TMINSTALL_OS="$test"
+	TMINSTALL_OSVERSION=$tmosversid
 	break 1
     elif [ "$test" == "ubuntu" ]; then		# 14-22+
 	TMINSTALL_OS="$test"
+	TMINSTALL_OSVERSION=$tmosversid
 	break 1
     elif [ "$test" == "fedora" ]; then		# 28-35+
 	TMINSTALL_OS="$test"
+	TMINSTALL_OSVERSION=$tmosversid
 	break 1
     elif [ "$test" == "rhel" ]; then		# redhat 7, 8, 9
 	TMINSTALL_OS="$test"
+	TMINSTALL_OSVERSION=$tmosversid
 	break 1
     elif [ "$test" == "centos" ]; then		# 7, 8, stream-8
 	TMINSTALL_OS="$test"
+	TMINSTALL_OSVERSION=$tmosversid
 	break 1
     elif [ "$test" == "opensuse" ]; then
 	TMINSTALL_OS="opensuse"
+	TMINSTALL_OSVERSION=$tmosversid
 	break 1
     elif [ "$test" == "suse" ]; then
 	TMINSTALL_OS="suse"
+	TMINSTALL_OSVERSION=$tmosversid
 	break 1
     fi
 done
 
-echo "Set TMINSTALL_OS ${TMINSTALL_OS}"
+
+echo "Set TMINSTALL_OS ${TMINSTALL_OS} TMINSTALL_OSVERSION ${TMINSTALL_OSVERSION}"
 
 #Check command line
 #-b beta (not full release) changes names of download files
@@ -337,9 +345,9 @@ fi
 now="$(date +'%d-%b-%y %H:%M')"
 echo "Finished checking locations of Script Directory at ${now}"
 
-echo "++++++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+  NN. set up working dir (tranSMART install base)"
-echo "++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  01.01 set up working dir (tranSMART install base) +"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 echo "tranSMART will be installed at this location: $TMINSTALL_BASE"
 
@@ -354,9 +362,9 @@ sudo -v
 # Checking if a package is installed
 # ubuntu
 # fedora dnf list installed | grep make
-echo "+++++++++++++++"
-echo "+  install make"
-echo "+++++++++++++++"
+echo "+++++++++++++++++++++++"
+echo "+  01.02 install make +"
+echo "+++++++++++++++++++++++"
 
 cd $TMINSTALL_BASE
 
@@ -367,9 +375,9 @@ packageInstall make
 packageInstall curl
 packageInstall unzip
 
-echo "+++++++++++++++++++++++++++++++++"
-echo " NN. checking java 8 is installed"
-echo "+++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++"
+echo "  01.03 checking java 8 is installed +"
+echo "++++++++++++++++++++++++++++++++++++++"
 
 set +e
 now="$(date +'%d-%b-%y %H:%M')"
@@ -403,9 +411,9 @@ cd $TMSCRIPTS_BASE
 ./InstallTomcat.sh
 
 
-echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+ Done with install - making final checks - (may take a while)"
-echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+ 09.01 Done with install - making final checks - (may take a while) +"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 set e+
 cd $TMSCRIPTS_BASE/checks
@@ -428,26 +436,26 @@ echo "${now} Check web interface"
 
 ./checkWeb.sh
 
-echo "++++++++++++++++++++++++++++"
-echo "+ Done with final checks"
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++"
+echo "+ 09.02 Done with final checks +"
+echo "++++++++++++++++++++++++++++++++"
 echo "+ To redo all checks"
 echo "cd $TMSCRIPTS_BASE/checks"
 echo "./checkAll.sh"
-echo "++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++"
 
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Finished install of basic transmart ${TMRELEASE} system"
 
 echo "-----------------------------------------------------------------"
-echo "To load datasets, use the these two files in"
-echo "the Scripts/install  directory: "
+echo "To load datasets, use these two files in"
+echo "the Scripts/install  directory:"
 echo "    datasetsList.txt - the list of possible datasets to load, and"
-echo "    load_datasets.sh - the script to load the datasets. "
+echo "    load_datasets.sh - the script to load the datasets."
 echo ""
 echo "First, in the file datasetsList.txt, un-comment the lines that "
-echo "correspond to the data sets you wish to load. "
+echo "correspond to the data sets you wish to load."
 echo ""
 echo "Then run the file load_datasets.sh with:"
 echo "    cd $TMINSTALL_BASE"

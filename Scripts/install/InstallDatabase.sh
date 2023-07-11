@@ -5,9 +5,9 @@
 #  for tranSMART release 19.1
 #**********************************
 
-echo "+++++++++++++++++++++++++++++++++++++++"
-echo "+  NN. set up the transmart-data folder"
-echo "+++++++++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++"
+echo "+  02.01 set up the transmart-data folder +"
+echo "+++++++++++++++++++++++++++++++++++++++++++"
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallDatabase starting"
@@ -24,24 +24,40 @@ fi
 now="$(date +'%d-%b-%y %H:%M')"
 echo "Finished setting up the transmart-data folder at ${now}"
 
-echo "++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+  NN. Install of basic tools and dependencies"
-echo "++++++++++++++++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  02.02 Install of basic tools and dependencies +"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 # sudo make -C env ubuntu_deps_root
 #   In the makefile target, ubuntu_deps_root, causes a
 #   make of these two steps: 
 # (1)
 sudo -v
-cd $TMINSTALL_BASE/transmart-data
-sudo make -C env install_ubuntu_packages
-sudo make -C env install_ubuntu_packages18
+cd $TMSCRIPTS_BASE/
+case $TMINSTALL_OS in
+    debian | ubuntu | suse | opensuse)
+	sudo apt-get install make git rsync libcairo-dev curl gnupg \
+	     tar gfortran g++ unzip libreadline-dev \
+	     libxt-dev libpango1.0-dev libprotoc-dev \
+	     texlive-fonts-recommended tex-gyre texlive-latex-extra liblz4-tool pv zip
+	case $TMINSTALL_OSVERSION in
+	    18)
+		sudo apt-get install -y postgresql-14 php7.2-cli php7.2-json openjdk-8-jdk openjdk-8-jre tomcat8 \
+		     libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
+		;;
+	    20)
+		sudo apt-get install -y postgresql-14 php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
+		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
+	esac
+	;;
+esac
+
 # verify these packages
 cd $TMSCRIPTS_BASE/checks
 ./checkMakefilePackages.sh
 if [ "$( checkInstallError "Some Basic Command-Line Tool from 'sudo make -C env install_ubuntu_packages' is missing; redo install" )" ] ; then exit -1; fi
 now="$(date +'%d-%b-%y %H:%M')"
-echo "sudo make -C env install_ubuntu_packages - finished at ${now}"
+echo "sudo make OS-specific packages - finished at ${now}"
 
 # (2)
 sudo -v
@@ -58,9 +74,9 @@ echo " "
 cd $TMSCRIPTS_BASE
 ./InstallEtl.sh
 
-echo "++++++++++++++++++++++++++++++++++"
-echo "+  NN. Dependency: Install of vars"
-echo "++++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++"
+echo "+  02.03 Dependency: Install of vars +"
+echo "++++++++++++++++++++++++++++++++++++++"
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Install vars file"
@@ -81,9 +97,9 @@ now="$(date +'%d-%b-%y %H:%M')"
 echo "make -C env ../vars - finished at ${now}"
 echo "Finished setting ubuntu dependencies (without root) at ${now}"
 
-echo "++++++++++++++++++++++++++++++++++++++++"
-echo "+  NN. Dependency: Install of ant, maven"
-echo "++++++++++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  02.04 Dependency: Install of ant, maven +"
+echo "++++++++++++++++++++++++++++++++++++++++++++"
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Check installed packages: ant, maven"
@@ -99,10 +115,14 @@ cd $TMSCRIPTS_BASE/checks
 returnCode=$?
 if (( $returnCode )); then
     echo "Installing groovy"
-    cd $TMINSTALL_BASE/transmart-data
-    make -C env groovy
+    cd $TMINSTALL_BASE/transmart-data/env
+#    make -C env groovy
+    curl  --location --silent --show-error  https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-3.0.9.zip
+    unzip apache-groovy-binary-3.0.9.zip
+    touch groovy-3.0.9/bin/groovy
+    ln -sf groovy-3.0.9/bin/groovy ./
     now="$(date +'%d-%b-%y %H:%M')"
-    echo "make -C env groovy - finished at ${now}"
+    echo "Finished install of groovy 3.0.9 at ${now}"
 fi
 
 cd $TMSCRIPTS_BASE/checks
@@ -112,9 +132,9 @@ if [ "$( checkInstallError "groovy not installed correctly; redo install" )" ] ;
 now="$(date +'%d-%b-%y %H:%M')"
 echo "Finished install of groovy at ${now}"
 
-echo "++++++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+  NN. Checks on install of tools and dependencies"
-echo "++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  02.05 Checks on install of tools and dependencies +"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 # fix files for postgres
 now="$(date +'%d-%b-%y %H:%M')"
@@ -131,7 +151,7 @@ if [ "$( checkInstallError "Some Basic Command-Line Tool is missing; redo instal
 ./checkVersions.sh
 if [ "$( checkInstallError "There is a Command-Line with an unsupportable version; redo install" )" ] ; then exit -1; fi
 ./checkFilesBasic.sh
-if [ "$( checkInstallError "One of more basic files are missing; redo install" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "One or more basic files are missing; redo install" )" ] ; then exit -1; fi
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Check on loading and setup of postgres"
@@ -148,9 +168,9 @@ if [ "$( checkInstallError "Database table folders needed by transmart not corre
 now="$(date +'%d-%b-%y %H:%M')"
 echo "Finished installing basic tools and dependencies at ${now}"
 
-echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+  NN. Set up basic PostgreSQL; supports transmart login"
-echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  02.06 Set up basic PostgreSQL; supports transmart login +"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Set up basic PostgreSQL with admin role"

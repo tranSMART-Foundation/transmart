@@ -8,9 +8,9 @@
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallRserve starting"
 
-echo "+++++++++++++++++++++++++++++++++++++++++++"
-echo "+  NN. Install R, Rserve and other packages"
-echo "+++++++++++++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  06.01 Install R, Rserve and other packages +"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++"
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Check R installation"
@@ -67,9 +67,9 @@ now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Finished installing R and R packages"
 
 
-echo "++++++++++++++++++++++++++++"
-echo "+  start Rserve"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++"
+echo "+  06.02 start Rserve +"
+echo "+++++++++++++++++++++++"
 
 sudo -v
 cd $TMSCRIPTS_BASE

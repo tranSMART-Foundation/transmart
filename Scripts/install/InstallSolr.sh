@@ -8,9 +8,9 @@
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallSolr starting"
 
-echo "++++++++++++++++++++++++++++++++"
-echo "+  NN. Set up solr service files"
-echo "++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++"
+echo "+  05.01 Set up solr service files +"
+echo "++++++++++++++++++++++++++++++++++++"
 
 sudo -v
 cd $TMINSTALL_BASE/transmart-data
@@ -41,9 +41,9 @@ echo "${now} Finished installing solr and solr service"
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Starting solr service"
 
-echo "+++++++++++++++++++++++++++++++++"
-echo "+  Load, configure and start SOLR"
-echo "+++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++"
+echo "+  05.02 Load, configure and start SOLR +"
+echo "+++++++++++++++++++++++++++++++++++++++++"
 
 cd $TMINSTALL_BASE/transmart-data
 sudo -v

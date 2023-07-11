@@ -8,9 +8,9 @@
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallConfig starting"
 
-echo "+++++++++++++++++++++++++++++++++"
-echo "+  NN. Set up configuration files"
-echo "+++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++"
+echo "+  03.01 Set up configuration files +"
+echo "+++++++++++++++++++++++++++++++++++++"
 
 cd $TMINSTALL_BASE/transmart-data
 sudo -v

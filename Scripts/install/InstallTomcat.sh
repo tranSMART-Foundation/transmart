@@ -8,9 +8,9 @@
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallTomcat starting"
 
-echo "+++++++++++++++++++++++++"
-echo "+  NN. Install Tomcat 8/9"
-echo "+++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++"
+echo "+  08.01 Install Tomcat 8/9 +"
+echo "+++++++++++++++++++++++++++++"
 
 sudo -v 
 cd $HOME
@@ -26,6 +26,13 @@ sudo service tomcat8 stop
 $TMSCRIPTS_BASE/updateTomcatConfig.sh
 
 now="$(date +'%d-%b-%y %H:%M')"
+echo "${now} Copy transmart config files to new tomcat user"
+
+sudo mkdir -p /var/lib/tomcat8/.grails/transmartConfig/
+sudo cp $HOME/.grails/transmartConfig/*.groovy /var/lib/tomcat8/.grails/transmartConfig/
+sudo chown -R tomcat8:tomcat8 /var/lib/tomcat8/.grails
+
+now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} +  Check tomcat install"
 
 cd $TMSCRIPTS_BASE/checks
@@ -35,9 +42,9 @@ if [ "$( checkInstallError "Tomcat install failed; redo install" )" ] ; then exi
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Restarting tomcat"
 
-echo "++++++++++++++++++++++++++++"
-echo "+  start Tomcat"
-echo "++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++"
+echo "+  08.02 start Tomcat +"
+echo "+++++++++++++++++++++++"
 
 #  (TODO)  Should check to see if it is already running
 sudo systemctl restart tomcat8
