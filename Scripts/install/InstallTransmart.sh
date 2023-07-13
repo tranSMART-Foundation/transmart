@@ -31,6 +31,7 @@ echo "${now} InstallTransmart starting"
 
 echo "Set TMRELEASE ${TMRELEASE}"
 echo "Set TMRELEASEPATH ${TMRELEASEPATH}"
+echo "Set TMRELEASEDIR ${TMRELEASEDIR}"
 
 # check we have everything we need. Assume we have just the scripts directory
 # http://library.transmartfoundation.org/release/release19_1_0_artifacts/Scripts-release-19.1.zip
@@ -46,6 +47,12 @@ export TMINSTALL_BASE
 
 echo "Set TMSCRIPTS_BASE ${TMSCRIPTS_BASE}"
 echo "Set TMINSTALL_BASE ${TMINSTALL_BASE}"
+
+if [ ! -e "${TMINSTALL_BASE}/tminstall-vars" ]; then
+    echo "TMSCRIPTS_BASE='${TMSCRIPTS_BASE}'" > "${TMINSTALL_BASE}/tminstall-vars"
+    echo "TMINSTALL_BASE='${TMINSTALL_BASE}'" >> "${TMINSTALL_BASE}/tminstall-vars"
+    chmod ugo+x "${TMINSTALL_BASE}/tminstall-vars"
+fi
 
 # TABLEBASES   defined in transmart-data needed to prove vars file has been sourced
 

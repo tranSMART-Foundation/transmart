@@ -153,6 +153,7 @@ if [ "$( checkInstallError "There is a Command-Line with an unsupportable versio
 ./checkFilesBasic.sh
 if [ "$( checkInstallError "One or more basic files are missing; redo install" )" ] ; then exit -1; fi
 
+cd $TMSCRIPTS_BASE/
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Check on loading and setup of postgres"
 
@@ -165,6 +166,7 @@ if [ "$( checkInstallError "PostgreSQL is not installed; redo install" )" ] ; th
 ./checkFilesPsql.sh
 if [ "$( checkInstallError "Database table folders needed by transmart not correct; fix as indicated; then redo install" )" ] ; then exit -1; fi
 
+cd $TMSCRIPTS_BASE/
 now="$(date +'%d-%b-%y %H:%M')"
 echo "Finished installing basic tools and dependencies at ${now}"
 
@@ -196,6 +198,7 @@ fi
 returnCode=$?
 set -e
 
+cd $TMSCRIPTS_BASE/
 now="$(date +'%d-%b-%y %H:%M')"
 if [ "$returnCode" -eq 0 ] ; then
 	echo "${now} Database is already loaded"
@@ -220,6 +223,8 @@ now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Check for initial datasets to load"
 ./checkPsqlDataLoad.sh
 if [ "$( checkInstallError "Loading database failed; clear database and run install again" )" ] ; then exit -1; fi
+
+cd $TMSCRIPTS_BASE/
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Datasets loaded (if any)"
 

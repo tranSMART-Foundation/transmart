@@ -6,8 +6,9 @@
 # ******************************************************************************
 
 function checkURL {
-    curl -s -o "/dev/null" $1
+    httpcode=$(curl -sI -o "/dev/null" -w"%{http_code}" $1)
     results=$?
+
     if [ $results -ne 0 ] ; then
         echo "Error occurred getting URL $1:"
         if [ $results -eq 6 ]; then
@@ -18,6 +19,18 @@ function checkURL {
         fi
         return 1
     fi
+
+    if [ $httpcode -eq 302 ] ; then
+ 	echo "Redirect 302 for URL $1:"
+ 	urleffective=$(curl -sIL -o "/dev/null" -w"%{url_effective}" $1)
+ 	echo "  $urleffective"
+    fi
+    if [ $httpcode -eq 404 ] ; then
+        echo "Error occurred getting URL $1:"
+ 	echo "  Host OK. URL returned 404"
+ 	return 1
+    fi
+ 
     return 0	
 }
 
@@ -32,7 +45,7 @@ echo "-------------------------------------------------------"
 solrUrl="http://localhost:8983/solr/#/"
 gwavaUrl="http://localhost:8080/gwava/"
 transmartUrl="http://localhost:8080/transmart"
-manualUrl="http://localhost:8080/transmartmanual"
+manualUrl="http://localhost:8080/transmartmanual/"
 
 checkURL $solrUrl
 solrResults=$?
