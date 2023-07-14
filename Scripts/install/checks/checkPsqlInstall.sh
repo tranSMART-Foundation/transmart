@@ -25,7 +25,7 @@ fi
 echo "PostgreSQL appears to be installed"
 
 echo "checking to see if PostgreSQL is running"
-postgresRunning=$(ps aux | grep postgres | grep -v "grep" | egrep ": autovacuum launcher")
+postgresRunning=$(ps aux | grep postgres | grep -v "grep" | egrep "autovacuum launcher")
 if [ -z "$postgresRunning" ]; then 
 	echo "PostgreSQL server does not appear to be running;"
 	echo  "  start with the command:"

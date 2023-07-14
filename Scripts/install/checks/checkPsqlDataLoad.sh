@@ -31,11 +31,12 @@ fi
 if [ "$runWithEcho" -eq 0 ]  ; then
 	echo "checking to see if PostgreSQL is running"
 fi
-postgresRunning=$(ps aux | grep postgres | grep -v "grep" | grep "stats collector")
+postgresRunning=$(ps aux | grep postgres | grep -v "grep" | grep "autovacuum launcher")
 if [ -z "$postgresRunning" ]; then 
 	if [ "$runWithEcho" -eq 0 ]  ; then
-		echo "PostgreSQL does not appear to be running; start it"
-		echo  "  with the command: sudo /etc/init.d/postgresql restart"  
+		echo "PostgreSQL does not appear to be running;"
+		echo  "  start it with the command:"
+		echo "   sudo /etc/init.d/postgresql restart"  
 	fi
 	exit 1
 fi

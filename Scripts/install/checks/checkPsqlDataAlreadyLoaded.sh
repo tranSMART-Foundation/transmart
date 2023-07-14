@@ -19,7 +19,7 @@ echo "------------------------------------------"
 echo "Checking SUDO authentication"
 sudo echo "Established SUDO authentication"
 
-postgresRunning=$(ps aux | grep postgres | grep -v "grep" | grep "stats collector process")
+postgresRunning=$(ps aux | grep postgres | grep -v "grep" | grep "autovacuum launcher")
 if [ -z "$postgresRunning" ]; then 
 	echo "Postgres is not running"
 	exit 1

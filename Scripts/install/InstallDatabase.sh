@@ -49,12 +49,9 @@ case $TMINSTALL_OS in
 		     libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev \
 		     ca-certificates gnupg
 		echo "Installing postgresql version 15"
-		sudo apt-get install postgresql-common
-		sudo sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -p
-		#sudo bash -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-		#curl --location --silent --show-error --insecure https://www.postgresql.org/media/keys/ACCC4CF8.asc \
-		#    | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
-		#sudo apt-get update
+		sudo apt-get install -y postgresql-common
+		sudo sh -c "curl --location --silent --show-error https://salsa.debian.org/postgresql/postgresql-common/raw/master/pgdg/apt.postgresql.org.sh > /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh"
+		sudo sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
 		sudo apt-get install -y postgresql-15 postgresql-doc-15 isag
 		;;
 	    20.04 | 20)
@@ -63,11 +60,10 @@ case $TMINSTALL_OS in
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev \
 		     ca-certificates gnupg
 		echo "Installing postgresql version 15"
-		sudo bash -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-		curl --location --silent --show-error --insecure https://www.postgresql.org/media/keys/ACCC4CF8.asc \
-		    | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
-		sudo apt-get update
-		sudo apt-get install -y postgresql-15
+		sudo apt-get install -y postgresql-common
+		sudo sh -c "curl --location --silent --show-error https://salsa.debian.org/postgresql/postgresql-common/raw/master/pgdg/apt.postgresql.org.sh > /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh"
+		sudo sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+		sudo apt-get install -y postgresql-15 postgresql-doc-15 isag
 	esac
 	;;
 esac
