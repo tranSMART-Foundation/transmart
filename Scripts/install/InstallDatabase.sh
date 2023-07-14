@@ -34,20 +34,40 @@ echo "++++++++++++++++++++++++++++++++++++++++++++++++++"
 # (1)
 sudo -v
 cd $TMSCRIPTS_BASE/
+echo "Installing tools and dependencies for TMINSTALL_OS ${TMINSTALL_OS}"
 case $TMINSTALL_OS in
     debian | ubuntu | suse | opensuse)
-	sudo apt-get install make git rsync libcairo-dev curl gnupg \
+	echo "Installing dependencies for ${TMINSTALL_OS} with apt-get"
+	sudo apt-get install -y make git rsync libcairo-dev curl gnupg \
 	     tar gfortran g++ unzip libreadline-dev \
 	     libxt-dev libpango1.0-dev libprotoc-dev \
 	     texlive-fonts-recommended tex-gyre texlive-latex-extra liblz4-tool pv zip
 	case $TMINSTALL_OSVERSION in
-	    18)
-		sudo apt-get install -y postgresql-14 php7.2-cli php7.2-json openjdk-8-jdk openjdk-8-jre tomcat8 \
-		     libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
+	    18.04 | 18)
+		echo "Installing dependencies for version 18"
+		sudo apt-get install -y php7.2-cli php7.2-json openjdk-8-jdk openjdk-8-jre tomcat8 \
+		     libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev \
+		     ca-certificates gnupg
+		echo "Installing postgresql version 15"
+		sudo apt-get install postgresql-common
+		sudo sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -p
+		#sudo bash -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+		#curl --location --silent --show-error --insecure https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+		#    | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
+		#sudo apt-get update
+		sudo apt-get install -y postgresql-15 postgresql-doc-15 isag
 		;;
-	    20)
-		sudo apt-get install -y postgresql-14 php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
-		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev
+	    20.04 | 20)
+		echo "Installing dependencies for version 20"
+		sudo apt-get install -y php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
+		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev \
+		     ca-certificates gnupg
+		echo "Installing postgresql version 15"
+		sudo bash -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+		curl --location --silent --show-error --insecure https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+		    | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
+		sudo apt-get update
+		sudo apt-get install -y postgresql-15
 	esac
 	;;
 esac
@@ -117,7 +137,7 @@ if (( $returnCode )); then
     echo "Installing groovy"
     cd $TMINSTALL_BASE/transmart-data/env
 #    make -C env groovy
-    curl  --location --silent --show-error  https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-3.0.9.zip
+    curl  --location --silent --show-error  https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-3.0.9.zip > apache-groovy-binary-3.0.9.zip
     unzip apache-groovy-binary-3.0.9.zip
     touch groovy-3.0.9/bin/groovy
     ln -sf groovy-3.0.9/bin/groovy ./

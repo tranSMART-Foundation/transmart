@@ -169,6 +169,7 @@ do
     fi
 done
 
+export TMINSTALL_OS TMINSTALL_OSVERSION
 
 echo "Set TMINSTALL_OS ${TMINSTALL_OS} TMINSTALL_OSVERSION ${TMINSTALL_OSVERSION}"
 
@@ -377,10 +378,11 @@ cd $TMINSTALL_BASE
 
 sudo -v
 now="$(date +'%d-%b-%y %H:%M')"
-echo "Checking installed packages: make, curl, unzip"
+echo "Checking installed packages: make, curl, unzip, editors (emacs)"
 packageInstall make
 packageInstall curl
 packageInstall unzip
+packageInstall emacs
 
 echo "++++++++++++++++++++++++++++++++++++++"
 echo "  01.03 checking java 8 is installed +"
