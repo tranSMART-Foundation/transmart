@@ -10,38 +10,44 @@
 #          
 # ubuntu20 tomcat9
 
-tomcatVersion=0
+case $TMINSTALL_OS in
+    ubuntu)
+	case $TMINSTALL_OSVERSION in
+	    18.04 | 18)
+		tomcatuser="tomcat8"
+		tomcatservice="tomcat8"
+		;;
+	    20.04 | 20 | 22.04 | 22)
+		tomcatuser="tomcat9"
+		tomcatservice="tomcat9"
+		;;
+	esac
+esac
 
 echo "------------------------------------------------------------------------"
 echo "|  Checking for tomcat install and modifications to tomcat configuration"
 echo "------------------------------------------------------------------------"
 
-if [ -e /etc/default/tomcat9 ] ; then
-    tomcatVersion=9
-elif [ -e /etc/default/tomcat8 ] ; then
-    tomcatVersion=8
-elif [ -e /etc/default/tomcat7 ] ; then
-    tomcatVersion=7
-else
+if [ ! -e /etc/default/$tomcatuser ] ; then
     echo "It appears that tomcat is not installed"
     echo "Please check install set and repeat test"
     exit 1
 fi
 
-sudo service tomcat8 status | grep -q "servlet engine"
+sudo service $tomcatservice status | grep -q "servlet engine"
 results=$?
 if ! [ $results ] ; then
     echo "It appears that tomcat is not installed"
-    echo "Please check install set and repeat test"
+    echo "Please check installation and repeat test"
     exit 1
 fi
 
-grep "Xmx2g" /etc/default/tomcat8 | grep -q "JAVA_OPTS"
+grep "Xmx2g" /etc/default/$tomcatuser | grep -q "JAVA_OPTS"
 results=$?
 if ! [ $results ] ; then
     echo "It appears that the tomcat configuration for heap space"
-    echo "was not modified; tomcat will not fun correctly"
-    echo "the heap space in /etc/default/tomcat8 should be set to -Xmx2g"
+    echo "was not modified; tomcat will not run correctly"
+    echo "the heap space in /etc/default/$tomcatuser should be set to -Xmx2g"
     exit 1
 fi
 

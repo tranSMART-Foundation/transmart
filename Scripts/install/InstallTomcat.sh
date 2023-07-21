@@ -12,25 +12,52 @@ echo "+++++++++++++++++++++++++++++"
 echo "+  08.01 Install Tomcat 8/9 +"
 echo "+++++++++++++++++++++++++++++"
 
+case $TMINSTALL_OS in
+    ubuntu)
+	case $TMINSTALL_OSVERSION in
+	    18.04 | 18)
+		tomcatuser="tomcat8"
+		tomcatinstall="tomcat8"
+		tomcatfixuser=0
+		;;
+	    20.04 | 20 | 22.04 | 22)
+		tomcatuser="tomcat"
+		tomcatinstall="tomcat9"
+		tomcatfixuser=1
+		;;
+	esac
+esac
+
 sudo -v 
 cd $HOME
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Check installed packages: tomcat"
 
-packageInstall tomcat8 
+packageInstall $tomcatinstall 
+
+if [ $tomcatfixuser == 1 ]; then
+    # while tomcat9 is stopped:
+    # For tomcat9 on Ubuntu20,22... we need to define the tomcat user directory
+    # which defaults to root!
+
+    sudo usermod $tomcatuser --home /home/$tomcatuser
+    sudo mkdir -p /home/$tomcatuser
+    sudo chown -R $tomcatuser:$tomcatuser /home/$tomcatuser
+
+fi
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Stop tomcat service to update configuration"
 
-sudo service tomcat8 stop
+sudo service $tomcatservice stop
 $TMSCRIPTS_BASE/updateTomcatConfig.sh
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Copy transmart config files to new tomcat user"
 
-sudo mkdir -p /var/lib/tomcat8/.grails/transmartConfig/
-sudo cp $HOME/.grails/transmartConfig/*.groovy /var/lib/tomcat8/.grails/transmartConfig/
-sudo chown -R tomcat8:tomcat8 /var/lib/tomcat8/.grails
+sudo mkdir -p /var/lib/$tomcatuser/.grails/transmartConfig/
+sudo cp $HOME/.grails/transmartConfig/*.groovy /var/lib/$tomcatuser/.grails/transmartConfig/
+sudo chown -R $tomcatuser:$tomcatuser /var/lib/$tomcatuser/.grails
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} +  Check tomcat install"
@@ -41,17 +68,6 @@ if [ "$( checkInstallError "Tomcat install failed; redo install" )" ] ; then exi
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Restarting tomcat"
-
-echo "+++++++++++++++++++++++"
-echo "+  08.02 start Tomcat +"
-echo "+++++++++++++++++++++++"
-
-#  (TODO)  Should check to see if it is already running
-sudo systemctl restart tomcat8
-now="$(date +'%d-%b-%y %H:%M')"
-echo "${now} Finished starting Tomcat8"
-echo "${now} Sleeping - waiting for tomcat/transmart to start (3 minutes)"
-sleep 3m
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallTomcat done. Finished installing tomcat"

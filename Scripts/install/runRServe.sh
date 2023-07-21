@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # TMINSTALL_BASE needs to be set; see InstallTransmart.sh
 if [ -z "$TMINSTALL_BASE" ] ; then
 	echo "TMINSTALL_BASE is not set in runRServe.sh"

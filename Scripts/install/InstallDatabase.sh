@@ -56,7 +56,18 @@ case $TMINSTALL_OS in
 		;;
 	    20.04 | 20)
 		echo "Installing dependencies for version 20"
-		sudo apt-get install -y php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre \
+		sudo apt-get install -y php7.4-cli php7.4-json openjdk-8-jdk openjdk-8-jre tomcat9 \
+		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev \
+		     ca-certificates gnupg
+		echo "Installing postgresql version 15"
+		sudo apt-get install -y postgresql-common
+		sudo sh -c "curl --location --silent --show-error https://salsa.debian.org/postgresql/postgresql-common/raw/master/pgdg/apt.postgresql.org.sh > /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh"
+		sudo sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+		sudo apt-get install -y postgresql-15 postgresql-doc-15 isag
+		;;
+	    22.04 | 22)
+		echo "Installing dependencies for version 22"
+		sudo apt-get install -y php8.1-cli openjdk-8-jdk openjdk-8-jre tomcat9 \
 		libbz2-dev liblzma-dev libcurl4-openssl-dev libjpeg-dev libxml2-dev libssl-dev libpcre2-dev \
 		     ca-certificates gnupg
 		echo "Installing postgresql version 15"
@@ -91,7 +102,7 @@ cd $TMSCRIPTS_BASE
 ./InstallEtl.sh
 
 echo "++++++++++++++++++++++++++++++++++++++"
-echo "+  02.03 Dependency: Install of vars +"
+echo "+  02.05 Dependency: Install of vars +"
 echo "++++++++++++++++++++++++++++++++++++++"
 
 now="$(date +'%d-%b-%y %H:%M')"
@@ -114,7 +125,7 @@ echo "make -C env ../vars - finished at ${now}"
 echo "Finished setting ubuntu dependencies (without root) at ${now}"
 
 echo "++++++++++++++++++++++++++++++++++++++++++++"
-echo "+  02.04 Dependency: Install of ant, maven +"
+echo "+  02.06 Dependency: Install of ant, maven +"
 echo "++++++++++++++++++++++++++++++++++++++++++++"
 
 now="$(date +'%d-%b-%y %H:%M')"
@@ -149,7 +160,7 @@ now="$(date +'%d-%b-%y %H:%M')"
 echo "Finished install of groovy at ${now}"
 
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+  02.05 Checks on install of tools and dependencies +"
+echo "+  02.07 Checks on install of tools and dependencies +"
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 # fix files for postgres
@@ -165,7 +176,7 @@ cd $TMSCRIPTS_BASE/checks
 ./basics.sh
 if [ "$( checkInstallError "Some Basic Command-Line Tool is missing; redo install" )" ] ; then exit -1; fi
 ./checkVersions.sh
-if [ "$( checkInstallError "There is a Command-Line with an unsupportable version; redo install" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "There is a Command-Line Tool with an unsupportable version; redo install" )" ] ; then exit -1; fi
 ./checkFilesBasic.sh
 if [ "$( checkInstallError "One or more basic files are missing; redo install" )" ] ; then exit -1; fi
 
@@ -187,7 +198,7 @@ now="$(date +'%d-%b-%y %H:%M')"
 echo "Finished installing basic tools and dependencies at ${now}"
 
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+  02.06 Set up basic PostgreSQL; supports transmart login +"
+echo "+  02.08 Set up basic PostgreSQL; supports transmart login +"
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 now="$(date +'%d-%b-%y %H:%M')"

@@ -70,7 +70,7 @@ fi
 # Ubuntu 16.04:
 # Ubuntu 18.04: /etc/os-release NAME="Ubuntu" ID="ubuntu" ID_LIKE="debian" VERSION_ID="18.04" VERSION_CODENAME="bionic" PRETTY_NAME="Ubuntu 18.04.6 LTS" VERSION="18.04.6 LTS (Bionic Beaver)" OSTYPE="linux-gnu"
 # Ubuntu 20.04:
-# Ubuntu 22.04:
+# Ubuntu 22.04: /etc/os-release NAME="Ubuntu" ID="ubuntu" ID_LIKE="debian" VERSION_ID="22.04" VERSION_CODENAME="jammy" PRETTY_NAME="Ubuntu 22.04 LTS" VERSION="22.04.2 LTS (Jammy Fellyfish)" OSTYPE="linux-gnu"
 # Fedora 33.1.2:
 # Fedora 34:
 # Fedora 35: /etc/os-release NAME="Fedora Linux" ID="fedora" ID_LIKE=undef VERSION_ID="35" VERSION_CODENAME="" PRETTY_NAME="Fedora Linux 35 (Workstation Edition)" VERSION="35 (Workstation Edition)" OSTYPE="linux"
@@ -136,8 +136,9 @@ tmosvers=$(grep '^VERSION=' "$release_file" | sed 's/VERSION=//' | sed 's/"//g' 
 tmosversid=$(grep '^VERSION_ID=' "$release_file" | sed 's/VERSION_ID=//'  | sed 's/"//g' | head -1)
 
 # set TMINSTALL_OS
-for test in "$tmosdist" "$tmosid"
+for test in "$tmosid" "$tmosdist"
 do
+    echo "Testing OS '$test'"
     if [ "$test" == "debian" ]; then	# debian 7-10+; ubuntu 14-22+
 	TMINSTALL_OS="$test"
 	TMINSTALL_OSVERSION=$tmosversid
@@ -168,6 +169,34 @@ do
 	break 1
     fi
 done
+
+# Check for OS and version we have support for in these scripts
+# The same lists will be used in other places where we need to test
+
+osfound=0
+osverfound=0
+
+case $TMINSTALL_OS in
+    ubuntu)
+	case $TMINSTALL_OSVERSION in
+	    18.04 | 18 | 20.04 | 20 | 22.04 | 22)
+		osfound=1
+		osverfound=1
+	esac
+esac
+
+if [ $osfound == 0 ]; then
+    echo "Operating system '$TMINSTALL_OS' is not yet supported."
+    echo "Contact the transmart developers support@axiomedix.com"
+    echo "to request an updated installation script for your system."
+    exit 1
+fi
+if [ $osverfound == 0 ]; then
+    echo "Operating system '$TMINSTALL_OS' is not yet supported for version '$TMINSTALL_OSVERSION'."
+    echo "Contact the transmart developers support@axiomedix.com"
+    echo "to request an updated installation script for your system."
+    exit 1
+fi
 
 export TMINSTALL_OS TMINSTALL_OSVERSION
 
@@ -399,6 +428,9 @@ fi
 set -e
 
 cd $TMSCRIPTS_BASE
+./InstallTomcat.sh
+
+cd $TMSCRIPTS_BASE
 ./InstallDatabase.sh
 
 cd $TMSCRIPTS_BASE
@@ -416,10 +448,6 @@ cd $TMSCRIPTS_BASE
 cd $TMSCRIPTS_BASE
 ./InstallManual.sh
 
-cd $TMSCRIPTS_BASE
-./InstallTomcat.sh
-
-
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+ 09.01 Done with install - making final checks - (may take a while) +"
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -433,7 +461,7 @@ echo "${now} Final checks on installation"
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Check tomcat"
 
-sudo ./checkFilesTomcat.sh
+sudo ./checkFilesTomcat.sh $TMINSTALL_OS $TMINSTALL_OSVERSION
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Check tools"

@@ -12,6 +12,20 @@ echo "+++++++++++++++++++++++++++++++++++++++++++++++"
 echo "+  06.01 Install R, Rserve and other packages +"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++"
 
+case $TMINSTALL_OS in
+    ubuntu)
+	case $TMINSTALL_OSVERSION in
+	    18.04 | 18)
+		tomcatuser="tomcat8"
+		tomcatdir="tomcat8"
+		;;
+	    20.04 | 20 | 22.04 | 22)
+		tomcatuser="tomcat"
+		tomcatdir="tomcat"
+		;;
+	esac
+esac
+
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Check R installation"
 
@@ -52,7 +66,7 @@ source ./vars
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Installing rserve service"
 
-sudo TABLESPACES=$TABLESPACES RSERVE_USER="tomcat8" make -C R install_rserve_unit
+sudo TABLESPACES=$TABLESPACES RSERVE_USER="$tomcatuser" make -C R install_rserve_unit
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} rserve service installed"
@@ -74,9 +88,9 @@ echo "+++++++++++++++++++++++"
 sudo -v
 cd $TMSCRIPTS_BASE
 
-# rserve runs as user tomcat8
+# rserve runs as user tomcatN
 # service started using /etc/systemd/system/rserve.service
-# and writes to /var/log/tomcat8/rserve-transmart.log
+# and writes to /var/log/tomcatN/rserve-transmart.log
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} Starting rserve service"

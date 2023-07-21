@@ -5,6 +5,18 @@
 # linux command lines that are needed for the tranSMART install and data loading
 # ******************************************************************************
 
+case $TMINSTALL_OS in
+    ubuntu)
+	case $TMINSTALL_OSVERSION in
+	    18.04 | 18)
+		tomcatdir="tomcat8"
+		;;
+	    20.04 | 20 | 22.04 | 22)
+		tomcatdir="tomcat9"
+		;;
+	esac
+esac
+
 function checkURL {
     httpcode=$(curl -sI -o "/dev/null" -w"%{http_code}" $1)
     results=$?
@@ -94,7 +106,7 @@ fi
 probe=$(curl --silent -L --cookie "" $transmartUrl | grep -i "<title>.*transmart.*</title>")
 if [ -z "$probe" ] ; then
 	echo "The tranSMART web site (at $transmartUrl) is not delivering the login or home page;"
-	echo "  see tomcat log file, /var/lib/tomcat8/logs/transmart.log for possible errors "
+	echo "  see tomcat log file, /var/lib/$tomcatdir/logs/transmart.log for possible errors "
 	exitResults=1
 else
 	echo "The transmart home page (login) appears to be loading"

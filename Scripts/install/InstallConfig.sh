@@ -8,6 +8,18 @@
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallConfig starting"
 
+case $TMINSTALL_OS in
+    ubuntu)
+	case $TMINSTALL_OSVERSION in
+	    18.04 | 18)
+		tomcatuser="tomcat8"
+		;;
+	    20.04 | 20 | 22.04 | 22)
+		tomcatuser="tomcat"
+		;;
+	esac
+esac
+
 echo "+++++++++++++++++++++++++++++++++++++"
 echo "+  03.01 Set up configuration files +"
 echo "+++++++++++++++++++++++++++++++++++++"
@@ -16,13 +28,13 @@ cd $TMINSTALL_BASE/transmart-data
 sudo -v
 source ./vars
 make -C config install
-sudo mkdir -p /var/lib/tomcat8/.grails/transmartConfig/
-sudo cp $HOME/.grails/transmartConfig/*.groovy /var/lib/tomcat8/.grails/transmartConfig/
-sudo chown -R tomcat8:tomcat8 /var/lib/tomcat8/.grails
+sudo mkdir -p /var/lib/$tomcatuser/.grails/transmartConfig/
+sudo cp $HOME/.grails/transmartConfig/*.groovy /var/lib/$tomcatuser/.grails/transmartConfig/
+sudo chown -R $tomcatuser:$tomcatuser /var/lib/$tomcatuser/.grails
 
 cd $TMSCRIPTS_BASE/checks
 ./checkFilesConfig.sh
-if [ "$( checkInstallError "configuration files not set up correctly, see install script and redo" )" ] ; then exit -1; fi
+if [ "$( checkInstallError "configuration files not set up correctly, see InstallConfig.sh script and redo" )" ] ; then exit -1; fi
 
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallConfig done. Finished setting up the configuration files"

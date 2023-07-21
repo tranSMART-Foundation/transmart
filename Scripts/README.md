@@ -5,7 +5,7 @@ A collection of helper scripts for building and installing tranSMART.
 local clones of all the tranSMART archives; for example, to
 perform a 'git pull' on each archive.
 * data-loading - scripts to automate initial loading of public curated data
-* install-rhel, install-ubuntu - scripts to install the tranSMART web application
-and PostgreSQL database on various platforms
+* install - scripts to install the tranSMART web application
+and PostgreSQL database on the supported platforms
 
 

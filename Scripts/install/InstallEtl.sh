@@ -8,9 +8,9 @@
 now="$(date +'%d-%b-%y %H:%M')"
 echo "${now} InstallEtl starting"
 
-echo "+++++++++++++++++++++++++++++++++++++++++++"
-echo "+  NN. Dependency: Install of transmart-etl"
-echo "+++++++++++++++++++++++++++++++++++++++++++"
+echo "++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  02.03 Dependency: Install of transmart-etl "
+echo "++++++++++++++++++++++++++++++++++++++++++++++"
 
 # make -C env ubuntu_deps_regular
 #   In the makefile target, ubuntu_deps_regular, causes a
@@ -35,9 +35,9 @@ if [ "$( checkInstallError "The directory transmart-data/env/transmart-etl was n
 now="$(date +'%d-%b-%y %H:%M')"
 echo "make -C env update_etl - finished at ${now}"
 
-echo "++++++++++++++++++++++++++++++++++++++++++++++"
-echo "+  NN. Dependency: Install of data-integration"
-echo "++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+  02.04 Dependency: Install of data-integration "
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++"
 
 # (2)
 sudo -v

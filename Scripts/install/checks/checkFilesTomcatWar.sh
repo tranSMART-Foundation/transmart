@@ -9,7 +9,27 @@ echo "-----------------------------------------"
 echo "|  Checking for required tomcat war files"
 echo "-----------------------------------------"
 
-baseWebapps="/var/lib/tomcat8/webapps"
+TMINSTALL_OS="$1"
+TMINSTALL_OSVERSION="$2"
+
+echo "Testing OS '$TMINSTALL_OS' VERSION '$TMINSTALL_OSVERSION'"
+
+case $TMINSTALL_OS in
+    ubuntu)
+	echo "testing ubuntu version"
+	case $TMINSTALL_OSVERSION in
+	    18.04 | 18)
+		baseWebapps="/var/lib/tomcat8/webapps"
+		echo "set ubuntu 18 variables"
+		;;
+	    20.04 | 20 | 22.04 | 22)
+		baseWebapps="/var/lib/tomcat9/webapps"
+		echo "set ubuntu 20/22 variables"
+		;;
+	esac
+esac
+
+echo "baseWebapps '$baseWebapps'"
 
 returnValue=0
 

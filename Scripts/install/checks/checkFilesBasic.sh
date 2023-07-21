@@ -12,9 +12,22 @@ echo "------------------------------------------------------------"
 base="$TMINSTALL_BASE/transmart-data"
 baseEnv="$base/env"
 baseR="$base/R"
-baseConfig="/usr/share/tomcat8/.grails/transmartConfig"
-baseWebapps="/var/lib/tomcat8/webapps"
-baseLogs="/var/lib/tomcat8/logs"
+
+case $TMINSTALL_OS in
+    ubuntu)
+	case $TMINSTALL_OSVERSION in
+	    18.04 | 18)
+		baseWebapps="/var/lib/tomcat8/webapps"
+		baseConfig="/usr/share/tomcat8/.grails/transmartConfig"
+		baseLogs="/var/lib/tomcat8/logs"
+		;;
+	    20.04 | 20 | 22.04 | 22)
+		baseWebapps="/var/lib/tomcat9/webapps"
+		baseConfig="/usr/share/tomcat9/.grails/transmartConfig"
+		baseLogs="/var/lib/tomcat9/logs"
+		;;
+	esac
+esac
 
 returnValue=0
 
