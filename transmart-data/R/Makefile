@@ -9,8 +9,9 @@ R_SOURCE = R-$(R_VERSION)
 R_PREFIX ?= $(realpath .)/root
 R_EXEC = $(R_PREFIX)/lib/R/bin/R
 RSERVE_USER ?= tomcat8
+RSERVE_DIR ?= ${RSERVE_USER}
 RSERVE_CONF ?= $(realpath .)/Rserv_nodaemon.conf
-RSERVE_LOG ?= /var/log/${RSERVE_USER}/rserve-transmart.log
+RSERVE_LOG ?= /var/log/${RSERVE_DIR}/rserve-transmart.log
 
 # drop -march=native flag - transmart-docker drops it 'to run on more than one CPU'
 #R_FLAGS ?= -O2 -march=native
