@@ -213,7 +213,7 @@ class SurvivalAnalysisController {
 	bufHeader
     }
 
-    private String parseLegendTable = { String legendInStr ->
+    private Closure parseLegendTable = { String legendInStr ->
 
 	StringBuilder sb = new StringBuilder()
 

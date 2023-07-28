@@ -192,7 +192,6 @@ SurvivalCurve.loader.individual <- function(dataChunk,output.name,time.field,cen
 							lty=1, 
 							col=c("blue","red","black","green","orange","purple"), 
 							lwd=1, 
-							firstx=0, 
 							mark.time=TRUE, 
 							mark=3, 
 							xscale=time.conversion, 
