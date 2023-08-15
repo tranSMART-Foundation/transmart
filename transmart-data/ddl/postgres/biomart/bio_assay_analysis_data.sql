@@ -108,7 +108,7 @@ CREATE FUNCTION tf_trg_bio_asy_analysis_data_id() RETURNS trigger
 AS $$
 begin
     if new.bio_asy_analysis_data_id is null then
-	select nextval('seq_bio_data_id') into new.bio_asy_analysis_data_id;
+	select nextval('biomart.seq_bio_data_id') into new.bio_asy_analysis_data_id;
     end if;
     return new;
 end

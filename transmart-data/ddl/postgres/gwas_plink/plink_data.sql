@@ -29,7 +29,7 @@ CREATE FUNCTION tf_trg_plink_data_id() RETURNS trigger
 AS $$
 begin
     if new.plink_data_id is null then
-        select nextval('gwas_plink.plink_data_id') into new.plink_data_id ;
+        select nextval('gwas_plink.seq_plink_data_id') into new.plink_data_id ;
     end if;
     return new;
 end;

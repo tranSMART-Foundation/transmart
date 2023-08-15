@@ -23,8 +23,8 @@ CREATE FUNCTION tf_trg_bio_pt_evt_attr_id() RETURNS trigger
     LANGUAGE plpgsql
 AS $$
 begin
-    if new.bio_clinic_trial_attribute_id is null then
-        select nextval('biomart.seq_bio_data_id') into new.bio_clinic_trial_attribute_id ;
+    if new.bio_clinic_trial_attr_id is null then
+        select nextval('biomart.seq_bio_data_id') into new.bio_clinic_trial_attr_id ;
     end if;
     return new;
 end;
