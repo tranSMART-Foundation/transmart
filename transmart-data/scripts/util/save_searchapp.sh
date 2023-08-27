@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash -e
 
 ./savetable.sh searchapp search_auth_group
 ./savetable.sh searchapp search_auth_principal
