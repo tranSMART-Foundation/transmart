@@ -41,6 +41,25 @@ foreach $s (@schema) {
 			$seqDepend{"$seqSchema.$seqName"} .= ";$s.$table.$id";
 		    }
 		}
+		if(/^\s+(\S+) .* (DEFAULT|default) nextval[\(]'([A-Za-z0-9_]+)'(::regclass)?[\)] NOT NULL/) {
+		    $seqSchema = lc($s);
+		    $seqName = lc($3);
+		    $id = lc($1);
+
+		    $psqlstr = "psql -A -t -c \"select greatest(start_value,last_value) from pg_sequences where schemaname = '$seqSchema' and sequencename = '$seqName'\"";
+		    open(PSQL, "$psqlstr|") || die "Failed to start psql";
+		    $pout = <PSQL>;
+		    chomp $pout;
+		    $sval = $pout;
+		    close PSQL;
+		    if(!defined($seqValue{"$seqSchema.$seqName"})){
+			$seqValue{"$seqSchema.$seqName"} = $sval;
+			$seqDepend{"$seqSchema.$seqName"} = "$s.$table.$id";
+		    } else {
+			$seqDepend{"$seqSchema.$seqName"} .= ";$s.$table.$id";
+		    }
+		    print "Test default $seqSchema.$id $seqName $sval\n";
+		}
 	    }
 	    close SQL;
 	}
