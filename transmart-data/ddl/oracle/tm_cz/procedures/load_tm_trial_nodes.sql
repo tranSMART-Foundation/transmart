@@ -1,7 +1,7 @@
 --
 -- Name: load_tm_trial_nodes(character varying, character varying, numeric); Type: FUNCTION; Schema: tm_cz; Owner: -
 --
-CREATE OR REPLACE PROCEDURE TM_CZ.LOAD_TM_TRIAL_NODES(
+CREATE OR REPLACE PROCEDURE TM_CZ.LOAD_TM_TRIAL_NODES (
        trial_id IN VARCHAR,
        full_name IN VARCHAR,
        currentjobid IN NUMBER DEFAULT 0,
