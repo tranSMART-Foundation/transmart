@@ -2646,13 +2646,6 @@
     "item" : {
       "type" : "TRIGGER",
       "owner" : "I2B2DEMODATA",
-      "name" : "TRG_VISIT_DIMENSION"
-    },
-    "file" : "i2b2demodata/visit_dimension.sql"
-  }, {
-    "item" : {
-      "type" : "TRIGGER",
-      "owner" : "I2B2DEMODATA",
       "name" : "TRG_QTM_PEC_PEC_ID"
     },
     "file" : "i2b2demodata/qtm_patient_enc_collection.sql"
