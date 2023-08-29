@@ -1479,7 +1479,7 @@ sub parsePostgres($){
 			$col = uc($col);
 			$cdef =~ s/,\s+$//g;
 			$pTableColumn{"$schema.$table"} .= "$col $cdef;";
-			if($cdef =~ /\s+DEFAULT\s+nextval\(\'([^\']+)\'::regclass\) NOT NULL$/){
+			if($cdef =~ /\s+DEFAULT\s+nextval\(\'([^\']+)\'(::regclass)?\) NOT NULL$/){
 			    $cid = $1;
 			    $cid = uc($1);
 			    $pNextval{"$schema.$table"} = "$col.$cid";
