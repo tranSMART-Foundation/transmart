@@ -1,7 +1,10 @@
 package org.transmart
 
 import grails.transaction.Transactional
+
 import groovy.util.logging.Slf4j
+
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.beans.factory.annotation.Autowired
 import org.transmart.biomart.BioAssayPlatform
 import org.transmart.biomart.BioDataExternalCode
@@ -20,6 +23,8 @@ class SearchKeywordService {
 
     @Autowired private SecurityService securityService
     @Autowired private UtilService utilService
+
+    GrailsApplication grailsApplication
 
     //Hard-coded list of items that we consider filter categories... configure in Config/database?
     private static final List<Map> filtercats = [
@@ -119,6 +124,24 @@ class SearchKeywordService {
 
     /** Searches for all keywords for a given term (like %il%) */
     List<Map> findSearchKeywords(String category, String term, int max) {
+
+	logger.info 'findSearchKeywords category {} term {} max {}', category, term, max
+	List hidecat = []
+
+	if ('ALL'.compareToIgnoreCase(category) != 0) {
+	    def properties = grailsApplication.config.com.recomdata.category.all.toProperties().sort()
+
+	    properties.each{it ->
+		logger.info 'getSearchCategoryConfig category.all {} : {} ({})', it.key, it.value, (it.value)
+		if(it.value == 'false') {	
+		    hidecat.add(it.key.toUpperCase())
+		    logger.info 'findSearchKeywords ALL skip {}', it.key.toUpperCase()
+		} else {
+		    logger.info 'findSearchKeywords ALL include {}', it.key.toUpperCase()
+		}
+	    }
+	}
+
 	List results = SearchKeywordTerm.createCriteria().list {
 	    if (term) {
 		like 'keywordTerm', term.toUpperCase() + '%'
@@ -136,7 +159,13 @@ class SearchKeywordService {
                 searchKeyword {
 		    eq 'dataCategory', category.toUpperCase()
                 }
-            }
+            } else if (hidecat.size()){		// ALL but exclude any hidden category/ies
+		searchKeyword {
+		    not {
+			'in' ('dataCategory', hidecat)
+		    }
+		}
+	    }
 
 	    if (!securityService.principal().isAdmin()) {
                 or {

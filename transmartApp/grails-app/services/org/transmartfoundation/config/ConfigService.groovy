@@ -563,6 +563,33 @@ class ConfigService {
        ]
 
         Map searchParams = [
+            'com.recomdata.category.all.country': [
+		default: true,
+                desc: 'In an ALL category search, include \'Country\''],
+            'com.recomdata.category.all.disease': [
+		default: true,
+                desc: 'In an ALL category search, include \'Disease\''],
+            'com.recomdata.category.alle.file_type': [
+		default: true,
+                desc: 'In an ALL category search, include \'File_type\''],
+            'com.recomdata.category.all.freetext': [
+		default: true,
+                desc: 'In an ALL category search, include \'Free Text\''],
+            'com.recomdata.category.all.gene': [
+		default: true,
+                desc: 'In an ALL category search, include \'Gene\''],
+            'com.recomdata.category.all.metabolite': [
+		default: true,
+                desc: 'In an ALL category search, include \'Metabolite\''],
+            'com.recomdata.category.all.mirna': [
+		default: true,
+                desc: 'In an ALL category search,include \'MiRNA\''],
+            'com.recomdata.category.all.organism': [
+		default: true,
+                desc: 'In an ALL category search, include \'Organism\''],
+            'com.recomdata.category.all.protein': [
+		default: true,
+                desc: 'In an ALL category search, include \'Protein\''],
             'com.recomdata.category.hide.country': [
 		default: false,
                 desc: 'In the pull-down category search list, hide \'Country\''],
@@ -1246,6 +1273,15 @@ class ConfigService {
             else if(k == 'sampleExplorer.fieldMapping.columns'){addConfigLink(sampleParams,k,linkSampleMapping(grailsApplication.config.sampleExplorer.fieldMapping.columns),'Click link to see full list')}
 
             // search
+            else if(k == 'com.recomdata.category.all.country'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.all.disease'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.all.file_type'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.all.freetext'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.all.gene'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.all.metabolite'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.all.mirna'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.all.organism'){addConfig(searchParams,k,v,'')}
+            else if(k == 'com.recomdata.category.all.protein'){addConfig(searchParams,k,v,'')}
             else if(k == 'com.recomdata.category.hide.country'){addConfig(searchParams,k,v,'')}
             else if(k == 'com.recomdata.category.hide.disease'){addConfig(searchParams,k,v,'')}
             else if(k == 'com.recomdata.category.hide.file_type'){addConfig(searchParams,k,v,'')}
