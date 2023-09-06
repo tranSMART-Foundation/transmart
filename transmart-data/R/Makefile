@@ -11,7 +11,6 @@ R_EXEC = $(R_PREFIX)/lib/R/bin/R
 RSERVE_USER ?= tomcat8
 RSERVE_DIR ?= ${RSERVE_USER}
 RSERVE_CONF ?= $(realpath .)/Rserv_nodaemon.conf
-RSERVE_LOG ?= /var/log/${RSERVE_DIR}/rserve-transmart.log
 
 # drop -march=native flag - transmart-docker drops it 'to run on more than one CPU'
 #R_FLAGS ?= -O2 -march=native
@@ -61,35 +60,29 @@ write_default_rserve:
 	@test -n '$(RSERVE_USER)' || { \
 		echo 'Define $$RSERVE_USER' 2>&1 ; false; }
 	echo 'RSERVE_USER=$(RSERVE_USER)' > /etc/default/rserve
-	echo 'RSERVE_LOG="$(RSERVE_LOG)"' >> /etc/default/rserve
 
 $(RSERVE_CONF): Rserv_nodaemon.conf
 	mkdir -p '$(dir $@)'
 	cp '$<' '$@'
 
-$(RSERVE_LOG):
-	mkdir -p '$(dir $@)'
-	touch '$@'
-	chown $(RSERVE_USER).$(RSERVE_USER) '$@'
-
 # must be run as root
 install_rserve_init: /etc/init.d/rserve
-/etc/init.d/rserve: write_default_rserve $(RSERVE_CONF) $(RSERVE_LOG)
-	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) RSERVE_LOG=$(RSERVE_LOG) php \
+/etc/init.d/rserve: write_default_rserve $(RSERVE_CONF)
+	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) php \
 		-d variables_order=E -d open_basedir=/ \
 		rserve.php > $@
 	chmod +x '$@'
 
 install_rserve_upstart: /etc/init/rserve.conf
 /etc/init/rserve.conf: write_default_rserve $(RSERVE_CONF)
-	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) RSERVE_LOG=$(RSERVE_LOG) php \
+	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) php \
 		-d variables_order=E -d open_basedir=/ \
 		rserve.conf.php > $@
 	initctl reload-configuration
 
 install_rserve_unit: /etc/systemd/system/rserve.service
 /etc/systemd/system/rserve.service: $(RSERVE_CONF)
-	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) RSERVE_LOG="append:$(RSERVE_LOG)" \
+	R_PREFIX='$(R_PREFIX)' RSERVE_CONF=$(RSERVE_CONF) \
 		RSERVE_USER=$(RSERVE_USER) php \
 		-d variables_order=E -d open_basedir=/ rserve.service.php > $@
 	systemctl daemon-reload
