@@ -46,7 +46,7 @@ class StudyIdService {
      * Fetches the study id associated with a concept from the 
      * {@link ConceptsResource} using the concept key.
      * 
-	 * @param conceptKey the concept key.
+     * @param conceptKey the concept key.
      * @param options map with optional parameters:
      *  - 'studyConceptOnly': if set, a study name will only be returned if the
      *    concept is a study.
@@ -67,17 +67,17 @@ class StudyIdService {
 
         String studyId = ''
         try {
-	    logger.debug 'Query study id for concept key: {} options {}', conceptKey, options
+//	    logger.debug 'Query study id for concept key: {} options {}', conceptKey, options
 	    OntologyTerm term = conceptsResourceService.getByKey(conceptKey)
-	    logger.debug 'term {}', term
+//	    logger.debug 'term {}', term
             Study study = term?.study
             studyId = study?.id
-	    logger.debug 'study {} studyId {} study.ontologyTerm {}', study, studyId, study?.ontologyTerm
+//	    logger.debug 'study {} studyId {} study.ontologyTerm {}', study, studyId, study?.ontologyTerm
             if (options?.studyConceptOnly && study?.ontologyTerm != term) {
-		logger.debug 'studyId {} set to null ontologyTerm {} does not match term {}', studyId, study?.ontologyTerm?.fullName, term?.fullName
+//		logger.debug 'studyId {} set to null ontologyTerm {} does not match term {}', studyId, study?.ontologyTerm?.fullName, term?.fullName
                 studyId = null
             }
-	    logger.debug 'Study id for concept key {} is: {}', conceptKey, studyId
+//	    logger.debug 'Study id for concept key {} is: {}', conceptKey, studyId
         }
 	catch (NoSuchResourceException ignored) {
 	    logger.warn 'Resource not found: ConceptResource.getByKey({})', conceptKey
@@ -89,7 +89,7 @@ class StudyIdService {
     Set<String> getStudyIdsForQueryId(Long queryId) {
         Set<String> result = []
         try {
-	    logger.debug 'Query trials for query id: {}', queryId
+//	    logger.debug 'Query trials for query id: {}', queryId
             QueryResult queryResult = queriesResourceService.getQueryResultFromId(queryId)
             result = queryResult.patients*.trial as Set
         }
