@@ -171,7 +171,9 @@ class SolrFacetService {
 	    }
         }
 
-        //And return the complete list of folder/i2b2 paths!
+//	logger.info 'getCombinedResults paths {} searchLog {}', searchResultIds, searchLog
+
+        //return the complete list of folder/i2b2 paths!
 	[paths: searchResultIds, searchLog: searchLog]
     }
 
@@ -383,11 +385,14 @@ class SolrFacetService {
 	    FmFolder fmFolder = FmFolder.findByUniqueId(folderId)
 	    if (fmFolder) {
 		folderSearchList << fmFolder?.folderFullName
+//		logger.info 'getFolderList folderId {} name {}', folderId, fmFolder?.folderFullName
             }
             else {
 		logger.error 'No folder found for unique ID: {}', folderId
             }
         }
+
+//	logger.info 'getFolderList result {} searchLog {}', folderSearchList, searchLog
 
 	folderSearchList
     }
@@ -500,7 +505,7 @@ class SolrFacetService {
      */
     private GPathResult executeSOLRFacetedQuery(String solrRequestUrl, String solrQueryParams) {
 
-	logger.debug solrQueryParams
+//	logger.debug solrQueryParams
 
         // submit request
 	URLConnection solrConnection = new URL(solrRequestUrl).openConnection()
