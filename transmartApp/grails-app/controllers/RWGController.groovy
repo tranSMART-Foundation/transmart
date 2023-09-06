@@ -52,7 +52,7 @@ class RWGController {
     }
 
     def updateSearchCategory() {
-	logger.debug 'updateSearchCategory params.id {}', params.id
+//	logger.debug 'updateSearchCategory params.id {}', params.id
 	session.searchCategory = params.id
 	render 'OK'
     }
@@ -284,6 +284,9 @@ class RWGController {
 
 	accessLogService.report 'Browse-Search', ''
 
+//	logger.info 'getFacetResults processedSearchTerms {} page {} globalOperator {} searchLog {}',
+//	    processedSearchTerms, page, globalOperator, searchLog
+
 	// Run the search!
 	Map combinedResult = solrFacetService.getCombinedResults(processedSearchTerms, page, globalOperator, searchLog)
 	session.searchLog = combinedResult.searchLog
@@ -293,6 +296,8 @@ class RWGController {
          */
 	if (page == 'RWG') {
 	    Map numbers = [PROGRAM: 0, STUDY: 0, ASSAY: 0, ANALYSIS: 0, FOLDER: 0]
+
+//	    logger.info 'getFacetResults RWG combinedResult {}', combinedResult
 
             if (combinedResult.paths) {
 		List<List> pathLists = finalizePathLists(combinedResult.paths)
@@ -320,6 +325,8 @@ class RWGController {
 		List<String> nodesToExpand = sessionRwgOpenedNodes()
 		List<String> nodesToClose = sessionRwgClosedNodes()
 
+//		logger.info 'getFacetResults RWG nodesToExpand {}', nodesToExpand
+
 		Map<FmFolder, String> folderContentsAccessLevelMap =
 		    fmFolderService.getFolderContentsWithAccessLevelInfo(null)
 		render template: '/fmFolder/folders', plugin: 'folderManagement', model: [
@@ -339,6 +346,9 @@ class RWGController {
         }
         else {
             def pathLists = finalizePathLists(combinedResult.paths)
+//	    logger.info 'getFacetResults nonRWG pathLists.size {} pathLists[0] {} pathLists[1] {}',
+//		pathLists.size(), pathLists[0], pathLists[1]
+
 	    render([searchResults: pathLists[0], uniqueLeaves: pathLists[1]] as JSON)
         }
     }
@@ -388,12 +398,12 @@ class RWGController {
 
         List result = []
 
-	//logger.info 'getSearchCategoryConfig start'
+//	logger.info 'getSearchCategoryConfig start'
 
 	def properties = grailsApplication.config.com.recomdata.category.hide.toProperties().sort()
 
 	properties.eachWithIndex{it, i ->
-	    //logger.info 'getSearchCategoryConfig hide [{}] {} : {}', i, it.key, it.value
+//	    logger.info 'getSearchCategoryConfig vategory.hide [{}] {} : {}', i, it.key, it.value
 	    if(it.value == 'true') {
 		result.add([category:it.key, value:'hide'])
 	    } else {
@@ -401,11 +411,11 @@ class RWGController {
 	    }
 	}
 
-	//logger.info 'getSearchCategoryConfig found {} hide values', result.size()
+//	logger.info 'getSearchCategoryConfig found {} hide values', result.size()
 
-	//result.eachWithIndex{it,i ->
-	    //logger.info 'result[{}] {}', i, it
-	//}
+//	result.eachWithIndex{it,i ->
+//	    logger.info 'result[{}] {}', i, it
+//	}
 	render result as JSON
     }
 
@@ -415,7 +425,7 @@ class RWGController {
 
     // Return search keywords
     def searchAutoComplete(String category, String term) {
-	logger.debug 'searchAutoComplete category {} term {}'. category, term 
+//	logger.debug 'searchAutoComplete category {} term {}'. category, term 
 	render searchKeywordService.findSearchKeywords(
 	    category ?: 'ALL', term,
 	    params.int('max', 15)) as JSON
