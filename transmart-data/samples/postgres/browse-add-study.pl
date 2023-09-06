@@ -1188,7 +1188,7 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
 	print DOSQL "insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
-    values('FOL:$studyid','$phasecode','STUDY_PHASE',$phasetag);
+    values('FOL:$studyid','$phasecode','BIO_CONCEPT_CODE',$phasetag);
 ";
 	close DOSQL;
 	print STDERR "Add tag for study phase '$phasecode'\n";
@@ -1224,7 +1224,7 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
 	print DOSQL "insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
-    values('FOL:$studyid','$objectivecode','STUDY_OBJECTIVE',$objectivetag);
+    values('FOL:$studyid','$objectivecode','BIO_CONCEPT_CODE',$objectivetag);
 ";
 	close DOSQL;
 	print STDERR "Add tag for study objective '$objectivecode'\n";
@@ -1391,7 +1391,7 @@ insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_
 	open (DOSQL, "|$sqlplus > sqlplus.out") || die "Failed to run sqlplus";
 
 	print DOSQL "insert into amapp.am_tag_association (subject_uid, object_uid, object_type, tag_item_id)
-    values('FOL:$studyid','$organismcode','SPECIES',$organismtag);
+    values('FOL:$studyid','$organismcode','BIO_CONCEPT_CODE',$organismtag);
 ";
 	close DOSQL;
 	print STDERR "Add tag for organism '$organismcode'\n";
