@@ -101,9 +101,9 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
         AssayQuery assaysQuery = new AssayQuery(assayConstraints)
 
 	List<Assay> assays = assaysQuery.list()
-        if (!assays) {
-            throw new EmptySetException('No assays satisfy the provided criteria')
-        }
+//        if (!assays) {
+//            throw new EmptySetException('No assays satisfy the provided criteria')
+//        }
 
 //	logger.info 'retrieveData assays {}', assays
 
