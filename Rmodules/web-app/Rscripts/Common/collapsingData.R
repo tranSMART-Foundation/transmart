@@ -33,7 +33,7 @@ function
 	meltedData <- melt(GEXDataToCollapse, id=c("PROBE.ID","GENE_SYMBOL","ASSAY.ID"))
 	
 	#Cast the data into a format that puts the ASSAY.ID in a column.
-	castedData <- data.frame(dcast(meltedData, PROBE.ID + GENE_SYMBOL ~ ASSAY.ID))
+	castedData <- data.frame(dcast(meltedData, PROBE.ID + GENE_SYMBOL ~ ASSAY.ID, fun.aggregate=mean))
 	
 	#Create a unique identifier column.
 	castedData$UNIQUE_ID <- paste(castedData$GENE_SYMBOL,castedData$PROBE.ID,sep="")

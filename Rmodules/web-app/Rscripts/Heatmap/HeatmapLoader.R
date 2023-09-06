@@ -86,7 +86,7 @@ zscore.file = "zscores.txt"
         meltedData <- melt(mRNAData, id = c("GROUP", "PATIENT_NUM", "GENE_SYMBOL"))
 
         #Cast the data into a format that puts the ASSAY.ID in a column.
-        mRNAData <- data.frame(dcast(meltedData, GROUP ~ PATIENT_NUM))
+        mRNAData <- data.frame(dcast(meltedData, GROUP ~ PATIENT_NUM, fun.aggregate=mean))
 
         #When we convert to a data frame the numeric columns get an x in front of them. Remove them here.
         colnames(mRNAData) <- sub("^X", "", colnames(mRNAData))
@@ -277,7 +277,7 @@ function(mRNAData, collapseRow.method, collapseRow.selectFewestMissing, output.f
     meltedData <- melt(mRNAData, id = c("GROUP", "GENE_SYMBOL", "PATIENT_NUM"))
 
     #Cast the data into a format that puts the PATIENT_NUM in a column.
-    castedData <- data.frame(dcast(meltedData, GROUP + GENE_SYMBOL ~ PATIENT_NUM))
+    castedData <- data.frame(dcast(meltedData, GROUP + GENE_SYMBOL ~ PATIENT_NUM, fun.aggregate=mean))
 
     #Create a unique identifier column.
     castedData$UNIQUE_ID <- paste(castedData$GENE_SYMBOL,castedData$GROUP,sep="")

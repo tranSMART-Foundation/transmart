@@ -32,19 +32,19 @@ zscore.file = "zscores.txt"
 	print("-------------------")
 	print("CMS.R")
 	print("CREATING CMS")
-	
+
 	#We need this to do the ddply below.
 	library(plyr)
 	library(multtest)
 	library(reshape2)
 	library(limma)
-	
+
 	#The Multiple hypothesis correction method used for DE analysis
 	mhcMethod = "BH"
-  
+
 	#---------------------
 	#Prepare raw data.
-	
+
 	#Pull the GEX data from the file.
 	mRNAData <- data.frame(read.delim(input.filename))
 
@@ -62,7 +62,13 @@ zscore.file = "zscores.txt"
 	mRNAData$PROBE.ID 		<- gsub("^\\s+|\\s+$", "",mRNAData$PROBE.ID)
 	mRNAData$GENE_SYMBOL 	<- gsub("^\\s+|\\s+$", "",mRNAData$GENE_SYMBOL)
 	mRNAData$PATIENT.ID   	<- gsub("^\\s+|\\s+$", "",mRNAData$PATIENT.ID)
-	
+
+	cat ("Probes: ", length(unique(mRNAData$PROBE.ID)), "\n")
+	cat ("Genes:  ", length(unique(mRNAData$GENE_SYMBOL)), "\n")
+	cat ("Patients: ", length(unique(mRNAData$PATIENT.ID)), "\n")
+	cat ("ZScores: ", range(mRNAData$VALUE), "\n")
+
+	#Calculate VALUE (Zscore) in mRNAData
 	if(calculateZscore){
 	  mRNAData = ddply(mRNAData, "PROBE.ID", transform, probe.md = median(VALUE, na.rm = TRUE))
 	  mRNAData = ddply(mRNAData, "PROBE.ID", transform, probe.sd = sd(VALUE, na.rm = TRUE))        
@@ -74,25 +80,25 @@ zscore.file = "zscores.txt"
 	  mRNAData$probe.md = NULL
 	  mRNAData$probe.sd = NULL
 	  write.table(mRNAData,zscore.file,quote=F,sep="\t",row.names=F,col.names=T)
+	  cat ("Calculated ZScores: ", range(mRNAData$VALUE), "\n")
 	}
-  
+
 	if (aggregate.probes) {
           # probe aggregation function adapted from dataBuilder.R to heatmap's specific data-formats
           mRNAData <- MS.probe.aggregation(mRNAData, collapseRow.method = "MaxMean", collapseRow.selectFewestMissing = TRUE)
-    	}
+	}
 
 	#Create a data.frame with unique probe/gene ids.
 	geneStatsData <- data.frame(mRNAData$PROBE.ID,mRNAData$GENE_SYMBOL);
-	
+
 	#Add a column name to our data.frame.
 	colnames(geneStatsData) <- c('PROBE.ID','GENE_SYMBOL')	
 	
 	geneStatsData <- unique(geneStatsData[,c("PROBE.ID","GENE_SYMBOL")]);
 
 	#---------------------
-	
-	#---------------------
-	#Prepare the casted raw data.
+
+	#Prepare the coerced raw data.
 	print("FORGING DATA");
 	#Get a copy of the raw data.
 	coercedData <- mRNAData
@@ -102,13 +108,13 @@ zscore.file = "zscores.txt"
 
 	#Melt the data, leaving 2 columns as the grouping fields.
 	meltedData <- melt(coercedData, id=c("PROBE.ID","GENE_SYMBOL","PATIENT.ID"))
-	
+
 	#Cast the data into a format that puts the PATIENT.ID in a column.
-	coercedData <- data.frame(dcast(meltedData, PROBE.ID + GENE_SYMBOL ~ PATIENT.ID))
+	coercedData <- data.frame(dcast(meltedData, PROBE.ID + GENE_SYMBOL ~ PATIENT.ID, fun.aggregate=mean))
 
 	#When we convert to a data frame the numeric columns get an x in front of them. Remove them here.
 	colnames(coercedData) <- sub("^X","",colnames(coercedData))
-	
+
 	#Get a gene list that we can use later to preserve the list of the genes.
 	geneList <- as.vector(coercedData$GENE_SYMBOL)
 	probeList <- as.vector(coercedData$PROBE.ID)
@@ -235,13 +241,13 @@ MS.probe.aggregation <- function(mRNAData, collapseRow.method,
                                  collapseRow.selectFewestMissing, 
                                  output.file = "aggregated_data.txt") {
     library(WGCNA)
-    
+
     #remove SUBSET column
     mRNAData <- subset(mRNAData, select = -c(SUBSET))
-    
+
     meltedData <- melt(mRNAData, id=c("PROBE.ID","GENE_SYMBOL","PATIENT.ID"))
     #Cast the data into a format that puts the PATIENT.ID in a column.
-    castedData <- data.frame(dcast(meltedData, PROBE.ID + GENE_SYMBOL ~ PATIENT.ID))
+    castedData <- data.frame(dcast(meltedData, PROBE.ID + GENE_SYMBOL ~ PATIENT.ID, fun.aggregate=mean))
     #Create a unique identifier column.
     castedData$UNIQUE_ID <- paste(castedData$PROBE.ID, castedData$GENE_SYMBOL,sep="___")
     #Set the name of the rows to be the unique ID.
@@ -250,14 +256,14 @@ MS.probe.aggregation <- function(mRNAData, collapseRow.method,
         warning("Only one probe.id present in the data. Probe aggregation can not be performed.")
         return (mRNAData)
     }
-    
+
     #Input expression matrix for collapseRows function
     datET = subset(castedData, select = -c(GENE_SYMBOL,PROBE.ID,UNIQUE_ID))
     GENE_SYMBOL = as.vector(castedData$GENE_SYMBOL)
     UNIQUE_ID = as.vector(castedData$UNIQUE_ID)
     rownames(datET) = UNIQUE_ID
-     #Run the collapsing on a subset of the data by removing some columns.
-     finalData <- collapseRows( datET = datET,
+    #Run the collapsing on a subset of the data by removing some columns.
+    finalData <- collapseRows( datET = datET,
                                 rowGroup = GENE_SYMBOL,
                                 rowID = UNIQUE_ID,
                                 method = collapseRow.method,
@@ -267,31 +273,31 @@ MS.probe.aggregation <- function(mRNAData, collapseRow.method,
                                 selectFewestMissing = collapseRow.selectFewestMissing,
                                 thresholdCombine = NA
                                 )
-      #Coerce the data into a data frame.
-      finalData=data.frame(finalData$group2row, finalData$datETcollapsed)
-      #Rename the columns, the selected row_id is the unique_id.
-      colnames(finalData)[2] <- 'UNIQUE_ID'
- 
-      #Merge the probe.id and gene symbol back in and remove the group and unique_id columns.
-      matrix_annot = matrix(unlist(strsplit(as.vector(finalData$UNIQUE_ID), split="___")), ncol=2, byrow=T)
-      colnames(matrix_annot) = c("PROBE.ID", "GENE_SYMBOL")
-      finalData = cbind(matrix_annot, finalData)
-      finalData = subset(finalData, select=-c(group, UNIQUE_ID))
-      #Melt the data back into the initial format.
-      finalData <- melt(finalData)
-  
-      #Set the column names again.
-      colnames(finalData) <- c("PROBE.ID","GENE_SYMBOL","PATIENT.ID","VALUE")
-      #When we convert to a data frame the numeric columns get an x in front of them. Remove them here.
-      finalData$PATIENT.ID <- sub("^X","",finalData$PATIENT.ID)
- 
-      #Return relevant columns
-      finalData <- finalData[,c("PATIENT.ID","VALUE","PROBE.ID","GENE_SYMBOL")]
-     
-      finalData$SUBSET<-finalData$PATIENT.ID
-      finalData$SUBSET[grep("^S1_|_S1_|_S1$",finalData$SUBSET)]<-"S1"
-      finalData$SUBSET[grep("^S2_|_S2_|_S2$",finalData$SUBSET)]<-"S2"
- 
-      write.table(finalData, file = output.file, sep = "\t", row.names = FALSE)
-      return(finalData)
+     #Coerce the data into a data frame.
+     finalData=data.frame(finalData$group2row, finalData$datETcollapsed)
+     #Rename the columns, the selected row_id is the unique_id.
+     colnames(finalData)[2] <- 'UNIQUE_ID'
+
+     #Merge the probe.id and gene symbol back in and remove the group and unique_id columns.
+     matrix_annot = matrix(unlist(strsplit(as.vector(finalData$UNIQUE_ID), split="___")), ncol=2, byrow=T)
+     colnames(matrix_annot) = c("PROBE.ID", "GENE_SYMBOL")
+     finalData = cbind(matrix_annot, finalData)
+     finalData = subset(finalData, select=-c(group, UNIQUE_ID))
+     #Melt the data back into the initial format.
+     finalData <- melt(finalData)
+
+     #Set the column names again.
+     colnames(finalData) <- c("PROBE.ID","GENE_SYMBOL","PATIENT.ID","VALUE")
+     #When we convert to a data frame the numeric columns get an x in front of them. Remove them here.
+     finalData$PATIENT.ID <- sub("^X","",finalData$PATIENT.ID)
+
+     #Return relevant columns
+     finalData <- finalData[,c("PATIENT.ID","VALUE","PROBE.ID","GENE_SYMBOL")]
+
+     finalData$SUBSET<-finalData$PATIENT.ID
+     finalData$SUBSET[grep("^S1_|_S1_|_S1$",finalData$SUBSET)]<-"S1"
+     finalData$SUBSET[grep("^S2_|_S2_|_S2$",finalData$SUBSET)]<-"S2"
+
+     write.table(finalData, file = output.file, sep = "\t", row.names = FALSE)
+     return(finalData)
 }

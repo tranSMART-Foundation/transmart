@@ -92,7 +92,7 @@ zscore.file = "zscores.txt"
     meltedData <- melt(mRNAData, id=c("GROUP","PATIENT_NUM","GENE_SYMBOL"))
 
     #Cast the data into a format that puts the ASSAY.ID in a column.
-    castedData <- data.frame(dcast(meltedData, GROUP ~ PATIENT_NUM))
+    castedData <- data.frame(dcast(meltedData, GROUP ~ PATIENT_NUM, fun.aggregate=mean))
 
     #Set the name of the rows to be the names of the probes.
     rownames(castedData) = castedData$GROUP
@@ -296,7 +296,7 @@ Heatmap.probe.aggregation <- function(mRNAData, collapseRow.method, collapseRow.
     meltedData <- melt(mRNAData, id=c("GROUP","GENE_SYMBOL","PATIENT_NUM"))
 
     #Cast the data into a format that puts the PATIENT_NUM in a column.
-    castedData <- data.frame(dcast(meltedData, GROUP + GENE_SYMBOL ~ PATIENT_NUM))
+    castedData <- data.frame(dcast(meltedData, GROUP + GENE_SYMBOL ~ PATIENT_NUM, fun.aggregate=mean))
 
     #Create a unique identifier column.
     castedData$UNIQUE_ID <- paste(castedData$GENE_SYMBOL,castedData$GROUP,sep="")

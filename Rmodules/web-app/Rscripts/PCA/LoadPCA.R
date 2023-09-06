@@ -87,7 +87,7 @@ zscore.file = "zscores.txt"
     meltedData <- melt(mRNAData, id=c("PROBE.ID","PATIENT.ID"))
 
     #Cast the data into a format that puts the PATIENT.ID in a column.
-    mRNAData <- data.frame(dcast(meltedData, PATIENT.ID ~ PROBE.ID))
+    mRNAData <- data.frame(dcast(meltedData, PATIENT.ID ~ PROBE.ID, fun.aggregate=mean))
 
     #Make the rownames be the patient nums so we can drop the patient_num column.
     rownames(mRNAData) <- mRNAData$PATIENT.ID
@@ -229,7 +229,7 @@ PCA.probe.aggregation <- function(mRNAData, collapseRow.method, collapseRow.sele
     library(WGCNA)
 
     #Cast the data into a format that puts the PATIENT_NUM in a column
-    castedData <- data.frame(dcast(mRNAData, PROBE.ID + GENE_SYMBOL ~ PATIENT.ID, value.var = "VALUE"))
+    castedData <- data.frame(dcast(mRNAData, PROBE.ID + GENE_SYMBOL ~ PATIENT.ID, value.var = "VALUE", fun.aggregate=mean))
 
     #Create a unique identifier column.
     castedData$UNIQUE_ID <- paste(castedData$GENE_SYMBOL,castedData$PROBE.ID,sep="")

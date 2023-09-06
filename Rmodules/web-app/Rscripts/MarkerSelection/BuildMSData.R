@@ -40,40 +40,40 @@ output.dataFile="outputfile"
 	print("-------------------")
 	print("BuildCMSData.R")
 	print("BUILDING CMS DATA")
-	
+
 	#Call a function to gather the gene expression data and filter the two subsets.
 	geneExpressionMatrix <- gexSubsetBuilder(
-								GEXFile = input.dataFile,
-								sample.subset1 = sample.subset1,
-								time.subset1 = time.subset1,
-								tissues.subset1 = tissues.subset1,
-								platform.subset1 = platform.subset1,
-								sample.subset2 = sample.subset2,
-								time.subset2 = time.subset2,
-								tissues.subset2 = tissues.subset2,
-								platform.subset2 = platform.subset2,
-								gene.list = genes,
-								gene.aggregate = genes.aggregate							
-								)
-	
+		GEXFile = input.dataFile,
+		sample.subset1 = sample.subset1,
+		time.subset1 = time.subset1,
+		tissues.subset1 = tissues.subset1,
+		platform.subset1 = platform.subset1,
+		sample.subset2 = sample.subset2,
+		time.subset2 = time.subset2,
+		tissues.subset2 = tissues.subset2,
+		platform.subset2 = platform.subset2,
+		gene.list = genes,
+		gene.aggregate = genes.aggregate							
+	)
+
 	#Pull out a subset of columns we are interested in.
 	geneExpressionMatrix <- geneExpressionMatrix[c('PATIENT.ID','ZSCORE','PROBE.ID','GENE_SYMBOL','SUBSET','ASSAY.ID')]
-	
+
 	#Trim the probe.id field.
 	geneExpressionMatrix$GENE_SYMBOL <- gsub("^\\s+|\\s+$", "",geneExpressionMatrix$GENE_SYMBOL)	
-	
+
 	#Pull the columns we are interested in out of the data.
-	finalFrame <- geneExpressionMatrix[c('PATIENT.ID','ZSCORE','PROBE.ID','GENE_SYMBOL','SUBSET')]	
-		
+	finalFrame <- geneExpressionMatrix[c('PATIENT.ID','ZSCORE','PROBE.ID','GENE_SYMBOL','SUBSET')]
+
 	colnames(finalFrame) <- c('PATIENT.ID','VALUE','PROBE.ID','GENE_SYMBOL','SUBSET')
 
 	#We need MASS to dump the data frame to a file.
-	require(MASS)	
-	
+	require(MASS)
+
 	#Write the final data file.
 	#write.matrix(finalFrame,output.dataFile,sep = "\t")
 	# Using write.table; write.matrix was leaving trailing white-space in the file - see JIRA issue TRANSREL-24.
-    write.table(finalData,filename, sep = "\t", quote = FALSE, row.names = FALSE)
-    print("-------------------")
+    	write.table(finalData,filename, sep = "\t", quote = FALSE, row.names = FALSE)
+	print("-------------------")
 	##########################################
 }
