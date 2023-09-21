@@ -299,7 +299,7 @@ inside the `R` directory to install the required packages. You can also build R
 from source:
 
     make -C R -j8 root/bin/R
-	make -C R install_packages
+	make -C R -j 1 install_packages
 
 Beware that if you run `install_packages` with concurrency some packages will
 fail building and you may have to run the command again.
