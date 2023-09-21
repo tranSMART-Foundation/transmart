@@ -27,12 +27,12 @@ LogisticRegressionData.loader <- function(
 	
 	######################################################
 	#Read the line graph data.
-	line.data<-read.delim(input.filename,header=T)
-	
+	line.data<-read.delim(input.filename,header=T,stringsAsFactors=T)
+
 	nDataConcepts <- length(levels(line.data$X))
 	if(nDataConcepts != 2)
 	{
-		stop(paste("||FRIENDLY||After extracting data ",nDataConcepts," categorical concepts were found while 2 concepts are expected. Please verify your variable selection and try again."))
+		stop(paste("||FRIENDLY||After extracting data",nDataConcepts,"categorical concepts were found while 2 concepts are expected. Please verify your variable selection and try again."))
 	}
 	
 	# If (two) categorical concepts are used to define both outcome groups (no binning of numerical or categorical variables),
