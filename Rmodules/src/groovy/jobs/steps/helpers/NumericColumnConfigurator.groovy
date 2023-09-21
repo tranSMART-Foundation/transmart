@@ -1,5 +1,7 @@
 package jobs.steps.helpers
 
+import groovy.util.logging.Slf4j
+
 import jobs.table.Column
 import jobs.table.columns.SimpleConceptVariableColumn
 import jobs.table.columns.TransformColumnDecorator
@@ -10,6 +12,7 @@ import org.transmartproject.core.dataquery.clinical.ClinicalVariable
 
 @Component
 @Scope('prototype')
+@Slf4j('logger')
 class NumericColumnConfigurator extends ColumnConfigurator {
 
     private static final List<String> propertyNames = ['header', 'projection', 'keyForConceptPath',
@@ -40,6 +43,7 @@ class NumericColumnConfigurator extends ColumnConfigurator {
     @Override
     protected void doAddColumn(Closure<Column> columnDecorator) {
         def resultColumnDecorator = log10 ? compose(columnDecorator, createLog10ColumnDecorator()) : columnDecorator
+//	logger.info 'doAddColumn log10 {} isClinical {} resultColumnDecorator {}', log10, isClinical(), resultColumnDecorator
         if (isClinical()) {
             addColumnClinical resultColumnDecorator
         }
@@ -57,7 +61,8 @@ class NumericColumnConfigurator extends ColumnConfigurator {
     }
 
     boolean isLog10() {
-        getStringParam keyForLog10, false
+//	logger.info 'isLog10 getStringParam {} {}', keyForLog10, getStringParam(keyForLog10, false)
+        'true'.equalsIgnoreCase(getStringParam(keyForLog10, false))
     }
 
     boolean isClinical() {
