@@ -88,7 +88,7 @@ class TerminalClinicalVariablesTabularResult extends
         }
 
         localIndexMap.each { TerminalClinicalVariable var, Integer index ->
-	    logger.info 'codeToIndex[{}] = {}', var.code, index
+//	    logger.info 'codeToIndex[{}] = {}', var.code, index
             codeToIndex[var.code] = index
         }
 
@@ -135,7 +135,7 @@ class TerminalClinicalVariablesTabularResult extends
 
         Object[] transformedData = new Object[localIndexMap.size()]
 
-	logger.info 'transformedData {}', transformedData
+//	logger.info 'transformedData {}', transformedData
 
         for (Object[] rawRow in list) {
 	    // array with 5 elements
@@ -143,7 +143,7 @@ class TerminalClinicalVariablesTabularResult extends
 		continue
             }
 
-	    logger.info 'rawRow {}', rawRow
+//	    logger.info 'rawRow {}', rawRow
 
 	    // find out the position of this concept in the final result
             Integer index = codeToIndex[rawRow[CODE_COLUMN_INDEX] as String]
@@ -157,7 +157,7 @@ class TerminalClinicalVariablesTabularResult extends
             TerminalClinicalVariable var = indexToColumn[index]
 
             if (transformedData[index] != null) {
-		logger.info 'More than one clinical result i2b2View {} index {} result size {}', i2b2View, index, transformedData.size()
+//		logger.info 'More than one clinical result i2b2View {} index {} result size {}', i2b2View, index, transformedData.size()
 		if(!i2b2View && 0) {
 		    throw new UnexpectedResultException("Got more than one fact for " +
 							"patient ${rawRow[PATIENT_NUM_COLUMN_INDEX]} and " +
@@ -169,9 +169,9 @@ class TerminalClinicalVariablesTabularResult extends
 	    }
         }
 
-	logger.info 'patientId {}', (list.find { it != null})[PATIENT_NUM_COLUMN_INDEX] as Long
-	logger.info 'data: {}', Arrays.asList(transformedData)
-	logger.info 'columnToIndex: {}', localIndexMap as Map
+//	logger.info 'patientId {}', (list.find { it != null})[PATIENT_NUM_COLUMN_INDEX] as Long
+//	logger.info 'data: {}', Arrays.asList(transformedData)
+//	logger.info 'columnToIndex: {}', localIndexMap as Map
 
         new PatientIdAnnotatedDataRow(
             patientId:     (list.find { it != null})[PATIENT_NUM_COLUMN_INDEX] as Long,
