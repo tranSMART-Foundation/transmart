@@ -70,8 +70,9 @@
 	    <table style="width:auto; border:0px; text-align:center; margin:auto;" align="center">
 		<tr>
 		    <td style="text-align:center;vertical-align:middle;margin-left:-40px;padding-top:20px;">
-			<g:link controller="RWG"><img src="${cms.image(name: 'transmartlogo.jpg')}" alt="Transmart"/></g:link>
-		    </td>
+				<g:link controller="RWG" action="index"><img
+						src="${resource(dir: 'images', file: grailsApplication.config.com.recomdata.largeLogo)}"
+						alt="Transmart"/></g:link>		    </td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
 		<tr>
@@ -188,15 +189,55 @@
 			</td>
 		    </tr>
 		</g:if>
+			<g:if test='${grailsApplication?.config?.motd}'>
+				<tr><td colspan=2>&nbsp;</td></tr>
+				<tr>
+					<td colspan=2 valign="middle" style="text-align:center;vertical-align:middle;border:1px;font-size:11px"
+						nowrap="nowrap">
+						<div style="margin-right:auto;margin-left:auto;width:435px;">
+							<div class="x-box-tl">
+								<div class="x-box-tr">
+									<div class="x-box-tc">
+									</div>
+								</div>
+							</div>
+							<div class="x-box-ml">
+								<div class="x-box-mr">
+									<div class="x-box-mc" style="text-align:left">
+										<br />
+										<g:if test='${grailsApplication?.config?.motd?.motd_title}' >
+											<h3 class='motd-title'>
+												${grailsApplication.config.motd.motd_title}
+											</h3>
+										</g:if>
+										<g:if test='${grailsApplication?.config?.motd?.motd_text}' >
+											<div class='motd-text'>
+												${grailsApplication.config.motd.motd_text}
+											</div>
+										</g:if>
+										<br />
+									</div>
+								</div>
+							</div>
+							<div class="x-box-bl">
+								<div class="x-box-br">
+									<div class="x-box-bc">
+									</div>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</g:if>
 		<tr><td>&nbsp;</td></tr>
 		<tr>
 		    <td style="text-align:center;vertical-align:middle;margin-left:-40px; padding-top: 10px;">
-			<g:set var="projectName" value="${grailsApplication.config?.com?.recomdata?.projectName}"/>
-			<g:set var="projectLogo" value="${grailsApplication.config?.com?.recomdata?.projectLogo}"/>
-			<g:set var="providerName" value="${grailsApplication.config?.com?.recomdata?.providerName}"/>
-			<g:set var="providerLogo" value="${grailsApplication.config?.com?.recomdata?.providerLogo}"/>
+			<g:set var="projectName" value="${projectName}"/>
+			<g:set var="projectLogo" value="${projectLogo}"/>
+			<g:set var="providerName" value="${providerName}"/>
+			<g:set var="providerLogo" value="${providerLogo}"/>
 			<g:if test="${projectName}">
-			    <span style="font-size:10px;display: inline-block;line-height: 35px; height: 35px;">Project&nbsp;</span>
+			    <span style="font-size:10px;display: inline-block;line-height: 35px; height: 35px;">Provided by&nbsp;</span>
 			    <a id="projectpowered" target="_blank"
 			       href="${projectURL}" style="text-decoration: none;">
 				<g:if test="${projectLogo}">
