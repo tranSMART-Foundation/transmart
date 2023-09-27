@@ -101,42 +101,7 @@ function addFilterCategories() {
 
 //Method to add the autocomplete for the search keywords
 function addSearchAutoComplete()	{
-    jQuery("#search-ac").autocomplete({
-	position:{my:"left top",at:"left bottom",collision:"none"},
-	source: sourceURL,
-	minLength:1,
-	select: function(event, ui) {
-	    if (ui.item != null && ui.item != "") {
-		searchParam={id:ui.item.id,display:ui.item.category,keyword:ui.item.label,category:ui.item.categoryId};
-		addSearchTerm(searchParam);
-	    }
-
-	    //If category is ALL, add this as free text as well
-	    var category = jQuery("#search-categories").val();
-	    return false;
-	}
-    }).data("ui-autocomplete")._renderItem = function( ul, item ) {
-	var resulta = '<a><span class="category-' + item.category.toLowerCase() + '">' + item.category + '&gt;</span>&nbsp;<b>' + item.label + '</b>&nbsp;';
-	if (item.synonyms != null) {
-	    resulta += (item.synonyms + '</a>');
-	}
-	else {
-	    resulta += '</a>';
-	}
-
-	return jQuery('<li></li>')
-	    .data("ui-autocomplete-item", item )
-	    .append(resulta)
-	    .appendTo(ul);
-    };	
-		
-    // Capture the enter key on the slider and fire off the search event on the autocomplete
-    jQuery("#search-categories").keypress(function(event)	{
-	if (event.which == 13)	{
-	    jQuery("#search-ac").autocomplete('search');
-	}
-    });
-	
+    //Autocomplete code removed. The below portion was left in because it submits the search on enter.
     jQuery('#search-ac').keypress(function(event) {
 	var category = jQuery("#search-categories").val();
 	var categoryText = jQuery('#search-categories option:selected').text();
@@ -545,7 +510,6 @@ function clearSearch()	{
 
     // Change the category picker back to ALL and set autocomplete to not have a category (ALL by default)
     document.getElementById("search-categories").selectedIndex = 0;
-    jQuery('#search-ac').autocomplete('option', 'source', sourceURL);
 
     showSearchTemplate();
     showSearchResults(); //reload the full search results
