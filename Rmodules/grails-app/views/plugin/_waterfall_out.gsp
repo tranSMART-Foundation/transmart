@@ -33,9 +33,7 @@
 		<img src="${request.getContextPath()}${location}" width='600' height='600'/> <br/>
 	    </g:each>
 	    <br/>
-            <g:if test="${zipLink}">
-		<a class='AnalysisLink' class='downloadLink' href="${request.getContextPath()}${zipLink}">Download raw R data</a>
-            </g:if>
+     <g:render template="/plugin/downloadRawDataLink" />
 	</form>
     </body>
 </html>
