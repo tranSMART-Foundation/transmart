@@ -744,7 +744,10 @@ class ConfigService {
                 desc: 'If true, remove the Upload tab from the common header'],
             'ui.tabs.datasetExplorer.xnatViewer.show': [
                 default: false,
-                desc: 'If true, enable the XNAT viewer in the Analyze tab']
+                desc: 'If true, enable the XNAT viewer in the Analyze tab'],
+            'ui.tabs.dataAttestation.hide' : [
+                default: true,
+                desc: "If false, enable the data Attestation page to the common header"]
         ]
 
         Map uploadParams = [
@@ -1482,6 +1485,7 @@ class ConfigService {
             else if(k == 'ui.tabs.sampleExplorer.hide'){addConfig(uiParams,k,v,'')}
             else if(k == 'ui.tabs.search.show'){addConfig(uiParams,k,v,'')}
             else if(k == 'ui.tabs.uploadData.hide'){addConfig(uiParams,k,v,'')}
+            else if(k == 'ui.tabs.dataAttestation.hide'){addConfig(uiParams,k,v,'')}
 
             // upload
             else if(k == 'com.recomdata.dataUpload.appTitle'){addConfig(uploadParams,k,v,'')}
