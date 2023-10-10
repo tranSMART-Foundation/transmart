@@ -745,9 +745,6 @@ class ConfigService {
             'ui.tabs.datasetExplorer.xnatViewer.show': [
                 default: false,
                 desc: 'If true, enable the XNAT viewer in the Analyze tab'],
-            'ui.tabs.dataAttestation.hide' : [
-                default: true,
-                desc: "If false, enable the data Attestation page to the common header"]
         ]
 
         Map uploadParams = [
