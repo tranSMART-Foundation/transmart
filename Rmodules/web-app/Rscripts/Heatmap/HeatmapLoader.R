@@ -23,8 +23,8 @@ input.filename,
 output.file = "Heatmap",
 meltData = TRUE,
 imageWidth = 1200,
-imageHeight = 1200,
-pxPerCell = 0,
+imageHeight = 800,
+pointsize = 15,
 maxDrawNumber = Inf,
 color.range.clamps = c(-2.5,2.5),
 aggregate.probes = FALSE,
@@ -46,7 +46,7 @@ zscore.file = "zscores.txt"
     #Pull the GEX data from the file.
     mRNAData <- data.frame(read.delim(input.filename, stringsAsFactors = FALSE))
     if (nrow(mRNAData) == 0) {
-       CairoPNG(file = paste(output.file,".png",sep=""), width=as.numeric(imageWidth), height=as.numeric(imageHeight), units = "px")
+        CairoPNG(file = paste(output.file,".png",sep=""), width=1200, height=600,units = "px")
         Plot.error.message("Your selection yielded an empty dataset,\nplease check your subset and biomarker selection."); return()
     }
 
@@ -86,7 +86,7 @@ zscore.file = "zscores.txt"
         meltedData <- melt(mRNAData, id = c("GROUP", "PATIENT_NUM", "GENE_SYMBOL"))
 
         #Cast the data into a format that puts the ASSAY.ID in a column.
-        mRNAData <- data.frame(dcast(meltedData, GROUP ~ PATIENT_NUM, fun.aggregate=mean))
+        mRNAData <- data.frame(dcast(meltedData, GROUP ~ PATIENT_NUM))
 
         #When we convert to a data frame the numeric columns get an x in front of them. Remove them here.
         colnames(mRNAData) <- sub("^X", "", colnames(mRNAData))
@@ -146,13 +146,13 @@ zscore.file = "zscores.txt"
     n_remaining_sample <- ncol(mRNAData)
     if (is.null(color.range.clamps)) color.range.clamps = c(min(mRNAData), max(mRNAData))
     if (n_remaining_marker > 1 & n_remaining_sample > 1) {
-        plotHeatmap(mRNAData, colcolor, color.range.clamps, as.numeric(pxPerCell), output.file)
+        plotHeatmap(mRNAData, colcolor, color.range.clamps, output.file)
     } else {
         #Prepare the package to capture the image file.
         CairoPNG(file = paste(output.file, ".png", sep = ""), width = as.numeric(imageWidth),
-                height = as.numeric(imageHeight))
+                height = as.numeric(imageHeight), pointsize = as.numeric(pointsize))
         tmp <- frame()
-        tmp2 <- mtext("not enough markers/samples to draw heatmap", cex = 2)
+        tmp2 <- mtext("not enough marker/samples to draw heatmap", cex = 2)
         print(tmp)
         print(tmp2)
         dev.off()
@@ -162,7 +162,7 @@ zscore.file = "zscores.txt"
     list(mRNAData)
 }
 
-plotHeatmap <- function(data, colcolors, color.range.clamps, pxPerCell, output.file = "Heatmap") {
+plotHeatmap <- function(data, colcolors, color.range.clamps, output.file = "Heatmap") {
     require(Cairo)
     require(gplots)
 
@@ -170,26 +170,17 @@ plotHeatmap <- function(data, colcolors, color.range.clamps, pxPerCell, output.f
     if (onlyOneSubset) { colcolors <- "white" }
 
     # The Cairo graphical backend has a width and height resolution restriction which depends upon environment settings
-    # The number of pixels (width and height) for each boxplot's cell is therefore dependent on the max number of row or column cells
+    # The number of pixels (width and heigth) for each boxplot's cell is therefore dependent on the max number of row or column cells
     # These numbers were found experimentally to generate legible plots, but might need to be further reduced if problems occur
-
     maxDim <- max(dim(data)[1], dim(data)[2])
-    
-    if(pxPerCell < 10) {
-    	if (maxDim < 250) {pxPerCell <- 30}
-    	else if (maxDim < 500) {pxPerCell <- 25}
-    	else if (maxDim < 1000) {pxPerCell <- 20}
-    	else if (maxDim < 2000) {pxPerCell <- 15}
-    	else {pxPerCell <- 10} # less than 10 pixels per cell makes the plot illegible
-    }
-    print(paste('calculated pxPerCell', pxPerCell))
+    if (maxDim < 250) {pxPerCell <- 30}
+    else if (maxDim < 500) {pxPerCell <- 25}
+    else if (maxDim < 1000) {pxPerCell <- 20}
+    else if (maxDim < 2000) {pxPerCell <- 15}
+    else {pxPerCell <- 10} # less than 10 pixels per cell makes the plot illegible
 
-    rowCnt = nrow(data)
-    rowPxPerCell = pxPerCell
-    colCnt = ncol(data)
-    colPxPerCell = pxPerCell
-
-    # all parameters determining the sizes of elements in the heatmap scale with the set pxPerCell (eg. fontsizes, legendsizes)
+    # all paramaters determining the sizes of elements in the heatmap scale with the set pxPerCell (eg. fontsizes, legendsizes)
+    hmPars <- list(pointSize = pxPerCell / 1, labelPointSize = pxPerCell / 9)
 
     # The heatmap is split into a grid for each of its elements to be drawn in (see lmat argument in heatmap.2 function)
     # the heatmap plot is split in 6 columns (left border, rows-dendrogram, rowcolors (not used), heatmap, labelStarts/legends, labelOverflow)
@@ -197,18 +188,16 @@ plotHeatmap <- function(data, colcolors, color.range.clamps, pxPerCell, output.f
     # first, calculate labelOverflow sizes
     letterSizeInCells <- 0.7
     legendSizesInCells <- 20
-    rowLabelSizeMax <- max(0, max(nchar(rownames(data))) - (legendSizesInCells / letterSizeInCells))
-    colLabelSizeMax <- max(0, max(nchar(colnames(data))) - (legendSizesInCells / letterSizeInCells))
-
-    hmPars <- list(pointSize = pxPerCell * letterSizeInCells, labelPointSize = pxPerCell / 9)
+    rowLabelSizeMax <- max(0, max(nchar(colnames(data))) - (legendSizesInCells / letterSizeInCells))
+    colLabelSizeMax <- max(0, max(nchar(rownames(data))) - (legendSizesInCells / letterSizeInCells))
 
     # define the heatmap's grid sizes
+    columnSizes <- c(1, 3, 0, ncol(data), legendSizesInCells, letterSizeInCells * colLabelSizeMax) * pxPerCell
     rowSizes <- c(1, 3, ifelse(onlyOneSubset, 0.5, 3), nrow(data), legendSizesInCells, letterSizeInCells * rowLabelSizeMax) * pxPerCell
-    colSizes <- c(1, 3, 0, ncol(data), legendSizesInCells, letterSizeInCells * colLabelSizeMax) * pxPerCell
+    totalWidth <- sum(columnSizes)
     totalHeight <- sum(rowSizes)
-    totalWidth <- sum(colSizes)
+    hmCanvasColumnRatios <- columnSizes / totalWidth
     hmCanvasRowRatios <- rowSizes / totalHeight
-    hmCanvasColRatios <- colSizes / totalWidth
 
     tryCatch(CairoPNG(file = paste(output.file, ".png", sep=""), width = totalWidth,
                       height = totalHeight, pointsize = hmPars$pointSize, units = "px"),
@@ -239,8 +228,7 @@ plotHeatmap <- function(data, colcolors, color.range.clamps, pxPerCell, output.f
               dendrogram = "none",
               Rowv = NA,
               Colv = NA,
-              density.info = "none", # "histogram", # density.info=c("histogram","density","none")
-#              density.info = "histogram", # "none", # density.info=c("histogram","density","none")
+              density.info = "none", # histogram", # density.info=c("histogram","density","none")
               trace = "none",
               lmat = matrix(ncol = 6, byrow = TRUE, data = c(
                   # 1 is subset column color bar, 2 is heatmap, 3 is row-clustering, 4 is column-clustering, 5 is color histogram (turned off), 6 is custom color legend
@@ -251,16 +239,13 @@ plotHeatmap <- function(data, colcolors, color.range.clamps, pxPerCell, output.f
                   -1, -1, -1, -1,  6, -1,
                   -1, -1, -1, -1, -1, -1)),
               lhei = hmCanvasRowRatios,
-              lwid = hmCanvasColRatios,
+              lwid = hmCanvasColumnRatios,
               key = FALSE,
-# key = TRUE results in error: "figure margins too large"
-#	      key = TRUE,
-#	      keysize = 0.001,
               extrafun = colorLegendPlot)
 
     # generate subset-legend if needed
     if (!onlyOneSubset) {
-        legend(x = sum(hmCanvasColRatios[1:4]), y = 1 - sum(hmCanvasRowRatios[1:2]),
+        legend(x = sum(hmCanvasColumnRatios[1:4]), y = 1 - sum(hmCanvasRowRatios[1:2]),
                legend = c("Subset 1", "Subset 2"),
                fill = c("orange", "yellow"),
                bg = "white", horiz = TRUE,
@@ -277,7 +262,7 @@ function(mRNAData, collapseRow.method, collapseRow.selectFewestMissing, output.f
     meltedData <- melt(mRNAData, id = c("GROUP", "GENE_SYMBOL", "PATIENT_NUM"))
 
     #Cast the data into a format that puts the PATIENT_NUM in a column.
-    castedData <- data.frame(dcast(meltedData, GROUP + GENE_SYMBOL ~ PATIENT_NUM, fun.aggregate=mean))
+    castedData <- data.frame(dcast(meltedData, GROUP + GENE_SYMBOL ~ PATIENT_NUM))
 
     #Create a unique identifier column.
     castedData$UNIQUE_ID <- paste(castedData$GENE_SYMBOL,castedData$GROUP,sep="")
