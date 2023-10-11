@@ -744,7 +744,7 @@ class ConfigService {
                 desc: 'If true, remove the Upload tab from the common header'],
             'ui.tabs.datasetExplorer.xnatViewer.show': [
                 default: false,
-                desc: 'If true, enable the XNAT viewer in the Analyze tab'],
+                desc: 'If true, enable the XNAT viewer in the Analyze tab']
         ]
 
         Map uploadParams = [
