@@ -56,9 +56,6 @@
 			<span>Group by subject (instead of node) for multiple nodes</span>
 		    </div>
 		    <div>
-			<input type="checkbox" id="chkCalculateZscore" name="calculateZscore"/>
-			<span>Calculate z-score on the fly</span>
-		    </div>
 		    <input type="button" value="Run" onClick="heatMapView.submit_job(this.form);" class="runAnalysisBtn"/>
 		</fieldset>
 	    </div>
