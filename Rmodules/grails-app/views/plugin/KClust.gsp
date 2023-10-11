@@ -9,9 +9,9 @@
 
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClustering ?: '/transmartmanual/advanced_workflow.html#k-means-clustering'}">
-		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
-		</a>
+%{--		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.kMeansClustering ?: '/transmartmanual/advanced_workflow.html#k-means-clustering'}">--}%
+%{--		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>--}%
+%{--		</a>--}%
 	    </h2>
 
 	    <form id="analysisForm">
@@ -39,24 +39,11 @@
 			    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
 			</a>
 		    </label>
-		    <input type="text" id="txtMaxDrawNumber"  value="50"/>
-
-		    <label for="txtPixelsPerCell">
-			Pixels per cell:
-			10-50, or empty to calculate size
-			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatPixelsPerCell ?: '/transmartmanual/advanced_workflow.html#pixels-per-cell'}">
-			    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
-			    </a>
-		    </label>
-		    <input type="text" id="txtPixelsPerCell"  value=""/>
+		    <input type="text" id="txtMaxDrawNumber"/>
 
 		</fieldset>
 
 		<fieldset class="toolFields">
-		    <div>
-			<input type="checkbox" id="chkCalculateZscore" name="calculateZscore">
-			<span>Calculate z-score on the fly</span>
-		    </div>
 		    <input type="button" value="Run" onClick="kmeansClustering.submit_job(this.form);" class="runAnalysisBtn">
 		</fieldset>
 
