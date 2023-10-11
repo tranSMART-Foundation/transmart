@@ -42,7 +42,7 @@ ui {
             // Currently, it is only used in special cases
             analysisJobs.show = false
             workspace.hide = false
-	    xnatViewer.show = false
+	      xnatViewer.show = false
         }
     }
     /*
