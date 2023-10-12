@@ -1,9 +1,9 @@
-<h2>
+<%-- <h2>
     DatasetExplorer Comparison Tab
     <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.analyzeComparison ?: '/transmartmanual/analyze.html#defining-the-cohorts'}">
 	<asset:image src="help/helpicon_white.jpg" alt="Help"/>
     </a>
-</h2>
+</h2> --%>
 
 <table id="queryTable" border="0">
 
