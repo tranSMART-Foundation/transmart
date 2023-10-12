@@ -45,6 +45,8 @@ class AnalyzeTabModule extends Module {
         tabGalaxy { $('li#resultsTabPanel__GalaxyPanel') }
         // MetaCore
         tabMetacore { $('li#resultsTabPanel__metacoreEnrichmentPanel') }
+        // genome browser
+        tabDalliance { $('li#resultsTabPanel__dallianceBrowser') }
     }
 
     final static String ANALYZE_TAB_QUERY = 'Comparison'
@@ -59,6 +61,7 @@ class AnalyzeTabModule extends Module {
     final static String ANALYZE_TAB_IMAGE = 'Image View'
     final static String ANALYZE_TAB_GALAXY = 'Galaxy Export'
     final static String ANALYZE_TAB_METACORE = 'MetaCore'
+    final static String ANALYZE_TAB_DALLIANCE = 'Genome Browser'
 
     private List<String> ANALYZE_TABS = []
 
@@ -74,6 +77,8 @@ class AnalyzeTabModule extends Module {
         ANALYZE_TABS.add(ANALYZE_TAB_WORKSPACE)
         ANALYZE_TABS.add(ANALYZE_TAB_IMAGE)
         ANALYZE_TABS.add(ANALYZE_TAB_GALAXY)
+        ANALYZE_TABS.add(ANALYZE_TAB_METACORE)
+        ANALYZE_TABS.add(ANALYZE_TAB_DALLIANCE)
     }
         
 
