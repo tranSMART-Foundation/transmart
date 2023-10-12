@@ -10,9 +10,9 @@
 	    %{--help and title--}%
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.survivalAnalysis ?: '/transmartmanual/advanced_workflow.html#survival-analysis'}">
-		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
-		</a>
+%{--		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.survivalAnalysis ?: '/transmartmanual/advanced_workflow.html#survival-analysis'}">--}%
+%{--		    <asset:image src="help/helpicon_white.jpg" alt="Help"/>--}%
+%{--		</a>--}%
 	    </h2>
 
 	    <form id="analysisForm">

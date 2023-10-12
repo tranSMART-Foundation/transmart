@@ -9,10 +9,10 @@
 
 	    <h2>
 		Variable Selection
-		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatMap ?: '/transmartmanual/advanced_workflow.html#standard-heatmap'}">
- 		    <asset:image src="help/helpicon_white.jpg" alt="Help" border="0"
-				 width="18pt" style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>
-		</a>
+%{--		<a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatMap ?: '/transmartmanual/advanced_workflow.html#standard-heatmap'}">--}%
+%{-- 		    <asset:image src="help/helpicon_white.jpg" alt="Help" border="0"--}%
+%{--				 width="18pt" style="margin-top:1pt;margin-bottom:1pt;margin-right:18pt;"/>--}%
+%{--		</a>--}%
 	    </h2>
 
 	    <div id="analysisForm">
@@ -39,15 +39,6 @@
 		    </label>
 		    <input type="text" id="txtMaxDrawNumber"  value="50"/>
 
-		    <label for="txtPixelsPerCell">
-			Pixels per cell:
-			    10-50, or empty to calculate size
-			    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.heatPixelsPerCell ?: '/transmartmanual/advanced_workflow.html#pixels-per-cell'}">
-			    <asset:image src="help/helpicon_white.jpg" alt="Help"/>
-			    </a>
-		    </label>
-		    <input type="text" id="txtPixelsPerCell"  value=""/>
-
 		</fieldset>
 
 		<fieldset class="toolFields">
@@ -55,7 +46,6 @@
 			<input type="checkbox" id="chkGroupBySubject" name="doGroupBySubject"/>
 			<span>Group by subject (instead of node) for multiple nodes</span>
 		    </div>
-		    <div>
 		    <input type="button" value="Run" onClick="heatMapView.submit_job(this.form);" class="runAnalysisBtn"/>
 		</fieldset>
 	    </div>

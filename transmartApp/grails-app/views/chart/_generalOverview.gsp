@@ -4,9 +4,9 @@
             <td colspan="2" align="center">
 		<div class="analysistitle" id="analysis_title">
                     Summary Statistics
-		    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.analyzeSummary ?: '/transmartmanual/summary_statistics.html'}">
-			<asset:image src="help/helpicon_white.jpg" alt="Help"/>
-		    </a>
+%{--		    <a target="_blank" href="${grailsApplication.config.org.transmartproject.helpUrls.analyzeSummary ?: '/transmartmanual/summary_statistics.html'}">--}%
+%{--			<asset:image src="help/helpicon_white.jpg" alt="Help"/>--}%
+%{--		    </a>--}%
 		</div>
             </td>
 	</tr>
@@ -47,4 +47,3 @@
 	</tr>
     </tbody>
 </table>
-
