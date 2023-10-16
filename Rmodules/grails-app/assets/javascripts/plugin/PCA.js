@@ -73,7 +73,7 @@ PCAView.prototype.get_form_params = function () {
         formParameters['independentVariable'] = inputConceptPathVar;
         formParameters['variablesConceptPaths'] = inputConceptPathVar;
         formParameters['doUseExperimentAsVariable'] = doUseExperimentAsVariable;
-        formParameters['calculateZscore'] = calculateZscore;
+        formParameters['calculateZscore'] = true;
 
         //get analysis constraints
         var constraints_json = this.get_analysis_constraints('PCA');

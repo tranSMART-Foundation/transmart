@@ -75,7 +75,7 @@ MarkerSelectionView.prototype.get_form_params = function () {
         formParameters['variablesConceptPaths'] = inputConceptPathVar;
         formParameters['txtNumberOfMarkers'] = numOfMarkers;
         formParameters['doGroupBySubject'] = doGroupBySubject;
-        formParameters['calculateZscore'] = calculateZscore;
+        formParameters['calculateZscore'] = true;
 
         // get analysis constraints
         var constraints_json = this.get_analysis_constraints('MarkerSelection');
