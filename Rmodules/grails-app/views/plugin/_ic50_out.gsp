@@ -47,9 +47,7 @@
 	    <br/>
 	    <br/>
 
-	    <g:if test="${zipLink}">
-		<a class='AnalysisLink' class='downloadLink' href="${request.getContextPath()}${zipLink}">Download raw R data</a>
-	    </g:if>
+	    <g:render template="/plugin/downloadRawDataLink" />
 	</form>
     </body>
 </html>
