@@ -69,15 +69,23 @@
 	<div align="center" style="clear:both; margin-left:auto; margin-right:auto; text-align:center">
 	    <table style="width:auto; border:0px; text-align:center; margin:auto;" align="center">
 		<tr>
-		    <td style="text-align:center;vertical-align:middle;margin-left:-40px;padding-top:20px;">
-			<g:link controller="RWG"><img src="${cms.image(name: 'transmartlogo.jpg')}" alt="Transmart"/></g:link>
+		    <td style="text-align:center; vertical-align:middle; margin-left:-40px; padding-top:20px;">
+			<g:if test="${grailsApplication.config?.com?.recomdata?.largeLogo}">
+			    <g:link controller="RWG" action="index">
+				<img src="${resource(dir: 'images', file: grailsApplication.config.com.recomdata.largeLogo)}" alt="Transmart"/>
+			    </g:link>
+			</g:if>
+			<g:else>
+			    <g:link controller="RWG" action="index">
+				<img src="${cms.image(name: 'transmartlogo.jpg')}" alt="Transmart"/>
+			    </g:link>
+			</g:else>
 		    </td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
 		<tr>
-		    <td colspan=2 valign="middle" style="text-align:center;vertical-align:middle;border:1px;font-size:11px"
-			nowrap="nowrap">
-			<div style="margin-right:auto;margin-left:auto;width:435px;">
+		    <td colspan=2 valign="middle" style="text-align:center; vertical-align:middle; border:1px; font-size:11px" nowrap="nowrap">
+			<div style="margin-right:auto; margin-left:auto; width:435px;">
 			    <div class="x-box-tl">
 				<div class="x-box-tr">
 				    <div class="x-box-tc">
@@ -97,7 +105,7 @@
 					<form action='${postUrl}' method='POST' id='loginForm' class='cssform'>
 					    <table style="border:0px; text-align:center; width:100%">
 						<tr>
-						    <td style="width: 100px">
+						    <td style="width:100px">
 							<label for='j_username' style="font-weight:bold">Username :</label>
 						    </td>
 						    <td style="white-space:nowrap;" NOWRAP>
@@ -130,9 +138,9 @@
 						<tr>
 						    <td colspan=2 style="text-align:center">
 							<br>
-							    <input type='submit' id='loginButton' value='Login' style="width:100%"/>
-							    <br>
-								<br>
+							<input type='submit' id='loginButton' value='Login' style="width:100%"/>
+							<br>
+							<br>
 						    </td>
 						</tr>
 						<g:if test="${adminEmail}">
@@ -141,7 +149,7 @@
 							    Not a user ? Contact <a
 										     href="mailto:${adminEmail}"
 										     target="_blank"
-										     style="text-decoration:underline;color:#0000FF">administrator</a>
+										     style="text-decoration:underline; color:#0000FF">administrator</a>
 							    to request an account.
 							</td>
 						    </tr>
@@ -169,11 +177,34 @@
 		    </td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
+		<g:set var="transmartSummary" value="${grailsApplication.config?.com?.recomdata?.welcome?.summary}"/>
 		<g:if test="${transmartSummary}">
 		    <tr>
-			<td style="font-weight: bold;text-align:center;color:#CC0000;vertical-align:middle;margin-left:-40px; padding-top: 10px;">
-			    <div style="margin-right:auto;margin-left:auto;width:435px">
-				${transmartSummary}
+			<td colspan=2 style="font-weight:bold; text-align:left; vertical-align:middle; padding-top:10px;">
+			    <div style="margin-right:auto; margin-left:auto; width:80%;">
+				<div class="x-box-tl">
+				    <div class="x-box-tr">
+					<div class="x-box-tc">
+					</div>
+				    </div>
+				</div>
+
+				<div class="x-box-ml">
+				    <div class="x-box-mr">
+					<div class="x-box-mc" style="text-align:left">
+					    <div style="margin-right:auto; margin-left:auto; width:80%;">
+						${transmartSummary}
+					    </div>
+					    ${disclaimer}
+					</div>
+				    </div>
+				</div>
+				<div class="x-box-bl">
+				    <div class="x-box-br">
+					<div class="x-box-bc">
+					</div>
+				    </div>
+				</div>
 			    </div>
 			</td>
 		    </tr>
@@ -181,51 +212,121 @@
 		<tr><td>&nbsp;</td></tr>
 		<g:if test="${disclaimer}">
 		    <tr>
-			<td style="font-weight: bold;text-align:center;color:#CC0000;vertical-align:middle;margin-left:-40px; padding-top: 10px;">
-			    <div style="margin-right:auto;margin-left:auto;width:435px">
-				${disclaimer}
+			<td colspan=2 style="font-weight:bold; text-align:left; color:#CC0000; vertical-align:middle; padding-top:10px;">
+			    <div style="margin-right:auto; margin-left:auto; width:80%;">
+				<div class="x-box-tl">
+				    <div class="x-box-tr">
+					<div class="x-box-tc">
+					</div>
+				    </div>
+				</div>
+				<div class="x-box-ml">
+				    <div class="x-box-mr">
+					<div class="x-box-mc" style="text-align:center; color:#CC0000;">
+					    ${disclaimer}
+					</div>
+				    </div>
+				</div>
+				<div class="x-box-bl">
+				    <div class="x-box-br">
+					<div class="x-box-bc">
+					</div>
+				    </div>
+				</div>
+			    </div>
+			</td>
+		    </tr>
+		</g:if>
+		<g:if test="${grailsApplication?.config?.com?.recomdata?.motd}">
+		    <tr><td colspan=2>&nbsp;</td></tr>
+		    <tr>
+			<td colspan=2 valign="middle" style="text-align:center; vertical-align:middle; border:1px; font-size:11px">
+			    <div style="margin-right:auto; margin-left:auto; width:80%;">
+				<div class="x-box-tl">
+				    <div class="x-box-tr">
+					<div class="x-box-tc">
+					</div>
+				    </div>
+				</div>
+				<div class="x-box-ml">
+				    <div class="x-box-mr">
+					<div class="x-box-mc" style="text-align:left">
+					    <g:if test="${grailsApplication.config.com.recomdata.motd.motd_title}" >
+						<h3 class='motd-title'>
+						    ${grailsApplication.config.com.recomdata.motd.motd_title}
+						</h3>
+					    </g:if>
+					    <g:if test="${grailsApplication.config.com.recomdata.motd.motd_text}" >
+						<div class='motd-text'>
+						    ${grailsApplication.config.com.recomdata.motd.motd_text}
+						</div>
+					    </g:if>
+					    <br />
+					</div>
+				    </div>
+				</div>
+				<div class="x-box-bl">
+				    <div class="x-box-br">
+					<div class="x-box-bc">
+					</div>
+				    </div>
+				</div>
 			    </div>
 			</td>
 		    </tr>
 		</g:if>
 		<tr><td>&nbsp;</td></tr>
-		<tr>
-		    <td style="text-align:center;vertical-align:middle;margin-left:-40px; padding-top: 10px;">
-			<g:set var="projectName" value="${grailsApplication.config?.com?.recomdata?.projectName}"/>
-			<g:set var="projectLogo" value="${grailsApplication.config?.com?.recomdata?.projectLogo}"/>
-			<g:set var="providerName" value="${grailsApplication.config?.com?.recomdata?.providerName}"/>
-			<g:set var="providerLogo" value="${grailsApplication.config?.com?.recomdata?.providerLogo}"/>
-			<g:if test="${projectName}">
-			    <span style="font-size:10px;display: inline-block;line-height: 35px; height: 35px;">Project&nbsp;</span>
-			    <a id="projectpowered" target="_blank"
-			       href="${projectURL}" style="text-decoration: none;">
-				<g:if test="${projectLogo}">
-				    <img src="${projectLogo}" alt="${projectName}"
-					 style="height:35px;vertical-align:middle;margin-bottom: 12px;">
-				</g:if>
-				<g:else>
-				    <span style="font-size:10px;display: inline-block;line-height: 35px; height: 35px;">${projectName}</span>
-				</g:else>
-			    </a>
-			</g:if>
-			<g:if test="${projectName && providerName}">
-			    <span style="font-size:10px;display: inline-block;line-height: 35px; height: 35px;">&nbsp;and&nbsp;</span>
-			</g:if>
-			<g:if test="${providerName}">
-			    <a id="providerpowered" target="_blank" href="${providerUrl}" style="text-decoration: none;">
-				<div>
-				    <span style="font-size:10px;display: inline-block;line-height: 35px; height: 35px;">Powered by&nbsp;</span>
-				    <g:if test="${providerLogo}">
-					<img src="${providerLogo}" alt="${providerName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;">
+		<g:set var="projectName" value="${grailsApplication.config?.com?.recomdata?.projectName}"/>
+		<g:set var="projectLogo" value="${grailsApplication.config?.com?.recomdata?.projectLogo}"/>
+		<g:set var="projectURL" value="${grailsApplication.config?.com?.recomdata?.projectURL}"/>
+		<g:set var="providerName" value="${grailsApplication.config?.com?.recomdata?.providerName}"/>
+		<g:set var="providerLogo" value="${grailsApplication.config?.com?.recomdata?.providerLogo}"/>
+		<g:set var="providerURL" value="${grailsApplication.config?.com?.recomdata?.providerURL}"/>
+
+		<g:if test="${projectName || providerName}">
+		    <tr>
+			<td colspan=2 valign="middle" style="text-align:center; vertical-align:middle; border:1px; font-size:11px">
+			    <div style="margin-right:auto; margin-left:auto; width:80%;">
+				<g:if test="${projectName}">
+				    <g:if test="${projectLogo}">
+					<a id="projectpowered" target="_blank" alt="${projectName}" <g:if test="projectURL">href="${projectURL}"</g:if> style="text-decoration:none;">
+					    <img src="${projectLogo}" style="height:35px; vertical-align:middle; margin-bottom:12px;">
+					</a>
 				    </g:if>
 				    <g:else>
-					<span style="font-size:10px;display: inline-block;line-height: 35px; height: 35px;">${providerName}</span>
+					<a id="projectpowered" target="_blank" <g:if test="projectURL">href="${projectURL}"</g:if> style="text-decoration:none;">
+					    ${projectName}
+					</a>
 				    </g:else>
-				</div>
-			    </a>
-			</g:if>
-		    </td>
-		</tr>
+				</g:if>
+				<g:if test="${projectName && providerName}">
+				    <g:if test="${providerNewline == true}">
+					<br/><br/>
+				    </g:if>
+				    <g:else>
+					<span style="font-size:10px; display:inline-block; line-height:35px; height:35px;">&nbsp;+&nbsp;</span>
+				    </g:else>
+				    <g:if test="${providerNewline == true}">
+					<br/><br/>
+				    </g:if>
+				</g:if>
+				<g:if test="${providerName}">
+				    <g:if test="${providerLogo}">
+					<a id="providerpowered" target="_blank" <g:if test="providerURL">href="${providerURL}"</g:if> style="text-decoration:none;">
+					    <img src="${providerLogo}" alt="${providerName}" style="height:35px; vertical-align:middle; margin-bottom:12px;">
+					</a>
+				    </g:if>
+				    <g:else>
+					<a id="providerpowered" target="_blank" <g:if test="providerURL">href="${providerURL}"</g:if> style="text-decoration:none;">
+					    ${providerName}
+					</a>
+				    </g:else>
+				</g:if>
+				<br />
+			    </div>
+			</td>
+		    </tr>
+		</g:if>
 	    </table>
 	</div>
     </body>
