@@ -22,6 +22,7 @@ def oauthEnabled      = true
 def samlEnabled       = false
 def gwavaEnabled      = false
 def transmartURL      = "http://localhost:${System.getProperty('server.port', '8080')}/transmart"
+def transmartimageURL = "http://localhost:${System.getProperty('server.port', '8080')}/transmartimages"
 
 //Disabling/Enabling UI tabs
 ui {
@@ -152,6 +153,10 @@ com.recomdata.adminEmail = "transmart-discuss@googlegroups.com"
 
 // application title
 com.recomdata.appTitle = "tranSMART v" + org.transmart.originalConfigBinding.appVersion
+
+// message of the day
+com.recomdata.motd.motd_title = "Message of the day."
+com.recomdata.motd.motd_text = "<i>Please pay attention.</i>"
 
 // Location of the help pages. Should be an absolute URL.
 // Currently, these are distribution with transmart,
