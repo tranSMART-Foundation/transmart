@@ -272,23 +272,30 @@ class ConfigService {
             'com.recomdata.smallLogo': [
                 desc: 'Application logo to be used in the search page (path appended to transmart URL)'],
             'com.recomdata.projectName': [
-                desc: 'Project name for welcome/login/query screens'],
+                desc: 'Project name/text for welcome/login/query screens'],
             'com.recomdata.projectLogo': [
                 desc: 'Project logo for welcome/login/query screens'],
             'com.recomdata.projectURL': [
                 desc: 'Project URL for link on welcome/login/query pages'],
             'com.recomdata.providerName': [
-                desc: 'Provider name for welcome/login/query screens'],
+                desc: 'Provider name/text for welcome/login/query screens'],
             'com.recomdata.providerLogo': [
                 desc: 'Provider logo for welcome/login/query screens'],
             'com.recomdata.providerURL': [
                 desc: 'Provider URL for link on welcome/login/query pages'],
+            'com.recomdata.providerNewline': [
+		default: false,
+		desc: 'If true, put provider name/logo below project text/logo'],
             'com.recomdata.skipdisclaimer': [
                 desc: 'If true, do not show the disclaimer text on welcome screen'],
             'com.recomdata.disclaimer': [
                 desc: 'Disclaimer text for welcome screen'],
             'com.recomdata.view.studyview': [
                 desc: 'View to choose for study display'],
+	    'com.recomdata.motd.motd_title': [
+		desc: 'Title for message of the day'],
+	    'com.recomdata.motd.motd_text': [
+		desc: 'Text (HTML) for message of the day'],
 	    'org.transmart.configFine': [
                 desc: 'Set to true on successful startup, last value in Config.groovy'],
 	    'edu.harvard.transmart.googleanalytics.tracking': [
@@ -946,6 +953,9 @@ class ConfigService {
             else if(k == 'com.recomdata.providerName'){addConfig(generalParams,k,v,'')}
             else if(k == 'com.recomdata.providerLogo'){addConfig(generalParams,k,v,'')}
             else if(k == 'com.recomdata.providerURL'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.providerNewline'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.motd.motd_title'){addConfig(generalParams,k,v,'')}
+            else if(k == 'com.recomdata.motd.motd_text'){addConfig(generalParams,k,v,'')}
             else if(k == 'com.recomdata.skipdisclaimer'){addConfig(generalParams,k,v,'')}
             else if(k == 'com.recomdata.disclaimer'){addConfig(generalParams,k,v,'')}
             else if(k == 'com.recomdata.view.studyview'){addConfig(generalParams,k,v,'')}
