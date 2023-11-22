@@ -71,31 +71,33 @@
     <g:set var="providerName" value="${grailsApplication.config?.com?.recomdata?.providerName}"/>
     <g:set var="providerLogo" value="${grailsApplication.config?.com?.recomdata?.providerLogo}"/>
     <g:if test="${projectName}">
-        <a id="projectpowered" target="_blank" href="${grailsApplication.config?.com?.recomdata?.projectURL}"
-           style="text-decoration: none;">
             <g:if test="${projectLogo}">
-                <img src="${projectLogo}" alt="${projectName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+		<a id="projectpowered" target="_blank" href="${grailsApplication.config?.com?.recomdata?.projectURL}"
+		   style="text-decoration: none;">
+                    <img src="${projectLogo}" alt="${projectName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+		</a>
             </g:if>
 	    <g:else>
-                <asset:image src="project_logo.png" alt="${projectName}"
-			     style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+		<a id="projectpowered" target="_blank" href="${projectURL}" style="text-decoration:none;">
+		    ${projectName}
+		</a>
             </g:else>
-	</a>
     </g:if>
     <g:if test="${projectName && providerName}">
         <span style="font-size:20px;display: inline-block;line-height: 35px; height: 35px;">&nbsp;+&nbsp;</span>
     </g:if>
     <g:if test="${providerName}">
-        <a id="providerpowered" target="_blank" href="${grailsApplication.config?.com?.recomdata?.providerURL}"
-           style="text-decoration: none;">
         <g:if test="${providerLogo}">
-	    <img src="${providerLogo}" alt="${providerName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
-        </g:if>
+            <a id="providerpowered" target="_blank" href="${grailsApplication.config?.com?.recomdata?.providerURL}"
+               style="text-decoration: none;">
+		<img src="${providerLogo}" alt="${providerName}" style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+	    </a>
+	</g:if>
 	<g:else>
-	    <asset:image src="provider_logo.png" alt="${providerName}"
-			 style="height:35px;vertical-align:middle;margin-bottom: 12px;" />
+	    <a id="providerpowered" target="_blank" <g:if test="providerURL">href="${providerURL}"</g:if> style="text-decoration:none;">
+		${providerName}
+	    </a>
         </g:else>
-        </a>
     </g:if>
 </div>
 
