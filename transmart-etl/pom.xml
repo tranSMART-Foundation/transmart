@@ -234,7 +234,7 @@
         <groovy.version>2.4.5</groovy.version>
         <opencsv.version>2.3</opencsv.version>
         <ojdbc.version>23.2.0.0</ojdbc.version>
-        <postgresql.jdbc.version>42.6.0</postgresql.jdbc.version>
+        <postgresql.jdbc.version>42.7.2</postgresql.jdbc.version>
         <gmavenProviderSelection>2.0</gmavenProviderSelection>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <main.class>org.transmartproject.pipeline.etl.CommandLineTool</main.class>
