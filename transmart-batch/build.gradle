@@ -28,7 +28,7 @@ dependencies {
     final GUAVA_VERSION = '32.0.1-jre'
     final JUNIT_VERSION = '4.11'
     final GMOCK_VERSION = '0.8.3'
-    final POSTGRESQL_VERSION = '42.6.0'
+    final POSTGRESQL_VERSION = '42.7.2'
     final ORACLE_VERSION = '23.2.0.0'
     final H2_VERSION = '1.4.185'
     final HIBERNATE_VALIDATOR_VERSION = '5.2.2.Final'

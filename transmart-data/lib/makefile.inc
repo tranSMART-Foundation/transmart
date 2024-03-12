@@ -1,11 +1,11 @@
 LIB_DIR          := $(dir $(lastword $(MAKEFILE_LIST)))
 
-# PostgreSQL driver 18-mar-23
+# PostgreSQL driver 21-mar-23
 # https://jdbc.postgresql.org/
 # ----------------------------
 
 JDBC_DL_PSQL     := https://jdbc.postgresql.org/download
-JDBC_DRIVER_PSQL := postgresql-42.6.0.jar
+JDBC_DRIVER_PSQL := postgresql-42.7.2.jar
 
 JDBC_DRIVER_PSQL_PATH := $(LIB_DIR)$(JDBC_DRIVER_PSQL)
 
