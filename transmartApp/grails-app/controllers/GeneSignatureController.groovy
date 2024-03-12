@@ -110,8 +110,10 @@ class GeneSignatureController {
             }
         }
 
-	[user       : securityService.principal(), adminFlag: admin, myItems: myItems, pubItems: pubItems,
-	 myListItems: myListItems, pubListItems: pubListItems, ctMap: ctMap]
+	[user: securityService.principal(), adminFlag: admin,
+	 myItems: myItems, pubItems: pubItems,
+	 myListItems: myListItems, pubListItems: pubListItems,
+	 ctMap: ctMap]
     }
 
     /**
@@ -151,7 +153,8 @@ class GeneSignatureController {
 
 	setSessionWizard new WizardModelDetails(
 	    loggedInUser: securityService.principal(),
-	    geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_EDIT,
+	    geneSigInst: clone,
+	    wizardType: WizardModelDetails.WIZ_TYPE_EDIT,
 	    editId: geneSig.id)
 
 	redirect action: 'edit1', params: ["id": geneSig.id, "page": 1]
@@ -162,8 +165,10 @@ class GeneSignatureController {
      */
     def cloneWizard(GeneSignature geneSig) {
 
-	GeneSignature clone = geneSig.clone()
-	clone.createdByAuthUser = AuthUser.load(securityService.currentUserId())
+	AuthUser user = AuthUser.get(securityService.currentUserId())
+	GeneSignature clone = geneSignatureService.doClone(geneSig)
+
+	clone.createdByAuthUser = user
         clone.modifiedByAuthUser = null
 	clone.name += ' (clone)'
 	clone.description += ' (clone)'
@@ -176,12 +181,15 @@ class GeneSignatureController {
 	if (clone.experimentTypeCellLineId == null) {
 	    clone.experimentTypeCellLine = null
 	}
-        // this is hack, don't know how to get around this!
+
+        // this is a hack, don't know how to get around this!
 
 	setSessionWizard new WizardModelDetails(
 	    loggedInUser: securityService.principal(),
-	    geneSigInst: clone, wizardType: WizardModelDetails.WIZ_TYPE_CLONE,
+	    geneSigInst: clone,
+	    wizardType: WizardModelDetails.WIZ_TYPE_CLONE,
 	    cloneId: geneSig.id)
+
 
 	redirect action: 'create1'
     }
@@ -814,7 +822,9 @@ class GeneSignatureController {
      */
     def downloadGMT(String id) {
 	String content = geneSignatureService.getGeneSigGMTContent(id)
-	String fileName = 'gene_sig_' + content?.substring(0, content?.indexOf('\t'))?.replace('-', '') + '.gmt'
+	String name = geneSignatureService.getGeneSigName(id)
+	String fileName = 'gene_sig_' + name.replace('-', '').replace(' ','') + '.gmt'
+
 	utilService.sendDownload response, 'application/vnd.gmt', fileName, content.bytes
     }
 

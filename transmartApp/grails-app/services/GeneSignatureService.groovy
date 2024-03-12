@@ -306,6 +306,15 @@ class GeneSignatureService {
      * mark specified instance public to user community
      */
     @Transactional
+    GeneSignature doClone(GeneSignature gs) {
+	GeneSignature clone = gs.clone()
+	clone
+    }
+
+    /**
+     * mark specified instance public to user community
+     */
+    @Transactional
     void makePublic(GeneSignature gs, boolean publicFlag) {
         gs.publicFlag = publicFlag
 	GeneSignature savedInst = gs.save()
@@ -469,7 +478,6 @@ class GeneSignatureService {
 		gs.addToGeneSigItems it
 	    }
         }
-
         // set AuthUser
         if (!gs.createdByAuthUser) {
 	    gs.createdByAuthUser = AuthUser.load(securityService.currentUserId())
@@ -481,7 +489,7 @@ class GeneSignatureService {
         // save gs, items, and search link
 	GeneSignature savedInst
 	savedInst = gs.save(flush: true)
-	
+
         if (!savedInst) {
 	    logger.error 'ERROR saving GeneSignature'
 	    gs.errors.allErrors.each {
@@ -493,8 +501,11 @@ class GeneSignatureService {
 	GeneSignature nsave = savedInst
 	if (!savedInst.uniqueId) {
 	    // need to refresh this object
-            if(domainKey == GeneSignature.DOMAIN_KEY_GL) {savedInst.updateUniqueIdList()}
-	    else{savedInst.updateUniqueId()}
+            if(domainKey == GeneSignature.DOMAIN_KEY_GL) {
+		savedInst.updateUniqueIdList()
+	    } else {
+		savedInst.updateUniqueId()
+	    }
         }
 
         // link objects to search
@@ -769,6 +780,11 @@ class GeneSignatureService {
 	}
 
 	countMap
+    }
+
+    String getGeneSigName(String geneSigId) {
+	GeneSignature gs = GeneSignature.get(geneSigId)
+	gs?.name ?: geneSigId
     }
 
     String getGeneSigGMTContent(String geneSigId) {
