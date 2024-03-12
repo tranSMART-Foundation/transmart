@@ -181,7 +181,7 @@
 		<g:if test="${transmartSummary}">
 		    <tr>
 			<td colspan=2 style="font-weight:bold; text-align:left; vertical-align:middle; padding-top:10px;">
-			    <div style="margin-right:auto; margin-left:auto; width:80%;">
+			    <div style="margin-right:auto; margin-left:auto; width:60%;">
 				<div class="x-box-tl">
 				    <div class="x-box-tr">
 					<div class="x-box-tc">
@@ -192,9 +192,9 @@
 				<div class="x-box-ml">
 				    <div class="x-box-mr">
 					<div class="x-box-mc" style="text-align:left">
-					    <div style="margin-right:auto; margin-left:auto; width:80%;">
-						${transmartSummary}
-					    </div>
+					    ${transmartSummary}
+					</div>
+					<div class="x-box-mc" style="text-align:left">
 					    ${disclaimer}
 					</div>
 				    </div>
@@ -213,7 +213,7 @@
 		<g:if test="${disclaimer}">
 		    <tr>
 			<td colspan=2 style="font-weight:bold; text-align:left; color:#CC0000; vertical-align:middle; padding-top:10px;">
-			    <div style="margin-right:auto; margin-left:auto; width:80%;">
+			    <div style="margin-right:auto; margin-left:auto; width:60%;">
 				<div class="x-box-tl">
 				    <div class="x-box-tr">
 					<div class="x-box-tc">
@@ -241,7 +241,7 @@
 		    <tr><td colspan=2>&nbsp;</td></tr>
 		    <tr>
 			<td colspan=2 valign="middle" style="text-align:center; vertical-align:middle; border:1px; font-size:11px">
-			    <div style="margin-right:auto; margin-left:auto; width:80%;">
+			    <div style="margin-right:auto; margin-left:auto; width:60%;">
 				<div class="x-box-tl">
 				    <div class="x-box-tr">
 					<div class="x-box-tc">
@@ -286,7 +286,7 @@
 		<g:if test="${projectName || providerName}">
 		    <tr>
 			<td colspan=2 valign="middle" style="text-align:center; vertical-align:middle; border:1px; font-size:11px">
-			    <div style="margin-right:auto; margin-left:auto; width:80%;">
+			    <div style="margin-right:auto; margin-left:auto; width:60%;">
 				<g:if test="${projectName}">
 				    <g:if test="${projectLogo}">
 					<a id="projectpowered" target="_blank" alt="${projectName}" <g:if test="projectURL">href="${projectURL}"</g:if> style="text-decoration:none;">

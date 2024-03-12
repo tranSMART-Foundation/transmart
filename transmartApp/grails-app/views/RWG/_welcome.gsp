@@ -1,6 +1,6 @@
 <div style="text-align:center;">
     <div class="welcome"
-         style="margin:40px auto; background:#F4F4F4; border:1px solid #DDD; padding:20px; width:80%; text-align:center; border-top-left-radius:20px; border-bottom-right-radius:20px">
+         style="margin:40px auto; background:#F4F4F4; border:1px solid #DDD; padding:20px; width:60%; text-align:center; border-top-left-radius:20px; border-bottom-right-radius:20px">
         <g:set var="transmartIntro" value="${grailsApplication.config?.com?.recomdata?.welcome?.intro}"/>
         <g:set var="transmartSummary" value="${grailsApplication.config?.com?.recomdata?.welcome?.summary}"/>
         <g:set var="projectName" value="${grailsApplication.config?.com?.recomdata?.projectName}"/>
@@ -37,7 +37,7 @@
 
     <g:if test='${grailsApplication?.config?.com?.recomdata?.guestAutoLogin}'>
 	<g:if test='${grailsApplication?.config?.com?.recomdata?.motd}'>
-	    <div style="margin-right:auto; margin-left:auto; width:80%;">
+	    <div style="margin-right:auto; margin-left:auto; width:60%;">
 		<div class="x-box-tl">
 		    <div class="x-box-tr">
 			<div class="x-box-tc">
